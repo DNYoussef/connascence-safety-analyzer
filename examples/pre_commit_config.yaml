@@ -1,0 +1,64 @@
+# .pre-commit-config.yaml
+# Pre-commit configuration for connascence detection
+
+repos:
+  # Standard pre-commit hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+
+  # Ruff linting with connascence rules
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.1.6
+    hooks:
+      - id: ruff
+        name: Ruff Connascence Rules
+        args: [--config=connascence/config/enhanced-ruff-config.toml]
+        
+      - id: ruff
+        name: Ruff Magic Literal Rules  
+        args: [--config=connascence/config/ruff_magic_literal_rules.toml]
+
+  # Custom connascence detection hooks
+  - repo: local
+    hooks:
+      # Main connascence detector
+      - id: connascence-check
+        name: Connascence Violation Check
+        entry: python connascence/src/check_connascence.py
+        language: system
+        files: '\.py$'
+        args: ['--severity', 'high']
+        pass_filenames: false
+        
+      # Magic literal detector
+      - id: magic-literal-check
+        name: Magic Literal Check
+        entry: python connascence/scripts/magic-literal-detector.py
+        language: system
+        files: '\.py$'
+        args: ['--threshold', '20.0', '--severity', 'medium']
+        pass_filenames: false
+        
+      # God object detector
+      - id: god-object-check
+        name: God Object Check
+        entry: python connascence/scripts/god_object_detector.py
+        language: system
+        files: '\.py$'
+        pass_filenames: false
+
+  # Optional: Run tests to ensure connascence compliance
+  - repo: local
+    hooks:
+      - id: connascence-test-compliance
+        name: Test Connascence Compliance
+        entry: python -m pytest connascence/tests/test_connascence_compliance.py -v
+        language: system
+        files: '\.py$'
+        pass_filenames: false
+        stages: [push]  # Only run on push, not every commit

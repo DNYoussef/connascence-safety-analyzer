@@ -1,0 +1,125 @@
+# Experimental Policy - Relaxed Rules for Prototypes and R&D
+name: experimental
+description: "Relaxed policy for prototypes, experiments, and rapid development"
+version: "1.0.0"
+
+# Threshold Configuration (relaxed)
+thresholds:
+  max_positional_params: 6
+  max_function_params: 12
+  god_class_methods: 40
+  god_class_lines: 1000
+  god_function_lines: 100
+  max_cyclomatic_complexity: 20
+  max_nesting_depth: 6
+  max_return_statements: 8
+  max_magic_literals_per_function: 15
+  max_magic_literals_per_file: 50
+  magic_literal_density_threshold: 0.60  # 60%
+  max_global_variables: 15
+  max_global_mutations: 10
+  min_duplicate_lines: 10
+  similarity_threshold: 0.75
+
+# Weight Configuration (lighter penalties)
+weights:
+  type_weights:
+    CoN: 0.5
+    CoT: 1
+    CoM: 1
+    CoP: 2
+    CoA: 2
+    CoE: 3
+    CoTi: 4
+    CoV: 3
+    CoI: 5
+  
+  locality_multipliers:
+    same_function: 0.5
+    same_class: 1.0
+    same_module: 1.5
+    cross_module: 2.0
+  
+  directory_multipliers:
+    core_paths: ["/experimental", "/prototype", "/poc", "/research"]
+    core_multiplier: 0.5
+    test_multiplier: 0.1
+    config_multiplier: 0.3
+    experimental_multiplier: 0.1
+
+# Analysis Configuration (minimal)
+enabled_analyzers:
+  - ast_static
+  # Framework awareness and runtime analysis disabled
+
+# Budget Limits (very generous)
+budget_limits:
+  CoM: 50     # Lots of magic literals allowed
+  CoP: 30     # Many position issues
+  CoA: 20     # Algorithm duplication OK
+  CoE: 15     # Execution order less strict
+  CoTi: 10    # Some timing OK for prototypes
+  CoV: 25     # Value coupling OK
+  CoI: 10     # Identity coupling more lenient
+  
+  critical: 10
+  high: 30
+  medium: 100
+  low: 200
+  
+  total_violations: 300
+  total_weight: 500.0
+
+# Quality Gates (very relaxed)
+quality_gates:
+  no_critical_violations: false
+  no_god_objects: false
+  no_timing_dependencies: false
+  no_identity_coupling: false
+  
+  max_high_severity_per_file: 20
+  max_complexity_average: 25.0
+  min_test_coverage: 0.30  # Only 30% coverage required
+
+# Framework Profiles (permissive)
+framework_profiles:
+  jupyter:
+    allow_all_magic_literals: true
+    allow_global_state: true
+  
+  research:
+    allow_god_objects: true
+    allow_complex_functions: true
+    
+  prototype:
+    skip_type_checking: true
+    allow_quick_hacks: true
+
+# Waiver Configuration (flexible)
+waiver_policy:
+  max_duration_days: 180    # 6-month waivers
+  require_owner: false      # No owner required
+  require_rationale: false  # No rationale required
+  auto_alert_before_expiry: 30
+
+# Baseline Policy (tracking only)
+baseline_policy:
+  track_trends: true
+  ratcheting: false         # No ratcheting enforcement
+  snapshot_frequency: "quarterly"
+  retention_period: "1 year"
+
+# Reporting (minimal)
+reporting:
+  include_context: false
+  include_suggestions: false
+  group_by_locality: false
+  show_trends: true         # Still useful to see trends
+  format_for_pr_comments: false
+
+# Special Rules for Experimental Code
+special_rules:
+  allow_notebook_style: true
+  skip_documentation_requirements: true
+  allow_exploratory_patterns: true
+  suppress_duplicate_warnings: true

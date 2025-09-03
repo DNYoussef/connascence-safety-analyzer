@@ -1,0 +1,4 @@
+cryptography
+pyjwt
+ldap3
+psycopg2

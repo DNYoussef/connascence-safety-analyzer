@@ -1,0 +1,15 @@
+{
+  "demo": "curl",
+  "description": "C NASA/JPL Safety Profile - Power of Ten compliance",
+  "proof_points": [
+    "Evidence-based",
+    "NASA compliance",
+    "Safety automation"
+  ],
+  "execution_time": "0.08s",
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "Traceback (most recent call last):\n  File \"C:\\Users\\17175\\Desktop\\connascence\\sales\\demos\\curl\\demo_curl.py\", line 592, in <module>\n    main()\n  File \"C:\\Users\\17175\\Desktop\\connascence\\sales\\demos\\curl\\demo_curl.py\", line 589, in main\n    demo.run_complete_demo()\n  File \"C:\\Users\\17175\\Desktop\\connascence\\sales\\demos\\curl\\demo_curl.py\", line 550, in run_complete_demo\n    print(\"\\U0001f6e1\\ufe0f  Starting curl NASA/JPL Safety Demo\")\n  File \"C:\\Python312\\Lib\\encodings\\cp1252.py\", line 19, in encode\n    return codecs.charmap_encode(input,self.errors,encoding_table)[0]\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nUnicodeEncodeError: 'charmap' codec can't encode characters in position 0-1: character maps to <undefined>\n",
+  "timestamp": "2025-09-03 00:17:46",
+  "status": "COMPLETED_WITH_MOCKS"
+}

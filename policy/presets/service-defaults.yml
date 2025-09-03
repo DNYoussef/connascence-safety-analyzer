@@ -1,0 +1,123 @@
+# Service Defaults Policy - Balanced Quality for Typical Microservices
+name: service-defaults
+description: "Balanced policy for typical microservices and applications"
+version: "1.0.0"
+
+# Threshold Configuration (standard defaults)
+thresholds:
+  max_positional_params: 3
+  max_function_params: 7
+  god_class_methods: 20
+  god_class_lines: 500
+  god_function_lines: 50
+  max_cyclomatic_complexity: 10
+  max_nesting_depth: 4
+  max_return_statements: 5
+  max_magic_literals_per_function: 5
+  max_magic_literals_per_file: 20
+  magic_literal_density_threshold: 0.25  # 25%
+  max_global_variables: 5
+  max_global_mutations: 3
+  min_duplicate_lines: 6
+  similarity_threshold: 0.85
+
+# Weight Configuration (balanced)
+weights:
+  type_weights:
+    CoN: 1
+    CoT: 2
+    CoM: 3
+    CoP: 4
+    CoA: 5
+    CoE: 6
+    CoTi: 8
+    CoV: 7
+    CoI: 9
+  
+  locality_multipliers:
+    same_function: 1.0
+    same_class: 2.0
+    same_module: 3.0
+    cross_module: 5.0
+  
+  directory_multipliers:
+    core_paths: ["/src", "/app", "/lib"]
+    core_multiplier: 2.0
+    test_multiplier: 0.5
+    config_multiplier: 0.7
+    experimental_multiplier: 0.3
+
+# Analysis Configuration
+enabled_analyzers:
+  - ast_static
+  - framework_aware
+  - duplicate_detection
+  # Runtime analysis disabled by default
+
+# Budget Limits (per-PR)
+budget_limits:
+  CoM: 15    # Magic literals
+  CoP: 10    # Position issues
+  CoA: 8     # Algorithm duplication
+  CoE: 5     # Execution order
+  CoTi: 2    # Timing issues
+  CoV: 8     # Value coupling
+  CoI: 3     # Identity coupling
+  
+  critical: 1
+  high: 8
+  medium: 20
+  low: 40
+  
+  total_violations: 75
+  total_weight: 150.0
+
+# Quality Gates (relaxed)
+quality_gates:
+  no_critical_violations: false  # Allow some critical with waivers
+  no_god_objects: false
+  no_timing_dependencies: false
+  no_identity_coupling: false
+  
+  max_high_severity_per_file: 5
+  max_complexity_average: 12.0
+  min_test_coverage: 0.70  # 70% coverage
+
+# Framework Profiles
+framework_profiles:
+  fastapi:
+    allow_many_params: ["Depends", "Query", "Path", "Body", "Header"]
+    allow_magic_literals: ["status_code", "response_model"]
+  
+  django:
+    allow_magic_literals: ["null=True", "blank=True", "max_length", "default"]
+    allow_many_params: ["request", "args", "kwargs"]
+    
+  flask:
+    allow_magic_literals: ["methods", "endpoint"]
+  
+  pytest:
+    relaxed_in_tests: true
+    allow_magic_literals: ["parametrize", "fixture"]
+
+# Waiver Configuration
+waiver_policy:
+  max_duration_days: 90
+  require_owner: true
+  require_rationale: true
+  auto_alert_before_expiry: 14
+
+# Baseline Policy
+baseline_policy:
+  track_trends: true
+  ratcheting: true
+  snapshot_frequency: "monthly"
+  retention_period: "3 months"
+
+# Reporting
+reporting:
+  include_context: true
+  include_suggestions: true
+  group_by_locality: false
+  show_trends: false
+  format_for_pr_comments: true

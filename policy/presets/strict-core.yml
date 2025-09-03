@@ -1,0 +1,135 @@
+# Strict Core Policy - Maximum Quality for Business Logic
+name: strict-core
+description: "Ultra-strict policy for core business logic and critical paths"
+version: "1.0.0"
+
+# Threshold Configuration
+thresholds:
+  # Position constraints (stricter)
+  max_positional_params: 2
+  max_function_params: 5
+  
+  # Size constraints (stricter)  
+  god_class_methods: 15
+  god_class_lines: 300
+  god_function_lines: 30
+  
+  # Complexity constraints (stricter)
+  max_cyclomatic_complexity: 8
+  max_nesting_depth: 3
+  max_return_statements: 3
+  
+  # Magic literal constraints (stricter)
+  max_magic_literals_per_function: 2
+  max_magic_literals_per_file: 10
+  magic_literal_density_threshold: 0.15  # 15%
+  
+  # Global state (stricter)
+  max_global_variables: 2
+  max_global_mutations: 1
+  
+  # Duplication (stricter)
+  min_duplicate_lines: 4
+  similarity_threshold: 0.9
+
+# Weight Configuration
+weights:
+  type_weights:
+    CoN: 2    # Name connascence weighted higher
+    CoT: 3    # Type issues more critical
+    CoM: 4    # Magic literals heavily penalized
+    CoP: 5    # Position issues very serious
+    CoA: 6    # Algorithm duplication critical
+    CoE: 8    # Execution order critical
+    CoTi: 10  # Timing issues extremely serious
+    CoV: 7    # Value coupling serious
+    CoI: 12   # Identity coupling most serious
+  
+  locality_multipliers:
+    same_function: 1.0
+    same_class: 2.5
+    same_module: 4.0
+    cross_module: 10.0  # Cross-module issues heavily penalized
+  
+  directory_multipliers:
+    core_paths: ["/core", "/src", "/business", "/domain"]
+    core_multiplier: 5.0     # Core code heavily weighted
+    test_multiplier: 0.2     # Tests lightly weighted
+    config_multiplier: 0.5
+    experimental_multiplier: 0.1
+
+# Analysis Configuration
+enabled_analyzers:
+  - ast_static
+  - runtime_probe   # Enable runtime analysis for core code
+  - framework_aware
+  - duplicate_detection
+
+# Budget Limits (per-PR maximums)
+budget_limits:
+  # By connascence type
+  CoM: 3     # Max 3 new magic literals per PR
+  CoP: 2     # Max 2 new position violations per PR  
+  CoA: 1     # Max 1 new algorithm duplication per PR
+  CoE: 0     # No new execution order issues
+  CoTi: 0    # No new timing dependencies
+  CoI: 0     # No new identity coupling
+  
+  # By severity
+  critical: 0    # No new critical issues
+  high: 2        # Max 2 new high-severity issues
+  medium: 5      # Max 5 new medium-severity issues
+  low: 10        # Max 10 new low-severity issues
+  
+  # Total limits
+  total_violations: 15
+  total_weight: 50.0
+
+# Quality Gates
+quality_gates:
+  # Absolute requirements
+  no_critical_violations: true
+  no_god_objects: true
+  no_timing_dependencies: true
+  no_identity_coupling: true
+  
+  # Relative requirements  
+  max_high_severity_per_file: 2
+  max_complexity_average: 6.0
+  min_test_coverage: 0.90  # 90% coverage required
+
+# Framework-Specific Rules
+framework_profiles:
+  fastapi:
+    # Allow dependency injection patterns
+    allow_many_params: ["Depends", "Query", "Path", "Body"]
+  
+  django:
+    # Django-specific exceptions
+    allow_magic_literals: ["null=True", "blank=True", "max_length"]
+    
+  pytest:
+    # Test-specific relaxations
+    relaxed_in_tests: true
+
+# Waiver Configuration  
+waiver_policy:
+  max_duration_days: 30      # Waivers expire after 30 days
+  require_owner: true        # Must specify owner
+  require_rationale: true    # Must provide justification
+  auto_alert_before_expiry: 7  # Alert 7 days before expiration
+
+# Baseline Policy
+baseline_policy:
+  track_trends: true
+  ratcheting: true          # Only new violations fail
+  snapshot_frequency: "weekly"
+  retention_period: "6 months"
+
+# Reporting Configuration
+reporting:
+  include_context: true
+  include_suggestions: true
+  group_by_locality: true
+  show_trends: true
+  format_for_pr_comments: true

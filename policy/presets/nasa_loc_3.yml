@@ -1,0 +1,171 @@
+# NASA/JPL Level of Control 3 (LOC-3) - Important Functions  
+#
+# LOC-3 represents important software functions where failures would:
+# - Degrade mission performance but not cause total loss
+# - Require workarounds or backup systems activation
+# - Impact secondary objectives but not primary mission goals
+# 
+# This is the most practical NASA profile for most development teams
+
+name: "NASA LOC-3 Important Functions"
+version: "1.0.0"
+description: "Level of Control 3 - Important software with managed fault tolerance"
+inherit: "nasa_jpl_pot10"
+
+# LOC-3 Balanced Approach - Strict but Practical
+budgets:
+  critical: 0           # Still no critical violations
+  high: 5              # Allow some high violations with justification
+  medium: 20           # Reasonable medium violations
+  low: 50              # More flexibility for low violations
+  
+  # NASA rule violations still restricted but not zero
+  nasa_rule_violations: 3  # Allow few violations with waivers
+  heap_after_init: 2       # Some dynamic allocation allowed
+  unbounded_loops: 1       # Server/daemon loops allowed
+  goto_usage: 0           # Still forbidden
+  missing_assertions: 5    # Some functions may not need assertions
+  unchecked_returns: 3     # Allow some with explicit void casting
+
+# Practical Thresholds - Based on Industry Standards
+thresholds:
+  max_positional_params: 4    # Standard limit
+  max_cyclomatic_complexity: 12  # Reasonable complexity
+  god_class_methods: 20       # Allow larger classes when justified
+  god_class_loc: 400          # Practical class size
+  max_function_length: 80     # Slightly more than NASA base rule
+  max_method_parameters: 5
+  max_nesting_depth: 4        # Allow reasonable nesting
+  max_file_length: 1000       # Reasonable file sizes
+  magic_literal_threshold: 2   # Allow some magic numbers with context
+
+# LOC-3 Specific Adaptations
+loc_3_rules:
+  pragmatic_safety:
+    allow_controlled_heap_use: true      # With proper cleanup
+    allow_server_loops: true             # Main event loops OK
+    allow_reasonable_complexity: true    # Up to threshold limits
+    severity: "high"  # Instead of critical
+    
+  error_handling:
+    require_error_propagation: true
+    allow_graceful_degradation: true
+    require_logging_on_errors: true
+    allow_retry_mechanisms: true
+    severity: "high"
+    
+  resource_management:
+    allow_dynamic_allocation_with_limits: true
+    max_heap_usage: "10MB"               # Reasonable limit
+    require_resource_cleanup: true
+    allow_reference_counting: true
+    severity: "medium"
+    
+  testing_requirements:
+    require_unit_tests: true
+    require_integration_tests: true
+    target_coverage: 85                  # Not 100% required
+    require_performance_tests: true
+
+# More Flexible Waiver System
+waivers:
+  expiry_days: 30             # Standard sprint duration
+  require_tech_lead_approval: true
+  require_peer_review: true
+  allowed_categories:
+    - "false_positive"
+    - "legacy_compatibility"
+    - "performance_requirement"
+    - "third_party_constraint"
+    - "prototype_code"
+  max_active_waivers: 15      # More reasonable limit
+  require_mitigation_plan: true
+  require_documentation: true
+
+# Framework-Specific Allowances
+framework_exceptions:
+  web_frameworks:
+    - "allow_request_response_loops"
+    - "allow_json_dynamic_parsing"
+    - "allow_database_connections"
+    
+  test_frameworks:
+    - "allow_test_helper_complexity"
+    - "allow_mock_object_patterns"
+    - "allow_test_data_magic_numbers"
+    
+  logging_frameworks:
+    - "allow_printf_family_usage"
+    - "allow_string_formatting"
+    
+  configuration_management:
+    - "allow_config_file_parsing"
+    - "allow_environment_variable_reading"
+
+# Language-Specific Practical Adaptations
+language_profiles:
+  python:
+    profile: "modern_practical"
+    adaptations:
+      - "allow_list_comprehensions"      # Even if complex
+      - "allow_generator_expressions"
+      - "allow_context_managers"         # with statements
+      - "allow_duck_typing"              # When type hints present
+      - "recursion_with_sys_setrecursionlimit"
+      
+  javascript:
+    profile: "modern_practical" 
+    adaptations:
+      - "allow_promise_chains"
+      - "allow_async_await_patterns"
+      - "allow_callback_patterns"
+      - "allow_event_driven_architecture"
+      
+  java:
+    profile: "enterprise_practical"
+    adaptations:
+      - "allow_spring_framework_patterns"
+      - "allow_reflection_for_frameworks"
+      - "allow_annotation_processing"
+      - "allow_lambda_expressions"
+
+# Integration with Modern Development Practices
+modern_practices:
+  ci_cd_integration:
+    allow_build_script_complexity: true
+    allow_deployment_automation: true
+    require_automated_testing: true
+    
+  containerization:
+    allow_dockerfile_flexibility: true
+    allow_configuration_injection: true
+    
+  cloud_native:
+    allow_service_discovery_patterns: true
+    allow_circuit_breaker_patterns: true
+    allow_retry_with_backoff: true
+
+# Refactoring Guidance - Practical Techniques
+refactoring_techniques:
+  prioritize_by_impact:
+    high_impact: ["Extract Method", "Replace Magic Number"]
+    medium_impact: ["Introduce Parameter Object", "Extract Class"]
+    low_impact: ["Rename Method", "Move Method"]
+    
+  modernization_allowed:
+    - "factory_patterns_for_object_creation"
+    - "strategy_pattern_for_algorithms"
+    - "observer_pattern_for_notifications"
+    - "dependency_injection"
+
+# Documentation - Practical Requirements
+documentation:
+  require_api_documentation: true
+  require_architectural_decisions: true
+  require_security_considerations: true
+  suggest_performance_notes: true
+  require_maintenance_instructions: true
+
+# This LOC-3 profile balances NASA safety principles with practical development
+# It maintains the core safety concepts while allowing modern software patterns
+# Most development teams should start here and adjust based on their risk profile

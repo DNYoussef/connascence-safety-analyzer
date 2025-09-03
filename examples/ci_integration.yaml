@@ -1,0 +1,102 @@
+# GitHub Actions CI Integration for Connascence Detection
+# Add this to .github/workflows/connascence-check.yml
+
+name: Connascence Quality Gate
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  connascence-analysis:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install ast networkx radon pytest
+        
+    - name: Run Connascence Analysis
+      run: |
+        # Run main connascence detector
+        python connascence/src/check_connascence.py . \
+          --severity high \
+          --format json \
+          --output connascence-report.json
+        
+        # Run magic literal detection
+        python connascence/scripts/magic-literal-detector.py . \
+          --threshold 20.0 \
+          --json > magic-literals-report.json
+        
+        # Run architectural analysis
+        python connascence/src/architectural_analysis.py \
+          --project-root . \
+          --output-format json
+          
+    - name: Upload Connascence Reports
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: connascence-reports
+        path: |
+          connascence-report.json
+          magic-literals-report.json
+          reports/architecture/
+          
+    - name: Validate Quality Gates
+      run: |
+        # Check if critical violations exist
+        if [ -s connascence-report.json ]; then
+          echo "Checking for critical violations..."
+          critical_count=$(python -c "
+          import json
+          with open('connascence-report.json') as f:
+              data = json.load(f)
+          print(sum(1 for v in data if v.get('severity') == 'critical'))
+          ")
+          
+          if [ "$critical_count" -gt 0 ]; then
+            echo "❌ Found $critical_count critical connascence violations!"
+            echo "::error::Critical connascence violations must be fixed before merge"
+            exit 1
+          fi
+        fi
+        
+        echo "✅ Connascence quality gates passed!"
+
+  ruff-connascence-lint:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install Ruff
+      run: |
+        python -m pip install --upgrade pip
+        pip install ruff
+        
+    - name: Run Ruff with Connascence Rules
+      run: |
+        # Use the enhanced ruff configuration for connascence detection
+        ruff check . --config connascence/config/enhanced-ruff-config.toml
+        
+    - name: Run Ruff Magic Literal Rules
+      run: |
+        # Use specific magic literal rules
+        ruff check . --config connascence/config/ruff_magic_literal_rules.toml

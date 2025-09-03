@@ -1,0 +1,4 @@
+tree-sitter
+click
+pyyaml
+jinja2

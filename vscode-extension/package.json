@@ -1,0 +1,171 @@
+{
+  "name": "connascence-safety-analyzer",
+  "displayName": "Connascence Safety Analyzer",
+  "description": "Enterprise-grade code analysis with NASA/JPL safety compliance and grammar-enhanced refactoring",
+  "version": "1.0.0",
+  "publisher": "connascence-systems",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Linters",
+    "Code Quality",
+    "Security",
+    "Refactoring"
+  ],
+  "keywords": [
+    "connascence",
+    "code quality",
+    "nasa",
+    "jpl",
+    "safety",
+    "refactoring",
+    "grammar",
+    "ast"
+  ],
+  "activationEvents": [
+    "onLanguage:python",
+    "onLanguage:c",
+    "onLanguage:cpp",
+    "onLanguage:javascript",
+    "onLanguage:typescript"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "connascence.analyzeFile",
+        "title": "Analyze File",
+        "category": "Connascence"
+      },
+      {
+        "command": "connascence.analyzeWorkspace",
+        "title": "Analyze Workspace",
+        "category": "Connascence"
+      },
+      {
+        "command": "connascence.validateSafety",
+        "title": "Validate NASA/JPL Safety",
+        "category": "Connascence"
+      },
+      {
+        "command": "connascence.suggestRefactoring",
+        "title": "Suggest Refactoring",
+        "category": "Connascence"
+      },
+      {
+        "command": "connascence.applyAutofix",
+        "title": "Apply Safe Autofix",
+        "category": "Connascence"
+      },
+      {
+        "command": "connascence.generateReport",
+        "title": "Generate Quality Report",
+        "category": "Connascence"
+      },
+      {
+        "command": "connascence.toggleSafetyProfile",
+        "title": "Toggle Safety Profile",
+        "category": "Connascence"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "connascence.analyzeFile",
+          "when": "editorHasSelection",
+          "group": "connascence"
+        },
+        {
+          "command": "connascence.suggestRefactoring",
+          "when": "editorHasSelection",
+          "group": "connascence"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "connascence.analyzeFile",
+          "when": "resourceExtname == .py || resourceExtname == .c || resourceExtname == .cpp",
+          "group": "connascence"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Connascence Safety Analyzer",
+      "properties": {
+        "connascence.safetyProfile": {
+          "type": "string",
+          "enum": ["none", "nasa_jpl_pot10", "nasa_loc_1", "nasa_loc_3", "modern_general"],
+          "default": "modern_general",
+          "description": "Active safety profile for analysis"
+        },
+        "connascence.grammarValidation": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable grammar-enhanced validation"
+        },
+        "connascence.realTimeAnalysis": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable real-time analysis as you type"
+        },
+        "connascence.autoFixSuggestions": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show automatic fix suggestions"
+        },
+        "connascence.serverUrl": {
+          "type": "string",
+          "default": "http://localhost:8080",
+          "description": "Connascence MCP server URL"
+        },
+        "connascence.authenticateWithServer": {
+          "type": "boolean",
+          "default": false,
+          "description": "Require authentication with server"
+        },
+        "connascence.frameworkProfile": {
+          "type": "string",
+          "enum": ["generic", "django", "fastapi", "react"],
+          "default": "generic",
+          "description": "Framework-specific analysis profile"
+        },
+        "connascence.showInlineHints": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show inline code quality hints"
+        },
+        "connascence.diagnosticSeverity": {
+          "type": "string",
+          "enum": ["error", "warning", "info", "hint"],
+          "default": "warning",
+          "description": "Severity level for diagnostics"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js",
+    "package": "vsce package",
+    "publish": "vsce publish"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.74.0",
+    "@types/node": "16.x",
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
+    "eslint": "^8.28.0",
+    "typescript": "^4.9.4",
+    "@vscode/test-electron": "^2.2.0",
+    "vsce": "^2.15.0"
+  },
+  "dependencies": {
+    "axios": "^1.3.0",
+    "ws": "^8.13.0"
+  }
+}

@@ -1,0 +1,54 @@
+CONNASCENCE ENTERPRISE LICENSE AGREEMENT
+
+Version 1.0.0
+Copyright © 2024 Connascence Systems. All rights reserved.
+
+This software is licensed, not sold. By installing or using this software, 
+you agree to be bound by the terms of this license agreement.
+
+ENTERPRISE TERMS:
+
+1. GRANT OF LICENSE
+   Subject to payment of applicable fees, Connascence Systems grants you a
+   non-exclusive, non-transferable license to use this software in accordance
+   with your Enterprise License Agreement.
+
+2. PERMITTED USES
+   - Use within your organization for code quality analysis
+   - Integration with your development tools and processes
+   - Deployment on your enterprise infrastructure
+   - Air-gapped deployment in classified environments
+
+3. RESTRICTIONS
+   - No redistribution without written permission
+   - No reverse engineering or decompilation
+   - No use outside of licensed organization
+   - No modification of security components
+
+4. SUPPORT AND MAINTENANCE
+   Enterprise support included with subscription:
+   - 24/7 technical support
+   - Regular security updates
+   - Feature updates and improvements
+   - Professional services and training
+
+5. COMPLIANCE
+   This software includes features for regulatory compliance:
+   - SOC 2 Type II controls
+   - ISO 27001 alignment  
+   - NASA/JPL safety standards
+   - NIST cybersecurity framework
+
+6. LIABILITY LIMITATION
+   IN NO EVENT SHALL CONNASCENCE SYSTEMS BE LIABLE FOR ANY INDIRECT,
+   INCIDENTAL, SPECIAL, OR CONSEQUENTIAL DAMAGES.
+
+7. TERMINATION
+   This license terminates automatically if you breach any terms.
+   Upon termination, you must cease all use and destroy all copies.
+
+For questions about this license, contact: legal@connascence.com
+
+CONNASCENCE SYSTEMS
+Enterprise Software Division
+Date: September 03, 2025

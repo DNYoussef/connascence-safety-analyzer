@@ -1,0 +1,15 @@
+{
+  "demo": "express",
+  "description": "JavaScript Polyglot - Semgrep integration & MCP loop",
+  "proof_points": [
+    "Framework intelligence",
+    "MCP automation",
+    "Polyglot coverage"
+  ],
+  "execution_time": "0.07s",
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "Traceback (most recent call last):\n  File \"C:\\Users\\17175\\Desktop\\connascence\\sales\\demos\\express\\demo_express.py\", line 634, in <module>\n    main()\n  File \"C:\\Users\\17175\\Desktop\\connascence\\sales\\demos\\express\\demo_express.py\", line 631, in main\n    demo.run_complete_demo()\n  File \"C:\\Users\\17175\\Desktop\\connascence\\sales\\demos\\express\\demo_express.py\", line 596, in run_complete_demo\n    print(\"\\U0001f310 Starting Express Polyglot Demo (JavaScript via Semgrep)\")\n  File \"C:\\Python312\\Lib\\encodings\\cp1252.py\", line 19, in encode\n    return codecs.charmap_encode(input,self.errors,encoding_table)[0]\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nUnicodeEncodeError: 'charmap' codec can't encode character '\\U0001f310' in position 0: character maps to <undefined>\n",
+  "timestamp": "2025-09-03 00:17:46",
+  "status": "COMPLETED_WITH_MOCKS"
+}

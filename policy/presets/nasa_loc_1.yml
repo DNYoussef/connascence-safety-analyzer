@@ -1,0 +1,151 @@
+# NASA/JPL Level of Control 1 (LOC-1) - Mission Critical
+# 
+# LOC-1 represents the highest level of software criticality:
+# - Flight software that directly controls spacecraft
+# - Life support systems
+# - Critical navigation and guidance systems
+# - Software whose failure could result in loss of mission or loss of life
+
+name: "NASA LOC-1 Mission Critical"
+version: "1.0.0" 
+description: "Level of Control 1 - Mission critical software with zero fault tolerance"
+inherit: "nasa_jpl_pot10"
+
+# LOC-1 Specific Overrides - Even Stricter Than Base Power of Ten
+severity_overrides:
+  all_nasa_violations: "critical"  # Every NASA rule violation is critical
+  all_connascence_violations_critical_or_high: "critical"  # Elevate high to critical
+  
+# Zero Tolerance Budgets
+budgets:
+  critical: 0           # Zero critical violations allowed
+  high: 0              # Zero high violations allowed  
+  medium: 0            # Zero medium violations allowed
+  low: 3               # Minimal low violations with mandatory waivers
+  
+  # Specific rule categories
+  nasa_rule_violations: 0
+  heap_after_init: 0
+  unbounded_loops: 0
+  goto_usage: 0
+  missing_assertions: 0
+  unchecked_returns: 0
+  magic_numbers: 0
+  god_objects: 0
+  complex_functions: 0
+  
+# Enhanced Thresholds - More Restrictive
+thresholds:
+  max_positional_params: 2    # Even fewer params
+  max_cyclomatic_complexity: 5 # Lower complexity ceiling
+  god_class_methods: 10       # Smaller classes
+  god_class_loc: 200          # Shorter classes
+  max_function_length: 40     # Shorter functions than NASA Rule 4
+  max_method_parameters: 3
+  max_nesting_depth: 2        # Minimal nesting
+  max_file_length: 500        # Shorter files
+  magic_literal_threshold: 0  # Absolutely no magic numbers
+
+# LOC-1 Specific Rules
+loc_1_rules:
+  formal_verification:
+    require_proof_annotations: true
+    require_loop_invariants: true
+    require_function_contracts: true
+    severity: "critical"
+    
+  redundancy:
+    require_dual_channel_validation: true
+    require_error_detection_codes: true
+    require_watchdog_patterns: true
+    severity: "critical"
+    
+  determinism:
+    ban_floating_point: true      # Fixed-point only
+    ban_dynamic_memory: true      # No heap at all
+    ban_unbounded_recursion: true # Already covered but emphasized
+    require_bounded_loops: true
+    max_interrupt_response_time: "10_microseconds"
+    severity: "critical"
+    
+  resource_management:
+    max_stack_depth: 1024        # Bytes
+    max_memory_allocation: "64KB" # Total program size
+    require_stack_analysis: true
+    ban_variable_length_arrays: true
+    severity: "critical"
+
+# Waiver System - Extremely Restricted
+waivers:
+  expiry_days: 3              # Very short waiver periods
+  require_mission_director_approval: true
+  require_formal_hazard_analysis: true
+  require_independent_review: true
+  require_test_evidence: true
+  allowed_categories:
+    - "hardware_constraint"     # Only hardware limitations allowed
+    - "external_interface_requirement"
+  max_active_waivers: 3       # Very few waivers allowed
+  require_mitigation_plan: true
+  require_fallback_implementation: true
+
+# Testing Requirements
+testing:
+  require_100_percent_coverage: true
+  require_mcdc_coverage: true     # Modified Condition/Decision Coverage  
+  require_boundary_value_testing: true
+  require_fault_injection_testing: true
+  require_stress_testing: true
+  require_formal_verification: true
+
+# Documentation Requirements
+documentation:
+  require_software_safety_plan: true
+  require_hazard_analysis: true
+  require_fmea_documentation: true  # Failure Mode Effects Analysis
+  require_verification_matrix: true
+  require_traceability_matrix: true
+
+# Build Requirements - Maximum Strictness
+build_requirements:
+  required_flags:
+    - "-Wall"
+    - "-Wextra" 
+    - "-Werror"
+    - "-pedantic"
+    - "-Wcast-qual"
+    - "-Wcast-align" 
+    - "-Wwrite-strings"
+    - "-Wredundant-decls"
+    - "-Winline"
+    - "-fstack-protector-all"
+  
+  required_static_analysis:
+    - "polyspace"     # Or equivalent formal verification
+    - "astrée"        # Or equivalent static analyzer
+    - "clang-analyzer"
+    - "pc-lint-plus"
+    
+  required_runtime_checks:
+    - "stack_overflow_detection"
+    - "buffer_overflow_protection" 
+    - "divide_by_zero_checking"
+    - "null_pointer_checking"
+
+# Integration Requirements
+integration:
+  require_hardware_in_loop_testing: true
+  require_system_level_testing: true
+  require_environmental_testing: true
+  require_radiation_testing: true      # For space applications
+  require_timing_analysis: true
+  
+# Change Control
+change_control:
+  require_ccb_approval: true          # Configuration Control Board
+  require_regression_analysis: true
+  require_impact_analysis: true
+  require_verification_rerun: true
+  
+# This is the most restrictive profile - use only for truly mission-critical code
+# Most projects should use LOC-2 or LOC-3 profiles which are more practical
