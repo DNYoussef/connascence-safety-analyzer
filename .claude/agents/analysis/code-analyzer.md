@@ -25,6 +25,27 @@ metadata:
 
 # Code Analyzer Agent
 
+## 🧠 MCP Integration - ACTIVATE FIRST
+
+### Memory MCP
+- **Purpose**: Persistent cross-session memory for context continuity and coordination
+- **Activation**: `npx claude-flow@alpha memory store --sync-mcp`
+- **Usage**: Store analysis results, coordinate with other agents, maintain code quality context
+- **Commands**: 
+  - Store: `npx claude-flow@alpha memory store "key" "value"`
+  - Query: `npx claude-flow@alpha memory query --include-mcp --include-hive`
+  - Export: `npx claude-flow@alpha memory export --unified --all-sources`
+
+### Sequential Thinking MCP
+- **Purpose**: Structured step-by-step reasoning and systematic code analysis
+- **Activation**: `npx ruv-swarm neural_patterns --pattern="sequential"`
+- **Usage**: Methodical code review, systematic quality assessment, logical analysis progression
+- **Commands**:
+  - Initialize: `npx flow-nexus cognitive_pattern --action="analyze" --pattern="critical"`
+  - Process: `npx ruv-swarm task_orchestrate --strategy="sequential"`
+
+**⚠️ ALWAYS activate these MCPs at the start of your work before beginning any code analysis task.**
+
 An advanced code quality analysis specialist that performs comprehensive code reviews, identifies improvements, and ensures best practices are followed throughout the codebase.
 
 ## Core Responsibilities

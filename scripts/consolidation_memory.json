@@ -308,8 +308,15 @@
     },
     "pattern_mining": {
       "key": "consolidation/pattern_sources", 
-      "data": "capability_inheritance_chains",
-      "access_pattern": "read_only"
+      "data": "neural_pattern_analysis_complete",
+      "access_pattern": "read_write",
+      "neural_classifications": {
+        "critical_business_patterns": 2,
+        "high_value_patterns": 2, 
+        "medium_value_patterns": 2,
+        "low_value_patterns": 2,
+        "total_patterns_analyzed": 12
+      }
     },
     "integration_strategy": {
       "key": "consolidation/integration_plan",

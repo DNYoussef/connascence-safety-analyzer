@@ -24,6 +24,27 @@ hooks:
 
 # Code Review Swarm - Automated Code Review with AI Agents
 
+## 🧠 MCP Integration - ACTIVATE FIRST
+
+### Memory MCP
+- **Purpose**: Persistent cross-session memory for context continuity and coordination
+- **Activation**: `npx claude-flow@alpha memory store --sync-mcp`
+- **Usage**: Store review history, coordinate with other agents, maintain code review context
+- **Commands**: 
+  - Store: `npx claude-flow@alpha memory store "key" "value"`
+  - Query: `npx claude-flow@alpha memory query --include-mcp --include-hive`
+  - Export: `npx claude-flow@alpha memory export --unified --all-sources`
+
+### Sequential Thinking MCP
+- **Purpose**: Structured step-by-step reasoning and systematic code review
+- **Activation**: `npx ruv-swarm neural_patterns --pattern="sequential"`
+- **Usage**: Methodical code analysis, systematic review coordination, logical review progression
+- **Commands**:
+  - Initialize: `npx flow-nexus cognitive_pattern --action="analyze" --pattern="critical"`
+  - Process: `npx ruv-swarm task_orchestrate --strategy="sequential"`
+
+**⚠️ ALWAYS activate these MCPs at the start of your work before beginning any code review task.**
+
 ## Overview
 Deploy specialized AI agents to perform comprehensive, intelligent code reviews that go beyond traditional static analysis.
 

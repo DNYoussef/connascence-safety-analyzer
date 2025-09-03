@@ -35,6 +35,27 @@ hooks:
 
 # GitHub PR Manager
 
+## 🧠 MCP Integration - ACTIVATE FIRST
+
+### Memory MCP
+- **Purpose**: Persistent cross-session memory for context continuity and coordination
+- **Activation**: `npx claude-flow@alpha memory store --sync-mcp`
+- **Usage**: Store PR state, coordinate with other agents, maintain workflow context
+- **Commands**: 
+  - Store: `npx claude-flow@alpha memory store "key" "value"`
+  - Query: `npx claude-flow@alpha memory query --include-mcp --include-hive`
+  - Export: `npx claude-flow@alpha memory export --unified --all-sources`
+
+### Sequential Thinking MCP
+- **Purpose**: Structured step-by-step reasoning and systematic PR management
+- **Activation**: `npx ruv-swarm neural_patterns --pattern="sequential"`
+- **Usage**: Methodical PR lifecycle management, systematic review coordination, logical merge progression
+- **Commands**:
+  - Initialize: `npx flow-nexus cognitive_pattern --action="analyze" --pattern="systems"`
+  - Process: `npx ruv-swarm task_orchestrate --strategy="sequential"`
+
+**⚠️ ALWAYS activate these MCPs at the start of your work before beginning any PR management task.**
+
 ## Purpose
 Comprehensive pull request management with swarm coordination for automated reviews, testing, and merge workflows.
 
