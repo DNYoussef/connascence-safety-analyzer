@@ -3,13 +3,17 @@ import uuid
 from typing import Dict, List, Any, Optional
 from analyzer.core import ConnascenceViolation
 
+# Baseline Manager Configuration Constants (CoM Improvement - Pass 2)
+DEFAULT_BASELINE_VERSION = "1.0.0"
+DEFAULT_BASELINE_CLEANUP_KEEP_COUNT = 5
+
 class BaselineManager:
     def __init__(self):
         self.baselines = {}
         self.active_baseline = None
     
     def create_baseline(self, violations: List[ConnascenceViolation], 
-                       description: str = "", version: str = "1.0.0") -> str:
+                       description: str = "", version: str = DEFAULT_BASELINE_VERSION) -> str:
         """Create a new baseline from violations."""
         baseline_id = str(uuid.uuid4())
         
@@ -85,7 +89,7 @@ class BaselineManager:
         
         del self.baselines[baseline_id]
     
-    def cleanup_old_baselines(self, keep_count: int = 5) -> List[str]:
+    def cleanup_old_baselines(self, keep_count: int = DEFAULT_BASELINE_CLEANUP_KEEP_COUNT) -> List[str]:
         """Clean up old baselines, keeping only the most recent ones."""
         if len(self.baselines) <= keep_count:
             return []
@@ -137,7 +141,7 @@ class BaselineManager:
 
 class BaselineSnapshot:
     def __init__(self, baseline_id: str, violations: List[ConnascenceViolation],
-                 description: str = "", version: str = "1.0.0", created_at: float = None):
+                 description: str = "", version: str = DEFAULT_BASELINE_VERSION, created_at: float = None):
         self.baseline_id = baseline_id
         self.violations = violations
         self.description = description

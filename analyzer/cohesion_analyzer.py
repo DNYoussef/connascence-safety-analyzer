@@ -15,6 +15,36 @@ from typing import Dict, List, Optional, Set, Tuple, Any
 from pathlib import Path
 import logging
 
+# Cohesion Analyzer Configuration Constants (CoM Improvement - Pass 2)
+# CoP Improvement - Pass 3: Parameter Objects
+@dataclass
+class ClassAnalysisParams:
+    """Parameter object for class analysis operations (CoP Improvement - Pass 3)."""
+    file_path: Path
+    class_node: ast.ClassDef
+    lines: List[str]
+    full_tree: ast.AST
+    
+    def __post_init__(self):
+        """Validate required parameters."""
+        if not isinstance(self.file_path, Path):
+            raise ValueError("file_path must be a Path object")
+        if not isinstance(self.class_node, ast.ClassDef):
+            raise ValueError("class_node must be an ast.ClassDef")
+
+# Cohesion Analyzer Configuration Constants (CoM Improvement - Pass 2)
+DEFAULT_COHESION_WEIGHT_LCOM5 = 0.3  # LCOM5 gets highest weight
+DEFAULT_COHESION_WEIGHT_STANDARD = 0.2  # Standard weights for other metrics
+DEFAULT_COHESION_WEIGHT_SECONDARY = 0.15  # Secondary weights
+DEFAULT_LINE_COUNT_PENALTY_FACTOR = 0.01  # Penalty factor for line count
+DEFAULT_PERCENTILE_THRESHOLD = 95.0  # Percentile threshold for analysis
+DEFAULT_MIN_CLASSES_FOR_STATS = 10  # Minimum classes needed for statistical analysis
+DEFAULT_GOD_CLASS_METHOD_THRESHOLD = 15  # Method count threshold for god class detection
+DEFAULT_GOD_CLASS_ATTRIBUTE_THRESHOLD = 5  # Attribute count threshold for god class detection
+DEFAULT_DATA_CLASS_ATTRIBUTE_THRESHOLD = 10  # Attribute count threshold for data class detection
+DEFAULT_MAX_LCOM5_NORMALIZATION = 5.0  # LCOM5 normalization factor
+DEFAULT_METHOD_ATTRIBUTE_RATIO_CAP = 3.0  # Method to attribute ratio cap
+
 logger = logging.getLogger(__name__)
 
 
@@ -42,11 +72,11 @@ class CohesionMetrics:
     def overall_cohesion(self) -> float:
         """Calculate overall cohesion score (0=bad, 1=good)."""
         # Invert LCOM5 (lower is better) and weight with other metrics
-        inverted_lcom5 = max(0, 1 - (self.lcom5 / 5.0))  # Normalize LCOM5
+        inverted_lcom5 = max(0, 1 - (self.lcom5 / DEFAULT_MAX_LCOM5_NORMALIZATION))  # Normalize LCOM5
         
-        weights = [0.3, 0.2, 0.2, 0.15, 0.15]  # LCOM5 gets highest weight
+        weights = [DEFAULT_COHESION_WEIGHT_LCOM5, DEFAULT_COHESION_WEIGHT_STANDARD, DEFAULT_COHESION_WEIGHT_STANDARD, DEFAULT_COHESION_WEIGHT_SECONDARY, DEFAULT_COHESION_WEIGHT_SECONDARY]  # LCOM5 gets highest weight
         metrics = [inverted_lcom5, self.interface_cohesion, self.data_cohesion, 
-                  self.behavioral_cohesion, min(1.0, self.method_attribute_ratio / 3.0)]
+                  self.behavioral_cohesion, min(1.0, self.method_attribute_ratio / DEFAULT_METHOD_ATTRIBUTE_RATIO_CAP)]
         
         return sum(w * m for w, m in zip(weights, metrics))
 
@@ -248,7 +278,7 @@ class CohesionAnalyzer:
 class StatisticalGodObjectDetector:
     """God object detector using statistical analysis and cohesion metrics."""
     
-    def __init__(self, percentile_threshold: float = 95.0, min_classes_for_stats: int = 10):
+    def __init__(self, percentile_threshold: float = DEFAULT_PERCENTILE_THRESHOLD, min_classes_for_stats: int = DEFAULT_MIN_CLASSES_FOR_STATS):
         self.percentile_threshold = percentile_threshold
         self.min_classes_for_stats = min_classes_for_stats
         self.cohesion_analyzer = CohesionAnalyzer()
@@ -298,6 +328,11 @@ class StatisticalGodObjectDetector:
     
     def _analyze_class(self, file_path: Path, class_node: ast.ClassDef, 
                        lines: List[str], full_tree: ast.AST) -> ClassAnalysis:
+        """Legacy signature for backward compatibility."""
+        params = ClassAnalysisParams(file_path, class_node, lines, full_tree)
+        return self._analyze_class_with_params(params)
+    
+    def _analyze_class_with_params(self, params: ClassAnalysisParams) -> ClassAnalysis:
         """Perform complete analysis of a single class."""
         
         # Calculate cohesion metrics
@@ -381,10 +416,10 @@ class StatisticalGodObjectDetector:
             return ClassRole.AGGREGATOR
         
         # Analyze structure to infer role
-        if complexity.method_count > 15 and complexity.attribute_count < 5:
+        if complexity.method_count > DEFAULT_GOD_CLASS_METHOD_THRESHOLD and complexity.attribute_count < DEFAULT_GOD_CLASS_ATTRIBUTE_THRESHOLD:
             return ClassRole.UTILITY  # Many methods, little data
         
-        if complexity.attribute_count > 10 and complexity.method_count < 5:
+        if complexity.attribute_count > DEFAULT_DATA_CLASS_ATTRIBUTE_THRESHOLD and complexity.method_count < DEFAULT_GOD_CLASS_ATTRIBUTE_THRESHOLD:
             return ClassRole.DATA_CONTAINER  # Lots of data, few methods
         
         return ClassRole.GENERIC

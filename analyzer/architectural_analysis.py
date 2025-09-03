@@ -29,6 +29,16 @@ import networkx as nx
 import radon.complexity as cc
 import radon.metrics as rm
 
+# Architectural Analysis Configuration Constants (CoM Improvement - Pass 2)
+DEFAULT_HOTSPOT_COUNT_THRESHOLD = 10  # Minimum violations to be considered a hotspot
+DEFAULT_TOP_HOTSPOTS_LIMIT = 10  # Maximum hotspots to report
+DEFAULT_HIGH_USAGE_NAME_THRESHOLD = 10  # Minimum usage count for high usage names
+DEFAULT_HIGH_COMPLEXITY_THRESHOLD = 50  # Complexity threshold for reporting
+DEFAULT_MAINTAINABILITY_THRESHOLD = 70  # Maintainability score threshold
+DEFAULT_CONNASCENCE_VIOLATIONS_THRESHOLD = 50  # Connascence violations threshold
+DEFAULT_ACCEPTABLE_COMPLEXITY_THRESHOLD = 20  # Acceptable complexity upper limit
+DEFAULT_REPORT_SEPARATOR_LENGTH = 60  # Length of separator lines in reports
+
 # Configure logging
 logger = logging.getLogger(__name__)
 
@@ -203,10 +213,10 @@ class ConnascenceAnalyzer:
         hotspots = [
             {"file": file_path, "violations": count}
             for file_path, count in sorted(file_violations.items(), key=lambda x: x[1], reverse=True)
-            if count > 10
+            if count > DEFAULT_HOTSPOT_COUNT_THRESHOLD
         ]
 
-        return hotspots[:10]  # Top 10 hotspots
+        return hotspots[:DEFAULT_TOP_HOTSPOTS_LIMIT]  # Top N hotspots
 
     def _should_skip_file(self, file_path: Path) -> bool:
         skip_patterns = ["__pycache__", ".git", "build", "dist", "deprecated", "archive"]
@@ -235,7 +245,7 @@ class ConnascenceAnalyzer:
                 name = node.id
                 names[name] = names.get(name, 0) + 1
 
-        high_usage_names = {name: count for name, count in names.items() if count > 10}
+        high_usage_names = {name: count for name, count in names.items() if count > DEFAULT_HIGH_USAGE_NAME_THRESHOLD}
         if high_usage_names:
             self.connascence_metrics.append(
                 ConnascenceMetric(
@@ -309,7 +319,7 @@ class MetricsCalculator:
                 if complexity:
                     total_complexity += complexity
                     file_count += 1
-                    if complexity > 50:
+                    if complexity > DEFAULT_HIGH_COMPLEXITY_THRESHOLD:
                         high_complexity_files.append({"file": str(file_path), "complexity": complexity})
             except Exception:
                 continue
@@ -317,7 +327,7 @@ class MetricsCalculator:
         return {
             "average_complexity": total_complexity / max(1, file_count),
             "total_files_analyzed": file_count,
-            "high_complexity_files": high_complexity_files[:10],
+            "high_complexity_files": high_complexity_files[:DEFAULT_TOP_HOTSPOTS_LIMIT],
         }
 
     def calculate_maintainability_index(self) -> dict[str, Any]:
@@ -340,7 +350,7 @@ class MetricsCalculator:
             scores = [item["score"] for item in maintainability_scores]
             return {
                 "average_maintainability": sum(scores) / len(scores),
-                "files_below_threshold": [item for item in maintainability_scores if item["score"] < 70][:10],
+                "files_below_threshold": [item for item in maintainability_scores if item["score"] < DEFAULT_MAINTAINABILITY_THRESHOLD][:DEFAULT_TOP_HOTSPOTS_LIMIT],
             }
         return {}
 
@@ -450,15 +460,15 @@ class ReportGenerator:
         if dependency_metrics.get("circular_dependencies", 0) > 0:
             recommendations.append("Break circular dependencies to improve maintainability")
 
-        if len(connascence_metrics) > 50:
+        if len(connascence_metrics) > DEFAULT_CONNASCENCE_VIOLATIONS_THRESHOLD:
             recommendations.append("Reduce connascence violations by refactoring toward weaker forms")
 
         high_complexity_files = complexity_metrics.get("high_complexity_files", [])
-        if len(high_complexity_files) > 10:
+        if len(high_complexity_files) > DEFAULT_TOP_HOTSPOTS_LIMIT:
             recommendations.append("Refactor high-complexity files to improve readability")
 
         low_maintainability = maintainability_metrics.get("files_below_threshold", [])
-        if len(low_maintainability) > 10:
+        if len(low_maintainability) > DEFAULT_TOP_HOTSPOTS_LIMIT:
             recommendations.append("Focus on improving maintainability index for critical files")
 
         return recommendations
@@ -467,9 +477,9 @@ class ReportGenerator:
         """Evaluate quality gates based on thresholds."""
         return {
             "no_circular_dependencies": summary.get("circular_dependencies", 1) == 0,
-            "acceptable_complexity": summary.get("average_complexity", 100) < 20,
-            "good_maintainability": summary.get("average_maintainability", 0) > 70,
-            "limited_connascence_violations": summary.get("connascence_violations", 100) < 50,
+            "acceptable_complexity": summary.get("average_complexity", 100) < DEFAULT_ACCEPTABLE_COMPLEXITY_THRESHOLD,
+            "good_maintainability": summary.get("average_maintainability", 0) > DEFAULT_MAINTAINABILITY_THRESHOLD,
+            "limited_connascence_violations": summary.get("connascence_violations", 100) < DEFAULT_CONNASCENCE_VIOLATIONS_THRESHOLD,
         }
 
     def _generate_html_report(self, report: ArchitecturalReport, output_file: Path):
@@ -582,9 +592,9 @@ def main():
     report = analyzer.run_full_analysis(args.output_format)
 
     # Print summary
-    print("\n" + "=" * 60)
+    print("\n" + "=" * DEFAULT_REPORT_SEPARATOR_LENGTH)
     print("ARCHITECTURAL ANALYSIS SUMMARY")
-    print("=" * 60)
+    print("=" * DEFAULT_REPORT_SEPARATOR_LENGTH)
     print(f"Total Modules: {report.summary.get('total_modules', 0)}")
     print(f"Circular Dependencies: {report.summary.get('circular_dependencies', 0)}")
     print(f"Connascence Violations: {report.summary.get('connascence_violations', 0)}")

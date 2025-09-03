@@ -2,6 +2,9 @@ import time
 from typing import Dict, List, Any, Optional
 from analyzer.core import ConnascenceViolation
 
+# BudgetTracker Configuration Constants (CoM Improvement - Pass 2)
+DEFAULT_USAGE_HISTORY_LIMIT = 10  # Last N entries to keep in usage history
+
 class BudgetTracker:
     def __init__(self):
         self.budget_limits = {}
@@ -63,7 +66,7 @@ class BudgetTracker:
             'budget_limits': self.budget_limits,
             'current_usage': self.current_usage,
             'current_compliance': compliance,
-            'usage_history': self.usage_history[-10:],  # Last 10 entries
+            'usage_history': self.usage_history[-DEFAULT_USAGE_HISTORY_LIMIT:],  # Last N entries
             'recommendations': self._generate_recommendations(compliance)
         }
     

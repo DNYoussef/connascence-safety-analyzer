@@ -4,9 +4,14 @@ import time
 from typing import Dict, List, Any, Optional
 from analyzer.core import ConnascenceViolation
 
+# MCP Server Configuration Constants (CoM Improvement - Pass 2)
+DEFAULT_RATE_LIMIT_REQUESTS = 100
+DEFAULT_RATE_LIMIT_WINDOW_SECONDS = 60
+DEFAULT_AUDIT_ENABLED = True
+
 class RateLimiter:
     """Rate limiter for MCP server."""
-    def __init__(self, max_requests=100, window_seconds=60):
+    def __init__(self, max_requests=DEFAULT_RATE_LIMIT_REQUESTS, window_seconds=DEFAULT_RATE_LIMIT_WINDOW_SECONDS):
         self.max_requests = max_requests
         self.window_seconds = window_seconds
         self.requests = {}
@@ -60,10 +65,10 @@ class ConnascenceMCPServer:
         self.version = "1.0.0"
         
         # Initialize components with custom config
-        rate_limit = self.config.get('max_requests_per_minute', 100)
+        rate_limit = self.config.get('max_requests_per_minute', DEFAULT_RATE_LIMIT_REQUESTS)
         self.rate_limiter = RateLimiter(max_requests=rate_limit)
         
-        audit_enabled = self.config.get('enable_audit_logging', True)
+        audit_enabled = self.config.get('enable_audit_logging', DEFAULT_AUDIT_ENABLED)
         self.audit_logger = AuditLogger(enabled=audit_enabled)
         
         # Path restrictions

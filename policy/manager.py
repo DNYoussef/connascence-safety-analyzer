@@ -5,46 +5,68 @@ from typing import Dict, List, Any, Optional, Union
 from analyzer.core import ConnascenceViolation
 from analyzer.thresholds import ThresholdConfig
 
+# Policy Manager Configuration Constants (CoM Improvement - Pass 2)
+STRICT_CORE_MAX_POSITIONAL_PARAMS = 2
+STRICT_CORE_GOD_CLASS_METHODS = 15
+STRICT_CORE_MAX_CYCLOMATIC_COMPLEXITY = 8
+STRICT_CORE_COM_LIMIT = 3
+STRICT_CORE_COP_LIMIT = 2
+STRICT_CORE_TOTAL_VIOLATIONS_LIMIT = 10
+
+SERVICE_DEFAULTS_MAX_POSITIONAL_PARAMS = 4
+SERVICE_DEFAULTS_GOD_CLASS_METHODS = 25
+SERVICE_DEFAULTS_MAX_CYCLOMATIC_COMPLEXITY = 12
+SERVICE_DEFAULTS_COM_LIMIT = 8
+SERVICE_DEFAULTS_COP_LIMIT = 5
+SERVICE_DEFAULTS_TOTAL_VIOLATIONS_LIMIT = 30
+
+EXPERIMENTAL_MAX_POSITIONAL_PARAMS = 6
+EXPERIMENTAL_GOD_CLASS_METHODS = 35
+EXPERIMENTAL_MAX_CYCLOMATIC_COMPLEXITY = 20
+EXPERIMENTAL_COM_LIMIT = 15
+EXPERIMENTAL_COP_LIMIT = 8
+EXPERIMENTAL_TOTAL_VIOLATIONS_LIMIT = 50
+
 class PolicyManager:
     def __init__(self):
         self.presets = {
             'strict-core': {
                 'name': 'Strict Core',
                 'thresholds': {
-                    'max_positional_params': 2,
-                    'god_class_methods': 15,
-                    'max_cyclomatic_complexity': 8
+                    'max_positional_params': STRICT_CORE_MAX_POSITIONAL_PARAMS,
+                    'god_class_methods': STRICT_CORE_GOD_CLASS_METHODS,
+                    'max_cyclomatic_complexity': STRICT_CORE_MAX_CYCLOMATIC_COMPLEXITY
                 },
                 'budget_limits': {
-                    'CoM': 3,
-                    'CoP': 2,
-                    'total_violations': 10
+                    'CoM': STRICT_CORE_COM_LIMIT,
+                    'CoP': STRICT_CORE_COP_LIMIT,
+                    'total_violations': STRICT_CORE_TOTAL_VIOLATIONS_LIMIT
                 }
             },
             'service-defaults': {
                 'name': 'Service Defaults', 
                 'thresholds': {
-                    'max_positional_params': 4,
-                    'god_class_methods': 25,
-                    'max_cyclomatic_complexity': 12
+                    'max_positional_params': SERVICE_DEFAULTS_MAX_POSITIONAL_PARAMS,
+                    'god_class_methods': SERVICE_DEFAULTS_GOD_CLASS_METHODS,
+                    'max_cyclomatic_complexity': SERVICE_DEFAULTS_MAX_CYCLOMATIC_COMPLEXITY
                 },
                 'budget_limits': {
-                    'CoM': 8,
-                    'CoP': 5,
-                    'total_violations': 30
+                    'CoM': SERVICE_DEFAULTS_COM_LIMIT,
+                    'CoP': SERVICE_DEFAULTS_COP_LIMIT,
+                    'total_violations': SERVICE_DEFAULTS_TOTAL_VIOLATIONS_LIMIT
                 }
             },
             'experimental': {
                 'name': 'Experimental',
                 'thresholds': {
-                    'max_positional_params': 6,
-                    'god_class_methods': 35,
-                    'max_cyclomatic_complexity': 20
+                    'max_positional_params': EXPERIMENTAL_MAX_POSITIONAL_PARAMS,
+                    'god_class_methods': EXPERIMENTAL_GOD_CLASS_METHODS,
+                    'max_cyclomatic_complexity': EXPERIMENTAL_MAX_CYCLOMATIC_COMPLEXITY
                 },
                 'budget_limits': {
-                    'CoM': 15,
-                    'CoP': 8,
-                    'total_violations': 50
+                    'CoM': EXPERIMENTAL_COM_LIMIT,
+                    'CoP': EXPERIMENTAL_COP_LIMIT,
+                    'total_violations': EXPERIMENTAL_TOTAL_VIOLATIONS_LIMIT
                 }
             }
         }
