@@ -182,8 +182,8 @@ class CohesionAnalyzer:
         if not all_attributes:
             return 0.0
         
-        # Calculate LCOM5: (M - Σ(μ(Aj))) / (M - 1)
-        # Where M = number of methods, μ(Aj) = number of methods using attribute j
+        # Calculate LCOM5: (M - ((Aj))) / (M - 1)
+        # Where M = number of methods, (Aj) = number of methods using attribute j
         M = len(methods)
         total_method_attribute_usage = 0
         

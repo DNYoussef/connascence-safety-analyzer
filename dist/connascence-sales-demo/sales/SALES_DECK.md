@@ -5,13 +5,13 @@
 **Transform code quality with NASA-grade safety analysis and intelligent refactoring**
 
 - **False Positive Rate**: <5% (4.5% measured across 3 major codebases)
-- **Autofix Acceptance**: ≥60% (62.9% achieved in production demos)  
+- **Autofix Acceptance**: 60% (62.9% achieved in production demos)  
 - **Enterprise Features**: RBAC, audit logging, air-gapped deployment
 - **Polyglot Support**: Python, C/C++, JavaScript (via Semgrep), expanding
 
 ---
 
-## 🎯 The Problem: Code Quality at Enterprise Scale
+## [TARGET] The Problem: Code Quality at Enterprise Scale
 
 ### Current State of Code Analysis
 
@@ -33,7 +33,7 @@
 
 ---
 
-## 💡 The Solution: Connascence Safety Analyzer
+## [TIP] The Solution: Connascence Safety Analyzer
 
 ### Architectural Quality with NASA Safety Standards
 
@@ -65,9 +65,9 @@
 
 ---
 
-## 📊 Proven Results: Three Major Demos
+## [METRICS] Proven Results: Three Major Demos
 
-### Demo 1: Celery (Python) - Real-World Complexity ✅
+### Demo 1: Celery (Python) - Real-World Complexity [DONE]
 
 **Target**: Popular async task queue with complex APIs  
 **Profile**: `modern_general` (production-ready)  
@@ -84,23 +84,23 @@
 - Method extraction: 42% success rate (complex cases)
 - **Zero false positives** on framework-specific patterns
 
-### Demo 2: curl (C) - NASA/JPL Safety Profile ✅
+### Demo 2: curl (C) - NASA/JPL Safety Profile [DONE]
 
 **Target**: Iconic C library, perfect for safety analysis  
 **Profile**: `nasa_jpl_pot10` (Power of Ten rules)
 **Results**:
 - **Files Analyzed**: 156 (lib/ only) in 1.8s
-- **NASA Compliance**: 87% → 96% potential improvement
+- **NASA Compliance**: 87%  96% potential improvement
 - **Unique Findings**: 23 (92.6% tool overlap eliminated)
-- **Safety Impact**: 6 recursion sites → 0 eliminated
+- **Safety Impact**: 6 recursion sites  0 eliminated
 
 **Key Wins**:
 - **Evidence-based filtering**: Doesn't flag what clang-tidy already catches
 - **Recursion elimination**: 4/6 automated, 2 need review
-- **Stack usage**: Unbounded → 3.2KB maximum
+- **Stack usage**: Unbounded  3.2KB maximum
 - **Certification ready**: Audit trail for NASA compliance
 
-### Demo 3: Express (JavaScript) - Polyglot via Semgrep ✅
+### Demo 3: Express (JavaScript) - Polyglot via Semgrep [DONE]
 
 **Target**: Popular Node.js framework  
 **Profile**: `modern_general` with Semgrep integration
@@ -113,12 +113,12 @@
 **Key Wins**:
 - **Framework intelligence**: Express middleware patterns
 - **Polyglot expansion**: No new parsers needed
-- **MCP automation**: Scan → suggest → fix → verify loop
+- **MCP automation**: Scan  suggest  fix  verify loop
 - **Bundle optimization**: 5.1% size reduction
 
 ---
 
-## 🏢 Enterprise Value Proposition
+## [ENTERPRISE] Enterprise Value Proposition
 
 ### For Engineering Leadership
 
@@ -130,7 +130,7 @@
 
 **Cost Savings Calculator:**
 ```
-500 developers × $150K average salary = $75M engineering cost
+500 developers  $150K average salary = $75M engineering cost
 2% productivity improvement = $1.5M annual savings  
 Tool cost: $200K annually
 ROI: 750% in year 1
@@ -166,7 +166,7 @@ ROI: 750% in year 1
 
 ---
 
-## 🚀 Implementation & Deployment
+## [RELEASE] Implementation & Deployment
 
 ### Quick Start (30 minutes)
 
@@ -204,7 +204,7 @@ connascence scan --path ./src --profile modern_general
 
 ---
 
-## 📈 Competitive Differentiation
+## [IMPROVEMENT] Competitive Differentiation
 
 ### vs. SonarQube
 - **Lower FP Rate**: 4.5% vs 18% typical
@@ -226,7 +226,7 @@ connascence scan --path ./src --profile modern_general
 
 ---
 
-## 💰 Pricing & Packaging
+##  Pricing & Packaging
 
 ### Starter Edition - $50K/year
 - Up to 50 developers
@@ -257,12 +257,12 @@ connascence scan --path ./src --profile modern_general
 
 ---
 
-## ✅ Buyer Checklist: Fast and Convincing
+## [DONE] Buyer Checklist: Fast and Convincing
 
 ### Demo Artifacts (Ready to Show)
 
 **1. Pull Requests (3 repos)**
-- **Celery**: "CoP↓ via Introduce Parameter Object" with SARIF  
+- **Celery**: "CoP via Introduce Parameter Object" with SARIF  
 - **curl**: "NASA/JPL Safety: Eliminate Recursion (Rule 3)"
 - **Express**: "Extract Method for Route Handler Patterns"
 
@@ -272,7 +272,7 @@ connascence scan --path ./src --profile modern_general
 - Polyglot analysis for Express (Semgrep integration)
 
 **3. VS Code Integration GIF**
-- Save file → diagnostics appear → quick fix applied
+- Save file  diagnostics appear  quick fix applied
 - Real-time safety analysis with NASA profile
 - Refactoring suggestions with confidence scores
 
@@ -320,7 +320,7 @@ connascence scan --path ./customer-repo --profile modern_general --demo-mode
 
 ---
 
-## 🎯 Next Steps
+## [TARGET] Next Steps
 
 ### Immediate Actions
 1. **Schedule Technical Demo**: 45-minute deep dive on customer codebase

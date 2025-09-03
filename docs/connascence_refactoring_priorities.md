@@ -58,7 +58,7 @@ class MultiTenantSystem:  # Coordinator only
 ```python
 # Current problematic patterns
 if status_code == 200:  # Magic number
-    print("✓ ALLOWED")  # Magic string
+    print(" ALLOWED")  # Magic string
 if user.role == 2:  # Magic number meaning
     return {"error": "Access denied"}  # Magic string
 
@@ -77,8 +77,8 @@ class SecurityConstants:
         SUPER_ADMIN = 4
 
     class Messages:
-        ACCESS_ALLOWED = "✓ ALLOWED"
-        ACCESS_DENIED = "✗ DENIED"
+        ACCESS_ALLOWED = " ALLOWED"
+        ACCESS_DENIED = " DENIED"
         ACCESS_FORBIDDEN = "Access denied"
 
 # Usage
@@ -272,7 +272,7 @@ def calculate_hash(file_path, chunk_size=8192):
   run: |
     python scripts/check_connascence.py . --severity high
     if [ $? -eq 1 ]; then
-      echo "❌ Critical connascence violations found"
+      echo " Critical connascence violations found"
       exit 1
     fi
 
@@ -280,7 +280,7 @@ def calculate_hash(file_path, chunk_size=8192):
   run: |
     python scripts/detect_anti_patterns.py . --pattern god_object
     if [ $? -eq 1 ]; then
-      echo "❌ New God Objects detected"
+      echo " New God Objects detected"
       exit 1
     fi
 ```

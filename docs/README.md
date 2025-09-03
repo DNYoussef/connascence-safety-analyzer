@@ -6,7 +6,7 @@
 [![PyPI version](https://badge.fury.io/py/connascence.svg)](https://pypi.org/project/connascence/)
 [![Code Quality](https://api.codeclimate.com/v1/badges/abc123/maintainability)](https://codeclimate.com/github/connascence/connascence-analyzer)
 
-## 🎯 What is Connascence?
+## [TARGET] What is Connascence?
 
 **Connascence** is a software engineering metric that measures coupling strength between components. Created by Meilir Page-Jones, it provides a systematic way to identify and reduce problematic dependencies in code.
 
@@ -16,7 +16,7 @@
 - **Prevents Technical Debt**: Catch coupling issues early
 - **Guides Refactoring**: Scientific approach to code improvement
 
-## ⚡ Quick Start
+##  Quick Start
 
 ### Installation
 
@@ -70,10 +70,10 @@ def calculate_price(item_type, user_level, season, promo_code, quantity, tax_rat
 
 **Analysis Results:**
 ```
-🔴 CRITICAL - CoP: 6 positional parameters (>3) - Use keyword arguments
-🟡 MEDIUM - CoM: Magic literal '100' - Extract to named constant  
-🟡 MEDIUM - CoM: Magic string "premium" - Use enum or constants
-🟡 MEDIUM - CoA: High cyclomatic complexity (12) - Break into smaller functions
+ CRITICAL - CoP: 6 positional parameters (>3) - Use keyword arguments
+ MEDIUM - CoM: Magic literal '100' - Extract to named constant  
+ MEDIUM - CoM: Magic string "premium" - Use enum or constants
+ MEDIUM - CoA: High cyclomatic complexity (12) - Break into smaller functions
 ```
 
 **After Refactoring:**
@@ -122,29 +122,29 @@ def _calculate_discount(request: PriceRequest) -> float:
 
 **New Analysis:**
 ```
-✅ No connascence violations detected!
-💡 Excellent coupling practices - maintainable and testable code.
+[DONE] No connascence violations detected!
+[TIP] Excellent coupling practices - maintainable and testable code.
 ```
 
-## 🏗️ Architecture
+##  Architecture
 
 ### Core Components
 
 ```
 connascence/
-├── analyzer/           # Detection engines
-│   ├── ast_engine/    # Static analysis (CoN, CoT, CoM, CoP, CoA)
-│   ├── runtime_probe/ # Dynamic analysis (CoE, CoTi, CoV, CoI)
-│   └── frameworks/    # Framework-specific profiles
-├── policy/            # Policy-as-code system
-├── reporting/         # SARIF, JSON, Markdown exporters
-├── autofix/           # Intelligent patch generation
-├── cli/               # Professional command-line interface
-├── mcp/               # Agent integration server
-└── vscode-extension/  # VS Code integration
+ analyzer/           # Detection engines
+    ast_engine/    # Static analysis (CoN, CoT, CoM, CoP, CoA)
+    runtime_probe/ # Dynamic analysis (CoE, CoTi, CoV, CoI)
+    frameworks/    # Framework-specific profiles
+ policy/            # Policy-as-code system
+ reporting/         # SARIF, JSON, Markdown exporters
+ autofix/           # Intelligent patch generation
+ cli/               # Professional command-line interface
+ mcp/               # Agent integration server
+ vscode-extension/  # VS Code integration
 ```
 
-## 📊 Detection Capabilities
+## [METRICS] Detection Capabilities
 
 ### Static Forms (Compile-time)
 
@@ -165,7 +165,7 @@ connascence/
 | **CoV** | Shared values | Global mutable state | Immutable objects |
 | **CoI** | Object identity | `is` comparisons | Value-based equality |
 
-## 🔧 Policy-as-Code
+## [TECH] Policy-as-Code
 
 ### Predefined Policies
 
@@ -201,10 +201,10 @@ budget_limits:
 connascence scan-diff --base main --budget-check
 
 # Example output:
-❌ Budget exceeded!
+ Budget exceeded!
 - CoM violations: 8/5 (3 over limit)
 - High severity: 12/8 (4 over limit)  
-💡 Focus on extracting magic literals first
+[TIP] Focus on extracting magic literals first
 ```
 
 ### Baseline Management
@@ -220,7 +220,7 @@ connascence scan . --baseline-mode
 connascence baseline status
 ```
 
-## 🤖 Agent Integration (MCP)
+## [GENERATED] Agent Integration (MCP)
 
 ### Available Tools
 
@@ -259,7 +259,7 @@ await mcp.call("enforce_policy", {
 - **Audit logging** - All agent actions logged with timestamps
 - **Deterministic results** - Stable fingerprints for caching
 
-## 📊 VS Code Extension
+## [METRICS] VS Code Extension
 
 ### Features
 
@@ -281,7 +281,7 @@ npm install && npm run compile
 code --install-extension .
 ```
 
-## 🏢 Enterprise Features
+## [ENTERPRISE] Enterprise Features
 
 ### CI/CD Integration
 
@@ -311,10 +311,10 @@ jobs:
 # Ingest from existing tools
 from connascence.integrators import RuffIngestor, RadonIngestor
 
-# Map Ruff PLR2004 (magic values) → CoM violations
+# Map Ruff PLR2004 (magic values)  CoM violations
 ruff_results = RuffIngestor().ingest("ruff_output.json")
 
-# Map Radon complexity → CoA violations  
+# Map Radon complexity  CoA violations  
 radon_results = RadonIngestor().ingest("radon_output.json")
 
 # Unified connascence report
@@ -328,7 +328,7 @@ unified_report = merge_results([native_results, ruff_results, radon_results])
 - **Team Metrics** - PR quality scores
 - **ROI Tracking** - Quality improvement impact
 
-## 🎨 Output Formats
+##  Output Formats
 
 ### SARIF 2.1.0 (GitHub Code Scanning)
 
@@ -384,25 +384,25 @@ unified_report = merge_results([native_results, ruff_results, radon_results])
 ### Markdown (PR Comments)
 
 ```markdown
-# 🟡 Connascence Analysis Report
+#  Connascence Analysis Report
 
 **Status:** 23 issues found | **Policy:** `service-defaults` | **Duration:** 1.2s
 
-## 📊 Summary
-**By Severity:** 🔴 **2** critical | 🟠 **8** high | 🟡 **13** medium  
+## [METRICS] Summary
+**By Severity:**  **2** critical |  **8** high |  **13** medium  
 **Most Common:** **12** CoM | **8** CoP | **3** CoA  
 **Files Affected:** 7/45
 
-## 🔍 Top Issues
-- 🔴 **CoA** in `pricing.py:15` - God Object: class 'PricingEngine' has 25 methods
-- 🟠 **CoM** in `config.py:42` - Magic literal '100' should be named constant
+## [SEARCH] Top Issues
+-  **CoA** in `pricing.py:15` - God Object: class 'PricingEngine' has 25 methods
+-  **CoM** in `config.py:42` - Magic literal '100' should be named constant
 
-## 💡 Recommendations  
-- 🔢 **Extract Magic Literals**: Consider creating constants module
-- 🚨 **Address Critical Issues First**: God objects represent design problems
+## [TIP] Recommendations  
+-  **Extract Magic Literals**: Consider creating constants module
+-  **Address Critical Issues First**: God objects represent design problems
 ```
 
-## 🚀 Performance
+## [RELEASE] Performance
 
 ### Benchmarks
 
@@ -418,7 +418,7 @@ unified_report = merge_results([native_results, ruff_results, radon_results])
 - **Parallel Processing** - Multi-threaded analysis
 - **Exclusion Patterns** - Skip irrelevant files
 
-## 📚 Documentation
+##  Documentation
 
 ### Complete Guides
 
@@ -435,15 +435,15 @@ unified_report = merge_results([native_results, ruff_results, radon_results])
 - [**Best Practices**](docs/BEST_PRACTICES.md) - Team adoption strategies
 - [**Case Studies**](docs/CASE_STUDIES.md) - Real-world examples
 
-## 🏆 Success Stories
+## [ACHIEVEMENT] Success Stories
 
 > *"Reduced our bug rate by 40% after implementing connascence analysis in our CI pipeline. The magic literal detection alone saved us from 3 production incidents."*  
-> **— Sarah Chen, Senior Engineer at TechCorp**
+> ** Sarah Chen, Senior Engineer at TechCorp**
 
 > *"The VS Code extension transformed how our team thinks about coupling. Real-time feedback during coding prevents issues before they're committed."*  
-> **— Marcus Rodriguez, Lead Developer at FinanceApp**
+> ** Marcus Rodriguez, Lead Developer at FinanceApp**
 
-## 🛡️ Enterprise Support
+## [SECURITY] Enterprise Support
 
 ### Commercial Licensing
 
@@ -457,7 +457,7 @@ unified_report = merge_results([native_results, ruff_results, radon_results])
 - **Professional**: Email support, SLA response times
 - **Enterprise**: Dedicated support, custom integrations, on-site training
 
-## 🤝 Contributing
+##  Contributing
 
 We welcome contributions! See our [Contributing Guide](CONTRIBUTING.md) for details.
 
@@ -478,7 +478,7 @@ pytest
 - [Discord Community](https://discord.gg/connascence) 
 - [Stack Overflow](https://stackoverflow.com/questions/tagged/connascence)
 
-## 📄 License
+## [DOC] License
 
 This project is licensed under the [Business Source License 1.1](LICENSE). 
 
@@ -493,4 +493,4 @@ pip install connascence-analyzer
 connascence scan .
 ```
 
-[Get Started →](docs/QUICKSTART.md) | [See Examples →](examples/) | [Commercial License →](https://connascence.io/pricing)
+[Get Started ](docs/QUICKSTART.md) | [See Examples ](examples/) | [Commercial License ](https://connascence.io/pricing)

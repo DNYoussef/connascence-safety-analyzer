@@ -20,7 +20,7 @@ The AIVillage codebase exhibits **critical coupling violations** that pose signi
 
 ---
 
-## 🚨 Critical God Objects Requiring Immediate Refactoring
+##  Critical God Objects Requiring Immediate Refactoring
 
 ### Tier 1: Massive God Objects (>800 LOC)
 1. **HorticulturistAgent** (~913 lines, 2 methods)
@@ -56,7 +56,7 @@ The AIVillage codebase exhibits **critical coupling violations** that pose signi
 
 ---
 
-## 🔗 Connascence Violation Patterns
+##  Connascence Violation Patterns
 
 ### Connascence of Meaning (31,137 violations)
 - **Magic literals scattered throughout codebase**
@@ -86,7 +86,7 @@ The AIVillage codebase exhibits **critical coupling violations** that pose signi
 
 ---
 
-## 📊 Coupling Metrics Analysis
+## [METRICS] Coupling Metrics Analysis
 
 ### Module Instability Analysis
 - **Average Coupling Score:** 15.8/100
@@ -108,7 +108,7 @@ The AIVillage codebase exhibits **critical coupling violations** that pose signi
 
 ---
 
-## 🛠 Anti-Pattern Detection Results
+##  Anti-Pattern Detection Results
 
 ### Critical Anti-Patterns (5,560 total)
 1. **Embedded SQL (1,902 instances)**
@@ -133,7 +133,7 @@ The AIVillage codebase exhibits **critical coupling violations** that pose signi
 
 ---
 
-## 🎯 Prioritized Refactoring Roadmap
+## [TARGET] Prioritized Refactoring Roadmap
 
 ### Phase 1: Foundation Stabilization (Weeks 1-4)
 **Priority: CRITICAL - Must be completed first**
@@ -206,7 +206,7 @@ The AIVillage codebase exhibits **critical coupling violations** that pose signi
 
 ---
 
-## 💰 Effort Estimation & Resource Allocation
+##  Effort Estimation & Resource Allocation
 
 ### Resource Requirements
 - **Senior Architects:** 2 FTE for 16 weeks
@@ -227,7 +227,7 @@ The AIVillage codebase exhibits **critical coupling violations** that pose signi
 
 ---
 
-## ⚠️ Risk Assessment Matrix
+## [WARNING] Risk Assessment Matrix
 
 ### High-Risk Refactoring Areas
 1. **BaseAgentTemplate Changes**
@@ -265,7 +265,7 @@ The AIVillage codebase exhibits **critical coupling violations** that pose signi
 
 ---
 
-## 🎯 Success Metrics & Validation
+## [TARGET] Success Metrics & Validation
 
 ### Quality Gates
 1. **Connascence Reduction:** >80% reduction in cross-module strong connascence
@@ -282,7 +282,7 @@ The AIVillage codebase exhibits **critical coupling violations** that pose signi
 
 ---
 
-## 🚀 Implementation Recommendations
+## [RELEASE] Implementation Recommendations
 
 ### Immediate Actions (This Week)
 1. **Freeze new feature development** in critical God Object files
@@ -304,7 +304,7 @@ The AIVillage codebase exhibits **critical coupling violations** that pose signi
 
 ---
 
-## 📈 Expected Benefits
+## [IMPROVEMENT] Expected Benefits
 
 ### Short-term (3 months)
 - **50% reduction** in critical connascence violations
@@ -326,7 +326,7 @@ The AIVillage codebase exhibits **critical coupling violations** that pose signi
 
 ---
 
-## 🔄 Continuous Improvement
+## [PROGRESS] Continuous Improvement
 
 ### Monitoring & Alerts
 1. **Daily coupling metrics** reporting

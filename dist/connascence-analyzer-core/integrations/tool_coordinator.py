@@ -346,7 +346,7 @@ class ToolCoordinator:
         critical_violations = [v for v in violations if v.get('severity') == 'critical']
         if critical_violations:
             recommendations.insert(0, 
-                f"🚨 URGENT: Address {len(critical_violations)} critical connascence violations immediately"
+                f" URGENT: Address {len(critical_violations)} critical connascence violations immediately"
             )
         
         return recommendations
@@ -589,9 +589,9 @@ class ToolCoordinator:
         report_lines.append("## Tool Results")
         for tool_name, result in analysis.tool_results.items():
             if result.success:
-                report_lines.append(f"- ✅ **{tool_name.title()}:** Completed in {result.execution_time:.2f}s")
+                report_lines.append(f"- [DONE] **{tool_name.title()}:** Completed in {result.execution_time:.2f}s")
             else:
-                report_lines.append(f"- ❌ **{tool_name.title()}:** Failed - {result.error_message}")
+                report_lines.append(f"-  **{tool_name.title()}:** Failed - {result.error_message}")
         report_lines.append("")
         
         # Recommendations

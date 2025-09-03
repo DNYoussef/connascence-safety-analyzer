@@ -207,8 +207,8 @@ class HTTPStatus:
     FORBIDDEN = 403
 
 class Messages:
-    ALLOWED = "✓ ALLOWED"
-    DENIED = "✗ DENIED"
+    ALLOWED = " ALLOWED"
+    DENIED = " DENIED"
 
 if status_code == HTTPStatus.OK:
     print(Messages.ALLOWED)

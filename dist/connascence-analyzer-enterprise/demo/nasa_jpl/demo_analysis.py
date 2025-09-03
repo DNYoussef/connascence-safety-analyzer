@@ -42,9 +42,9 @@ def demo_analysis():
             enable_safety_profiles=True,
             nasa_compliance=True
         )
-        print("✅ Grammar-enhanced analyzer initialized")
+        print("[DONE] Grammar-enhanced analyzer initialized")
     except ImportError as e:
-        print(f"❌ Failed to initialize analyzer: {e}")
+        print(f" Failed to initialize analyzer: {e}")
         return False
     
     print()
@@ -54,21 +54,21 @@ def demo_analysis():
     print("-" * 50)
     
     if not violations_file.exists():
-        print(f"❌ Violations file not found: {violations_file}")
+        print(f" Violations file not found: {violations_file}")
         return False
     
     try:
         violations_result = analyzer.analyze_file(violations_file, "nasa_jpl_pot10")
-        print(f"📁 File: {violations_result.file_path}")
-        print(f"🔍 Language: {violations_result.language.value}")
-        print(f"📊 Quality Score: {violations_result.overall_quality_score:.2f}/1.00")
+        print(f"[FOLDER] File: {violations_result.file_path}")
+        print(f"[SEARCH] Language: {violations_result.language.value}")
+        print(f"[METRICS] Quality Score: {violations_result.overall_quality_score:.2f}/1.00")
         print()
         
         # Grammar validation results
         grammar = violations_result.grammar_validation
         print("Grammar Validation:")
-        print(f"  ✅ Syntactically Valid: {grammar.is_valid}")
-        print(f"  ⚠️  Safety Violations: {len(grammar.violations)}")
+        print(f"  [DONE] Syntactically Valid: {grammar.is_valid}")
+        print(f"  [WARNING]  Safety Violations: {len(grammar.violations)}")
         
         if grammar.violations:
             print("\n  NASA Rule Violations Detected:")
@@ -84,21 +84,21 @@ def demo_analysis():
         
         # Refactoring opportunities
         if violations_result.refactoring_opportunities:
-            print("🔧 Refactoring Opportunities (Refactoring.Guru techniques):")
+            print("[TECH] Refactoring Opportunities (Refactoring.Guru techniques):")
             for i, opp in enumerate(violations_result.refactoring_opportunities[:3], 1):
                 print(f"    {i}. {opp.technique.value}: {opp.description}")
                 print(f"       Confidence: {opp.confidence:.1%}")
             print()
         
         # Magic literals and other issues
-        print("🔮 Code Quality Issues:")
+        print(" Code Quality Issues:")
         print(f"    Magic Literals: {len(violations_result.magic_literals)}")
         print(f"    Connascence Issues: {len(violations_result.connascence_violations)}")
         print(f"    God Objects: {len(violations_result.god_objects)}")
         print()
         
     except Exception as e:
-        print(f"❌ Analysis failed: {e}")
+        print(f" Analysis failed: {e}")
         return False
     
     # 2. Analyze compliant code for comparison
@@ -106,22 +106,22 @@ def demo_analysis():
     print("-" * 50)
     
     if not compliant_file.exists():
-        print(f"❌ Compliant file not found: {compliant_file}")
+        print(f" Compliant file not found: {compliant_file}")
         return False
     
     try:
         compliant_result = analyzer.analyze_file(compliant_file, "nasa_jpl_pot10")
-        print(f"📁 File: {compliant_result.file_path}")
-        print(f"📊 Quality Score: {compliant_result.overall_quality_score:.2f}/1.00")
+        print(f"[FOLDER] File: {compliant_result.file_path}")
+        print(f"[METRICS] Quality Score: {compliant_result.overall_quality_score:.2f}/1.00")
         
         grammar = compliant_result.grammar_validation
-        print(f"✅ Syntactically Valid: {grammar.is_valid}")
-        print(f"✅ Safety Violations: {len(grammar.violations)}")
-        print(f"✅ NASA Compliant: {len(grammar.violations) == 0}")
+        print(f"[DONE] Syntactically Valid: {grammar.is_valid}")
+        print(f"[DONE] Safety Violations: {len(grammar.violations)}")
+        print(f"[DONE] NASA Compliant: {len(grammar.violations) == 0}")
         print()
         
     except Exception as e:
-        print(f"❌ Compliant analysis failed: {e}")
+        print(f" Compliant analysis failed: {e}")
         return False
     
     # 3. Generate comparison report
@@ -133,7 +133,7 @@ def demo_analysis():
     
     violations_before = len(violations_result.grammar_validation.violations)
     violations_after = len(compliant_result.grammar_validation.violations)
-    print(f"Safety Violations Reduced: {violations_before} → {violations_after} (-{violations_before - violations_after})")
+    print(f"Safety Violations Reduced: {violations_before}  {violations_after} (-{violations_before - violations_after})")
     
     print()
     
@@ -146,7 +146,7 @@ def demo_analysis():
     
     print("Power of Ten Rules Compliance:")
     for rule_num, rule_data in compliance_data["rules"].items():
-        status = "✅ PASS" if rule_data["compliant"] else "❌ FAIL"
+        status = "[DONE] PASS" if rule_data["compliant"] else " FAIL"
         violations = rule_data["violations"] 
         print(f"  Rule {rule_num}: {status} ({violations} violations)")
     
@@ -154,13 +154,13 @@ def demo_analysis():
     print(f"\nOverall Compliance: {overall_compliance:.1f}%")
     
     if overall_compliance >= 95:
-        print("🎉 EXCELLENT: Ready for safety-critical deployment")
+        print("[SUCCESS] EXCELLENT: Ready for safety-critical deployment")
     elif overall_compliance >= 80:
-        print("⚠️  GOOD: Minor issues to address")
+        print("[WARNING]  GOOD: Minor issues to address")
     elif overall_compliance >= 60:
-        print("🔧 NEEDS WORK: Systematic refactoring required")
+        print("[TECH] NEEDS WORK: Systematic refactoring required")
     else:
-        print("🚨 CRITICAL: Major compliance issues detected")
+        print(" CRITICAL: Major compliance issues detected")
     
     print()
     
@@ -206,7 +206,7 @@ def demo_analysis():
     with open(report_file, 'w') as f:
         json.dump(report_data, f, indent=2, default=str)
     
-    print(f"📄 Detailed report saved to: {report_file}")
+    print(f"[DOC] Detailed report saved to: {report_file}")
     print()
     
     # 7. Demo MCP integration capabilities
@@ -230,7 +230,7 @@ def demo_analysis():
     print('  connascence.get_quality_score(path="sample.c", profile="nasa_jpl_pot10")')
     print()
     
-    print("✅ Demo completed successfully!")
+    print("[DONE] Demo completed successfully!")
     return True
 
 

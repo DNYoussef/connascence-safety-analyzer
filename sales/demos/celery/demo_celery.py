@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Celery Demo Script - Python Connascence Analysis
-Showcases FP <5% and autofix ≥60% acceptance rates
+Showcases FP <5% and autofix 60% acceptance rates
 """
 
 import subprocess
@@ -19,17 +19,17 @@ class CeleryDemo:
     def clone_celery(self):
         """Clone Celery repository if not exists"""
         if not self.celery_path.exists():
-            print("🔄 Cloning Celery repository...")
+            print("[PROGRESS] Cloning Celery repository...")
             subprocess.run([
                 "git", "clone", "https://github.com/celery/celery", str(self.celery_path)
             ], check=True)
-            print("✅ Celery cloned successfully")
+            print("[DONE] Celery cloned successfully")
         else:
-            print("✅ Using existing Celery repository")
+            print("[DONE] Using existing Celery repository")
 
     def run_connascence_scan(self):
         """Run connascence analysis on Celery with modern_general profile"""
-        print("\n🔍 Running Connascence analysis on Celery...")
+        print("\n[SEARCH] Running Connascence analysis on Celery...")
         
         start_time = time.time()
         
@@ -48,7 +48,7 @@ class CeleryDemo:
             result = subprocess.run(cmd, capture_output=True, text=True, check=False)
             analysis_time = time.time() - start_time
             
-            print(f"✅ Analysis completed in {analysis_time:.1f}s")
+            print(f"[DONE] Analysis completed in {analysis_time:.1f}s")
             
             # Save raw output for debugging
             with open(self.output_dir / "scan_output.txt", "w") as f:
@@ -60,16 +60,16 @@ class CeleryDemo:
             return result.returncode == 0
             
         except subprocess.CalledProcessError as e:
-            print(f"❌ Analysis failed: {e}")
+            print(f" Analysis failed: {e}")
             return False
 
     def generate_hotspots(self):
         """Generate hotspot analysis"""
-        print("\n📊 Generating hotspot analysis...")
+        print("\n[METRICS] Generating hotspot analysis...")
         
         report_file = self.output_dir / "report.json"
         if not report_file.exists():
-            print("⚠️  No report.json found, creating mock hotspots")
+            print("[WARNING]  No report.json found, creating mock hotspots")
             self.create_mock_hotspots()
             return
             
@@ -83,15 +83,15 @@ class CeleryDemo:
             result = subprocess.run(cmd, capture_output=True, text=True, check=True)
             hotspots_file = self.output_dir / "hotspots.md"
             hotspots_file.write_text(result.stdout)
-            print(f"✅ Hotspots saved to {hotspots_file}")
+            print(f"[DONE] Hotspots saved to {hotspots_file}")
             
         except subprocess.CalledProcessError:
-            print("⚠️  Hotspot generation failed, creating mock data")
+            print("[WARNING]  Hotspot generation failed, creating mock data")
             self.create_mock_hotspots()
 
     def suggest_refactors(self):
         """Generate refactoring suggestions with dry-run autofixes"""
-        print("\n🔧 Generating refactoring suggestions...")
+        print("\n[TECH] Generating refactoring suggestions...")
         
         report_file = self.output_dir / "report.json"
         pr_file = self.output_dir / "PR.md"
@@ -111,10 +111,10 @@ class CeleryDemo:
         
         try:
             result = subprocess.run(cmd, capture_output=True, text=True, check=True)
-            print(f"✅ Refactoring suggestions saved to {pr_file}")
+            print(f"[DONE] Refactoring suggestions saved to {pr_file}")
             
         except subprocess.CalledProcessError:
-            print("⚠️  Refactor suggestion failed, creating mock PR")
+            print("[WARNING]  Refactor suggestion failed, creating mock PR")
             self.create_mock_refactors()
 
     def create_mock_hotspots(self):
@@ -166,16 +166,16 @@ class CeleryDemo:
 - Method extractions: 18/43 successful (42%)
 
 ## Quality Impact
-Applying top 10 fixes would improve Connascence Index from 12.4 → 8.7 (30% improvement)
+Applying top 10 fixes would improve Connascence Index from 12.4  8.7 (30% improvement)
 """
         
         hotspots_file = self.output_dir / "hotspots.md"
         hotspots_file.write_text(hotspots_md)
-        print(f"✅ Mock hotspots created at {hotspots_file}")
+        print(f"[DONE] Mock hotspots created at {hotspots_file}")
 
     def create_mock_refactors(self):
         """Create mock refactoring PR for demo purposes"""
-        pr_md = """# Connascence: CoP↓ via Introduce Parameter Object
+        pr_md = """# Connascence: CoP via Introduce Parameter Object
 
 ## Summary
 This PR reduces Connascence of Position (CoP) by introducing parameter objects for methods with long parameter lists, improving maintainability and reducing coupling.
@@ -277,15 +277,15 @@ def inspect_registered(self):
 
 ## Impact
 
-- **Connascence Index**: 12.4 → 9.8 (-21%)
+- **Connascence Index**: 12.4  9.8 (-21%)
 - **Maintainability**: Parameter objects enable backward-compatible extensions
 - **Code Quality**: Reduced duplication and magic numbers
 - **Test Coverage**: Existing tests pass without modification
 
 ## Build Status
-✅ All tests pass  
-✅ Linting passes  
-✅ Type checking passes  
+[DONE] All tests pass  
+[DONE] Linting passes  
+[DONE] Type checking passes  
 
 ## Refactoring Techniques Applied
 - **Introduce Parameter Object** (Fowler) - Reduces CoP
@@ -298,7 +298,7 @@ def inspect_registered(self):
         
         pr_file = self.output_dir / "PR.md"
         pr_file.write_text(pr_md)
-        print(f"✅ Mock PR created at {pr_file}")
+        print(f"[DONE] Mock PR created at {pr_file}")
 
     def generate_sarif_sample(self):
         """Generate sample SARIF output for demo"""
@@ -361,7 +361,7 @@ def inspect_registered(self):
         with open(sarif_file, 'w') as f:
             json.dump(sarif_data, f, indent=2)
         
-        print(f"✅ SARIF report created at {sarif_file}")
+        print(f"[DONE] SARIF report created at {sarif_file}")
 
     def create_dashboard_screenshot_data(self):
         """Create data for dashboard screenshots"""
@@ -404,11 +404,11 @@ def inspect_registered(self):
         with open(dashboard_file, 'w') as f:
             json.dump(dashboard_data, f, indent=2)
             
-        print(f"✅ Dashboard data created at {dashboard_file}")
+        print(f"[DONE] Dashboard data created at {dashboard_file}")
 
     def run_complete_demo(self):
         """Run the complete Celery demo"""
-        print("🚀 Starting Celery Connascence Demo")
+        print("[RELEASE] Starting Celery Connascence Demo")
         print("=" * 50)
         
         # Step 1: Clone repository
@@ -424,20 +424,20 @@ def inspect_registered(self):
         self.create_dashboard_screenshot_data()
         
         # Step 4: Summary
-        print("\n🎯 Demo Complete!")
+        print("\n[TARGET] Demo Complete!")
         print("=" * 50)
-        print(f"📁 Output directory: {self.output_dir.absolute()}")
-        print("📄 Key artifacts:")
-        print(f"  • Hotspots: {self.output_dir}/hotspots.md")
-        print(f"  • PR Draft: {self.output_dir}/PR.md") 
-        print(f"  • SARIF: {self.output_dir}/celery.sarif")
-        print(f"  • Dashboard Data: {self.output_dir}/dashboard_data.json")
+        print(f"[FOLDER] Output directory: {self.output_dir.absolute()}")
+        print("[DOC] Key artifacts:")
+        print(f"   Hotspots: {self.output_dir}/hotspots.md")
+        print(f"   PR Draft: {self.output_dir}/PR.md") 
+        print(f"   SARIF: {self.output_dir}/celery.sarif")
+        print(f"   Dashboard Data: {self.output_dir}/dashboard_data.json")
         
-        print("\n📊 Key Metrics:")
-        print("  • False Positive Rate: <5% (4.5% measured)")
-        print("  • Autofix Acceptance: ≥60% (62.9% achieved)")
-        print("  • Analysis Speed: 2.3s for 347 files")
-        print("  • Quality Improvement: 30% CI reduction potential")
+        print("\n[METRICS] Key Metrics:")
+        print("   False Positive Rate: <5% (4.5% measured)")
+        print("   Autofix Acceptance: 60% (62.9% achieved)")
+        print("   Analysis Speed: 2.3s for 347 files")
+        print("   Quality Improvement: 30% CI reduction potential")
         
         return success
 

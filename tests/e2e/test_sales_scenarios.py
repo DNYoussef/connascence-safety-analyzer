@@ -28,7 +28,7 @@ class TestSalesDemoScenarios:
     def test_celery_demo_scenario(self, sales_artifacts_dir):
         """Test complete Celery demo scenario - Python connascence analysis"""
         
-        print("\n🎯 Testing Celery Demo Scenario")
+        print("\n[TARGET] Testing Celery Demo Scenario")
         
         # Step 1: Create mock Celery codebase structure
         celery_dir = sales_artifacts_dir / "celery"
@@ -100,12 +100,12 @@ class Celery:
         # Step 5: Generate demo artifacts
         self._generate_celery_demo_artifacts(sales_artifacts_dir, violations, autofixes)
         
-        print(f"✅ Celery demo validated - FP: {fp_rate:.1f}%, Autofix: {autofix_rate:.1f}%")
+        print(f"[DONE] Celery demo validated - FP: {fp_rate:.1f}%, Autofix: {autofix_rate:.1f}%")
 
     def test_curl_demo_scenario(self, sales_artifacts_dir):
         """Test complete curl demo scenario - C NASA/JPL safety analysis"""
         
-        print("\n🛡️ Testing curl NASA/JPL Demo Scenario")
+        print("\n[SECURITY] Testing curl NASA/JPL Demo Scenario")
         
         # Step 1: Create mock curl codebase with NASA violations
         curl_dir = sales_artifacts_dir / "curl"
@@ -162,12 +162,12 @@ int setup_transfer(CURL *curl, int method, int protocol, int flags,
         # Step 6: Generate NASA demo artifacts
         self._generate_nasa_demo_artifacts(sales_artifacts_dir, violations, safety_fixes)
         
-        print(f"✅ NASA demo validated - {len(nasa_violations)} rule violations, {tool_overlap_rate:.1f}% overlap")
+        print(f"[DONE] NASA demo validated - {len(nasa_violations)} rule violations, {tool_overlap_rate:.1f}% overlap")
 
     def test_express_demo_scenario(self, sales_artifacts_dir):
         """Test complete Express demo scenario - JavaScript polyglot analysis"""
         
-        print("\n🌐 Testing Express Polyglot Demo Scenario")
+        print("\n Testing Express Polyglot Demo Scenario")
         
         # Step 1: Create mock Express.js codebase
         express_dir = sales_artifacts_dir / "express"
@@ -235,12 +235,12 @@ router.use('/users', (req, res, next) => {
         # Step 5: Generate polyglot demo artifacts
         self._generate_express_demo_artifacts(sales_artifacts_dir, violations, mcp_results)
         
-        print(f"✅ Express demo validated - {improvement:.1f}% CI improvement, {len(framework_patterns)} patterns")
+        print(f"[DONE] Express demo validated - {improvement:.1f}% CI improvement, {len(framework_patterns)} patterns")
 
     def test_vs_code_integration_scenario(self, sales_artifacts_dir):
         """Test VS Code extension integration scenario"""
         
-        print("\n💻 Testing VS Code Integration Scenario")
+        print("\n[CODE] Testing VS Code Integration Scenario")
         
         # Step 1: Mock VS Code extension environment
         vscode_workspace = sales_artifacts_dir / "vscode_test"
@@ -273,12 +273,12 @@ def problematic_function(a, b, c, d, e, f, g, h, i, j):
         for fix in quick_fixes:
             assert fix['ast_safe'] == True, "All fixes must be AST-safe"
             
-        print(f"✅ VS Code integration validated - {len(diagnostics)} diagnostics, {len(quick_fixes)} fixes")
+        print(f"[DONE] VS Code integration validated - {len(diagnostics)} diagnostics, {len(quick_fixes)} fixes")
 
     def test_enterprise_security_scenario(self, sales_artifacts_dir):
         """Test enterprise security features scenario"""
         
-        print("\n🔒 Testing Enterprise Security Scenario")
+        print("\n Testing Enterprise Security Scenario")
         
         # Step 1: Test RBAC functionality
         rbac_results = self._mock_rbac_testing()
@@ -307,12 +307,12 @@ def problematic_function(a, b, c, d, e, f, g, h, i, j):
             'airgap': airgap_results
         })
         
-        print("✅ Enterprise security validated - RBAC, audit, air-gap all functional")
+        print("[DONE] Enterprise security validated - RBAC, audit, air-gap all functional")
 
     def test_complete_sales_presentation(self, sales_artifacts_dir):
         """Test complete sales presentation scenario"""
         
-        print("\n🎬 Testing Complete Sales Presentation")
+        print("\n Testing Complete Sales Presentation")
         
         # Step 1: Verify all demo artifacts exist
         required_artifacts = [
@@ -342,7 +342,7 @@ def problematic_function(a, b, c, d, e, f, g, h, i, j):
         for item in checklist_items:
             assert buyer_checklist[item] == True, f"Buyer checklist item {item} not ready"
             
-        print("✅ Complete sales presentation validated - all artifacts ready")
+        print("[DONE] Complete sales presentation validated - all artifacts ready")
 
     # Helper methods for mocking analysis results
     
@@ -573,7 +573,7 @@ def problematic_function(a, b, c, d, e, f, g, h, i, j):
 - {len(fixes)} safety-critical autofixes applied
 
 ## Compliance Improvement
-NASA/JPL Power of Ten: 87% → 96% compliance achieved.
+NASA/JPL Power of Ten: 87%  96% compliance achieved.
 """
         (artifacts_dir / 'curl_pr.md').write_text(pr_content)
         
@@ -584,7 +584,7 @@ NASA/JPL Power of Ten: 87% → 96% compliance achieved.
         pr_content = f"""# Express MCP Loop: Framework Intelligence
 
 ## MCP Automation Results
-- Connascence Index: {mcp_results['initial_connascence_index']} → {mcp_results['final_connascence_index']} ({improvement:.1f}% improvement)
+- Connascence Index: {mcp_results['initial_connascence_index']}  {mcp_results['final_connascence_index']} ({improvement:.1f}% improvement)
 - Fixes Applied: {mcp_results['fixes_applied']}
 - Semgrep Integration: {len(violations)} framework patterns detected
 

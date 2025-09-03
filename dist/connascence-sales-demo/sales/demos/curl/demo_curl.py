@@ -19,17 +19,17 @@ class CurlDemo:
     def clone_curl(self):
         """Clone curl repository if not exists"""
         if not self.curl_path.exists():
-            print("🔄 Cloning curl repository...")
+            print("[PROGRESS] Cloning curl repository...")
             subprocess.run([
                 "git", "clone", "https://github.com/curl/curl", str(self.curl_path)
             ], check=True)
-            print("✅ curl cloned successfully")
+            print("[DONE] curl cloned successfully")
         else:
-            print("✅ Using existing curl repository")
+            print("[DONE] Using existing curl repository")
 
     def verify_build_flags(self):
         """Verify NASA-compliant build flags"""
-        print("\n🛡️  Verifying NASA/JPL build flag compliance...")
+        print("\n[SECURITY]  Verifying NASA/JPL build flag compliance...")
         
         cmd = [
             "connascence", "verify_build_flags",
@@ -50,24 +50,24 @@ class CurlDemo:
                     f.write("\nErrors/Warnings:\n")
                     f.write(result.stderr)
                     
-            print(f"✅ Build flags verification saved to {flags_file}")
+            print(f"[DONE] Build flags verification saved to {flags_file}")
             return result.returncode == 0
             
         except subprocess.CalledProcessError:
-            print("⚠️  Build flag verification failed, creating mock results")
+            print("[WARNING]  Build flag verification failed, creating mock results")
             self.create_mock_build_flags()
             return True
 
     def run_safety_scan(self):
         """Run connascence scan with safety_c_strict profile"""
-        print("\n🔍 Running NASA/JPL safety analysis on curl/lib...")
+        print("\n[SEARCH] Running NASA/JPL safety analysis on curl/lib...")
         
         start_time = time.time()
         
         # Focus on lib/ directory for faster runtime
         lib_path = self.curl_path / "lib"
         if not lib_path.exists():
-            print("⚠️  curl/lib not found, using full repository")
+            print("[WARNING]  curl/lib not found, using full repository")
             lib_path = self.curl_path
         
         cmd = [
@@ -83,7 +83,7 @@ class CurlDemo:
             result = subprocess.run(cmd, capture_output=True, text=True, check=False)
             analysis_time = time.time() - start_time
             
-            print(f"✅ Safety analysis completed in {analysis_time:.1f}s")
+            print(f"[DONE] Safety analysis completed in {analysis_time:.1f}s")
             
             # Save raw output
             with open(self.output_dir / "safety_scan_output.txt", "w") as f:
@@ -95,12 +95,12 @@ class CurlDemo:
             return result.returncode == 0
             
         except subprocess.CalledProcessError as e:
-            print(f"❌ Safety analysis failed: {e}")
+            print(f" Safety analysis failed: {e}")
             return False
 
     def generate_evidence_report(self):
         """Generate evidence report showing tool correlation"""
-        print("\n📋 Generating evidence report...")
+        print("\n[CHECKLIST] Generating evidence report...")
         
         report_file = self.output_dir / "report.json"
         evidence_file = self.output_dir / "evidence.md"
@@ -117,15 +117,15 @@ class CurlDemo:
         
         try:
             result = subprocess.run(cmd, capture_output=True, text=True, check=True)
-            print(f"✅ Evidence report saved to {evidence_file}")
+            print(f"[DONE] Evidence report saved to {evidence_file}")
             
         except subprocess.CalledProcessError:
-            print("⚠️  Evidence report generation failed, creating mock")
+            print("[WARNING]  Evidence report generation failed, creating mock")
             self.create_mock_evidence_report()
 
     def suggest_safety_refactors(self):
         """Generate safety-focused refactoring suggestions"""
-        print("\n🔧 Generating safety refactoring suggestions...")
+        print("\n[TECH] Generating safety refactoring suggestions...")
         
         report_file = self.output_dir / "report.json"
         pr_file = self.output_dir / "PR.md"
@@ -146,10 +146,10 @@ class CurlDemo:
         
         try:
             result = subprocess.run(cmd, capture_output=True, text=True, check=True)
-            print(f"✅ Safety refactoring suggestions saved to {pr_file}")
+            print(f"[DONE] Safety refactoring suggestions saved to {pr_file}")
             
         except subprocess.CalledProcessError:
-            print("⚠️  Safety refactor suggestions failed, creating mock")
+            print("[WARNING]  Safety refactor suggestions failed, creating mock")
             self.create_mock_safety_refactors()
 
     def create_mock_build_flags(self):
@@ -157,51 +157,51 @@ class CurlDemo:
         flags_content = """NASA/JPL Power of Ten Build Flags Verification
 ==================================================
 
-🛡️  COMPILER FLAGS ANALYSIS
+[SECURITY]  COMPILER FLAGS ANALYSIS
 --------------------------
 
-✅ COMPLIANT FLAGS DETECTED:
-  • -Wall                    (Rule 10: Enable all warnings)
-  • -Werror                  (Rule 10: Treat warnings as errors)
-  • -Wextra                  (Extended warning set)
-  • -pedantic                (ISO C compliance)
-  • -fstack-protector-strong (Stack protection)
-  • -D_FORTIFY_SOURCE=2      (Buffer overflow protection)
+[DONE] COMPLIANT FLAGS DETECTED:
+   -Wall                    (Rule 10: Enable all warnings)
+   -Werror                  (Rule 10: Treat warnings as errors)
+   -Wextra                  (Extended warning set)
+   -pedantic                (ISO C compliance)
+   -fstack-protector-strong (Stack protection)
+   -D_FORTIFY_SOURCE=2      (Buffer overflow protection)
 
-✅ NASA SAFETY FLAGS:
-  • -fno-common              (No common variables) 
-  • -fstrict-aliasing         (Strict aliasing rules)
-  • -Wstrict-aliasing=3       (Detect aliasing violations)
-  • -fno-omit-frame-pointer  (Keep frame pointers for debugging)
+[DONE] NASA SAFETY FLAGS:
+   -fno-common              (No common variables) 
+   -fstrict-aliasing         (Strict aliasing rules)
+   -Wstrict-aliasing=3       (Detect aliasing violations)
+   -fno-omit-frame-pointer  (Keep frame pointers for debugging)
 
-⚠️  RECOMMENDED ADDITIONS:
-  • -Wcast-qual              (Warn about cast qualifiers)
-  • -Wwrite-strings          (Warn about string literal modification)
-  • -Wvla                    (Warn about variable length arrays)
+[WARNING]  RECOMMENDED ADDITIONS:
+   -Wcast-qual              (Warn about cast qualifiers)
+   -Wwrite-strings          (Warn about string literal modification)
+   -Wvla                    (Warn about variable length arrays)
 
-🎯 COMPLIANCE SCORE: 92% (NASA/JPL Power of Ten)
+[TARGET] COMPLIANCE SCORE: 92% (NASA/JPL Power of Ten)
 
 BUILD SYSTEM INTEGRATION:
 ------------------------
-✅ CMake build system detected
-✅ Makefile.am with proper flag propagation  
-✅ Configure script sets appropriate defaults
-✅ Cross-compilation support maintained
+[DONE] CMake build system detected
+[DONE] Makefile.am with proper flag propagation  
+[DONE] Configure script sets appropriate defaults
+[DONE] Cross-compilation support maintained
 
 STATIC ANALYSIS INTEGRATION:
 ---------------------------
-✅ clang-tidy configuration found
-✅ Coverity scan integration present
-✅ PC-lint configuration available
-✅ cppcheck integration detected
+[DONE] clang-tidy configuration found
+[DONE] Coverity scan integration present
+[DONE] PC-lint configuration available
+[DONE] cppcheck integration detected
 
 EVIDENCE-BASED FINDINGS:
 -----------------------
 The following issues are ALREADY COVERED by your build system:
-• Buffer overflows → Covered by -D_FORTIFY_SOURCE=2
-• Stack smashing → Covered by -fstack-protector-strong  
-• Uninitialized variables → Covered by -Wall -Wuninitialized
-• Type confusion → Covered by -Wstrict-aliasing=3
+ Buffer overflows  Covered by -D_FORTIFY_SOURCE=2
+ Stack smashing  Covered by -fstack-protector-strong  
+ Uninitialized variables  Covered by -Wall -Wuninitialized
+ Type confusion  Covered by -Wstrict-aliasing=3
 
 This means Connascence will NOT double-flag these issues,
 focusing only on architectural and design-level concerns
@@ -210,7 +210,7 @@ that your existing tools cannot detect.
         
         flags_file = self.output_dir / "build_flags_verification.txt"
         flags_file.write_text(flags_content)
-        print(f"✅ Mock build flags verification created")
+        print(f"[DONE] Mock build flags verification created")
 
     def create_mock_evidence_report(self):
         """Create mock evidence report for demo"""
@@ -227,7 +227,7 @@ that your existing tools cannot detect.
 
 Connascence analyzer implements **evidence-based correlation** to avoid double-flagging issues already covered by your existing toolchain:
 
-### Issues ALREADY COVERED by Your Tools ✅
+### Issues ALREADY COVERED by Your Tools [DONE]
 
 #### Build System Coverage (92% effective)
 - **Buffer overflows**: Detected by `-D_FORTIFY_SOURCE=2`
@@ -245,7 +245,7 @@ Connascence analyzer implements **evidence-based correlation** to avoid double-f
 - **Double-free**: Detected by AddressSanitizer  
 - **Memory corruption**: Detected by Valgrind memcheck
 
-### Connascence UNIQUE Findings (No Tool Overlap) 🎯
+### Connascence UNIQUE Findings (No Tool Overlap) [TARGET]
 
 Our analysis focuses on **architectural concerns** that existing tools cannot detect:
 
@@ -311,9 +311,9 @@ if (elapsed > 300000) {  // 5 minutes, but why?
 ## Business Value
 
 ### Risk Reduction
-- **Stack overflow elimination**: 6 recursion sites → 0
-- **Interface brittleness**: 5 parameter order dependencies → 0  
-- **Maintenance debt**: 8 algorithm duplications → 2 (75% reduction)
+- **Stack overflow elimination**: 6 recursion sites  0
+- **Interface brittleness**: 5 parameter order dependencies  0  
+- **Maintenance debt**: 8 algorithm duplications  2 (75% reduction)
 
 ### NASA Compliance Improvement
 - **Current compliance**: 87% (Power of Ten rules)
@@ -322,10 +322,10 @@ if (elapsed > 300000) {  // 5 minutes, but why?
 
 ## Integration Benefits
 
-✅ **No duplicate work**: We don't report what clang-tidy already catches  
-✅ **Architectural focus**: Finds design issues, not just code issues  
-✅ **Evidence-based**: Every finding includes proof it's not covered elsewhere  
-✅ **Safe automation**: High-confidence fixes with dry-run verification  
+[DONE] **No duplicate work**: We don't report what clang-tidy already catches  
+[DONE] **Architectural focus**: Finds design issues, not just code issues  
+[DONE] **Evidence-based**: Every finding includes proof it's not covered elsewhere  
+[DONE] **Safe automation**: High-confidence fixes with dry-run verification  
 
 ---
 
@@ -334,7 +334,7 @@ if (elapsed > 300000) {  // 5 minutes, but why?
         
         evidence_file = self.output_dir / "evidence.md"
         evidence_file.write_text(evidence_content)
-        print(f"✅ Mock evidence report created")
+        print(f"[DONE] Mock evidence report created")
 
     def create_mock_safety_refactors(self):
         """Create mock safety refactoring PR"""
@@ -465,22 +465,22 @@ int setup_transfer(const struct transfer_config *config);
 ## Build & Test Results
 
 ```bash
-✅ All 1,247 tests pass
-✅ Valgrind: No new memory issues  
-✅ Static analysis: 0/23 recursion violations (was 6/23)
-✅ Stack usage: Reduced from unbounded to 3.2KB maximum
-✅ Performance: No measurable impact (< 0.1% difference)
+[DONE] All 1,247 tests pass
+[DONE] Valgrind: No new memory issues  
+[DONE] Static analysis: 0/23 recursion violations (was 6/23)
+[DONE] Stack usage: Reduced from unbounded to 3.2KB maximum
+[DONE] Performance: No measurable impact (< 0.1% difference)
 ```
 
 ## NASA Compliance Metrics
 
 | Rule | Before | After | Status |
 |------|--------|-------|--------|  
-| Rule 3 (No recursion) | 6 violations | 0 violations | ✅ COMPLIANT |
-| Rule 8 (No magic numbers) | 4 violations | 1 violation | 🟡 IMPROVED |
-| Rule 10 (Compiler warnings) | 0 violations | 0 violations | ✅ COMPLIANT |
+| Rule 3 (No recursion) | 6 violations | 0 violations | [DONE] COMPLIANT |
+| Rule 8 (No magic numbers) | 4 violations | 1 violation |  IMPROVED |
+| Rule 10 (Compiler warnings) | 0 violations | 0 violations | [DONE] COMPLIANT |
 
-**Overall Compliance**: 87% → 96% (NASA/JPL Power of Ten)
+**Overall Compliance**: 87%  96% (NASA/JPL Power of Ten)
 
 ## Refactoring Techniques Applied
 - **Replace Recursion with Iteration** (Fowler) - Eliminates stack risk
@@ -494,7 +494,7 @@ int setup_transfer(const struct transfer_config *config);
         
         pr_file = self.output_dir / "PR.md"
         pr_file.write_text(pr_content)
-        print(f"✅ Mock safety refactoring PR created")
+        print(f"[DONE] Mock safety refactoring PR created")
 
     def create_safety_dashboard_data(self):
         """Create dashboard data focused on safety metrics"""
@@ -543,11 +543,11 @@ int setup_transfer(const struct transfer_config *config);
         with open(dashboard_file, 'w') as f:
             json.dump(dashboard_data, f, indent=2)
             
-        print(f"✅ Safety dashboard data created")
+        print(f"[DONE] Safety dashboard data created")
 
     def run_complete_demo(self):
         """Run the complete curl safety demo"""
-        print("🛡️  Starting curl NASA/JPL Safety Demo")
+        print("[SECURITY]  Starting curl NASA/JPL Safety Demo")
         print("=" * 50)
         
         # Step 1: Clone repository  
@@ -569,20 +569,20 @@ int setup_transfer(const struct transfer_config *config);
         self.create_safety_dashboard_data()
         
         # Summary
-        print("\n🎯 Safety Demo Complete!")
+        print("\n[TARGET] Safety Demo Complete!")
         print("=" * 50)
-        print(f"📁 Output directory: {self.output_dir.absolute()}")
-        print("📄 Key artifacts:")
-        print(f"  • Build Flags: {self.output_dir}/build_flags_verification.txt")
-        print(f"  • Evidence Report: {self.output_dir}/evidence.md")
-        print(f"  • Safety PR: {self.output_dir}/PR.md")
-        print(f"  • Dashboard: {self.output_dir}/safety_dashboard.json")
+        print(f"[FOLDER] Output directory: {self.output_dir.absolute()}")
+        print("[DOC] Key artifacts:")
+        print(f"   Build Flags: {self.output_dir}/build_flags_verification.txt")
+        print(f"   Evidence Report: {self.output_dir}/evidence.md")
+        print(f"   Safety PR: {self.output_dir}/PR.md")
+        print(f"   Dashboard: {self.output_dir}/safety_dashboard.json")
         
-        print("\n🛡️  Safety Metrics:")
-        print("  • NASA Compliance: 87% → 96% potential")
-        print("  • Recursion Sites: 6 → 0 (eliminated)")  
-        print("  • Evidence-based: 92.6% tool overlap (no double flagging)")
-        print("  • Autofix Rate: 73.9% for safety-critical issues")
+        print("\n[SECURITY]  Safety Metrics:")
+        print("   NASA Compliance: 87%  96% potential")
+        print("   Recursion Sites: 6  0 (eliminated)")  
+        print("   Evidence-based: 92.6% tool overlap (no double flagging)")
+        print("   Autofix Rate: 73.9% for safety-critical issues")
 
 def main():
     demo = CurlDemo()

@@ -300,7 +300,7 @@ class LocalDashboard:
             browser_thread.daemon = True
             browser_thread.start()
         
-        print(f"🚀 Connascence Dashboard starting on http://localhost:{self.port}")
+        print(f"[RELEASE] Connascence Dashboard starting on http://localhost:{self.port}")
         self.socketio.run(self.app, host='0.0.0.0', port=self.port, debug=False)
     
     def stop_server(self):
@@ -327,7 +327,7 @@ def main():
     try:
         dashboard.start_server()
     except KeyboardInterrupt:
-        print("\n👋 Dashboard stopped")
+        print("\n Dashboard stopped")
 
 
 if __name__ == '__main__':

@@ -49,16 +49,16 @@ class MarkdownReporter:
         critical_count = sum(1 for v in result.violations if v.severity.value == "critical")
         
         if critical_count > 0:
-            status_emoji = "🔴"
+            status_emoji = ""
             status = f"{critical_count} critical issues found"
         elif total_violations > 20:
-            status_emoji = "🟡" 
+            status_emoji = "" 
             status = f"{total_violations} issues found"
         elif total_violations > 0:
-            status_emoji = "🟢"
+            status_emoji = ""
             status = f"{total_violations} minor issues"
         else:
-            status_emoji = "✅"
+            status_emoji = "[DONE]"
             status = "No issues found"
         
         return f"""# {status_emoji} Connascence Analysis Report
@@ -70,7 +70,7 @@ class MarkdownReporter:
         violations = result.violations
         
         if not violations:
-            return "**🎉 Great work!** No connascence violations detected."
+            return "**[SUCCESS] Great work!** No connascence violations detected."
         
         # Count by severity
         by_severity = {}
@@ -84,14 +84,14 @@ class MarkdownReporter:
             type_key = violation.type.value
             by_type[type_key] = by_type.get(type_key, 0) + 1
         
-        summary_lines = ["## 📊 Summary"]
+        summary_lines = ["## [METRICS] Summary"]
         
         # Severity breakdown with emojis
         severity_emojis = {
-            "critical": "🔴",
-            "high": "🟠", 
-            "medium": "🟡",
-            "low": "⚪"
+            "critical": "",
+            "high": "", 
+            "medium": "",
+            "low": ""
         }
         
         severity_items = []
@@ -130,7 +130,7 @@ class MarkdownReporter:
             reverse=True
         )
         
-        lines = ["## 🔍 Top Issues"]
+        lines = ["## [SEARCH] Top Issues"]
         
         shown_count = 0
         for violation in sorted_violations:
@@ -139,11 +139,11 @@ class MarkdownReporter:
             
             # Format violation
             severity_emoji = {
-                "critical": "🔴",
-                "high": "🟠",
-                "medium": "🟡", 
-                "low": "⚪"
-            }.get(violation.severity.value, "⚪")
+                "critical": "",
+                "high": "",
+                "medium": "", 
+                "low": ""
+            }.get(violation.severity.value, "")
             
             file_name = Path(violation.file_path).name
             line_ref = f"{file_name}:{violation.line_number}"
@@ -154,7 +154,7 @@ class MarkdownReporter:
             
             # Add recommendation if available
             if violation.recommendation:
-                lines.append(f"  > 💡 {violation.recommendation}")
+                lines.append(f"  > [TIP] {violation.recommendation}")
             
             shown_count += 1
         
@@ -185,7 +185,7 @@ class MarkdownReporter:
             reverse=True
         )
         
-        lines = ["## 📁 Files Needing Attention"]
+        lines = ["## [FOLDER] Files Needing Attention"]
         
         shown_files = 0
         for file_path, file_violations in sorted_files:
@@ -225,9 +225,9 @@ class MarkdownReporter:
         violations = result.violations
         
         if not violations:
-            return "## ✨ Keep up the great work!\n\nYour code shows excellent connascence practices."
+            return "## [FEATURE] Keep up the great work!\n\nYour code shows excellent connascence practices."
         
-        lines = ["## 💡 Recommendations"]
+        lines = ["## [TIP] Recommendations"]
         
         # Analyze violation patterns for targeted advice
         by_type = {}
@@ -240,19 +240,19 @@ class MarkdownReporter:
         # Type-specific recommendations
         if by_type.get("CoM", 0) > 5:  # Many magic literals
             recommendations.append(
-                "🔢 **Extract Magic Literals**: Consider creating a constants module "
+                " **Extract Magic Literals**: Consider creating a constants module "
                 "for the numerous magic numbers and strings found."
             )
         
         if by_type.get("CoP", 0) > 3:  # Position issues
             recommendations.append(
-                "📋 **Use Keyword Arguments**: Functions with many positional parameters "
+                "[CHECKLIST] **Use Keyword Arguments**: Functions with many positional parameters "
                 "are hard to maintain. Consider using keyword arguments or data classes."
             )
         
         if by_type.get("CoA", 0) > 2:  # Algorithm duplication
             recommendations.append(
-                "🔄 **Eliminate Duplication**: Similar algorithms detected. "
+                "[PROGRESS] **Eliminate Duplication**: Similar algorithms detected. "
                 "Extract common logic into shared functions or modules."
             )
         
@@ -260,14 +260,14 @@ class MarkdownReporter:
         critical_count = sum(1 for v in violations if v.severity.value == "critical")
         if critical_count > 0:
             recommendations.append(
-                "🚨 **Address Critical Issues First**: Focus on critical violations "
+                " **Address Critical Issues First**: Focus on critical violations "
                 "as they represent significant design problems."
             )
         
         # General advice if no specific patterns
         if not recommendations:
             recommendations.append(
-                "🔍 **Review High-Weight Issues**: Focus on violations with the highest "
+                "[SEARCH] **Review High-Weight Issues**: Focus on violations with the highest "
                 "weight scores for maximum impact on code quality."
             )
         
@@ -287,8 +287,8 @@ class MarkdownReporter:
             "measures the strength of coupling between components. Lower connascence "
             "leads to more maintainable code.",
             "",
-            "📚 [Learn More](https://connascence.io) | "
-            "🔧 [Connascence Analyzer](https://github.com/connascence/connascence-analyzer)"
+            " [Learn More](https://connascence.io) | "
+            "[TECH] [Connascence Analyzer](https://github.com/connascence/connascence-analyzer)"
         ]
         
         return "\n".join(footer_parts)

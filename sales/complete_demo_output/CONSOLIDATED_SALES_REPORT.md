@@ -80,7 +80,7 @@
 ###  VS Code Integration Demo
 - Real-time analysis with inline diagnostics
 - Quick fix application with AST-safe refactoring
-- Safety profile switching (NASA → Modern → Custom)
+- Safety profile switching (NASA  Modern  Custom)
 
 ###  Proof Point Validation
 - **FP Rate**: <5% measured across 550+ files, 3 languages

@@ -28,18 +28,18 @@ def run_connascence_checks():
         ], capture_output=True, text=True, timeout=60)
         
         if result.returncode == 0:
-            print("✅ No high-severity connascence violations found!")
+            print("[DONE] No high-severity connascence violations found!")
             return True
         else:
-            print("❌ Connascence violations detected:")
+            print(" Connascence violations detected:")
             print(result.stdout)
             return False
             
     except subprocess.TimeoutExpired:
-        print("❌ Connascence analysis timed out")
+        print(" Connascence analysis timed out")
         return False
     except Exception as e:
-        print(f"❌ Error running connascence analysis: {e}")
+        print(f" Error running connascence analysis: {e}")
         return False
 
 
@@ -58,21 +58,21 @@ def run_magic_literal_checks():
         ], capture_output=True, text=True, timeout=30)
         
         if result.returncode == 0:
-            print("✅ Magic literal usage within acceptable limits!")
+            print("[DONE] Magic literal usage within acceptable limits!")
             return True
         else:
-            print("❌ Excessive magic literals detected:")
+            print(" Excessive magic literals detected:")
             print(result.stdout)
             return False
             
     except Exception as e:
-        print(f"❌ Error running magic literal detection: {e}")
+        print(f" Error running magic literal detection: {e}")
         return False
 
 
 if __name__ == "__main__":
     """Main pre-commit check."""
-    print("🔍 Running connascence pre-commit checks...")
+    print("[SEARCH] Running connascence pre-commit checks...")
     
     checks_passed = 0
     total_checks = 2
@@ -87,9 +87,9 @@ if __name__ == "__main__":
     
     # Final result
     if checks_passed == total_checks:
-        print(f"✅ All {total_checks} connascence checks passed!")
+        print(f"[DONE] All {total_checks} connascence checks passed!")
         sys.exit(0)
     else:
-        print(f"❌ {total_checks - checks_passed}/{total_checks} connascence checks failed!")
-        print("\n💡 Fix the connascence violations above and try again.")
+        print(f" {total_checks - checks_passed}/{total_checks} connascence checks failed!")
+        print("\n[TIP] Fix the connascence violations above and try again.")
         sys.exit(1)

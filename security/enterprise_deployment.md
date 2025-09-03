@@ -2,7 +2,7 @@
 
 This guide covers deploying the connascence analysis system in enterprise environments with comprehensive security controls.
 
-## 🔒 Security Features Overview
+##  Security Features Overview
 
 ### Authentication & Authorization
 - **Multi-factor Authentication** - Integration with enterprise SSO (SAML, LDAP, OIDC)
@@ -28,7 +28,7 @@ This guide covers deploying the connascence analysis system in enterprise enviro
 - **Integration with SIEM** - Log forwarding to enterprise security tools
 - **Incident Response** - Automated response to security events
 
-## 🚀 Quick Deployment
+## [RELEASE] Quick Deployment
 
 ### Standard Enterprise Deployment
 ```bash
@@ -57,18 +57,18 @@ connascence configure-auth --provider=local --user-db=/secure/users.db
 connascence serve --air-gapped --security-enabled
 ```
 
-## 📋 User Roles & Permissions
+## [CHECKLIST] User Roles & Permissions
 
 ### Role Hierarchy
 
 | Role | Code Access | Analysis | Autofix | Audit Logs | Admin |
 |------|-------------|----------|---------|------------|-------|
-| **Viewer** | Read | ❌ | ❌ | ❌ | ❌ |
-| **Analyst** | Read | ✅ | ❌ | ❌ | ❌ |
-| **Developer** | Read | ✅ | ✅ | ❌ | ❌ |
-| **Auditor** | Read | ✅ | ❌ | ✅ | ❌ |
-| **Security Officer** | Read | Read-only | ❌ | ✅ | Partial |
-| **Admin** | Full | ✅ | ✅ | ✅ | ✅ |
+| **Viewer** | Read |  |  |  |  |
+| **Analyst** | Read | [DONE] |  |  |  |
+| **Developer** | Read | [DONE] | [DONE] |  |  |
+| **Auditor** | Read | [DONE] |  | [DONE] |  |
+| **Security Officer** | Read | Read-only |  | [DONE] | Partial |
+| **Admin** | Full | [DONE] | [DONE] | [DONE] | [DONE] |
 
 ### Permission Matrix
 
@@ -100,7 +100,7 @@ permissions:
     system: [admin]
 ```
 
-## 🔧 Configuration
+## [TECH] Configuration
 
 ### Security Configuration File
 ```yaml
@@ -183,7 +183,7 @@ ldap:
     developer: "cn=developers,ou=groups,dc=company,dc=com"
 ```
 
-## 🛡️ Security Hardening
+## [SECURITY] Security Hardening
 
 ### Operating System Hardening
 ```bash
@@ -242,7 +242,7 @@ ALTER TABLE audit_events ENABLE ROW LEVEL SECURITY;
 CREATE POLICY audit_user_policy ON audit_events FOR ALL TO connascence_audit_user;
 ```
 
-## 📊 Monitoring & Alerting
+## [METRICS] Monitoring & Alerting
 
 ### Security Metrics Dashboard
 ```yaml
@@ -304,7 +304,7 @@ incident_response:
         - "lock_audit_access"
 ```
 
-## 🔍 Compliance & Audit
+## [SEARCH] Compliance & Audit
 
 ### SOC 2 Type II Controls
 - **CC6.1** - Logical access security measures
@@ -346,7 +346,7 @@ data_classification:
     - "security_configuration"
 ```
 
-## 🚨 Incident Response
+##  Incident Response
 
 ### Security Incident Playbooks
 
@@ -373,7 +373,7 @@ contacts:
   compliance: "compliance@company.com"
 ```
 
-## 📞 Enterprise Support
+## [CONTACT] Enterprise Support
 
 ### Professional Services
 - **Security Assessment** - Comprehensive security review and hardening

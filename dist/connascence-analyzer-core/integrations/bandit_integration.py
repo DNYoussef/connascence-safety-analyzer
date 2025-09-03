@@ -409,7 +409,7 @@ class BanditIntegration:
         high_severity = [issue for issue in bandit_results.get('issues', []) 
                         if issue.get('severity') == 'high']
         if high_severity:
-            suggestions.insert(0, f"🚨 URGENT: Address {len(high_severity)} high-severity security issues immediately")
+            suggestions.insert(0, f" URGENT: Address {len(high_severity)} high-severity security issues immediately")
         
         # Confidence-based suggestions
         high_confidence = [issue for issue in bandit_results.get('issues', []) 

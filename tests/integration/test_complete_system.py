@@ -429,7 +429,7 @@ print(json.dumps({
         
         # Verify proof points
         assert demo_results['celery']['fp_rate'] < 5.0  # FP < 5%
-        assert demo_results['celery']['autofix_rate'] >= 60.0  # Autofix ≥60%
+        assert demo_results['celery']['autofix_rate'] >= 60.0  # Autofix 60%
         assert demo_results['curl']['nasa_compliance'] >= 90  # NASA compliance high
         assert demo_results['express']['mcp_loop_successful'] == True  # MCP works
 

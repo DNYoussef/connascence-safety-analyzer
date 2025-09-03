@@ -433,7 +433,7 @@ Examples:
         if args.budget_check:
             budget_status = self.budget_tracker.check_budget(result.violations, policy)
             if not budget_status.passed:
-                print(f"❌ Budget exceeded! {budget_status.violations_summary}")
+                print(f" Budget exceeded! {budget_status.violations_summary}")
                 return 1
         
         # Generate output

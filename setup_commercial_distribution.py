@@ -245,10 +245,10 @@ def main():
     if success:
         print("\\nDemo suite complete - ready for customer presentation!")
         print("Key artifacts:")
-        print("• False Positive Rate: <5% validated")
-        print("• Autofix Acceptance: >=60% validated") 
-        print("• NASA/JPL compliance: Ready")
-        print("• Enterprise security: Deployed")
+        print(" False Positive Rate: <5% validated")
+        print(" Autofix Acceptance: >=60% validated") 
+        print(" NASA/JPL compliance: Ready")
+        print(" Enterprise security: Deployed")
     else:
         print("\\nDemo suite had some issues - check output for details")
     
@@ -338,7 +338,7 @@ python3 --version >/dev/null 2>&1 || {{
 }}
 
 # Install core packages
-echo "📦 Installing core analysis engine..."
+echo "[PACKAGE] Installing core analysis engine..."
 pip install connascence-analyzer-core-{self.version}.tar.gz
 
 echo "Installing enterprise security features..."  
@@ -357,12 +357,12 @@ systemctl daemon-reload
 systemctl enable connascence
 
 # Initialize security
-echo "🔐 Initializing security framework..."
+echo " Initializing security framework..."
 connascence init-security --mode=enterprise
 
 # Setup VS Code extension (optional)
 if command -v code &> /dev/null; then
-    echo "💻 Installing VS Code extension..."
+    echo "[CODE] Installing VS Code extension..."
     code --install-extension connascence-vscode-extension-{self.version}.vsix
 fi
 
@@ -515,7 +515,7 @@ Default admin credentials:
 This software is licensed under the Connascence Enterprise License.
 See LICENSE.txt for full terms.
 
-Copyright © 2024 Connascence Systems. All rights reserved.
+Copyright  2024 Connascence Systems. All rights reserved.
 """
         
         (installer_dir / "README.md").write_text(enterprise_readme)
@@ -574,7 +574,7 @@ Copyright © 2024 Connascence Systems. All rights reserved.
         enterprise_license = f"""CONNASCENCE ENTERPRISE LICENSE AGREEMENT
 
 Version {self.version}
-Copyright © 2024 Connascence Systems. All rights reserved.
+Copyright  2024 Connascence Systems. All rights reserved.
 
 This software is licensed, not sold. By installing or using this software, 
 you agree to be bound by the terms of this license agreement.
@@ -641,7 +641,7 @@ This software includes components from the following open source projects:
    Copyright (c) 2014 Pallets
 
 3. PyYAML (MIT License)  
-   Copyright (c) 2017-2021 Ingy döt Net
+   Copyright (c) 2017-2021 Ingy dt Net
    
 4. Jinja2 (BSD License)
    Copyright (c) 2007 Pallets
@@ -810,7 +810,7 @@ python connascence-sales-demo/run_demo.py
 ---
 
 *Connascence Enterprise - Where Architecture Meets Safety*  
-*Copyright © 2024 Connascence Systems. All rights reserved.*
+*Copyright  2024 Connascence Systems. All rights reserved.*
 """
         
         (self.dist_dir / 'DISTRIBUTION_MANIFEST.md').write_text(manifest_md)

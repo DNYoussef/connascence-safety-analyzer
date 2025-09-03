@@ -342,7 +342,7 @@ class CIDashboard:
 </head>
 <body>
     <div class="header">
-        <h1>🔗 Connascence Analysis Report</h1>
+        <h1> Connascence Analysis Report</h1>
         <p><strong>Project:</strong> {scan_results.get('project_path', 'Unknown')}</p>
         <p><strong>Policy:</strong> {scan_results.get('policy_preset', 'Unknown')}</p>
         <p><strong>Generated:</strong> {scan_results.get('timestamp', 'Unknown')}</p>
@@ -404,12 +404,12 @@ class CIDashboard:
         
         # Status emoji
         status_emoji = {
-            'clean': '✅',
-            'violations_found': '⚠️',
-            'budget_exceeded': '💥',
-            'critical': '🚨',
-            'error': '❌'
-        }.get(status, '📊')
+            'clean': '[DONE]',
+            'violations_found': '[WARNING]',
+            'budget_exceeded': '',
+            'critical': '',
+            'error': ''
+        }.get(status, '[METRICS]')
         
         comment = f"""## {status_emoji} Connascence Analysis Report
 
@@ -432,7 +432,7 @@ class CIDashboard:
         # Show critical violations
         critical_violations = [v for v in violations if v.get('severity') == 'critical']
         if critical_violations:
-            comment += "\n### 🚨 Critical Violations\n"
+            comment += "\n###  Critical Violations\n"
             for violation in critical_violations[:5]:  # Limit to 5
                 file_path = violation.get('file_path', '')
                 line_number = violation.get('line_number', 0)
@@ -442,7 +442,7 @@ class CIDashboard:
         # Budget status
         budget_status = scan_results.get('budget_status')
         if budget_status and budget_status.get('budget_exceeded'):
-            comment += "\n### 💥 Budget Exceeded\n"
+            comment += "\n###  Budget Exceeded\n"
             for violation_type, details in budget_status.get('violations', {}).items():
                 comment += f"- **{violation_type}:** Over budget\n"
         

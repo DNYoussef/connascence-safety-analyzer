@@ -22,10 +22,10 @@ def main():
     if success:
         print("\nDemo suite complete - ready for customer presentation!")
         print("Key artifacts:")
-        print("• False Positive Rate: <5% validated")
-        print("• Autofix Acceptance: >=60% validated") 
-        print("• NASA/JPL compliance: Ready")
-        print("• Enterprise security: Deployed")
+        print(" False Positive Rate: <5% validated")
+        print(" Autofix Acceptance: >=60% validated") 
+        print(" NASA/JPL compliance: Ready")
+        print(" Enterprise security: Deployed")
     else:
         print("\nDemo suite had some issues - check output for details")
     

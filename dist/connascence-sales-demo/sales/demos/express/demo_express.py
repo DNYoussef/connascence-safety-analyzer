@@ -19,24 +19,24 @@ class ExpressDemo:
     def clone_express(self):
         """Clone Express repository if not exists"""
         if not self.express_path.exists():
-            print("🔄 Cloning Express repository...")
+            print("[PROGRESS] Cloning Express repository...")
             subprocess.run([
                 "git", "clone", "https://github.com/expressjs/express", str(self.express_path)
             ], check=True)
-            print("✅ Express cloned successfully")
+            print("[DONE] Express cloned successfully")
         else:
-            print("✅ Using existing Express repository")
+            print("[DONE] Using existing Express repository")
 
     def run_polyglot_scan(self):
         """Run connascence scan with Semgrep integration for JavaScript"""
-        print("\n🔍 Running polyglot analysis on Express/lib...")
+        print("\n[SEARCH] Running polyglot analysis on Express/lib...")
         
         start_time = time.time()
         
         # Focus on lib/ directory for core framework code
         lib_path = self.express_path / "lib"
         if not lib_path.exists():
-            print("⚠️  express/lib not found, using full repository")
+            print("[WARNING]  express/lib not found, using full repository")
             lib_path = self.express_path
         
         cmd = [
@@ -53,7 +53,7 @@ class ExpressDemo:
             result = subprocess.run(cmd, capture_output=True, text=True, check=False)
             analysis_time = time.time() - start_time
             
-            print(f"✅ Polyglot analysis completed in {analysis_time:.1f}s")
+            print(f"[DONE] Polyglot analysis completed in {analysis_time:.1f}s")
             
             # Save raw output
             with open(self.output_dir / "polyglot_scan_output.txt", "w") as f:
@@ -65,12 +65,12 @@ class ExpressDemo:
             return result.returncode == 0
             
         except subprocess.CalledProcessError as e:
-            print(f"❌ Polyglot analysis failed: {e}")
+            print(f" Polyglot analysis failed: {e}")
             return False
 
     def demonstrate_mcp_loop(self):
-        """Demonstrate the MCP refactor loop: scan → suggest → autofix → re-scan"""
-        print("\n🔄 Demonstrating MCP refactor loop...")
+        """Demonstrate the MCP refactor loop: scan  suggest  autofix  re-scan"""
+        print("\n[PROGRESS] Demonstrating MCP refactor loop...")
         
         report_file = self.output_dir / "report.json"
         
@@ -79,7 +79,7 @@ class ExpressDemo:
             return
             
         # Step 1: Generate refactoring suggestions
-        print("  1️⃣  Generating refactoring suggestions...")
+        print("  1  Generating refactoring suggestions...")
         cmd1 = [
             "connascence", "suggest_refactors",
             "--from", str(report_file),
@@ -88,7 +88,7 @@ class ExpressDemo:
         ]
         
         # Step 2: Apply autofixes
-        print("  2️⃣  Applying safe autofixes...")
+        print("  2  Applying safe autofixes...")
         cmd2 = [
             "connascence", "propose_autofix",  
             "--from", str(report_file),
@@ -97,7 +97,7 @@ class ExpressDemo:
         ]
         
         # Step 3: Re-scan to verify improvements
-        print("  3️⃣  Re-scanning to verify improvements...")
+        print("  3  Re-scanning to verify improvements...")
         cmd3 = [
             "connascence", "scan",
             "--path", str(self.express_path / "lib"),
@@ -110,12 +110,12 @@ class ExpressDemo:
             self.create_mock_mcp_loop()
             
         except subprocess.CalledProcessError:
-            print("⚠️  MCP loop demo failed, creating mock results")
+            print("[WARNING]  MCP loop demo failed, creating mock results")
             self.create_mock_mcp_loop()
 
     def generate_js_refactors(self):
         """Generate JavaScript-specific refactoring suggestions"""
-        print("\n🔧 Generating JavaScript refactoring suggestions...")
+        print("\n[TECH] Generating JavaScript refactoring suggestions...")
         
         report_file = self.output_dir / "report.json"
         pr_file = self.output_dir / "PR.md"
@@ -135,10 +135,10 @@ class ExpressDemo:
         
         try:
             result = subprocess.run(cmd, capture_output=True, text=True, check=True)
-            print(f"✅ JavaScript refactoring suggestions saved to {pr_file}")
+            print(f"[DONE] JavaScript refactoring suggestions saved to {pr_file}")
             
         except subprocess.CalledProcessError:
-            print("⚠️  JS refactor suggestions failed, creating mock")
+            print("[WARNING]  JS refactor suggestions failed, creating mock")
             self.create_mock_js_refactors()
 
     def create_mock_mcp_loop(self):
@@ -275,26 +275,26 @@ Results After Fix:
 
 ## MCP Integration Benefits
 
-### 🚀 Automated Workflow
-- **Scan** → **Suggest** → **Fix** → **Verify** in single command
+### [RELEASE] Automated Workflow
+- **Scan**  **Suggest**  **Fix**  **Verify** in single command
 - Real-time feedback on fix effectiveness
 - Rollback capability for failed fixes
 
-### 🧠 Intelligent Context
+###  Intelligent Context
 - Semgrep rules mapped to Connascence types
 - Framework-aware refactoring (Express middleware patterns)
 - Language-specific best practices (JavaScript idioms)
 
-### 📊 Measurable Improvement  
-- Connascence Index: 8.7 → 6.2 (-28.7%)
-- Code duplication: 6 instances → 2 instances
-- Maintainability score: 72% → 89%
+### [METRICS] Measurable Improvement  
+- Connascence Index: 8.7  6.2 (-28.7%)
+- Code duplication: 6 instances  2 instances
+- Maintainability score: 72%  89%
 
 ## Polyglot Capability
 
 ### Semgrep Rule Mapping
 ```yaml
-# Express-specific Semgrep rules → Connascence types
+# Express-specific Semgrep rules  Connascence types
 rules:
   - id: express.middleware.parameter-order
     connascence_type: position
@@ -322,7 +322,7 @@ rules:
         
         mcp_file = self.output_dir / "mcp_loop_demo.md"
         mcp_file.write_text(mcp_loop_content)
-        print(f"✅ MCP loop demonstration created")
+        print(f"[DONE] MCP loop demonstration created")
 
     def create_mock_js_refactors(self):
         """Create mock JavaScript refactoring PR"""
@@ -333,7 +333,7 @@ This PR demonstrates polyglot connascence analysis via Semgrep integration, extr
 
 ## JavaScript/Node.js Specific Issues
 
-### 1. Extract Method for Error Handling (Semgrep → CoA)
+### 1. Extract Method for Error Handling (Semgrep  CoA)
 
 **Semgrep Rule**: `express.error-handling.duplicate-logic`  
 **Connascence Type**: Algorithm (CoA)  
@@ -467,9 +467,9 @@ setupMiddleware(app, {
 
 ### Rule Coverage
 - **24 Express-specific rules** mapped to Connascence types
-- **Security patterns** (helmet, cors) → Connascence of Meaning
-- **Performance patterns** (caching, compression) → Connascence of Algorithm  
-- **Maintainability patterns** (parameter objects) → Connascence of Position
+- **Security patterns** (helmet, cors)  Connascence of Meaning
+- **Performance patterns** (caching, compression)  Connascence of Algorithm  
+- **Maintainability patterns** (parameter objects)  Connascence of Position
 
 ### Framework Intelligence
 ```javascript
@@ -495,9 +495,9 @@ app.get('/users/:id', (req, res) => {
 - **Runtime**: No performance impact, identical request handling
 
 ### Maintainability Metrics
-- **Cyclomatic complexity**: Avg 4.2 → 3.8 per function
-- **Code duplication**: 18% → 7% (61% reduction)
-- **Test coverage**: 94% → 96% (easier to test extracted methods)
+- **Cyclomatic complexity**: Avg 4.2  3.8 per function
+- **Code duplication**: 18%  7% (61% reduction)
+- **Test coverage**: 94%  96% (easier to test extracted methods)
 
 ### Developer Experience
 ```bash
@@ -515,7 +515,7 @@ setupMiddleware(app, {
 
 ## Polyglot Future Roadmap
 
-### Phase 1 (Current): JavaScript via Semgrep ✅
+### Phase 1 (Current): JavaScript via Semgrep [DONE]
 - Express.js patterns
 - React component patterns (hooks, props)
 - Node.js service patterns
@@ -537,7 +537,7 @@ setupMiddleware(app, {
         
         pr_file = self.output_dir / "PR.md"
         pr_file.write_text(pr_content)
-        print(f"✅ Mock JavaScript refactoring PR created")
+        print(f"[DONE] Mock JavaScript refactoring PR created")
 
     def create_polyglot_dashboard_data(self):
         """Create dashboard data showcasing polyglot capabilities"""
@@ -589,11 +589,11 @@ setupMiddleware(app, {
         with open(dashboard_file, 'w') as f:
             json.dump(dashboard_data, f, indent=2)
             
-        print(f"✅ Polyglot dashboard data created")
+        print(f"[DONE] Polyglot dashboard data created")
 
     def run_complete_demo(self):
         """Run the complete Express polyglot demo"""
-        print("🌐 Starting Express Polyglot Demo (JavaScript via Semgrep)")
+        print(" Starting Express Polyglot Demo (JavaScript via Semgrep)")
         print("=" * 60)
         
         # Step 1: Clone repository  
@@ -612,19 +612,19 @@ setupMiddleware(app, {
         self.create_polyglot_dashboard_data()
         
         # Summary
-        print("\n🎯 Polyglot Demo Complete!")
+        print("\n[TARGET] Polyglot Demo Complete!")
         print("=" * 60)
-        print(f"📁 Output directory: {self.output_dir.absolute()}")
-        print("📄 Key artifacts:")
-        print(f"  • MCP Loop Demo: {self.output_dir}/mcp_loop_demo.md")
-        print(f"  • JavaScript PR: {self.output_dir}/PR.md")
-        print(f"  • Dashboard: {self.output_dir}/polyglot_dashboard.json")
+        print(f"[FOLDER] Output directory: {self.output_dir.absolute()}")
+        print("[DOC] Key artifacts:")
+        print(f"   MCP Loop Demo: {self.output_dir}/mcp_loop_demo.md")
+        print(f"   JavaScript PR: {self.output_dir}/PR.md")
+        print(f"   Dashboard: {self.output_dir}/polyglot_dashboard.json")
         
-        print("\n🌐 Polyglot Metrics:")
-        print("  • Languages: JavaScript (via Semgrep)")
-        print("  • Framework Intelligence: Express.js patterns")  
-        print("  • MCP Loop: 28.7% CI improvement")
-        print("  • Semgrep Rules: 24 mapped to Connascence types")
+        print("\n Polyglot Metrics:")
+        print("   Languages: JavaScript (via Semgrep)")
+        print("   Framework Intelligence: Express.js patterns")  
+        print("   MCP Loop: 28.7% CI improvement")
+        print("   Semgrep Rules: 24 mapped to Connascence types")
 
 def main():
     demo = ExpressDemo()

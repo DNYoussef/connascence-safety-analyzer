@@ -507,7 +507,7 @@ class ReportGenerator:
     <h2>Quality Gates</h2>
     {"".join([
         f'<div class="quality-gate"><span class="{"pass" if passed else "fail"}">'
-        f'{"✅" if passed else "❌"} {gate_name}</span></div>'
+        f'{"[DONE]" if passed else ""} {gate_name}</span></div>'
         for gate_name, passed in report.quality_gates.items()
     ])}
 
@@ -592,7 +592,7 @@ def main():
 
     print("\nQuality Gates:")
     for gate_name, passed in report.quality_gates.items():
-        status = "✅ PASS" if passed else "❌ FAIL"
+        status = "[DONE] PASS" if passed else " FAIL"
         print(f"  {status} - {gate_name}")
 
     if report.recommendations:

@@ -130,23 +130,23 @@ repos:
 
 ```
 connascence/
-├── src/                    # Core detection engines
-│   ├── check_connascence.py          # Main AST-based detector (546 lines)
-│   ├── connascence_analyzer.py       # Simplified analyzer (252 lines)
-│   ├── architectural_analysis.py     # Full architectural analysis (606 lines)
-│   └── magic_literal_analyzer.py     # Magic literal analyzer (423 lines)
-├── config/                 # Linting configurations
-│   ├── ruff_magic_literal_rules.toml # Ruff config for magic literals
-│   └── enhanced-ruff-config.toml     # Comprehensive Ruff config
-├── scripts/               # CI/CD integration scripts
-│   └── magic-literal-detector.py    # Pre-commit magic literal detector
-├── tests/                 # Comprehensive test suite
-│   ├── test_connascence_detection.py     # Core detection tests
-│   ├── test_connascence_compliance.py    # Meta-testing for test quality
-│   └── test_connascence_refactoring.py   # Refactoring validation
-├── docs/                  # Documentation and reports
-├── examples/              # Usage examples and templates
-└── README.md              # This file
+ src/                    # Core detection engines
+    check_connascence.py          # Main AST-based detector (546 lines)
+    connascence_analyzer.py       # Simplified analyzer (252 lines)
+    architectural_analysis.py     # Full architectural analysis (606 lines)
+    magic_literal_analyzer.py     # Magic literal analyzer (423 lines)
+ config/                 # Linting configurations
+    ruff_magic_literal_rules.toml # Ruff config for magic literals
+    enhanced-ruff-config.toml     # Comprehensive Ruff config
+ scripts/               # CI/CD integration scripts
+    magic-literal-detector.py    # Pre-commit magic literal detector
+ tests/                 # Comprehensive test suite
+    test_connascence_detection.py     # Core detection tests
+    test_connascence_compliance.py    # Meta-testing for test quality
+    test_connascence_refactoring.py   # Refactoring validation
+ docs/                  # Documentation and reports
+ examples/              # Usage examples and templates
+ README.md              # This file
 ```
 
 ## Usage Examples

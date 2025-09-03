@@ -158,7 +158,7 @@ python demo_express.py
 
 **Key messaging while running:**
 - "Framework intelligence - we understand Express middleware patterns"
-- "MCP (Model Context Protocol) loop: scan → suggest → fix → verify"  
+- "MCP (Model Context Protocol) loop: scan  suggest  fix  verify"  
 - "Leverages Semgrep's 800+ JavaScript rules, but adds architectural intelligence"
 
 ### Show MCP Loop Results
@@ -168,7 +168,7 @@ cat out/express/mcp_loop_demo.md | grep -A 30 "Step 1: MCP"
 ```
 
 **"This is our automation advantage:**
-- Connascence Index: 8.7 → 6.2 (28.7% improvement)
+- Connascence Index: 8.7  6.2 (28.7% improvement)
 - Automated error handling extraction  
 - Framework-aware parameter object introduction"
 
@@ -251,15 +251,15 @@ print('Air-gapped mode: No external dependencies')
 ### Summarize the Proof Points
 **"What you've seen in 15 minutes:**
 
-**✅ Accuracy**: 4.5% false positive rate across 3 major codebases  
-**✅ Intelligence**: 62.9% autofix acceptance with production-safe refactoring  
-**✅ Safety**: NASA/JPL Power of Ten compliance automation  
-**✅ Enterprise**: RBAC, audit, air-gapped deployment ready  
-**✅ Polyglot**: JavaScript, Python, C/C++ today, expanding rapidly"
+**[DONE] Accuracy**: 4.5% false positive rate across 3 major codebases  
+**[DONE] Intelligence**: 62.9% autofix acceptance with production-safe refactoring  
+**[DONE] Safety**: NASA/JPL Power of Ten compliance automation  
+**[DONE] Enterprise**: RBAC, audit, air-gapped deployment ready  
+**[DONE] Polyglot**: JavaScript, Python, C/C++ today, expanding rapidly"
 
 ### ROI Calculation
 **"For your 500-developer team:**
-- Current static analysis time waste: 2 hours/week × 500 devs = $2.6M/year
+- Current static analysis time waste: 2 hours/week  500 devs = $2.6M/year
 - Our false positive rate: 4.5% vs typical 15-30%  
 - Time savings: 85% reduction = $2.2M annual savings
 - Tool cost: $300K Enterprise edition
