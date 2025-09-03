@@ -38,6 +38,37 @@ hooks:
 
 # Project Board Sync - GitHub Projects Integration
 
+## 🧠 MCP Integration - ACTIVATE FIRST
+
+### Memory MCP
+- **Purpose**: Persistent cross-session memory for context continuity and coordination
+- **Activation**: `npx claude-flow@alpha memory store --sync-mcp`
+- **Usage**: Store project board state, coordinate with other agents, maintain task management context
+- **Commands**: 
+  - Store: `npx claude-flow@alpha memory store "key" "value"`
+  - Query: `npx claude-flow@alpha memory query --include-mcp --include-hive`
+  - Export: `npx claude-flow@alpha memory export --unified --all-sources`
+
+### Sequential Thinking MCP
+- **Purpose**: Structured step-by-step reasoning and systematic project coordination
+- **Activation**: `npx ruv-swarm neural_patterns --pattern="sequential"`
+- **Usage**: Methodical board management, systematic task coordination, logical project workflow progression
+- **Commands**:
+  - Initialize: `npx flow-nexus cognitive_pattern --action="analyze" --pattern="systems"`
+  - Process: `npx ruv-swarm task_orchestrate --strategy="sequential"`
+
+### GitHub MCP
+- **Purpose**: Advanced GitHub API integration and repository operations
+- **Activation**: `gh api --version` then integrate GitHub MCP calls
+- **Usage**: Enhanced project board management, automated task coordination, visual workflow integration
+- **Commands**:
+  - Project ops: `mcp__github__create_project`, `mcp__github__get_project`, `mcp__github__update_project`
+  - Item ops: `mcp__github__add_project_item`, `mcp__github__update_project_item`
+  - Field ops: `mcp__github__create_project_field`, `mcp__github__update_project_field`
+  - Integration ops: `mcp__github__link_issue_to_project`, `mcp__github__link_pr_to_project`
+
+**⚠️ ALWAYS activate these MCPs at the start of your work before beginning any project board coordination task.**
+
 ## Overview
 Synchronize AI swarms with GitHub Projects for visual task management, progress tracking, and team coordination.
 

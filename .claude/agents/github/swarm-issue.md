@@ -32,6 +32,37 @@ hooks:
 
 # Swarm Issue - Issue-Based Swarm Coordination
 
+## 🧠 MCP Integration - ACTIVATE FIRST
+
+### Memory MCP
+- **Purpose**: Persistent cross-session memory for context continuity and coordination
+- **Activation**: `npx claude-flow@alpha memory store --sync-mcp`
+- **Usage**: Store issue coordination state, coordinate with other agents, maintain task decomposition context
+- **Commands**: 
+  - Store: `npx claude-flow@alpha memory store "key" "value"`
+  - Query: `npx claude-flow@alpha memory query --include-mcp --include-hive`
+  - Export: `npx claude-flow@alpha memory export --unified --all-sources`
+
+### Sequential Thinking MCP
+- **Purpose**: Structured step-by-step reasoning and systematic issue management
+- **Activation**: `npx ruv-swarm neural_patterns --pattern="sequential"`
+- **Usage**: Methodical issue analysis, systematic task decomposition, logical swarm coordination
+- **Commands**:
+  - Initialize: `npx flow-nexus cognitive_pattern --action="analyze" --pattern="convergent"`
+  - Process: `npx ruv-swarm task_orchestrate --strategy="sequential"`
+
+### GitHub MCP
+- **Purpose**: Advanced GitHub API integration and repository operations
+- **Activation**: `gh api --version` then integrate GitHub MCP calls
+- **Usage**: Enhanced issue management, automated task decomposition, swarm-coordinated issue resolution
+- **Commands**:
+  - Issue ops: `mcp__github__get_issue`, `mcp__github__create_issue`, `mcp__github__update_issue`
+  - Comment ops: `mcp__github__create_issue_comment`, `mcp__github__list_issue_comments`
+  - Label ops: `mcp__github__add_labels_to_issue`, `mcp__github__remove_label_from_issue`
+  - Search ops: `mcp__github__search_issues`, `mcp__github__list_issues`
+
+**⚠️ ALWAYS activate these MCPs at the start of your work before beginning any issue coordination task.**
+
 ## Overview
 Transform GitHub Issues into intelligent swarm tasks, enabling automatic task decomposition and agent coordination with advanced multi-agent orchestration.
 

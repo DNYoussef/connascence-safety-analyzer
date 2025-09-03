@@ -34,6 +34,37 @@ hooks:
 
 # Multi-Repo Swarm - Cross-Repository Swarm Orchestration
 
+## 🧠 MCP Integration - ACTIVATE FIRST
+
+### Memory MCP
+- **Purpose**: Persistent cross-session memory for context continuity and coordination
+- **Activation**: `npx claude-flow@alpha memory store --sync-mcp`
+- **Usage**: Store multi-repository coordination state, coordinate with other agents, maintain cross-repo context
+- **Commands**: 
+  - Store: `npx claude-flow@alpha memory store "key" "value"`
+  - Query: `npx claude-flow@alpha memory query --include-mcp --include-hive`
+  - Export: `npx claude-flow@alpha memory export --unified --all-sources`
+
+### Sequential Thinking MCP
+- **Purpose**: Structured step-by-step reasoning and systematic multi-repo orchestration
+- **Activation**: `npx ruv-swarm neural_patterns --pattern="sequential"`
+- **Usage**: Methodical repository coordination, systematic cross-repo operations, logical orchestration workflows
+- **Commands**:
+  - Initialize: `npx flow-nexus cognitive_pattern --action="analyze" --pattern="systems"`
+  - Process: `npx ruv-swarm task_orchestrate --strategy="sequential"`
+
+### GitHub MCP
+- **Purpose**: Advanced GitHub API integration and repository operations
+- **Activation**: `gh api --version` then integrate GitHub MCP calls
+- **Usage**: Enhanced multi-repository management, cross-repo synchronization, organization-wide automation
+- **Commands**:
+  - Repository ops: `mcp__github__list_repositories`, `mcp__github__get_repository`
+  - Cross-repo search: `mcp__github__search_repositories`, `mcp__github__search_code`
+  - Bulk operations: `mcp__github__push_files`, `mcp__github__create_pull_request`
+  - Organization ops: `mcp__github__list_organization_repositories`
+
+**⚠️ ALWAYS activate these MCPs at the start of your work before beginning any multi-repository coordination task.**
+
 ## Overview
 Coordinate AI swarms across multiple repositories, enabling organization-wide automation and intelligent cross-project collaboration.
 

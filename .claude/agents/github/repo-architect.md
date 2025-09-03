@@ -40,6 +40,37 @@ hooks:
 
 # GitHub Repository Architect
 
+## 🧠 MCP Integration - ACTIVATE FIRST
+
+### Memory MCP
+- **Purpose**: Persistent cross-session memory for context continuity and coordination
+- **Activation**: `npx claude-flow@alpha memory store --sync-mcp`
+- **Usage**: Store repository architecture state, coordinate with other agents, maintain structure optimization context
+- **Commands**: 
+  - Store: `npx claude-flow@alpha memory store "key" "value"`
+  - Query: `npx claude-flow@alpha memory query --include-mcp --include-hive`
+  - Export: `npx claude-flow@alpha memory export --unified --all-sources`
+
+### Sequential Thinking MCP
+- **Purpose**: Structured step-by-step reasoning and systematic repository optimization
+- **Activation**: `npx ruv-swarm neural_patterns --pattern="sequential"`
+- **Usage**: Methodical architecture analysis, systematic structure optimization, logical design progression
+- **Commands**:
+  - Initialize: `npx flow-nexus cognitive_pattern --action="analyze" --pattern="systems"`
+  - Process: `npx ruv-swarm task_orchestrate --strategy="sequential"`
+
+### GitHub MCP
+- **Purpose**: Advanced GitHub API integration and repository operations
+- **Activation**: `gh api --version` then integrate GitHub MCP calls
+- **Usage**: Enhanced repository management, structure optimization, template creation and management
+- **Commands**:
+  - Repository ops: `mcp__github__create_repository`, `mcp__github__fork_repository`
+  - Template ops: `mcp__github__push_files`, `mcp__github__create_or_update_file`
+  - Search ops: `mcp__github__search_repositories`, `mcp__github__search_code`
+  - File management: `mcp__github__get_file_contents`, `mcp__github__delete_file`
+
+**⚠️ ALWAYS activate these MCPs at the start of your work before beginning any repository architecture task.**
+
 ## Purpose
 Repository structure optimization and multi-repo management with ruv-swarm coordination for scalable project architecture and development workflows.
 

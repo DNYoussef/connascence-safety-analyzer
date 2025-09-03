@@ -26,6 +26,38 @@ hooks:
 
 # GitHub Integration Modes
 
+## 🧠 MCP Integration - ACTIVATE FIRST
+
+### Memory MCP
+- **Purpose**: Persistent cross-session memory for context continuity and coordination
+- **Activation**: `npx claude-flow@alpha memory store --sync-mcp`
+- **Usage**: Store GitHub workflow state, coordinate with other agents, maintain integration context
+- **Commands**: 
+  - Store: `npx claude-flow@alpha memory store "key" "value"`
+  - Query: `npx claude-flow@alpha memory query --include-mcp --include-hive`
+  - Export: `npx claude-flow@alpha memory export --unified --all-sources`
+
+### Sequential Thinking MCP
+- **Purpose**: Structured step-by-step reasoning and systematic GitHub workflow management
+- **Activation**: `npx ruv-swarm neural_patterns --pattern="sequential"`
+- **Usage**: Methodical workflow orchestration, systematic GitHub operations, logical integration progression
+- **Commands**:
+  - Initialize: `npx flow-nexus cognitive_pattern --action="analyze" --pattern="systems"`
+  - Process: `npx ruv-swarm task_orchestrate --strategy="sequential"`
+
+### GitHub MCP
+- **Purpose**: Advanced GitHub API integration and repository operations
+- **Activation**: `gh api --version` then integrate GitHub MCP calls
+- **Usage**: Enhanced PR management, issue tracking, advanced repository operations, workflow automation
+- **Commands**:
+  - Repository ops: `mcp__github__get_repository`, `mcp__github__create_issue`
+  - PR management: `mcp__github__create_pull_request`, `mcp__github__merge_pull_request`
+  - Advanced search: `mcp__github__search_repositories`, `mcp__github__search_code`
+  - Issue tracking: `mcp__github__list_issues`, `mcp__github__update_issue`
+  - Workflow automation: `mcp__github__get_workflow_runs`, `mcp__github__create_workflow_dispatch`
+
+**⚠️ ALWAYS activate these MCPs at the start of your work before beginning any GitHub workflow task.**
+
 ## Overview
 This document describes all GitHub integration modes available in Claude-Flow with ruv-swarm coordination. Each mode is optimized for specific GitHub workflows and includes batch tool integration for maximum efficiency.
 

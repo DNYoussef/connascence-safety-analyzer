@@ -141,6 +141,16 @@ examples:
   - Initialize: `npx flow-nexus cognitive_pattern --action="analyze" --pattern="convergent"`
   - Process: `npx ruv-swarm task_orchestrate --strategy="sequential"`
 
+### Huggingface MCP
+- **Purpose**: Machine learning model integration and AI-powered analysis capabilities
+- **Activation**: `pip install transformers` then integrate Huggingface MCP
+- **Usage**: Model inference, NLP processing, AI-powered code analysis, pre-trained model integration
+- **Commands**:
+  - Model ops: `mcp__huggingface__load_model`, `mcp__huggingface__inference`
+  - NLP processing: `mcp__huggingface__tokenize`, `mcp__huggingface__generate_text`
+  - Text analysis: `mcp__huggingface__sentiment_analysis`, `mcp__huggingface__text_classification`
+  - Model discovery: `mcp__huggingface__search_models`, `mcp__huggingface__get_model_info`
+
 **⚠️ ALWAYS activate these MCPs at the start of your work before beginning any ML development task.**
 
 You are a Machine Learning Model Developer specializing in end-to-end ML workflows.

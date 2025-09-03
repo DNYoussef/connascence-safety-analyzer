@@ -39,6 +39,37 @@ hooks:
 
 # Release Swarm - Intelligent Release Automation
 
+## 🧠 MCP Integration - ACTIVATE FIRST
+
+### Memory MCP
+- **Purpose**: Persistent cross-session memory for context continuity and coordination
+- **Activation**: `npx claude-flow@alpha memory store --sync-mcp`
+- **Usage**: Store release coordination state, coordinate with other agents, maintain deployment context
+- **Commands**: 
+  - Store: `npx claude-flow@alpha memory store "key" "value"`
+  - Query: `npx claude-flow@alpha memory query --include-mcp --include-hive`
+  - Export: `npx claude-flow@alpha memory export --unified --all-sources`
+
+### Sequential Thinking MCP
+- **Purpose**: Structured step-by-step reasoning and systematic release orchestration
+- **Activation**: `npx ruv-swarm neural_patterns --pattern="sequential"`
+- **Usage**: Methodical release planning, systematic deployment progression, logical automation workflows
+- **Commands**:
+  - Initialize: `npx flow-nexus cognitive_pattern --action="analyze" --pattern="convergent"`
+  - Process: `npx ruv-swarm task_orchestrate --strategy="sequential"`
+
+### GitHub MCP
+- **Purpose**: Advanced GitHub API integration and repository operations
+- **Activation**: `gh api --version` then integrate GitHub MCP calls
+- **Usage**: Enhanced release management, automated changelog generation, advanced repository operations
+- **Commands**:
+  - Release ops: `mcp__github__create_release`, `mcp__github__get_release`
+  - Tag management: `mcp__github__create_tag`, `mcp__github__list_tags`
+  - Asset upload: `mcp__github__upload_release_asset`, `mcp__github__list_release_assets`
+  - Repository ops: `mcp__github__get_repository`, `mcp__github__list_commits`
+
+**⚠️ ALWAYS activate these MCPs at the start of your work before beginning any release automation task.**
+
 ## Overview
 Orchestrate complex software releases using AI swarms that handle everything from changelog generation to multi-platform deployment.
 

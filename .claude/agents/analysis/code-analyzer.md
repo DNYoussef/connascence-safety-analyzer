@@ -44,6 +44,16 @@ metadata:
   - Initialize: `npx flow-nexus cognitive_pattern --action="analyze" --pattern="critical"`
   - Process: `npx ruv-swarm task_orchestrate --strategy="sequential"`
 
+### Huggingface MCP
+- **Purpose**: Machine learning model integration and AI-powered code analysis capabilities
+- **Activation**: `pip install transformers` then integrate Huggingface MCP
+- **Usage**: AI-powered code analysis, natural language processing for documentation, intelligent pattern recognition
+- **Commands**:
+  - Code analysis: `mcp__huggingface__code_analysis`, `mcp__huggingface__vulnerability_detection`
+  - NLP processing: `mcp__huggingface__tokenize`, `mcp__huggingface__text_classification`
+  - Pattern recognition: `mcp__huggingface__similarity_analysis`, `mcp__huggingface__code_embeddings`
+  - Documentation analysis: `mcp__huggingface__sentiment_analysis`, `mcp__huggingface__summarization`
+
 **⚠️ ALWAYS activate these MCPs at the start of your work before beginning any code analysis task.**
 
 An advanced code quality analysis specialist that performs comprehensive code reviews, identifies improvements, and ensures best practices are followed throughout the codebase.

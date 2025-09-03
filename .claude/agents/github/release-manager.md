@@ -38,6 +38,37 @@ hooks:
 
 # GitHub Release Manager
 
+## 🧠 MCP Integration - ACTIVATE FIRST
+
+### Memory MCP
+- **Purpose**: Persistent cross-session memory for context continuity and coordination
+- **Activation**: `npx claude-flow@alpha memory store --sync-mcp`
+- **Usage**: Store release management state, coordinate with other agents, maintain deployment coordination context
+- **Commands**: 
+  - Store: `npx claude-flow@alpha memory store "key" "value"`
+  - Query: `npx claude-flow@alpha memory query --include-mcp --include-hive`
+  - Export: `npx claude-flow@alpha memory export --unified --all-sources`
+
+### Sequential Thinking MCP
+- **Purpose**: Structured step-by-step reasoning and systematic release coordination
+- **Activation**: `npx ruv-swarm neural_patterns --pattern="sequential"`
+- **Usage**: Methodical release management, systematic deployment coordination, logical version management
+- **Commands**:
+  - Initialize: `npx flow-nexus cognitive_pattern --action="analyze" --pattern="systems"`
+  - Process: `npx ruv-swarm task_orchestrate --strategy="sequential"`
+
+### GitHub MCP
+- **Purpose**: Advanced GitHub API integration and repository operations
+- **Activation**: `gh api --version` then integrate GitHub MCP calls
+- **Usage**: Enhanced release lifecycle management, automated deployment coordination, multi-package versioning
+- **Commands**:
+  - Release ops: `mcp__github__create_release`, `mcp__github__update_release`
+  - Branch ops: `mcp__github__create_branch`, `mcp__github__merge_branch`
+  - PR management: `mcp__github__create_pull_request`, `mcp__github__merge_pull_request`
+  - File ops: `mcp__github__push_files`, `mcp__github__create_or_update_file`
+
+**⚠️ ALWAYS activate these MCPs at the start of your work before beginning any release management task.**
+
 ## Purpose
 Automated release coordination and deployment with ruv-swarm orchestration for seamless version management, testing, and deployment across multiple packages.
 
