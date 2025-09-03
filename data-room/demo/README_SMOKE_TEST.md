@@ -9,7 +9,7 @@ This smoke test provides **immediate proof** that the Connascence system works a
 ✅ **Core analyzer functionality** - Detects connascence patterns in real code  
 ✅ **Multi-platform compatibility** - Windows, Linux, macOS  
 ✅ **Output format validation** - JSON, SARIF, Markdown  
-✅ **MCP server integration** - Claude integration ready  
+✅ **MCP server integration** - Analysis service integration ready  
 ✅ **VS Code extension compatibility** - IDE integration works  
 ✅ **Performance validation** - Completes in under 30 seconds  
 
@@ -230,7 +230,7 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 1. **Explore Full Analysis**: `connascence analyze ./your-project`
 2. **Try VS Code Extension**: Install and analyze in IDE
 3. **Set Up CI/CD**: Integrate SARIF output
-4. **Configure MCP**: Connect to Claude for AI assistance
+4. **Configure MCP**: Connect to analysis service for automated code review
 5. **Review Enterprise Features**: Check `/data-room/` for pricing
 
 ---

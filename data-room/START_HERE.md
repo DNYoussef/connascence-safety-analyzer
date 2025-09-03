@@ -6,7 +6,7 @@
 
 ### What This Is
 - **Production-ready** code quality platform with 84.8% accuracy
-- **AI-powered** detection of 9 types of connascence (coupling patterns)
+- **Rule-based static analysis** detection of 9 types of connascence (coupling patterns)
 - **Enterprise-validated** with real cost savings data
 - **Zero-config** deployment with comprehensive tooling
 
@@ -119,7 +119,7 @@ Complete validation checklist for:
 - **3x more accurate** than traditional static analysis tools
 - **67% cost reduction** vs manual code review processes
 - **Enterprise-ready** security and compliance from day one
-- **AI-powered** with continuous learning and improvement
+- **Advanced pattern detection** with continuous rule refinement
 
 ---
 

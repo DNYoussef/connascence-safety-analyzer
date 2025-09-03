@@ -163,7 +163,7 @@ Payback Period: 2.8 months
 | Capability | Traditional Tools | Connascence |
 |------------|------------------|-------------|
 | **Structural Analysis** | Surface-level syntax | Deep architectural coupling |
-| **Learning & Adaptation** | Static rule sets | AI-powered continuous improvement |
+| **Pattern Learning** | Static rule sets | Algorithmic pattern detection with continuous improvement |
 | **Enterprise Integration** | Limited APIs | Full DevOps pipeline integration |
 | **Scalability** | Per-developer licensing | Unlimited developers |
 | **Privacy & Security** | Cloud-dependent | On-premises option available |

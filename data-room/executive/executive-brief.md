@@ -6,7 +6,7 @@
 Modern software development faces a **$85 billion annual cost** in technical debt maintenance. Traditional code review processes catch only 23% of structural coupling issues that lead to expensive refactoring and system failures.
 
 ### The Solution
-**Connascence** is an AI-powered code quality platform that automatically detects and prevents the 9 types of coupling anti-patterns that drive 78% of technical debt accumulation.
+**Connascence** is a rule-based static analysis platform that automatically detects and prevents the 9 types of coupling anti-patterns that drive 78% of technical debt accumulation.
 
 ---
 
@@ -69,7 +69,7 @@ Modern software development faces a **$85 billion annual cost** in technical deb
 ### vs. Traditional Static Analysis
 - **3x more accurate** detection of structural issues
 - **Zero false positives** on coupling analysis
-- **AI-powered insights** vs rule-based checking
+- **Advanced static analysis** vs basic rule-based checking
 
 ### vs. Manual Code Review
 - **24/7 automated analysis** vs periodic human review
