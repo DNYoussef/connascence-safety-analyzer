@@ -177,23 +177,20 @@ class ConnascenceDetector(ast.NodeVisitor):
             self.global_vars.add(name)
         self.generic_visit(node)
 
-    def visit_Num(self, node: ast.Num):
-        """Detect magic numbers (Connascence of Meaning) - deprecated but kept for compatibility."""
-        # Skip common "safe" numbers
-        if hasattr(node, "n") and node.n not in [0, 1, -1, 2, 10, 100, 1000]:
-            self.magic_literals.append((node, node.n))
-        self.generic_visit(node)
-
     def visit_Constant(self, node: ast.Constant):
-        """Detect magic constants (Connascence of Meaning)."""
-        if isinstance(node.value, int | float):
+        """Detect magic literals (Connascence of Meaning) using modern ast.Constant."""
+        # Handle numeric constants
+        if isinstance(node.value, (int, float)):
+            # Skip common "safe" numbers
             if node.value not in [0, 1, -1, 2, 10, 100, 1000]:
                 self.magic_literals.append((node, node.value))
-        elif isinstance(node.value, str):
-            # Skip very short strings and common patterns
-            if len(node.value) > 3 and not re.match(r"^[a-zA-Z0-9_-]+$", node.value):
+        # Handle string constants that might be magic
+        elif isinstance(node.value, str) and len(node.value) > 1:
+            # Skip obvious safe strings
+            if node.value not in ['', ' ', '\n', '\t', 'utf-8', 'ascii']:
                 self.magic_literals.append((node, node.value))
         self.generic_visit(node)
+
 
     def visit_Call(self, node: ast.Call):
         """Detect timing-related calls and other patterns."""
@@ -535,6 +532,30 @@ Examples:
     if args.verbose:
         print(f"\nAnalysis completed in {elapsed:.2f} seconds")
         print(f"Found {len(violations)} violations")
+
+    # Check for license validation (exit code 4)
+    try:
+        from src.licensing import LicenseValidator, LicenseValidationResult
+        license_validator = LicenseValidator()
+        project_root = target_path if target_path.is_dir() else target_path.parent
+        
+        license_report = license_validator.validate_license(project_root)
+        if license_report.validation_result != LicenseValidationResult.VALID:
+            if args.verbose:
+                print(f"\nLicense validation failed: {license_report.validation_result.value}")
+                print("Run with license validation for details")
+            return 4  # License error
+        
+        if args.verbose:
+            print("License validation: PASSED")
+            
+    except ImportError:
+        if args.verbose:
+            print("License validation skipped (module not available)")
+    except Exception as e:
+        if args.verbose:
+            print(f"License validation error: {e}")
+        return 4  # License error
 
     # Exit with error code if critical violations found
     critical_count = sum(1 for v in violations if v.severity == "critical")

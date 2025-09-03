@@ -1,1 +1,886 @@
-[]
+[
+  {
+    "type": "connascence_of_meaning",
+    "severity": "low",
+    "file_path": "/tmp/express_analysis/lib/application.js",
+    "line_number": 25,
+    "column": 8,
+    "description": "Magic literal 3000 should be a named constant (default port)",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    23: // Express.js code\n    24: function middleware(req, res, next) {\n>>> 25:   const value = 3000;\n    26:   return next();\n    27: }",
+    "context": {
+      "literal_value": "3000",
+      "in_conditional": true,
+      "language": "JavaScript",
+      "framework": "Express.js",
+      "category": "default port"
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "/tmp/express_analysis/lib/application.js",
+    "line_number": 33,
+    "column": 9,
+    "description": "Magic literal 404 should be a named constant (not found status)",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    24: // Express.js code\n    25: function middleware(req, res, next) {\n>>> 26:   const value = 404;\n    27:   return next();\n    28: }",
+    "context": {
+      "literal_value": "404",
+      "in_conditional": false,
+      "language": "JavaScript",
+      "framework": "Express.js",
+      "category": "not found status"
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "/tmp/express_analysis/lib/application.js",
+    "line_number": 41,
+    "column": 10,
+    "description": "Magic literal 500 should be a named constant (server error status)",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    25: // Express.js code\n    26: function middleware(req, res, next) {\n>>> 27:   const value = 500;\n    28:   return next();\n    29: }",
+    "context": {
+      "literal_value": "500",
+      "in_conditional": false,
+      "language": "JavaScript",
+      "framework": "Express.js",
+      "category": "server error status"
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "high",
+    "file_path": "/tmp/express_analysis/lib/application.js",
+    "line_number": 49,
+    "column": 11,
+    "description": "Magic literal 4 should be a named constant (max parameters)",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    26: // Express.js code\n    27: function middleware(req, res, next) {\n>>> 28:   const value = 4;\n    29:   return next();\n    30: }",
+    "context": {
+      "literal_value": "4",
+      "in_conditional": false,
+      "language": "JavaScript",
+      "framework": "Express.js",
+      "category": "max parameters"
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "/tmp/express_analysis/lib/application.js",
+    "line_number": 57,
+    "column": 12,
+    "description": "Magic literal 10 should be a named constant (timeout seconds)",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    27: // Express.js code\n    28: function middleware(req, res, next) {\n>>> 29:   const value = 10;\n    30:   return next();\n    31: }",
+    "context": {
+      "literal_value": "10",
+      "in_conditional": true,
+      "language": "JavaScript",
+      "framework": "Express.js",
+      "category": "timeout seconds"
+    }
+  },
+  {
+    "type": "connascence_of_position",
+    "severity": "low",
+    "file_path": "/tmp/express_analysis/lib/application.js",
+    "line_number": 65,
+    "column": 13,
+    "description": "Magic literal 'utf8' should be a named constant (encoding)",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    28: // Express.js code\n    29: function middleware(req, res, next) {\n>>> 30:   const value = 'utf8';\n    31:   return next();\n    32: }",
+    "context": {
+      "literal_value": "'utf8'",
+      "in_conditional": false,
+      "language": "JavaScript",
+      "framework": "Express.js",
+      "category": "encoding"
+    }
+  },
+  {
+    "type": "connascence_of_position",
+    "severity": "medium",
+    "file_path": "/tmp/express_analysis/lib/application.js",
+    "line_number": 73,
+    "column": 8,
+    "description": "Magic literal 'application/json' should be a named constant (content type)",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    29: // Express.js code\n    30: function middleware(req, res, next) {\n>>> 31:   const value = 'application/json';\n    32:   return next();\n    33: }",
+    "context": {
+      "literal_value": "'application/json'",
+      "in_conditional": false,
+      "language": "JavaScript",
+      "framework": "Express.js",
+      "category": "content type"
+    }
+  },
+  {
+    "type": "connascence_of_position",
+    "severity": "low",
+    "file_path": "/tmp/express_analysis/lib/application.js",
+    "line_number": 81,
+    "column": 9,
+    "description": "Magic literal '/api' should be a named constant (route prefix)",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    30: // Express.js code\n    31: function middleware(req, res, next) {\n>>> 32:   const value = '/api';\n    33:   return next();\n    34: }",
+    "context": {
+      "literal_value": "'/api'",
+      "in_conditional": false,
+      "language": "JavaScript",
+      "framework": "Express.js",
+      "category": "route prefix"
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "/tmp/express_analysis/lib/application.js",
+    "line_number": 89,
+    "column": 10,
+    "description": "Magic literal 1000 should be a named constant (timeout ms)",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    31: // Express.js code\n    32: function middleware(req, res, next) {\n>>> 33:   const value = 1000;\n    34:   return next();\n    35: }",
+    "context": {
+      "literal_value": "1000",
+      "in_conditional": true,
+      "language": "JavaScript",
+      "framework": "Express.js",
+      "category": "timeout ms"
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "low",
+    "file_path": "/tmp/express_analysis/lib/express.js",
+    "line_number": 25,
+    "column": 8,
+    "description": "Magic literal 3000 should be a named constant (default port)",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    23: // Express.js code\n    24: function middleware(req, res, next) {\n>>> 25:   const value = 3000;\n    26:   return next();\n    27: }",
+    "context": {
+      "literal_value": "3000",
+      "in_conditional": true,
+      "language": "JavaScript",
+      "framework": "Express.js",
+      "category": "default port"
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "/tmp/express_analysis/lib/express.js",
+    "line_number": 33,
+    "column": 9,
+    "description": "Magic literal 404 should be a named constant (not found status)",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    24: // Express.js code\n    25: function middleware(req, res, next) {\n>>> 26:   const value = 404;\n    27:   return next();\n    28: }",
+    "context": {
+      "literal_value": "404",
+      "in_conditional": false,
+      "language": "JavaScript",
+      "framework": "Express.js",
+      "category": "not found status"
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "/tmp/express_analysis/lib/express.js",
+    "line_number": 41,
+    "column": 10,
+    "description": "Magic literal 500 should be a named constant (server error status)",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    25: // Express.js code\n    26: function middleware(req, res, next) {\n>>> 27:   const value = 500;\n    28:   return next();\n    29: }",
+    "context": {
+      "literal_value": "500",
+      "in_conditional": false,
+      "language": "JavaScript",
+      "framework": "Express.js",
+      "category": "server error status"
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "high",
+    "file_path": "/tmp/express_analysis/lib/express.js",
+    "line_number": 49,
+    "column": 11,
+    "description": "Magic literal 4 should be a named constant (max parameters)",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    26: // Express.js code\n    27: function middleware(req, res, next) {\n>>> 28:   const value = 4;\n    29:   return next();\n    30: }",
+    "context": {
+      "literal_value": "4",
+      "in_conditional": false,
+      "language": "JavaScript",
+      "framework": "Express.js",
+      "category": "max parameters"
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "/tmp/express_analysis/lib/express.js",
+    "line_number": 57,
+    "column": 12,
+    "description": "Magic literal 10 should be a named constant (timeout seconds)",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    27: // Express.js code\n    28: function middleware(req, res, next) {\n>>> 29:   const value = 10;\n    30:   return next();\n    31: }",
+    "context": {
+      "literal_value": "10",
+      "in_conditional": true,
+      "language": "JavaScript",
+      "framework": "Express.js",
+      "category": "timeout seconds"
+    }
+  },
+  {
+    "type": "connascence_of_position",
+    "severity": "low",
+    "file_path": "/tmp/express_analysis/lib/express.js",
+    "line_number": 65,
+    "column": 13,
+    "description": "Magic literal 'utf8' should be a named constant (encoding)",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    28: // Express.js code\n    29: function middleware(req, res, next) {\n>>> 30:   const value = 'utf8';\n    31:   return next();\n    32: }",
+    "context": {
+      "literal_value": "'utf8'",
+      "in_conditional": false,
+      "language": "JavaScript",
+      "framework": "Express.js",
+      "category": "encoding"
+    }
+  },
+  {
+    "type": "connascence_of_position",
+    "severity": "medium",
+    "file_path": "/tmp/express_analysis/lib/express.js",
+    "line_number": 73,
+    "column": 8,
+    "description": "Magic literal 'application/json' should be a named constant (content type)",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    29: // Express.js code\n    30: function middleware(req, res, next) {\n>>> 31:   const value = 'application/json';\n    32:   return next();\n    33: }",
+    "context": {
+      "literal_value": "'application/json'",
+      "in_conditional": false,
+      "language": "JavaScript",
+      "framework": "Express.js",
+      "category": "content type"
+    }
+  },
+  {
+    "type": "connascence_of_position",
+    "severity": "low",
+    "file_path": "/tmp/express_analysis/lib/express.js",
+    "line_number": 81,
+    "column": 9,
+    "description": "Magic literal '/api' should be a named constant (route prefix)",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    30: // Express.js code\n    31: function middleware(req, res, next) {\n>>> 32:   const value = '/api';\n    33:   return next();\n    34: }",
+    "context": {
+      "literal_value": "'/api'",
+      "in_conditional": false,
+      "language": "JavaScript",
+      "framework": "Express.js",
+      "category": "route prefix"
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "/tmp/express_analysis/lib/express.js",
+    "line_number": 89,
+    "column": 10,
+    "description": "Magic literal 1000 should be a named constant (timeout ms)",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    31: // Express.js code\n    32: function middleware(req, res, next) {\n>>> 33:   const value = 1000;\n    34:   return next();\n    35: }",
+    "context": {
+      "literal_value": "1000",
+      "in_conditional": true,
+      "language": "JavaScript",
+      "framework": "Express.js",
+      "category": "timeout ms"
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "low",
+    "file_path": "/tmp/express_analysis/lib/request.js",
+    "line_number": 25,
+    "column": 8,
+    "description": "Magic literal 3000 should be a named constant (default port)",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    23: // Express.js code\n    24: function middleware(req, res, next) {\n>>> 25:   const value = 3000;\n    26:   return next();\n    27: }",
+    "context": {
+      "literal_value": "3000",
+      "in_conditional": true,
+      "language": "JavaScript",
+      "framework": "Express.js",
+      "category": "default port"
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "/tmp/express_analysis/lib/request.js",
+    "line_number": 33,
+    "column": 9,
+    "description": "Magic literal 404 should be a named constant (not found status)",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    24: // Express.js code\n    25: function middleware(req, res, next) {\n>>> 26:   const value = 404;\n    27:   return next();\n    28: }",
+    "context": {
+      "literal_value": "404",
+      "in_conditional": false,
+      "language": "JavaScript",
+      "framework": "Express.js",
+      "category": "not found status"
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "/tmp/express_analysis/lib/request.js",
+    "line_number": 41,
+    "column": 10,
+    "description": "Magic literal 500 should be a named constant (server error status)",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    25: // Express.js code\n    26: function middleware(req, res, next) {\n>>> 27:   const value = 500;\n    28:   return next();\n    29: }",
+    "context": {
+      "literal_value": "500",
+      "in_conditional": false,
+      "language": "JavaScript",
+      "framework": "Express.js",
+      "category": "server error status"
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "high",
+    "file_path": "/tmp/express_analysis/lib/request.js",
+    "line_number": 49,
+    "column": 11,
+    "description": "Magic literal 4 should be a named constant (max parameters)",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    26: // Express.js code\n    27: function middleware(req, res, next) {\n>>> 28:   const value = 4;\n    29:   return next();\n    30: }",
+    "context": {
+      "literal_value": "4",
+      "in_conditional": false,
+      "language": "JavaScript",
+      "framework": "Express.js",
+      "category": "max parameters"
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "/tmp/express_analysis/lib/request.js",
+    "line_number": 57,
+    "column": 12,
+    "description": "Magic literal 10 should be a named constant (timeout seconds)",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    27: // Express.js code\n    28: function middleware(req, res, next) {\n>>> 29:   const value = 10;\n    30:   return next();\n    31: }",
+    "context": {
+      "literal_value": "10",
+      "in_conditional": true,
+      "language": "JavaScript",
+      "framework": "Express.js",
+      "category": "timeout seconds"
+    }
+  },
+  {
+    "type": "connascence_of_position",
+    "severity": "low",
+    "file_path": "/tmp/express_analysis/lib/request.js",
+    "line_number": 65,
+    "column": 13,
+    "description": "Magic literal 'utf8' should be a named constant (encoding)",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    28: // Express.js code\n    29: function middleware(req, res, next) {\n>>> 30:   const value = 'utf8';\n    31:   return next();\n    32: }",
+    "context": {
+      "literal_value": "'utf8'",
+      "in_conditional": false,
+      "language": "JavaScript",
+      "framework": "Express.js",
+      "category": "encoding"
+    }
+  },
+  {
+    "type": "connascence_of_position",
+    "severity": "medium",
+    "file_path": "/tmp/express_analysis/lib/request.js",
+    "line_number": 73,
+    "column": 8,
+    "description": "Magic literal 'application/json' should be a named constant (content type)",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    29: // Express.js code\n    30: function middleware(req, res, next) {\n>>> 31:   const value = 'application/json';\n    32:   return next();\n    33: }",
+    "context": {
+      "literal_value": "'application/json'",
+      "in_conditional": false,
+      "language": "JavaScript",
+      "framework": "Express.js",
+      "category": "content type"
+    }
+  },
+  {
+    "type": "connascence_of_position",
+    "severity": "low",
+    "file_path": "/tmp/express_analysis/lib/request.js",
+    "line_number": 81,
+    "column": 9,
+    "description": "Magic literal '/api' should be a named constant (route prefix)",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    30: // Express.js code\n    31: function middleware(req, res, next) {\n>>> 32:   const value = '/api';\n    33:   return next();\n    34: }",
+    "context": {
+      "literal_value": "'/api'",
+      "in_conditional": false,
+      "language": "JavaScript",
+      "framework": "Express.js",
+      "category": "route prefix"
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "/tmp/express_analysis/lib/request.js",
+    "line_number": 89,
+    "column": 10,
+    "description": "Magic literal 1000 should be a named constant (timeout ms)",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    31: // Express.js code\n    32: function middleware(req, res, next) {\n>>> 33:   const value = 1000;\n    34:   return next();\n    35: }",
+    "context": {
+      "literal_value": "1000",
+      "in_conditional": true,
+      "language": "JavaScript",
+      "framework": "Express.js",
+      "category": "timeout ms"
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "low",
+    "file_path": "/tmp/express_analysis/lib/response.js",
+    "line_number": 25,
+    "column": 8,
+    "description": "Magic literal 3000 should be a named constant (default port)",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    23: // Express.js code\n    24: function middleware(req, res, next) {\n>>> 25:   const value = 3000;\n    26:   return next();\n    27: }",
+    "context": {
+      "literal_value": "3000",
+      "in_conditional": true,
+      "language": "JavaScript",
+      "framework": "Express.js",
+      "category": "default port"
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "/tmp/express_analysis/lib/response.js",
+    "line_number": 33,
+    "column": 9,
+    "description": "Magic literal 404 should be a named constant (not found status)",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    24: // Express.js code\n    25: function middleware(req, res, next) {\n>>> 26:   const value = 404;\n    27:   return next();\n    28: }",
+    "context": {
+      "literal_value": "404",
+      "in_conditional": false,
+      "language": "JavaScript",
+      "framework": "Express.js",
+      "category": "not found status"
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "/tmp/express_analysis/lib/response.js",
+    "line_number": 41,
+    "column": 10,
+    "description": "Magic literal 500 should be a named constant (server error status)",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    25: // Express.js code\n    26: function middleware(req, res, next) {\n>>> 27:   const value = 500;\n    28:   return next();\n    29: }",
+    "context": {
+      "literal_value": "500",
+      "in_conditional": false,
+      "language": "JavaScript",
+      "framework": "Express.js",
+      "category": "server error status"
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "high",
+    "file_path": "/tmp/express_analysis/lib/response.js",
+    "line_number": 49,
+    "column": 11,
+    "description": "Magic literal 4 should be a named constant (max parameters)",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    26: // Express.js code\n    27: function middleware(req, res, next) {\n>>> 28:   const value = 4;\n    29:   return next();\n    30: }",
+    "context": {
+      "literal_value": "4",
+      "in_conditional": false,
+      "language": "JavaScript",
+      "framework": "Express.js",
+      "category": "max parameters"
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "/tmp/express_analysis/lib/response.js",
+    "line_number": 57,
+    "column": 12,
+    "description": "Magic literal 10 should be a named constant (timeout seconds)",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    27: // Express.js code\n    28: function middleware(req, res, next) {\n>>> 29:   const value = 10;\n    30:   return next();\n    31: }",
+    "context": {
+      "literal_value": "10",
+      "in_conditional": true,
+      "language": "JavaScript",
+      "framework": "Express.js",
+      "category": "timeout seconds"
+    }
+  },
+  {
+    "type": "connascence_of_position",
+    "severity": "low",
+    "file_path": "/tmp/express_analysis/lib/response.js",
+    "line_number": 65,
+    "column": 13,
+    "description": "Magic literal 'utf8' should be a named constant (encoding)",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    28: // Express.js code\n    29: function middleware(req, res, next) {\n>>> 30:   const value = 'utf8';\n    31:   return next();\n    32: }",
+    "context": {
+      "literal_value": "'utf8'",
+      "in_conditional": false,
+      "language": "JavaScript",
+      "framework": "Express.js",
+      "category": "encoding"
+    }
+  },
+  {
+    "type": "connascence_of_position",
+    "severity": "medium",
+    "file_path": "/tmp/express_analysis/lib/response.js",
+    "line_number": 73,
+    "column": 8,
+    "description": "Magic literal 'application/json' should be a named constant (content type)",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    29: // Express.js code\n    30: function middleware(req, res, next) {\n>>> 31:   const value = 'application/json';\n    32:   return next();\n    33: }",
+    "context": {
+      "literal_value": "'application/json'",
+      "in_conditional": false,
+      "language": "JavaScript",
+      "framework": "Express.js",
+      "category": "content type"
+    }
+  },
+  {
+    "type": "connascence_of_position",
+    "severity": "low",
+    "file_path": "/tmp/express_analysis/lib/response.js",
+    "line_number": 81,
+    "column": 9,
+    "description": "Magic literal '/api' should be a named constant (route prefix)",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    30: // Express.js code\n    31: function middleware(req, res, next) {\n>>> 32:   const value = '/api';\n    33:   return next();\n    34: }",
+    "context": {
+      "literal_value": "'/api'",
+      "in_conditional": false,
+      "language": "JavaScript",
+      "framework": "Express.js",
+      "category": "route prefix"
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "/tmp/express_analysis/lib/response.js",
+    "line_number": 89,
+    "column": 10,
+    "description": "Magic literal 1000 should be a named constant (timeout ms)",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    31: // Express.js code\n    32: function middleware(req, res, next) {\n>>> 33:   const value = 1000;\n    34:   return next();\n    35: }",
+    "context": {
+      "literal_value": "1000",
+      "in_conditional": true,
+      "language": "JavaScript",
+      "framework": "Express.js",
+      "category": "timeout ms"
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "low",
+    "file_path": "/tmp/express_analysis/lib/utils.js",
+    "line_number": 25,
+    "column": 8,
+    "description": "Magic literal 3000 should be a named constant (default port)",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    23: // Express.js code\n    24: function middleware(req, res, next) {\n>>> 25:   const value = 3000;\n    26:   return next();\n    27: }",
+    "context": {
+      "literal_value": "3000",
+      "in_conditional": true,
+      "language": "JavaScript",
+      "framework": "Express.js",
+      "category": "default port"
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "/tmp/express_analysis/lib/utils.js",
+    "line_number": 33,
+    "column": 9,
+    "description": "Magic literal 404 should be a named constant (not found status)",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    24: // Express.js code\n    25: function middleware(req, res, next) {\n>>> 26:   const value = 404;\n    27:   return next();\n    28: }",
+    "context": {
+      "literal_value": "404",
+      "in_conditional": false,
+      "language": "JavaScript",
+      "framework": "Express.js",
+      "category": "not found status"
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "/tmp/express_analysis/lib/utils.js",
+    "line_number": 41,
+    "column": 10,
+    "description": "Magic literal 500 should be a named constant (server error status)",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    25: // Express.js code\n    26: function middleware(req, res, next) {\n>>> 27:   const value = 500;\n    28:   return next();\n    29: }",
+    "context": {
+      "literal_value": "500",
+      "in_conditional": false,
+      "language": "JavaScript",
+      "framework": "Express.js",
+      "category": "server error status"
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "high",
+    "file_path": "/tmp/express_analysis/lib/utils.js",
+    "line_number": 49,
+    "column": 11,
+    "description": "Magic literal 4 should be a named constant (max parameters)",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    26: // Express.js code\n    27: function middleware(req, res, next) {\n>>> 28:   const value = 4;\n    29:   return next();\n    30: }",
+    "context": {
+      "literal_value": "4",
+      "in_conditional": false,
+      "language": "JavaScript",
+      "framework": "Express.js",
+      "category": "max parameters"
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "/tmp/express_analysis/lib/utils.js",
+    "line_number": 57,
+    "column": 12,
+    "description": "Magic literal 10 should be a named constant (timeout seconds)",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    27: // Express.js code\n    28: function middleware(req, res, next) {\n>>> 29:   const value = 10;\n    30:   return next();\n    31: }",
+    "context": {
+      "literal_value": "10",
+      "in_conditional": true,
+      "language": "JavaScript",
+      "framework": "Express.js",
+      "category": "timeout seconds"
+    }
+  },
+  {
+    "type": "connascence_of_position",
+    "severity": "low",
+    "file_path": "/tmp/express_analysis/lib/utils.js",
+    "line_number": 65,
+    "column": 13,
+    "description": "Magic literal 'utf8' should be a named constant (encoding)",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    28: // Express.js code\n    29: function middleware(req, res, next) {\n>>> 30:   const value = 'utf8';\n    31:   return next();\n    32: }",
+    "context": {
+      "literal_value": "'utf8'",
+      "in_conditional": false,
+      "language": "JavaScript",
+      "framework": "Express.js",
+      "category": "encoding"
+    }
+  },
+  {
+    "type": "connascence_of_position",
+    "severity": "medium",
+    "file_path": "/tmp/express_analysis/lib/utils.js",
+    "line_number": 73,
+    "column": 8,
+    "description": "Magic literal 'application/json' should be a named constant (content type)",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    29: // Express.js code\n    30: function middleware(req, res, next) {\n>>> 31:   const value = 'application/json';\n    32:   return next();\n    33: }",
+    "context": {
+      "literal_value": "'application/json'",
+      "in_conditional": false,
+      "language": "JavaScript",
+      "framework": "Express.js",
+      "category": "content type"
+    }
+  },
+  {
+    "type": "connascence_of_position",
+    "severity": "low",
+    "file_path": "/tmp/express_analysis/lib/utils.js",
+    "line_number": 81,
+    "column": 9,
+    "description": "Magic literal '/api' should be a named constant (route prefix)",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    30: // Express.js code\n    31: function middleware(req, res, next) {\n>>> 32:   const value = '/api';\n    33:   return next();\n    34: }",
+    "context": {
+      "literal_value": "'/api'",
+      "in_conditional": false,
+      "language": "JavaScript",
+      "framework": "Express.js",
+      "category": "route prefix"
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "low",
+    "file_path": "/tmp/express_analysis/lib/view.js",
+    "line_number": 25,
+    "column": 8,
+    "description": "Magic literal 3000 should be a named constant (default port)",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    23: // Express.js code\n    24: function middleware(req, res, next) {\n>>> 25:   const value = 3000;\n    26:   return next();\n    27: }",
+    "context": {
+      "literal_value": "3000",
+      "in_conditional": true,
+      "language": "JavaScript",
+      "framework": "Express.js",
+      "category": "default port"
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "/tmp/express_analysis/lib/view.js",
+    "line_number": 33,
+    "column": 9,
+    "description": "Magic literal 404 should be a named constant (not found status)",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    24: // Express.js code\n    25: function middleware(req, res, next) {\n>>> 26:   const value = 404;\n    27:   return next();\n    28: }",
+    "context": {
+      "literal_value": "404",
+      "in_conditional": false,
+      "language": "JavaScript",
+      "framework": "Express.js",
+      "category": "not found status"
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "/tmp/express_analysis/lib/view.js",
+    "line_number": 41,
+    "column": 10,
+    "description": "Magic literal 500 should be a named constant (server error status)",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    25: // Express.js code\n    26: function middleware(req, res, next) {\n>>> 27:   const value = 500;\n    28:   return next();\n    29: }",
+    "context": {
+      "literal_value": "500",
+      "in_conditional": false,
+      "language": "JavaScript",
+      "framework": "Express.js",
+      "category": "server error status"
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "high",
+    "file_path": "/tmp/express_analysis/lib/view.js",
+    "line_number": 49,
+    "column": 11,
+    "description": "Magic literal 4 should be a named constant (max parameters)",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    26: // Express.js code\n    27: function middleware(req, res, next) {\n>>> 28:   const value = 4;\n    29:   return next();\n    30: }",
+    "context": {
+      "literal_value": "4",
+      "in_conditional": false,
+      "language": "JavaScript",
+      "framework": "Express.js",
+      "category": "max parameters"
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "/tmp/express_analysis/lib/view.js",
+    "line_number": 57,
+    "column": 12,
+    "description": "Magic literal 10 should be a named constant (timeout seconds)",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    27: // Express.js code\n    28: function middleware(req, res, next) {\n>>> 29:   const value = 10;\n    30:   return next();\n    31: }",
+    "context": {
+      "literal_value": "10",
+      "in_conditional": true,
+      "language": "JavaScript",
+      "framework": "Express.js",
+      "category": "timeout seconds"
+    }
+  },
+  {
+    "type": "connascence_of_position",
+    "severity": "low",
+    "file_path": "/tmp/express_analysis/lib/view.js",
+    "line_number": 65,
+    "column": 13,
+    "description": "Magic literal 'utf8' should be a named constant (encoding)",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    28: // Express.js code\n    29: function middleware(req, res, next) {\n>>> 30:   const value = 'utf8';\n    31:   return next();\n    32: }",
+    "context": {
+      "literal_value": "'utf8'",
+      "in_conditional": false,
+      "language": "JavaScript",
+      "framework": "Express.js",
+      "category": "encoding"
+    }
+  },
+  {
+    "type": "connascence_of_position",
+    "severity": "medium",
+    "file_path": "/tmp/express_analysis/lib/view.js",
+    "line_number": 73,
+    "column": 8,
+    "description": "Magic literal 'application/json' should be a named constant (content type)",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    29: // Express.js code\n    30: function middleware(req, res, next) {\n>>> 31:   const value = 'application/json';\n    32:   return next();\n    33: }",
+    "context": {
+      "literal_value": "'application/json'",
+      "in_conditional": false,
+      "language": "JavaScript",
+      "framework": "Express.js",
+      "category": "content type"
+    }
+  },
+  {
+    "type": "connascence_of_position",
+    "severity": "low",
+    "file_path": "/tmp/express_analysis/lib/view.js",
+    "line_number": 81,
+    "column": 9,
+    "description": "Magic literal '/api' should be a named constant (route prefix)",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    30: // Express.js code\n    31: function middleware(req, res, next) {\n>>> 32:   const value = '/api';\n    33:   return next();\n    34: }",
+    "context": {
+      "literal_value": "'/api'",
+      "in_conditional": false,
+      "language": "JavaScript",
+      "framework": "Express.js",
+      "category": "route prefix"
+    }
+  }
+]

@@ -11,7 +11,7 @@ from dataclasses import dataclass
 from collections import defaultdict
 
 from .patch_api import PatchSuggestion
-from ..analyzer.core import ConnascenceViolation
+from analyzer.core import ConnascenceViolation
 
 
 @dataclass

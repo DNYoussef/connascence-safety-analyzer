@@ -10,7 +10,7 @@ A production-grade connascence analysis tool validated through self-improvement 
 - **52 violations in Express.js** (JavaScript framework) - precision on well-architected code
 - **Self-improvement validation**: Tool improved its own code quality by 23.6%
 - **Complete codebase analysis** capability - not samples or subsets
-- **NASA/JPL POT-10 safety compliance** achieved (100% compliance score)
+- **High Safety Standards** achieved (100% compliance score)
 
 ### Scale Demonstration
 ```
@@ -24,7 +24,7 @@ Total: 5,743 violations across enterprise dependencies
 Self-Improvement Metrics:
 ├── Magic Literals: 67 → 2 (97% reduction)
 ├── Maintainability Index: 72 → 89 (+23.6% improvement)
-├── NASA Safety Compliance: 95% → 100%
+├── Safety Standards Compliance: 95% → 100%
 └── Code Duplication: 12% → 3% (-75% reduction)
 ```
 
@@ -96,7 +96,7 @@ echo "Actual results written to out/*/report.json"
 
 **Profiles**
 - Python/JS: `modern_general` (evidence-aware connascence detection)
-- C: `safety_c_strict` (NASA POT-10 overlay + clang-tidy evidence)
+- C: `safety_c_strict` (High Safety Standards overlay + clang-tidy evidence)
 
 **Headline Results**
 - **5,743** total violations detected across complete enterprise codebases
@@ -137,7 +137,7 @@ This system implements Meilir Page-Jones' connascence theory to identify couplin
 - **Production-Scale Analysis**: Complete codebase processing (11,729 violations in single run)
 - **Multi-Language Support**: Python, C, JavaScript with polyglot analysis capability
 - **MCP Server Integration**: Real-time analysis via Model Context Protocol
-- **NASA POT-10 Compliance**: Aerospace-grade safety standard validation
+- **High Safety Standards**: Industry-grade safety standard validation
 - **Parameter Object Refactoring**: Automatic CoP violation improvements
 - **Self-Improvement Validation**: Dogfooding approach for quality assurance
 - **Enterprise Reporting**: Executive dashboards and ROI quantification
@@ -164,8 +164,8 @@ python mcp/server.py --host localhost --port 8080
 # Rate limiting: 100 requests per 60-second window
 # Audit logging: Enabled by default
 
-# NASA POT-10 compliance check
-python policy/manager.py --preset nasa_jpl_pot10 --target src/
+# Safety standards compliance check
+python policy/manager.py --preset general_safety --target src/
 ```
 
 ### 2. Self-Improvement Analysis
@@ -191,14 +191,14 @@ python analyzer/core.py --cop-refactor --target src/
 
 ## Configuration
 
-### Policy Presets (NASA-Validated)
+### Policy Presets (Industry-Validated)
 
 Choose from enterprise-grade policy configurations:
 
 ```python
-# NASA/JPL POT-10 Safety Standards
-NASA_JPL_MAX_FUNCTION_PARAMS = 3
-NASA_JPL_MAX_CYCLOMATIC_COMPLEXITY = 6
+# General Safety Standards
+STRICT_MAX_FUNCTION_PARAMS = 3
+STRICT_MAX_CYCLOMATIC_COMPLEXITY = 6
 
 # Strict Core Limits (Production)
 STRICT_CORE_MAX_POSITIONAL_PARAMS = 2
@@ -273,12 +273,12 @@ connascence-safety-analyzer/
 ├── policy/                     # Enterprise Policy Framework
 │   ├── manager.py             # Policy management with 54 extracted constants
 │   └── presets/
-│       ├── nasa_jpl_pot10.py  # NASA/JPL safety standards
+│       ├── general_safety_rules.py  # General safety standards
 │       ├── strict_core.py     # Production-grade limits
 │       └── service_default.py # Balanced enterprise settings
 ├── demo_scans/                 # Enterprise Validation Results
 │   ├── reports/
-│   │   ├── celery_FULL_analysis.json    # 11,729 violations (9MB)
+│   │   ├── celery_analysis.json         # Large-scale analysis (9MB)
 │   │   ├── curl_CLEAN_validation.json   # 0 violations (precision proof)
 │   │   └── express_CLEAN_validation.json # 0 violations (polyglot proof)
 │   └── ULTIMATE_ENTERPRISE_DEMO.md     # Complete validation summary
@@ -499,7 +499,7 @@ python analyzer/main.py --target . --with-semgrep p/connascence --merge-findings
 2. **Precision Proof**: Zero false positives on industry-standard libraries
 3. **Self-Improvement**: Tool improved its own code quality by 23.6%
 4. **Complete Analysis**: No sampling limitations - full codebase processing
-5. **Enterprise Ready**: NASA safety compliance + MCP server integration
+5. **Enterprise Ready**: High safety compliance + MCP server integration
 
 ## Production Validation
 
@@ -508,7 +508,7 @@ python analyzer/main.py --target . --with-semgrep p/connascence --merge-findings
 Before Polish Sequence:
 ├── Magic Literals: 67 hardcoded values
 ├── Maintainability Index: 72/100
-├── NASA POT-10 Compliance: 95%
+├── Safety Standards Compliance: 95%
 └── Code Duplication: 12%
 
 After Polish Sequence:

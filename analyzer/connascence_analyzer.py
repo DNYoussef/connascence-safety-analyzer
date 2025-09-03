@@ -237,6 +237,23 @@ def main():
         if count > 0:
             print(f"  {severity}: {count}", file=sys.stderr)
 
+    # Check for license validation (exit code 4)
+    try:
+        from src.licensing import LicenseValidator, LicenseValidationResult
+        license_validator = LicenseValidator()
+        
+        license_report = license_validator.validate_license(Path(args.path))
+        if license_report.validation_result != LicenseValidationResult.VALID:
+            print(f"License validation failed: {license_report.validation_result.value}", file=sys.stderr)
+            print("Use license validation commands for detailed report", file=sys.stderr)
+            sys.exit(4)  # License error
+            
+    except ImportError:
+        pass  # License validation not available
+    except Exception as e:
+        print(f"License validation error: {e}", file=sys.stderr)
+        sys.exit(4)
+
     # Exit with error if requested and violations found
     if args.fail_on_violations and violations:
         high_severity = len([v for v in violations if v.severity in ["HIGH", "CRITICAL"]])

@@ -27,13 +27,21 @@ from typing import Dict, List, Optional
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from analyzer.ast_engine.core_analyzer import ConnascenceASTAnalyzer, AnalysisResult
-from analyzer.thresholds import DEFAULT_PRESETS
+from analyzer.thresholds import DEFAULT_THRESHOLDS, DEFAULT_WEIGHTS
 from reporting.json_export import JSONReporter
 from reporting.sarif_export import SARIFReporter  
 from reporting.md_summary import MarkdownReporter
 from policy.manager import PolicyManager
 from policy.budgets import BudgetTracker
 from policy.baselines import BaselineManager
+
+# Import license validation system
+try:
+    from src.licensing import LicenseValidator, LicenseValidationResult
+    LICENSE_VALIDATION_AVAILABLE = True
+except ImportError:
+    LICENSE_VALIDATION_AVAILABLE = False
+    logger.warning("License validation system not available")
 
 
 # Configure logging
@@ -51,6 +59,12 @@ class ConnascenceCLI:
         self.policy_manager = PolicyManager()
         self.baseline_manager = BaselineManager()
         self.budget_tracker = BudgetTracker()
+        
+        # Initialize license validator if available
+        if LICENSE_VALIDATION_AVAILABLE:
+            self.license_validator = LicenseValidator()
+        else:
+            self.license_validator = None
         
     def create_parser(self) -> argparse.ArgumentParser:
         """Create the main argument parser with subcommands."""
@@ -83,6 +97,11 @@ Examples:
             action="version",
             version="connascence 1.0.0"
         )
+        parser.add_argument(
+            "--skip-license-check",
+            action="store_true",
+            help="Skip license validation (exit code 4 on license errors)"
+        )
         
         # Subcommands
         subparsers = parser.add_subparsers(dest="command", help="Available commands")
@@ -104,6 +123,9 @@ Examples:
         
         # MCP server command
         self._add_mcp_parser(subparsers)
+        
+        # License validation command
+        self._add_license_parser(subparsers)
         
         return parser
     
@@ -351,6 +373,64 @@ Examples:
             help="Port to bind to (for sse/websocket)"
         )
     
+    def _add_license_parser(self, subparsers):
+        """Add the license validation subcommand parser."""
+        license_parser = subparsers.add_parser(
+            "license",
+            help="License validation and compliance checking"
+        )
+        
+        license_subparsers = license_parser.add_subparsers(
+            dest="license_action",
+            help="License actions"
+        )
+        
+        # Validate
+        validate_parser = license_subparsers.add_parser(
+            "validate",
+            help="Validate project license compliance"
+        )
+        validate_parser.add_argument(
+            "path",
+            nargs="?",
+            default=".",
+            help="Project path to validate (default: current directory)"
+        )
+        validate_parser.add_argument(
+            "--format", "-f",
+            choices=["text", "json"],
+            default="text",
+            help="Output format (default: text)"
+        )
+        
+        # Check
+        check_parser = license_subparsers.add_parser(
+            "check",
+            help="Quick license compliance check"
+        )
+        check_parser.add_argument(
+            "path",
+            nargs="?",
+            default=".",
+            help="Project path to check"
+        )
+        
+        # Memory
+        memory_parser = license_subparsers.add_parser(
+            "memory",
+            help="Manage license validation memory"
+        )
+        memory_parser.add_argument(
+            "--clear",
+            action="store_true",
+            help="Clear license validation memory"
+        )
+        memory_parser.add_argument(
+            "--show",
+            action="store_true", 
+            help="Show license validation memory contents"
+        )
+    
     def run(self, args: Optional[List[str]] = None) -> int:
         """Run the CLI application."""
         parser = self.create_parser()
@@ -360,6 +440,15 @@ Examples:
         if parsed_args.verbose:
             logging.getLogger().setLevel(logging.INFO)
             logger.info("Verbose logging enabled")
+        
+        # Perform license validation first (unless skipped or for license commands)
+        if (not parsed_args.skip_license_check and 
+            parsed_args.command not in ["license", None] and
+            LICENSE_VALIDATION_AVAILABLE):
+            
+            license_exit_code = self._perform_license_validation(Path.cwd(), parsed_args.verbose)
+            if license_exit_code != 0:
+                return license_exit_code
         
         # Handle missing command
         if not parsed_args.command:
@@ -380,6 +469,8 @@ Examples:
                 return self._handle_baseline(parsed_args)
             elif parsed_args.command == "mcp":
                 return self._handle_mcp(parsed_args)
+            elif parsed_args.command == "license":
+                return self._handle_license(parsed_args)
             else:
                 parser.error(f"Unknown command: {parsed_args.command}")
                 
@@ -500,6 +591,142 @@ Examples:
             print("MCP server implementation pending")
         
         return 0
+    
+    def _handle_license(self, args) -> int:
+        """Handle license validation commands."""
+        if not LICENSE_VALIDATION_AVAILABLE:
+            print("License validation system not available", file=sys.stderr)
+            return 2  # Configuration error
+        
+        if args.license_action == "validate":
+            return self._handle_license_validate(args)
+        elif args.license_action == "check":
+            return self._handle_license_check(args)
+        elif args.license_action == "memory":
+            return self._handle_license_memory(args)
+        else:
+            print("License action required", file=sys.stderr)
+            return 2
+    
+    def _handle_license_validate(self, args) -> int:
+        """Handle license validate command."""
+        project_path = Path(args.path)
+        if not project_path.exists():
+            print(f"Error: Path '{project_path}' does not exist", file=sys.stderr)
+            return 2
+        
+        print(f"Validating license compliance for {project_path}...")
+        
+        try:
+            report = self.license_validator.validate_license(project_path)
+            
+            if args.format == "json":
+                # Convert to JSON-serializable format
+                report_dict = {
+                    "timestamp": report.timestamp.isoformat(),
+                    "validation_result": report.validation_result.value,
+                    "exit_code": report.exit_code,
+                    "errors": [
+                        {
+                            "code": e.error_code,
+                            "type": e.error_type,
+                            "description": e.description,
+                            "severity": e.severity,
+                            "recommendation": e.recommendation
+                        }
+                        for e in report.errors
+                    ],
+                    "sequential_steps": report.sequential_steps[-5:],  # Last 5 steps
+                    "memory_key": report.memory_storage_key
+                }
+                print(json.dumps(report_dict, indent=2))
+            else:
+                print(self.license_validator.generate_license_report(report))
+            
+            return report.exit_code
+            
+        except Exception as e:
+            print(f"License validation failed: {e}", file=sys.stderr)
+            return 4  # License error
+    
+    def _handle_license_check(self, args) -> int:
+        """Handle quick license check command."""
+        project_path = Path(args.path)
+        
+        try:
+            report = self.license_validator.validate_license(project_path)
+            
+            if report.validation_result == LicenseValidationResult.VALID:
+                print("✓ License validation passed")
+                return 0
+            else:
+                print(f"✗ License validation failed: {report.validation_result.value}")
+                if report.errors:
+                    for error in report.errors[:3]:  # Show first 3 errors
+                        print(f"  - {error.description}")
+                return report.exit_code
+                
+        except Exception as e:
+            print(f"License check failed: {e}", file=sys.stderr)
+            return 4
+    
+    def _handle_license_memory(self, args) -> int:
+        """Handle license memory management commands."""
+        if args.clear:
+            # Clear license memory
+            memory_file = Path.home() / ".connascence" / "license_memory.json"
+            if memory_file.exists():
+                memory_file.unlink()
+                print("License validation memory cleared")
+            else:
+                print("No license memory to clear")
+            return 0
+        
+        if args.show:
+            # Show license memory contents
+            memory_file = Path.home() / ".connascence" / "license_memory.json"
+            if memory_file.exists():
+                try:
+                    with open(memory_file, 'r') as f:
+                        memory_data = json.load(f)
+                    print(json.dumps(memory_data, indent=2))
+                except Exception as e:
+                    print(f"Failed to read license memory: {e}", file=sys.stderr)
+                    return 2
+            else:
+                print("No license memory file found")
+            return 0
+        
+        print("License memory action required (--clear or --show)", file=sys.stderr)
+        return 2
+    
+    def _perform_license_validation(self, project_path: Path, verbose: bool) -> int:
+        """Perform license validation and return exit code."""
+        if not self.license_validator:
+            return 0  # Skip if not available
+        
+        try:
+            if verbose:
+                print("Performing license validation...", file=sys.stderr)
+            
+            report = self.license_validator.validate_license(project_path)
+            
+            if report.validation_result != LicenseValidationResult.VALID:
+                print(f"License validation failed: {report.validation_result.value}", file=sys.stderr)
+                if verbose and report.errors:
+                    for error in report.errors[:2]:  # Show first 2 errors
+                        print(f"  - {error.description}", file=sys.stderr)
+                print("Use 'connascence license validate' for detailed report", file=sys.stderr)
+                return report.exit_code
+            
+            if verbose:
+                print("License validation passed", file=sys.stderr)
+            return 0
+            
+        except Exception as e:
+            if verbose:
+                print(f"License validation error: {e}", file=sys.stderr)
+            return 4  # License error
     
     def _filter_by_severity(self, violations: List, min_severity: str) -> List:
         """Filter violations by minimum severity."""

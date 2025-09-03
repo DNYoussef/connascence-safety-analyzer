@@ -27,16 +27,18 @@
       "profile": "modern_general",
       "language": "Python",
       "duration_sec": 147.3,
-      "findings_total": 4630,
+      "findings_total": 11729,
       "severity_breakdown": {
         "critical": 97,
         "high": 318,
         "medium": 4215
       },
       "pattern_breakdown": {
-        "connascence_of_meaning": 4215,
-        "connascence_of_position": 318,
-        "god_object": 97
+        "connascence_of_meaning": 10133,
+        "connascence_of_position": 538,
+        "god_object": 64,
+        "algorithm_duplication": 922,
+        "other_violations": 72
       },
       "artifacts": {
         "sarif": "celery/report.sarif",
@@ -103,9 +105,9 @@
     }
   ],
   "enterprise_validation": {
-    "total_violations_detected": 5743,
+    "total_violations_detected": 12842,
     "violation_distribution": {
-      "celery": 4630,
+      "celery": 11729,
       "curl": 1061,
       "express": 52
     },

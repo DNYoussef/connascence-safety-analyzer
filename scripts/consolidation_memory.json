@@ -1,0 +1,337 @@
+{
+  "consolidation_analysis": {
+    "timestamp": "2025-09-03T13:56:00.000Z",
+    "agent": "memory_coordinator",
+    "session_id": "swarm-1756920545388",
+    "analysis_scope": "comprehensive_duplication_mapping"
+  },
+  "duplication_locations": {
+    "demo_files": {
+      "source": "sale/demos/",
+      "targets": [
+        "dist/connascence-sales-demo/sales/demos/"
+      ],
+      "status": "exact_duplicate",
+      "priority": "high",
+      "files": {
+        "celery": {
+          "source_file": "sale/demos/celery/demo_celery.py",
+          "target_file": "dist/connascence-sales-demo/sales/demos/celery/demo_celery.py",
+          "size_bytes": 16315,
+          "capabilities": [
+            "CeleryDemo class implementation",
+            "Repository cloning functionality",
+            "Connascence analysis execution",
+            "Mock data generation (hotspots, refactors, SARIF)",
+            "Dashboard data generation",
+            "Complete demo workflow orchestration"
+          ],
+          "business_logic": [
+            "Demo script orchestration",
+            "Analysis result processing",
+            "Report artifact generation",
+            "Mock data creation for fallback scenarios"
+          ],
+          "dependencies": [
+            "subprocess",
+            "json",
+            "pathlib.Path",
+            "time"
+          ],
+          "integration_points": [
+            "connascence CLI commands",
+            "File system operations",
+            "Process execution"
+          ]
+        },
+        "curl": {
+          "source_file": "sale/demos/curl/demo_curl.py",
+          "target_file": "dist/connascence-sales-demo/sales/demos/curl/demo_curl.py",
+          "size_bytes": 21963,
+          "capabilities": [
+            "CurlDemo class implementation",
+            "C/C++ codebase analysis",
+            "Complex codebase handling",
+            "Enterprise-scale demo execution",
+            "Multi-format output generation"
+          ],
+          "business_logic": [
+            "Large codebase analysis workflows",
+            "Performance benchmarking",
+            "Enterprise demo scenarios"
+          ]
+        },
+        "express": {
+          "source_file": "sale/demos/express/demo_express.py",
+          "target_file": "dist/connascence-sales-demo/sales/demos/express/demo_express.py", 
+          "size_bytes": 20525,
+          "capabilities": [
+            "ExpressDemo class implementation",
+            "JavaScript/Node.js analysis",
+            "Web framework pattern detection",
+            "Modern web development scenarios"
+          ],
+          "business_logic": [
+            "Frontend/backend analysis coordination",
+            "Modern JavaScript pattern detection",
+            "Web application architecture analysis"
+          ]
+        }
+      }
+    },
+    "report_directories": {
+      "primary_source": "demo_scans/reports/",
+      "duplicate_locations": [
+        "docs/",
+        "examples/demo_reports/",
+        "test_results/"
+      ],
+      "status": "mixed_content_overlap",
+      "priority": "medium",
+      "analysis_artifacts": {
+        "demo_scans_reports": {
+          "location": "demo_scans/reports/",
+          "files": {
+            "celery_analysis.json": {
+              "size_bytes": 3690161,
+              "capabilities": ["Large-scale analysis results", "Violation tracking", "Enterprise metrics"],
+              "content_type": "analysis_output"
+            },
+            "celery_analysis_real.json": {
+              "size_bytes": 9591217,
+              "capabilities": ["Production analysis results", "Real-world data", "Comprehensive violations"],
+              "content_type": "production_data"
+            },
+            "curl_analysis.json": {
+              "size_bytes": 661188,
+              "capabilities": ["C/C++ analysis results", "Cross-language support", "System-level analysis"],
+              "content_type": "analysis_output"
+            },
+            "express_analysis.json": {
+              "size_bytes": 36750,
+              "capabilities": ["JavaScript analysis", "Web framework patterns", "Modern development analysis"],
+              "content_type": "analysis_output"
+            },
+            "violation_memory_store.json": {
+              "size_bytes": 680,
+              "capabilities": ["Memory coordination", "Report aggregation", "Status tracking"],
+              "content_type": "coordination_data"
+            },
+            "ENTERPRISE_DEMO_RESULTS.md": {
+              "capabilities": ["Documentation", "Results presentation", "Enterprise metrics"],
+              "content_type": "presentation"
+            },
+            "SALES_METRICS.json": {
+              "size_bytes": 4786,
+              "capabilities": ["Sales presentation data", "Key metrics", "Business intelligence"],
+              "content_type": "business_data"
+            },
+            "ENTERPRISE_SCALE_METRICS.json": {
+              "size_bytes": 6322,
+              "capabilities": ["Scale metrics", "Performance data", "Enterprise benchmarks"],
+              "content_type": "performance_data"
+            }
+          }
+        },
+        "docs_directory": {
+          "location": "docs/",
+          "overlapping_capabilities": [
+            "Analysis report presentation",
+            "Comprehensive analysis documentation",
+            "JSON report storage"
+          ],
+          "unique_capabilities": [
+            "Architecture decision records (ADR)",
+            "CI pipeline documentation",
+            "Elimination action plans",
+            "Refactoring priorities"
+          ]
+        },
+        "test_results": {
+          "location": "test_results/",
+          "capabilities": [
+            "Test execution logs",
+            "Integration test results",
+            "Unit test summaries"
+          ],
+          "overlap_with": "demo_scans/reports/"
+        }
+      }
+    },
+    "distribution_packages": {
+      "base_location": "dist/",
+      "packages": {
+        "connascence-analyzer-core": {
+          "capabilities": [
+            "Core analysis engine",
+            "AST processing",
+            "Connascence detection algorithms",
+            "Autofix implementations",
+            "CLI interface"
+          ],
+          "business_logic": [
+            "Pattern recognition",
+            "Code quality assessment",
+            "Refactoring suggestions",
+            "Safety validation"
+          ],
+          "size_estimate": "large",
+          "integration_priority": "critical"
+        },
+        "connascence-analyzer-enterprise": {
+          "unique_capabilities": [
+            "Enterprise features",
+            "Advanced reporting",
+            "Scale optimization",
+            "NASA/JPL compliance"
+          ],
+          "demo_overlap": "demo/nasa_jpl/demo_analysis.py",
+          "integration_priority": "high"
+        },
+        "connascence-sales-demo": {
+          "capabilities": [
+            "Sales demonstration workflows",
+            "Customer-facing demos",
+            "Proof-of-concept implementations"
+          ],
+          "direct_duplicate": "sale/demos/",
+          "integration_priority": "immediate"
+        },
+        "connascence-vscode-extension": {
+          "capabilities": [
+            "IDE integration",
+            "Real-time analysis",
+            "Developer workflow integration"
+          ],
+          "integration_priority": "medium"
+        }
+      }
+    }
+  },
+  "capability_inheritance_chains": {
+    "demo_execution_chain": {
+      "pattern": "Source → Distribution → Execution",
+      "flow": [
+        {
+          "source": "sale/demos/",
+          "inherits_to": "dist/connascence-sales-demo/sales/demos/",
+          "capability_transfer": "complete",
+          "modification_risk": "low"
+        }
+      ]
+    },
+    "analysis_reporting_chain": {
+      "pattern": "Generation → Storage → Presentation",
+      "flow": [
+        {
+          "generator": "analyzer engines",
+          "primary_storage": "demo_scans/reports/",
+          "presentation_copies": ["docs/", "examples/demo_reports/"],
+          "capability_transfer": "partial",
+          "modification_risk": "medium"
+        }
+      ]
+    },
+    "enterprise_integration_chain": {
+      "pattern": "Core → Enterprise → Distribution",
+      "flow": [
+        {
+          "core": "analyzer/",
+          "enterprise": "dist/connascence-analyzer-enterprise/",
+          "distribution": "dist/connascence-analyzer-core/",
+          "capability_transfer": "hierarchical",
+          "modification_risk": "high"
+        }
+      ]
+    }
+  },
+  "integration_priorities": {
+    "immediate": [
+      {
+        "source": "sale/demos/",
+        "target": "dist/connascence-sales-demo/sales/demos/",
+        "action": "consolidate_to_single_location",
+        "rationale": "exact_duplicates_with_no_differentiation",
+        "validation_checkpoints": [
+          "file_content_comparison",
+          "dependency_validation",
+          "execution_testing"
+        ]
+      }
+    ],
+    "high": [
+      {
+        "sources": ["demo_scans/reports/", "docs/", "examples/demo_reports/"],
+        "action": "centralize_with_symbolic_links",
+        "rationale": "overlapping_content_with_unique_elements",
+        "validation_checkpoints": [
+          "content_uniqueness_analysis",
+          "access_pattern_validation",
+          "tool_dependency_check"
+        ]
+      }
+    ],
+    "medium": [
+      {
+        "source": "test_results/",
+        "action": "integrate_with_reporting_system", 
+        "rationale": "temporal_data_with_structural_overlap",
+        "validation_checkpoints": [
+          "temporal_consistency_check",
+          "reporting_workflow_validation"
+        ]
+      }
+    ]
+  },
+  "validation_checkpoints": {
+    "file_integrity": {
+      "checksums": "required",
+      "content_comparison": "byte_level",
+      "dependency_validation": "import_analysis"
+    },
+    "functional_validation": {
+      "demo_execution": "all_scenarios",
+      "report_generation": "end_to_end",
+      "integration_testing": "cross_package"
+    },
+    "business_continuity": {
+      "sales_demo_availability": "critical",
+      "analysis_result_consistency": "critical", 
+      "enterprise_feature_preservation": "high"
+    }
+  },
+  "cross_agent_memory_keys": {
+    "code_extraction": {
+      "key": "consolidation/extraction_targets",
+      "data": "immediate_priority_duplicates",
+      "access_pattern": "read_write"
+    },
+    "pattern_mining": {
+      "key": "consolidation/pattern_sources", 
+      "data": "capability_inheritance_chains",
+      "access_pattern": "read_only"
+    },
+    "integration_strategy": {
+      "key": "consolidation/integration_plan",
+      "data": "integration_priorities",
+      "access_pattern": "collaborative"
+    },
+    "validation_requirements": {
+      "key": "consolidation/validation_spec",
+      "data": "validation_checkpoints", 
+      "access_pattern": "read_only"
+    }
+  },
+  "metadata": {
+    "total_duplicate_locations_identified": 15,
+    "total_file_size_analyzed": "~15MB",
+    "critical_business_capabilities": 8,
+    "integration_complexity_score": "medium_high",
+    "estimated_consolidation_time": "4_hours",
+    "risk_assessment": {
+      "data_loss": "low",
+      "functionality_impact": "low", 
+      "business_disruption": "minimal"
+    }
+  }
+}

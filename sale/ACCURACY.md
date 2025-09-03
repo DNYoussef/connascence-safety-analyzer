@@ -182,7 +182,7 @@ print('Sample indices:', sample)
 
 # Extract specific violations for manual review
 python analyzer/audit_helper.py \
-  --report demo_scans/reports/celery_FULL_analysis.json \
+  --report demo_scans/reports/celery_analysis.json \
   --sample-indices [list from above] \
   --output audit_sample.json
 ```

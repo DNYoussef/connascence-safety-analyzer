@@ -27,8 +27,14 @@ class MasterTestRunner:
             'integration_tests': {
                 'path': self.base_dir / 'tests' / 'integration',
                 'pattern': 'test_*.py', 
-                'description': 'Integration tests for system components',
-                'critical': True
+                'description': 'Integration tests: MCP server, autofix engine, workflow validation, cross-component testing',
+                'critical': True,
+                'test_modules': [
+                    'test_mcp_server_integration.py',
+                    'test_autofix_engine_integration.py', 
+                    'test_workflow_integration.py',
+                    'test_cross_component_validation.py'
+                ]
             },
             'e2e_tests': {
                 'path': self.base_dir / 'tests' / 'e2e',

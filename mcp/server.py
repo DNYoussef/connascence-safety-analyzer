@@ -1,6 +1,7 @@
 
 import asyncio
 import time
+from pathlib import Path
 from typing import Dict, List, Any, Optional
 from analyzer.core import ConnascenceViolation
 
@@ -500,7 +501,7 @@ class ConnascenceMCPServer:
         # Enhanced path traversal detection
         traversal_patterns = [
             r'\.\./',     # ../
-            r'\.\.\\'',   # ..\\
+            r'\\\.\.\\',  # ..\\
             r'/\.\./',    # /../
             r'\\\.\.\\', # \\..\\
             r'%2e%2e',    # URL encoded ..
