@@ -1,0 +1,16 @@
+{
+  "total_violations": 11729,
+  "severity": {
+    "critical": 64,
+    "high": 1995,
+    "medium": 9670
+  },
+  "patterns": {
+    "connascence_of_meaning": 10133,
+    "connascence_of_algorithm": 922,
+    "connascence_of_position": 538,
+    "connascence_of_timing": 72,
+    "god_object": 64
+  },
+  "duration": 147.3
+}

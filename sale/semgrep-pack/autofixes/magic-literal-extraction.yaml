@@ -1,0 +1,74 @@
+rules:
+  - id: autofix-magic-literal-timeout
+    pattern-either:
+      - pattern: sleep($TIMEOUT)
+      - pattern: time.sleep($TIMEOUT)  
+      - pattern: setTimeout($FUNC, $TIMEOUT)
+    pattern-not:
+      pattern-either:
+        - pattern: sleep(0)
+        - pattern: time.sleep(0)
+        - pattern: setTimeout($FUNC, 0)
+    message: |
+      Magic timeout value extracted to named constant for maintainability.
+    severity: INFO
+    languages: [python, javascript]
+    fix: |
+      # Extracted timeout constant
+      TIMEOUT_SECONDS = $TIMEOUT
+      sleep(TIMEOUT_SECONDS)
+    metadata:
+      category: autofix
+      subcategory: connascence-of-meaning
+      confidence: HIGH
+      impact: MEDIUM
+      autofix: true
+
+  - id: autofix-magic-literal-threshold
+    pattern-either:
+      - pattern: if $VAR > $THRESHOLD
+      - pattern: if $VAR >= $THRESHOLD
+      - pattern: if $VAR < $THRESHOLD  
+      - pattern: if $VAR <= $THRESHOLD
+    pattern-not:
+      pattern-either:
+        - pattern: if $VAR > 0
+        - pattern: if $VAR >= 0
+        - pattern: if $VAR < 0
+        - pattern: if $VAR <= 0
+        - pattern: if $VAR > 1
+        - pattern: if $VAR >= 1
+    message: |
+      Magic threshold value extracted to named constant.
+    severity: INFO
+    languages: [python, javascript]
+    fix: |
+      # Extracted threshold constant
+      THRESHOLD_VALUE = $THRESHOLD
+      if $VAR >= THRESHOLD_VALUE
+    metadata:
+      category: autofix
+      subcategory: connascence-of-meaning
+      confidence: HIGH
+      impact: MEDIUM
+      autofix: true
+
+  - id: autofix-magic-buffer-size
+    pattern: |
+      char $BUFFER[$SIZE];
+    pattern-not: |
+      char $BUFFER[1];
+    message: |
+      Magic buffer size extracted to named constant for safety.
+    severity: WARNING
+    languages: [c, cpp]
+    fix: |
+      #define BUFFER_SIZE $SIZE
+      char $BUFFER[BUFFER_SIZE];
+    metadata:
+      category: autofix
+      subcategory: nasa-pot10-compliance
+      confidence: HIGH
+      impact: HIGH
+      safety_critical: true
+      autofix: true

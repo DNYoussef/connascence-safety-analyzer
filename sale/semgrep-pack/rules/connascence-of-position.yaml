@@ -1,0 +1,109 @@
+rules:
+  - id: connascence-too-many-parameters
+    pattern-either:
+      - pattern: def $FUNC($A, $B, $C, $D, $E, ...): ...
+      - pattern: function $FUNC($A, $B, $C, $D, $E, ...) { ... }
+      - pattern: |
+          $TYPE $FUNC($TYPE1 $A, $TYPE2 $B, $TYPE3 $C, $TYPE4 $D, $TYPE5 $E, ...) {
+            ...
+          }
+    message: |
+      Function '$FUNC' has too many parameters (5+), creating connascence of position.
+      Consider using a parameter object or configuration struct to reduce coupling.
+      
+      Example refactor:
+      ```python
+      @dataclass
+      class FunctionConfig:
+          param_a: str
+          param_b: int
+          param_c: bool = False
+      
+      def $FUNC(config: FunctionConfig):
+          # Use config.param_a, config.param_b, etc.
+      ```
+    severity: WARNING
+    languages: [python, javascript, typescript, c, cpp]
+    metadata:
+      category: connascence
+      subcategory: position
+      confidence: HIGH
+      likelihood: HIGH
+      impact: MEDIUM
+      enterprise_validated: true
+      references:
+        - "Meilir Page-Jones: Parameter coupling reduces maintainability"
+        - "Celery analysis: 538 CoP violations detected"
+        
+  - id: connascence-long-parameter-list
+    patterns:
+      - pattern-either:
+          - pattern: def $FUNC($A, $B, $C, $D): ...
+          - pattern: function $FUNC($A, $B, $C, $D) { ... }
+      - pattern-not: def $FUNC(self, $A, $B, $C): ...
+      - pattern-not: def $FUNC(cls, $A, $B, $C): ...
+    message: |
+      Function '$FUNC' has 4+ parameters. Consider if a parameter object would improve readability.
+      
+      NASA POT-10 recommendation: Functions should have ≤3 parameters for safety-critical code.
+    severity: INFO
+    languages: [python, javascript, typescript]
+    metadata:
+      category: connascence
+      subcategory: position
+      confidence: MEDIUM
+      likelihood: MEDIUM
+      impact: LOW
+      nasa_pot10_related: true
+
+  - id: connascence-boolean-parameters
+    pattern-either:
+      - pattern: $FUNC(..., True, ...)
+      - pattern: $FUNC(..., False, ...)
+      - pattern: $FUNC(..., true, ...)
+      - pattern: $FUNC(..., false, ...)
+    message: |
+      Boolean parameter creates connascence of meaning and position.
+      Consider using named parameters or enum values for clarity.
+      
+      Better: $FUNC(..., enable_feature=True, ...)
+    severity: INFO
+    languages: [python, javascript, typescript]
+    metadata:
+      category: connascence
+      subcategory: position-meaning
+      confidence: MEDIUM
+      likelihood: MEDIUM
+      impact: LOW
+      
+  - id: connascence-constructor-parameters
+    patterns:
+      - pattern: |
+          def __init__(self, $A, $B, $C, $D, $E, ...):
+            ...
+      - pattern-not: |
+          def __init__(self, $A, $B, $C, **kwargs):
+            ...
+    message: |
+      Constructor with 5+ parameters creates strong positional coupling.
+      Consider using a builder pattern or parameter object.
+      
+      Example:
+      ```python
+      @dataclass
+      class CreationParams:
+          param_a: str
+          param_b: int = 0
+          
+      def __init__(self, params: CreationParams):
+          # Reduced coupling, better maintainability
+      ```
+    severity: WARNING
+    languages: [python]
+    metadata:
+      category: connascence
+      subcategory: position
+      confidence: HIGH
+      likelihood: HIGH
+      impact: HIGH
+      autofix_available: true
