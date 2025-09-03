@@ -399,7 +399,7 @@ Examples:
         start_time = time.time()
         
         # Load policy
-        policy = self.policy_manager.load_preset(args.policy)
+        policy = self.policy_manager.get_preset(args.policy)
         
         # Create analyzer with policy configuration
         analyzer = ConnascenceASTAnalyzer(

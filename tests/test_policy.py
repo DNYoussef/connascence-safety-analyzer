@@ -28,26 +28,26 @@ class TestPolicyManager:
     def test_default_presets_loading(self):
         """Test loading of default policy presets."""
         # Test strict-core preset
-        strict_policy = self.policy_manager.load_preset('strict-core')
+        strict_policy = self.policy_manager.get_preset('strict-core')
         assert strict_policy is not None
         assert strict_policy.max_positional_params == 2
         assert strict_policy.god_class_methods == 15
         
         # Test service-defaults preset
-        service_policy = self.policy_manager.load_preset('service-defaults')
+        service_policy = self.policy_manager.get_preset('service-defaults')
         assert service_policy is not None
         assert service_policy.max_positional_params == 3
         assert service_policy.god_class_methods == 20
         
         # Test experimental preset
-        experimental_policy = self.policy_manager.load_preset('experimental')
+        experimental_policy = self.policy_manager.get_preset('experimental')
         assert experimental_policy is not None
         assert experimental_policy.max_positional_params == 4
     
     def test_invalid_preset_name(self):
         """Test handling of invalid preset names."""
         with pytest.raises(ValueError) as exc_info:
-            self.policy_manager.load_preset('non-existent-preset')
+            self.policy_manager.get_preset('non-existent-preset')
         
         assert 'preset not found' in str(exc_info.value).lower()
     
@@ -107,7 +107,7 @@ class TestPolicyManager:
     def test_policy_inheritance(self):
         """Test policy inheritance and customization."""
         # Load base policy
-        base_policy = self.policy_manager.load_preset('service-defaults')
+        base_policy = self.policy_manager.get_preset('service-defaults')
         
         # Create custom overrides
         overrides = {
@@ -124,7 +124,7 @@ class TestPolicyManager:
     
     def test_policy_serialization(self):
         """Test policy serialization and deserialization."""
-        policy = self.policy_manager.load_preset('strict-core')
+        policy = self.policy_manager.get_preset('strict-core')
         
         # Serialize to dict
         policy_dict = self.policy_manager.serialize_policy(policy)
@@ -528,7 +528,7 @@ class TestPolicyIntegration:
         """Test complete policy workflow from loading to enforcement."""
         # Step 1: Load policy
         policy_manager = PolicyManager()
-        policy = policy_manager.load_preset('strict-core')
+        policy = policy_manager.get_preset('strict-core')
         
         # Step 2: Set up budget tracking
         budget_tracker = BudgetTracker()
@@ -594,7 +594,7 @@ class TestPolicyIntegration:
     def test_policy_violation_categorization(self):
         """Test categorization of violations by policy rules."""
         policy_manager = PolicyManager()
-        strict_policy = policy_manager.load_preset('strict-core')
+        strict_policy = policy_manager.get_preset('strict-core')
         
         # Violations that should be flagged under strict policy
         violations = [

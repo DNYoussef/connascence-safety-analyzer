@@ -226,7 +226,9 @@ class MagicLiteralAnalyzer(ast.NodeVisitor):
             return None
         
         category = self._categorize_literal(value, context, context_type)
-        severity = self._assess_contextual_severity(value, context, node, context_type)
+        severity = self._assess_contextual_severity(
+            value=value, context=context, node=node, context_type=context_type
+        )
         in_conditional = self._is_in_conditional(node)
 
         return MagicLiteral(
@@ -368,8 +370,12 @@ class MagicLiteralAnalyzer(ast.NodeVisitor):
 
         return "unknown"
 
-    def _assess_contextual_severity(self, value: Any, context: str, node: ast.AST, context_type: ContextType) -> str:
-        """Assess severity using contextual analysis."""
+    def _assess_contextual_severity(self, *, value: Any, context: str, node: ast.AST, context_type: ContextType) -> str:
+        """
+        Assess severity using contextual analysis.
+        
+        Using keyword-only arguments to reduce Connascence of Position (CoP).
+        """
         context_lower = context.lower()
         
         # Critical: Security-related magic literals
