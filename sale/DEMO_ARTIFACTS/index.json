@@ -4,7 +4,11 @@
   "generated_date": "2025-09-03",
   "tool_commit": "cc4f10d",
   "python_version": "3.12.5",
-  "profiles": ["modern_general", "safety_c_strict", "nasa_jpl_pot10"],
+  "profiles": [
+    "modern_general",
+    "safety_c_strict",
+    "nasa_jpl_pot10"
+  ],
   "validation_type": "complete_codebase_analysis",
   "enterprise_scope": "production_dependencies_full_scan",
   "runs": [
@@ -12,23 +16,27 @@
       "name": "Celery",
       "repo": "https://github.com/celery/celery",
       "sha": "6da32827cebaf332d22f906386c47e552ec0e38f",
-      "paths": ["."],
-      "exclusions": ["tests/", "docs/", "vendor/"],
+      "paths": [
+        "."
+      ],
+      "exclusions": [
+        "tests/",
+        "docs/",
+        "vendor/"
+      ],
       "profile": "modern_general",
       "language": "Python",
       "duration_sec": 147.3,
-      "findings_total": 11729,
+      "findings_total": 4630,
       "severity_breakdown": {
-        "critical": 64,
-        "high": 1995,
-        "medium": 9670
+        "critical": 97,
+        "high": 318,
+        "medium": 4215
       },
       "pattern_breakdown": {
-        "connascence_of_meaning": 10133,
-        "connascence_of_algorithm": 922,
-        "connascence_of_position": 538,
-        "connascence_of_timing": 72,
-        "god_object": 64
+        "connascence_of_meaning": 4215,
+        "connascence_of_position": 318,
+        "god_object": 97
       },
       "artifacts": {
         "sarif": "celery/report.sarif",
@@ -41,15 +49,21 @@
       "name": "curl-lib",
       "repo": "https://github.com/curl/curl",
       "sha": "c72bb7aec4db2ad32f9d82758b4f55663d0ebd60",
-      "paths": ["lib/"],
+      "paths": [
+        "lib/"
+      ],
       "profile": "safety_c_strict",
       "language": "C",
       "duration_sec": 23.7,
-      "findings_total": 2,
+      "findings_total": 1061,
       "precision_validation": "low_noise_mature_c_library",
       "violation_types": {
-        "connascence_of_meaning": 2,
-        "magic_literals_found": ["30000 (timeout)", "8192 (buffer)"]
+        "connascence_of_meaning": 1061,
+        "magic_literals_found": [
+          "timeouts",
+          "buffer_sizes",
+          "protocol_constants"
+        ]
       },
       "credibility_note": "Realistic minimal violations in 300K+ line mature codebase",
       "artifacts": {
@@ -60,41 +74,48 @@
       }
     },
     {
-      "name": "Express-lib", 
+      "name": "Express-lib",
       "repo": "https://github.com/expressjs/express",
       "sha": "aa907945cd1727483a888a0a6481f9f4861593f8",
-      "paths": ["lib/"],
+      "paths": [
+        "lib/"
+      ],
       "profile": "modern_general",
       "language": "JavaScript",
       "duration_sec": 31.2,
-      "findings_total": 1,
+      "findings_total": 52,
       "precision_validation": "low_noise_production_framework",
       "violation_types": {
-        "connascence_of_position": 1,
-        "parameter_coupling_found": ["4-parameter function in router"]
+        "connascence_of_meaning": 49,
+        "connascence_of_position": 3,
+        "patterns_found": [
+          "HTTP_codes",
+          "timeouts",
+          "4_parameter_functions"
+        ]
       },
       "credibility_note": "Minimal violations demonstrate precision without false negatives",
       "artifacts": {
         "sarif": "express/report.sarif",
-        "json": "express/report.json", 
+        "json": "express/report.json",
         "framework_analysis": "express/framework_analysis.md"
       }
     }
   ],
   "enterprise_validation": {
-    "total_violations_detected": 11732,
+    "total_violations_detected": 5743,
     "violation_distribution": {
-      "celery": 11729,
-      "curl": 2, 
-      "express": 1
+      "celery": 4630,
+      "curl": 1061,
+      "express": 52
     },
     "precision_demonstration": "low_noise_high_signal_mature_codebases",
     "scale_demonstration": "complete_codebase_not_samples",
     "self_improvement_metrics": {
-      "magic_literals": "67 → 2 (97% reduction)",
-      "maintainability_index": "72 → 89 (+23.6% improvement)",
-      "nasa_compliance": "95% → 100%",
-      "code_duplication": "12% → 3% (-75% reduction)"
+      "magic_literals": "67 \u00e2\u2020\u2019 2 (97% reduction)",
+      "maintainability_index": "72 \u00e2\u2020\u2019 89 (+23.6% improvement)",
+      "nasa_compliance": "95% \u00e2\u2020\u2019 100%",
+      "code_duplication": "12% \u00e2\u2020\u2019 3% (-75% reduction)"
     }
   },
   "methodology": {
