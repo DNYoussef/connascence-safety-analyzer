@@ -10,7 +10,12 @@ import pytest
 from pathlib import Path
 from typing import List
 
-from analyzer.ast_engine.core_analyzer import ConnascenceASTAnalyzer, AnalysisResult
+# Import path fixes
+import sys
+import os
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+
+from analyzer.ast_engine.core_analyzer import ConnascenceASTAnalyzer, AnalysisResult, Violation
 from analyzer.core import ConnascenceViolation
 
 
@@ -42,7 +47,9 @@ def calculate_price(base_price):
             assert violation.file_path == "test.py"
             assert violation.line_number > 0
             assert violation.description
-            assert violation.severity in ['low', 'medium', 'high', 'critical']
+            # Handle both string and enum severity values
+            severity_val = violation.severity.value if hasattr(violation.severity, 'value') else violation.severity
+            assert severity_val in ['low', 'medium', 'high', 'critical']
     
     def test_parameter_bomb_detection(self):
         """Test detection of too many positional parameters (CoP)."""

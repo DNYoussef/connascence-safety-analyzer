@@ -11,7 +11,10 @@ from typing import Dict, List, Optional, Set, Any, Union
 from dataclasses import dataclass
 
 from .patch_api import PatchSuggestion
-from ..analyzer.core import ConnascenceViolation
+import sys
+import os
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+from analyzer.core import ConnascenceViolation
 
 
 @dataclass

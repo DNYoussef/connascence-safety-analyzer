@@ -6,12 +6,16 @@ including GitHub Actions integration, pull request comments, and build status.
 """
 
 import json
+import logging
 import os
 import tempfile
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Any
 import subprocess
+import re
+
+logger = logging.getLogger(__name__)
 
 from analyzer.ast_engine.core_analyzer import ConnascenceASTAnalyzer
 from policy.budgets import BudgetTracker
@@ -117,11 +121,21 @@ class CIDashboard:
         try:
             comment_body = self._generate_pr_comment(scan_results)
             
-            # Use GitHub CLI if available
+            # Use GitHub CLI if available - with input sanitization
+            if not self._validate_pr_number(pr_number):
+                logger.warning(f"Invalid PR number: {pr_number}")
+                return False
+                
+            # Sanitize comment body to prevent injection
+            sanitized_body = self._sanitize_comment_body(comment_body)
+            if not sanitized_body:
+                logger.warning("Comment body failed sanitization")
+                return False
+            
             result = subprocess.run([
                 'gh', 'pr', 'comment', str(pr_number),
-                '--body', comment_body
-            ], capture_output=True, text=True)
+                '--body', sanitized_body
+            ], capture_output=True, text=True, shell=False, timeout=30)
             
             return result.returncode == 0
         except Exception:
@@ -146,9 +160,14 @@ class CIDashboard:
     def _get_changed_files(self, base_ref: str, head_ref: str) -> List[Path]:
         """Get list of changed Python files between refs."""
         try:
+            # Validate git refs to prevent injection
+            if not self._validate_git_ref(base_ref) or not self._validate_git_ref(head_ref):
+                logger.warning(f"Invalid git refs: {base_ref}, {head_ref}")
+                return []
+            
             result = subprocess.run([
                 'git', 'diff', '--name-only', f'{base_ref}...{head_ref}'
-            ], capture_output=True, text=True)
+            ], capture_output=True, text=True, shell=False, timeout=30)
             
             if result.returncode != 0:
                 return []
@@ -228,6 +247,42 @@ class CIDashboard:
             report['status_message'] = 'No connascence violations detected'
         
         return report
+    
+    def _validate_pr_number(self, pr_number) -> bool:
+        """Validate PR number to prevent injection attacks."""
+        try:
+            pr_int = int(pr_number)
+            return 1 <= pr_int <= 99999  # Reasonable range
+        except (ValueError, TypeError):
+            return False
+    
+    def _sanitize_comment_body(self, body: str) -> Optional[str]:
+        """Sanitize comment body to prevent injection."""
+        if not body or len(body) > 50000:  # Reasonable limit
+            return None
+            
+        # Remove potentially dangerous characters while preserving markdown
+        # Keep alphanumeric, spaces, basic punctuation, and markdown syntax
+        sanitized = re.sub(r'[`$;&|<>(){}\\[\\]\\\\]', '', body)
+        
+        return sanitized if sanitized else None
+    
+    def _validate_git_ref(self, ref: str) -> bool:
+        """Validate git reference to prevent injection."""
+        if not ref or len(ref) > 100:
+            return False
+            
+        # Allow alphanumeric, dash, underscore, dot, and slash for branch/tag names
+        if not re.match(r'^[a-zA-Z0-9_\\-\\./,\\s]+$', ref):
+            return False
+            
+        # Prevent command injection patterns
+        dangerous_patterns = ['&&', '||', ';', '|', '`', '$', '(', ')']
+        for pattern in dangerous_patterns:
+            if pattern in ref:
+                return False
+                
+        return True
     
     def _create_error_report(self, error_message: str) -> Dict[str, Any]:
         """Create error report."""

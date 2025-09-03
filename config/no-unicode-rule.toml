@@ -1,0 +1,58 @@
+# NO UNICODE RULE CONFIGURATION
+# HIGH PRIORITY: Enforce no Unicode characters in code or documentation
+
+[tool.ruff.lint]
+# Add rule to detect non-ASCII characters
+extend-select = [
+    "UP009",  # UTF-8 encoding with bytes literals
+]
+
+# Custom rules for Unicode detection
+[tool.ruff.lint.per-file-ignores]
+"**/*.py" = []
+"**/*.md" = []  # Apply to documentation too
+
+# Black configuration to ensure ASCII-only
+[tool.black] 
+skip-string-normalization = false
+force-exclude = '''
+/(
+  # Exclude files with Unicode that cannot be easily fixed
+  \.git
+  | \.mypy_cache
+  | \.pytest_cache  
+  | \.ruff_cache
+  | \.venv
+  | venv
+  | build
+  | dist
+)/
+'''
+
+# Custom linting rules
+[tool.custom-linting]
+enforce-ascii-only = true
+unicode-detection = "error"
+documentation-ascii-only = true
+
+# Patterns to detect Unicode violations
+unicode-patterns = [
+    "\u[0-9a-fA-F]{4}",  # Unicode escape sequences
+    "[\u0080-\uffff]",   # Non-ASCII characters
+    "[\u2000-\u206f]",   # General punctuation block
+    "[\u2190-\u21ff]",   # Arrows block  
+    "[\u2600-\u26ff]",   # Miscellaneous symbols
+    "[\u1f000-\u1f9ff]"  # Emoji blocks
+]
+
+# Replacement suggestions
+replacements = [
+    {"unicode": "\u2713", "ascii": "DONE"},
+    {"unicode": "\u2705", "ascii": "DONE"}, 
+    {"unicode": "\u274c", "ascii": "WRONG"},
+    {"unicode": "\u26a1", "ascii": "FAST"},
+    {"unicode": "\ud83d\ude80", "ascii": "ROCKET"},
+    {"unicode": "\ud83c\udfaf", "ascii": "TARGET"},
+    {"unicode": "\ud83d\udcc1", "ascii": "FOLDER"},
+    {"unicode": "\ud83d\udccb", "ascii": "LIST"}
+]

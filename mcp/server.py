@@ -179,13 +179,67 @@ class ConnascenceMCPServer:
         return self._tools
     
     def validate_input(self, tool_name: str, args: Dict[str, Any]) -> bool:
-        """Validate tool input."""
+        """Validate tool input with comprehensive security checks."""
+        import re
+        
+        # Common validation for all tools
+        if not isinstance(args, dict):
+            return False
+            
+        # Check for excessively large payloads
+        if len(str(args)) > 100000:  # 100KB limit
+            return False
+        
         if tool_name == 'scan_path':
-            return 'path' in args and isinstance(args['path'], str)
+            if 'path' not in args or not isinstance(args['path'], str):
+                return False
+            
+            # Validate path format
+            path = args['path']
+            if not path or len(path) > 500:
+                return False
+                
+            # Additional validation for policy preset
+            if 'policy_preset' in args:
+                preset = args['policy_preset']
+                if not isinstance(preset, str) or len(preset) > 50:
+                    return False
+                if not re.match(r'^[a-zA-Z0-9_\-]+$', preset):
+                    return False
+                    
+            return True
+            
         elif tool_name == 'explain_finding':
-            return 'finding_id' in args
+            if 'finding_id' not in args:
+                return False
+            
+            finding_id = args['finding_id']
+            if not isinstance(finding_id, str) or len(finding_id) > 100:
+                return False
+                
+            # Only allow alphanumeric and basic separators
+            if not re.match(r'^[a-zA-Z0-9_\-\.]+$', finding_id):
+                return False
+                
+            return True
+            
         elif tool_name == 'propose_autofix':
-            return 'violation' in args
+            if 'violation' not in args:
+                return False
+            
+            violation = args['violation']
+            if not isinstance(violation, dict):
+                return False
+                
+            # Validate violation structure
+            required_fields = ['id', 'type', 'file_path']
+            for field in required_fields:
+                if field not in violation or not isinstance(violation[field], str):
+                    return False
+                    
+            return True
+            
+        # Default validation for other tools
         return True
     
     def validate_path(self, path: str) -> bool:
@@ -197,20 +251,37 @@ class ConnascenceMCPServer:
             return False
     
     async def scan_path(self, args: Dict[str, Any]) -> Dict[str, Any]:
-        """Scan path tool implementation."""
+        """Scan path tool implementation with enhanced security."""
         # Check rate limit first
         if not self.rate_limiter.check_rate_limit():
+            self.audit_logger.log('rate_limit_exceeded', {'tool': 'scan_path'})
             raise Exception("Rate limit exceeded")
         
-        # Log the request
-        self.audit_logger.log_request(tool_name='scan_path', timestamp=time.time())
-            
+        # Comprehensive input validation
         if not self.validate_input('scan_path', args):
+            self.audit_logger.log('invalid_input', {'tool': 'scan_path', 'args': str(args)[:100]})
             raise ValueError("Invalid input for scan_path")
         
         path = args['path']
-        if not self.validate_path(path):
-            raise ValueError("Path not allowed")
+        
+        # Enhanced path validation with detailed error reporting
+        try:
+            self._validate_path(path)
+        except ValueError as e:
+            self.audit_logger.log('path_validation_failed', {
+                'tool': 'scan_path',
+                'path': path[:100],  # Truncate for logging
+                'error': str(e)
+            })
+            raise ValueError(f"Path validation failed: {str(e)}")
+        
+        # Log the request with sanitized information
+        self.audit_logger.log_request(
+            tool_name='scan_path', 
+            timestamp=time.time(),
+            path_length=len(path),
+            policy_preset=args.get('policy_preset', 'default')
+        )
         
         profile = args.get('policy_preset', 'default')
         limit_results = args.get('limit_results')
@@ -386,41 +457,105 @@ class ConnascenceMCPServer:
             raise ValueError(f'Invalid policy preset: {preset}')
     
     def _validate_path(self, path: str) -> None:
-        """Validate path for security (enhanced version)."""
+        """Validate path for security with comprehensive protection."""
         from pathlib import Path
+        import re
         
-        # Restricted paths - need to catch various formats
-        restricted = [
-            '/etc', '/var/log', '/home/other_user', '/usr/bin',
-            'c:\\windows\\system32', 'c:/windows/system32', 
-            '\\windows\\system32', '/windows/system32'
+        if not path or len(path) > 500:  # Reasonable path length limit
+            raise ValueError(f'Invalid path length: {path}')
+        
+        # Check for null bytes and other control characters
+        if '\x00' in path or any(ord(c) < 32 for c in path if c not in '\t\n\r'):
+            raise ValueError(f'Path contains invalid characters: {path}')
+        
+        # Comprehensive restricted paths - system directories
+        restricted_patterns = [
+            # Unix/Linux system paths
+            r'^/etc(/.*)?$',
+            r'^/var/log(/.*)?$', 
+            r'^/usr/bin(/.*)?$',
+            r'^/bin(/.*)?$',
+            r'^/sbin(/.*)?$',
+            r'^/root(/.*)?$',
+            r'^/proc(/.*)?$',
+            r'^/sys(/.*)?$',
+            r'^/dev(/.*)?$',
+            # Windows system paths
+            r'^[a-zA-Z]:[/\\]windows[/\\]system32(/.*)?$',
+            r'^[a-zA-Z]:[/\\]windows[/\\]syswow64(/.*)?$',
+            r'^[a-zA-Z]:[/\\]program files(/.*)?$',
+            r'^[a-zA-Z]:[/\\]program files \(x86\)(/.*)?$',
+            r'^[a-zA-Z]:[/\\]users[/\\]administrator(/.*)?$',
+            # Network paths
+            r'^\\\\[^/\\]+(/.*)?$',  # UNC paths
         ]
         
-        path_lower = path.lower()
+        path_normalized = path.lower().replace('\\', '/')
         
-        # Check for exact matches and path prefixes
-        for restricted_path in restricted:
-            if path_lower.startswith(restricted_path.lower()):
-                raise ValueError(f'Path not allowed: {path}')
+        # Check against restricted patterns
+        for pattern in restricted_patterns:
+            if re.match(pattern, path_normalized, re.IGNORECASE):
+                raise ValueError(f'Path not allowed (restricted): {path}')
         
-        # Check for path traversal attempts  
-        if '..' in path:
-            raise ValueError(f'Path not allowed: {path}')
-            
-        # Try to resolve path and check again
+        # Enhanced path traversal detection
+        traversal_patterns = [
+            r'\.\./',     # ../
+            r'\.\.\\'',   # ..\\
+            r'/\.\./',    # /../
+            r'\\\.\.\\', # \\..\\
+            r'%2e%2e',    # URL encoded ..
+            r'\.\.\.',    # Multiple dots
+        ]
+        
+        for pattern in traversal_patterns:
+            if re.search(pattern, path, re.IGNORECASE):
+                raise ValueError(f'Path not allowed (traversal): {path}')
+        
+        # Try to resolve path and validate resolved path
         try:
-            p = Path(path).resolve()
-            resolved_str = str(p).lower()
+            p = Path(path).resolve(strict=False)  # Don't require path to exist
+            resolved_str = str(p).lower().replace('\\', '/')
             
-            for restricted_path in restricted:
-                if resolved_str.startswith(restricted_path.lower()):
-                    raise ValueError(f'Path not allowed: {path}')
-                    
+            # Check resolved path against restrictions
+            for pattern in restricted_patterns:
+                if re.match(pattern, resolved_str, re.IGNORECASE):
+                    raise ValueError(f'Path not allowed (resolved): {path}')
+            
+            # Ensure resolved path is within safe boundaries
+            if not self._is_within_safe_boundaries(p):
+                raise ValueError(f'Path not allowed (boundaries): {path}')
+                
         except (OSError, ValueError) as e:
             if 'Path not allowed' in str(e):
                 raise
-            # For other OS errors, we still want to block the path
-            raise ValueError(f'Path not allowed: {path}') from e
+            # For other OS errors, be restrictive and block the path
+            raise ValueError(f'Path not allowed (validation error): {path}') from e
+    
+    def _is_within_safe_boundaries(self, path: Path) -> bool:
+        """Check if resolved path is within safe boundaries."""
+        try:
+            # Define safe base directories (customize for your environment)
+            safe_bases = [
+                Path.cwd(),  # Current working directory
+                Path.home() / 'projects',  # User projects directory
+                Path('/tmp'),  # Temporary directory (Unix)
+                Path('/var/tmp'),  # Alternative temp directory (Unix)
+            ]
+            
+            # Check if path is under any safe base directory
+            for safe_base in safe_bases:
+                try:
+                    if safe_base.exists():
+                        path.relative_to(safe_base.resolve())
+                        return True
+                except (ValueError, OSError):
+                    continue
+                    
+            return False
+            
+        except Exception:
+            # If we can't determine safety, be restrictive
+            return False
     
     async def propose_autofix_tool(self, args: Dict[str, Any]) -> Dict[str, Any]:
         """Propose autofix tool implementation."""

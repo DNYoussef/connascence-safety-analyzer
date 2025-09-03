@@ -7,8 +7,13 @@ with connascence violations for comprehensive code quality analysis.
 
 import subprocess
 import json
+import logging
+import shlex
 from pathlib import Path
 from typing import Dict, List, Any, Optional
+import re
+
+logger = logging.getLogger(__name__)
 
 
 class RuffIntegration:
@@ -45,28 +50,50 @@ class RuffIntegration:
         return "Not available"
     
     def analyze(self, project_path: Path) -> Dict[str, Any]:
-        """Run Ruff analysis on project."""
+        """Run Ruff analysis on project with enhanced security."""
         if not self.is_available():
             raise RuntimeError("Ruff is not available")
+        
+        # Validate and sanitize project path
+        validated_path = self._validate_and_sanitize_path(project_path)
+        if not validated_path:
+            raise ValueError(f"Invalid or unsafe project path: {project_path}")
         
         # Run ruff check with JSON output
         cmd = [
             'ruff', 'check', 
-            str(project_path),
+            str(validated_path),
             '--format', 'json',
             '--output-format', 'json'
         ]
         
-        # Add configuration options
+        # Add configuration options with validation
         if self.config.get('config_file'):
-            cmd.extend(['--config', str(self.config['config_file'])])
+            config_file_path = self._validate_and_sanitize_path(Path(self.config['config_file']))
+            if config_file_path:
+                cmd.extend(['--config', str(config_file_path)])
         
         if self.config.get('ignore'):
             for ignore in self.config['ignore']:
-                cmd.extend(['--ignore', ignore])
+                # Sanitize ignore patterns to prevent injection
+                sanitized_ignore = self._sanitize_ignore_pattern(ignore)
+                if sanitized_ignore:
+                    cmd.extend(['--ignore', sanitized_ignore])
         
         try:
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+            # Log command for audit (without sensitive data)
+            logger.debug(f"Executing ruff command: {' '.join(cmd[:3])} [path]")
+            
+            # Execute with enhanced security
+            result = subprocess.run(
+                cmd, 
+                capture_output=True, 
+                text=True, 
+                timeout=60,
+                shell=False,  # Prevent shell injection
+                cwd=None,     # Don't inherit current directory
+                env={'PATH': '/usr/bin:/bin'}  # Restrict environment
+            )
             
             # Parse JSON output
             issues = []
@@ -93,9 +120,95 @@ class RuffIntegration:
             }
             
         except subprocess.TimeoutExpired:
+            logger.warning(f"Ruff analysis timed out for path: {validated_path}")
             raise RuntimeError("Ruff analysis timed out")
+        except subprocess.CalledProcessError as e:
+            logger.error(f"Ruff analysis failed with return code {e.returncode}")
+            raise RuntimeError(f"Ruff analysis failed: return code {e.returncode}")
         except Exception as e:
+            logger.error(f"Unexpected error during ruff analysis: {str(e)}")
             raise RuntimeError(f"Ruff analysis failed: {str(e)}")
+    
+    def _validate_and_sanitize_path(self, path: Path) -> Optional[Path]:
+        """Validate and sanitize file path to prevent path traversal attacks."""
+        try:
+            # Resolve path to absolute path
+            resolved_path = path.resolve()
+            
+            # Convert to string for validation
+            path_str = str(resolved_path)
+            
+            # Check for path traversal attempts
+            if '..' in path_str or path_str.startswith('/'):
+                # Additional validation for legitimate parent directory access
+                if not self._is_safe_path(resolved_path):
+                    return None
+            
+            # Check against restricted paths
+            restricted_paths = [
+                '/etc', '/var/log', '/usr/bin', '/bin', '/sbin',
+                '/proc', '/sys', '/dev', '/root',
+                'C:\\Windows', 'C:\\Program Files', 'C:\\Users\\Administrator'
+            ]
+            
+            path_lower = path_str.lower()
+            for restricted in restricted_paths:
+                if path_lower.startswith(restricted.lower()):
+                    return None
+            
+            # Verify path exists and is readable
+            if not resolved_path.exists():
+                return None
+                
+            return resolved_path
+            
+        except (OSError, ValueError) as e:
+            logger.warning(f"Path validation failed: {e}")
+            return None
+    
+    def _is_safe_path(self, path: Path) -> bool:
+        """Check if path is within safe boundaries."""
+        try:
+            # Get current working directory
+            cwd = Path.cwd()
+            
+            # Check if path is within current working directory or subdirectories
+            try:
+                path.relative_to(cwd)
+                return True
+            except ValueError:
+                # Path is outside current directory - additional checks needed
+                pass
+            
+            # Allow specific safe parent directories
+            safe_parents = ['/tmp', '/var/tmp', Path.home()]
+            for safe_parent in safe_parents:
+                try:
+                    if isinstance(safe_parent, str):
+                        safe_parent = Path(safe_parent)
+                    path.relative_to(safe_parent)
+                    return True
+                except ValueError:
+                    continue
+                    
+            return False
+            
+        except Exception:
+            return False
+    
+    def _sanitize_ignore_pattern(self, pattern: str) -> Optional[str]:
+        """Sanitize ignore pattern to prevent command injection."""
+        if not pattern or len(pattern) > 100:  # Reasonable limit
+            return None
+            
+        # Only allow alphanumeric, dash, underscore, dot, slash, and asterisk
+        if not re.match(r'^[a-zA-Z0-9_\-\.*/]+$', pattern):
+            return None
+            
+        # Remove any shell metacharacters
+        pattern = re.sub(r'[;&|`$(){}\\[\\]<>]', '', pattern)
+        
+        return pattern if pattern else None
     
     def _parse_text_output(self, text_output: str) -> List[Dict[str, Any]]:
         """Parse Ruff text output as fallback."""

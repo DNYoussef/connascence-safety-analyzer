@@ -1,0 +1,66 @@
+{
+  "name": "unified-memory-system",
+  "version": "2.0.0",
+  "description": "Integrated memory system combining Memory MCP server with Claude Flow memory",
+  "components": {
+    "claudeFlowMemory": {
+      "type": "sqlite",
+      "path": ".claude/.swarm/memory.db", 
+      "tables": 12,
+      "features": [
+        "cross-session-persistence",
+        "namespace-organization", 
+        "memory-compression",
+        "export-import"
+      ]
+    },
+    "memoryMcpServer": {
+      "type": "mcp-server",
+      "server": "@modelcontextprotocol/server-memory",
+      "features": [
+        "persistent-storage",
+        "key-value-pairs",
+        "cross-conversation-memory"
+      ]
+    },
+    "hiveMemory": {
+      "type": "sqlite",
+      "path": ".claude/.hive-mind/hive.db",
+      "features": [
+        "collective-intelligence",
+        "agent-coordination",
+        "consensus-data"
+      ]
+    }
+  },
+  "integration": {
+    "enabled": true,
+    "syncStrategy": "bidirectional",
+    "namespace": "connascence-unified",
+    "syncInterval": 30000,
+    "conflictResolution": "claude-flow-priority"
+  },
+  "unified-operations": {
+    "store": {
+      "primary": "claude-flow",
+      "backup": "memory-mcp",
+      "hive-context": "auto-sync"
+    },
+    "retrieve": {
+      "priority": ["claude-flow", "hive-memory", "memory-mcp"],
+      "fallback": "enabled",
+      "cache": true
+    },
+    "search": {
+      "fulltext": "claude-flow",
+      "keyValue": "memory-mcp", 
+      "contextual": "hive-memory"
+    }
+  },
+  "commands": {
+    "unified-store": "npx claude-flow@alpha memory store --sync-mcp",
+    "unified-query": "npx claude-flow@alpha memory query --include-mcp --include-hive",
+    "unified-export": "npx claude-flow@alpha memory export --unified --all-sources",
+    "sync-all": "npx claude-flow@alpha memory sync --mcp --hive --bidirectional"
+  }
+}

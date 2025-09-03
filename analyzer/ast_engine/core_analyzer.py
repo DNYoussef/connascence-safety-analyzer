@@ -70,25 +70,83 @@ class Violation:
         ]
         content = "|".join(components)
         return hashlib.md5(content.encode()).hexdigest()[:12]
+    
+    @property
+    def connascence_type(self) -> str:
+        """Backward compatibility property for tests."""
+        return self.type.value
+    
+    @property
+    def rule_id(self) -> str:
+        """Generate rule ID for compatibility."""
+        return f"CON_{self.type.value}"
+    
 
 
 @dataclass
 class AnalysisResult:
     """Results of connascence analysis."""
     
-    timestamp: str
-    project_root: str
-    total_files_analyzed: int
-    analysis_duration_ms: int
-    
     violations: List[Violation]
-    file_stats: Dict[str, Dict[str, Any]]
-    summary_metrics: Dict[str, Any]
+    total_files: int = 0
+    analysis_time: float = 0.0
+    connascence_index: float = 0.0
     
-    # Policy compliance
+    # Advanced fields
+    timestamp: str = ""
+    project_root: str = ""
+    total_files_analyzed: int = 0
+    analysis_duration_ms: int = 0
+    file_stats: Dict[str, Dict[str, Any]] = None
+    summary_metrics: Dict[str, Any] = None
     policy_preset: Optional[str] = None
     budget_status: Optional[Dict[str, Any]] = None
     baseline_comparison: Optional[Dict[str, Any]] = None
+    
+    def __post_init__(self):
+        if self.file_stats is None:
+            self.file_stats = {}
+        if self.summary_metrics is None:
+            self.summary_metrics = {}
+        # Backward compatibility
+        if self.total_files == 0:
+            self.total_files = self.total_files_analyzed
+        if self.analysis_time == 0.0:
+            self.analysis_time = self.analysis_duration_ms / 1000.0
+    
+    @property
+    def total_violations(self) -> int:
+        """Total number of violations."""
+        return len(self.violations)
+    
+    @property
+    def critical_count(self) -> int:
+        """Number of critical violations."""
+        return len([v for v in self.violations if v.severity == Severity.CRITICAL])
+    
+    @property
+    def high_count(self) -> int:
+        """Number of high severity violations."""
+        return len([v for v in self.violations if v.severity == Severity.HIGH])
+    
+    @property
+    def medium_count(self) -> int:
+        """Number of medium severity violations."""
+        return len([v for v in self.violations if v.severity == Severity.MEDIUM])
+    
+    @property
+    def low_count(self) -> int:
+        """Number of low severity violations."""
+        return len([v for v in self.violations if v.severity == Severity.LOW])
+    
+    @property
+    def violations_by_type(self) -> Dict[str, int]:
+        """Count violations by type."""
+        counts = {}
+        for violation in self.violations:
+            type_key = violation.type.value
+            counts[type_key] = counts.get(type_key, 0) + 1
+        return counts
 
 
 class ConnascenceASTAnalyzer:
@@ -140,6 +198,60 @@ class ConnascenceASTAnalyzer:
                 return False
         return True
     
+    def analyze_string(self, source_code: str, filename: str = "string_input.py") -> List[Violation]:
+        """Analyze source code string for connascence violations."""
+        self.current_file_path = filename
+        violations = []
+        
+        try:
+            if not source_code.strip():  # Skip empty code
+                return []
+            
+            self.current_source_lines = source_code.splitlines()
+            tree = ast.parse(source_code, filename=filename)
+            
+            # Run all static analysis passes
+            file_violations = []
+            file_violations.extend(self._analyze_name_connascence(tree))
+            file_violations.extend(self._analyze_type_connascence(tree))
+            file_violations.extend(self._analyze_meaning_connascence(tree))
+            file_violations.extend(self._analyze_position_connascence(tree))
+            file_violations.extend(self._analyze_algorithm_connascence(tree))
+            
+            # Calculate weights and finalize violations
+            for violation in file_violations:
+                violation.weight = calculate_violation_weight(
+                    violation.type, violation.severity, violation.locality,
+                    self.current_file_path, self.weights
+                )
+            
+            # Collect file statistics
+            self.file_stats[self.current_file_path] = self._calculate_file_stats(
+                tree, file_violations
+            )
+            
+            violations.extend(file_violations)
+            
+        except (SyntaxError, UnicodeDecodeError) as e:
+            # Create violation for unparseable code
+            violation = Violation(
+                id="",
+                type=ConnascenceType.NAME,  # Closest match
+                severity=Severity.CRITICAL,
+                file_path=self.current_file_path,
+                line_number=getattr(e, "lineno", 1),
+                column=getattr(e, "offset", 0) or 0,
+                description=f"Code cannot be parsed: {e}",
+                recommendation="Fix syntax errors before analyzing connascence",
+                context={"error_type": type(e).__name__, "error_message": str(e)}
+            )
+            violations.append(violation)
+            
+        except Exception as e:
+            logger.warning(f"Error analyzing {filename}: {e}")
+        
+        return violations
+
     def analyze_file(self, file_path: Path) -> List[Violation]:
         """Analyze a single file for connascence violations."""
         if not self.should_analyze_file(file_path):
@@ -166,6 +278,9 @@ class ConnascenceASTAnalyzer:
             file_violations.extend(self._analyze_meaning_connascence(tree))
             file_violations.extend(self._analyze_position_connascence(tree))
             file_violations.extend(self._analyze_algorithm_connascence(tree))
+            file_violations.extend(self._analyze_execution_connascence(tree))
+            file_violations.extend(self._analyze_value_connascence(tree))
+            file_violations.extend(self._analyze_timing_connascence(tree))
             
             # Calculate weights and finalize violations
             for violation in file_violations:
@@ -464,6 +579,326 @@ class ConnascenceASTAnalyzer:
                         class_name=node.name,
                         locality="same_class",
                         context={"method_count": method_count, "lines_of_code": loc}
+                    ))
+        
+        return violations
+    
+    def _analyze_execution_connascence(self, tree: ast.AST) -> List[Violation]:
+        """Analyze connascence of execution (CoE) - order-dependent operations."""
+        violations = []
+        
+        # Track initialization and method call patterns
+        class_methods = {}
+        function_calls = []
+        init_patterns = []
+        
+        for node in ast.walk(tree):
+            # Track class methods to detect setup/teardown dependencies
+            if isinstance(node, ast.ClassDef):
+                methods = [n for n in node.body if isinstance(n, ast.FunctionDef)]
+                class_methods[node.name] = methods
+                
+                # Look for setup/init methods that suggest order dependency
+                init_methods = [m for m in methods if m.name in ['__init__', 'setup', 'initialize', 'connect', 'start']]
+                teardown_methods = [m for m in methods if m.name in ['cleanup', 'teardown', 'disconnect', 'stop', 'close']]
+                
+                if init_methods and teardown_methods:
+                    # Check if there are regular methods that might depend on init
+                    regular_methods = [m for m in methods if m not in init_methods and m not in teardown_methods and not m.name.startswith('_')]
+                    
+                    if len(regular_methods) > 0:
+                        violations.append(Violation(
+                            id="",
+                            type=ConnascenceType.EXECUTION,
+                            severity=Severity.HIGH,
+                            file_path=self.current_file_path,
+                            line_number=node.lineno,
+                            column=node.col_offset,
+                            description=f"Class '{node.name}' has setup/teardown methods suggesting execution order dependency",
+                            recommendation="Document required method call order or use context managers",
+                            class_name=node.name,
+                            locality="same_class",
+                            context={
+                                "init_methods": [m.name for m in init_methods],
+                                "teardown_methods": [m.name for m in teardown_methods],
+                                "dependent_methods": [m.name for m in regular_methods]
+                            }
+                        ))
+            
+            # Look for explicit order dependencies in function calls
+            elif isinstance(node, ast.Call):
+                function_calls.append(node)
+                
+                # Check for common order-dependent patterns
+                if isinstance(node.func, ast.Attribute):
+                    method_name = node.func.attr
+                    
+                    # Database transaction patterns
+                    if method_name in ['begin', 'commit', 'rollback']:
+                        init_patterns.append((node, 'transaction'))
+                    
+                    # File operation patterns
+                    elif method_name in ['open', 'close', 'write', 'read']:
+                        init_patterns.append((node, 'file_ops'))
+                    
+                    # Network connection patterns
+                    elif method_name in ['connect', 'disconnect', 'send', 'receive']:
+                        init_patterns.append((node, 'network'))
+        
+        # Check for missing error handling around order-dependent operations
+        for node, pattern_type in init_patterns:
+            # Check if the call is within try-except block
+            parent_nodes = []
+            current = node
+            
+            # Walk up the AST to find if we're in a try block
+            in_try_block = False
+            for ancestor in ast.walk(tree):
+                if isinstance(ancestor, ast.Try):
+                    for child in ast.walk(ancestor):
+                        if child is node:
+                            in_try_block = True
+                            break
+            
+            if not in_try_block:
+                severity = Severity.HIGH if pattern_type in ['transaction', 'network'] else Severity.MEDIUM
+                violations.append(Violation(
+                    id="",
+                    type=ConnascenceType.EXECUTION,
+                    severity=severity,
+                    file_path=self.current_file_path,
+                    line_number=node.lineno,
+                    column=node.col_offset,
+                    description=f"Order-dependent {pattern_type} operation without error handling",
+                    recommendation="Wrap order-dependent operations in try-except blocks",
+                    code_snippet=self._get_code_snippet(node),
+                    locality="same_function",
+                    context={"operation_type": pattern_type}
+                ))
+        
+        return violations
+    
+    def _analyze_value_connascence(self, tree: ast.AST) -> List[Violation]:
+        """Analyze connascence of value (CoV) - shared mutable state dependencies."""
+        violations = []
+        
+        # Track global variables and their usage
+        global_vars = set()
+        global_assignments = []
+        global_reads = []
+        class_attributes = {}
+        
+        for node in ast.walk(tree):
+            # Track global variable assignments
+            if isinstance(node, ast.Global):
+                global_vars.update(node.names)
+            
+            elif isinstance(node, ast.Assign):
+                for target in node.targets:
+                    if isinstance(target, ast.Name):
+                        # Check if it's a module-level assignment (potential global)
+                        if isinstance(node.parent, ast.Module) if hasattr(node, 'parent') else True:
+                            global_assignments.append((node, target.id))
+            
+            # Track class attributes that might be shared mutable state
+            elif isinstance(node, ast.ClassDef):
+                mutable_attrs = []
+                for child in node.body:
+                    if isinstance(child, ast.Assign):
+                        for target in child.targets:
+                            if isinstance(target, ast.Name):
+                                # Check if the assigned value is mutable
+                                if isinstance(child.value, (ast.List, ast.Dict, ast.Set)):
+                                    mutable_attrs.append(target.id)
+                
+                if mutable_attrs:
+                    class_attributes[node.name] = mutable_attrs
+                    
+                    # Check if class has methods that modify these attributes
+                    methods_modifying_attrs = []
+                    for method in [n for n in node.body if isinstance(n, ast.FunctionDef)]:
+                        for stmt in ast.walk(method):
+                            if isinstance(stmt, ast.Assign):
+                                for target in stmt.targets:
+                                    if isinstance(target, ast.Attribute) and isinstance(target.value, ast.Name) and target.value.id == 'self':
+                                        if target.attr in mutable_attrs:
+                                            methods_modifying_attrs.append(method.name)
+                    
+                    if len(methods_modifying_attrs) > 1:
+                        violations.append(Violation(
+                            id="",
+                            type=ConnascenceType.VALUES,
+                            severity=Severity.MEDIUM,
+                            file_path=self.current_file_path,
+                            line_number=node.lineno,
+                            column=node.col_offset,
+                            description=f"Class '{node.name}' has shared mutable attributes modified by multiple methods",
+                            recommendation="Consider immutable data structures or encapsulation patterns",
+                            class_name=node.name,
+                            locality="same_class",
+                            context={
+                                "mutable_attributes": mutable_attrs,
+                                "modifying_methods": list(set(methods_modifying_attrs))
+                            }
+                        ))
+            
+            # Look for singleton patterns with mutable state
+            elif isinstance(node, ast.FunctionDef) and node.name.lower() in ['singleton', 'get_instance']:
+                # Check if function modifies global state
+                modifies_global = False
+                for stmt in ast.walk(node):
+                    if isinstance(stmt, ast.Global):
+                        modifies_global = True
+                        break
+                
+                if modifies_global:
+                    violations.append(Violation(
+                        id="",
+                        type=ConnascenceType.VALUES,
+                        severity=Severity.HIGH,
+                        file_path=self.current_file_path,
+                        line_number=node.lineno,
+                        column=node.col_offset,
+                        description=f"Singleton pattern in '{node.name}' creates shared mutable state dependency",
+                        recommendation="Consider dependency injection or immutable singleton state",
+                        function_name=node.name,
+                        locality="same_module",
+                        context={"pattern_type": "singleton"}
+                    ))
+        
+        # Check for module-level mutable collections
+        module_level_mutables = []
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Assign) and hasattr(node, 'lineno'):
+                # Check if this is at module level by examining line context
+                line_content = self.current_source_lines[node.lineno - 1] if node.lineno <= len(self.current_source_lines) else ""
+                if not line_content.startswith(' ') and not line_content.startswith('\t'):
+                    for target in node.targets:
+                        if isinstance(target, ast.Name) and isinstance(node.value, (ast.List, ast.Dict, ast.Set)):
+                            module_level_mutables.append((node, target.id))
+        
+        for node, var_name in module_level_mutables:
+            violations.append(Violation(
+                id="",
+                type=ConnascenceType.VALUES,
+                severity=Severity.MEDIUM,
+                file_path=self.current_file_path,
+                line_number=node.lineno,
+                column=node.col_offset,
+                description=f"Module-level mutable collection '{var_name}' creates shared state dependency",
+                recommendation="Consider using immutable collections or factory functions",
+                locality="same_module",
+                context={"variable_name": var_name, "collection_type": type(node.value).__name__}
+            ))
+        
+        return violations
+    
+    def _analyze_timing_connascence(self, tree: ast.AST) -> List[Violation]:
+        """Analyze connascence of timing (CoTi) - temporal coupling and race conditions."""
+        violations = []
+        
+        # Look for threading and timing-related imports
+        threading_imports = set()
+        time_imports = set()
+        
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                for alias in node.names:
+                    if alias.name in ['threading', 'concurrent.futures', 'asyncio', 'multiprocessing']:
+                        threading_imports.add(alias.name)
+                    elif alias.name in ['time', 'datetime']:
+                        time_imports.add(alias.name)
+        
+        # Look for timing-dependent patterns
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Call):
+                # Sleep calls (basic timing dependency)
+                if isinstance(node.func, ast.Attribute) and node.func.attr == 'sleep':
+                    violations.append(Violation(
+                        id="",
+                        type=ConnascenceType.TIMING,
+                        severity=Severity.MEDIUM,
+                        file_path=self.current_file_path,
+                        line_number=node.lineno,
+                        column=node.col_offset,
+                        description="Sleep call creates timing dependency",
+                        recommendation="Consider using proper synchronization primitives or async patterns",
+                        code_snippet=self._get_code_snippet(node),
+                        locality="same_function"
+                    ))
+                
+                # Threading operations without proper synchronization
+                elif isinstance(node.func, ast.Attribute):
+                    method_name = node.func.attr
+                    
+                    # Thread creation without locks
+                    if method_name in ['Thread', 'start'] and 'threading' in threading_imports:
+                        violations.append(Violation(
+                            id="",
+                            type=ConnascenceType.TIMING,
+                            severity=Severity.HIGH,
+                            file_path=self.current_file_path,
+                            line_number=node.lineno,
+                            column=node.col_offset,
+                            description="Threading operation may create race conditions",
+                            recommendation="Use proper synchronization mechanisms (locks, queues, etc.)",
+                            code_snippet=self._get_code_snippet(node),
+                            locality="same_module",
+                            context={"operation": method_name}
+                        ))
+                    
+                    # Time-based polling patterns
+                    elif method_name in ['now', 'time'] and any(imp in time_imports for imp in ['time', 'datetime']):
+                        # Check if this is in a loop (polling pattern)
+                        in_loop = False
+                        for ancestor in ast.walk(tree):
+                            if isinstance(ancestor, (ast.While, ast.For)):
+                                for child in ast.walk(ancestor):
+                                    if child is node:
+                                        in_loop = True
+                                        break
+                        
+                        if in_loop:
+                            violations.append(Violation(
+                                id="",
+                                type=ConnascenceType.TIMING,
+                                severity=Severity.MEDIUM,
+                                file_path=self.current_file_path,
+                                line_number=node.lineno,
+                                column=node.col_offset,
+                                description="Time-based polling loop creates timing dependency",
+                                recommendation="Use event-driven patterns or proper async mechanisms",
+                                code_snippet=self._get_code_snippet(node),
+                                locality="same_function",
+                                context={"pattern_type": "polling"}
+                            ))
+        
+        # Look for async/await without proper error handling
+        for node in ast.walk(tree):
+            if isinstance(node, ast.AsyncFunctionDef):
+                has_await = False
+                has_timeout = False
+                
+                for child in ast.walk(node):
+                    if isinstance(child, ast.Await):
+                        has_await = True
+                    elif isinstance(child, ast.Call) and isinstance(child.func, ast.Attribute):
+                        if child.func.attr in ['wait_for', 'timeout']:
+                            has_timeout = True
+                
+                if has_await and not has_timeout:
+                    violations.append(Violation(
+                        id="",
+                        type=ConnascenceType.TIMING,
+                        severity=Severity.MEDIUM,
+                        file_path=self.current_file_path,
+                        line_number=node.lineno,
+                        column=node.col_offset,
+                        description=f"Async function '{node.name}' has await without timeout handling",
+                        recommendation="Add timeout handling to prevent indefinite blocking",
+                        function_name=node.name,
+                        locality="same_function",
+                        context={"async_pattern": "await_without_timeout"}
                     ))
         
         return violations

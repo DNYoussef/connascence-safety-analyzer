@@ -5,21 +5,10 @@ This module implements comprehensive AST analysis for detecting static
 forms of connascence (CoN, CoT, CoM, CoP, CoA).
 """
 
-from .core_analyzer import ConnascenceASTAnalyzer, Violation
-from .visitors import (
-    NameConnascenceVisitor,
-    TypeConnascenceVisitor, 
-    MeaningConnascenceVisitor,
-    PositionConnascenceVisitor,
-    AlgorithmConnascenceVisitor,
-)
+from .core_analyzer import ConnascenceASTAnalyzer, Violation, AnalysisResult
 
 __all__ = [
     "ConnascenceASTAnalyzer",
-    "Violation",
-    "NameConnascenceVisitor",
-    "TypeConnascenceVisitor", 
-    "MeaningConnascenceVisitor",
-    "PositionConnascenceVisitor",
-    "AlgorithmConnascenceVisitor",
+    "Violation", 
+    "AnalysisResult",
 ]
