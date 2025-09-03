@@ -178,7 +178,7 @@ class GrammarEnhancedAnalyzer:
 def create_analyzer_for_profile(profile_name: str) -> GrammarEnhancedAnalyzer:
     """Factory function to create analyzer with specific profile."""
     
-    if profile_name == SafetyProfiles.NASA_JPL_POT10:
+    if profile_name == SafetyProfiles.General Safety_JPL_POT10:
         return GrammarEnhancedAnalyzer(
             enable_safety_profiles=True,
             nasa_compliance=True

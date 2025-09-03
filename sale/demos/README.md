@@ -16,7 +16,7 @@ This will run the complete demo suite and generate all sales artifacts:
 - **Output**: Parameter Object refactoring PR with SARIF
 
 ### 2. curl (C)
-- **Proof Point**: NASA/JPL Power of Ten compliance
+- **Proof Point**: General Safety Standards compliance
 - **Proof Point**: Evidence-based analysis (no double flagging)
 - **Output**: Safety refactoring with recursion elimination
 
@@ -37,7 +37,7 @@ After running the demo:
 Use the generated artifacts to demonstrate:
 1. **<5% False Positive Rate** across 3 major codebases
 2. **60% Autofix Acceptance** with production-safe transformations
-3. **NASA/JPL Safety Compliance** with automated verification
+3. **General Safety Safety Compliance** with automated verification
 4. **Enterprise Security** with RBAC, audit, air-gapped deployment
 
 ## Support

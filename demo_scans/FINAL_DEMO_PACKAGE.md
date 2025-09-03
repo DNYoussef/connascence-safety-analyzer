@@ -27,10 +27,10 @@
 
 ### Supporting Demos
 
-#### curl (C) - NASA Safety Validation
+#### curl (C) - General Safety Safety Validation
 - **Purpose**: Demonstrates precision on clean, industry-standard C code
 - **Result**: Minimal violations (validates low false positive rate)
-- **Value**: NASA POT-10 safety profile demonstration
+- **Value**: General Safety POT-10 safety profile demonstration
 
 #### Express (JavaScript) - Polyglot Proof
 - **Purpose**: Shows JavaScript/polyglot analysis capability  
@@ -81,7 +81,7 @@ demo_scans/reports/
 ### Self-Improvement Validation
 The analyzer successfully improved its own codebase:
 - 97% magic literal elimination (67  2)
-- 100% NASA POT-10 compliance achieved
+- 100% General Safety POT-10 compliance achieved
 - 23.6% maintainability improvement
 - Parameter objects introduced for complex signatures
 
@@ -99,7 +99,7 @@ The analyzer successfully improved its own codebase:
 
 ### 3. Polyglot Capability
 - Python: Detailed connascence analysis
-- C: NASA safety profile validation
+- C: General Safety safety profile validation
 - JavaScript: Framework pattern recognition
 
 ### 4. Precision Focus

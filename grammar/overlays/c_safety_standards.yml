@@ -1,16 +1,16 @@
-# NASA C Safety Grammar Overlay
+# General Safety C Safety Grammar Overlay
 # 
-# Implements NASA/JPL Power of Ten rules as grammar constraints
+# Implements General Safety Standards as grammar constraints
 # for C language code generation and validation.
 
 id: "nasa_c_safety"
-name: "NASA C Safety Profile"
-description: "NASA/JPL Power of Ten rules for C code generation and validation"
+name: "General Safety C Safety Profile"
+description: "General Safety Standards for C code generation and validation"
 language: "c"
 version: "1.0.0"
 
 metadata:
-  source: "NASA/JPL Coding Standard (Spinroot.com/gerard/pdf/P10.pdf)"
+  source: "General Safety Coding Standard (Spinroot.com/gerard/pdf/P10.pdf)"
   criticality: "safety_critical"
   domain: "embedded_flight_software"
 
@@ -18,7 +18,7 @@ rules:
   # Rule 1: Avoid complex flow constructs
   - id: "nasa_rule_1_goto"
     name: "No goto statements"
-    description: "NASA Rule 1: Avoid complex flow constructs such as goto statements"
+    description: "General Safety Rule 1: Avoid complex flow constructs such as goto statements"
     severity: "critical"
     rule_type: "ban"
     target: "goto_statement"
@@ -28,7 +28,7 @@ rules:
   
   - id: "nasa_rule_1_setjmp_longjmp"
     name: "No setjmp/longjmp"
-    description: "NASA Rule 1: Avoid setjmp and longjmp for exception handling"
+    description: "General Safety Rule 1: Avoid setjmp and longjmp for exception handling"
     severity: "critical" 
     rule_type: "ban"
     target: "setjmp_longjmp_call"
@@ -38,7 +38,7 @@ rules:
   
   - id: "nasa_rule_1_recursion"
     name: "No recursion"
-    description: "NASA Rule 1: Do not use direct or indirect recursion"
+    description: "General Safety Rule 1: Do not use direct or indirect recursion"
     severity: "critical"
     rule_type: "ban" 
     target: "recursive_function_call"
@@ -49,7 +49,7 @@ rules:
   # Rule 2: All loops must have fixed upper bounds  
   - id: "nasa_rule_2_loop_bounds"
     name: "Bounded loops required"
-    description: "NASA Rule 2: All loops must have statically determinable upper bounds"
+    description: "General Safety Rule 2: All loops must have statically determinable upper bounds"
     severity: "critical"
     rule_type: "require"
     target: "loop_bound_annotation"
@@ -61,7 +61,7 @@ rules:
   
   - id: "nasa_rule_2_infinite_loops"
     name: "No infinite loops"
-    description: "NASA Rule 2: Prohibit while(1) and similar infinite loops"
+    description: "General Safety Rule 2: Prohibit while(1) and similar infinite loops"
     severity: "high"
     rule_type: "ban"
     target: "infinite_loop"
@@ -73,7 +73,7 @@ rules:
   # Rule 3: Do not use the heap after initialization
   - id: "nasa_rule_3_malloc_after_init"
     name: "No malloc after initialization"
-    description: "NASA Rule 3: Do not use malloc/free after system initialization"
+    description: "General Safety Rule 3: Do not use malloc/free after system initialization"
     severity: "critical"
     rule_type: "ban"
     target: "dynamic_allocation_call"
@@ -88,7 +88,7 @@ rules:
   # Rule 4: Restrict function size  
   - id: "nasa_rule_4_function_size"
     name: "Function size limit"
-    description: "NASA Rule 4: No function should be longer than what can be printed on a single sheet of paper"
+    description: "General Safety Rule 4: No function should be longer than what can be printed on a single sheet of paper"
     severity: "high"
     rule_type: "limit"
     target: "function_lines"
@@ -100,7 +100,7 @@ rules:
   
   - id: "nasa_rule_4_function_complexity"
     name: "Function complexity limit"
-    description: "NASA Rule 4: Functions should have single purpose and low complexity"
+    description: "General Safety Rule 4: Functions should have single purpose and low complexity"
     severity: "medium"
     rule_type: "limit"
     target: "cyclomatic_complexity"
@@ -111,7 +111,7 @@ rules:
   # Rule 5: Use at least 2 runtime assertions per function
   - id: "nasa_rule_5_assertions"
     name: "Minimum assertions required"
-    description: "NASA Rule 5: Use at least two runtime assertions per function"
+    description: "General Safety Rule 5: Use at least two runtime assertions per function"
     severity: "high" 
     rule_type: "require"
     target: "assertion_count"
@@ -125,7 +125,7 @@ rules:
   # Rule 6: Declare data objects at the smallest possible level of scope
   - id: "nasa_rule_6_variable_scope"
     name: "Minimize variable scope"
-    description: "NASA Rule 6: Declare data objects in smallest possible scope"
+    description: "General Safety Rule 6: Declare data objects in smallest possible scope"
     severity: "medium"
     rule_type: "require"
     target: "minimal_scope_declaration"
@@ -136,7 +136,7 @@ rules:
   
   - id: "nasa_rule_6_global_variables"
     name: "Limit global variables"
-    description: "NASA Rule 6: Minimize use of global variables"
+    description: "General Safety Rule 6: Minimize use of global variables"
     severity: "high"
     rule_type: "limit"
     target: "global_variable_count"
@@ -149,7 +149,7 @@ rules:
   # Rule 7: Check the return value of all non-void functions
   - id: "nasa_rule_7_return_values"
     name: "Check return values"
-    description: "NASA Rule 7: Check return value of all non-void functions"
+    description: "General Safety Rule 7: Check return value of all non-void functions"
     severity: "high"
     rule_type: "require" 
     target: "return_value_check"
@@ -161,7 +161,7 @@ rules:
   
   - id: "nasa_rule_7_parameter_validation"
     name: "Validate function parameters"
-    description: "NASA Rule 7: The validity of function parameters must be checked"
+    description: "General Safety Rule 7: The validity of function parameters must be checked"
     severity: "high"
     rule_type: "require"
     target: "parameter_validation"
@@ -174,7 +174,7 @@ rules:
   # Rule 8: Limit preprocessor use
   - id: "nasa_rule_8_macro_complexity"
     name: "Limit macro complexity"
-    description: "NASA Rule 8: The use of the preprocessor must be limited and simple"
+    description: "General Safety Rule 8: The use of the preprocessor must be limited and simple"
     severity: "medium"
     rule_type: "limit"
     target: "macro_complexity"
@@ -188,7 +188,7 @@ rules:
   
   - id: "nasa_rule_8_include_depth"
     name: "Limit include depth"
-    description: "NASA Rule 8: Limit preprocessing include depth"
+    description: "General Safety Rule 8: Limit preprocessing include depth"
     severity: "low"
     rule_type: "limit" 
     target: "include_depth"
@@ -199,7 +199,7 @@ rules:
   # Rule 9: Limit pointer use
   - id: "nasa_rule_9_pointer_indirection"
     name: "Single-level pointers only"
-    description: "NASA Rule 9: Use of pointers should be restricted (max 1 level of indirection)"
+    description: "General Safety Rule 9: Use of pointers should be restricted (max 1 level of indirection)"
     severity: "high"
     rule_type: "limit"
     target: "pointer_indirection"
@@ -210,7 +210,7 @@ rules:
   
   - id: "nasa_rule_9_function_pointers"
     name: "No function pointers"
-    description: "NASA Rule 9: The use of function pointers should be avoided"
+    description: "General Safety Rule 9: The use of function pointers should be avoided"
     severity: "high"
     rule_type: "ban"
     target: "function_pointer"
@@ -220,7 +220,7 @@ rules:
   
   - id: "nasa_rule_9_pointer_arithmetic"
     name: "Limit pointer arithmetic"
-    description: "NASA Rule 9: Pointer arithmetic should be avoided"
+    description: "General Safety Rule 9: Pointer arithmetic should be avoided"
     severity: "medium"
     rule_type: "limit"
     target: "pointer_arithmetic"
@@ -262,6 +262,6 @@ enforcement:
   
 # Documentation requirements
 documentation:
-  require_rule_citations: true  # Cite which NASA rule applies
+  require_rule_citations: true  # Cite which General Safety rule applies
   require_safety_rationale: true  # Explain safety impact
   require_alternatives: true  # Suggest safe alternatives

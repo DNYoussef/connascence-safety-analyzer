@@ -53,12 +53,12 @@ def another_duplicate():  # CoA violation duplicate
     return result
 ''')
             
-            # Create sample C file for NASA analysis
+            # Create sample C file for General Safety analysis
             sample_c = workspace / "sample.c"
             sample_c.write_text('''
 #include <stdio.h>
 
-int recursive_func(int n) {  // NASA Rule 3 violation
+int recursive_func(int n) {  // General Safety Rule 3 violation
     if (n <= 0) return 0;
     return n + recursive_func(n - 1);  // Recursion
 }
@@ -223,7 +223,7 @@ print(json.dumps({
         violations = generator.check_safety_violations(
             sample_py.read_text(), 
             'python',
-            'nasa_jpl_pot10'
+            'general_safety_strict'
         )
         
         # Should find magic numbers and deep nesting
@@ -265,30 +265,30 @@ print(json.dumps({
         assert has_admin_perm == False
 
     def test_nasa_safety_profile(self, test_workspace):
-        """Test NASA/JPL safety profile analysis"""
+        """Test General Safety safety profile analysis"""
         
-        from connascence.policy.presets.nasa_jpl_pot10 import NASA_JPL_POT10_PROFILE
+        from policy.presets.general_safety_rules import GENERAL_SAFETY_PROFILE
         
         # Test profile loading
-        assert 'recursion_banned' in NASA_JPL_POT10_PROFILE['rules']
-        assert 'max_function_params' in NASA_JPL_POT10_PROFILE['thresholds']
+        assert 'recursion_banned' in GENERAL_SAFETY_PROFILE['rules']
+        assert 'max_function_params' in GENERAL_SAFETY_PROFILE['rules']
         
-        # Test C file analysis with NASA profile
+        # Test C file analysis with General Safety profile
         sample_c = test_workspace / "sample.c"
         
-        # Mock analysis that would detect NASA violations
+        # Mock analysis that would detect General Safety violations
         violations = [
             {
                 'rule': 'nasa_rule_3_no_recursion',
                 'file': str(sample_c),
                 'line': 4,
-                'message': 'Recursion detected - violates NASA Rule 3'
+                'message': 'Recursion detected - violates General Safety Rule 3'
             },
             {
                 'rule': 'nasa_rule_8_no_magic_numbers',
                 'file': str(sample_c), 
                 'line': 10,
-                'message': 'Magic number 5000 - violates NASA Rule 8'
+                'message': 'Magic number 5000 - violates General Safety Rule 8'
             }
         ]
         
@@ -308,7 +308,7 @@ print(json.dumps({
         
         # Test configuration
         assert config_service.getSafetyProfile() in [
-            'none', 'nasa_jpl_pot10', 'nasa_loc_1', 'nasa_loc_3', 'modern_general'
+            'none', 'general_safety_strict', 'nasa_loc_1', 'nasa_loc_3', 'modern_general'
         ]
         
         # Mock file analysis
@@ -430,7 +430,7 @@ print(json.dumps({
         # Verify proof points
         assert demo_results['celery']['fp_rate'] < 5.0  # FP < 5%
         assert demo_results['celery']['autofix_rate'] >= 60.0  # Autofix 60%
-        assert demo_results['curl']['nasa_compliance'] >= 90  # NASA compliance high
+        assert demo_results['curl']['nasa_compliance'] >= 90  # General Safety compliance high
         assert demo_results['express']['mcp_loop_successful'] == True  # MCP works
 
     def test_sales_artifact_generation(self):

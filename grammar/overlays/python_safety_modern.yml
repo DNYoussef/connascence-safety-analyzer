@@ -1,16 +1,16 @@
-# NASA Python Safety Grammar Overlay (Modern Adaptation)
+# General Safety Python Safety Grammar Overlay (Modern Adaptation)
 #
-# Adapts NASA/JPL Power of Ten rules for Python development
+# Adapts General Safety Standards for Python development
 # while respecting Python's idioms and modern development practices.
 
 id: "nasa_python_safety"
-name: "NASA Python Safety Profile (Modern)"
-description: "NASA/JPL safety principles adapted for modern Python development"
+name: "General Safety Python Safety Profile (Modern)"
+description: "General Safety safety principles adapted for modern Python development"
 language: "python"
 version: "1.0.0"
 
 metadata:
-  source: "NASA/JPL Power of Ten adapted for Python"
+  source: "General Safety Standards adapted for Python"
   adaptation_philosophy: "Safety principles with Python idioms"
   target_domain: "critical_python_applications"
 
@@ -21,7 +21,7 @@ rules:
   # Rule 1 Adaptation: No dynamic execution (Python's equivalent to goto)
   - id: "python_rule_1_dynamic_execution"
     name: "No exec/eval statements"
-    description: "Python adaptation of NASA Rule 1: Avoid exec() and eval() for control flow"
+    description: "Python adaptation of General Safety Rule 1: Avoid exec() and eval() for control flow"
     severity: "critical"
     rule_type: "ban"
     target: "dynamic_execution"

@@ -32,7 +32,7 @@
 - False Positive Rate <5% (4.5% Celery, 2.1% curl)
 - Autofix Acceptance Rate ≥60% (62.9% Celery, 73.9% curl)  
 - Enterprise Security Ready (RBAC, audit, air-gap)
-- NASA/JPL Compliance (Power of Ten enforcement)
+- General Safety Compliance (Power of Ten enforcement)
 
 ### ✅ Unified Report Generation
 **Test**: Validate `src/reports/core/unified_reporter.py` functionality  
@@ -105,7 +105,7 @@
 
 ### ✅ Enterprise Features Functional
 - **Security**: RBAC, audit logging, encryption operational
-- **Compliance**: NASA/JPL Power of Ten profiles active  
+- **Compliance**: General Safety Standards profiles active  
 - **Integration**: VS Code, CI/CD, SIEM support maintained
 - **Polyglot**: Python, C/C++, JavaScript analysis working
 
@@ -118,7 +118,7 @@
 - Enterprise Security: Full RBAC deployed
 
 ### ✅ Safety Compliance Patterns
-**NASA Power of Ten**: Enforcement profiles active  
+**General Safety Power of Ten**: Enforcement profiles active  
 **MISRA C Mapping**: Ready for deployment  
 **Connascence Detection**: All 9 types fully operational  
 **AST-Safe Refactoring**: Transformation engine validated

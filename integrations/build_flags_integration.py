@@ -2,7 +2,7 @@
 Build Flags Integration for Connascence Analysis
 
 Integrates with build systems to verify compiler flags and build configuration
-compliance with NASA/JPL Power of Ten Rule 10: "Use compiler warnings set to their
+compliance with General Safety Standards Rule 10: "Use compiler warnings set to their
 most pedantic setting" and "All code must compile without warnings."
 
 Supports multiple compilers and build systems for comprehensive flag verification.
@@ -62,7 +62,7 @@ class BuildFlagsIntegration:
         # Analyze compiler flags
         flag_analysis = self._analyze_compiler_flags(project_path, compilers, build_system)
         
-        # Verify NASA/JPL requirements
+        # Verify General Safety requirements
         nasa_compliance = self._check_nasa_compliance(flag_analysis)
         
         # Generate recommendations
@@ -452,7 +452,7 @@ class BuildFlagsIntegration:
     
     def _test_compilation_with_flags(self, compiler: CompilerInfo, 
                                    project_path: Path) -> Dict[str, Any]:
-        """Test compilation with NASA-required flags."""
+        """Test compilation with General Safety-required flags."""
         test_results = {
             'test_file_compiled': False,
             'warnings_generated': [],
@@ -476,7 +476,7 @@ int main() {
 '''
             test_file.write_text(test_code)
             
-            # Test with NASA flags
+            # Test with General Safety flags
             if compiler.name in ['gcc', 'clang']:
                 nasa_flags = ['-Wall', '-Wextra', '-Werror', '-pedantic']
             elif compiler.name == 'msvc':
@@ -522,7 +522,7 @@ int main() {
         return errors
     
     def _check_nasa_compliance(self, flag_analysis: Dict[str, Any]) -> Dict[str, Any]:
-        """Check compliance with NASA Power of Ten Rule 10."""
+        """Check compliance with General Safety Power of Ten Rule 10."""
         compliance = {
             'compliant': True,
             'rule_10_compliance': 'unknown',
@@ -588,10 +588,10 @@ int main() {
         """Generate recommendations for build flag improvements."""
         recommendations = []
         
-        # NASA Rule 10 recommendations
+        # General Safety Rule 10 recommendations
         if not nasa_compliance['compiler_warnings_as_errors']:
             recommendations.append(
-                "Enable warnings-as-errors: Add -Werror (GCC/Clang) or /WX (MSVC) to enforce NASA Rule 10"
+                "Enable warnings-as-errors: Add -Werror (GCC/Clang) or /WX (MSVC) to enforce General Safety Rule 10"
             )
         
         # Specific compiler recommendations

@@ -161,7 +161,7 @@ Rules in this pack follow enterprise validation standards:
 
 - **Connascence Theory**: Meilir Page-Jones, "What Every Programmer Should Know About Object-Oriented Design"
 - **Enterprise Validation**: Complete analysis results at `/sale/DEMO_ARTIFACTS/`
-- **NASA POT-10**: Power of Ten safety rules for critical systems
+- **General Safety POT-10**: Power of Ten safety rules for critical systems
 - **Design Partner Letter**: Production validation by TechVanguard Engineering
 
 ---

@@ -40,7 +40,7 @@ code . --install-extension connascence-safety-analyzer
 - **Accuracy**: <5% false positive rate measured on real codebases
 - **Intelligence**: 60%+ autofix acceptance rate with AST-safe refactoring  
 - **Enterprise Security**: RBAC, audit logging, and air-gapped deployment
-- **NASA Compliance**: Power of Ten rules with automated verification"
+- **General Safety Compliance**: Power of Ten rules with automated verification"
 
 ---
 
@@ -94,10 +94,10 @@ cat out/celery/dashboard_data.json | jq '.autofix_stats'
 
 ---
 
-## Demo 2: curl - NASA/JPL Safety Profile (4 minutes)
+## Demo 2: curl - General Safety Safety Profile (4 minutes)
 
 ### Setup the Safety Context
-**"Now let's switch gears to safety-critical systems. curl is used in everything from spacecraft to medical devices. Here's how we achieve NASA/JPL Power of Ten compliance..."**
+**"Now let's switch gears to safety-critical systems. curl is used in everything from spacecraft to medical devices. Here's how we achieve General Safety Standards compliance..."**
 
 ### Run Safety Analysis
 ```bash  
@@ -107,7 +107,7 @@ python demo_curl.py
 
 **While running, explain the differentiation:**
 - "This isn't just finding bugs - it's architectural safety analysis"
-- "We're checking NASA Power of Ten rules: no recursion, bounded loops, limited pointer indirection"
+- "We're checking General Safety Power of Ten rules: no recursion, bounded loops, limited pointer indirection"
 - "Most importantly, we use evidence-based analysis to avoid double-flagging"
 
 ### Show Evidence-Based Results
@@ -121,14 +121,14 @@ cat out/curl/evidence.md | grep -A 20 "Evidence-Based Analysis"
 - **"We focus on architectural issues that compilers and linters cannot detect"**
 - "23 unique findings vs 312 potential issues - massive noise reduction"
 
-### NASA Compliance Demonstration  
+### General Safety Compliance Demonstration  
 ```bash
 # Show build flags verification
 cat out/curl/build_flags_verification.txt | head -20
 ```
 
 **"This proves integration with your existing toolchain:**
-- Verifies your compiler flags meet NASA standards
+- Verifies your compiler flags meet General Safety standards
 - Shows which security measures are already covered
 - Focuses our analysis on gaps other tools miss"
 
@@ -138,7 +138,7 @@ cat out/curl/build_flags_verification.txt | head -20
 cat out/curl/PR.md | grep -A 15 "Convert Pipeline Recursion"
 ```
 
-**"Recursion elimination - NASA Rule 3:**
+**"Recursion elimination - General Safety Rule 3:**
 - Before: Unbounded stack usage, unprovable termination
 - After: Bounded iteration, formal verification possible
 - Impact: Safe for embedded systems with 8KB stacks"
@@ -253,7 +253,7 @@ print('Air-gapped mode: No external dependencies')
 
 **[DONE] Accuracy**: 4.5% false positive rate across 3 major codebases  
 **[DONE] Intelligence**: 62.9% autofix acceptance with production-safe refactoring  
-**[DONE] Safety**: NASA/JPL Power of Ten compliance automation  
+**[DONE] Safety**: General Safety Standards compliance automation  
 **[DONE] Enterprise**: RBAC, audit, air-gapped deployment ready  
 **[DONE] Polyglot**: JavaScript, Python, C/C++ today, expanding rapidly"
 
@@ -293,7 +293,7 @@ print('Air-gapped mode: No external dependencies')
 **Response**: "AST-safe refactoring - it's mathematically impossible for our autofixes to create syntax errors. We parse your code into an abstract syntax tree, verify the transformation maintains syntactic correctness, then generate the fix. Plus, everything is dry-run first - you preview every change before applying it."
 
 ### "What about our specific compliance requirements?"
-**Response**: "We built custom safety profiles for NASA/JPL, MISRA C, and others. Our policy system is highly configurable - we can map your specific coding standards to connascence rules. Plus, our audit logging provides the evidence trail compliance auditors require. Would you like to see how we'd handle your specific requirements?"
+**Response**: "We built custom safety profiles for General Safety, MISRA C, and others. Our policy system is highly configurable - we can map your specific coding standards to connascence rules. Plus, our audit logging provides the evidence trail compliance auditors require. Would you like to see how we'd handle your specific requirements?"
 
 ### "This seems expensive"  
 **Response**: "Let's look at the math. Your current static analysis tools probably cost $200K+ annually when you include licenses for SonarQube, Veracode, CodeClimate, etc. Add the developer time waste from false positives - 2 hours per week across 500 developers is $2.6M annually. Our $300K enterprise edition saves you $2.2M in the first year alone. It's not an expense, it's your highest-ROI infrastructure investment."
@@ -315,4 +315,4 @@ print('Air-gapped mode: No external dependencies')
 
 ---
 
-**Remember: Confidence, proof points, and immediate next steps. This isn't just another static analysis tool - it's architectural intelligence with NASA-grade safety standards.**
+**Remember: Confidence, proof points, and immediate next steps. This isn't just another static analysis tool - it's architectural intelligence with General Safety-grade safety standards.**

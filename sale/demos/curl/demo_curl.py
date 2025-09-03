@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-curl Demo Script - C NASA/JPL Safety Profile Showcase
+curl Demo Script - C General Safety Safety Profile Showcase
 Demonstrates Power of Ten compliance and evidence-based analysis
 """
 
@@ -28,8 +28,8 @@ class CurlDemo:
             print("[DONE] Using existing curl repository")
 
     def verify_build_flags(self):
-        """Verify NASA-compliant build flags"""
-        print("\n[SECURITY]  Verifying NASA/JPL build flag compliance...")
+        """Verify General Safety-compliant build flags"""
+        print("\n[SECURITY]  Verifying General Safety build flag compliance...")
         
         cmd = [
             "connascence", "verify_build_flags",
@@ -43,7 +43,7 @@ class CurlDemo:
             # Save results
             flags_file = self.output_dir / "build_flags_verification.txt"
             with open(flags_file, 'w') as f:
-                f.write("NASA/JPL Power of Ten Build Flags Verification\n")
+                f.write("General Safety Standards Build Flags Verification\n")
                 f.write("=" * 50 + "\n\n")
                 f.write(result.stdout)
                 if result.stderr:
@@ -60,7 +60,7 @@ class CurlDemo:
 
     def run_safety_scan(self):
         """Run connascence scan with safety_c_strict profile"""
-        print("\n[SEARCH] Running NASA/JPL safety analysis on curl/lib...")
+        print("\n[SEARCH] Running General Safety safety analysis on curl/lib...")
         
         start_time = time.time()
         
@@ -154,7 +154,7 @@ class CurlDemo:
 
     def create_mock_build_flags(self):
         """Create mock build flags verification for demo"""
-        flags_content = """NASA/JPL Power of Ten Build Flags Verification
+        flags_content = """General Safety Standards Build Flags Verification
 ==================================================
 
 [SECURITY]  COMPILER FLAGS ANALYSIS
@@ -168,7 +168,7 @@ class CurlDemo:
    -fstack-protector-strong (Stack protection)
    -D_FORTIFY_SOURCE=2      (Buffer overflow protection)
 
-[DONE] NASA SAFETY FLAGS:
+[DONE] General Safety SAFETY FLAGS:
    -fno-common              (No common variables) 
    -fstrict-aliasing         (Strict aliasing rules)
    -Wstrict-aliasing=3       (Detect aliasing violations)
@@ -179,7 +179,7 @@ class CurlDemo:
    -Wwrite-strings          (Warn about string literal modification)
    -Wvla                    (Warn about variable length arrays)
 
-[TARGET] COMPLIANCE SCORE: 92% (NASA/JPL Power of Ten)
+[TARGET] COMPLIANCE SCORE: 92% (General Safety Standards)
 
 BUILD SYSTEM INTEGRATION:
 ------------------------
@@ -218,7 +218,7 @@ that your existing tools cannot detect.
 
 ## Executive Summary
 - **Project**: curl/lib (core library)
-- **Analysis Profile**: NASA/JPL Power of Ten  
+- **Analysis Profile**: General Safety Standards  
 - **Files Analyzed**: 156 C source files
 - **Total Findings**: 23 architectural issues
 - **Tool Overlap**: 89% coverage by existing static analysis
@@ -283,7 +283,7 @@ int setup_transfer(CURL *curl, int method, int protocol,
 **Impact**: Brittle interfaces, hard to extend
 **Fix**: Introduce parameter struct
 
-#### 4. Magic Numbers (NASA Rule 8) - 4 instances
+#### 4. Magic Numbers (General Safety Rule 8) - 4 instances
 **Example**: `lib/connect.c:234`
 ```c
 // Magic timeout values  
@@ -315,9 +315,9 @@ if (elapsed > 300000) {  // 5 minutes, but why?
 - **Interface brittleness**: 5 parameter order dependencies  0  
 - **Maintenance debt**: 8 algorithm duplications  2 (75% reduction)
 
-### NASA Compliance Improvement
+### General Safety Compliance Improvement
 - **Current compliance**: 87% (Power of Ten rules)
-- **Post-fix compliance**: 96% (exceeds NASA requirements)
+- **Post-fix compliance**: 96% (exceeds General Safety requirements)
 - **Certification impact**: Reduces review time by estimated 40%
 
 ## Integration Benefits
@@ -338,12 +338,12 @@ if (elapsed > 300000) {  // 5 minutes, but why?
 
     def create_mock_safety_refactors(self):
         """Create mock safety refactoring PR"""
-        pr_content = """# NASA/JPL Safety: Eliminate Recursion (Rule 3)
+        pr_content = """# General Safety Safety: Eliminate Recursion (Rule 3)
 
 ## Summary
-This PR eliminates recursion violations in curl/lib to achieve NASA/JPL Power of Ten compliance, converting recursive algorithms to iterative approaches with bounded stack usage.
+This PR eliminates recursion violations in curl/lib to achieve General Safety Standards compliance, converting recursive algorithms to iterative approaches with bounded stack usage.
 
-## NASA/JPL Rule 3 Compliance
+## General Safety Rule 3 Compliance
 **Rule**: "The use of recursion should not be allowed"  
 **Rationale**: Recursion can lead to stack overflow in resource-constrained environments and makes static analysis of stack usage impossible.
 
@@ -472,7 +472,7 @@ int setup_transfer(const struct transfer_config *config);
 [DONE] Performance: No measurable impact (< 0.1% difference)
 ```
 
-## NASA Compliance Metrics
+## General Safety Compliance Metrics
 
 | Rule | Before | After | Status |
 |------|--------|-------|--------|  
@@ -480,16 +480,16 @@ int setup_transfer(const struct transfer_config *config);
 | Rule 8 (No magic numbers) | 4 violations | 1 violation |  IMPROVED |
 | Rule 10 (Compiler warnings) | 0 violations | 0 violations | [DONE] COMPLIANT |
 
-**Overall Compliance**: 87%  96% (NASA/JPL Power of Ten)
+**Overall Compliance**: 87%  96% (General Safety Standards)
 
 ## Refactoring Techniques Applied
 - **Replace Recursion with Iteration** (Fowler) - Eliminates stack risk
 - **Introduce Parameter Object** (Fowler) - Reduces positional coupling  
-- **Bounded Buffer Pattern** (NASA) - Ensures predictable resource usage
+- **Bounded Buffer Pattern** (General Safety) - Ensures predictable resource usage
 
 ---
 
-*Generated with [Connascence Safety Analyzer](https://connascence.com) - NASA/JPL compliance automation*
+*Generated with [Connascence Safety Analyzer](https://connascence.com) - General Safety compliance automation*
 """
         
         pr_file = self.output_dir / "PR.md"
@@ -500,7 +500,7 @@ int setup_transfer(const struct transfer_config *config);
         """Create dashboard data focused on safety metrics"""
         dashboard_data = {
             "project": "curl/lib",
-            "profile": "NASA/JPL Power of Ten",
+            "profile": "General Safety Standards",
             "scan_time": "1.8s",
             "files_analyzed": 156,
             "compliance_score": {
@@ -547,7 +547,7 @@ int setup_transfer(const struct transfer_config *config);
 
     def run_complete_demo(self):
         """Run the complete curl safety demo"""
-        print("[SECURITY]  Starting curl NASA/JPL Safety Demo")
+        print("[SECURITY]  Starting curl General Safety Safety Demo")
         print("=" * 50)
         
         # Step 1: Clone repository  
@@ -579,7 +579,7 @@ int setup_transfer(const struct transfer_config *config);
         print(f"   Dashboard: {self.output_dir}/safety_dashboard.json")
         
         print("\n[SECURITY]  Safety Metrics:")
-        print("   NASA Compliance: 87%  96% potential")
+        print("   General Safety Compliance: 87%  96% potential")
         print("   Recursion Sites: 6  0 (eliminated)")  
         print("   Evidence-based: 92.6% tool overlap (no double flagging)")
         print("   Autofix Rate: 73.9% for safety-critical issues")

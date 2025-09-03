@@ -339,7 +339,7 @@ All critical test suites passed successfully. The system is ready for:
 ### Sales Demo Requirements
 - **False Positive Rate <5%**: {'VALIDATED' if proof_points_status['fp_rate'] else 'NOT VALIDATED'}
 - **Autofix Acceptance 60%**: {'VALIDATED' if proof_points_status['autofix_rate'] else 'NOT VALIDATED'}  
-- **NASA Compliance Ready**: {'VALIDATED' if proof_points_status['nasa_compliance'] else 'NOT VALIDATED'}
+- **General Safety Compliance Ready**: {'VALIDATED' if proof_points_status['nasa_compliance'] else 'NOT VALIDATED'}
 - **Enterprise Security**: {'VALIDATED' if proof_points_status['enterprise_security'] else 'NOT VALIDATED'}
 
 ### Component Integration
@@ -425,7 +425,7 @@ All test results, coverage reports, and execution logs available in:
         return {
             'fp_rate': sales_test_passed,  # E2E tests validate <5% FP rate
             'autofix_rate': sales_test_passed,  # E2E tests validate 60% autofix
-            'nasa_compliance': integration_passed,  # Integration tests validate NASA
+            'nasa_compliance': integration_passed,  # Integration tests validate General Safety
             'enterprise_security': security_passed,  # Security tests validate enterprise features
             'mcp_integration': integration_passed,  # Integration tests validate MCP
             'vscode_extension': vscode_passed,  # VS Code extension tests

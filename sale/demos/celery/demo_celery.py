@@ -293,7 +293,7 @@ def inspect_registered(self):
 - **Extract Method** + **Form Template Method** (Gang of Four) - Reduces CoA
 
 ---
-*Generated with [Connascence Safety Analyzer](https://connascence.com) - Enterprise code quality with NASA/JPL safety compliance*
+*Generated with [Connascence Safety Analyzer](https://connascence.com) - Enterprise code quality with General Safety safety compliance*
 """
         
         pr_file = self.output_dir / "PR.md"

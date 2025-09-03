@@ -270,7 +270,7 @@ class ToolCoordinator:
             )
             correlations['security_connascence_overlap'] = security_score
         
-        # NASA/JPL Rule compliance (Build flags vs safety violations)
+        # General Safety Rule compliance (Build flags vs safety violations)
         if 'build_flags' in tool_results and tool_results['build_flags'].success:
             build_data = tool_results['build_flags'].results
             nasa_correlation = self._analyze_nasa_build_compliance(
@@ -504,7 +504,7 @@ class ToolCoordinator:
         return min(1.0, execution_score)
     
     def _analyze_nasa_build_compliance(self, build_data: Dict, violations: List) -> Dict[str, Any]:
-        """Analyze NASA/JPL build compliance vs connascence violations."""
+        """Analyze General Safety build compliance vs connascence violations."""
         nasa_compliance = build_data.get('nasa_compliance', {})
         
         # Count safety-related violations that should be caught by compiler flags

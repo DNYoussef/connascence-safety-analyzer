@@ -54,7 +54,7 @@ class RefactoringTechnique(Enum):
     EXTRACT_SUPERCLASS = "extract_superclass"
     SUBSTITUTE_ALGORITHM = "substitute_algorithm"
     
-    # NASA/Safety Specific
+    # General Safety/Safety Specific
     INTRODUCE_ASSERTION = "introduce_assertion"
     REPLACE_RECURSION_WITH_ITERATION = "replace_recursion_with_iteration"
     REPLACE_CONSTRUCTOR_WITH_FACTORY = "replace_constructor_with_factory"
@@ -138,7 +138,7 @@ class ASTSafeRefactoring:
         duplication_candidates = self._find_algorithm_duplication_candidates(functions, code)
         opportunities.extend(duplication_candidates)
         
-        # Find NASA-specific opportunities
+        # Find General Safety-specific opportunities
         nasa_candidates = self._find_nasa_safety_opportunities(parse_result.ast, code, language)
         opportunities.extend(nasa_candidates)
         
@@ -299,7 +299,7 @@ class ASTSafeRefactoring:
             # This is a simplified check - real implementation would analyze parameter patterns
             param_count = len(func.get('parameters', []))
             
-            if param_count >= 4:  # NASA/connascence threshold
+            if param_count >= 4:  # General Safety/connascence threshold
                 candidates.append(RefactoringCandidate(
                     technique=RefactoringTechnique.INTRODUCE_PARAMETER_OBJECT,
                     file_path="current_file",
@@ -319,14 +319,14 @@ class ASTSafeRefactoring:
         candidates = []
         
         for func in functions:
-            if func.get('body_lines', 0) > 60:  # NASA Rule 4
+            if func.get('body_lines', 0) > 60:  # General Safety Rule 4
                 candidates.append(RefactoringCandidate(
                     technique=RefactoringTechnique.EXTRACT_METHOD,
                     file_path="current_file",
                     start_line=func.get('line_start', 1),
                     end_line=func.get('line_end', 1),
                     description=f"Extract methods from large function {func['name']}",
-                    rationale=f"Function {func['name']} has {func['body_lines']} lines, exceeds NASA Rule 4 limit",
+                    rationale=f"Function {func['name']} has {func['body_lines']} lines, exceeds General Safety Rule 4 limit",
                     estimated_effort="high",
                     safety_impact="medium",
                     connascence_improvement="CoA -> CoN"
@@ -368,7 +368,7 @@ class ASTSafeRefactoring:
         return candidates
     
     def _find_nasa_safety_opportunities(self, ast, code: str, language: LanguageSupport) -> List[RefactoringCandidate]:
-        """Find NASA safety-specific refactoring opportunities."""
+        """Find General Safety safety-specific refactoring opportunities."""
         candidates = []
         
         # Look for recursion that could be converted to iteration
@@ -383,7 +383,7 @@ class ASTSafeRefactoring:
                         start_line=func.get('line_start', 1),
                         end_line=func.get('line_end', 1),
                         description=f"Replace recursion in {func['name']} with iteration",
-                        rationale="NASA Rule 1: Avoid recursion in safety-critical code",
+                        rationale="General Safety Rule 1: Avoid recursion in safety-critical code",
                         estimated_effort="high",
                         safety_impact="high",
                         connascence_improvement="CoE -> CoN"
@@ -398,7 +398,7 @@ class ASTSafeRefactoring:
                     start_line=func.get('line_start', 1),
                     end_line=func.get('line_end', 1),
                     description=f"Add runtime assertions to {func['name']}",
-                    rationale="NASA Rule 5: Use at least 2 runtime assertions per function",
+                    rationale="General Safety Rule 5: Use at least 2 runtime assertions per function",
                     estimated_effort="low",
                     safety_impact="high",
                     connascence_improvement="CoE -> Explicit Contracts"
@@ -568,7 +568,7 @@ class FunctionParameters:
         start_idx = candidate.start_line - 1
         
         if start_idx < len(lines):
-            lines.insert(start_idx, "// TODO: Convert recursion to iteration for NASA Rule 1 compliance")
+            lines.insert(start_idx, "// TODO: Convert recursion to iteration for General Safety Rule 1 compliance")
         
         return '\n'.join(lines)
     
@@ -649,7 +649,7 @@ class FunctionParameters:
         return f"{func_name}(" in func_body
     
     def _needs_more_assertions(self, func: Dict, code: str) -> bool:
-        """Check if function needs more assertions (NASA Rule 5)."""
+        """Check if function needs more assertions (General Safety Rule 5)."""
         # Extract function body and count assertions
         start_line = func.get('line_start', 1)
         end_line = func.get('line_end', 1)
@@ -659,4 +659,4 @@ class FunctionParameters:
         # Count existing assertions
         assertion_count = func_body.count('assert') + func_body.count('ASSERT')
         
-        return assertion_count < 2  # NASA Rule 5
+        return assertion_count < 2  # General Safety Rule 5

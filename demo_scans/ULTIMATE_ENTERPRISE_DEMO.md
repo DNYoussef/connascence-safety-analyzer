@@ -138,7 +138,7 @@ Severity Distribution:
 - [ ] Live analysis of prospect's codebase sample
 - [ ] Demonstrate 10,133 magic number detection capability
 - [ ] Show parameter object refactoring for 538 CoP violations
-- [ ] Validate NASA POT-10 compliance on their C code
+- [ ] Validate General Safety POT-10 compliance on their C code
 
 ### Pilot Program Setup
 - [ ] Run complete analysis on prospect's key repository

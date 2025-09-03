@@ -48,7 +48,7 @@
 
 ### Scale Demonstration
 - **Production Deployment**: 847K+ lines analyzed across 23 repositories
-- **Languages Supported**: Python, C/C++, JavaScript with NASA POT-10 compliance
+- **Languages Supported**: Python, C/C++, JavaScript with General Safety POT-10 compliance
 - **Performance**: Consistent <4GB memory, 99.7% uptime over 90 days
 
 ### Accuracy Validation
@@ -70,7 +70,7 @@
 
 ### curl Library (C) 
 - **1,061 violations** in safety-critical networking code
-- **NASA POT-10 compliance** validation for embedded systems
+- **General Safety POT-10 compliance** validation for embedded systems
 - **Mature codebase precision** - finds real issues, not noise
 
 ### Express.js Framework (JavaScript)
@@ -83,7 +83,7 @@
 ### Unique Technology
 - **Connascence-based analysis** - theoretical foundation others lack
 - **Multi-language support** with language-specific intelligence
-- **NASA POT-10 integration** for safety-critical applications
+- **General Safety POT-10 integration** for safety-critical applications
 
 ### Enterprise Readiness
 - **Production validated** by TechVanguard Engineering (90-day deployment)

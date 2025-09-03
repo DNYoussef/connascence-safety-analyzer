@@ -86,7 +86,7 @@
 
 **Key Information**:
 - **No external data transmission** - complete local analysis
-- **NASA POT-10 compliance** (educational/commercial use disclaimer)
+- **General Safety POT-10 compliance** (educational/commercial use disclaimer)
 - **SOC 2, ISO 27001, NIST Framework** compatible
 
 ---
@@ -118,7 +118,7 @@
 ✅ **Budget for quality tools** - $75K/year validated by design partner commitment  
 
 ### Red Light Considerations
-⚠️ **Safety-critical applications** - Requires independent NASA/JPL certification validation  
+⚠️ **Safety-critical applications** - Requires independent General Safety certification validation  
 ⚠️ **Small teams (<10 devs)** - ROI calculations optimized for larger development teams  
 ⚠️ **Legacy codebases only** - Tool validated primarily on modern, well-maintained code  
 ⚠️ **Immediate deployment pressure** - 2-4 week evaluation period recommended  

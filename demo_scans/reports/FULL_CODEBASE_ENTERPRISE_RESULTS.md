@@ -26,7 +26,7 @@
 
 **Full Codebase Metrics**:
 - **Complete C analysis** of industry-standard networking library
-- **NASA POT-10 validation** across entire codebase
+- **General Safety POT-10 validation** across entire codebase
 - **System-level code quality** assessment
 - **Enterprise C development** pattern analysis
 

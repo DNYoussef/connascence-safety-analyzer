@@ -74,10 +74,10 @@ class PolicyPresets:
 
 
 class SafetyProfiles:
-    """NASA and safety profile constants."""
-    NASA_JPL_POT10 = "nasa_jpl_pot10"
-    NASA_LOC_1 = "nasa_loc_1"
-    NASA_LOC_3 = "nasa_loc_3"
+    """General Safety and safety profile constants."""
+    GENERAL_SAFETY_STRICT = "general_safety_strict"
+    SAFETY_LEVEL_1 = "safety_level_1"
+    SAFETY_LEVEL_3 = "safety_level_3"
     MODERN_GENERAL = "modern_general"
 
 

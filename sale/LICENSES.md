@@ -17,16 +17,16 @@
 
 ## Important Disclaimers
 
-### NASA/JPL Affiliation Disclaimer
-**NOT AFFILIATED WITH OR ENDORSED BY NASA/JPL**
+### General Safety Affiliation Disclaimer
+**NOT AFFILIATED WITH OR ENDORSED BY General Safety**
 
-The Connascence Safety Analyzer implements analysis inspired by NASA/JPL Power of Ten (POT-10) safety rules for educational and commercial software quality purposes. This tool:
+The Connascence Safety Analyzer implements analysis inspired by General Safety Standards (POT-10) safety rules for educational and commercial software quality purposes. This tool:
 
-- Is NOT officially affiliated with, endorsed by, or sponsored by NASA or JPL
-- Is NOT certified by NASA or JPL for aerospace or safety-critical applications  
-- Does NOT guarantee compliance with actual NASA/JPL safety standards
-- Should NOT be considered a substitute for official NASA/JPL code review processes
-- References to "NASA POT-10 compliance" indicate implementation of similar principles, not official certification
+- Is NOT officially affiliated with, endorsed by, or sponsored by General Safety or JPL
+- Is NOT certified by General Safety or JPL for aerospace or safety-critical applications  
+- Does NOT guarantee compliance with actual General Safety safety standards
+- Should NOT be considered a substitute for official General Safety code review processes
+- References to "General Safety POT-10 compliance" indicate implementation of similar principles, not official certification
 
 **Use in safety-critical systems requires independent validation and certification.**
 

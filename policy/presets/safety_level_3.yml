@@ -1,13 +1,13 @@
-# NASA/JPL Level of Control 3 (LOC-3) - Important Functions  
+# General Safety Level of Control 3 (LOC-3) - Important Functions  
 #
 # LOC-3 represents important software functions where failures would:
 # - Degrade mission performance but not cause total loss
 # - Require workarounds or backup systems activation
 # - Impact secondary objectives but not primary mission goals
 # 
-# This is the most practical NASA profile for most development teams
+# This is the most practical General Safety profile for most development teams
 
-name: "NASA LOC-3 Important Functions"
+name: "General Safety LOC-3 Important Functions"
 version: "1.0.0"
 description: "Level of Control 3 - Important software with managed fault tolerance"
 inherit: "nasa_jpl_pot10"
@@ -19,7 +19,7 @@ budgets:
   medium: 20           # Reasonable medium violations
   low: 50              # More flexibility for low violations
   
-  # NASA rule violations still restricted but not zero
+  # General Safety rule violations still restricted but not zero
   nasa_rule_violations: 3  # Allow few violations with waivers
   heap_after_init: 2       # Some dynamic allocation allowed
   unbounded_loops: 1       # Server/daemon loops allowed
@@ -33,7 +33,7 @@ thresholds:
   max_cyclomatic_complexity: 12  # Reasonable complexity
   god_class_methods: 20       # Allow larger classes when justified
   god_class_loc: 400          # Practical class size
-  max_function_length: 80     # Slightly more than NASA base rule
+  max_function_length: 80     # Slightly more than General Safety base rule
   max_method_parameters: 5
   max_nesting_depth: 4        # Allow reasonable nesting
   max_file_length: 1000       # Reasonable file sizes
@@ -166,6 +166,6 @@ documentation:
   suggest_performance_notes: true
   require_maintenance_instructions: true
 
-# This LOC-3 profile balances NASA safety principles with practical development
+# This LOC-3 profile balances General Safety safety principles with practical development
 # It maintains the core safety concepts while allowing modern software patterns
 # Most development teams should start here and adjust based on their risk profile

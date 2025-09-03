@@ -183,7 +183,7 @@
             "Enterprise features",
             "Advanced reporting",
             "Scale optimization",
-            "NASA/JPL compliance"
+            "Safety Standards/High Quality compliance"
           ],
           "demo_overlap": "demo/nasa_jpl/demo_analysis.py",
           "integration_priority": "high"

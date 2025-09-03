@@ -68,7 +68,7 @@ The tool integrates seamlessly with our GitHub Actions workflow:
 
 ### Repository Profile: Real-time Analytics Engine (C++)
 - **Size**: 89,000 lines
-- **NASA POT-10 Compliance**: Achieved 100% compliance for safety-critical components
+- **General Safety POT-10 Compliance**: Achieved 100% compliance for safety-critical components
 - **Key Improvements**:
   - Eliminated all goto statements and recursion in critical paths
   - 156 magic buffer sizes replaced with symbolic constants

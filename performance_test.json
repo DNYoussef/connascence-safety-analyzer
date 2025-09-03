@@ -7708,7 +7708,7 @@
       "severity": "MEDIUM",
       "file_path": "demo\\nasa_jpl\\demo_analysis.py",
       "line_number": 29,
-      "description": "Hardcoded string constant: NASA/JPL POWER OF TEN RULES ANALYSIS DEMO",
+      "description": "Hardcoded string constant: Safety Standards/High Quality POWER OF TEN RULES ANALYSIS DEMO",
       "suggestion": "Extract to named constant"
     },
     {
@@ -7716,7 +7716,7 @@
       "severity": "MEDIUM",
       "file_path": "demo\\nasa_jpl\\demo_analysis.py",
       "line_number": 53,
-      "description": "Hardcoded string constant: 1. ANALYZING CODE WITH NASA/JPL VIOLATIONS",
+      "description": "Hardcoded string constant: 1. ANALYZING CODE WITH Safety Standards/High Quality VIOLATIONS",
       "suggestion": "Extract to named constant"
     },
     {
@@ -7724,7 +7724,7 @@
       "severity": "MEDIUM",
       "file_path": "demo\\nasa_jpl\\demo_analysis.py",
       "line_number": 105,
-      "description": "Hardcoded string constant: 2. ANALYZING NASA/JPL COMPLIANT CODE",
+      "description": "Hardcoded string constant: 2. ANALYZING Safety Standards/High Quality COMPLIANT CODE",
       "suggestion": "Extract to named constant"
     },
     {
@@ -7740,7 +7740,7 @@
       "severity": "MEDIUM",
       "file_path": "demo\\nasa_jpl\\demo_analysis.py",
       "line_number": 141,
-      "description": "Hardcoded string constant: 4. NASA/JPL COMPLIANCE SCORECARD",
+      "description": "Hardcoded string constant: 4. Safety Standards/High Quality COMPLIANCE SCORECARD",
       "suggestion": "Extract to named constant"
     },
     {
@@ -14604,7 +14604,7 @@
       "severity": "MEDIUM",
       "file_path": "dist\\connascence-analyzer-enterprise\\demo\\nasa_jpl\\demo_analysis.py",
       "line_number": 29,
-      "description": "Hardcoded string constant: NASA/JPL POWER OF TEN RULES ANALYSIS DEMO",
+      "description": "Hardcoded string constant: Safety Standards/High Quality POWER OF TEN RULES ANALYSIS DEMO",
       "suggestion": "Extract to named constant"
     },
     {
@@ -14612,7 +14612,7 @@
       "severity": "MEDIUM",
       "file_path": "dist\\connascence-analyzer-enterprise\\demo\\nasa_jpl\\demo_analysis.py",
       "line_number": 53,
-      "description": "Hardcoded string constant: 1. ANALYZING CODE WITH NASA/JPL VIOLATIONS",
+      "description": "Hardcoded string constant: 1. ANALYZING CODE WITH Safety Standards/High Quality VIOLATIONS",
       "suggestion": "Extract to named constant"
     },
     {
@@ -14620,7 +14620,7 @@
       "severity": "MEDIUM",
       "file_path": "dist\\connascence-analyzer-enterprise\\demo\\nasa_jpl\\demo_analysis.py",
       "line_number": 105,
-      "description": "Hardcoded string constant: 2. ANALYZING NASA/JPL COMPLIANT CODE",
+      "description": "Hardcoded string constant: 2. ANALYZING Safety Standards/High Quality COMPLIANT CODE",
       "suggestion": "Extract to named constant"
     },
     {
@@ -14636,7 +14636,7 @@
       "severity": "MEDIUM",
       "file_path": "dist\\connascence-analyzer-enterprise\\demo\\nasa_jpl\\demo_analysis.py",
       "line_number": 141,
-      "description": "Hardcoded string constant: 4. NASA/JPL COMPLIANCE SCORECARD",
+      "description": "Hardcoded string constant: 4. Safety Standards/High Quality COMPLIANCE SCORECARD",
       "suggestion": "Extract to named constant"
     },
     {
@@ -15706,7 +15706,7 @@
     {
       "type": "Connascence of Type",
       "severity": "LOW",
-      "file_path": "policy\\presets\\nasa_jpl_pot10.py",
+      "file_path": "policy\\presets\\general_safety_strict.py",
       "line_number": 6,
       "description": "Magic number: 3",
       "suggestion": "Extract to named constant"
@@ -15714,7 +15714,7 @@
     {
       "type": "Connascence of Type",
       "severity": "LOW",
-      "file_path": "policy\\presets\\nasa_jpl_pot10.py",
+      "file_path": "policy\\presets\\general_safety_strict.py",
       "line_number": 11,
       "description": "Magic number: 3",
       "suggestion": "Extract to named constant"
@@ -15722,7 +15722,7 @@
     {
       "type": "Connascence of Type",
       "severity": "LOW",
-      "file_path": "policy\\presets\\nasa_jpl_pot10.py",
+      "file_path": "policy\\presets\\general_safety_strict.py",
       "line_number": 12,
       "description": "Magic number: 6",
       "suggestion": "Extract to named constant"

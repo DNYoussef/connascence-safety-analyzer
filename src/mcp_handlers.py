@@ -290,7 +290,7 @@ class SafetyValidationHandler(BaseMCPHandler):
             generate_report = args.get("generate_report", True)
             include_evidence = args.get("include_evidence", True)
             
-            # Create NASA-compliant analyzer
+            # Create General Safety-compliant analyzer
             from .refactored_grammar_analyzer import GrammarEnhancedAnalyzer
             analyzer = GrammarEnhancedAnalyzer(
                 enable_safety_profiles=True,
@@ -367,7 +367,7 @@ class SafetyValidationHandler(BaseMCPHandler):
             vtype = violation.get("rule", "unknown")
             violation_types[vtype] = violation_types.get(vtype, 0) + 1
         
-        # Generate NASA-specific recommendations
+        # Generate General Safety-specific recommendations
         recommendations = []
         if "nasa_rule_1" in violation_types:
             recommendations.append("Replace goto statements and recursion with structured control flow")
@@ -376,7 +376,7 @@ class SafetyValidationHandler(BaseMCPHandler):
         if "nasa_rule_3" in violation_types:
             recommendations.append("Move dynamic allocations to initialization phase or use pre-allocated pools")
         if len(violation_types) > 5:
-            recommendations.append("Consider implementing a systematic code review process for NASA compliance")
+            recommendations.append("Consider implementing a systematic code review process for General Safety compliance")
         
         # Get next steps based on compliance
         if compliance_percentage >= 95:
@@ -384,7 +384,7 @@ class SafetyValidationHandler(BaseMCPHandler):
         elif compliance_percentage >= 80:
             next_steps = ["Focus on critical violations first", "Implement pre-commit hooks for compliance"]
         elif compliance_percentage >= 60:
-            next_steps = ["Systematic refactoring required", "Training on NASA coding standards recommended"]
+            next_steps = ["Systematic refactoring required", "Training on General Safety coding standards recommended"]
         else:
             next_steps = ["Major compliance issues detected", "Consider professional code audit", "Implement step-by-step compliance plan"]
         

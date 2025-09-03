@@ -289,7 +289,7 @@ connascence-safety-analyzer/
 │   └── DASHBOARD_METRICS.md   # Executive dashboards (89/100 score)
 └── tests/                     # Production Test Suite
     ├── test_enterprise_scale.py
-    ├── test_nasa_compliance.py
+    ├── test_General Safety_compliance.py
     └── test_parameter_objects.py
 ```
 
@@ -458,7 +458,7 @@ python analyzer/main.py --target . --verbose --show-timers --log-level INFO
 ### Usage with Exit Codes
 ```bash
 # CI/CD pipeline usage with proper error handling
-python analyzer/main.py --target . --profile nasa_jpl_pot10 --budget-critical 0
+python analyzer/main.py --target . --profile General Safety_jpl_pot10 --budget-critical 0
 if [ $? -eq 0 ]; then
   echo "✓ No critical violations - build approved"
 elif [ $? -eq 1 ]; then
@@ -565,7 +565,7 @@ Architectural Improvements:
 ## Contributing
 
 1. Run enterprise test suite: `python -m pytest tests/test_enterprise_scale.py`
-2. Validate NASA compliance: `python policy/manager.py --preset nasa_jpl_pot10 --target .`
+2. Validate General Safety compliance: `python policy/manager.py --preset General Safety_jpl_pot10 --target .`
 3. Self-improvement check: `python analyzer/main.py --target . --self-improve`
 4. Ensure MCP server functionality: `python mcp/server.py --test-mode`
 

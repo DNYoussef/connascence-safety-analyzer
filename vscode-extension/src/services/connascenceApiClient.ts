@@ -77,7 +77,7 @@ export class ConnascenceApiClient {
     }
 
     /**
-     * Get safety validation using NASA/JPL compliance
+     * Get safety validation using General Safety compliance
      */
     public async validateSafety(filePath: string, profile: string): Promise<{
         compliant: boolean,

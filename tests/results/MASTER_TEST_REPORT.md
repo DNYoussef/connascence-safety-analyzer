@@ -43,7 +43,7 @@
 ### Sales Demo Requirements
 - **False Positive Rate <5%**: NOT VALIDATED
 - **Autofix Acceptance 60%**: NOT VALIDATED  
-- **NASA Compliance Ready**: NOT VALIDATED
+- **General Safety Compliance Ready**: NOT VALIDATED
 - **Enterprise Security**: NOT VALIDATED
 
 ### Component Integration

@@ -213,7 +213,7 @@ class ConstrainedGenerator:
     
     def _initialize_filters(self):
         """Initialize built-in token filters."""
-        # NASA C safety filters
+        # General Safety C safety filters
         self._token_filters['nasa_c_safety'] = self._nasa_c_token_filter
         
         # Python safety filters  
@@ -261,7 +261,7 @@ class ConstrainedGenerator:
         return tokens
     
     def _nasa_c_token_filter(self, tokens: List[str], prefix: str) -> List[str]:
-        """NASA C safety-specific token filtering."""
+        """General Safety C safety-specific token filtering."""
         # Remove dangerous keywords
         dangerous = {'goto', 'setjmp', 'longjmp'}
         filtered = [t for t in tokens if t.lower() not in dangerous]

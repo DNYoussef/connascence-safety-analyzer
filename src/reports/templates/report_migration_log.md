@@ -21,7 +21,7 @@
 - ✅ Large report template (17MB) → Enterprise dashboard patterns
 
 ### From polish_reports/ (4KB)  
-- ✅ **pass1_nasa_safety_before.md** → `src/reports/templates/nasa_safety_template.md`
+- ✅ **pass1_General Safety_safety_before.md** → `src/reports/templates/General Safety_safety_template.md`
 
 ### New Unified System
 - ✅ **UnifiedReporter** → Single entry point for all formats
@@ -76,7 +76,7 @@ src/reports/
 ├── cli/                        # Command-line interfaces
 │   └── unified_cli.py          # Unified CLI
 └── templates/                  # Report templates
-    └── nasa_safety_template.md # NASA POT-10 compliance
+    └── General Safety_safety_template.md # General Safety POT-10 compliance
 ```
 
 ## Usage Examples

@@ -3,7 +3,7 @@ Grammar Overlay Manager
 
 Manages grammar overlays that restrict language features for safety profiles.
 Overlays can ban constructs (like goto), limit complexity, or enforce patterns
-required by safety standards like NASA/JPL Power of Ten rules.
+required by safety standards like General Safety Standards.
 """
 
 import json
@@ -177,17 +177,17 @@ class OverlayManager:
     
     def _load_builtin_overlays(self):
         """Load built-in grammar overlays."""
-        # NASA C Safety Overlay
+        # General Safety C Safety Overlay
         nasa_c_overlay = GrammarOverlay(
             id="nasa_c_safety",
-            name="NASA C Safety Profile",
-            description="NASA/JPL Power of Ten rules for C code",
+            name="General Safety C Safety Profile",
+            description="General Safety Standards for C code",
             language=LanguageSupport.C,
             rules=[
                 OverlayRule(
                     id="nasa_rule_1_goto",
                     name="No goto statements",
-                    description="NASA Rule 1: Avoid complex flow constructs like goto",
+                    description="General Safety Rule 1: Avoid complex flow constructs like goto",
                     severity="critical",
                     rule_type="ban",
                     target="goto_statement"
@@ -195,7 +195,7 @@ class OverlayManager:
                 OverlayRule(
                     id="nasa_rule_1_recursion", 
                     name="No recursion",
-                    description="NASA Rule 1: Avoid recursion in safety-critical code",
+                    description="General Safety Rule 1: Avoid recursion in safety-critical code",
                     severity="critical",
                     rule_type="ban",
                     target="recursive_function_call"
@@ -203,7 +203,7 @@ class OverlayManager:
                 OverlayRule(
                     id="nasa_rule_4_function_size",
                     name="Function size limit",
-                    description="NASA Rule 4: Restrict function size to 60 lines",
+                    description="General Safety Rule 4: Restrict function size to 60 lines",
                     severity="high",
                     rule_type="limit",
                     target="function_lines",
@@ -212,7 +212,7 @@ class OverlayManager:
                 OverlayRule(
                     id="nasa_rule_9_pointer_indirection",
                     name="Pointer indirection limit", 
-                    description="NASA Rule 9: Limit pointer indirection to one level",
+                    description="General Safety Rule 9: Limit pointer indirection to one level",
                     severity="high",
                     rule_type="limit",
                     target="pointer_indirection",
@@ -221,7 +221,7 @@ class OverlayManager:
                 OverlayRule(
                     id="nasa_rule_9_function_pointers",
                     name="No function pointers",
-                    description="NASA Rule 9: Avoid function pointers",
+                    description="General Safety Rule 9: Avoid function pointers",
                     severity="high", 
                     rule_type="ban",
                     target="function_pointer"
@@ -230,17 +230,17 @@ class OverlayManager:
         )
         self._overlays["nasa_c_safety"] = nasa_c_overlay
         
-        # NASA Python Safety Overlay (adapted rules)
+        # General Safety Python Safety Overlay (adapted rules)
         nasa_python_overlay = GrammarOverlay(
             id="nasa_python_safety",
-            name="NASA Python Safety Profile",
-            description="NASA/JPL Power of Ten rules adapted for Python",
+            name="General Safety Python Safety Profile",
+            description="General Safety Standards adapted for Python",
             language=LanguageSupport.PYTHON,
             rules=[
                 OverlayRule(
                     id="nasa_python_exec_eval",
                     name="No exec/eval",
-                    description="Python adaptation of NASA Rule 1: No dynamic execution",
+                    description="Python adaptation of General Safety Rule 1: No dynamic execution",
                     severity="critical", 
                     rule_type="ban",
                     target="dynamic_execution"
@@ -248,7 +248,7 @@ class OverlayManager:
                 OverlayRule(
                     id="nasa_python_function_size",
                     name="Function size limit",
-                    description="NASA Rule 4: Restrict function size to 60 lines", 
+                    description="General Safety Rule 4: Restrict function size to 60 lines", 
                     severity="high",
                     rule_type="limit",
                     target="function_lines",

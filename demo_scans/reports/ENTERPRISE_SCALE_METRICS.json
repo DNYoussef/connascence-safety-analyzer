@@ -45,7 +45,7 @@
       "enterprise_significance": {
         "precision_demonstration": "Zero false positives on mature C codebase",
         "industry_validation": "Clean results on battle-tested networking library",
-        "safety_compliance": "NASA POT-10 validation across complete codebase",
+        "safety_compliance": "Safety Standards Strict Safety validation across complete codebase",
         "tool_credibility": "Accurate analysis of widely-used system library"
       }
     },

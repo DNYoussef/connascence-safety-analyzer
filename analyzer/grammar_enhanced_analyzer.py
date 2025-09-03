@@ -108,12 +108,12 @@ class GrammarEnhancedAnalyzer:
     def __init__(self, 
                  enable_safety_profiles: bool = True,
                  framework_profile: Optional[FrameworkProfile] = None,
-                 nasa_compliance: bool = False):
+                 safety_compliance: bool = False):
         """Initialize the enhanced analyzer."""
         
         self.enable_safety_profiles = enable_safety_profiles
         self.framework_profile = framework_profile  
-        self.nasa_compliance = nasa_compliance
+        self.safety_compliance = safety_compliance
         
         # Initialize components
         if GRAMMAR_AVAILABLE:
@@ -392,15 +392,15 @@ class GrammarEnhancedAnalyzer:
             "profile": safety_profile,
             "compliant": len(grammar_result.violations) == 0,
             "violations": grammar_result.violations,
-            "nasa_compliant": False
+            "safety_compliant": False
         }
         
-        if self.nasa_compliance and safety_profile:
-            # Check NASA-specific compliance
-            nasa_violations = [v for v in grammar_result.violations 
-                             if v.get('rule', '').startswith('nasa_')]
-            compliance["nasa_compliant"] = len(nasa_violations) == 0
-            compliance["nasa_violations"] = nasa_violations
+        if self.safety_compliance and safety_profile:
+            # Check safety-specific compliance
+            safety_violations = [v for v in grammar_result.violations 
+                               if v.get('rule', '').startswith('safety_')]
+            compliance["safety_compliant"] = len(safety_violations) == 0
+            compliance["safety_violations"] = safety_violations
         
         return compliance
     
@@ -413,7 +413,7 @@ class GrammarEnhancedAnalyzer:
         
         if safety_profile:
             overlays.append(f"{language.value}_{safety_profile}")
-            if self.nasa_compliance:
+            if self.safety_compliance:
                 mode = GenerationMode.STRICT
         
         return GenerationConstraints(
@@ -458,10 +458,10 @@ class GrammarEnhancedAnalyzer:
 def create_analyzer_for_profile(profile_name: str) -> GrammarEnhancedAnalyzer:
     """Factory function to create analyzer with specific profile."""
     
-    if profile_name == "nasa_jpl_pot10":
+    if profile_name == "general_safety_strict":
         return GrammarEnhancedAnalyzer(
             enable_safety_profiles=True,
-            nasa_compliance=True
+            safety_compliance=True
         )
     elif profile_name == "django":
         return GrammarEnhancedAnalyzer(

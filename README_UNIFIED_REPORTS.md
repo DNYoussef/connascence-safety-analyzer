@@ -142,7 +142,7 @@ config = {
 - ✅ Historical analysis datasets for trend analysis
 
 ### From polish_reports/ (4KB)
-- ✅ NASA POT-10 safety compliance templates
+- ✅ General Safety POT-10 safety compliance templates
 - ✅ Specialized analysis patterns for safety-critical systems
 
 ## 🚀 Performance & Scale
@@ -167,7 +167,7 @@ content = generate_report(result, "custom", "output.custom")
 ```
 
 ### Built-in Templates
-- **NASA Safety Compliance**: POT-10 safety profile templates
+- **General Safety Safety Compliance**: POT-10 safety profile templates
 - **Enterprise Dashboards**: Executive KPI and ROI templates  
 - **Sales Presentations**: Demo and competitive positioning templates
 - **SARIF Extensions**: Enhanced rule definitions and metadata

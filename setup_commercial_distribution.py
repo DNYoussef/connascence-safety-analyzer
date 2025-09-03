@@ -247,7 +247,7 @@ def main():
         print("Key artifacts:")
         print(" False Positive Rate: <5% validated")
         print(" Autofix Acceptance: >=60% validated") 
-        print(" NASA/JPL compliance: Ready")
+        print(" General Safety compliance: Ready")
         print(" Enterprise security: Deployed")
     else:
         print("\\nDemo suite had some issues - check output for details")
@@ -279,7 +279,7 @@ This will run the complete demo suite and generate all sales artifacts:
 - **Output**: Parameter Object refactoring PR with SARIF
 
 ### 2. curl (C)
-- **Proof Point**: NASA/JPL Power of Ten compliance
+- **Proof Point**: General Safety Standards compliance
 - **Proof Point**: Evidence-based analysis (no double flagging)
 - **Output**: Safety refactoring with recursion elimination
 
@@ -300,7 +300,7 @@ After running the demo:
 Use the generated artifacts to demonstrate:
 1. **<5% False Positive Rate** across 3 major codebases
 2. **>=60% Autofix Acceptance** with production-safe transformations
-3. **NASA/JPL Safety Compliance** with automated verification
+3. **General Safety Safety Compliance** with automated verification
 4. **Enterprise Security** with RBAC, audit, air-gapped deployment
 
 ## Support
@@ -494,7 +494,7 @@ Default admin credentials:
 ### Compliance
 - [DONE] SOC 2 Type II controls
 - [DONE] ISO 27001 alignment
-- [DONE] NASA/JPL Power of Ten profiles
+- [DONE] General Safety Standards profiles
 - [DONE] NIST framework mapping
 
 ### Integration
@@ -609,7 +609,7 @@ ENTERPRISE TERMS:
    This software includes features for regulatory compliance:
    - SOC 2 Type II controls
    - ISO 27001 alignment  
-   - NASA/JPL safety standards
+   - General Safety safety standards
    - NIST cybersecurity framework
 
 6. LIABILITY LIMITATION
@@ -720,7 +720,7 @@ Full license texts available in the licenses/ directory.
                 'Enterprise SSO integration',
                 'SIEM integration',
                 'SOC 2 compliance controls',
-                'NASA/JPL safety profiles'
+                'General Safety safety profiles'
             ],
             'supported_platforms': [
                 'Linux (Ubuntu 20.04+)',
@@ -779,7 +779,7 @@ Full license texts available in the licenses/ directory.
 
 - **False Positive Rate**: {manifest['proof_points']['false_positive_rate']}
 - **Autofix Acceptance**: {manifest['proof_points']['autofix_acceptance_rate']}  
-- **NASA Compliance**: {manifest['proof_points']['nasa_compliance']}
+- **General Safety Compliance**: {manifest['proof_points']['nasa_compliance']}
 - **Enterprise Security**: {manifest['proof_points']['enterprise_security']}
 
 ## Supported Platforms

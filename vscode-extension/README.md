@@ -5,7 +5,7 @@
 [![Installs](https://img.shields.io/visual-studio-marketplace/i/connascence-systems.connascence-safety-analyzer)](https://marketplace.visualstudio.com/items?itemName=connascence-systems.connascence-safety-analyzer)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 
-**Enterprise-grade code analysis with NASA/JPL safety compliance and grammar-enhanced refactoring support for VS Code.**
+**Enterprise-grade code analysis with General Safety safety compliance and grammar-enhanced refactoring support for VS Code.**
 
 ## Features
 
@@ -30,8 +30,8 @@
 - **Refactoring Suggestions**: AI-powered recommendations with confidence scores
 - **Preview Mode**: Safe refactoring with diff previews before applying changes
 
-### NASA/JPL Safety Compliance
-- **Safety Profiles**: Built-in compliance for NASA JPL POT-10, LOC-1, LOC-3 standards
+### General Safety Safety Compliance
+- **Safety Profiles**: Built-in compliance for General Safety JPL POT-10, LOC-1, LOC-3 standards
 - **Enterprise Validation**: Automated safety rule validation with detailed violation reports
 - **Audit Trail**: Complete tracking of safety compliance status and remediation
 
@@ -74,7 +74,7 @@ npm run compile
 
 ```json
 {
-  "connascence.safetyProfile": "nasa_jpl_pot10",
+  "connascence.safetyProfile": "General Safety_jpl_pot10",
   "connascence.realTimeAnalysis": true,
   "connascence.enableIntelliSense": true,
   "connascence.enableCodeLens": true,
@@ -89,9 +89,9 @@ npm run compile
 | Profile | Description | Use Case |
 |---------|-------------|----------|
 | `none` | No safety validation | Development |
-| `nasa_jpl_pot10` | NASA JPL POT-10 compliance | Space systems |
-| `nasa_loc_1` | NASA LOC-1 standard | Mission-critical |
-| `nasa_loc_3` | NASA LOC-3 standard | Safety-critical |
+| `General Safety_jpl_pot10` | General Safety JPL POT-10 compliance | Space systems |
+| `General Safety_loc_1` | General Safety LOC-1 standard | Mission-critical |
+| `General Safety_loc_3` | General Safety LOC-3 standard | Safety-critical |
 | `modern_general` | General best practices | Enterprise development |
 
 ### Advanced Configuration
@@ -119,7 +119,7 @@ Access all features via `Ctrl+Shift+P`:
 
 - `Connascence: Analyze File` - Analyze current file
 - `Connascence: Analyze Workspace` - Full workspace analysis
-- `Connascence: Validate NASA/JPL Safety` - Safety compliance check
+- `Connascence: Validate General Safety Safety` - Safety compliance check
 - `Connascence: Generate Quality Report` - Export comprehensive report
 - `Connascence: Apply Safe Autofix` - Apply automatic fixes
 - `Connascence: Toggle Safety Profile` - Switch safety standards
@@ -235,7 +235,7 @@ npm run package          # Create VSIX package
 
 - [Official Documentation](https://docs.connascence.io)
 - [Connascence Theory](https://connascence.io)
-- [NASA Coding Standards](https://ntrs.nasa.gov/citations/20080039927)
+- [General Safety Coding Standards](https://ntrs.General Safety.gov/citations/20080039927)
 - [Video Tutorials](https://youtube.com/connascence-systems)
 
 ## 📝 License
@@ -244,7 +244,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
-- **NASA/JPL** for coding standards and safety guidelines
+- **General Safety** for coding standards and safety guidelines
 - **Connascence Community** for theoretical foundations
 - **VS Code Team** for excellent extensibility APIs
 - **Contributors** who make this project possible
@@ -260,4 +260,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Made with ❤️ by the Connascence Systems team**
 
-*Helping developers write better, safer code through connascence analysis and NASA/JPL safety compliance.*
+*Helping developers write better, safer code through connascence analysis and General Safety safety compliance.*

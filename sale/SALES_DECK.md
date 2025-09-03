@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-**Transform code quality with NASA-grade safety analysis and intelligent refactoring**
+**Transform code quality with General Safety-grade safety analysis and intelligent refactoring**
 
 - **False Positive Rate**: <5% (4.5% measured across 3 major codebases)
 - **Autofix Acceptance**: 60% (62.9% achieved in production demos)  
@@ -20,14 +20,14 @@
 - **Narrow Focus**: Syntax errors, not architectural quality
 - **Tool Proliferation**: 5-8 different tools per project
 - **No Refactoring Intelligence**: Find problems, don't solve them
-- **Compliance Gaps**: Don't map to safety standards (NASA, MISRA)
+- **Compliance Gaps**: Don't map to safety standards (General Safety, MISRA)
 
 ### The $10M+ Problem
 
 **For a 500-developer organization:**
 - **Developer Time Lost**: 2 hours/week on false positives = $2.6M/year
 - **Technical Debt Growth**: 15% annually without architectural guidance  
-- **Compliance Costs**: $500K-2M for NASA/MISRA certification
+- **Compliance Costs**: $500K-2M for General Safety/MISRA certification
 - **Quality Incidents**: 3-5 production issues/month from architectural problems
 - **Tool License Sprawl**: $200K+ annually across quality toolchain
 
@@ -35,7 +35,7 @@
 
 ## [TIP] The Solution: Connascence Safety Analyzer
 
-### Architectural Quality with NASA Safety Standards
+### Architectural Quality with General Safety Safety Standards
 
 **What Makes Us Different:**
 
@@ -45,7 +45,7 @@
 - Focus on **architectural issues** other tools can't detect
 - Proof: curl analysis shows 89% coverage by existing build flags
 
-#### 2. **NASA/JPL Safety Profiles** (Certification Ready)
+#### 2. **General Safety Safety Profiles** (Certification Ready)
 - **Power of Ten Rules**: Full compliance mapping
 - **Level of Control (LOC)**: LOC-1, LOC-3, LOC-6 profiles  
 - **Build Flag Integration**: Verifies compiler safety settings
@@ -84,13 +84,13 @@
 - Method extraction: 42% success rate (complex cases)
 - **Zero false positives** on framework-specific patterns
 
-### Demo 2: curl (C) - NASA/JPL Safety Profile [DONE]
+### Demo 2: curl (C) - General Safety Safety Profile [DONE]
 
 **Target**: Iconic C library, perfect for safety analysis  
-**Profile**: `nasa_jpl_pot10` (Power of Ten rules)
+**Profile**: `General Safety_jpl_pot10` (Power of Ten rules)
 **Results**:
 - **Files Analyzed**: 156 (lib/ only) in 1.8s
-- **NASA Compliance**: 87%  96% potential improvement
+- **General Safety Compliance**: 87%  96% potential improvement
 - **Unique Findings**: 23 (92.6% tool overlap eliminated)
 - **Safety Impact**: 6 recursion sites  0 eliminated
 
@@ -98,7 +98,7 @@
 - **Evidence-based filtering**: Doesn't flag what clang-tidy already catches
 - **Recursion elimination**: 4/6 automated, 2 need review
 - **Stack usage**: Unbounded  3.2KB maximum
-- **Certification ready**: Audit trail for NASA compliance
+- **Certification ready**: Audit trail for General Safety compliance
 
 ### Demo 3: Express (JavaScript) - Polyglot via Semgrep [DONE]
 
@@ -139,7 +139,7 @@ ROI: 750% in year 1
 ### For Compliance Teams
 
 **Certification Acceleration:**
-- **NASA/JPL**: Automated Power of Ten compliance checking
+- **General Safety**: Automated Power of Ten compliance checking
 - **MISRA C**: C/C++ automotive standards mapping
 - **SOC 2**: Complete audit trail with tamper-resistant logging
 - **ISO 27001**: Security controls and access management
@@ -209,7 +209,7 @@ connascence scan --path ./src --profile modern_general
 ### vs. SonarQube
 - **Lower FP Rate**: 4.5% vs 18% typical
 - **Architectural Focus**: Connascence vs syntax-only
-- **Safety Standards**: NASA/JPL vs generic rules
+- **Safety Standards**: General Safety vs generic rules
 - **Intelligent Refactoring**: 60+ techniques vs basic suggestions
 
 ### vs. Veracode
@@ -221,7 +221,7 @@ connascence scan --path ./src --profile modern_general
 ### vs. Internal Tools
 - **Proven Results**: <5% FP rate vs 15-30% typical
 - **Enterprise Security**: RBAC, audit, air-gap vs basic access
-- **Compliance Ready**: NASA/MISRA mapping vs custom rules
+- **Compliance Ready**: General Safety/MISRA mapping vs custom rules
 - **Professional Support**: 24/7 available vs internal resources
 
 ---
@@ -236,7 +236,7 @@ connascence scan --path ./src --profile modern_general
 
 ### Professional Edition - $150K/year  
 - Up to 200 developers
-- All safety profiles (NASA, MISRA)
+- All safety profiles (General Safety, MISRA)
 - Advanced refactoring and MCP integration
 - SSO and audit logging
 - Business hours phone support
@@ -263,7 +263,7 @@ connascence scan --path ./src --profile modern_general
 
 **1. Pull Requests (3 repos)**
 - **Celery**: "CoP via Introduce Parameter Object" with SARIF  
-- **curl**: "NASA/JPL Safety: Eliminate Recursion (Rule 3)"
+- **curl**: "General Safety Safety: Eliminate Recursion (Rule 3)"
 - **Express**: "Extract Method for Route Handler Patterns"
 
 **2. Dashboard Screenshots**  
@@ -273,7 +273,7 @@ connascence scan --path ./src --profile modern_general
 
 **3. VS Code Integration GIF**
 - Save file  diagnostics appear  quick fix applied
-- Real-time safety analysis with NASA profile
+- Real-time safety analysis with General Safety profile
 - Refactoring suggestions with confidence scores
 
 ### Key Numbers to Say Aloud
@@ -286,7 +286,7 @@ connascence scan --path ./src --profile modern_general
 **Business Impact:**
 - "25-40% technical debt reduction in first 6 months"
 - "750% ROI in year 1 for 500-developer organization"
-- "NASA compliance from 87% to 96% with automated fixes"
+- "General Safety compliance from 87% to 96% with automated fixes"
 
 **Competitive Advantages:**
 - "Evidence-based analysis - we don't double-flag what your existing tools already catch"
@@ -342,7 +342,7 @@ connascence scan --path ./customer-repo --profile modern_general --demo-mode
 
 ---
 
-**Ready to transform your code quality with NASA-grade safety analysis?**
+**Ready to transform your code quality with General Safety-grade safety analysis?**
 
 Contact our enterprise team: sales@connascence.com | +1-800-QUALITY
 

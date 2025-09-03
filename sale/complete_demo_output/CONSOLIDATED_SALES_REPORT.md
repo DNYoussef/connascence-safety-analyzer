@@ -13,9 +13,9 @@
 
 ### [DONE] CURL Demo
 
-**Description**: C NASA/JPL Safety Profile - Power of Ten compliance  
+**Description**: C General Safety Safety Profile - Power of Ten compliance  
 **Execution Time**: 0.09s  
-**Proof Points**: Evidence-based, NASA compliance, Safety automation  
+**Proof Points**: Evidence-based, General Safety compliance, Safety automation  
 **Status**: SUCCESS  
 
 **Key Artifacts**:
@@ -59,7 +59,7 @@
 
 ### [DONE] Enterprise Readiness
 - **Security**: RBAC, audit logging, encryption, air-gapped mode
-- **Compliance**: NASA/JPL Power of Ten, MISRA C mapping ready
+- **Compliance**: General Safety Standards, MISRA C mapping ready
 - **Integration**: VS Code, CI/CD, SIEM, SSO support
 - **Polyglot**: Python, C/C++, JavaScript today, expanding [DONE]
 
@@ -69,18 +69,18 @@
 
 ### [DOC] Pull Requests (3 repos)
 1. **Celery PR**: Introduce Parameter Object refactoring with SARIF
-2. **curl PR**: NASA safety compliance (eliminate recursion)  
+2. **curl PR**: General Safety safety compliance (eliminate recursion)  
 3. **Express PR**: Extract Method with MCP automation
 
 ### [METRICS] Dashboard Screenshots  
 1. **Connascence Index trends** for all three repositories
-2. **Safety compliance panel** showing NASA Power of Ten progress
+2. **Safety compliance panel** showing General Safety Power of Ten progress
 3. **Polyglot analysis** demonstrating Semgrep integration
 
 ### VS Code Integration Demo
 - Real-time analysis with inline diagnostics
 - Quick fix application with AST-safe refactoring
-- Safety profile switching (NASA  Modern  Custom)
+- Safety profile switching (General Safety  Modern  Custom)
 
 ### [IMPROVEMENT] Proof Point Validation
 - **FP Rate**: <5% measured across 550+ files, 3 languages
@@ -107,7 +107,7 @@
 ### Competitive Differentiation
 - **vs SonarQube**: 4.5% vs 18% typical false positive rate
 - **vs Veracode**: Architectural focus + intelligent refactoring  
-- **vs Internal Tools**: Enterprise security + NASA compliance ready
+- **vs Internal Tools**: Enterprise security + General Safety compliance ready
 - **vs All**: Evidence-based analysis (no double flagging) + AST-safe refactoring
 
 ---

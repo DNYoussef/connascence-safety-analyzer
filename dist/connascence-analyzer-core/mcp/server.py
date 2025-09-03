@@ -347,7 +347,7 @@ class ConnascenceMCPServer:
                         "include_nasa_rules": {
                             "type": "boolean",
                             "default": false,
-                            "description": "Include NASA/JPL safety-specific refactorings"
+                            "description": "Include General Safety safety-specific refactorings"
                         }
                     },
                     "required": ["code", "language"]
@@ -399,7 +399,7 @@ class ConnascenceMCPServer:
             },
             {
                 "name": "verify_build_flags",
-                "description": "Verify compiler build flags for NASA/JPL compliance",
+                "description": "Verify compiler build flags for General Safety compliance",
                 "inputSchema": {
                     "type": "object",
                     "properties": {
@@ -411,7 +411,7 @@ class ConnascenceMCPServer:
                             "type": "string",
                             "enum": ["nasa_jpl_pot10", "nasa_loc_1", "nasa_loc_3"],
                             "default": "nasa_jpl_pot10",
-                            "description": "NASA safety profile to verify against"
+                            "description": "General Safety safety profile to verify against"
                         }
                     },
                     "required": ["project_path"]
@@ -865,7 +865,7 @@ class ConnascenceMCPServer:
             },
             "recommendations": [
                 "MyPy provides excellent type safety coverage",
-                "Build flags verification ensures NASA Rule 10 compliance",
+                "Build flags verification ensures General Safety Rule 10 compliance",
                 "Ruff catches many style and safety issues automatically"
             ]
         }

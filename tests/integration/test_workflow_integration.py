@@ -246,11 +246,11 @@ function calculateVipDiscount(price) {
 }
 ''')
         
-        # C file for NASA analysis
+        # C file for General Safety analysis
         (workspace / "src" / "calculator.c").write_text('''
 #include <stdio.h>
 
-// NASA Rule violations for testing
+// General Safety Rule violations for testing
 int factorial(int n) {  // Rule 3: No recursion
     if (n <= 1) return 1;
     return n * factorial(n - 1);  // Recursion violation
@@ -401,13 +401,13 @@ def mock_analysis_engine():
                     'weight': 2.0,
                     'context': 'def calculate_total(items, tax_rate, discount):'
                 },
-                # NASA violations in C file
+                # General Safety violations in C file
                 {
-                    'id': 'NASA_001',
-                    'rule_id': 'NASA_RULE_3',
+                    'id': 'General Safety_001',
+                    'rule_id': 'General Safety_RULE_3',
                     'connascence_type': 'CoA',
                     'severity': 'critical',
-                    'description': 'Recursion detected - violates NASA JPL Rule 3',
+                    'description': 'Recursion detected - violates General Safety JPL Rule 3',
                     'file_path': str(path / 'src' / 'calculator.c'),
                     'line_number': 5,
                     'weight': 5.0,

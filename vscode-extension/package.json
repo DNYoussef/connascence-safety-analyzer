@@ -1,7 +1,7 @@
 {
   "name": "connascence-safety-analyzer",
   "displayName": "Connascence Safety Analyzer",
-  "description": "Enterprise-grade code analysis with NASA/JPL safety compliance and grammar-enhanced refactoring",
+  "description": "Enterprise-grade code analysis with Safety Standards/High Quality safety compliance and grammar-enhanced refactoring",
   "version": "1.0.0",
   "publisher": "connascence-systems",
   "engines": {
@@ -46,7 +46,7 @@
       },
       {
         "command": "connascence.validateSafety",
-        "title": "Validate NASA/JPL Safety",
+        "title": "Validate Safety Standards/High Quality Safety",
         "category": "Connascence"
       },
       {
@@ -113,7 +113,7 @@
       "properties": {
         "connascence.safetyProfile": {
           "type": "string",
-          "enum": ["none", "nasa_jpl_pot10", "nasa_loc_1", "nasa_loc_3", "modern_general"],
+          "enum": ["none", "general_safety_strict", "safety_level_1", "safety_level_3", "modern_general"],
           "default": "modern_general",
           "description": "Active safety profile for analysis"
         },

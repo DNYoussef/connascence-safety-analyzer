@@ -125,7 +125,7 @@
 "**89% developer adoption** with **8.4/10 satisfaction rating**. **38% faster onboarding** and **27% fewer coupling-related bugs**. **<3% false positive rate** means developers trust the results."
 
 ### For Architects (Technical Focus)
-"**12,842 violations detected** across major open-source projects with **0% false positives** on mature codebases. **NASA POT-10 compliance** for safety-critical code and **multi-language intelligence** across Python, C, JavaScript."
+"**12,842 violations detected** across major open-source projects with **0% false positives** on mature codebases. **General Safety POT-10 compliance** for safety-critical code and **multi-language intelligence** across Python, C, JavaScript."
 
 ### For DevOps (Integration Focus)  
 "**2.3 minutes per 10K lines** analysis speed with **<4GB memory footprint**. **SARIF output** for GitHub Security tab. **99.7% uptime** in 90-day enterprise deployment."
@@ -137,7 +137,7 @@
 ### Unique Technology Positioning
 1. **Only tool** providing connascence-based coupling analysis with theoretical foundation
 2. **<3% false positive rate** vs industry standard 10-15% (5x better precision)  
-3. **Multi-language intelligence** with NASA POT-10 safety integration
+3. **Multi-language intelligence** with General Safety POT-10 safety integration
 4. **Autofix capabilities** with 78% success rate on parameter object refactors
 
 ### Enterprise Readiness Proof Points

@@ -1,14 +1,14 @@
-# NASA/JPL Power of Ten Rules - Safety Critical Profile
+# General Safety Standards Rules - Safety Critical Profile
 # 
-# This preset implements NASA/JPL's "Power of Ten" rules for safety-critical systems.
+# This preset implements General Safety's "Power of Ten" rules for safety-critical systems.
 # Based on Gerard J. Holzmann's JPL Coding Standard (Spinroot.com/gerard/pdf/P10.pdf)
 #
 # These rules are designed for flight software and embedded systems where
 # reliability and predictability are paramount over performance or convenience.
 
-name: "NASA JPL Power of Ten"
+name: "General Safety JPL Power of Ten"
 version: "1.0.0"
-description: "Safety-critical coding standard based on NASA/JPL Power of Ten rules"
+description: "Safety-critical coding standard based on General Safety Standards"
 inherit: "strict-core"
 
 # Build Requirements (Rule 10: Warnings = Errors)
@@ -25,7 +25,7 @@ build_requirements:
     clang: "10.0"
     msvc: "19.28"  # VS 2019 16.8
 
-# NASA Power of Ten Rule Enforcement
+# General Safety Power of Ten Rule Enforcement
 nasa_rules:
   # Rule 1: Avoid complex flow constructs
   rule_1_flow_control:
@@ -111,7 +111,7 @@ thresholds:
   god_class_methods: 15     # Smaller classes in safety code
   god_class_loc: 300
   max_file_length: 800
-  max_function_length: 60   # NASA Rule 4
+  max_function_length: 60   # General Safety Rule 4
   max_method_parameters: 4
   max_nesting_depth: 3
   magic_literal_threshold: 0  # No magic numbers allowed
@@ -125,7 +125,7 @@ budgets:
   medium: 10
   low: 20
   
-  # NASA Rule Categories
+  # General Safety Rule Categories
   nasa_rule_violations: 0  # Zero tolerance for Power of Ten violations
   heap_after_init: 0
   unbounded_loops: 0

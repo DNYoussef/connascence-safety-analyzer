@@ -59,7 +59,7 @@ Each sampled violation underwent manual verification:
 **Repository**: https://github.com/curl/curl  
 **SHA**: c72bb7aec4db2ad32f9d82758b4f55663d0ebd60  
 **Scope**: `lib/` directory only  
-**Profile**: safety_c_strict (NASA POT-10 overlay)  
+**Profile**: safety_c_strict (General Safety POT-10 overlay)  
 **Total Violations Found**: 0  
 **Audit Result**: Clean mature codebase - validates tool precision (no false positives possible)  
 **Significance**: Industry-standard C library with 25+ years of development

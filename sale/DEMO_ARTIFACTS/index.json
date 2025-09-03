@@ -7,7 +7,7 @@
   "profiles": [
     "modern_general",
     "safety_c_strict",
-    "nasa_jpl_pot10"
+    "general_safety_strict"
   ],
   "validation_type": "complete_codebase_analysis",
   "enterprise_scope": "production_dependencies_full_scan",
@@ -127,7 +127,7 @@
     "completeness_validation": "full repository traversal excluding tests/docs/vendor patterns"
   },
   "legal_disclaimers": {
-    "nasa_affiliation": "Not affiliated with or endorsed by NASA/JPL",
+    "nasa_affiliation": "Not affiliated with or endorsed by Safety Standards/High Quality",
     "enterprise_scope": "Results scoped to tested repositories and configurations",
     "accuracy_scope": "False positive rate applies to audited sample size and methodology"
   }

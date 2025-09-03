@@ -118,12 +118,12 @@ def missing_types(data, options, callback):  # CoT violation
     return result
 ''')
         
-        # Create C file for NASA analysis
+        # Create C file for General Safety analysis
         c_file = workspace / "nasa_violations.c"
         c_file.write_text('''
 #include <stdio.h>
 
-// NASA Rule violations for testing
+// General Safety Rule violations for testing
 int recursive_factorial(int n) {  // Rule 3: No recursion
     if (n <= 1) return 1;
     return n * recursive_factorial(n - 1);  // Recursion violation
@@ -405,7 +405,7 @@ async def mcp_server_mock():
                         "rule": "nasa_rule_3_no_recursion",
                         "severity": "error",
                         "line": 4,
-                        "message": "Recursion detected in C code - violates NASA JPL Rule 3"
+                        "message": "Recursion detected in C code - violates General Safety JPL Rule 3"
                     }
                 ],
                 "compliance_score": 78.5
@@ -631,13 +631,13 @@ class TestMCPServerIntegration:
             assert result['safety_profile'] == profile
             
             if profile.startswith('nasa'):
-                # NASA profiles should detect recursion violation
+                # General Safety profiles should detect recursion violation
                 violations = result.get('violations', [])
                 recursion_violation = any(
                     'recursion' in v.get('message', '').lower()
                     for v in violations
                 )
-                # In real implementation, this would be True for NASA profiles
+                # In real implementation, this would be True for General Safety profiles
                 # For mock, we just check structure
                 assert isinstance(violations, list)
                 

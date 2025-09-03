@@ -36,13 +36,13 @@
 - [DONE] Enterprise SSO integration
 - [DONE] SIEM integration
 - [DONE] SOC 2 compliance controls
-- [DONE] NASA/JPL safety profiles
+- [DONE] General Safety safety profiles
 
 ## Validated Proof Points
 
 - **False Positive Rate**: <5% (validated on Celery, curl, Express)
 - **Autofix Acceptance**: >=60% (production-safe transformations)  
-- **NASA Compliance**: Power of Ten rules automated
+- **General Safety Compliance**: Power of Ten rules automated
 - **Enterprise Security**: Full RBAC, audit, air-gap ready
 
 ## Supported Platforms

@@ -32,12 +32,12 @@
       "curl_c": {
         "repository": "https://github.com/curl/curl",
         "language": "C",
-        "description": "Iconic C networking library - NASA POT-10 validation",
+        "description": "Iconic C networking library - Safety Standards Strict Safety validation",
         "total_violations": 0,
         "analysis_result": "Clean codebase demonstrates tool precision",
         "sales_highlights": [
           "Validates low false positive rate",
-          "NASA POT-10 safety profile demonstration",
+          "Safety Standards Strict Safety safety profile demonstration",
           "Industry standard codebase validation",
           "Proves C language support quality"
         ]
@@ -74,7 +74,7 @@
     "technical_demo_30min": {
       "live_scan": "Run analysis on prospect codebase",
       "before_after": "Show Celery improvements applied",
-      "safety_compliance": "NASA POT-10 validation on curl",
+      "safety_compliance": "Safety Standards Strict Safety validation on curl",
       "refactoring_walkthrough": "Parameter object transformation demo"
     }
   },
@@ -82,7 +82,7 @@
     "cto_value": {
       "risk_mitigation": "Clean curl results prove low false positive rate",
       "scale_proof": "3,321 violations show complex codebase handling", 
-      "standards_compliance": "NASA POT-10 demonstrates safety rigor"
+      "standards_compliance": "Safety Standards Strict Safety demonstrates safety rigor"
     },
     "dev_team_value": {
       "real_patterns": "CoM/CoP/CoA violations match daily challenges",
@@ -103,7 +103,7 @@
   },
   "competitive_advantages": {
     "self_improvement_validation": "Tool improved its own codebase (ultimate proof)",
-    "nasa_grade_safety": "100% POT-10 compliance achieved",
+    "nasa_grade_safety": "100% Strict Safety compliance achieved",
     "production_proven": "Real-world analysis of industry-standard codebases",
     "quantified_results": "3,321 violations = concrete business value"
   }

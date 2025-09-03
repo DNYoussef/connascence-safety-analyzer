@@ -85,7 +85,7 @@ export class StatusBarManager {
     private formatProfile(profile: string): string {
         switch (profile) {
             case 'nasa_jpl_pot10':
-                return 'NASA/JPL';
+                return 'General Safety';
             case 'nasa_loc_1':
                 return 'LOC-1';
             case 'nasa_loc_3':

@@ -378,7 +378,7 @@ class TreeSitterBackend:
         """Check for violations of grammar overlay constraints."""
         violations = []
         
-        # NASA safety overlay checks
+        # General Safety safety overlay checks
         if overlay == 'nasa_c_safety':
             violations.extend(self._check_nasa_c_violations(ast))
         elif overlay == 'nasa_python_safety':
@@ -387,7 +387,7 @@ class TreeSitterBackend:
         return violations
     
     def _check_nasa_c_violations(self, ast: 'Node') -> List[Dict[str, Any]]:
-        """Check for NASA C safety violations."""
+        """Check for General Safety C safety violations."""
         violations = []
         
         # Rule 1: No goto statements
@@ -396,7 +396,7 @@ class TreeSitterBackend:
             violations.append({
                 "rule": "nasa_rule_1",
                 "type": "goto_forbidden",
-                "message": "NASA Rule 1: goto statements are forbidden",
+                "message": "General Safety Rule 1: goto statements are forbidden",
                 "line": node.start_point[0] + 1,
                 "column": node.start_point[1],
                 "severity": "critical"
@@ -408,7 +408,7 @@ class TreeSitterBackend:
             violations.append({
                 "rule": "nasa_rule_9", 
                 "type": "function_pointer_forbidden",
-                "message": "NASA Rule 9: function pointers should be avoided",
+                "message": "General Safety Rule 9: function pointers should be avoided",
                 "line": node.start_point[0] + 1,
                 "column": node.start_point[1],
                 "severity": "high"
@@ -417,7 +417,7 @@ class TreeSitterBackend:
         return violations
     
     def _check_nasa_python_violations(self, ast: 'Node') -> List[Dict[str, Any]]:
-        """Check for NASA Python safety violations (adapted rules).""" 
+        """Check for General Safety Python safety violations (adapted rules).""" 
         violations = []
         
         # Python adaptation: exec/eval forbidden (similar to C goto)
@@ -429,7 +429,7 @@ class TreeSitterBackend:
                     violations.append({
                         "rule": "nasa_rule_1_python",
                         "type": "dynamic_execution_forbidden", 
-                        "message": "NASA Rule 1 (Python): exec/eval statements are forbidden",
+                        "message": "General Safety Rule 1 (Python): exec/eval statements are forbidden",
                         "line": node.start_point[0] + 1,
                         "column": node.start_point[1],
                         "severity": "critical"

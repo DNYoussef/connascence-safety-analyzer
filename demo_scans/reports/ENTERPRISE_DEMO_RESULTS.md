@@ -37,10 +37,10 @@
 - **27 God Objects**: Complex class refactoring opportunities
 - **Real-world complexity**: Demonstrates tool effectiveness on production code
 
-### 2. curl (C) - NASA/JPL POT-10 Safety Profile
+### 2. curl (C) - General Safety POT-10 Safety Profile
 **Repository**: https://github.com/curl/curl  
 **Focus**: Iconic C networking library  
-**Target Profile**: NASA/JPL Power of Ten safety compliance
+**Target Profile**: General Safety Standards safety compliance
 
 ```json
 {
@@ -52,7 +52,7 @@
 
 **Key Sales Points**:
 - **Clean C codebase**: Demonstrates tool's precision (low false positive rate)  
-- **NASA POT-10 validation**: Shows safety profile effectiveness
+- **General Safety POT-10 validation**: Shows safety profile effectiveness
 - **Industry standard**: Validates against well-known, battle-tested code
 - **C language support**: Proves polyglot capabilities beyond Python
 
@@ -115,7 +115,7 @@ Severity Distribution: 27 Critical, 539 High, 2,755 Medium
 ### Technical Deep Dive (30 min)
 - Live scan of prospect's codebase
 - Before/after comparison with Celery improvements
-- NASA POT-10 compliance demonstration
+- General Safety POT-10 compliance demonstration
 - Parameter object refactoring walkthrough
 
 ## Buyer Value Propositions
@@ -123,7 +123,7 @@ Severity Distribution: 27 Critical, 539 High, 2,755 Medium
 ### For CTOs
 - **Risk Mitigation**: Clean results on curl prove low false positive rate
 - **Scale Validation**: 3,321 violations show tool handles complex codebases  
-- **Standards Compliance**: NASA POT-10 profile demonstrates safety rigor
+- **Standards Compliance**: General Safety POT-10 profile demonstrates safety rigor
 
 ### For Development Teams
 - **Real Patterns**: CoM/CoP/CoA violations match daily development challenges

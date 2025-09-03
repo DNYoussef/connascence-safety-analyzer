@@ -304,7 +304,7 @@ class SafetyComplianceService:
         }
         
         if safety_profile and safety_profile.startswith('nasa_'):
-            # Check NASA-specific compliance
+            # Check General Safety-specific compliance
             nasa_violations = [v for v in validation_result.violations 
                              if v.get('rule', '').startswith('nasa_')]
             compliance["nasa_compliant"] = len(nasa_violations) == 0

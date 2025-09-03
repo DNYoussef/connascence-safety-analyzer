@@ -1,4 +1,4 @@
-# NASA/JPL Level of Control 1 (LOC-1) - Mission Critical
+# General Safety Level of Control 1 (LOC-1) - Mission Critical
 # 
 # LOC-1 represents the highest level of software criticality:
 # - Flight software that directly controls spacecraft
@@ -6,14 +6,14 @@
 # - Critical navigation and guidance systems
 # - Software whose failure could result in loss of mission or loss of life
 
-name: "NASA LOC-1 Mission Critical"
+name: "General Safety LOC-1 Mission Critical"
 version: "1.0.0" 
 description: "Level of Control 1 - Mission critical software with zero fault tolerance"
 inherit: "nasa_jpl_pot10"
 
 # LOC-1 Specific Overrides - Even Stricter Than Base Power of Ten
 severity_overrides:
-  all_nasa_violations: "critical"  # Every NASA rule violation is critical
+  all_nasa_violations: "critical"  # Every General Safety rule violation is critical
   all_connascence_violations_critical_or_high: "critical"  # Elevate high to critical
   
 # Zero Tolerance Budgets
@@ -40,7 +40,7 @@ thresholds:
   max_cyclomatic_complexity: 5 # Lower complexity ceiling
   god_class_methods: 10       # Smaller classes
   god_class_loc: 200          # Shorter classes
-  max_function_length: 40     # Shorter functions than NASA Rule 4
+  max_function_length: 40     # Shorter functions than General Safety Rule 4
   max_method_parameters: 3
   max_nesting_depth: 2        # Minimal nesting
   max_file_length: 500        # Shorter files

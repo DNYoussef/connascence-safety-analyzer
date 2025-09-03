@@ -154,7 +154,7 @@ class GrammarEnhancedMCPExtension:
                             "type": "string",
                             "enum": ["nasa_jpl_pot10", "nasa_loc_1", "nasa_loc_3"],
                             "required": True,
-                            "description": "NASA safety profile to validate against"
+                            "description": "General Safety safety profile to validate against"
                         },
                         "generate_report": {
                             "type": "boolean",
@@ -450,7 +450,7 @@ class GrammarEnhancedMCPExtension:
             generate_report = args.get("generate_report", True)
             include_evidence = args.get("include_evidence", True)
             
-            # Create NASA-compliant analyzer
+            # Create General Safety-compliant analyzer
             analyzer = GrammarEnhancedAnalyzer(
                 enable_safety_profiles=True,
                 nasa_compliance=True
@@ -530,7 +530,7 @@ class GrammarEnhancedMCPExtension:
             }
     
     def _generate_nasa_recommendations(self, violation_types: Dict[str, int]) -> List[str]:
-        """Generate NASA-specific recommendations based on violation patterns."""
+        """Generate General Safety-specific recommendations based on violation patterns."""
         recommendations = []
         
         if "nasa_rule_1" in violation_types:
@@ -549,7 +549,7 @@ class GrammarEnhancedMCPExtension:
             recommendations.append("Add parameter validation and return value checking")
         
         if len(violation_types) > 5:
-            recommendations.append("Consider implementing a systematic code review process for NASA compliance")
+            recommendations.append("Consider implementing a systematic code review process for General Safety compliance")
         
         return recommendations
     
@@ -560,7 +560,7 @@ class GrammarEnhancedMCPExtension:
         elif compliance_percentage >= 80:
             return ["Focus on critical violations first", "Implement pre-commit hooks for compliance"]
         elif compliance_percentage >= 60:
-            return ["Systematic refactoring required", "Training on NASA coding standards recommended"]
+            return ["Systematic refactoring required", "Training on General Safety coding standards recommended"]
         else:
             return ["Major compliance issues detected", "Consider professional code audit", "Implement step-by-step compliance plan"]
 

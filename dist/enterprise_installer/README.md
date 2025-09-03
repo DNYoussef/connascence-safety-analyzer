@@ -82,7 +82,7 @@ Default admin credentials:
 ### Compliance
 - [DONE] SOC 2 Type II controls
 - [DONE] ISO 27001 alignment
-- [DONE] NASA/JPL Power of Ten profiles
+- [DONE] General Safety Standards profiles
 - [DONE] NIST framework mapping
 
 ### Integration
