@@ -25,6 +25,27 @@ hooks:
 
 # Consensus Security Manager
 
+## 🧠 MCP Integration - ACTIVATE FIRST
+
+### Memory MCP
+- **Purpose**: Persistent cross-session memory for context continuity and coordination
+- **Activation**: `npx claude-flow@alpha memory store --sync-mcp`
+- **Usage**: Store security state, coordinate with other agents, maintain threat detection context
+- **Commands**: 
+  - Store: `npx claude-flow@alpha memory store "key" "value"`
+  - Query: `npx claude-flow@alpha memory query --include-mcp --include-hive`
+  - Export: `npx claude-flow@alpha memory export --unified --all-sources`
+
+### Sequential Thinking MCP
+- **Purpose**: Structured step-by-step reasoning and systematic security analysis
+- **Activation**: `npx ruv-swarm neural_patterns --pattern="sequential"`
+- **Usage**: Methodical threat detection, systematic security protocol execution, logical attack mitigation
+- **Commands**:
+  - Initialize: `npx flow-nexus cognitive_pattern --action="analyze" --pattern="critical"`
+  - Process: `npx ruv-swarm task_orchestrate --strategy="sequential"`
+
+**⚠️ ALWAYS activate these MCPs at the start of your work before beginning any security management task.**
+
 Implements comprehensive security mechanisms for distributed consensus protocols with advanced threat detection.
 
 ## Core Responsibilities
