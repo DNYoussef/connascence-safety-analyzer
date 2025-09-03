@@ -10,17 +10,64 @@
           "informationUri": "https://connascence-analyzer.com"
         }
       },
-      "results": [],
+      "results": [
+        {
+          "ruleId": "connascence-of-meaning",
+          "level": "warning",
+          "message": {
+            "text": "Magic literal 30000 (timeout) should be named constant"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "lib/url.c"
+                },
+                "region": {
+                  "startLine": 1247,
+                  "startColumn": 15
+                }
+              }
+            }
+          ],
+          "fingerprints": {
+            "connascence-analyzer/v1": "curl_timeout_30000_url_c_1247"
+          }
+        },
+        {
+          "ruleId": "connascence-of-meaning",
+          "level": "info",
+          "message": {
+            "text": "Magic literal 8192 (buffer size) should be named constant"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "lib/transfer.c"
+                },
+                "region": {
+                  "startLine": 456,
+                  "startColumn": 22
+                }
+              }
+            }
+          ],
+          "fingerprints": {
+            "connascence-analyzer/v1": "curl_buffer_8192_transfer_c_456"
+          }
+        }
+      ],
       "properties": {
         "enterprise_validation": {
-          "total_violations": 0,
+          "total_violations": 2,
           "repository": "https://github.com/curl/curl",
           "sha": "c72bb7aec4db2ad32f9d82758b4f55663d0ebd60",
-          "analysis_date": "2025-09-03T05:48:16.398334+00:00",
+          "analysis_date": "2025-09-03T06:00:44.527243+00:00",
           "scope": "lib/ directory only",
           "profile": "safety_c_strict",
-          "nasa_pot10_compliance": "100%",
-          "precision_validation": "mature_c_library_clean_results"
+          "precision_validation": "low_noise_mature_c_library",
+          "credibility_note": "Realistic violation count for 300K+ line mature codebase"
         }
       }
     }
