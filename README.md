@@ -288,11 +288,12 @@ connascence-safety-analyzer/
 │   │   ├── curl_CLEAN_validation.json   # 0 violations (precision proof)
 │   │   └── express_CLEAN_validation.json # 0 violations (polyglot proof)
 │   └── ULTIMATE_ENTERPRISE_DEMO.md     # Complete validation summary
-├── sales_artifacts/            # Executive Sales Materials
-│   ├── POLISH_RESULTS.md      # Self-improvement metrics (+23.6% quality)
-│   ├── ENTERPRISE_DEMO.md     # 15-minute demo script
-│   ├── ACCURACY.md            # Precision/recall validation
-│   └── DASHBOARD_METRICS.md   # Executive dashboards (89/100 score)
+├── data-room/                  # Professional Buyer Materials
+│   ├── START_HERE.md          # 5-minute buyer entrance
+│   ├── executive/             # CTO/CISO materials (ROI, security, implementation)
+│   ├── technical/             # Dev team validation (MCP tools, policy matrix)
+│   ├── demo/                  # Proof tools (smoke test, POC guide)
+│   └── artifacts/             # Evidence organization
 └── tests/                     # Production Test Suite
     ├── test_enterprise_scale.py
     ├── test_General Safety_compliance.py

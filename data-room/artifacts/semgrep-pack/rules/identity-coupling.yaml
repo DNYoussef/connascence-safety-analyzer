@@ -1,0 +1,310 @@
+rules:
+  # Identity Coupling - Object Reference Dependencies
+  - id: object-identity-comparison
+    pattern-either:
+      - pattern: |
+          if ($OBJ1 === $OBJ2) { ... }
+      - pattern: |
+          if ($OBJ1 == $OBJ2) { ... }
+      - pattern: |
+          $OBJ1 is $OBJ2
+      - pattern: |
+          if ($OBJ1 == $OBJ2) { ... }
+    message: |
+      Object identity comparison creates tight coupling to specific object instances.
+      Changes to object creation or references break this comparison.
+      Consider comparing object properties or using equals methods instead.
+    languages:
+      - javascript
+      - typescript
+      - python
+      - java
+    severity: WARNING
+    metadata:
+      category: identity-coupling
+      confidence: MEDIUM
+      impact: MEDIUM
+      likelihood: HIGH
+      fix_guidance: |
+        Compare by value instead of identity:
+        ```javascript
+        // Before - identity coupling
+        if (user1 === user2) { ... }
+        
+        // After - value comparison
+        if (user1.id === user2.id) { ... }
+        // Or use equals method
+        if (user1.equals(user2)) { ... }
+        ```
+
+  - id: singleton-identity-coupling
+    pattern-either:
+      - pattern: |
+          if ($VAR === $SINGLETON.getInstance()) { ... }
+      - pattern: |
+          if ($VAR == $SINGLETON.instance) { ... }
+      - pattern: |
+          return $SINGLETON === $OTHER_SINGLETON;
+    message: |
+      Singleton identity comparison creates coupling to singleton implementation.
+      Code depends on specific singleton instance rather than behavior.
+      Consider dependency injection or interface-based design.
+    languages:
+      - javascript
+      - typescript
+      - java
+    severity: WARNING
+    metadata:
+      category: identity-coupling
+      confidence: HIGH
+      impact: HIGH
+      likelihood: MEDIUM
+      fix_guidance: |
+        Use dependency injection:
+        ```javascript
+        // Before - singleton identity coupling
+        if (logger === Logger.getInstance()) { ... }
+        
+        // After - dependency injection
+        class Service {
+          constructor(logger) {
+            this.logger = logger;
+          }
+          
+          someMethod() {
+            if (this.logger.isEnabled()) { ... }
+          }
+        }
+        ```
+
+  - id: null-object-identity-coupling
+    pattern-either:
+      - pattern: |
+          if ($VAR === NULL_OBJECT) { ... }
+      - pattern: |
+          if ($VAR == NULL_OBJECT) { ... }
+      - pattern: |
+          return $VAR === NullObject.instance;
+    message: |
+      Null object identity comparison creates coupling to specific null object instance.
+      Consider using proper null object pattern or optional types.
+    languages:
+      - javascript
+      - typescript
+      - java
+    severity: INFO
+    metadata:
+      category: identity-coupling
+      confidence: MEDIUM
+      impact: LOW
+      likelihood: MEDIUM
+      fix_guidance: |
+        Use proper null object pattern:
+        ```javascript
+        // Before - identity coupling to null object
+        if (user === NullUser.instance) { ... }
+        
+        // After - behavior-based null object
+        if (user.isNull()) { ... }
+        // Or use optional types
+        if (!user.isPresent()) { ... }
+        ```
+
+  - id: array-reference-coupling
+    pattern-either:
+      - pattern: |
+          if ($ARR1 === $ARR2) { ... }
+      - pattern: |
+          if ($ARR1 == $ARR2) { ... }
+      - pattern: |
+          $ARR1 is $ARR2
+    message: |
+      Array reference comparison creates identity coupling.
+      Arrays with same contents but different references will compare as unequal.
+      Compare array contents instead of references.
+    languages:
+      - javascript
+      - typescript
+      - python
+    severity: WARNING
+    metadata:
+      category: identity-coupling
+      confidence: HIGH
+      impact: MEDIUM
+      likelihood: HIGH
+      fix_guidance: |
+        Compare array contents:
+        ```javascript
+        // Before - reference comparison
+        if (arr1 === arr2) { ... }
+        
+        // After - content comparison
+        if (arr1.length === arr2.length && 
+            arr1.every((val, i) => val === arr2[i])) { ... }
+        // Or use utility function
+        if (_.isEqual(arr1, arr2)) { ... }
+        ```
+
+  - id: function-identity-coupling
+    pattern-either:
+      - pattern: |
+          if ($FUNC1 === $FUNC2) { ... }
+      - pattern: |
+          if ($CALLBACK === $EXPECTED_CALLBACK) { ... }
+      - pattern: |
+          $HANDLERS.includes($SPECIFIC_HANDLER)
+    message: |
+      Function identity comparison creates coupling to specific function instances.
+      Function comparison by reference is fragile and implementation-dependent.
+      Consider using function names, tags, or behavior-based identification.
+    languages:
+      - javascript
+      - typescript
+    severity: WARNING
+    metadata:
+      category: identity-coupling
+      confidence: MEDIUM
+      impact: MEDIUM
+      likelihood: MEDIUM
+      fix_guidance: |
+        Use function identification by name or behavior:
+        ```javascript
+        // Before - function identity coupling
+        if (handler === specificHandler) { ... }
+        
+        // After - name-based identification
+        if (handler.name === 'specificHandler') { ... }
+        // Or use function tagging
+        handler.tag = 'specific';
+        if (handler.tag === 'specific') { ... }
+        ```
+
+  - id: class-instance-identity-coupling
+    pattern-either:
+      - pattern: |
+          if ($OBJ.constructor === $CLASS) { ... }
+      - pattern: |
+          if (instanceof $CLASS === instanceof $OTHER_CLASS) { ... }
+      - pattern: |
+          if ($OBJ.__class__ is $CLASS) { ... }
+    message: |
+      Class constructor identity comparison creates coupling to specific class implementation.
+      Consider using instanceof checks or interface-based design.
+    languages:
+      - javascript
+      - typescript
+      - python
+    severity: INFO
+    metadata:
+      category: identity-coupling
+      confidence: MEDIUM
+      impact: MEDIUM
+      likelihood: MEDIUM
+      fix_guidance: |
+        Use instanceof or interface checks:
+        ```javascript
+        // Before - constructor identity coupling
+        if (obj.constructor === MyClass) { ... }
+        
+        // After - instanceof check
+        if (obj instanceof MyClass) { ... }
+        // Or interface-based check
+        if ('requiredMethod' in obj) { ... }
+        ```
+
+  - id: dom-element-identity-coupling
+    pattern-either:
+      - pattern: |
+          if ($ELEMENT === document.getElementById($ID)) { ... }
+      - pattern: |
+          if ($NODE === $PARENT.firstChild) { ... }
+      - pattern: |
+          $ELEMENTS.includes($SPECIFIC_ELEMENT)
+    message: |
+      DOM element identity comparison creates coupling to specific element instances.
+      DOM elements can be recreated, making identity checks unreliable.
+      Compare by element attributes, IDs, or use element queries.
+    languages:
+      - javascript
+      - typescript
+    severity: WARNING
+    metadata:
+      category: identity-coupling
+      confidence: MEDIUM
+      impact: MEDIUM
+      likelihood: HIGH
+      fix_guidance: |
+        Compare by element attributes:
+        ```javascript
+        // Before - element identity coupling
+        if (element === document.getElementById('myId')) { ... }
+        
+        // After - attribute-based comparison
+        if (element.id === 'myId') { ... }
+        // Or use element queries
+        if (element.matches('#myId')) { ... }
+        ```
+
+  - id: promise-identity-coupling
+    pattern-either:
+      - pattern: |
+          if ($PROMISE1 === $PROMISE2) { ... }
+      - pattern: |
+          $PROMISES.includes($SPECIFIC_PROMISE)
+      - pattern: |
+          if ($ASYNC_RESULT === $EXPECTED_PROMISE) { ... }
+    message: |
+      Promise identity comparison creates coupling to specific promise instances.
+      Promises are typically one-time objects, making identity checks unreliable.
+      Compare promise results or use promise coordination patterns.
+    languages:
+      - javascript
+      - typescript
+    severity: INFO
+    metadata:
+      category: identity-coupling
+      confidence: MEDIUM
+      impact: LOW
+      likelihood: LOW
+      fix_guidance: |
+        Compare promise results or use coordination:
+        ```javascript
+        // Before - promise identity coupling
+        if (promise1 === promise2) { ... }
+        
+        // After - result comparison
+        const [result1, result2] = await Promise.all([promise1, promise2]);
+        if (result1.id === result2.id) { ... }
+        ```
+
+  - id: event-object-identity-coupling
+    pattern-either:
+      - pattern: |
+          if ($EVENT === $CACHED_EVENT) { ... }
+      - pattern: |
+          if ($EVENT.target === $SPECIFIC_ELEMENT) { ... }
+      - pattern: |
+          $EVENT_CACHE.has($EVENT)
+    message: |
+      Event object identity coupling creates dependencies on specific event instances.
+      Event objects are typically short-lived and should not be stored by reference.
+      Compare event properties instead of object identity.
+    languages:
+      - javascript
+      - typescript
+    severity: INFO
+    metadata:
+      category: identity-coupling
+      confidence: MEDIUM
+      impact: LOW
+      likelihood: MEDIUM
+      fix_guidance: |
+        Compare event properties:
+        ```javascript
+        // Before - event identity coupling
+        if (event === cachedEvent) { ... }
+        
+        // After - property comparison
+        if (event.type === cachedEventType && 
+            event.target === cachedTarget) { ... }
+        ```

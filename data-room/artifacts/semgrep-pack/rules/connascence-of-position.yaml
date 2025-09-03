@@ -1,0 +1,182 @@
+# Connascence of Position (CoP) Rules
+# Detects parameter ordering dependencies and positional coupling
+
+rules:
+  - id: excessive-parameters-position-coupling
+    message: |
+      Function with 5+ parameters creates Connascence of Position (CoP).
+      Consider using an options object or parameter object pattern.
+      
+      Enterprise impact: High parameter count increases bug risk and reduces maintainability.
+      Refactor to: function processOrder({customerId, items, shippingAddress, paymentMethod, options})
+    severity: ERROR
+    languages: [javascript, typescript]
+    patterns:
+      - pattern: |
+          function $FUNC($A, $B, $C, $D, $E, ...) { ... }
+      - pattern: |
+          const $FUNC = ($A, $B, $C, $D, $E, ...) => { ... }
+      - pattern: |
+          ($A, $B, $C, $D, $E, ...) => { ... }
+    metadata:
+      category: connascence-of-position
+      subcategory: parameter-count
+      confidence: HIGH
+      impact: HIGH
+      effort: MEDIUM
+      enterprise_priority: HIGH
+      technical_debt: "High maintenance cost due to parameter ordering dependencies"
+
+  - id: constructor-parameter-ordering
+    message: |
+      Constructor with multiple parameters of same type creates CoP risk.
+      Consider builder pattern or parameter object.
+      
+      Example: new User({name, email, age}) instead of new User(name, email, age)
+    severity: WARNING
+    languages: [javascript, typescript, java, csharp]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              new $CLASS($A, $B, $C, $D)
+          - pattern: |
+              constructor($A, $B, $C, $D) { ... }
+    metadata:
+      category: connascence-of-position
+      subcategory: constructor-coupling
+      confidence: MEDIUM
+      impact: MEDIUM
+      effort: MEDIUM
+
+  - id: array-destructuring-position-coupling
+    message: |
+      Deep array destructuring creates position coupling (CoP).
+      Consider using object destructuring or limiting destructuring depth.
+      
+      Risky pattern: const [,,, fourthItem] = array; // Fragile to array changes
+    severity: INFO
+    languages: [javascript, typescript]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              const [$A, $B, $C, $D, $E] = $ARRAY
+          - pattern: |
+              const [, , , $ITEM] = $ARRAY
+          - pattern: |
+              const [, , $ITEM, , $OTHER] = $ARRAY
+    metadata:
+      category: connascence-of-position
+      subcategory: array-destructuring
+      confidence: MEDIUM
+      impact: LOW
+      effort: LOW
+
+  - id: callback-parameter-position
+    message: |
+      Callback functions with positional parameters create CoP coupling.
+      Consider named parameters or options object.
+      
+      Enterprise concern: Callback parameter changes break consumer code.
+    severity: WARNING
+    languages: [javascript, typescript]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $FUNC(($A, $B, $C, $D) => { ... })
+          - pattern: |
+              callback($ERROR, $DATA, $META, $EXTRA)
+          - pattern: |
+              on('event', ($A, $B, $C) => { ... })
+    metadata:
+      category: connascence-of-position
+      subcategory: callback-coupling
+      confidence: MEDIUM
+      impact: MEDIUM
+      effort: MEDIUM
+
+  - id: sql-parameter-position-coupling
+    message: |
+      Positional SQL parameters create database coupling (CoP).
+      Consider named parameters for better maintainability.
+      
+      Safer: SELECT * FROM users WHERE name = :name AND age > :minAge
+    severity: WARNING
+    languages: [javascript, typescript, python, java]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              "SELECT * FROM $TABLE WHERE $COL = ? AND $COL2 = ? AND $COL3 = ?"
+          - pattern: |
+              query($SQL, [$A, $B, $C, $D])
+          - pattern: |
+              execute($SQL, $A, $B, $C)
+    metadata:
+      category: connascence-of-position
+      subcategory: sql-parameters
+      confidence: HIGH
+      impact: MEDIUM
+      effort: LOW
+      database_coupling: HIGH
+
+  - id: api-response-array-position
+    message: |
+      API responses using positional arrays create client coupling (CoP).
+      Consider using objects with named fields.
+      
+      Better: {userId: 123, userName: "john", userEmail: "john@example.com"}
+    severity: ERROR
+    languages: [javascript, typescript]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              response.json([$ID, $NAME, $EMAIL])
+          - pattern: |
+              return [$STATUS, $DATA, $MESSAGE]
+          - pattern: |
+              send([$ERROR_CODE, $ERROR_MSG])
+    metadata:
+      category: connascence-of-position
+      subcategory: api-response
+      confidence: HIGH
+      impact: HIGH
+      effort: LOW
+      api_stability: CRITICAL
+
+  - id: tuple-position-coupling
+    message: |
+      Large tuples create position coupling (CoP) risks.
+      Consider using structured data types.
+      
+      Enterprise impact: Tuple changes break dependent code silently.
+    severity: WARNING
+    languages: [python, typescript]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              ($A, $B, $C, $D, $E)
+          - pattern: |
+              return $A, $B, $C, $D
+    metadata:
+      category: connascence-of-position
+      subcategory: tuple-coupling
+      confidence: MEDIUM
+      impact: MEDIUM
+      effort: MEDIUM
+
+  - id: method-chaining-position-coupling
+    message: |
+      Long method chains with positional parameters create CoP coupling.
+      Consider fluent interfaces with named methods.
+      
+      Example: query.where('name', '=', value).limit(10).offset(20)
+    severity: INFO
+    languages: [javascript, typescript, java]
+    patterns:
+      - pattern: |
+          $OBJ.$METHOD($A, $B).$METHOD2($C, $D).$METHOD3($E, $F)
+    metadata:
+      category: connascence-of-position
+      subcategory: method-chaining
+      confidence: LOW
+      impact: LOW
+      effort: HIGH

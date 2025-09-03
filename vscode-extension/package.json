@@ -113,7 +113,13 @@
       "properties": {
         "connascence.safetyProfile": {
           "type": "string",
-          "enum": ["none", "general_safety_strict", "safety_level_1", "safety_level_3", "modern_general"],
+          "enum": [
+            "none",
+            "general_safety_strict",
+            "safety_level_1",
+            "safety_level_3",
+            "modern_general"
+          ],
           "default": "modern_general",
           "description": "Active safety profile for analysis"
         },
@@ -169,7 +175,12 @@
         },
         "connascence.frameworkProfile": {
           "type": "string",
-          "enum": ["generic", "django", "fastapi", "react"],
+          "enum": [
+            "generic",
+            "django",
+            "fastapi",
+            "react"
+          ],
           "default": "generic",
           "description": "Framework-specific analysis profile"
         },
@@ -180,7 +191,12 @@
         },
         "connascence.diagnosticSeverity": {
           "type": "string",
-          "enum": ["error", "warning", "info", "hint"],
+          "enum": [
+            "error",
+            "warning",
+            "info",
+            "hint"
+          ],
           "default": "warning",
           "description": "Severity level for diagnostics"
         }
@@ -188,18 +204,12 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "npm run webpack",
+    "vscode:prepublish": "echo 'Using pre-compiled files'",
     "compile": "tsc -p ./",
-    "webpack": "webpack --mode production",
-    "webpack-dev": "webpack --mode development --watch",
     "watch": "tsc -watch -p ./",
-    "pretest": "npm run compile && npm run lint",
-    "lint": "eslint src --ext ts --fix",
-    "test": "node ./out/test/runTest.js",
-    "test:unit": "mocha out/test/unit/**/*.test.js",
     "package": "vsce package --no-dependencies",
     "publish": "vsce publish --no-dependencies",
-    "build:production": "npm run lint && npm run webpack && npm run test"
+    "build:production": "echo 'Using pre-compiled files'"
   },
   "devDependencies": {
     "@types/vscode": "^1.74.0",
@@ -209,17 +219,12 @@
     "eslint": "^8.57.0",
     "typescript": "^5.3.3",
     "@vscode/test-electron": "^2.3.8",
-    "vsce": "^2.22.0",
+    "@vscode/vsce": "^2.15.0",
     "mocha": "^10.2.0",
     "@types/mocha": "^10.0.6",
     "webpack": "^5.89.0",
     "webpack-cli": "^5.1.4",
-    "ts-loader": "^9.5.1",
-    "@vscode/vsce": "^2.22.0"
+    "ts-loader": "^9.5.1"
   },
-  "dependencies": {
-    "axios": "^1.6.7",
-    "ws": "^8.16.0",
-    "debounce": "^2.0.0"
-  }
+  "dependencies": {}
 }

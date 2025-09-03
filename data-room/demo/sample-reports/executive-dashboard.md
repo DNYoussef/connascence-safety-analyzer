@@ -211,6 +211,19 @@ Projected Annual: $2.8M (117% of target)
 
 ---
 
+## Visual Dashboard Examples
+
+![Dashboard Overview](../../artifacts/screenshots/dashboard-overview.png)
+*Executive dashboard showing violation distribution, team scores, debt reduction, and risk levels*
+
+![Analysis Details](../../artifacts/screenshots/analysis-details.png)  
+*Detailed connascence analysis and performance improvements*
+
+![ROI Trends](../../artifacts/screenshots/roi-trends.png)
+*ROI progression and quarterly percentage improvements*
+
+---
+
 ## Questions or Deep Dive?
 
 **Detailed Technical Analysis**: [See Technical Reports](../technical/detailed-analysis.md)  

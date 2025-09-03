@@ -1,0 +1,244 @@
+# Connascence of Identity (CoI) Rules
+# Detects object identity and reference coupling issues
+
+rules:
+  - id: object-reference-coupling
+    message: |
+      Object reference coupling detected (CoI).
+      Multiple references to same object create identity dependencies.
+      
+      Enterprise risk: Unexpected mutations affect multiple parts of system.
+      Consider immutable objects or explicit copying.
+    severity: WARNING
+    languages: [javascript, typescript]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              const $REF1 = $OBJECT;
+              const $REF2 = $OBJECT;
+              $REF1.$PROPERTY = $VALUE;
+          - pattern: |
+              function $FUNC($OBJ) {
+                $OBJ.$PROP = $NEW_VALUE;
+                return $OBJ;
+              }
+          - pattern: |
+              const $SHARED = $GLOBAL_OBJECT;
+              $SHARED.$METHOD();
+    metadata:
+      category: connascence-of-identity
+      subcategory: reference-sharing
+      confidence: MEDIUM
+      impact: MEDIUM
+      effort: MEDIUM
+      mutation_risk: HIGH
+      enterprise_priority: MEDIUM
+
+  - id: singleton-identity-coupling
+    message: |
+      Singleton identity coupling detected (CoI).
+      Multiple components depend on same singleton instance identity.
+      
+      Enterprise concern: Global state makes testing and modularity difficult.
+      Consider dependency injection or service locator pattern.
+    severity: ERROR
+    languages: [javascript, typescript, java, csharp]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              class $SINGLETON {
+                static instance = null;
+                static getInstance() {
+                  if (!this.instance) {
+                    this.instance = new $SINGLETON();
+                  }
+                  return this.instance;
+                }
+              }
+          - pattern: |
+              const instance = $SINGLETON.getInstance();
+              instance.$METHOD();
+          - pattern: |
+              export const $GLOBAL_INSTANCE = new $CLASS();
+    metadata:
+      category: connascence-of-identity
+      subcategory: singleton-coupling
+      confidence: HIGH
+      impact: HIGH
+      effort: HIGH
+      testability_impact: HIGH
+      modularity_impact: HIGH
+
+  - id: shared-mutable-state
+    message: |
+      Shared mutable state creates identity coupling (CoI).
+      Multiple functions/components modify same object reference.
+      
+      Enterprise impact: Difficult to track state changes and debug issues.
+      Consider immutable state management patterns.
+    severity: ERROR
+    languages: [javascript, typescript]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              let $SHARED_STATE = { ... };
+              function $FUNC1() {
+                $SHARED_STATE.$PROP = $VALUE1;
+              }
+              function $FUNC2() {
+                $SHARED_STATE.$PROP = $VALUE2;
+              }
+          - pattern: |
+              const $GLOBAL = {};
+              export function $MUTATOR1() {
+                $GLOBAL.$FIELD = $NEW_VALUE;
+              }
+              export function $MUTATOR2() {
+                delete $GLOBAL.$FIELD;
+              }
+    metadata:
+      category: connascence-of-identity
+      subcategory: shared-mutation
+      confidence: HIGH
+      impact: HIGH
+      effort: MEDIUM
+      debugging_difficulty: HIGH
+
+  - id: dom-element-identity-coupling
+    message: |
+      DOM element identity coupling detected (CoI).
+      Multiple components depend on specific DOM element instances.
+      
+      Frontend risk: Fragile when DOM structure changes.
+      Consider event delegation or component-based references.
+    severity: WARNING
+    languages: [javascript, typescript]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              const $ELEMENT = document.getElementById('$ID');
+              $COMPONENT1.attachTo($ELEMENT);
+              $COMPONENT2.observe($ELEMENT);
+          - pattern: |
+              const $NODE = document.querySelector('$SELECTOR');
+              $HANDLER1($NODE);
+              $HANDLER2($NODE);
+    metadata:
+      category: connascence-of-identity
+      subcategory: dom-coupling
+      confidence: HIGH
+      impact: MEDIUM
+      effort: LOW
+      frontend_fragility: HIGH
+
+  - id: database-connection-identity-coupling
+    message: |
+      Database connection identity coupling detected (CoI).
+      Multiple modules depend on same connection instance.
+      
+      Enterprise risk: Connection state changes affect multiple services.
+      Consider connection pooling or per-operation connections.
+    severity: ERROR
+    languages: [javascript, typescript, python, java]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              const $CONNECTION = database.connect($CONFIG);
+              module1.setConnection($CONNECTION);
+              module2.setConnection($CONNECTION);
+          - pattern: |
+              export const dbConnection = new Connection($CONFIG);
+          - pattern: |
+              global.DB_INSTANCE = connect($DB_URL);
+    metadata:
+      category: connascence-of-identity
+      subcategory: connection-sharing
+      confidence: HIGH
+      impact: CRITICAL
+      effort: MEDIUM
+      scalability_impact: HIGH
+
+  - id: cache-instance-identity-coupling
+    message: |
+      Cache instance identity coupling detected (CoI).
+      Multiple components share same cache instance reference.
+      
+      Enterprise concern: Cache state changes have unpredictable effects.
+      Consider cache abstraction layer or namespaced caches.
+    severity: WARNING
+    languages: [javascript, typescript, python, java]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              const $CACHE = new Cache();
+              service1.setCache($CACHE);
+              service2.setCache($CACHE);
+          - pattern: |
+              export const sharedCache = createCache();
+          - pattern: |
+              const cache = Cache.getInstance();
+              cache.set($KEY, $VALUE);
+    metadata:
+      category: connascence-of-identity
+      subcategory: cache-sharing
+      confidence: MEDIUM
+      impact: MEDIUM
+      effort: MEDIUM
+
+  - id: array-reference-mutation-coupling
+    message: |
+      Array reference mutation coupling detected (CoI).
+      Array passed by reference and mutated by multiple functions.
+      
+      Enterprise risk: Unexpected array modifications break assumptions.
+      Consider array copying or immutable data structures.
+    severity: WARNING
+    languages: [javascript, typescript, python]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              function $FUNC1($ARRAY) {
+                $ARRAY.push($ITEM);
+                return $ARRAY;
+              }
+              function $FUNC2($ARRAY) {
+                $ARRAY.pop();
+                return $ARRAY;
+              }
+          - pattern: |
+              const $SHARED_ARRAY = [];
+              $FUNC1($SHARED_ARRAY);
+              $FUNC2($SHARED_ARRAY);
+    metadata:
+      category: connascence-of-identity
+      subcategory: array-mutation
+      confidence: MEDIUM
+      impact: MEDIUM
+      effort: LOW
+
+  - id: prototype-identity-coupling
+    message: |
+      Prototype identity coupling detected (CoI).
+      Modifications to prototype affect all instances.
+      
+      Enterprise impact: Global prototype changes have far-reaching effects.
+      Avoid prototype modifications in application code.
+    severity: ERROR
+    languages: [javascript, typescript]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              Array.prototype.$METHOD = function() { ... };
+          - pattern: |
+              String.prototype.$PROPERTY = $VALUE;
+          - pattern: |
+              Object.prototype.$FUNCTION = $IMPL;
+          - pattern: |
+              $CONSTRUCTOR.prototype.$ADDITION = $VALUE;
+    metadata:
+      category: connascence-of-identity
+      subcategory: prototype-modification
+      confidence: HIGH
+      impact: CRITICAL
+      effort: LOW
+      global_impact: CRITICAL

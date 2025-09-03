@@ -173,9 +173,9 @@ This live demo shows Connascence analyzing real code and identifying coupling is
 - **Q&A Session**: Schedule follow-up discussion
 
 ### Demo Resources
-- [Sample Reports](./sample-reports/) - Real analysis outputs
+- [Sample Reports](./sample-reports/) - Real analysis outputs with visual dashboards
 - [POC Guide](./poc-guide.md) - Set up your own test environment
-- [Integration Examples](../technical/integration.md) - See how it fits your stack
+- [Integration Examples](../technical/architecture.md) - See how it fits your stack
 
 ---
 

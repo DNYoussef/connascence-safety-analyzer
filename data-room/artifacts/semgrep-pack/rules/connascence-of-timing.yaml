@@ -1,0 +1,222 @@
+# Connascence of Timing (CoT) Rules
+# Detects race conditions, timing dependencies, and concurrency issues
+
+rules:
+  - id: race-condition-shared-state
+    message: |
+      Potential race condition detected in shared state access (CoT).
+      Multiple async operations modifying shared state without synchronization.
+      
+      Enterprise risk: Race conditions cause data corruption and unpredictable behavior.
+      Consider using mutex, semaphore, or atomic operations.
+    severity: ERROR
+    languages: [javascript, typescript]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              async function $FUNC() {
+                ...
+                $SHARED_VAR = $VALUE;
+                ...
+                await $ASYNC_CALL;
+                ...
+                $SHARED_VAR = $OTHER_VALUE;
+                ...
+              }
+          - pattern: |
+              $GLOBAL_VAR++;
+              await $PROMISE;
+              $GLOBAL_VAR--;
+    metadata:
+      category: connascence-of-timing
+      subcategory: race-conditions
+      confidence: HIGH
+      impact: CRITICAL
+      effort: HIGH
+      enterprise_priority: CRITICAL
+      reliability_impact: "Data corruption, inconsistent state"
+      concurrency_risk: HIGH
+
+  - id: async-callback-timing-dependency
+    message: |
+      Callback timing dependency detected (CoT).
+      Execution order depends on async operation completion timing.
+      
+      Enterprise concern: Non-deterministic behavior in production systems.
+      Consider Promise.all() or explicit sequencing.
+    severity: ERROR
+    languages: [javascript, typescript]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $ASYNC1($CALLBACK1);
+              $ASYNC2($CALLBACK2);
+          - pattern: |
+              setTimeout(() => { $CALLBACK1() }, $TIME1);
+              setTimeout(() => { $CALLBACK2() }, $TIME2);
+          - pattern: |
+              $EVENT_EMITTER.on('event1', $HANDLER1);
+              $EVENT_EMITTER.on('event2', $HANDLER2);
+              $EVENT_EMITTER.emit('event1');
+              $EVENT_EMITTER.emit('event2');
+    metadata:
+      category: connascence-of-timing
+      subcategory: callback-ordering
+      confidence: HIGH
+      impact: HIGH
+      effort: MEDIUM
+      determinism: LOW
+
+  - id: database-transaction-timing
+    message: |
+      Database operations outside transaction create timing coupling (CoT).
+      Multiple DB operations should be wrapped in transaction for consistency.
+      
+      Enterprise impact: Data consistency issues in concurrent environments.
+    severity: ERROR
+    languages: [javascript, typescript, python, java]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              await db.insert($DATA1);
+              await db.update($DATA2);
+              await db.delete($DATA3);
+          - pattern: |
+              query1 = "INSERT INTO...";
+              query2 = "UPDATE...";
+              execute(query1);
+              execute(query2);
+    metadata:
+      category: connascence-of-timing
+      subcategory: database-consistency
+      confidence: HIGH
+      impact: CRITICAL
+      effort: MEDIUM
+      data_consistency: CRITICAL
+      enterprise_priority: HIGH
+
+  - id: event-handler-timing-coupling
+    message: |
+      Event handlers with timing dependencies detected (CoT).
+      Handler execution order should not affect system correctness.
+      
+      Consider making handlers idempotent and order-independent.
+    severity: WARNING
+    languages: [javascript, typescript]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $EMITTER.on('event', () => {
+                $SHARED_STATE = $VALUE1;
+              });
+              $EMITTER.on('event', () => {
+                $OPERATION($SHARED_STATE);
+              });
+          - pattern: |
+              addEventListener('$EVENT1', $HANDLER1);
+              addEventListener('$EVENT2', $HANDLER2);
+              // Where handlers modify same state
+    metadata:
+      category: connascence-of-timing
+      subcategory: event-ordering
+      confidence: MEDIUM
+      impact: MEDIUM
+      effort: MEDIUM
+
+  - id: initialization-order-dependency
+    message: |
+      Initialization order dependency detected (CoT).
+      Module/component initialization depends on specific timing.
+      
+      Enterprise concern: Application startup becomes fragile and environment-dependent.
+    severity: ERROR
+    languages: [javascript, typescript, java, python]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              import $MODULE1;
+              import $MODULE2;
+              $MODULE2.init($MODULE1.getData());
+          - pattern: |
+              const $CONFIG = require('$CONFIG_PATH');
+              const $SERVICE = require('$SERVICE_PATH');
+              $SERVICE.configure($CONFIG);
+    metadata:
+      category: connascence-of-timing
+      subcategory: initialization-order
+      confidence: HIGH
+      impact: HIGH
+      effort: HIGH
+      startup_reliability: CRITICAL
+
+  - id: cache-invalidation-timing
+    message: |
+      Cache invalidation timing dependency detected (CoT).
+      Cache updates and invalidation are not synchronized.
+      
+      Enterprise risk: Stale data served to users due to timing issues.
+    severity: ERROR
+    languages: [javascript, typescript, python, java]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              cache.set($KEY, $VALUE);
+              database.update($DATA);
+              // Missing cache invalidation
+          - pattern: |
+              await updateDatabase($DATA);
+              cache.invalidate($KEY); // Potential timing gap
+    metadata:
+      category: connascence-of-timing
+      subcategory: cache-consistency
+      confidence: HIGH
+      impact: HIGH
+      effort: MEDIUM
+      data_freshness: CRITICAL
+
+  - id: concurrent-file-operations
+    message: |
+      Concurrent file operations without synchronization (CoT).
+      Multiple processes/threads accessing same file can cause corruption.
+      
+      Consider file locking or atomic operations.
+    severity: ERROR
+    languages: [javascript, typescript, python, java]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              fs.writeFile($PATH, $DATA1);
+              fs.writeFile($PATH, $DATA2);
+          - pattern: |
+              await writeFile($PATH, $CONTENT);
+              await appendFile($PATH, $MORE_CONTENT);
+    metadata:
+      category: connascence-of-timing
+      subcategory: file-operations
+      confidence: HIGH
+      impact: HIGH
+      effort: MEDIUM
+      data_integrity: HIGH
+
+  - id: resource-cleanup-timing
+    message: |
+      Resource cleanup timing dependency detected (CoT).
+      Resources may be accessed after cleanup due to timing issues.
+      
+      Enterprise concern: Resource leaks and cleanup race conditions.
+    severity: WARNING
+    languages: [javascript, typescript, python, java]
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $RESOURCE.close();
+              $RESOURCE.operation(); // Potential use after close
+          - pattern: |
+              setTimeout(() => $RESOURCE.cleanup(), $TIME);
+              $RESOURCE.use(); // May execute after cleanup
+    metadata:
+      category: connascence-of-timing
+      subcategory: resource-lifecycle
+      confidence: MEDIUM
+      impact: MEDIUM
+      effort: MEDIUM

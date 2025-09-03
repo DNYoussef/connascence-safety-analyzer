@@ -1,0 +1,320 @@
+# Semgrep + Connascence Integration Workflow
+# Example showing how both tools complement each other in CI/CD
+
+name: "Code Quality Analysis"
+description: |
+  Comprehensive code quality analysis using both Semgrep (fast pattern detection) 
+  and Connascence Analyzer (deep coupling analysis) in a coordinated workflow.
+
+stages:
+  # Stage 1: Fast Feedback with Semgrep
+  - name: "quick-patterns"
+    description: "Quick detection of common anti-patterns"
+    tool: "semgrep"
+    config:
+      rules: "./connascence-pack/"
+      output: "json"
+      timeout: "30s"
+    exit_conditions:
+      - "high_severity_errors > 0"
+      - "critical_security_issues > 0"
+
+  # Stage 2: Targeted Deep Analysis with Connascence
+  - name: "coupling-analysis"
+    description: "Deep coupling analysis on files with issues"
+    tool: "connascence-analyzer"
+    depends_on: "quick-patterns"
+    config:
+      input_files: "${quick-patterns.changed_files}"
+      analysis_depth: "deep"
+      report_format: "json"
+      timeout: "300s"
+    conditions:
+      - "run_if: quick-patterns.found_coupling_patterns > 0"
+
+  # Stage 3: Combined Reporting
+  - name: "consolidated-report"
+    description: "Merge insights from both tools"
+    tool: "custom-script"
+    script: |
+      #!/bin/bash
+      python3 scripts/merge_reports.py \
+        --semgrep-report semgrep-results.json \
+        --connascence-report connascence-results.json \
+        --output consolidated-report.json
+
+# Example Pipeline Configuration
+
+## GitHub Actions Integration
+github_actions:
+  workflow_file: ".github/workflows/code-quality.yml"
+  content: |
+    name: Code Quality Analysis
+    on: [push, pull_request]
+    
+    jobs:
+      quick-scan:
+        runs-on: ubuntu-latest
+        steps:
+          - uses: actions/checkout@v3
+          
+          # Fast Semgrep scan for immediate feedback
+          - name: Semgrep Connascence Pack
+            uses: returntocorp/semgrep-action@v1
+            with:
+              config: >-
+                data-room/artifacts/semgrep-pack/
+              generateSarif: "1"
+          
+          # Store results for next stage
+          - name: Upload Semgrep Results
+            uses: actions/upload-artifact@v3
+            with:
+              name: semgrep-results
+              path: semgrep.sarif
+      
+      deep-analysis:
+        runs-on: ubuntu-latest
+        needs: quick-scan
+        if: needs.quick-scan.outputs.coupling_patterns_found == 'true'
+        steps:
+          - uses: actions/checkout@v3
+          
+          - name: Download Semgrep Results
+            uses: actions/download-artifact@v3
+            with:
+              name: semgrep-results
+          
+          # Deep analysis only on problematic files
+          - name: Connascence Deep Analysis
+            run: |
+              # Extract files with coupling issues from Semgrep results
+              python3 scripts/extract_problem_files.py semgrep.sarif > problem_files.txt
+              
+              # Run deep analysis only on those files
+              python3 -m connascence.analyzer \
+                --files-from problem_files.txt \
+                --output connascence.json \
+                --format json \
+                --analysis-depth deep
+          
+          # Combine reports
+          - name: Generate Combined Report
+            run: |
+              python3 scripts/merge_reports.py \
+                --semgrep semgrep.sarif \
+                --connascence connascence.json \
+                --output combined-report.html
+          
+          - name: Upload Combined Report
+            uses: actions/upload-artifact@v3
+            with:
+              name: combined-report
+              path: combined-report.html
+
+## Jenkins Integration
+jenkins:
+  pipeline_file: "Jenkinsfile.quality"
+  content: |
+    pipeline {
+        agent any
+        
+        stages {
+            stage('Quick Pattern Detection') {
+                steps {
+                    script {
+                        // Fast Semgrep scan
+                        sh '''
+                            semgrep \
+                                --config=data-room/artifacts/semgrep-pack/ \
+                                --json \
+                                --output=semgrep-results.json \
+                                --timeout=30 \
+                                .
+                        '''
+                        
+                        // Check if we found coupling patterns
+                        def results = readJSON file: 'semgrep-results.json'
+                        env.COUPLING_PATTERNS_FOUND = results.results.size() > 0 ? 'true' : 'false'
+                    }
+                }
+                post {
+                    always {
+                        archiveArtifacts artifacts: 'semgrep-results.json'
+                    }
+                }
+            }
+            
+            stage('Deep Coupling Analysis') {
+                when {
+                    environment name: 'COUPLING_PATTERNS_FOUND', value: 'true'
+                }
+                steps {
+                    script {
+                        // Extract problem files from Semgrep results
+                        sh '''
+                            python3 scripts/extract_problem_files.py \
+                                semgrep-results.json > problem_files.txt
+                        '''
+                        
+                        // Run Connascence analyzer on problem files only
+                        sh '''
+                            python3 -m connascence.analyzer \
+                                --files-from problem_files.txt \
+                                --output connascence-results.json \
+                                --format json \
+                                --budget-file .connascence-budget.yaml
+                        '''
+                    }
+                }
+            }
+            
+            stage('Generate Report') {
+                steps {
+                    script {
+                        sh '''
+                            python3 scripts/merge_reports.py \
+                                --semgrep semgrep-results.json \
+                                --connascence connascence-results.json \
+                                --output quality-report.html \
+                                --template enterprise
+                        '''
+                    }
+                }
+                post {
+                    always {
+                        publishHTML([
+                            allowMissing: false,
+                            alwaysLinkToLastBuild: true,
+                            keepAll: true,
+                            reportDir: '.',
+                            reportFiles: 'quality-report.html',
+                            reportName: 'Code Quality Report'
+                        ])
+                    }
+                }
+            }
+        }
+    }
+
+## GitLab CI Integration
+gitlab_ci:
+  config_file: ".gitlab-ci.yml"
+  content: |
+    stages:
+      - quick-scan
+      - deep-analysis
+      - report
+    
+    variables:
+      SEMGREP_CONFIG: "data-room/artifacts/semgrep-pack/"
+    
+    semgrep-scan:
+      stage: quick-scan
+      image: returntocorp/semgrep:latest
+      script:
+        - semgrep --config=${SEMGREP_CONFIG} --json --output=semgrep.json .
+        - python3 scripts/check_coupling_patterns.py semgrep.json
+      artifacts:
+        reports:
+          sast: semgrep.json
+        paths:
+          - semgrep.json
+        expire_in: 1 day
+      rules:
+        - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+        - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    
+    connascence-analysis:
+      stage: deep-analysis
+      image: python:3.9
+      dependencies:
+        - semgrep-scan
+      before_script:
+        - pip install -r requirements.txt
+      script:
+        - |
+          if [ -f semgrep.json ] && [ $(cat semgrep.json | jq '.results | length') -gt 0 ]; then
+            python3 scripts/extract_problem_files.py semgrep.json > files.txt
+            python3 -m connascence.analyzer --files-from files.txt --output connascence.json
+          else
+            echo "No coupling patterns found, skipping deep analysis"
+            echo '{"results": []}' > connascence.json
+          fi
+      artifacts:
+        paths:
+          - connascence.json
+        expire_in: 1 day
+      rules:
+        - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+        - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    
+    quality-report:
+      stage: report
+      image: python:3.9
+      dependencies:
+        - semgrep-scan
+        - connascence-analysis
+      script:
+        - pip install jinja2 pandas
+        - |
+          python3 scripts/merge_reports.py \
+            --semgrep semgrep.json \
+            --connascence connascence.json \
+            --output quality-report.html \
+            --format html
+      artifacts:
+        paths:
+          - quality-report.html
+        expire_in: 1 week
+      rules:
+        - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+        - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+# Tool Coordination Strategy
+
+coordination_strategy:
+  description: |
+    How Semgrep and Connascence Analyzer complement each other:
+    
+    1. **Speed vs Depth**: Semgrep provides fast feedback, Connascence provides deep analysis
+    2. **Broad vs Targeted**: Semgrep scans all files, Connascence focuses on problem areas  
+    3. **Pattern vs Context**: Semgrep finds patterns, Connascence understands relationships
+    4. **Prevention vs Analysis**: Semgrep prevents new issues, Connascence analyzes existing complexity
+  
+  workflow_benefits:
+    - "Fast feedback loop (Semgrep in <30s)"
+    - "Targeted deep analysis (Connascence on hotspots only)"
+    - "Comprehensive coverage (surface patterns + deep coupling)"
+    - "Cost effective (expensive analysis only where needed)"
+    - "Actionable results (immediate fixes + strategic refactoring)"
+  
+  file_classification:
+    clean_files: "Pass both Semgrep and Connascence checks"
+    surface_issues: "Semgrep issues only - quick fixes possible" 
+    deep_issues: "Both tools find issues - strategic refactoring needed"
+    complex_clean: "Pass Semgrep but complex per Connascence - monitor for changes"
+
+# Performance Optimization
+
+performance_optimization:
+  semgrep:
+    cache_rules: true
+    parallel_jobs: 4
+    timeout_per_file: "5s"
+    exclude_patterns:
+      - "node_modules/**"
+      - "*.min.js"
+      - "dist/**"
+      - "build/**"
+  
+  connascence:
+    incremental_analysis: true
+    cache_ast_parsing: true
+    analysis_depth: "medium"  # Start with medium, go deep only on hotspots
+    memory_limit: "1GB"
+    
+  coordination:
+    parallel_execution: false  # Run Semgrep first, then Connascence
+    result_caching: true
+    artifact_retention: "7 days"
