@@ -52,7 +52,7 @@
       "description": "Sales Demo and Proof Points",
       "target": "demo",
       "includes": [
-        "sales/"
+        "sale/"
       ],
       "dependencies": []
     }

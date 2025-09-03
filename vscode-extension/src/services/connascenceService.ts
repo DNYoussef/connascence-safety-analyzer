@@ -3,6 +3,7 @@ import * as path from 'path';
 import { spawn } from 'child_process';
 import { ConfigurationService } from './configurationService';
 import { TelemetryService } from './telemetryService';
+import { ConnascenceApiClient } from './connascenceApiClient';
 
 export interface AnalysisResult {
     findings: Finding[];
@@ -68,31 +69,21 @@ export interface WorkspaceAnalysisResult {
 }
 
 export class ConnascenceService {
-    private mcpClient: any; // TODO: Implement MCP client
+    private apiClient: ConnascenceApiClient;
 
     constructor(
         private configService: ConfigurationService,
         private telemetryService: TelemetryService
     ) {
-        this.initializeMCPClient();
-    }
-
-    private async initializeMCPClient(): Promise<void> {
-        // TODO: Initialize MCP client connection to connascence server
-        const serverUrl = this.configService.getServerUrl();
-        console.log(`Initializing MCP client for: ${serverUrl}`);
+        this.apiClient = new ConnascenceApiClient();
     }
 
     async analyzeFile(filePath: string): Promise<AnalysisResult> {
         this.telemetryService.logEvent('file.analysis.started', { file: path.basename(filePath) });
         
         try {
-            // Use MCP server if available, otherwise fallback to CLI
-            if (this.configService.useMCPServer()) {
-                return await this.analyzeMCP(filePath);
-            } else {
-                return await this.analyzeCLI(filePath);
-            }
+            // Use the integrated API client
+            return await this.apiClient.analyzeFile(filePath);
         } catch (error) {
             this.telemetryService.logEvent('file.analysis.error', { error: error.message });
             throw error;
@@ -103,11 +94,7 @@ export class ConnascenceService {
         this.telemetryService.logEvent('workspace.analysis.started');
         
         try {
-            if (this.configService.useMCPServer()) {
-                return await this.analyzeWorkspaceMCP(workspacePath);
-            } else {
-                return await this.analyzeWorkspaceCLI(workspacePath);
-            }
+            return await this.apiClient.analyzeWorkspace(workspacePath);
         } catch (error) {
             this.telemetryService.logEvent('workspace.analysis.error', { error: error.message });
             throw error;
@@ -117,40 +104,44 @@ export class ConnascenceService {
     async validateSafety(filePath: string, profile: string): Promise<SafetyValidationResult> {
         this.telemetryService.logEvent('safety.validation.started', { profile });
         
-        if (this.configService.useMCPServer()) {
-            return await this.validateSafetyMCP(filePath, profile);
-        } else {
-            return await this.validateSafetyCLI(filePath, profile);
+        try {
+            return await this.apiClient.validateSafety(filePath, profile);
+        } catch (error) {
+            this.telemetryService.logEvent('safety.validation.error', { error: error.message });
+            throw error;
         }
     }
 
     async suggestRefactoring(filePath: string, selection?: { start: { line: number; character: number }, end: { line: number; character: number } }): Promise<RefactoringSuggestion[]> {
         this.telemetryService.logEvent('refactoring.suggestion.requested');
         
-        if (this.configService.useMCPServer()) {
-            return await this.suggestRefactoringMCP(filePath, selection);
-        } else {
-            return await this.suggestRefactoringCLI(filePath, selection);
+        try {
+            return await this.apiClient.suggestRefactoring(filePath, selection);
+        } catch (error) {
+            this.telemetryService.logEvent('refactoring.suggestion.error', { error: error.message });
+            throw error;
         }
     }
 
     async getAutofixes(filePath: string): Promise<AutoFix[]> {
         this.telemetryService.logEvent('autofix.requested');
         
-        if (this.configService.useMCPServer()) {
-            return await this.getAutofixesMCP(filePath);
-        } else {
-            return await this.getAutofixesCLI(filePath);
+        try {
+            return await this.apiClient.getAutofixes(filePath);
+        } catch (error) {
+            this.telemetryService.logEvent('autofix.error', { error: error.message });
+            throw error;
         }
     }
 
     async generateReport(workspacePath: string): Promise<any> {
         this.telemetryService.logEvent('report.generation.started');
         
-        if (this.configService.useMCPServer()) {
-            return await this.generateReportMCP(workspacePath);
-        } else {
-            return await this.generateReportCLI(workspacePath);
+        try {
+            return await this.apiClient.generateReport(workspacePath);
+        } catch (error) {
+            this.telemetryService.logEvent('report.generation.error', { error: error.message });
+            throw error;
         }
     }
 

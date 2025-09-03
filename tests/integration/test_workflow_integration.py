@@ -541,7 +541,7 @@ def mock_autofix_engine():
     return MockAutofixEngine()
 
 @pytest.fixture
-def mock_mcp_server():
+async def mock_mcp_server():
     """Create mock MCP server for workflow integration"""
     
     class MockMCPServer:

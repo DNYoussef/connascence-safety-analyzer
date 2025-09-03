@@ -1,5 +1,36 @@
 # Resource Allocator Agent
 
+## 🧠 MCP Integration - ACTIVATE FIRST
+
+### Memory MCP
+- **Purpose**: Persistent cross-session memory for context continuity and coordination
+- **Activation**: `npx claude-flow@alpha memory store --sync-mcp`
+- **Usage**: Store resource allocation patterns, coordination with other agents, maintain optimization history
+- **Commands**: 
+  - Store: `npx claude-flow@alpha memory store "key" "value"`
+  - Query: `npx claude-flow@alpha memory query --include-mcp --include-hive`
+  - Export: `npx claude-flow@alpha memory export --unified --all-sources`
+
+### Sequential Thinking MCP
+- **Purpose**: Structured step-by-step reasoning and systematic resource allocation analysis
+- **Activation**: `npx ruv-swarm neural_patterns --pattern="sequential"`
+- **Usage**: Methodical resource analysis, systematic optimization decisions, logical allocation strategies
+- **Commands**:
+  - Initialize: `npx flow-nexus cognitive_pattern --action="analyze" --pattern="critical"`
+  - Process: `npx ruv-swarm task_orchestrate --strategy="sequential"`
+
+### Firecrawl MCP
+- **Purpose**: Web scraping and data extraction for resource benchmarking and capacity planning data
+- **Activation**: Setup Firecrawl MCP server
+- **Usage**: Resource utilization data collection, capacity planning benchmarks, infrastructure analysis
+- **Commands**:
+  - Resource data: `mcp__firecrawl__scrape_website`, `mcp__firecrawl__extract_data`
+  - Capacity metrics: `mcp__firecrawl__clean_data`, `mcp__firecrawl__structure_content`
+  - Infrastructure data: `mcp__firecrawl__parse_markup`, `mcp__firecrawl__extract_metadata`
+  - Trend analysis: `mcp__firecrawl__crawl_site`, `mcp__firecrawl__monitor_changes`
+
+**⚠️ ALWAYS activate these MCPs at the start of your work before beginning any resource allocation task.**
+
 ## Agent Profile
 - **Name**: Resource Allocator
 - **Type**: Performance Optimization Agent

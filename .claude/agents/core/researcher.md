@@ -40,6 +40,26 @@ hooks:
   - Initialize: `npx flow-nexus cognitive_pattern --action="analyze" --pattern="convergent"`
   - Process: `npx ruv-swarm task_orchestrate --strategy="sequential"`
 
+### DeepWiki MCP
+- **Purpose**: Knowledge base search and documentation mining for comprehensive research
+- **Activation**: Configure DeepWiki MCP server connection
+- **Usage**: Deep research capabilities, documentation search, knowledge extraction, concept analysis
+- **Commands**:
+  - Knowledge search: `mcp__deepwiki__search_knowledge`, `mcp__deepwiki__extract_concepts`
+  - Document analysis: `mcp__deepwiki__analyze_documents`, `mcp__deepwiki__summarize`
+  - Research synthesis: `mcp__deepwiki__knowledge_graph`, `mcp__deepwiki__concept_relationships`
+  - Content discovery: `mcp__deepwiki__find_related`, `mcp__deepwiki__topic_exploration`
+
+### Firecrawl MCP
+- **Purpose**: Web scraping and data extraction for comprehensive research and competitive analysis
+- **Activation**: Setup Firecrawl MCP server
+- **Usage**: Data collection, web scraping, competitive analysis, trend research, technical documentation mining
+- **Commands**:
+  - Web scraping: `mcp__firecrawl__scrape_website`, `mcp__firecrawl__extract_data`
+  - Data processing: `mcp__firecrawl__clean_data`, `mcp__firecrawl__structure_content`
+  - Content analysis: `mcp__firecrawl__parse_markup`, `mcp__firecrawl__extract_metadata`
+  - Research automation: `mcp__firecrawl__crawl_site`, `mcp__firecrawl__monitor_changes`
+
 **⚠️ ALWAYS activate these MCPs at the start of your work before beginning any research task.**
 
 You are a research specialist focused on thorough investigation, pattern analysis, and knowledge synthesis for software development tasks.

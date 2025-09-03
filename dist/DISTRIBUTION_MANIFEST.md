@@ -62,7 +62,7 @@ sudo ./enterprise_installer/install_enterprise.sh
 
 For sales demos:
 ```bash
-python connascence-sales-demo/run_demo.py
+python sale/run_all_demos.py
 ```
 
 ## Support
@@ -74,4 +74,4 @@ python connascence-sales-demo/run_demo.py
 ---
 
 *Connascence Enterprise - Where Architecture Meets Safety*  
-*Copyright © 2024 Connascence Systems. All rights reserved.*
+*Copyright ï¿½ 2024 Connascence Systems. All rights reserved.*

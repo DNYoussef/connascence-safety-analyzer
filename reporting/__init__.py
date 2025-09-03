@@ -21,11 +21,13 @@ Key Features:
 from .json_export import JSONReporter
 from .sarif_export import SARIFReporter
 from .md_summary import MarkdownReporter
-from .scorecard import ScorecardGenerator
+
+# ScorecardGenerator not yet implemented
+# from .scorecard import ScorecardGenerator
 
 __all__ = [
     "JSONReporter",
     "SARIFReporter", 
     "MarkdownReporter",
-    "ScorecardGenerator",
+    # "ScorecardGenerator",
 ]

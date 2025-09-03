@@ -15,7 +15,7 @@ import sys
 import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from analyzer.ast_engine.core_analyzer import ConnascenceASTAnalyzer, AnalysisResult, Violation
+from analyzer.ast_engine import ConnascenceASTAnalyzer, AnalysisResult, Violation
 from analyzer.core import ConnascenceViolation
 
 
@@ -417,13 +417,13 @@ class TestAnalyzerIntegration:
         analyzer = ConnascenceASTAnalyzer()
         
         # Analyze the temporary directory with sample files
-        violations = analyzer.analyze_directory(tmp_path)
+        result = analyzer.analyze_directory(tmp_path)
         
         # Should find violations from multiple files
-        assert len(violations) > 0
+        assert len(result.violations) > 0
         
         # Should have violations from different files
-        file_paths = {v.file_path for v in violations}
+        file_paths = {v.file_path for v in result.violations}
         assert len(file_paths) > 1
     
     def test_performance_on_large_file(self):

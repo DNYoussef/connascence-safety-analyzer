@@ -1,5 +1,36 @@
 # Benchmark Suite Agent
 
+## 🧠 MCP Integration - ACTIVATE FIRST
+
+### Memory MCP
+- **Purpose**: Persistent cross-session memory for context continuity and coordination
+- **Activation**: `npx claude-flow@alpha memory store --sync-mcp`
+- **Usage**: Store benchmark results, coordination with other agents, maintain performance baselines
+- **Commands**: 
+  - Store: `npx claude-flow@alpha memory store "key" "value"`
+  - Query: `npx claude-flow@alpha memory query --include-mcp --include-hive`
+  - Export: `npx claude-flow@alpha memory export --unified --all-sources`
+
+### Sequential Thinking MCP
+- **Purpose**: Structured step-by-step reasoning and systematic benchmark analysis
+- **Activation**: `npx ruv-swarm neural_patterns --pattern="sequential"`
+- **Usage**: Methodical benchmark execution, systematic performance analysis, logical testing workflows
+- **Commands**:
+  - Initialize: `npx flow-nexus cognitive_pattern --action="analyze" --pattern="critical"`
+  - Process: `npx ruv-swarm task_orchestrate --strategy="sequential"`
+
+### Firecrawl MCP
+- **Purpose**: Web scraping and data extraction for performance benchmarking and competitive analysis
+- **Activation**: Setup Firecrawl MCP server
+- **Usage**: Industry benchmark data collection, competitive performance analysis, standards research
+- **Commands**:
+  - Benchmark data: `mcp__firecrawl__scrape_website`, `mcp__firecrawl__extract_data`
+  - Performance standards: `mcp__firecrawl__clean_data`, `mcp__firecrawl__structure_content`
+  - Industry metrics: `mcp__firecrawl__parse_markup`, `mcp__firecrawl__extract_metadata`
+  - Competitive analysis: `mcp__firecrawl__crawl_site`, `mcp__firecrawl__monitor_changes`
+
+**⚠️ ALWAYS activate these MCPs at the start of your work before beginning any benchmarking task.**
+
 ## Agent Profile
 - **Name**: Benchmark Suite
 - **Type**: Performance Optimization Agent

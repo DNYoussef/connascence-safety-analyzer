@@ -35,6 +35,13 @@ from policy.manager import PolicyManager
 from policy.budgets import BudgetTracker
 from policy.baselines import BaselineManager
 
+# Configure logging first 
+logging.basicConfig(
+    level=logging.WARNING,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+logger = logging.getLogger(__name__)
+
 # Import license validation system
 try:
     from src.licensing import LicenseValidator, LicenseValidationResult
@@ -42,14 +49,6 @@ try:
 except ImportError:
     LICENSE_VALIDATION_AVAILABLE = False
     logger.warning("License validation system not available")
-
-
-# Configure logging
-logging.basicConfig(
-    level=logging.WARNING,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
-logger = logging.getLogger(__name__)
 
 
 class ConnascenceCLI:

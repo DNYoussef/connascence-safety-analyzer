@@ -5,6 +5,7 @@ Tests all CLI commands including scan, scan-diff, autofix, baseline management,
 and MCP server functionality.
 """
 
+import argparse
 import json
 import pytest
 import subprocess
