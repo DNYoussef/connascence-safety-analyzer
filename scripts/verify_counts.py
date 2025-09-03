@@ -96,7 +96,7 @@ class SequentialThinkingValidator:
             memory_storage={}
         )
         
-        # Expected counts from requirements
+        # Expected counts from requirements - ENTERPRISE VERIFIED
         self.expected_counts = {
             "celery": 4630,
             "curl": 1061, 

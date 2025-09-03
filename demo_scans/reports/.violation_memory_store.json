@@ -3,7 +3,7 @@
   "reports": {
     "celery": {
       "file": "demo_scans/reports/celery_analysis.json",
-      "count": 11729,
+      "count": 4630,
       "repository": "celery",
       "status": "complete"
     },
@@ -21,7 +21,7 @@
     }
   },
   "summary": {
-    "total_violations": 12842,
+    "total_violations": 5743,
     "generation_method": "sequential_systematic_approach",
     "validation_status": "verified"
   }

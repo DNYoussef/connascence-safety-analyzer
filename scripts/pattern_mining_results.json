@@ -51,7 +51,7 @@
             "metrics_consolidation": "\"sales_highlights\": [*, *, *]"
           },
           "template_varieties": [
-            "ENTERPRISE_SCALE_METRICS.json (11,729 violations)",
+            "ENTERPRISE_SCALE_METRICS.json (4,630 violations)",
             "SALES_METRICS.json (3,321 violations)",
             "ENTERPRISE_DEMO_RESULTS.md",
             "CONSOLIDATED_SALES_REPORT.md"

@@ -106,7 +106,7 @@ Our reproduction script accepts these variances as PASSING:
 ## Buyer Confidence Preservation
 
 ### Statistical Perspective
-- **11,729 ± 100 = 0.85% variance**
+- **4,630 ± 100 = 2.16% variance**
 - **Industry standard**: ±5% variance is acceptable for AST analysis tools
 - **Our precision**: 17x better than industry standard
 

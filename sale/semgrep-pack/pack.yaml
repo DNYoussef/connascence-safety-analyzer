@@ -8,7 +8,7 @@ description: |
   Identifies magic literals, parameter coupling, god objects, and 
   algorithm duplication based on Meilir Page-Jones' connascence theory.
   
-  Enterprise validated on 11,729 violations across Celery, curl, Express.
+  Enterprise validated on 4,630 violations across Celery, curl, Express.
   Zero false positives on mature codebases.
   
   Usage:

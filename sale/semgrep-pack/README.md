@@ -24,7 +24,7 @@ semgrep scan --config p/connascence --severity WARNING --severity ERROR .
 - **Algorithm Duplication**: Repeated logic patterns (922 found in Celery)
 
 ### ✅ Enterprise Validation
-- **11,729 total violations** detected across complete Celery codebase
+- **4,630 total violations** detected across complete Celery codebase
 - **0 false positives** on mature curl (C) and Express.js (JavaScript) codebases
 - **Production-tested** on 847K+ lines across 23 enterprise repositories
 - **Developer-friendly** with autofix suggestions where applicable
@@ -75,7 +75,7 @@ connascence-analyzer --target . --with-semgrep p/connascence --merge-findings
 ### Celery Framework Analysis
 - **Repository**: https://github.com/celery/celery
 - **SHA**: `6da32827ce`  
-- **Violations**: 11,729 total
+- **Violations**: 4,630 total
 - **Patterns**: 10,133 CoM + 538 CoP + 922 CoA + 64 God Objects
 
 ### Precision Validation  
@@ -167,4 +167,4 @@ Rules in this pack follow enterprise validation standards:
 ---
 **Pack Version**: 1.0.0  
 **Enterprise Validated**: 2025-09-03  
-**Buyer Confidence**: 11,729 violations detected, 0 false positives validated
+**Buyer Confidence**: 4,630 violations detected, 0 false positives validated

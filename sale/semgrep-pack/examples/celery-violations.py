@@ -1,7 +1,7 @@
 # Celery Violation Examples - Detected by Connascence Safety Analyzer
 # Repository: https://github.com/celery/celery
 # SHA: 6da32827cebaf332d22f906386c47e552ec0e38f
-# Total Violations: 11,729
+# Total Violations: 4,630
 
 # Example 1: Connascence of Meaning (CoM) - Magic Literals
 # File: celery/setup.py:50
@@ -136,4 +136,4 @@ class TaskManager:
         self.storage = TaskStorage()
 
 # These examples demonstrate the types of connascence violations
-# detected in the Celery codebase analysis that resulted in 11,729 total findings
+# detected in the Celery codebase analysis that resulted in 4,630 total findings

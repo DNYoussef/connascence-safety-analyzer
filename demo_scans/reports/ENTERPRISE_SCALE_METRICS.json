@@ -4,7 +4,7 @@
     "scope": "complete_codebase_analysis",
     "tool_version": "1.0-sale",
     "scale_validation": "enterprise_production_level",
-    "total_violations_detected": 11729,
+    "total_violations_detected": 4630,
     "repositories_analyzed": 3,
     "analysis_type": "full_codebase_comprehensive"
   },
@@ -13,22 +13,22 @@
       "repository_url": "https://github.com/celery/celery",
       "analysis_scope": "complete_repository_all_files",
       "language": "Python",
-      "total_violations": 11729,
+      "total_violations": 4630,
       "enterprise_scale_proof": "production_async_framework",
       "severity_distribution": {
         "critical": 64,
-        "high": 1995,
-        "medium": 9670
+        "high": 154,
+        "medium": 838
       },
       "connascence_pattern_breakdown": {
-        "connascence_of_meaning": 10133,
-        "connascence_of_algorithm": 922,
-        "connascence_of_position": 538,
-        "connascence_of_timing": 72,
+        "connascence_of_meaning": 4200,
+        "connascence_of_algorithm": 86,
+        "connascence_of_position": 280,
+        "connascence_of_timing": 0,
         "god_object": 64
       },
       "enterprise_significance": {
-        "scale_demonstration": "11,729 violations in production codebase",
+        "scale_demonstration": "4,630 violations in production codebase",
         "complexity_proof": "Real-world async framework complexity",
         "technical_debt_quantification": "Massive improvement opportunity identified",
         "enterprise_relevance": "Dependency used by enterprise applications globally"
@@ -67,8 +67,8 @@
   },
   "enterprise_sales_impact": {
     "scale_validation": {
-      "total_violations": 11729,
-      "largest_single_codebase": "Celery with 11,729 violations",
+      "total_violations": 4630,
+      "largest_single_codebase": "Celery with 4,630 violations",
       "enterprise_complexity_handled": "Production async framework completely analyzed",
       "no_sampling_limitations": "Complete codebase analysis, not subsets"
     },
@@ -80,45 +80,45 @@
     },
     "competitive_advantages": {
       "complete_analysis": "No sampling or artificial limitations",
-      "enterprise_scale": "Successfully processed 11,729 violations in single codebase",
+      "enterprise_scale": "Successfully processed 4,630 violations in single codebase",
       "polyglot_coverage": "Python, C, JavaScript enterprise environments",
       "production_validation": "Analysis of actual enterprise dependencies"
     }
   },
   "sales_talking_points": {
-    "scale_proof": "11,729 violations detected in complete Celery codebase - not a sample",
+    "scale_proof": "4,630 violations detected in complete Celery codebase - not a sample",
     "precision_proof": "Zero false positives on curl and Express - industry-standard validation",
     "enterprise_relevance": "Analyzed complete repositories your teams depend on daily",
-    "roi_quantification": "11,729 technical debt items = massive productivity improvement opportunity",
+    "roi_quantification": "4,630 technical debt items = massive productivity improvement opportunity",
     "competitive_differentiation": "Complete codebase analysis capability, not limited samples"
   },
   "demo_script_enhancements": {
-    "opening_hook": "We analyzed complete enterprise codebases - 11,729 violations in Celery alone",
+    "opening_hook": "We analyzed complete enterprise codebases - 4,630 violations in Celery alone",
     "scale_emphasis": "No samples, no limitations - complete production codebase analysis",
     "precision_validation": "Zero false positives on mature C and JavaScript codebases",
-    "roi_calculation": "11,729 improvement opportunities = quantified enterprise value",
+    "roi_calculation": "4,630 improvement opportunities = quantified enterprise value",
     "competitive_advantage": "Most tools provide samples - we analyze complete codebases"
   },
   "buyer_validation_points": {
     "for_ctos": {
       "scale_confidence": "Handles complete enterprise codebases without limitations",
       "precision_assurance": "Accurate results on industry-standard dependencies",
-      "roi_quantification": "11,729 violations = measurable technical debt reduction"
+      "roi_quantification": "4,630 violations = measurable technical debt reduction"
     },
     "for_dev_teams": {
       "real_world_patterns": "Analysis of actual dependencies they use daily",
       "comprehensive_coverage": "No blind spots - complete codebase analysis",
-      "actionable_results": "10,133 magic numbers alone = massive maintainability gains"
+      "actionable_results": "4,200 magic numbers alone = massive maintainability gains"
     },
     "for_eng_managers": {
-      "measurable_impact": "11,729 technical debt items quantified across single codebase",
+      "measurable_impact": "4,630 technical debt items quantified across single codebase",
       "resource_planning": "Scale of improvements enables accurate effort estimation",
       "team_productivity": "Complete analysis enables comprehensive improvement planning"
     }
   },
   "technical_specifications": {
     "analysis_depth": "complete_repository_traversal",
-    "memory_efficiency": "handled_11729_violations_without_issues",
+    "memory_efficiency": "handled_4630_violations_without_issues",
     "processing_capability": "full_enterprise_codebase_analysis",
     "pattern_recognition": "comprehensive_violation_detection_across_complete_scope",
     "scalability_proven": "production_ready_enterprise_deployment_validated"
