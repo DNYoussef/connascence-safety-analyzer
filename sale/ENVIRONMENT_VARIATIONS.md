@@ -2,14 +2,14 @@
 
 ## Reproduction Exactness: Kill-Shot Defense
 
-**Critical Issue**: Buyers running reproduction commands may get slightly different violation counts than documented (11,729 for Celery). This document explains acceptable variations and provides defensive responses.
+**Critical Issue**: Buyers running reproduction commands may get slightly different violation counts than documented (4,630 for Celery). This document explains acceptable variations and provides defensive responses.
 
 ## Expected Variations by Environment
 
 ### Operating System Differences
 
 #### Windows (Baseline Environment)
-- **Baseline Count**: 11,729 violations (Celery)
+- **Baseline Count**: 4,630 violations (Celery)
 - **Line Endings**: CRLF (`\r\n`) 
 - **Path Separators**: Backslash (`\`)
 - **Unicode Handling**: CP1252 encoding affects some pattern matching
@@ -20,7 +20,7 @@
 - **Path Separators**: Forward slash (`/`) in file path analysis
 - **Unicode Handling**: UTF-8 encoding may detect additional patterns
 
-#### Expected Range: 11,629 - 11,829 violations
+#### Expected Range: 4,530 - 4,730 violations
 
 ### Python Version Differences
 

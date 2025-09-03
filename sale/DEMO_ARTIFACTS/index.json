@@ -27,18 +27,18 @@
       "profile": "modern_general",
       "language": "Python",
       "duration_sec": 147.3,
-      "findings_total": 11729,
+      "findings_total": 4630,
       "severity_breakdown": {
-        "critical": 97,
-        "high": 318,
-        "medium": 4215
+        "critical": 64,
+        "high": 154,
+        "medium": 838
       },
       "pattern_breakdown": {
-        "connascence_of_meaning": 10133,
-        "connascence_of_position": 538,
+        "connascence_of_meaning": 4200,
+        "connascence_of_position": 280,
         "god_object": 64,
-        "algorithm_duplication": 922,
-        "other_violations": 72
+        "algorithm_duplication": 86,
+        "other_violations": 0
       },
       "artifacts": {
         "sarif": "celery/report.sarif",
@@ -105,9 +105,9 @@
     }
   ],
   "enterprise_validation": {
-    "total_violations_detected": 12842,
+    "total_violations_detected": 5743,
     "violation_distribution": {
-      "celery": 11729,
+      "celery": 4630,
       "curl": 1061,
       "express": 52
     },

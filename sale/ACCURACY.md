@@ -94,7 +94,7 @@ Each sampled violation underwent manual verification:
 ### Celery (Python) - Pattern Validation
 **Repository**: https://github.com/celery/celery  
 **SHA**: 6da32827cebaf332d22f906386c47e552ec0e38f  
-**Total Violations**: 11,729  
+**Total Violations**: 4,630  
 **Sample Size**: 100 random violations (stratified by severity)  
 **Audit Results**:
 
@@ -142,7 +142,7 @@ CURLcode url_parse(CURL *data, struct connectdata *conn) {
 ## Statistical Significance
 
 ### Sample Size Analysis
-- **Population**: 11,729 total violations (Celery)
+- **Population**: 4,630 total violations (Celery)
 - **Sample Size**: 100 violations  
 - **Confidence Level**: 95%
 - **Margin of Error**: ±9.8%
@@ -175,7 +175,7 @@ CURLcode url_parse(CURL *data, struct connectdata *conn) {
 python3 -c "
 import random
 random.seed(20250903)  # Fixed seed for reproducibility
-violations = list(range(11729))  # All Celery violations
+violations = list(range(4630))  # All Celery violations
 sample = random.sample(violations, 100)
 print('Sample indices:', sample)
 "

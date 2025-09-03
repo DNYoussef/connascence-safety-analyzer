@@ -62,7 +62,7 @@
 
 **Key Metrics**:
 - **<3% false positive rate** across enterprise codebases
-- **12,842 violations** detected across major open-source projects
+- **5,743 violations** detected across major open-source projects
 - **23.6% maintainability improvement** on refactored code
 
 ### DevOps Engineer / Platform Team

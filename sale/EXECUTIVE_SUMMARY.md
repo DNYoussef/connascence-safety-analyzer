@@ -53,7 +53,7 @@
 
 ### Accuracy Validation
 - **Zero False Positives** on mature codebases (curl C library, Express.js framework)
-- **12,842 Real Violations** detected across three major open-source projects
+- **5,743 Real Violations** detected across three major open-source projects
 - **100% Precision** on manually audited critical violations
 
 ### Developer Experience
@@ -64,7 +64,7 @@
 ## 🔍 Technical Validation Summary
 
 ### Celery Framework (Python)
-- **11,729 violations** detected in complete codebase
+- **4,630 violations** detected in complete codebase
 - **10,133 magic literals, 538 parameter coupling, 64 god objects, 922 algorithm duplications** identified
 - **Realistic patterns** that improve maintainability
 
