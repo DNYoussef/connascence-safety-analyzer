@@ -2,319 +2,343 @@
 
 ## 15-Minute Technical Validation
 
-This guide helps you quickly validate Connascence with your own codebase to verify accuracy, performance, and integration capabilities.
+This guide helps you quickly validate Connascence with your own codebase using the actual implementation to verify functionality, performance, and integration potential.
 
 ### Prerequisites
-- Docker Desktop or compatible container runtime
-- Sample codebase (10,000+ lines recommended)
+- Python 3.8 or higher
+- Sample Python codebase for analysis
 - 15-30 minutes for complete validation
+- Git (for source code access)
 
 ---
 
 ## Quick Start Options
 
-### Option 1: Docker One-Liner (Fastest)
+### Option 1: Direct Installation (Recommended)
 ```bash
-# Pull and run Connascence analysis container
-docker run -v /path/to/your/code:/code connascence/cli:latest analyze /code --output json
+# Clone the repository
+git clone https://github.com/connascence/connascence-analyzer
+cd connascence-analyzer
+
+# Install dependencies
+pip install -e .
+
+# Run basic analysis
+python -m cli.connascence scan ./examples
 ```
 
-### Option 2: Cloud POC Environment (No Installation)
+### Option 2: Local Development Setup
 ```bash
-# Access secure POC environment
-curl -X POST https://poc.connascence.io/analyze \
-  -H "Authorization: Bearer [POC_TOKEN]" \
-  -F "codebase=@your-code.zip"
+# Clone repository
+git clone https://github.com/connascence/connascence-analyzer
+cd connascence-analyzer
+
+# Set up development environment
+pip install -e ".[dev]"
+
+# Run tests to verify installation
+python -m pytest tests/ -v
+
+# Analyze your own code
+python -m cli.connascence scan /path/to/your/python/code
 ```
 
-### Option 3: Local Development Setup
+### Option 3: Using Project Scripts
 ```bash
-# Clone and setup
-git clone https://github.com/connascence/poc-environment
-cd poc-environment
-docker-compose up -d
-# Upload your code via web interface at http://localhost:8080
+# Use the included validation script
+python verify_demo.py
+
+# Run comprehensive analysis
+python run_all_tests.py
 ```
 
 ---
 
 ## Validation Scenarios
 
-### Scenario 1: Language Compatibility Test
+### Scenario 1: Basic Functionality Test
 **Duration**: 3-5 minutes  
-**Purpose**: Verify language support and parsing accuracy
+**Purpose**: Verify core analysis capabilities
 
 ```bash
-# Test with multiple language files
-mkdir test-samples
-# Add sample files: .js, .java, .py, .cs, etc.
-docker run -v ./test-samples:/code connascence/cli:latest analyze /code --languages all
+# Test with included examples
+python -m cli.connascence scan ./examples --format json
+
+# Test with your Python codebase
+python -m cli.connascence scan /path/to/your/code --policy service-defaults
 ```
 
 **Expected Results**:
-- Successful parsing of all supported languages
-- Detection of at least 3-4 connascence types
-- Zero parsing errors for valid syntax
+- Successful parsing of Python files
+- Detection of connascence patterns (CoN, CoT, CoM, etc.)
+- JSON/text output with findings
 
-### Scenario 2: Accuracy Validation
+### Scenario 2: Policy Configuration Test
 **Duration**: 5-10 minutes  
-**Purpose**: Validate detection accuracy against known issues
+**Purpose**: Validate different analysis policies
 
 ```bash
-# Use provided test suite with known connascence issues
-curl -O https://poc.connascence.io/test-suite.zip
-unzip test-suite.zip
-docker run -v ./test-suite:/code connascence/cli:latest analyze /code --validate
+# Test different policy presets
+python -m cli.connascence scan ./examples --policy strict-core
+python -m cli.connascence scan ./examples --policy service-defaults
+python -m cli.connascence scan ./examples --policy experimental
+
+# Test custom severity filtering
+python -m cli.connascence scan ./examples --severity high
 ```
 
 **Expected Results**:
-- Detection of all 47 planted connascence issues
-- Zero false positives on clean code samples
-- Accuracy score >84%
+- Different violation counts based on policy
+- Appropriate severity filtering
+- Configurable rule enforcement
 
-### Scenario 3: Performance Benchmark
+### Scenario 3: Performance Validation
 **Duration**: 5-10 minutes  
-**Purpose**: Test performance on realistic codebase size
+**Purpose**: Test performance on realistic codebase
 
 ```bash
-# Performance test with large codebase
-docker run -v /path/to/large/codebase:/code connascence/cli:latest analyze /code --benchmark
+# Performance test with timing
+time python -m cli.connascence scan /path/to/large/codebase
+
+# Enable incremental analysis
+python -m cli.connascence scan ./examples --incremental
 ```
 
 **Expected Results**:
-- Processing rate >10,000 lines/minute
-- Memory usage <512MB for typical analysis
-- Linear scaling with codebase size
+Based on actual benchmarks:
+- Processing rate: ~33,000 lines/second (optimized)
+- Memory usage: Reasonable for analysis scope
+- 4.4x speedup with optimization enabled
 
-### Scenario 4: Integration Test
-**Duration**: 5-10 minutes  
-**Purpose**: Validate CI/CD integration capabilities
+### Scenario 4: Output Format Test
+**Duration**: 5 minutes  
+**Purpose**: Validate different output formats
 
 ```bash
-# Test CI/CD integration
-docker run connascence/cli:latest ci-test \
-  --repo-url https://github.com/your-org/your-repo \
-  --output junit.xml
+# Test different output formats
+python -m cli.connascence scan ./examples --format json
+python -m cli.connascence scan ./examples --format sarif
+python -m cli.connascence scan ./examples --format markdown
+python -m cli.connascence scan ./examples --format text
+
+# Save results to file
+python -m cli.connascence scan ./examples --output results.json
 ```
 
 **Expected Results**:
-- Successful repository clone and analysis
-- JUnit XML output for CI integration
-- Return code 0 for passing quality gates
+- Multiple output format support
+- Well-formatted results
+- File output capability
 
 ---
 
 ## Detailed Analysis Walkthrough
 
-### Step 1: Initial Setup (2 minutes)
+### Step 1: Installation and Setup (5 minutes)
 ```bash
-# Create working directory
-mkdir connascence-poc
-cd connascence-poc
+# Clone the repository
+git clone https://github.com/connascence/connascence-analyzer
+cd connascence-analyzer
 
-# Pull latest POC image
-docker pull connascence/poc:latest
+# Check Python version
+python --version  # Should be 3.8+
+
+# Install the package
+pip install -e .
+
+# Verify installation
+python -m cli.connascence --help
 ```
 
 ### Step 2: Basic Analysis (5 minutes)
 ```bash
-# Analyze your codebase
-docker run -v $(pwd):/workspace connascence/poc:latest \
-  analyze /workspace/your-code \
-  --output-format detailed \
-  --save-report /workspace/analysis-report.json
+# Analyze included examples
+python -m cli.connascence scan ./examples
+
+# Review the output to understand findings
+# Check for different connascence types detected
 ```
 
-### Step 3: Review Results (5 minutes)
+### Step 3: Analyze Your Own Code (10 minutes)
 ```bash
-# Generate human-readable report
-docker run -v $(pwd):/workspace connascence/poc:latest \
-  report /workspace/analysis-report.json \
-  --format html \
-  --output /workspace/report.html
+# Copy your Python project to test
+cp -r /path/to/your/python/project ./test-project
 
-# Open report in browser
-open report.html  # macOS
-start report.html # Windows
-xdg-open report.html # Linux
+# Run analysis with different options
+python -m cli.connascence scan ./test-project --policy strict-core
+python -m cli.connascence scan ./test-project --format json --output results.json
+
+# Review results
+cat results.json | python -m json.tool
 ```
 
-### Step 4: API Integration Test (3 minutes)
+### Step 4: Advanced Features (Optional - 10 minutes)
 ```bash
-# Test REST API integration
-curl -X POST http://localhost:8080/api/analyze \
-  -H "Content-Type: application/json" \
-  -d '{
-    "repository": "https://github.com/your-org/your-repo",
-    "webhook_url": "https://your-domain.com/webhook",
-    "analysis_options": {
-      "include_all_types": true,
-      "severity_threshold": "medium"
-    }
-  }'
+# Test baseline functionality
+python -m cli.connascence baseline snapshot
+
+# Test explanation feature
+python -m cli.connascence explain CoN
+
+# Test incremental analysis
+python -m cli.connascence scan ./test-project --incremental
 ```
 
 ---
 
 ## Validation Checklist
 
-### Technical Accuracy ✅
-- [ ] **Language Support**: All required languages parsed successfully
-- [ ] **Detection Accuracy**: Known issues correctly identified
-- [ ] **False Positive Rate**: <1% false positive rate achieved
-- [ ] **Completeness**: All 9 connascence types detected where present
+### Core Functionality ✅
+- [ ] **Installation**: Package installs without errors
+- [ ] **Basic Analysis**: Can analyze Python code successfully
+- [ ] **Policy Support**: Three policy presets work correctly
+- [ ] **Output Formats**: JSON, SARIF, markdown, text outputs work
+
+### Analysis Accuracy ✅
+- [ ] **Pattern Detection**: Detects connascence patterns in test code
+- [ ] **Severity Levels**: Correctly categorizes findings by severity
+- [ ] **False Positives**: Minimal false positives on clean code
+- [ ] **Coverage**: Analyzes all Python files in target directory
 
 ### Performance Validation ✅
-- [ ] **Processing Speed**: >10,000 lines/minute throughput
-- [ ] **Memory Efficiency**: <512MB peak memory usage
-- [ ] **Scalability**: Linear performance scaling verified
-- [ ] **Response Time**: <2 seconds for typical file analysis
+- [ ] **Processing Speed**: Completes analysis in reasonable time
+- [ ] **Memory Usage**: Doesn't consume excessive memory
+- [ ] **Scalability**: Handles codebases of varying sizes
+- [ ] **Incremental Mode**: Faster re-analysis with caching
 
-### Integration Testing ✅
-- [ ] **API Functionality**: REST API responds correctly
-- [ ] **Webhook Delivery**: Real-time notifications working
-- [ ] **CI/CD Integration**: Pipeline integration successful
-- [ ] **Output Formats**: JSON, XML, HTML reports generated
-
-### User Experience ✅
-- [ ] **Setup Simplicity**: <5 minutes to first analysis
-- [ ] **Report Clarity**: Results easy to understand and act upon
-- [ ] **Documentation**: Clear guidance for issue remediation
-- [ ] **Support Access**: Technical support responsive
-
----
-
-## Common Issues & Troubleshooting
-
-### Issue: Analysis Fails to Start
-```bash
-# Check Docker status
-docker ps
-docker logs [container_id]
-
-# Verify volume mounts
-docker run -v $(pwd):/workspace connascence/poc:latest ls /workspace
-```
-
-### Issue: Language Not Recognized
-```bash
-# Check supported languages
-docker run connascence/poc:latest languages --list
-
-# Force language detection
-docker run connascence/poc:latest analyze /code --language javascript
-```
-
-### Issue: Performance Below Expectations
-```bash
-# Check system resources
-docker stats
-
-# Use performance mode
-docker run --memory=2g --cpus=4 connascence/poc:latest analyze /code --performance-mode
-```
-
-### Issue: API Integration Problems
-```bash
-# Test API connectivity
-curl -I http://localhost:8080/health
-
-# Check authentication
-curl -H "Authorization: Bearer [TOKEN]" http://localhost:8080/api/status
-```
+### Configuration & Integration ✅
+- [ ] **CLI Interface**: Command-line interface works as documented
+- [ ] **Configuration**: Policy presets and options work correctly
+- [ ] **File Handling**: Properly handles file exclusions/inclusions
+- [ ] **Error Handling**: Graceful handling of invalid inputs
 
 ---
 
 ## Sample Results Analysis
 
-### Typical Findings for 50,000 Line Codebase
+### Typical Findings for Python Codebase
 ```json
 {
   "analysis_summary": {
-    "total_lines": 50000,
-    "files_analyzed": 247,
-    "processing_time": "4.2 minutes",
-    "connascence_issues": 89,
-    "technical_debt_estimate": "$127,000"
+    "files_analyzed": 157,
+    "lines_analyzed": 48306,
+    "processing_time_ms": 789,
+    "violations_found": 11921
   },
   "connascence_distribution": {
-    "connascence_of_name": 34,
-    "connascence_of_type": 23,
-    "connascence_of_meaning": 15,
-    "connascence_of_position": 12,
-    "connascence_of_algorithm": 3,
-    "connascence_of_timing": 2
+    "connascence_of_name": "Most common - variable naming issues",
+    "connascence_of_type": "Type-related coupling",
+    "connascence_of_meaning": "Magic number/string issues", 
+    "connascence_of_position": "Parameter order dependencies",
+    "connascence_of_algorithm": "Duplicate logic patterns"
   },
-  "risk_assessment": {
-    "high_priority": 8,
-    "medium_priority": 31,
-    "low_priority": 50
+  "performance_metrics": {
+    "lines_per_second": 33394,
+    "optimization_enabled": true,
+    "cache_utilization": "Not enabled in this run"
   }
 }
 ```
 
-### Interpretation Guide
-- **High Priority Issues**: Require immediate attention (structural problems)
-- **Medium Priority**: Should be addressed in next sprint
-- **Low Priority**: Technical debt to address over time
-- **Cost Estimates**: Based on industry average remediation costs
+### Understanding the Results
+- **High Count Violations**: Often ConName and ConType (common patterns)
+- **Medium Priority**: ConMeaning (magic values) and ConPosition  
+- **Low Frequency**: ConAlgorithm and ConTiming (more complex patterns)
+- **Performance**: Based on actual benchmark data from the system
+
+---
+
+## Common Issues & Troubleshooting
+
+### Issue: Import Errors During Installation
+```bash
+# Check Python version
+python --version
+
+# Ensure pip is up to date
+pip install --upgrade pip
+
+# Install with verbose output
+pip install -e . -v
+```
+
+### Issue: Analysis Fails on Code
+```bash
+# Check if path exists and contains Python files
+ls -la /path/to/your/code
+
+# Try with verbose output
+python -m cli.connascence scan /path/to/code --verbose
+
+# Test with smaller subset
+python -m cli.connascence scan /path/to/code/single_file.py
+```
+
+### Issue: Performance Concerns
+```bash
+# Use performance optimization
+python -m cli.connascence scan /path/to/code --incremental
+
+# Check system resources
+top  # or htop on Linux
+```
 
 ---
 
 ## Next Steps After POC
 
 ### Immediate Actions (Same Day)
-- [ ] Review analysis results with development team
-- [ ] Identify 2-3 high-priority issues for immediate fix
-- [ ] Validate business impact calculations
-- [ ] Schedule follow-up technical discussion
+- [ ] Review detected connascence patterns in your code
+- [ ] Understand the types of issues found
+- [ ] Validate a few findings manually to verify accuracy
+- [ ] Document integration requirements
 
-### Short Term (1-2 Weeks)
-- [ ] Integrate with CI/CD pipeline
-- [ ] Set up automated analysis for new commits
+### Short Term (1-2 Weeks)  
+- [ ] Integrate into development workflow
+- [ ] Set up automated analysis scripts
 - [ ] Train team on connascence concepts
-- [ ] Establish quality gates and metrics
+- [ ] Establish quality improvement process
 
 ### Planning Phase (2-4 Weeks)
-- [ ] Plan full deployment strategy
-- [ ] Budget for team training and implementation
-- [ ] Design remediation roadmap for identified issues
-- [ ] Set up monitoring and progress tracking
+- [ ] Plan systematic remediation of identified issues
+- [ ] Establish coding standards based on findings
+- [ ] Consider integration with CI/CD systems
+- [ ] Set up regular quality monitoring
 
 ---
 
 ## POC Support & Resources
 
 ### Technical Support
-- **Email**: poc-support@connascence.io
-- **Slack**: #poc-support channel
-- **Documentation**: https://docs.connascence.io/poc
-- **Video Walkthrough**: https://demo.connascence.io/poc-video
+- **Issues**: GitHub Issues on the repository
+- **Documentation**: README.md and in-code documentation  
+- **Examples**: Check the /examples directory
+- **Tests**: Review /tests directory for usage patterns
 
 ### Additional Resources
 - [Sample Reports](./sample-reports/) - Example analysis outputs
-- [Integration Examples](../technical/integration.md) - CI/CD setup guides
-- [Best Practices](../technical/best-practices.md) - Implementation recommendations
+- [CLI Documentation](../../cli/connascence.py) - Complete CLI reference
+- [Core Analyzer](../../analyzer/) - Understanding the analysis engine
 
 ### Feedback & Improvement
-After completing the POC, please share:
-- Analysis accuracy feedback
-- Performance observations
-- Integration challenges
-- Feature requests or suggestions
+After completing the POC:
+- Report any installation issues
+- Share analysis accuracy observations  
+- Suggest feature improvements
+- Document integration challenges
 
 ---
 
 ## Ready to Start Your POC?
 
-Choose your preferred option above and begin validation. Most teams complete initial validation within 15 minutes and have actionable results within 30 minutes.
+1. **Clone the repository** from GitHub
+2. **Install with pip install -e .**
+3. **Run analysis** on your Python codebase
+4. **Review results** and validate findings
+5. **Test different configurations** and policies
 
-**Need Custom POC Setup?** Contact our technical team for assistance with:
-- Enterprise environment configuration
-- Large codebase optimization
-- Custom integration requirements
-- Specific language or framework support
+**Need Help?** Check the README.md file or create a GitHub issue for support.
 
 ---
 
-*POC environment is updated weekly with latest features and improvements.*
+*POC based on actual implementation - results will vary based on codebase characteristics.*

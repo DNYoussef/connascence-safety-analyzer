@@ -29,20 +29,20 @@ jobs:
     - name: Run Connascence Analysis
       run: |
         # Run main connascence detector
-        python connascence/src/check_connascence.py . \
+        connascence analyze . \
           --severity high \
           --format json \
           --output connascence-report.json
         
         # Run magic literal detection
-        python connascence/scripts/magic-literal-detector.py . \
+        connascence detect-literals . \
           --threshold 20.0 \
-          --json > magic-literals-report.json
+          --format json > magic-literals-report.json
         
         # Run architectural analysis
-        python connascence/src/architectural_analysis.py \
+        connascence analyze-architecture \
           --project-root . \
-          --output-format json
+          --format json
           
     - name: Upload Connascence Reports
       uses: actions/upload-artifact@v3
@@ -94,9 +94,9 @@ jobs:
     - name: Run Ruff with Connascence Rules
       run: |
         # Use the enhanced ruff configuration for connascence detection
-        ruff check . --config connascence/config/enhanced-ruff-config.toml
+        ruff check . --config config/ruff.toml
         
-    - name: Run Ruff Magic Literal Rules
+    - name: Additional Connascence Checks
       run: |
-        # Use specific magic literal rules
-        ruff check . --config connascence/config/ruff_magic_literal_rules.toml
+        # Run additional connascence checks
+        connascence check-config --validate

@@ -238,22 +238,7 @@ class EnterpriseReproducer:
         start_time = time.time()
         output_files = []
         
-        # Prepare analysis command
-        analyzer_path = self.base_path / "analyzer" / "main.py"
-        if not analyzer_path.exists():
-            # Try alternative locations
-            analyzer_path = self.base_path / "src" / "main.py"
-            if not analyzer_path.exists():
-                return AnalysisResult(
-                    repository=repo_name,
-                    sha=config["sha"],
-                    violations_found=0,
-                    expected_violations=config["expected_violations"],
-                    analysis_time=0,
-                    success=False,
-                    output_files=[],
-                    error_message="Analyzer script not found"
-                )
+        # Use unified connascence CLI command instead of legacy scripts
         
         # Setup analysis target path
         target_path = repo_dir
@@ -275,10 +260,10 @@ class EnterpriseReproducer:
         repo_output_dir = self.output_dir / repo_name
         repo_output_dir.mkdir(exist_ok=True)
         
-        # Build analysis command - using exact README configuration
+        # Build analysis command using unified connascence CLI
         cmd = [
-            sys.executable, str(analyzer_path),
-            "--target", str(target_path),
+            "connascence", "analyze",
+            "--path", str(target_path),
             "--profile", config["profile"],
             "--format", "sarif,json,md",
             "--output", str(repo_output_dir)
@@ -580,7 +565,7 @@ mkdir -p {session.output_directory}
             exclude_arg = f"--exclude \"{config['exclude']}\"" if config.get("exclude") else ""
             
             report_content += f"""# {repo_name.upper()} analysis ({config['expected_violations']:,} violations expected)
-python analyzer/main.py \\
+connascence analyze \\
   --repo {config['url']} \\
   --sha {config['sha']} \\
   --profile {config['profile']} \\
@@ -819,16 +804,14 @@ Examples:
     
     args = parser.parse_args()
     
-    # Validate base path contains analyzer
-    analyzer_path = args.base_path / "analyzer" / "main.py"
-    if not analyzer_path.exists():
-        # Try alternative location
-        analyzer_path = args.base_path / "src" / "main.py"
-        if not analyzer_path.exists():
-            print("❌ ERROR: Could not find analyzer/main.py or src/main.py", file=sys.stderr)
-            print(f"   Searched in: {args.base_path}", file=sys.stderr)
-            print("   Please run from connascence project root or specify --base-path", file=sys.stderr)
-            sys.exit(EXIT_CONFIG_ERROR)
+    # Validate connascence CLI is available
+    try:
+        subprocess.run(["connascence", "--version"], capture_output=True, check=True)
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        print("❌ ERROR: 'connascence' CLI not found", file=sys.stderr)
+        print("   Please install the connascence package: pip install connascence", file=sys.stderr)
+        print("   Or run: python -m pip install -e .", file=sys.stderr)
+        sys.exit(EXIT_CONFIG_ERROR)
     
     # Initialize reproducer
     reproducer = EnterpriseReproducer(

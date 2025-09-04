@@ -47,8 +47,8 @@ EOF
     [[ -f "$TEMP_DIR/test.js" ]]
 }
 
-test_mcp_server_exists() {
-    [[ -f "../../mcp/server.py" || -f "../mcp/server.py" || -f "../../src/mcp_handlers.py" ]]
+test_connascence_cli_available() {
+    command -v connascence >/dev/null 2>&1 || python -c "import connascence" >/dev/null 2>&1
 }
 
 test_semgrep_rules_exist() {
@@ -95,7 +95,7 @@ main() {
     run_test test_python_optional "Python detected (optional)"
     
     log_info "Testing core installation..."
-    run_test test_mcp_server_exists "MCP server exists"
+    run_test test_connascence_cli_available "Connascence CLI available"
     run_test test_semgrep_rules_exist "Semgrep rules exist"
     run_test test_vscode_extension_exists "VS Code extension exists"
     

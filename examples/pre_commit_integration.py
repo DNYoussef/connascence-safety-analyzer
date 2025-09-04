@@ -15,13 +15,10 @@ def run_connascence_checks():
     """Run connascence checks as part of pre-commit."""
     print("Running connascence analysis...")
     
-    # Path to connascence checker
-    checker_path = Path(__file__).parent.parent / "src" / "check_connascence.py"
-    
-    # Run analysis on staged Python files
+    # Run analysis on staged Python files using unified CLI
     try:
         result = subprocess.run([
-            sys.executable, str(checker_path),
+            "connascence", "analyze",
             ".",
             "--severity", "high",
             "--format", "json"
@@ -47,11 +44,9 @@ def run_magic_literal_checks():
     """Run magic literal detection."""
     print("Running magic literal detection...")
     
-    detector_path = Path(__file__).parent.parent / "scripts" / "magic-literal-detector.py"
-    
     try:
         result = subprocess.run([
-            sys.executable, str(detector_path),
+            "connascence", "detect-literals",
             ".", 
             "--threshold", "25.0",  # Allow up to 25% magic literals
             "--severity", "medium"

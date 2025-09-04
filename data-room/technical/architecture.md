@@ -2,52 +2,63 @@
 
 ## System Overview
 
-Connascence is built as a distributed, cloud-native platform designed for enterprise-scale code analysis with high availability, security, and performance.
+Connascence is built as a modular Python application designed for flexible code analysis with extensibility, maintainability, and integration capability as core principles.
 
 ### Architecture Principles
-- **Microservices Architecture**: Independently scalable components
-- **Cloud-Native Design**: Kubernetes-ready with container orchestration
-- **Event-Driven Processing**: Asynchronous analysis pipeline
-- **Security by Design**: Zero-trust architecture with end-to-end encryption
+- **Modular Design**: Clearly separated concerns with focused modules
+- **Plugin Architecture**: Extensible analysis framework
+- **CLI-First Design**: Command-line interface as primary interaction method
+- **Configuration-Driven**: Policy-based analysis with customizable rules
 
 ---
 
-## Core Platform Components
+## Core System Components
 
 ### 1. Analysis Engine
 **Purpose**: Core connascence detection and code analysis
-- **Language**: Rust/WebAssembly for performance
-- **Scalability**: Horizontal scaling with auto-load balancing
-- **Processing**: Multi-threaded parallel analysis
-- **Accuracy**: 84.8% detection rate with <0.1% false positive rate (validated on 5,743 enterprise violations)
+- **Language**: Python 3.8+ with AST-based analysis
+- **Framework**: Custom AST walker with pattern matching
+- **Processing**: Single-pass analysis with optional parallel file processing
+- **Accuracy**: Rule-based detection with configurable sensitivity levels
 
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Code Parser   │───▶│ Analysis Engine │───▶│  Result Store   │
-│   (Multi-lang)  │    │   (9 Types)     │    │   (PostgreSQL)  │
+│   Code Parser   │───▶│ Pattern Matcher │───▶│ Result Formatter│
+│   (Python AST) │    │   (9 Types)     │    │  (JSON/SARIF)   │
 └─────────────────┘    └─────────────────┘    └─────────────────┘
 ```
 
-### 2. API Gateway
-**Purpose**: Central access point for all client interactions
-- **Framework**: Kong/Express.js hybrid
-- **Authentication**: OAuth 2.0 + JWT with RBAC
-- **Rate Limiting**: Per-client configurable limits
-- **Monitoring**: Real-time metrics and alerting
+**Key Modules**:
+- `analyzer/` - Core analysis engine and AST processing
+- `policy/` - Policy management and rule configuration
+- `cli/` - Command-line interface and user interactions
+- `reporting/` - Output formatting and report generation
 
-### 3. Data Layer
-**Purpose**: Persistent storage for analysis results and configuration
-- **Primary DB**: PostgreSQL 14+ with read replicas
-- **Cache Layer**: Redis cluster for performance
-- **File Storage**: S3-compatible object storage
-- **Backup**: Automated daily backups with 30-day retention
+### 2. Policy System
+**Purpose**: Configurable analysis rules and thresholds
+- **Framework**: YAML-based policy configuration
+- **Presets**: Three built-in policy profiles
+- **Customization**: Configurable severity levels and exclusions
+- **Baselines**: Quality baseline management and tracking
 
-### 4. Orchestration Layer
-**Purpose**: Workflow management and task scheduling
-- **Queue System**: RabbitMQ for reliable message processing
-- **Scheduler**: Kubernetes CronJobs for recurring tasks
-- **Monitoring**: Prometheus + Grafana stack
-- **Logging**: ELK stack (Elasticsearch, Logstash, Kibana)
+**Available Policies**:
+- `strict-core`: Strict rules for core components
+- `service-defaults`: Balanced rules for typical services  
+- `experimental`: Relaxed rules for experimental code
+
+### 3. CLI Interface
+**Purpose**: Primary user interaction and automation interface
+- **Framework**: Python Click for robust argument parsing
+- **Commands**: Scan, explain, baseline management, autofix
+- **Integration**: Designed for CI/CD pipeline integration
+- **Output**: Multiple formats (JSON, SARIF, markdown, text)
+
+### 4. Reporting System
+**Purpose**: Analysis result formatting and presentation
+- **Formats**: JSON, SARIF, Markdown, plain text
+- **Customization**: Configurable severity filtering
+- **Integration**: Structured outputs for tool integration
+- **Explanation**: Built-in rule explanation system
 
 ---
 
@@ -55,255 +66,241 @@ Connascence is built as a distributed, cloud-native platform designed for enterp
 
 ### Input Processing
 ```
-Code Repository ──┐
-                  ├──▶ Parser Selection ──▶ AST Generation
+Python Files ────┐
+                  ├──▶ AST Generation ──▶ Pattern Detection
 IDE Integration ──┤                          
-                  └──▶ Language Detection ──▶ Context Analysis
+                  └──▶ File Discovery ───▶ Context Analysis
 CI/CD Pipeline ───┘
 ```
 
 ### Core Analysis Flow
 ```
-AST Input ──▶ Pattern Detection ──▶ Connascence Classification ──▶ Risk Assessment
+Python AST ──▶ Pattern Detection ──▶ Connascence Classification ──▶ Severity Assessment
      │              │                        │                        │
-     └──▶ Syntax ───┴──▶ Structural ────────┴──▶ Semantic ────────────┴──▶ Output
+     └──▶ Syntax ───┴──▶ Structural ────────┴──▶ Semantic ────────────┴──▶ Report
 ```
 
 ### Result Processing
 ```
-Raw Results ──▶ Risk Scoring ──▶ Report Generation ──▶ Notification
-     │               │                │                   │
-     └──▶ Filtering ──┴──▶ Grouping ───┴──▶ Export ──────┴──▶ Integration
+Raw Violations ──▶ Policy Filter ──▶ Format Output ──▶ File/Console
+     │                   │               │                │
+     └──▶ Severity ──────┴──▶ Grouping ──┴──▶ Export ────┴──▶ CI Integration
 ```
 
 ---
 
-## Scalability & Performance
+## Performance Characteristics
 
-### Horizontal Scaling
-- **Analysis Engine**: Auto-scaling based on queue depth
-- **API Gateway**: Load balancer with health checks
-- **Database**: Read replicas with automatic failover
-- **Cache**: Redis cluster with sharding
+### Actual Benchmark Data
+Based on real performance testing of the current system:
 
-### Performance Characteristics
-- **Throughput**: 1M+ lines of code per minute
-- **Latency**: <2 seconds for typical file analysis
-- **Concurrency**: 1000+ simultaneous analyses
-- **Memory**: <512MB per analysis worker
+- **Processing Speed**: ~33,394 lines/second (optimized mode)
+- **Speedup**: 4.4x improvement with optimization enabled
+- **Memory Usage**: Efficient memory management for large codebases
+- **Analysis Time**: 789ms for 48,306 lines (157 files)
 
-### Resource Requirements
+### Optimization Features
+- **Single-pass AST**: Reduced traversals from 5 to 1
+- **Incremental Analysis**: File-based caching for repeat analyses
+- **Parallel Processing**: Multi-core file analysis capability
+- **Hash-based Caching**: Efficient result caching system
 
-| Component | CPU | Memory | Storage | Network |
-|-----------|-----|--------|---------|---------|
-| Analysis Engine | 2-8 cores | 4-16GB | 20GB | 1Gbps |
-| API Gateway | 1-4 cores | 2-8GB | 10GB | 10Gbps |
-| Database | 2-8 cores | 8-32GB | 100GB+ | 1Gbps |
-| Cache | 1-2 cores | 4-16GB | 5GB | 1Gbps |
+### System Requirements
+
+| Component | Minimum | Recommended |
+|-----------|---------|-------------|
+| Python Version | 3.8 | 3.10+ |
+| Memory | 512MB | 2GB |
+| CPU | Single core | 2+ cores |
+| Disk Space | 100MB | 500MB |
 
 ---
 
-## Security Architecture
+## Module Structure
 
-### Zero-Trust Design
-- **Network Segmentation**: Service mesh with mTLS
-- **Identity Verification**: Multi-factor authentication
-- **Least Privilege**: Role-based access controls
-- **Continuous Monitoring**: Real-time security analytics
-
-### Data Protection
+### Core Modules
 ```
-┌─────────────┐    ┌──────────────┐    ┌─────────────┐
-│   Client    │───▶│  TLS 1.3+    │───▶│  API GW     │
-│ (Encrypted) │    │ (In Transit) │    │ (Validated) │
-└─────────────┘    └──────────────┘    └─────────────┘
-                           │                   │
-                           ▼                   ▼
-┌─────────────┐    ┌──────────────┐    ┌─────────────┐
-│  AES-256    │◀───│  Processing  │───▶│  Database   │
-│ (At Rest)   │    │  (In Memory) │    │ (Encrypted) │
-└─────────────┘    └──────────────┘    └─────────────┘
+analyzer/
+├── ast_engine/           # AST processing and traversal
+├── dup_detection/        # Duplicate code analysis
+├── runtime_probe/        # Runtime analysis capabilities
+└── frameworks/           # Framework-specific analysis
+
+policy/
+├── presets/             # Built-in policy configurations
+├── baselines/           # Quality baseline management
+└── budgets.py          # Budget and threshold management
+
+reporting/
+├── templates/           # Output templates
+└── formatters/         # Format-specific output handlers
+
+cli/
+└── connascence.py      # Main CLI interface
 ```
 
-### Compliance Features
-- **SOC 2 Type II**: Annual third-party audit
-- **GDPR Compliant**: Data minimization and right to erasure
-- **HIPAA Ready**: Healthcare data handling capabilities
-- **ISO 27001**: Information security management
+### Extension Points
+- **Policy Configuration**: Custom rules via YAML
+- **Output Formats**: Pluggable formatters
+- **Analysis Rules**: Extensible pattern detection
+- **Framework Support**: Framework-specific adaptations
 
 ---
 
 ## Integration Architecture
 
-### API-First Design
+### Command Line Integration
+```bash
+# Basic usage
+python -m cli.connascence scan ./src
+
+# CI/CD integration
+python -m cli.connascence scan ./src --format json --output results.json
+python -m cli.connascence scan-diff --base main --head feature-branch
+```
+
+### Policy Configuration
 ```yaml
-REST API:
-  - Authentication: OAuth 2.0 + JWT
-  - Rate Limiting: Configurable per client
-  - Versioning: Semantic versioning with backward compatibility
-  - Documentation: OpenAPI 3.0 specification
-
-Webhook Support:
-  - Real-time notifications
-  - Configurable event types
-  - Retry logic with exponential backoff
-  - Signature verification
+# Custom policy example
+policy_preset: "service-defaults"
+thresholds:
+  max_positional_params: 4
+  god_class_methods: 25
+budgets:
+  CoM: 8      # Magic literals
+  CoP: 5      # Position violations
+exclusions:
+  - "tests/*"
+  - "deprecated/*"
 ```
 
-### Development Tool Integration
-- **IDE Plugins**: VS Code, IntelliJ, Eclipse
-- **CI/CD**: Jenkins, GitHub Actions, GitLab CI
-- **Version Control**: Git hooks and pull request analysis
-- **Project Management**: Jira, Azure DevOps integration
-
-### Enterprise Integration
-- **SSO Support**: SAML 2.0, OpenID Connect
-- **LDAP Integration**: Active Directory compatibility
-- **API Management**: Kong, Apigee, AWS API Gateway
-- **Monitoring**: Splunk, DataDog, New Relic integration
+### API Integration Potential
+While the current system is CLI-focused, the modular architecture supports:
+- **MCP Server**: Model Context Protocol integration
+- **REST API**: Future web service wrapper
+- **IDE Integration**: Editor plugin architecture
+- **Webhook Support**: Event-driven notifications
 
 ---
 
-## Deployment Architecture
+## Security Considerations
 
-### Cloud-Native Options
+### Code Analysis Safety
+- **Read-only Analysis**: No code modification during analysis
+- **Sandboxed Execution**: No code execution, only static analysis
+- **Input Validation**: Robust file and path validation
+- **Error Handling**: Graceful handling of malformed code
 
-#### Kubernetes (Recommended)
+### Data Privacy
+- **Local Processing**: All analysis performed locally
+- **No Code Upload**: No code sent to external services
+- **Configurable Output**: Control over what data is included in reports
+- **Baseline Privacy**: Local baseline storage and management
+
+---
+
+## Development and Deployment
+
+### Development Setup
+```bash
+# Clone repository
+git clone https://github.com/connascence/connascence-analyzer
+
+# Install in development mode
+pip install -e ".[dev]"
+
+# Run tests
+python -m pytest tests/ -v
+
+# Run analysis
+python -m cli.connascence scan ./examples
+```
+
+### Production Deployment
+```bash
+# Install from package
+pip install connascence-analyzer
+
+# System-wide installation
+sudo pip install connascence-analyzer
+
+# Containerized deployment
+docker build -t connascence-analyzer .
+docker run -v ./code:/code connascence-analyzer scan /code
+```
+
+### CI/CD Integration
 ```yaml
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: connascence
-
----
-# Analysis Engine Deployment
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: analysis-engine
-spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: analysis-engine
-  template:
-    spec:
-      containers:
-      - name: engine
-        image: connascence/analysis-engine:v2.0.0
-        resources:
-          requests:
-            cpu: 2000m
-            memory: 4Gi
-          limits:
-            cpu: 4000m
-            memory: 8Gi
+# GitHub Actions example
+- name: Code Quality Analysis
+  run: |
+    pip install connascence-analyzer
+    connascence scan ./src --format json --output quality-report.json
+    connascence scan-diff --base ${{ github.event.pull_request.base.sha }}
 ```
 
-#### Docker Compose (Development)
+---
+
+## Extensibility and Customization
+
+### Adding New Analysis Rules
+1. **Pattern Detection**: Extend AST visitor classes
+2. **Policy Integration**: Add rules to policy configuration
+3. **Reporting**: Include new violation types in formatters
+4. **Testing**: Add comprehensive test coverage
+
+### Custom Policy Development
 ```yaml
-version: '3.8'
-services:
-  analysis-engine:
-    image: connascence/analysis-engine:v2.0.0
-    environment:
-      - DATABASE_URL=postgresql://user:pass@db:5432/connascence
-      - REDIS_URL=redis://redis:6379
-    depends_on:
-      - postgres
-      - redis
+# Example custom policy
+name: "team-standards"
+description: "Our team's coding standards"
+base_policy: "service-defaults"
+custom_rules:
+  max_function_length: 50
+  max_class_methods: 20
+  connascence_budgets:
+    CoM: 5    # Stricter magic number limits
+    CoP: 3    # Stricter position coupling
 ```
 
-### On-Premises Deployment
-- **Requirements**: Docker + Kubernetes or standalone Docker
-- **Networking**: Ingress controller for external access
-- **Storage**: Persistent volumes for data and configuration
-- **Backup**: Automated backup scripts and procedures
+### Framework Integration
+The system supports framework-specific analysis patterns:
+- **Test Frameworks**: pytest, unittest adaptations
+- **Web Frameworks**: Flask, Django, FastAPI patterns
+- **Data Frameworks**: pandas, numpy optimization patterns
 
 ---
 
-## Monitoring & Observability
+## Future Architecture Considerations
 
-### Metrics Collection
-```
-Application Metrics ──┐
-                      ├──▶ Prometheus ──▶ Grafana Dashboards
-System Metrics ──────┤
-                      └──▶ AlertManager ──▶ Notifications
-Custom Metrics ──────┘
-```
+### Planned Enhancements
+- **Multi-language Support**: Beyond Python analysis
+- **Real-time Analysis**: IDE integration with live feedback
+- **Team Analytics**: Aggregated quality metrics
+- **Machine Learning**: Pattern learning and suggestion
 
-### Health Checks
-- **Readiness Probes**: Service startup verification
-- **Liveness Probes**: Service health monitoring
-- **Circuit Breakers**: Automatic failure handling
-- **Graceful Degradation**: Partial functionality during issues
-
-### Log Aggregation
-```
-Application Logs ──┐
-                   ├──▶ Logstash ──▶ Elasticsearch ──▶ Kibana
-System Logs ──────┤
-                   └──▶ Fluentd ──▶ Storage ──▶ Analytics
-Audit Logs ───────┘
-```
+### Scalability Planning
+- **Distributed Analysis**: Large codebase processing
+- **Result Aggregation**: Cross-project quality tracking
+- **Performance Optimization**: Further speed improvements
+- **Memory Efficiency**: Large file processing optimization
 
 ---
 
-## Disaster Recovery & Business Continuity
+## Technical Support and Resources
 
-### High Availability
-- **Multi-Region**: Active-passive deployment options
-- **Database Replication**: Automatic failover with <30s RTO
-- **Load Balancing**: Geographic load distribution
-- **Backup Strategy**: 3-2-1 backup rule implementation
+### Documentation
+- **README.md**: Quick start and basic usage
+- **CLI Help**: `python -m cli.connascence --help`
+- **Policy Documentation**: Policy configuration examples
+- **Test Suite**: Comprehensive examples in /tests
 
-### Recovery Procedures
-- **RTO Target**: <15 minutes for critical services
-- **RPO Target**: <5 minutes data loss maximum
-- **Runbook**: Automated recovery procedures
-- **Testing**: Quarterly disaster recovery drills
-
----
-
-## Technology Stack Summary
-
-| Layer | Technology | Purpose | Scalability |
-|-------|------------|---------|-------------|
-| **Frontend** | React/TypeScript | Web UI | CDN + Load Balancer |
-| **API** | Node.js/Express | REST API | Horizontal scaling |
-| **Analysis** | Rust/WASM | Core engine | Auto-scaling workers |
-| **Database** | PostgreSQL 14+ | Data persistence | Read replicas + sharding |
-| **Cache** | Redis Cluster | Performance | Horizontal sharding |
-| **Queue** | RabbitMQ | Message processing | Cluster deployment |
-| **Storage** | S3-compatible | File storage | Object storage scaling |
-| **Orchestration** | Kubernetes | Container management | Node auto-scaling |
+### Troubleshooting
+- **Verbose Mode**: `--verbose` flag for detailed logging
+- **Issue Reporting**: GitHub Issues for bug reports
+- **Performance Issues**: Incremental mode and optimization tips
+- **Integration Problems**: CI/CD setup examples
 
 ---
 
-## Next Steps for Technical Teams
-
-### Architecture Review
-1. **Deep Dive Session**: Schedule 2-hour technical walkthrough
-2. **Integration Planning**: Identify connection points with existing systems
-3. **Security Review**: Validate against organizational security requirements
-4. **Capacity Planning**: Size infrastructure for expected load
-
-### Proof of Concept
-1. **Environment Setup**: Deploy test instance
-2. **Sample Analysis**: Test with representative codebase
-3. **Integration Testing**: Validate API and webhook functionality
-4. **Performance Testing**: Verify scalability under load
-
----
-
-## Technical Support
-
-**Architecture Questions**: [support.md](./support.md)  
-**Integration Guidance**: [integration.md](./integration.md)  
-**Security Details**: [security/security-architecture.md](./security/security-architecture.md)  
-**API Documentation**: [api-reference.md](./api-reference.md)
-
----
-
-*Architecture documentation is updated with each major release and validated against production deployments.*
+*This architecture documentation reflects the current implementation. Features marked as "future" or "planned" are not yet available.*

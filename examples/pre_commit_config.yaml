@@ -17,11 +17,11 @@ repos:
     hooks:
       - id: ruff
         name: Ruff Connascence Rules
-        args: [--config=connascence/config/enhanced-ruff-config.toml]
+        args: [--config=policy/enhanced-ruff-config.toml]
         
       - id: ruff
         name: Ruff Magic Literal Rules  
-        args: [--config=connascence/config/ruff_magic_literal_rules.toml]
+        args: [--config=policy/ruff_magic_literal_rules.toml]
 
   # Custom connascence detection hooks
   - repo: local
@@ -29,7 +29,7 @@ repos:
       # Main connascence detector
       - id: connascence-check
         name: Connascence Violation Check
-        entry: python connascence/src/check_connascence.py
+        entry: connascence analyze
         language: system
         files: '\.py$'
         args: ['--severity', 'high']
@@ -38,7 +38,7 @@ repos:
       # Magic literal detector
       - id: magic-literal-check
         name: Magic Literal Check
-        entry: python connascence/scripts/magic-literal-detector.py
+        entry: connascence detect-literals
         language: system
         files: '\.py$'
         args: ['--threshold', '20.0', '--severity', 'medium']
@@ -47,7 +47,7 @@ repos:
       # God object detector
       - id: god-object-check
         name: God Object Check
-        entry: python connascence/scripts/god_object_detector.py
+        entry: connascence detect-god-objects
         language: system
         files: '\.py$'
         pass_filenames: false

@@ -81,7 +81,7 @@ EXPRESS_SHA=aa907945cd1727483a888a0a6481f9f4861593f8
 ### Command Line Flags for Buyers
 ```bash
 # Match our exact baseline (Windows, Python 3.12.5)
-python analyzer/main.py \
+connascence analyze \
   --repo https://github.com/celery/celery \
   --sha 6da32827cebaf332d22f906386c47e552ec0e38f \
   --exclude "tests/,docs/,vendor/,.git/,__pycache__/,*.pyc" \
@@ -92,7 +92,7 @@ python analyzer/main.py \
 
 # Alternative: Use our Docker container for exact replication
 docker run connascence-analyzer:v1.0-sale \
-  --repo celery --sha 6da32827ce --baseline-exact
+  analyze --repo celery --sha 6da32827ce --baseline-exact
 ```
 
 ### Tolerance Documentation
@@ -149,7 +149,7 @@ If buyer gets drastically different results (>500 violation difference):
 
 ```bash
 # Debug script for buyer
-python analyzer/debug.py \
+connascence debug \
   --repo celery \
   --sha 6da32827ce \
   --compare-baseline \

@@ -31,7 +31,7 @@
 
 ### 1. Self-Analysis Capability ✅
 ```bash
-python cli/connascence.py scan . --format json --policy strict-core
+connascence scan . --format json --policy strict-core
 # ✅ Successfully analyzed 473 files
 # ✅ Detected 48,513 violations with strict policy
 # ✅ Generated actionable recommendations
