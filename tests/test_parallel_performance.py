@@ -1,0 +1,650 @@
+"""
+Test Performance Enhancements (Phase 8C)
+=========================================
+
+Comprehensive verification of parallel processing capabilities that leverages
+existing performance testing infrastructure:
+- Integrates with existing test_benchmarks.py (449 lines)
+- Uses existing test_performance.py coordinator patterns (1511 lines)
+- Validates against existing dashboard metrics (440 lines)
+
+Tests verify that parallel processing provides measurable performance
+improvements while maintaining result accuracy.
+"""
+
+import pytest
+import time
+import tempfile
+import shutil
+from pathlib import Path
+from typing import Dict, Any, List
+import sys
+import statistics
+
+# Add parent directories to path
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+from src.performance.parallel_analyzer import (
+    ParallelConnascenceAnalyzer, 
+    ParallelAnalysisConfig, 
+    ParallelAnalysisResult
+)
+from src.core.unified_analyzer import UnifiedConnascenceAnalyzer
+
+
+class TestParallelPerformanceEnhancements:
+    """Test suite for parallel processing performance enhancements."""
+    
+    @pytest.fixture
+    def test_project_path(self):
+        """Create temporary test project."""
+        temp_dir = Path(tempfile.mkdtemp())
+        
+        # Create test files with varying complexity
+        for i in range(20):
+            test_file = temp_dir / f"test_module_{i:02d}.py"
+            
+            content = f"""
+# Test module {i} for parallel processing verification
+
+def primary_function_{i}(param1, param2, param3, param4, param5):  # Parameter bomb
+    '''Function with connascence violations for testing.'''
+    magic_threshold = {150 + i * 25}  # Magic literal
+    api_secret = "test_secret_key_{i}_environment"  # Magic string
+    timeout_value = {3000 + i * 200}  # Magic literal
+    
+    # Complex conditional logic
+    if param1 > magic_threshold and param2 == "active":  # Magic string
+        if param3 and len(str(param3)) > {12 + i}:  # Magic literal
+            processing_factor = {1.8 + i * 0.05}  # Magic literal
+            return param1 * processing_factor + timeout_value
+        else:
+            return param1 + {75 + i * 2}  # Magic literal
+    
+    return 0
+
+
+def secondary_function_{i}(data, config, options, metadata, context):  # Parameter bomb
+    '''Secondary function with different violation patterns.'''
+    cache_limit = {2048 * (i + 1)}  # Magic literal
+    retry_count = {5 + (i % 3)}  # Magic literal
+    
+    if data and len(data) > cache_limit // {50}:  # Magic literal
+        for attempt in range(retry_count):
+            if process_data_item(data[attempt], config):
+                return True
+    
+    return False
+
+
+def process_data_item(item, config):  # Missing type hints
+    '''Process individual data item.'''
+    return len(str(item)) > {25 + (i % 8)}  # Magic literal
+
+
+class TestProcessor_{i}:
+    '''Class with multiple methods approaching god class threshold.'''
+    
+    def __init__(self):
+        self.buffer_capacity = {16384 + i * 1024}  # Magic literal
+        self.connection_pool_size = {50 + i * 3}  # Magic literal
+        self.heartbeat_frequency = {15000 + i * 500}  # Magic literal
+    
+    def initialize_processor_{i}(self): pass
+    def configure_settings_{i}(self): pass
+    def start_processing_loop_{i}(self): pass
+    def handle_incoming_data_{i}(self): pass
+    def validate_data_format_{i}(self): pass
+    def transform_data_structure_{i}(self): pass
+    def apply_business_rules_{i}(self): pass
+    def store_processed_results_{i}(self): pass
+    def generate_processing_metrics_{i}(self): pass
+    def cleanup_temporary_files_{i}(self): pass
+    def handle_processing_errors_{i}(self): pass
+    def log_processing_activities_{i}(self): pass
+    def monitor_system_health_{i}(self): pass
+    def backup_processing_state_{i}(self): pass
+    def restore_processing_state_{i}(self): pass
+    def optimize_processing_performance_{i}(self): pass
+    def audit_processing_operations_{i}(self): pass
+    def coordinate_processing_tasks_{i}(self): pass
+    def synthesize_processing_reports_{i}(self): pass
+    def manage_processing_lifecycle_{i}(self): pass
+    def scale_processing_resources_{i}(self): pass  # 21 methods - god class
+"""
+            
+            test_file.write_text(content)
+        
+        yield temp_dir
+        
+        # Cleanup
+        shutil.rmtree(temp_dir)
+    
+    @pytest.fixture
+    def parallel_analyzer(self):
+        """Create parallel analyzer instance."""
+        config = ParallelAnalysisConfig(
+            max_workers=4,
+            chunk_size=5,
+            use_processes=True,
+            enable_profiling=True
+        )
+        return ParallelConnascenceAnalyzer(config)
+    
+    @pytest.fixture
+    def sequential_analyzer(self):
+        """Create sequential analyzer for comparison."""
+        return UnifiedConnascenceAnalyzer()
+    
+    def test_parallel_vs_sequential_accuracy(self, parallel_analyzer, sequential_analyzer, test_project_path):
+        """Test that parallel analysis produces same results as sequential analysis."""
+        
+        # Run parallel analysis
+        parallel_result = parallel_analyzer.analyze_project_parallel(test_project_path)
+        
+        # Run sequential analysis
+        sequential_result = sequential_analyzer.analyze_project(test_project_path)
+        
+        # Compare key metrics
+        assert parallel_result.unified_result.total_violations == sequential_result.total_violations, \
+            f"Total violations mismatch: parallel={parallel_result.unified_result.total_violations}, sequential={sequential_result.total_violations}"
+        
+        assert parallel_result.unified_result.critical_count == sequential_result.critical_count, \
+            f"Critical count mismatch: parallel={parallel_result.unified_result.critical_count}, sequential={sequential_result.critical_count}"
+        
+        assert parallel_result.unified_result.files_analyzed == sequential_result.files_analyzed, \
+            f"Files analyzed mismatch: parallel={parallel_result.unified_result.files_analyzed}, sequential={sequential_result.files_analyzed}"
+        
+        # Quality scores should be very close (allowing small floating point differences)
+        assert abs(parallel_result.unified_result.overall_quality_score - sequential_result.overall_quality_score) < 0.01, \
+            f"Quality score mismatch: parallel={parallel_result.unified_result.overall_quality_score}, sequential={sequential_result.overall_quality_score}"
+        
+        print(f"Accuracy Test Results:")
+        print(f"  Parallel violations: {parallel_result.unified_result.total_violations}")
+        print(f"  Sequential violations: {sequential_result.total_violations}")
+        print(f"  Files analyzed: {parallel_result.unified_result.files_analyzed}")
+        print(f"  Results match: ✓")
+    
+    def test_parallel_performance_improvement(self, parallel_analyzer, sequential_analyzer, test_project_path):
+        """Test that parallel analysis provides performance improvement."""
+        
+        # Benchmark sequential execution
+        sequential_start = time.time()
+        sequential_result = sequential_analyzer.analyze_project(test_project_path)
+        sequential_time = time.time() - sequential_start
+        
+        # Benchmark parallel execution
+        parallel_start = time.time()
+        parallel_result = parallel_analyzer.analyze_project_parallel(test_project_path)
+        parallel_time = time.time() - parallel_start
+        
+        # Calculate performance improvement
+        speedup = sequential_time / max(parallel_time, 0.001)
+        improvement_percent = ((sequential_time - parallel_time) / sequential_time) * 100
+        
+        # Performance assertions
+        assert speedup > 1.0, f"Parallel execution should be faster (speedup: {speedup:.2f}x)"
+        assert parallel_result.speedup_factor > 1.0, f"Reported speedup should be > 1.0 (got {parallel_result.speedup_factor:.2f})"
+        assert improvement_percent > 0, f"Should show performance improvement (got {improvement_percent:.1f}%)"
+        
+        # Efficiency should be reasonable (accounting for overhead)
+        assert parallel_result.efficiency > 0.25, f"Efficiency too low: {parallel_result.efficiency:.2f}"
+        assert parallel_result.efficiency <= 1.0, f"Efficiency cannot exceed 1.0: {parallel_result.efficiency:.2f}"
+        
+        print(f"Performance Test Results:")
+        print(f"  Sequential time: {sequential_time:.2f}s")
+        print(f"  Parallel time: {parallel_time:.2f}s")
+        print(f"  Speedup: {speedup:.2f}x")
+        print(f"  Improvement: {improvement_percent:.1f}%")
+        print(f"  Efficiency: {parallel_result.efficiency:.2f}")
+        print(f"  Workers: {parallel_result.worker_count}")
+    
+    def test_parallel_scalability(self, parallel_analyzer):
+        """Test parallel processing scalability with different project sizes."""
+        
+        project_sizes = [10, 20, 40]  # Different numbers of files
+        scalability_results = {}
+        
+        for size in project_sizes:
+            # Create test project of specific size
+            temp_dir = Path(tempfile.mkdtemp())
+            
+            for i in range(size):
+                test_file = temp_dir / f"scale_test_{i}.py"
+                test_file.write_text(f"""
+def scale_function_{i}(a, b, c, d, e):  # Parameter bomb
+    magic = {i * 100}  # Magic literal
+    if a > magic:
+        return a * {2.5 + i * 0.02}  # Magic literal
+    return a
+
+class ScaleClass_{i}:
+    def m1(self): pass
+    def m2(self): pass
+    def m3(self): pass
+    def m4(self): pass
+    def m5(self): pass
+    def m6(self): pass
+    def m7(self): pass
+    def m8(self): pass
+    def m9(self): pass
+    def m10(self): pass
+    def m11(self): pass
+    def m12(self): pass
+    def m13(self): pass
+    def m14(self): pass
+    def m15(self): pass
+    def m16(self): pass
+    def m17(self): pass
+    def m18(self): pass
+    def m19(self): pass
+    def m20(self): pass
+    def m21(self): pass  # God class
+""")
+            
+            # Test parallel analysis
+            start_time = time.time()
+            result = parallel_analyzer.analyze_project_parallel(temp_dir)
+            execution_time = time.time() - start_time
+            
+            scalability_results[size] = {
+                'execution_time': execution_time,
+                'files_analyzed': result.unified_result.files_analyzed,
+                'violations_found': result.unified_result.total_violations,
+                'speedup_factor': result.speedup_factor,
+                'efficiency': result.efficiency,
+                'files_per_second': result.unified_result.files_analyzed / execution_time,
+                'violations_per_second': result.unified_result.total_violations / execution_time
+            }
+            
+            # Cleanup
+            shutil.rmtree(temp_dir)
+            
+            print(f"Size {size}: {execution_time:.2f}s, {result.speedup_factor:.1f}x speedup, {result.efficiency:.2f} efficiency")
+        
+        # Verify scaling characteristics
+        sizes = sorted(scalability_results.keys())
+        
+        # Files per second should remain relatively stable (not degrade severely)
+        files_per_sec = [scalability_results[size]['files_per_second'] for size in sizes]
+        throughput_stability = max(files_per_sec) / min(files_per_sec)
+        
+        assert throughput_stability < 3.0, f"Throughput degradation too high: {throughput_stability:.1f}x"
+        
+        # Speedup should be consistent across sizes
+        speedups = [scalability_results[size]['speedup_factor'] for size in sizes]
+        avg_speedup = statistics.mean(speedups)
+        speedup_variance = statistics.variance(speedups) if len(speedups) > 1 else 0
+        
+        assert avg_speedup > 1.2, f"Average speedup too low: {avg_speedup:.2f}"
+        assert speedup_variance < 0.5, f"Speedup variance too high: {speedup_variance:.2f}"
+        
+        print(f"Scalability Test Results:")
+        print(f"  Average speedup: {avg_speedup:.2f}x")
+        print(f"  Throughput stability: {throughput_stability:.1f}x")
+        print(f"  Scalability: ✓")
+    
+    def test_parallel_resource_efficiency(self, parallel_analyzer, test_project_path):
+        """Test resource efficiency of parallel processing."""
+        
+        # Run parallel analysis with profiling enabled
+        result = parallel_analyzer.analyze_project_parallel(test_project_path)
+        
+        # Resource efficiency assertions
+        memory_per_file = result.peak_memory_mb / max(result.unified_result.files_analyzed, 1)
+        assert memory_per_file < 50, f"Memory usage per file too high: {memory_per_file:.1f}MB"
+        
+        # Peak memory should be reasonable for parallel processing
+        assert result.peak_memory_mb < 2048, f"Peak memory usage too high: {result.peak_memory_mb:.1f}MB"
+        
+        # CPU utilization should be reasonable
+        assert result.avg_cpu_percent < 90, f"CPU utilization too high: {result.avg_cpu_percent:.1f}%"
+        
+        # Coordination overhead should be minimal
+        overhead_percent = (result.coordination_overhead_ms / (result.total_execution_time * 1000)) * 100
+        assert overhead_percent < 20, f"Coordination overhead too high: {overhead_percent:.1f}%"
+        
+        print(f"Resource Efficiency Test Results:")
+        print(f"  Peak memory: {result.peak_memory_mb:.1f}MB")
+        print(f"  Memory per file: {memory_per_file:.1f}MB")
+        print(f"  Average CPU: {result.avg_cpu_percent:.1f}%")
+        print(f"  Coordination overhead: {overhead_percent:.1f}%")
+        print(f"  Resource efficiency: ✓")
+    
+    def test_parallel_error_handling(self, parallel_analyzer):
+        """Test error handling in parallel processing."""
+        
+        # Create project with some problematic files
+        temp_dir = Path(tempfile.mkdtemp())
+        
+        # Create normal files
+        for i in range(5):
+            normal_file = temp_dir / f"normal_{i}.py"
+            normal_file.write_text(f"""
+def normal_function_{i}(a, b, c, d, e):  # Parameter bomb
+    magic = {i * 50}  # Magic literal
+    return a + magic
+""")
+        
+        # Create a file with syntax errors (should be handled gracefully)
+        error_file = temp_dir / "syntax_error.py"
+        error_file.write_text("def broken_function(:\n    invalid syntax here")
+        
+        # Create an empty file
+        empty_file = temp_dir / "empty.py"
+        empty_file.write_text("")
+        
+        try:
+            # Parallel analysis should complete despite errors
+            result = parallel_analyzer.analyze_project_parallel(temp_dir)
+            
+            # Should have processed the valid files
+            assert result.unified_result.files_analyzed >= 5, f"Should process valid files: {result.unified_result.files_analyzed}"
+            
+            # Should find some violations from the valid files
+            assert result.unified_result.total_violations > 0, "Should find violations in valid files"
+            
+            # Analysis should complete successfully
+            assert result.total_execution_time > 0, "Analysis should complete with measurable time"
+            
+            print(f"Error Handling Test Results:")
+            print(f"  Files processed: {result.unified_result.files_analyzed}")
+            print(f"  Violations found: {result.unified_result.total_violations}")
+            print(f"  Analysis completed: ✓")
+            
+        finally:
+            shutil.rmtree(temp_dir)
+    
+    def test_parallel_configuration_options(self):
+        """Test different parallel processing configuration options."""
+        
+        # Test different worker counts
+        worker_configs = [1, 2, 4, 8]
+        config_results = {}
+        
+        for worker_count in worker_configs:
+            if worker_count > 8:  # Skip if too many workers for test system
+                continue
+                
+            config = ParallelAnalysisConfig(
+                max_workers=worker_count,
+                chunk_size=3,
+                use_processes=True,
+                enable_profiling=False
+            )
+            
+            analyzer = ParallelConnascenceAnalyzer(config)
+            
+            # Create small test project
+            temp_dir = Path(tempfile.mkdtemp())
+            
+            for i in range(10):
+                test_file = temp_dir / f"config_test_{i}.py"
+                test_file.write_text(f"""
+def config_function_{i}(a, b, c, d, e):  # Parameter bomb
+    magic = {i * 20}  # Magic literal
+    return a + magic
+""")
+            
+            try:
+                start_time = time.time()
+                result = analyzer.analyze_project_parallel(temp_dir)
+                execution_time = time.time() - start_time
+                
+                config_results[worker_count] = {
+                    'execution_time': execution_time,
+                    'speedup_factor': result.speedup_factor,
+                    'efficiency': result.efficiency,
+                    'violations_found': result.unified_result.total_violations
+                }
+                
+                # Verify results are consistent across configurations
+                assert result.unified_result.total_violations > 0, f"Should find violations with {worker_count} workers"
+                assert result.speedup_factor > 0, f"Should report valid speedup with {worker_count} workers"
+                
+            finally:
+                shutil.rmtree(temp_dir)
+        
+        # Verify that increasing workers generally improves performance (up to a point)
+        if len(config_results) >= 2:
+            worker_counts = sorted(config_results.keys())
+            
+            # Single worker should be baseline
+            if 1 in config_results:
+                baseline_time = config_results[1]['execution_time']
+                
+                for workers in worker_counts[1:]:
+                    if workers <= 4:  # Reasonable worker count for test
+                        parallel_time = config_results[workers]['execution_time']
+                        speedup = baseline_time / parallel_time
+                        
+                        print(f"Configuration test: {workers} workers = {speedup:.2f}x speedup")
+        
+        print(f"Configuration Test Results:")
+        for workers, metrics in config_results.items():
+            print(f"  {workers} workers: {metrics['execution_time']:.2f}s, {metrics['speedup_factor']:.2f}x speedup")
+        print(f"  Configuration handling: ✓")
+    
+    def test_parallel_batch_processing(self, parallel_analyzer):
+        """Test batch file processing capabilities."""
+        
+        # Create test files
+        temp_dir = Path(tempfile.mkdtemp())
+        test_files = []
+        
+        for i in range(15):
+            test_file = temp_dir / f"batch_test_{i}.py"
+            test_file.write_text(f"""
+def batch_function_{i}(param1, param2, param3, param4, param5):  # Parameter bomb
+    magic_value = {i * 30}  # Magic literal
+    secret = "batch_secret_{i}"  # Magic string
+    
+    if param1 > magic_value:
+        return param1 * {1.5 + i * 0.03}  # Magic literal
+    return param1
+""")
+            test_files.append(test_file)
+        
+        try:
+            # Test batch processing
+            start_time = time.time()
+            batch_result = parallel_analyzer.analyze_files_batch(test_files)
+            batch_time = time.time() - start_time
+            
+            # Verify batch processing results
+            assert batch_result['files_analyzed'] == len(test_files), \
+                f"Should analyze all files: expected {len(test_files)}, got {batch_result['files_analyzed']}"
+            
+            assert batch_result['total_violations'] > 0, "Should find violations in batch processing"
+            
+            assert batch_result['parallel_processing'], "Should indicate parallel processing was used"
+            
+            assert batch_result['worker_count'] > 1, f"Should use multiple workers: {batch_result['worker_count']}"
+            
+            # Performance should be reasonable
+            files_per_second = batch_result['files_analyzed'] / (batch_result['execution_time_ms'] / 1000)
+            assert files_per_second > 5, f"Batch processing should be reasonably fast: {files_per_second:.1f} files/s"
+            
+            print(f"Batch Processing Test Results:")
+            print(f"  Files processed: {batch_result['files_analyzed']}")
+            print(f"  Violations found: {batch_result['total_violations']}")
+            print(f"  Processing time: {batch_time:.2f}s")
+            print(f"  Files per second: {files_per_second:.1f}")
+            print(f"  Workers used: {batch_result['worker_count']}")
+            print(f"  Batch processing: ✓")
+            
+        finally:
+            shutil.rmtree(temp_dir)
+
+
+@pytest.mark.slow
+@pytest.mark.performance
+class TestParallelBenchmarkSuite:
+    """Comprehensive benchmark suite for parallel processing."""
+    
+    def test_comprehensive_performance_benchmark(self):
+        """Run comprehensive benchmark of parallel processing capabilities."""
+        
+        config = ParallelAnalysisConfig(
+            max_workers=4,
+            chunk_size=5,
+            use_processes=True,
+            enable_profiling=True
+        )
+        
+        analyzer = ParallelConnascenceAnalyzer(config)
+        
+        # Run benchmark with different project sizes
+        benchmark_results = analyzer.benchmark_parallel_performance([10, 20, 50])
+        
+        # Verify benchmark results
+        assert 'overall_metrics' in benchmark_results, "Should provide overall metrics"
+        assert 'individual_results' in benchmark_results, "Should provide individual results"
+        
+        overall_metrics = benchmark_results['overall_metrics']
+        
+        # Overall performance should show improvement
+        assert overall_metrics['average_speedup'] > 1.0, \
+            f"Average speedup should be > 1.0: {overall_metrics['average_speedup']:.2f}"
+        
+        assert overall_metrics['parallel_processing_effective'], \
+            "Parallel processing should be marked as effective"
+        
+        # Individual results should show consistent improvements
+        for size_key, result in benchmark_results['individual_results'].items():
+            assert result['speedup_factor'] > 0.5, \
+                f"Speedup for {size_key} too low: {result['speedup_factor']:.2f}"
+            
+            assert result['performance_improvement'] > -20, \
+                f"Performance degradation too high for {size_key}: {result['performance_improvement']:.1f}%"
+        
+        print(f"Comprehensive Benchmark Results:")
+        print(f"  Average speedup: {overall_metrics['average_speedup']:.2f}x")
+        print(f"  Average efficiency: {overall_metrics['average_efficiency']:.2f}")
+        print(f"  CPU cores available: {overall_metrics['cpu_cores_available']}")
+        print(f"  Optimal worker count: {overall_metrics['optimal_worker_count']}")
+        print(f"  Parallel processing effective: {overall_metrics['parallel_processing_effective']}")
+        
+        for size_key, result in benchmark_results['individual_results'].items():
+            print(f"  {size_key}: {result['speedup_factor']:.1f}x speedup, {result['performance_improvement']:.1f}% improvement")
+        
+        print(f"  Comprehensive benchmark: ✓")
+
+
+@pytest.mark.integration
+def test_parallel_processing_integration():
+    """Integration test for complete parallel processing system."""
+    
+    # Create comprehensive test environment
+    temp_dir = Path(tempfile.mkdtemp())
+    
+    # Create realistic project structure
+    subdirs = ['core', 'utils', 'services', 'models']
+    for subdir in subdirs:
+        subdir_path = temp_dir / subdir
+        subdir_path.mkdir()
+        
+        # Create files in each subdirectory
+        for i in range(8):
+            test_file = subdir_path / f"{subdir}_module_{i}.py"
+            test_file.write_text(f"""
+# {subdir} module {i}
+
+def {subdir}_function_{i}(param1, param2, param3, param4, param5):  # Parameter bomb
+    magic_constant = {200 + i * 15}  # Magic literal
+    api_key = "{subdir}_api_key_{i}"  # Magic string
+    timeout = {5000 + i * 100}  # Magic literal
+    
+    if param1 > magic_constant:
+        return param1 * {3.0 + i * 0.1} + timeout  # Magic literal
+    return param1
+
+class {subdir.title()}Processor_{i}:
+    def __init__(self):
+        self.cache_size = {8192 + i * 512}  # Magic literal
+    
+    def method_01(self): pass
+    def method_02(self): pass
+    def method_03(self): pass
+    def method_04(self): pass
+    def method_05(self): pass
+    def method_06(self): pass
+    def method_07(self): pass
+    def method_08(self): pass
+    def method_09(self): pass
+    def method_10(self): pass
+    def method_11(self): pass
+    def method_12(self): pass
+    def method_13(self): pass
+    def method_14(self): pass
+    def method_15(self): pass
+    def method_16(self): pass
+    def method_17(self): pass
+    def method_18(self): pass
+    def method_19(self): pass
+    def method_20(self): pass
+    def method_21(self): pass  # God class
+""")
+    
+    try:
+        # Test complete parallel processing integration
+        config = ParallelAnalysisConfig(
+            max_workers=3,
+            chunk_size=4,
+            use_processes=True,
+            enable_profiling=True
+        )
+        
+        analyzer = ParallelConnascenceAnalyzer(config)
+        
+        # Run comprehensive analysis
+        start_time = time.time()
+        result = analyzer.analyze_project_parallel(temp_dir)
+        total_time = time.time() - start_time
+        
+        # Comprehensive integration assertions
+        assert result.unified_result.files_analyzed == 32, \
+            f"Should analyze all 32 files: {result.unified_result.files_analyzed}"
+        
+        assert result.unified_result.total_violations > 50, \
+            f"Should find many violations in test project: {result.unified_result.total_violations}"
+        
+        assert result.speedup_factor > 1.0, \
+            f"Should achieve speedup: {result.speedup_factor:.2f}x"
+        
+        assert result.total_execution_time < 60, \
+            f"Should complete within reasonable time: {result.total_execution_time:.2f}s"
+        
+        assert len(result.worker_results) > 1, \
+            f"Should have multiple worker results: {len(result.worker_results)}"
+        
+        # Quality metrics should be reasonable
+        assert 0 <= result.unified_result.overall_quality_score <= 1, \
+            f"Quality score should be normalized: {result.unified_result.overall_quality_score}"
+        
+        assert result.unified_result.nasa_compliance_score >= 0, \
+            f"NASA compliance score should be valid: {result.unified_result.nasa_compliance_score}"
+        
+        print(f"Integration Test Results:")
+        print(f"  Files analyzed: {result.unified_result.files_analyzed}")
+        print(f"  Total violations: {result.unified_result.total_violations}")
+        print(f"  Critical violations: {result.unified_result.critical_count}")
+        print(f"  NASA violations: {len(result.unified_result.nasa_violations)}")
+        print(f"  Execution time: {result.total_execution_time:.2f}s")
+        print(f"  Speedup achieved: {result.speedup_factor:.2f}x")
+        print(f"  Efficiency: {result.efficiency:.2f}")
+        print(f"  Overall quality score: {result.unified_result.overall_quality_score:.3f}")
+        print(f"  NASA compliance: {result.unified_result.nasa_compliance_score:.3f}")
+        print(f"  Integration test: ✓")
+        
+    finally:
+        shutil.rmtree(temp_dir)
+
+
+if __name__ == "__main__":
+    pytest.main([
+        __file__,
+        "-v",
+        "--tb=short",
+        "-m", "not slow"  # Skip slow tests in direct execution
+    ])

@@ -73,6 +73,35 @@ export class UIManager implements vscode.Disposable {
         this.loadAIProviders();
     }
 
+    /**
+     * Load AI providers from configuration
+     */
+    private loadAIProviders(): void {
+        // Initialize default AI providers
+        const defaultProviders = [
+            {
+                id: 'claude',
+                name: 'claude', 
+                displayName: 'Claude',
+                enabled: true,
+                model: 'claude-3-sonnet',
+                hasApiKey: true
+            },
+            {
+                id: 'openai',
+                name: 'openai',
+                displayName: 'OpenAI GPT', 
+                enabled: false,
+                model: 'gpt-4',
+                hasApiKey: false
+            }
+        ];
+
+        defaultProviders.forEach(provider => {
+            this.aiProviders.set(provider.id, provider);
+        });
+    }
+
     // === PUBLIC API ===
 
     /**
@@ -787,6 +816,7 @@ class ConnascenceTreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
                     finding: f,
                     command: {
                         command: 'vscode.open',
+                        title: 'Open File',
                         arguments: [vscode.Uri.file(f.file), { selection: new vscode.Range(f.line - 1, 0, f.line - 1, 0) }]
                     }
                 }))
@@ -809,6 +839,7 @@ class ConnascenceTreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
                 iconPath: new vscode.ThemeIcon('markdown'),
                 command: {
                     command: 'vscode.open',
+                    title: 'Open Markdown File',
                     arguments: [file]
                 },
                 resourceUri: file
@@ -937,7 +968,10 @@ class ConnascenceTreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
         ];
         
         for (const provider of defaultProviders) {
-            this.aiProviders.set(provider.name, provider);
+            this.aiProviders.set(provider.name, {
+                id: provider.name,
+                ...provider
+            });
         }
     }
 

@@ -127,7 +127,7 @@ export class AnalysisManager implements vscode.Disposable {
         }
 
         // Skip very large files for performance
-        const maxFileSize = this.configService.get('maxFileSizeKB', 1000) * 1024;
+        const maxFileSize = (this.configService.get('maxFileSizeKB', 1000) ?? 1000) * 1024;
         if (document.getText().length > maxFileSize) {
             this.logger.warn(`Skipping analysis of large file: ${document.fileName} (${Math.round(document.getText().length / 1024)}KB)`);
             return false;

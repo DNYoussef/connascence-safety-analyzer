@@ -1,0 +1,176 @@
+{
+  "mcp_configuration": {
+    "name": "Enhanced MCP Configuration",
+    "version": "2.0.0",
+    "description": "MCP servers configuration for connascence analyzer with AI integration",
+    "last_updated": "2025-01-04"
+  },
+  
+  "mcpServers": {
+    "claude-flow": {
+      "command": "npx",
+      "args": [
+        "claude-flow@alpha",
+        "mcp",
+        "start"
+      ],
+      "type": "stdio",
+      "description": "Claude Flow v2.0.0 Alpha - 87 MCP tools with hive-mind intelligence",
+      "capabilities": [
+        "swarm_coordination",
+        "neural_processing", 
+        "task_orchestration",
+        "memory_management"
+      ],
+      "integration_priority": "high",
+      "enabled": true
+    },
+    
+    "ruv-swarm": {
+      "command": "npx",
+      "args": [
+        "ruv-swarm@latest",
+        "mcp",
+        "start",
+        "--stability"
+      ],
+      "type": "stdio",
+      "description": "ruv-swarm MCP server for enhanced coordination and neural processing",
+      "capabilities": [
+        "distributed_processing",
+        "consensus_algorithms",
+        "performance_optimization",
+        "adaptive_coordination"
+      ],
+      "integration_priority": "high",
+      "enabled": true
+    },
+    
+    "flow-nexus": {
+      "command": "npx", 
+      "args": [
+        "flow-nexus@latest",
+        "mcp",
+        "start"
+      ],
+      "type": "stdio",
+      "description": "Flow Nexus Complete MCP server for advanced AI orchestration",
+      "capabilities": [
+        "advanced_orchestration",
+        "multi_agent_coordination",
+        "workflow_automation",
+        "integration_management"
+      ],
+      "integration_priority": "high",
+      "enabled": true
+    },
+    
+    "memory": {
+      "command": "npx",
+      "args": [
+        "@modelcontextprotocol/server-memory"
+      ],
+      "type": "stdio",
+      "description": "Persistent memory server for cross-session context",
+      "capabilities": [
+        "persistent_memory",
+        "cross_session_context",
+        "data_persistence",
+        "context_management"
+      ],
+      "integration_priority": "medium",
+      "enabled": true
+    },
+    
+    "markdown": {
+      "command": "npx",
+      "args": [
+        "@modelcontextprotocol/server-markdown"
+      ],
+      "type": "stdio", 
+      "description": "Markdown processing and documentation server",
+      "capabilities": [
+        "markdown_processing",
+        "documentation_generation",
+        "report_formatting",
+        "template_processing"
+      ],
+      "integration_priority": "low",
+      "enabled": true
+    }
+  },
+  
+  "integration_settings": {
+    "auto_discovery": true,
+    "health_check_interval": 30,
+    "retry_attempts": 3,
+    "timeout_seconds": 10,
+    "parallel_connections": true,
+    "connection_pooling": true
+  },
+  
+  "connascence_integration": {
+    "enable_ai_recommendations": true,
+    "enable_automated_fixes": false,
+    "enable_context_awareness": true,
+    "enable_cross_tool_correlation": true,
+    
+    "ai_context_sharing": {
+      "share_violations": true,
+      "share_nasa_compliance": true,
+      "share_mece_analysis": true,
+      "share_severity_context": true
+    },
+    
+    "tool_specific_settings": {
+      "claude-flow": {
+        "use_for_recommendations": true,
+        "use_for_explanations": true,
+        "use_for_refactoring": true
+      },
+      "ruv-swarm": {
+        "use_for_performance": true,
+        "use_for_optimization": true,
+        "use_for_clustering": true
+      },
+      "flow-nexus": {
+        "use_for_orchestration": true,
+        "use_for_workflow": true,
+        "use_for_coordination": true
+      }
+    }
+  },
+  
+  "fallback_configuration": {
+    "enable_graceful_degradation": true,
+    "offline_mode": true,
+    "cache_responses": true,
+    "cache_ttl_seconds": 3600,
+    "local_processing_fallback": true
+  },
+  
+  "monitoring": {
+    "enable_performance_tracking": true,
+    "enable_usage_analytics": true,
+    "enable_error_reporting": true,
+    "log_level": "info",
+    "metrics_collection": {
+      "response_times": true,
+      "success_rates": true,
+      "usage_patterns": true,
+      "error_frequencies": true
+    }
+  },
+  
+  "security": {
+    "enable_authentication": false,
+    "enable_encryption": false,
+    "rate_limiting": {
+      "enabled": true,
+      "requests_per_minute": 60,
+      "burst_limit": 10
+    },
+    "input_validation": true,
+    "output_sanitization": true
+  }
+}

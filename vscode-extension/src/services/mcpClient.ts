@@ -18,7 +18,7 @@ export class MCPClient implements vscode.Disposable {
         private configService: ConfigurationService,
         private logger: ExtensionLogger
     ) {
-        this.serverUrl = this.configService.get('serverUrl', 'http://localhost:8080');
+        this.serverUrl = this.configService.get('serverUrl', 'http://localhost:8080') ?? 'http://localhost:8080';
         this.setupConfigurationWatcher();
     }
 
@@ -254,7 +254,7 @@ export class MCPClient implements vscode.Disposable {
         this.disposables.push(
             vscode.workspace.onDidChangeConfiguration((event) => {
                 if (event.affectsConfiguration('connascence.serverUrl')) {
-                    const newUrl = this.configService.get('serverUrl', 'http://localhost:8080');
+                    const newUrl = this.configService.get('serverUrl', 'http://localhost:8080') ?? 'http://localhost:8080';
                     if (newUrl !== this.serverUrl) {
                         this.serverUrl = newUrl;
                         this.isConnected = false;

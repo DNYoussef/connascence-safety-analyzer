@@ -593,6 +593,41 @@ npm install -g @connascence/mcp-server
         `;
     }
 
+    private generateAnalysisContent(): string {
+        return `
+            <div class="content-header">
+                <div class="content-title">🔍 Code Analysis</div>
+                <div class="breadcrumb">Features > Analysis</div>
+            </div>
+            
+            <p>The Connascence extension provides real-time analysis of your code to detect coupling issues.</p>
+            
+            <h2>Analysis Types</h2>
+            <div class="analysis-types">
+                <div class="analysis-card">
+                    <div class="analysis-name">🔍 Real-time Analysis</div>
+                    <p>Automatically scans files as you type with configurable debouncing</p>
+                </div>
+                
+                <div class="analysis-card">
+                    <div class="analysis-name">📁 Workspace Analysis</div>
+                    <p>Comprehensive scan of entire workspace or selected folders</p>
+                </div>
+                
+                <div class="analysis-card">
+                    <div class="analysis-name">📄 File Analysis</div>
+                    <p>Targeted analysis of individual files with detailed reporting</p>
+                </div>
+            </div>
+            
+            <h2>Quick Actions</h2>
+            <div class="action-buttons">
+                <button class="btn" onclick="runCommand('connascence.analyzeWorkspace')">🔍 Analyze Workspace</button>
+                <button class="btn btn-secondary" onclick="runCommand('connascence.analyzeFile')">📄 Analyze Current File</button>
+            </div>
+        `;
+    }
+
     private generateViolationsContent(): string {
         return `
             <div class="content-header">

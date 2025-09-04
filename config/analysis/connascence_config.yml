@@ -1,0 +1,163 @@
+# Connascence Analysis Configuration
+# Consolidated from pyproject.toml and policy configurations
+
+analysis:
+  name: "Enhanced Connascence Analysis"
+  version: "2.0.0"
+  description: "Professional connascence analysis with NASA Power of Ten integration"
+  
+  # Default policy for analysis
+  policy_preset: "strict-core"
+  
+  # Analysis options
+  options:
+    enable_nasa_rules: true
+    enable_mece_analysis: true
+    enable_multi_tool_correlation: true
+    enable_ai_recommendations: true
+    comprehensive_mode: false
+    
+  # Custom thresholds for this codebase
+  thresholds:
+    max_positional_params: 4       # Slightly relaxed for internal APIs
+    god_class_methods: 25          # Relaxed for main analyzer classes
+    max_cyclomatic_complexity: 12
+    function_size_limit: 60        # NASA Rule 4
+    assertion_density: 2           # NASA Rule 5
+    
+  # Budget limits for PRs and CI/CD
+  budgets:
+    CoM: 8        # Magic literals
+    CoP: 5        # Position violations  
+    CoA: 3        # Algorithm duplication
+    critical: 0   # No critical issues
+    high: 5       # Max 5 high severity
+    medium: 15    # Medium severity limit
+    
+  # File exclusions
+  exclusions:
+    - "deprecated/*"
+    - "experimental/*" 
+    - "examples/*"
+    - "fixtures/*"
+    - "tests/*"
+    - "vscode-extension/out/*"
+    - "vscode-extension/node_modules/*"
+    - ".git/*"
+    - ".mypy_cache/*"
+    - ".pytest_cache/*"
+    - ".ruff_cache/*"
+    - ".venv/*"
+    - "venv/*"
+    - "build/*"
+    - "dist/*"
+    
+  # Framework profiles for adapted analysis
+  frameworks:
+    - "pytest"    # Test framework adaptations
+    - "fastapi"   # For MCP server endpoints
+    - "vscode"    # VS Code extension patterns
+    - "click"     # CLI framework patterns
+    
+# Severity calculation configuration
+severity:
+  calculation_method: "weighted_multi_factor"
+  
+  # Base severity factors
+  factors:
+    connascence_type_weight: 0.4
+    scope_impact_weight: 0.3
+    nasa_rule_violation_weight: 0.2
+    cross_tool_consensus_weight: 0.1
+    
+  # Severity enhancement rules
+  enhancement:
+    nasa_rule_violation: "+1"          # Increase severity by one level
+    multiple_rule_violations: "+2"     # Multiple violations = critical
+    cross_tool_consensus_high: "+1"    # High confidence from multiple tools
+    
+  # Severity level mappings
+  levels:
+    critical: 
+      score_range: [8, 10]
+      ci_action: "fail"
+      requires_waiver: true
+    high:
+      score_range: [6, 7]
+      ci_action: "fail"
+      requires_review: true
+    medium:
+      score_range: [4, 5]
+      ci_action: "warn"
+      requires_review: false
+    low:
+      score_range: [1, 3]
+      ci_action: "info"
+      requires_review: false
+      
+# Output and reporting configuration
+output:
+  default_format: "text"
+  supported_formats:
+    - "text"
+    - "json"
+    - "sarif"
+    - "html"
+    - "markdown"
+    - "csv"
+    
+  # Report sections
+  report_sections:
+    - "summary"
+    - "violations_by_type"
+    - "violations_by_severity"
+    - "nasa_compliance_status"
+    - "mece_analysis_summary"
+    - "recommendations"
+    - "trend_analysis"
+    
+  # Executive dashboard options
+  dashboard:
+    enable_real_time: true
+    refresh_interval: 30  # seconds
+    show_metrics: true
+    show_trends: true
+    show_nasa_compliance: true
+
+# Integration with external tools
+integrations:
+  mcp_servers:
+    enabled: true
+    endpoints:
+      - "claude-flow"
+      - "ruv-swarm"
+      - "flow-nexus"
+      
+  version_control:
+    git_integration: true
+    commit_message_analysis: true
+    pr_analysis: true
+    
+  ci_cd:
+    github_actions: true
+    quality_gates: true
+    failure_prediction: true
+    
+# Performance and scalability
+performance:
+  parallel_processing: true
+  max_workers: 4
+  chunk_size: 100
+  cache_enabled: true
+  cache_ttl: 3600  # seconds
+  
+  # Memory management
+  memory_limits:
+    max_file_size_mb: 10
+    max_total_memory_mb: 512
+    
+  # Batch processing options
+  batch_processing:
+    enabled: true
+    batch_size: 50
+    clustering_enabled: true

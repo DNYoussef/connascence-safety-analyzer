@@ -1,0 +1,374 @@
+# NASA Power of Ten Rules - Complete Implementation
+# Source: Gerard J. Holzmann, JPL (Spinroot.com/gerard/pdf/P10.pdf)
+#
+# These 10 rules were developed at NASA JPL for flight software to ensure
+# software safety and reliability in mission-critical environments.
+
+name: "NASA Power of Ten Rules"
+version: "2.0.0"
+description: "NASA JPL Power of Ten rules for safety-critical software development"
+source: "Gerard J. Holzmann, JPL Laboratory for Reliable Software"
+criticality: "mission_critical"
+domain: "space_flight_software"
+
+# === THE 10 POWER OF TEN RULES ===
+
+rules:
+  # Rule 1: Avoid complex flow constructs, such as goto and recursion
+  nasa_rule_1:
+    id: "POT_RULE_1"
+    title: "Avoid complex flow constructs"
+    description: "Avoid complex flow constructs, such as goto and recursion"
+    rationale: "Complex control flow makes verification and analysis difficult"
+    severity: "critical"
+    categories: ["control_flow", "verification"]
+    violations:
+      - type: "goto_statement"
+        message: "NASA Rule 1: goto statements prohibited"
+        suggestion: "Use structured control flow (if/else, loops, functions)"
+      - type: "recursive_function"
+        message: "NASA Rule 1: Recursion prohibited"
+        suggestion: "Convert to iterative solution with explicit stack if needed"
+      - type: "setjmp_longjmp"
+        message: "NASA Rule 1: setjmp/longjmp prohibited"
+        suggestion: "Use proper error handling and return codes"
+
+  # Rule 2: All loops must have fixed upper bounds
+  nasa_rule_2:
+    id: "POT_RULE_2"
+    title: "All loops must have fixed upper bounds"
+    description: "All loops must have a statically determinable upper bound"
+    rationale: "Unbounded loops can cause infinite execution and resource exhaustion"
+    severity: "critical"
+    categories: ["loops", "termination", "resource_management"]
+    violations:
+      - type: "unbounded_loop"
+        message: "NASA Rule 2: Loop must have statically determinable upper bound"
+        suggestion: "Add loop counter or use bounded iteration"
+      - type: "while_true_loop"
+        message: "NASA Rule 2: while(1) loops prohibited unless in main event loop"
+        suggestion: "Use bounded loops with clear termination conditions"
+      - type: "infinite_for_loop"
+        message: "NASA Rule 2: Infinite for loops prohibited"
+        suggestion: "Define clear iteration bounds"
+
+  # Rule 3: Do not use the heap after initialization
+  nasa_rule_3:
+    id: "POT_RULE_3" 
+    title: "Do not use the heap after initialization"
+    description: "Avoid dynamic memory allocation after system initialization"
+    rationale: "Dynamic allocation can cause memory fragmentation and unpredictable behavior"
+    severity: "critical"
+    categories: ["memory_management", "heap", "initialization"]
+    violations:
+      - type: "malloc_after_init"
+        message: "NASA Rule 3: malloc/calloc/realloc prohibited after initialization"
+        suggestion: "Pre-allocate all memory during initialization phase"
+      - type: "free_after_init"
+        message: "NASA Rule 3: free() prohibited after initialization"
+        suggestion: "Use static memory allocation or memory pools"
+      - type: "new_operator"
+        message: "NASA Rule 3: C++ new operator prohibited after initialization"
+        suggestion: "Use placement new on pre-allocated memory"
+
+  # Rule 4: No function should be longer than what can be printed on a single sheet of paper
+  nasa_rule_4:
+    id: "POT_RULE_4"
+    title: "Restrict function size"
+    description: "No function should exceed 60 lines (single sheet of paper)"
+    rationale: "Large functions are difficult to understand, test, and verify"
+    severity: "high"
+    categories: ["function_size", "readability", "maintainability"]
+    violations:
+      - type: "function_too_long"
+        message: "NASA Rule 4: Function exceeds 60 lines"
+        suggestion: "Break into smaller, focused functions"
+        threshold: 60
+      - type: "function_too_complex"
+        message: "NASA Rule 4: Function cyclomatic complexity too high"
+        suggestion: "Reduce complexity by extracting helper functions"
+        threshold: 10
+
+  # Rule 5: The assertion density should be at least 2 assertions per function
+  nasa_rule_5:
+    id: "POT_RULE_5"
+    title: "Use at least 2 runtime assertions per function"
+    description: "The assertion density should average 2 assertions per function"
+    rationale: "Assertions catch errors early and document assumptions"
+    severity: "high"
+    categories: ["assertions", "verification", "error_detection"]
+    violations:
+      - type: "insufficient_assertions"
+        message: "NASA Rule 5: Function needs at least 2 assertions"
+        suggestion: "Add pre/post-condition assertions or invariant checks"
+        threshold: 2
+      - type: "missing_precondition_assertion"
+        message: "NASA Rule 5: Add precondition assertion"
+        suggestion: "Validate input parameters with assert() or similar"
+      - type: "missing_postcondition_assertion"
+        message: "NASA Rule 5: Add postcondition assertion"
+        suggestion: "Validate function results before returning"
+
+  # Rule 6: Data objects should be declared at the smallest possible level of scope
+  nasa_rule_6:
+    id: "POT_RULE_6"
+    title: "Declare data objects at smallest scope"
+    description: "Declare data objects at the smallest possible level of scope"
+    rationale: "Limited scope reduces coupling and makes code easier to understand"
+    severity: "medium"
+    categories: ["scope", "data_management", "coupling"]
+    violations:
+      - type: "variable_scope_too_wide"
+        message: "NASA Rule 6: Variable can be declared in smaller scope"
+        suggestion: "Move declaration closer to first use"
+      - type: "excessive_global_variables"
+        message: "NASA Rule 6: Too many global variables"
+        suggestion: "Encapsulate in modules or pass as parameters"
+        threshold: 20
+      - type: "file_scope_non_const"
+        message: "NASA Rule 6: Non-const file-scope variable"
+        suggestion: "Make const or move to function scope"
+
+  # Rule 7: Check the return value of all non-void functions
+  nasa_rule_7:
+    id: "POT_RULE_7"
+    title: "Check return values of all non-void functions"
+    description: "The return value of non-void functions must be checked"
+    rationale: "Unchecked return values can hide errors and cause system failures"
+    severity: "high"
+    categories: ["error_handling", "return_values", "reliability"]
+    violations:
+      - type: "unchecked_return_value"
+        message: "NASA Rule 7: Return value not checked"
+        suggestion: "Check return value or explicitly cast to void with comment"
+      - type: "unchecked_critical_function"
+        message: "NASA Rule 7: Critical function return value not checked"
+        suggestion: "Always check return values of memory, I/O, and system functions"
+        critical_functions: ["malloc", "fopen", "fwrite", "pthread_create"]
+      - type: "parameter_validation_missing"
+        message: "NASA Rule 7: Function parameters not validated"
+        suggestion: "Add null checks and range validation for parameters"
+
+  # Rule 8: The use of the preprocessor must be limited to include of header files and simple macro definitions
+  nasa_rule_8:
+    id: "POT_RULE_8"
+    title: "Limit preprocessor use"
+    description: "Preprocessor use limited to includes and simple macro definitions"
+    rationale: "Complex macros make code hard to debug and analyze"
+    severity: "medium"
+    categories: ["preprocessor", "macros", "complexity"]
+    violations:
+      - type: "complex_macro"
+        message: "NASA Rule 8: Macro too complex"
+        suggestion: "Replace with inline function or simpler macro"
+      - type: "variadic_macro"
+        message: "NASA Rule 8: Variadic macros prohibited"
+        suggestion: "Use functions with proper parameter lists"
+      - type: "recursive_macro"
+        message: "NASA Rule 8: Recursive macros prohibited"
+        suggestion: "Rewrite as non-recursive or use function"
+      - type: "token_pasting_macro"
+        message: "NASA Rule 8: Token pasting macros discouraged"
+        suggestion: "Use explicit naming or function generation"
+
+  # Rule 9: The use of pointers should be restricted
+  nasa_rule_9:
+    id: "POT_RULE_9"
+    title: "Restrict pointer use"
+    description: "Use of pointers should be restricted (one level of indirection max)"
+    rationale: "Multiple pointer indirection increases complexity and error potential"
+    severity: "high"
+    categories: ["pointers", "memory_safety", "complexity"]
+    violations:
+      - type: "multiple_pointer_indirection"
+        message: "NASA Rule 9: Multiple levels of pointer indirection"
+        suggestion: "Use single-level pointers or structured data types"
+        max_indirection: 1
+      - type: "function_pointer"
+        message: "NASA Rule 9: Function pointers should be avoided"
+        suggestion: "Use switch statements or direct function calls"
+      - type: "pointer_arithmetic"
+        message: "NASA Rule 9: Pointer arithmetic should be minimized"
+        suggestion: "Use array indexing instead of pointer arithmetic"
+
+  # Rule 10: All code should be compiled with all possible compiler warnings enabled
+  nasa_rule_10:
+    id: "POT_RULE_10"
+    title: "Compile with all warnings enabled"
+    description: "All code must be compiled with maximum warning level and warnings as errors"
+    rationale: "Compiler warnings catch many common programming errors"
+    severity: "critical"
+    categories: ["compilation", "warnings", "error_prevention"]
+    violations:
+      - type: "compiler_warning_present"
+        message: "NASA Rule 10: Compiler warning must be fixed"
+        suggestion: "Address warning or add explicit suppression with justification"
+      - type: "warnings_not_errors"
+        message: "NASA Rule 10: Compiler warnings must be treated as errors"
+        suggestion: "Enable -Werror or equivalent compiler flag"
+      - type: "insufficient_warning_level"
+        message: "NASA Rule 10: Insufficient compiler warning level"
+        suggestion: "Enable maximum warning level (-Wall -Wextra -Wpedantic)"
+
+# === ENFORCEMENT CONFIGURATION ===
+
+enforcement:
+  mode: "strict"
+  fail_on_violation: true
+  require_waivers_for_exceptions: true
+  
+  # Severity mapping for CI/CD
+  ci_cd_mappings:
+    critical: "error"    # Build fails
+    high: "error"        # Build fails  
+    medium: "warning"    # Build succeeds with warnings
+    low: "info"          # Informational only
+
+  # Build integration
+  build_flags:
+    c_cpp:
+      required_flags: ["-Wall", "-Wextra", "-Werror", "-pedantic"]
+      optional_flags: ["-Wshadow", "-Wconversion", "-Wunreachable-code"]
+    python:
+      required_tools: ["mypy", "ruff", "bandit"]
+      mypy_flags: ["--strict", "--warn-unreachable"]
+    javascript:
+      required_tools: ["eslint", "typescript"]
+      eslint_rules: ["@typescript-eslint/recommended"]
+
+# === WAIVER SYSTEM ===
+
+waivers:
+  enabled: true
+  require_justification: true
+  require_approval: true
+  max_active_waivers: 5
+  expiry_days: 14
+  
+  allowed_categories:
+    - "third_party_library_constraint"
+    - "performance_critical_section" 
+    - "legacy_compatibility_requirement"
+    - "prototype_development_only"
+    
+  approval_levels:
+    critical: "lead_engineer"
+    high: "senior_developer"
+    medium: "peer_review"
+    low: "self_approval"
+
+# === LANGUAGE-SPECIFIC ADAPTATIONS ===
+
+language_profiles:
+  c:
+    profile: "strict_nasa_c"
+    additional_checks:
+      - "misra_c_compliance"
+      - "cert_c_secure_coding"
+    tools: ["cppcheck", "splint", "pc-lint"]
+    
+  cpp:
+    profile: "restricted_cpp" 
+    additional_checks:
+      - "core_guidelines_compliance"
+      - "autosar_cpp_compliance"
+    restrictions:
+      - "no_exceptions"
+      - "no_rtti"
+      - "limited_templates"
+    
+  python:
+    profile: "safety_python"
+    additional_checks:
+      - "mypy_strict_mode"
+      - "bandit_security_scan"
+    restrictions:
+      - "no_eval_exec"
+      - "limited_dynamic_imports"
+      - "explicit_type_annotations"
+    
+  javascript:
+    profile: "strict_typescript"
+    additional_checks:
+      - "typescript_strict_mode"
+      - "eslint_recommended"
+    restrictions:
+      - "no_eval"
+      - "no_with_statements"
+      - "explicit_types_required"
+
+# === INTEGRATION WITH CONNASCENCE ANALYSIS ===
+
+connascence_integration:
+  # Map Power of Ten violations to connascence types
+  violation_mappings:
+    goto_statement: "connascence_of_execution"
+    recursive_function: "connascence_of_algorithm"
+    unbounded_loop: "connascence_of_algorithm"
+    malloc_after_init: "connascence_of_timing"
+    function_too_long: "connascence_of_algorithm"
+    insufficient_assertions: "connascence_of_meaning"
+    variable_scope_too_wide: "connascence_of_position"
+    unchecked_return_value: "connascence_of_meaning"
+    complex_macro: "connascence_of_meaning"
+    multiple_pointer_indirection: "connascence_of_position"
+    compiler_warning_present: "connascence_of_meaning"
+    
+  # Enhance connascence severity based on NASA rule violations
+  severity_enhancement:
+    nasa_rule_violation: "+1"  # Increase severity by one level
+    multiple_rule_violations: "+2"  # Multiple violations = critical
+    
+  # AI prompt integration
+  include_in_ai_prompts: true
+  ai_context_sections:
+    - "violated_nasa_rules"
+    - "safety_impact_assessment" 
+    - "recommended_nasa_compliant_solution"
+    - "verification_strategy"
+
+# === METRICS AND REPORTING ===
+
+metrics:
+  track_compliance_score: true
+  compliance_formula: "(rules_passed / total_rules) * 100"
+  target_compliance: 100  # 100% compliance required
+  
+  violation_tracking:
+    - count_by_rule
+    - count_by_severity
+    - count_by_file
+    - count_by_developer
+    - trend_over_time
+    
+  reporting:
+    daily_compliance_report: true
+    violation_trend_analysis: true
+    developer_training_recommendations: true
+
+# === DOCUMENTATION REQUIREMENTS ===
+
+documentation:
+  require_rule_citations: true
+  require_safety_rationale: true  
+  require_verification_strategy: true
+  require_test_coverage_plan: true
+  
+  templates:
+    waiver_request: "templates/nasa_waiver_request.md"
+    safety_analysis: "templates/nasa_safety_analysis.md"
+    compliance_report: "templates/nasa_compliance_report.md"
+
+# === VERSION CONTROL INTEGRATION ===
+
+version_control:
+  pre_commit_hooks: true
+  commit_message_requirements:
+    - cite_nasa_rules_if_relevant
+    - include_compliance_impact
+    - reference_safety_analysis
+    
+  branch_protection:
+    require_compliance_check: true
+    require_safety_review: true
+    block_merge_on_violations: true

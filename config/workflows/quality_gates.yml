@@ -1,0 +1,354 @@
+# Quality Gates and Failure Prediction Configuration
+# Advanced quality control for connascence analyzer
+
+quality_gates:
+  name: "Enhanced Quality Gates System"
+  version: "2.0.0"
+  description: "Intelligent quality gates with failure prediction and automated decision making"
+  
+  # Gate definitions
+  gates:
+    
+    # Critical Violations Gate
+    critical_violations_gate:
+      name: "Critical Violations Gate"
+      type: "threshold"
+      metric: "critical_violations_count"
+      threshold: 0
+      operator: "lte"  # less than or equal to
+      action: "fail"
+      message: "Build failed: Critical violations detected"
+      
+    # NASA Compliance Gate  
+    nasa_compliance_gate:
+      name: "NASA Power of Ten Compliance Gate"
+      type: "score"
+      metric: "nasa_compliance_score"
+      threshold: 90
+      operator: "gte"  # greater than or equal to
+      action: "fail"
+      message: "Build failed: NASA compliance below 90%"
+      warning_threshold: 95
+      warning_message: "Warning: NASA compliance below 95%"
+      
+    # Overall Quality Gate
+    overall_quality_gate:
+      name: "Overall Quality Gate"
+      type: "score"  
+      metric: "overall_compliance_score"
+      threshold: 85
+      operator: "gte"
+      action: "fail"
+      message: "Build failed: Overall quality score below 85%"
+      warning_threshold: 90
+      warning_message: "Warning: Overall quality score below 90%"
+      
+    # High Severity Gate
+    high_severity_gate:
+      name: "High Severity Violations Gate"
+      type: "threshold"
+      metric: "high_violations_count"
+      threshold: 5
+      operator: "lte"
+      action: "warn"
+      message: "Warning: High severity violations exceed threshold"
+      
+    # Technical Debt Gate
+    technical_debt_gate:
+      name: "Technical Debt Gate"
+      type: "composite"
+      metrics:
+        - name: "code_duplication_percentage"
+          threshold: 15
+          operator: "lte"
+          weight: 0.4
+        - name: "cyclomatic_complexity_avg"
+          threshold: 10
+          operator: "lte"
+          weight: 0.3
+        - name: "function_size_violations"
+          threshold: 3
+          operator: "lte"
+          weight: 0.3
+      composite_threshold: 0.8
+      action: "warn"
+      message: "Warning: Technical debt indicators elevated"
+      
+    # Trend Analysis Gate
+    trend_analysis_gate:
+      name: "Quality Trend Gate"
+      type: "trend"
+      metric: "overall_compliance_score"
+      lookback_days: 7
+      min_improvement_rate: -2  # Allow 2% degradation
+      action: "warn"
+      message: "Warning: Quality trend declining"
+      
+  # Failure prediction system
+  failure_prediction:
+    enabled: true
+    
+    # Machine learning model for failure prediction
+    model:
+      type: "gradient_boosting"
+      features:
+        - "critical_violations_count"
+        - "high_violations_count"
+        - "nasa_compliance_score"
+        - "code_duplication_percentage"
+        - "cyclomatic_complexity_avg"
+        - "test_coverage_percentage"
+        - "lines_of_code"
+        - "number_of_functions"
+        - "days_since_last_major_refactor"
+        
+    # Prediction thresholds
+    thresholds:
+      high_risk: 0.8      # 80% probability of issues
+      medium_risk: 0.6    # 60% probability of issues
+      low_risk: 0.4       # 40% probability of issues
+      
+    # Actions based on predictions
+    actions:
+      high_risk:
+        - "require_senior_review"
+        - "run_extended_tests"
+        - "generate_detailed_report"
+        - "notify_team_lead"
+      medium_risk:
+        - "require_peer_review"
+        - "run_additional_checks"
+        - "generate_summary_report"
+      low_risk:
+        - "standard_review_process"
+        
+  # Intelligent routing system
+  intelligent_routing:
+    enabled: true
+    
+    # Route to different review processes based on analysis
+    routing_rules:
+      
+      # NASA critical path
+      nasa_critical_path:
+        conditions:
+          - "nasa_compliance_score < 95"
+          - "critical_violations_count > 0"
+        actions:
+          - "route_to_senior_architect"
+          - "require_safety_review"
+          - "generate_compliance_report"
+          - "block_merge_until_resolved"
+          
+      # Technical debt path
+      technical_debt_path:
+        conditions:
+          - "code_duplication_percentage > 20"
+          - "cyclomatic_complexity_avg > 12"
+        actions:
+          - "route_to_refactoring_team"
+          - "generate_refactoring_recommendations"
+          - "schedule_technical_debt_review"
+          
+      # Security path
+      security_path:
+        conditions:
+          - "security_violations_count > 0"
+          - "bandit_score < 8"
+        actions:
+          - "route_to_security_team"
+          - "require_security_review"
+          - "generate_security_report"
+          
+      # Performance path
+      performance_path:
+        conditions:
+          - "performance_score < 7"
+          - "memory_usage_violations > 3"
+        actions:
+          - "route_to_performance_team"
+          - "require_performance_review"
+          - "schedule_performance_testing"
+          
+  # Automated fixes and suggestions
+  automated_fixes:
+    enabled: true
+    
+    # Categories of issues that can be auto-fixed
+    fixable_issues:
+      formatting:
+        - "line_too_long"
+        - "trailing_whitespace" 
+        - "missing_final_newline"
+        tools: ["black", "ruff"]
+        auto_apply: true
+        
+      imports:
+        - "unused_import"
+        - "duplicate_import"
+        - "import_order"
+        tools: ["ruff", "isort"]
+        auto_apply: true
+        
+      simple_refactoring:
+        - "variable_naming"
+        - "function_naming"
+        - "unused_variable"
+        tools: ["ruff"]
+        auto_apply: false  # Require human review
+        
+    # AI-powered suggestions
+    ai_suggestions:
+      enabled: true
+      mcp_integration: true
+      suggestion_types:
+        - "code_refactoring"
+        - "performance_optimization"
+        - "security_improvements"
+        - "nasa_compliance_fixes"
+        
+  # Metrics collection and analysis
+  metrics:
+    
+    # Core quality metrics
+    core_metrics:
+      - name: "critical_violations_count"
+        source: "unified_analyzer"
+        aggregation: "sum"
+        
+      - name: "high_violations_count"
+        source: "unified_analyzer"
+        aggregation: "sum"
+        
+      - name: "nasa_compliance_score"
+        source: "nasa_analyzer"
+        aggregation: "percentage"
+        
+      - name: "overall_compliance_score"
+        source: "severity_classifier"
+        aggregation: "weighted_average"
+        
+      - name: "code_duplication_percentage"
+        source: "mece_analyzer"
+        aggregation: "percentage"
+        
+    # Derived metrics
+    derived_metrics:
+      - name: "quality_trend_7d"
+        calculation: "moving_average(overall_compliance_score, 7)"
+        
+      - name: "improvement_rate"
+        calculation: "(current_score - previous_score) / previous_score * 100"
+        
+      - name: "technical_debt_ratio"
+        calculation: "technical_debt_minutes / (total_lines_of_code * 0.5)"
+        
+    # Historical tracking
+    historical_tracking:
+      enabled: true
+      retention_days: 90
+      storage_backend: "json_files"  # Could be database in production
+      
+  # Notification system
+  notifications:
+    enabled: true
+    
+    # Notification channels
+    channels:
+      slack:
+        enabled: false
+        webhook_url: "${SLACK_WEBHOOK_URL}"
+        
+      email:
+        enabled: false
+        smtp_server: "${SMTP_SERVER}"
+        
+      github:
+        enabled: true
+        use_pr_comments: true
+        use_check_runs: true
+        
+      console:
+        enabled: true
+        log_level: "INFO"
+        
+    # Notification rules
+    rules:
+      critical_failure:
+        trigger: "critical_violations_count > 0"
+        channels: ["github", "console"]
+        message: "Critical violations detected - build blocked"
+        
+      nasa_compliance_warning:
+        trigger: "nasa_compliance_score < 95"
+        channels: ["github", "console"]  
+        message: "NASA compliance below target - review required"
+        
+      quality_improvement:
+        trigger: "improvement_rate > 5"
+        channels: ["console"]
+        message: "Quality improvement detected - great work!"
+        
+  # Integration with CI/CD systems
+  cicd_integration:
+    
+    # GitHub Actions integration
+    github_actions:
+      enabled: true
+      
+      # Status reporting
+      status_reporting:
+        use_check_runs: true
+        use_pr_status: true
+        use_commit_status: true
+        
+      # Environment variables
+      env_variables:
+        - "QUALITY_GATE_STATUS"
+        - "NASA_COMPLIANCE_SCORE"
+        - "OVERALL_COMPLIANCE_SCORE"
+        - "CRITICAL_VIOLATIONS_COUNT"
+        - "FAILURE_PREDICTION_SCORE"
+        
+      # Artifacts
+      artifacts:
+        - "quality-gates-report.json"
+        - "failure-prediction-report.json"
+        - "automated-fixes.json"
+        - "intelligent-routing-decisions.json"
+        
+    # Generic CI/CD integration
+    generic_cicd:
+      exit_codes:
+        gate_passed: 0
+        gate_failed: 1
+        gate_warning: 2
+        gate_error: 3
+        
+  # Development and testing
+  development:
+    mock_mode: false
+    debug_logging: false
+    
+    # Test data for validation
+    test_scenarios:
+      - name: "critical_violations_scenario"
+        data:
+          critical_violations_count: 2
+          nasa_compliance_score: 85
+        expected_result: "FAILED"
+        
+      - name: "warning_scenario"
+        data:
+          critical_violations_count: 0
+          high_violations_count: 8
+          nasa_compliance_score: 93
+        expected_result: "WARNING"
+        
+      - name: "pass_scenario"
+        data:
+          critical_violations_count: 0
+          high_violations_count: 2
+          nasa_compliance_score: 97
+          overall_compliance_score: 92
+        expected_result: "PASSED"

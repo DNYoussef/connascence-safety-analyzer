@@ -63,6 +63,9 @@ class AlgorithmAnalyzer(BaseConnascenceAnalyzer):
                         context={"complexity": complexity}
                     ))
         
+        # NASA Power of Ten Rule 1: Avoid recursive functions
+        violations.extend(self._detect_recursion_violations(tree))
+        
         return violations
     
     def analyze_execution_connascence(self, tree: ast.AST) -> List[Violation]:
@@ -214,6 +217,52 @@ class AlgorithmAnalyzer(BaseConnascenceAnalyzer):
                             }
                         ))
         
+        # NASA Power of Ten Rule 3: No heap usage after initialization
+        violations.extend(self._detect_heap_usage_after_init(tree))
+        
+        return violations
+    
+    def _detect_heap_usage_after_init(self, tree: ast.AST) -> List[Violation]:
+        """Detect heap usage after initialization for NASA Rule 3."""
+        violations = []
+        
+        # Track initialization functions vs regular runtime functions
+        init_functions = {'__init__', 'initialize', 'setup', 'init', 'main', 'configure'}
+        runtime_functions = set()
+        
+        # Collect all function definitions
+        for node in ast.walk(tree):
+            if isinstance(node, ast.FunctionDef):
+                if node.name not in init_functions:
+                    runtime_functions.add(node.name)
+        
+        # Check for dynamic allocation in runtime functions
+        for node in ast.walk(tree):
+            if isinstance(node, ast.FunctionDef) and node.name in runtime_functions:
+                for child in ast.walk(node):
+                    if isinstance(child, ast.Call):
+                        if isinstance(child.func, ast.Name):
+                            # Direct heap allocation calls
+                            if child.func.id in ['list', 'dict', 'set', 'bytearray']:
+                                violations.append(Violation(
+                                    id="",
+                                    type=ConnascenceType.TIMING,
+                                    severity=Severity.CRITICAL,
+                                    file_path=self.current_file_path,
+                                    line_number=child.lineno,
+                                    column=child.col_offset,
+                                    description=f"NASA Rule 3 violation: Heap allocation in runtime function '{node.name}'",
+                                    recommendation="REFACTOR: Move all dynamic allocation to initialization phase. NASA Rule 3 prohibits heap usage after initialization",
+                                    function_name=node.name,
+                                    locality="same_function",
+                                    context={
+                                        "nasa_rule": "Rule_3_No_Heap_After_Init",
+                                        "allocation_type": child.func.id,
+                                        "runtime_function": node.name,
+                                        "safety_critical": True
+                                    }
+                                ))
+        
         return violations
     
     def _calculate_function_signature(self, node: ast.FunctionDef) -> str:
@@ -348,3 +397,103 @@ class AlgorithmAnalyzer(BaseConnascenceAnalyzer):
             isinstance(comparator, ast.Constant) and comparator.value in (None, True, False)
             for comparator in node.comparators
         )
+    
+    def _detect_recursion_violations(self, tree: ast.AST) -> List[Violation]:
+        """Detect recursive function calls for NASA Rule 1."""
+        violations = []
+        function_calls = {}  # Track function calls within each function
+        
+        # First pass: collect all function definitions
+        functions = {}
+        for node in ast.walk(tree):
+            if isinstance(node, ast.FunctionDef):
+                functions[node.name] = node
+        
+        # Second pass: analyze calls within each function
+        for func_name, func_node in functions.items():
+            calls_in_function = []
+            for node in ast.walk(func_node):
+                if isinstance(node, ast.Call):
+                    if isinstance(node.func, ast.Name) and node.func.id in functions:
+                        calls_in_function.append((node.func.id, node))
+            
+            function_calls[func_name] = calls_in_function
+        
+        # Detect direct recursion
+        for func_name, calls in function_calls.items():
+            for called_func, call_node in calls:
+                if called_func == func_name:  # Direct recursion
+                    violations.append(Violation(
+                        id="",
+                        type=ConnascenceType.ALGORITHM,
+                        severity=Severity.CRITICAL,
+                        file_path=self.current_file_path,
+                        line_number=call_node.lineno,
+                        column=call_node.col_offset,
+                        description=f"NASA Rule 1 violation: Direct recursion detected in function '{func_name}'",
+                        recommendation="REFACTOR: Replace recursion with iterative approach or bounded recursion with explicit stack limits. NASA Rule 1 prohibits recursion in safety-critical code",
+                        function_name=func_name,
+                        locality="same_function",
+                        context={
+                            "nasa_rule": "Rule_1_No_Recursion",
+                            "recursion_type": "direct",
+                            "function_name": func_name,
+                            "safety_critical": True
+                        }
+                    ))
+        
+        # Detect indirect recursion (simple cycle detection)
+        violations.extend(self._detect_indirect_recursion(function_calls, functions))
+        
+        return violations
+    
+    def _detect_indirect_recursion(self, function_calls: dict, functions: dict) -> List[Violation]:
+        """Detect indirect recursion cycles."""
+        violations = []
+        
+        def find_cycles(start_func, visited, path):
+            if start_func in visited:
+                if start_func in path:
+                    # Found a cycle
+                    cycle_start = path.index(start_func)
+                    cycle = path[cycle_start:] + [start_func]
+                    return [cycle]
+                return []
+            
+            visited.add(start_func)
+            path.append(start_func)
+            
+            cycles = []
+            if start_func in function_calls:
+                for called_func, _ in function_calls[start_func]:
+                    cycles.extend(find_cycles(called_func, visited.copy(), path.copy()))
+            
+            return cycles
+        
+        # Check each function for indirect recursion cycles
+        for func_name in functions.keys():
+            cycles = find_cycles(func_name, set(), [])
+            for cycle in cycles:
+                if len(cycle) > 2:  # Indirect recursion (cycle length > 2)
+                    func_node = functions[func_name]
+                    violations.append(Violation(
+                        id="",
+                        type=ConnascenceType.ALGORITHM,
+                        severity=Severity.HIGH,
+                        file_path=self.current_file_path,
+                        line_number=func_node.lineno,
+                        column=func_node.col_offset,
+                        description=f"NASA Rule 1 violation: Indirect recursion cycle detected: {' → '.join(cycle)}",
+                        recommendation="REFACTOR: Break recursion cycle by redesigning call hierarchy. NASA Rule 1 prohibits all forms of recursion",
+                        function_name=func_name,
+                        locality="cross_function",
+                        context={
+                            "nasa_rule": "Rule_1_No_Recursion",
+                            "recursion_type": "indirect",
+                            "cycle_path": cycle,
+                            "cycle_length": len(cycle) - 1,
+                            "safety_critical": True
+                        }
+                    ))
+        
+        return violations

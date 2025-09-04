@@ -1,0 +1,351 @@
+# Main Configuration for Enhanced Connascence Safety Analyzer
+# Unified configuration consolidating all settings
+# Version: 2.0.0
+
+project:
+  name: "Enhanced Connascence Safety Analyzer"
+  version: "2.0.0"
+  description: "Professional connascence analysis with NASA Power of Ten integration"
+  homepage: "https://connascence.io"
+  repository: "https://github.com/connascence/connascence-analyzer"
+  
+# Configuration file references
+config_includes:
+  analysis_config: "config/analysis/connascence_config.yml"
+  nasa_policies: "config/policies/nasa_power_of_ten.yml"
+  pre_commit_hooks: "config/tools/pre_commit_hooks.yml"
+  mcp_servers: "config/tools/mcp_servers.json"
+  workflows: "config/workflows/"
+  
+# Core analyzer settings
+analyzer:
+  entry_point: "scripts/unified_connascence_analyzer.py"
+  default_mode: "comprehensive"
+  
+  # Analysis capabilities
+  capabilities:
+    connascence_detection: true
+    nasa_compliance_check: true
+    mece_duplication_analysis: true
+    multi_tool_integration: true
+    ai_recommendations: true
+    severity_classification: true
+    
+  # Default command line options
+  default_options:
+    format: "text"
+    enable_nasa_rules: true
+    enable_mece_analysis: true
+    enable_tools: true
+    comprehensive: false
+    verbose: false
+    
+# Tool integration configuration
+tools:
+  
+  # Static analysis tools
+  static_analysis:
+    ruff:
+      enabled: true
+      config_file: "pyproject.toml"
+      fix_on_run: true
+      severity_mapping:
+        "E": "medium"
+        "W": "low" 
+        "F": "high"
+        "B": "high"
+        "C4": "medium"
+        
+    mypy:
+      enabled: true
+      config_file: "pyproject.toml"
+      strict_mode: true
+      severity_mapping:
+        "error": "high"
+        "warning": "medium"
+        "note": "low"
+        
+    bandit:
+      enabled: true
+      security_focus: true
+      exclude_dirs: ["tests/"]
+      severity_mapping:
+        "HIGH": "critical"
+        "MEDIUM": "high"
+        "LOW": "medium"
+        
+    radon:
+      enabled: true
+      complexity_threshold: 10
+      maintainability_threshold: "B"
+      severity_mapping:
+        "A": "low"
+        "B": "low"
+        "C": "medium"
+        "D": "high"
+        "E": "critical"
+        "F": "critical"
+        
+    black:
+      enabled: true
+      config_file: "pyproject.toml"
+      check_only: true
+      
+  # MCP server integration
+  mcp_integration:
+    enabled: true
+    config_file: "config/tools/mcp_servers.json"
+    auto_discovery: true
+    health_checks: true
+    
+  # Pre-commit hooks
+  pre_commit:
+    enabled: true
+    config_file: "config/tools/pre_commit_hooks.yml"
+    auto_install: true
+    
+# NASA Power of Ten configuration
+nasa_power_of_ten:
+  enabled: true
+  config_file: "config/policies/nasa_power_of_ten.yml"
+  enforcement_mode: "strict"
+  
+  # Rule-specific settings
+  rules:
+    rule_1_complexity: 
+      enabled: true
+      severity: "critical"
+    rule_2_loops:
+      enabled: true
+      severity: "critical"
+    rule_3_heap:
+      enabled: true
+      severity: "critical"
+    rule_4_function_size:
+      enabled: true
+      max_lines: 60
+      severity: "high"
+    rule_5_assertions:
+      enabled: true
+      min_assertions: 2
+      severity: "high"
+    rule_6_scope:
+      enabled: true
+      severity: "medium"
+    rule_7_return_values:
+      enabled: true
+      severity: "high"
+    rule_8_preprocessor:
+      enabled: true
+      severity: "medium"
+    rule_9_pointers:
+      enabled: true
+      severity: "high"
+    rule_10_warnings:
+      enabled: true
+      severity: "critical"
+      
+# MECE Analysis configuration
+mece_analysis:
+  enabled: true
+  detection_methods:
+    - "hash_based"
+    - "ast_similarity"
+    - "semantic_analysis"
+  
+  thresholds:
+    similarity_threshold: 0.8
+    minimum_file_size: 100
+    minimum_function_size: 10
+    
+  clustering:
+    enabled: true
+    algorithm: "hierarchical"
+    max_clusters: 20
+    
+# Severity classification
+severity:
+  calculation_method: "weighted_multi_factor"
+  
+  weights:
+    connascence_type: 0.4
+    scope_impact: 0.3
+    nasa_rule_violation: 0.2
+    cross_tool_consensus: 0.1
+    
+  enhancement_rules:
+    nasa_violation: "+1"
+    multiple_violations: "+2"
+    cross_tool_high_confidence: "+1"
+    
+  levels:
+    critical: 
+      range: [8, 10]
+      action: "fail"
+      requires_waiver: true
+    high:
+      range: [6, 7]
+      action: "fail"
+      requires_review: true
+    medium:
+      range: [4, 5] 
+      action: "warn"
+    low:
+      range: [1, 3]
+      action: "info"
+      
+# Reporting configuration
+reporting:
+  default_format: "text"
+  
+  formats:
+    text:
+      enabled: true
+      template: "templates/report.txt"
+    json:
+      enabled: true
+      schema_version: "2.0"
+    sarif:
+      enabled: true
+      version: "2.1.0"
+    html:
+      enabled: true
+      template: "templates/report.html"
+      include_charts: true
+    markdown:
+      enabled: true
+      template: "templates/report.md"
+    csv:
+      enabled: true
+      include_headers: true
+      
+  sections:
+    - "executive_summary"
+    - "violations_by_type"
+    - "violations_by_severity"
+    - "nasa_compliance_status"
+    - "mece_analysis_summary"
+    - "tool_correlation_analysis"
+    - "recommendations"
+    - "trend_analysis"
+    - "appendices"
+    
+# CI/CD Integration
+ci_cd:
+  github_actions:
+    enabled: true
+    workflow_file: ".github/workflows/nasa-compliance-check.yml"
+    
+  pre_commit_hooks:
+    enabled: true
+    auto_install: true
+    
+  quality_gates:
+    enabled: true
+    fail_on_critical: true
+    fail_on_high: true
+    warn_on_medium: true
+    
+  budgets:
+    critical_violations: 0
+    high_violations: 5
+    medium_violations: 15
+    total_violations: 25
+    
+# Performance optimization
+performance:
+  parallel_processing: true
+  max_workers: 4
+  chunk_size: 100
+  
+  caching:
+    enabled: true
+    ttl_seconds: 3600
+    cache_location: ".cache/"
+    
+  memory_management:
+    max_file_size_mb: 10
+    max_total_memory_mb: 512
+    garbage_collection: true
+    
+  batch_processing:
+    enabled: true
+    batch_size: 50
+    clustering_enabled: true
+    
+# File handling
+files:
+  include_patterns:
+    - "**/*.py"
+    - "**/*.pyi"
+    
+  exclude_patterns:
+    - "deprecated/*"
+    - "experimental/*"
+    - "examples/*"
+    - "fixtures/*"
+    - "tests/*"
+    - "vscode-extension/out/*"
+    - "vscode-extension/node_modules/*"
+    - ".git/*"
+    - ".mypy_cache/*"
+    - ".pytest_cache/*"
+    - ".ruff_cache/*"
+    - ".venv/*"
+    - "venv/*"
+    - "build/*"
+    - "dist/*"
+    
+  encoding: "utf-8"
+  max_line_length: 120
+  
+# Logging configuration
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  
+  handlers:
+    console:
+      enabled: true
+      level: "INFO"
+    file:
+      enabled: true
+      filename: "logs/connascence_analyzer.log"
+      level: "DEBUG"
+      max_bytes: 10485760  # 10MB
+      backup_count: 5
+      
+  loggers:
+    "analyzer": "DEBUG"
+    "policy": "INFO" 
+    "reporting": "INFO"
+    "integrations": "DEBUG"
+    "mcp": "INFO"
+    
+# Development and testing
+development:
+  debug_mode: false
+  profile_performance: false
+  enable_experimental_features: false
+  
+  testing:
+    test_data_dir: "tests/fixtures"
+    mock_mcp_servers: true
+    skip_slow_tests: false
+    
+  validation:
+    validate_config_on_startup: true
+    validate_outputs: true
+    strict_mode: false
+    
+# Documentation
+documentation:
+  generate_docs: true
+  output_dir: "docs/"
+  include_examples: true
+  include_api_reference: true
+  
+  formats:
+    - "html"
+    - "markdown" 
+    - "pdf"

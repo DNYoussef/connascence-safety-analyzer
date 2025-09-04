@@ -1,0 +1,31 @@
+====================================================================================================
+ENHANCED CONNASCENCE ANALYSIS REPORT - PHASE 2
+====================================================================================================
+
+EXECUTIVE SUMMARY
+--------------------------------------------------
+Analysis completed in 0.55s
+Enhancement processing: 0.00s
+Tools executed: 1
+Tools failed: 1
+Overall score: 10000.00%
+
+ENHANCED CORRELATIONS
+--------------------------------------------------
+High-confidence correlations: 0
+Critical priority issues: 0
+Average confidence score: 0.00%
+
+AI-POWERED RECOMMENDATIONS
+--------------------------------------------------
+1. Fix tool integration issues (low effort)
+   Tools not running: mypy
+
+NASA POWER OF TEN COMPLIANCE
+--------------------------------------------------
+Compliance score: 100.00%
+Rules violated: 0
+
+====================================================================================================
+END ENHANCED ANALYSIS REPORT
+====================================================================================================

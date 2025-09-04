@@ -6,6 +6,7 @@ connascence violations, trends, and autofix suggestions locally.
 """
 
 import json
+import sys
 import threading
 import time
 from datetime import datetime, timedelta
@@ -15,11 +16,13 @@ from flask import Flask, render_template, request, jsonify, send_from_directory
 from flask_socketio import SocketIO, emit
 import webbrowser
 
-from analyzer.ast_engine.core_analyzer import ConnascenceASTAnalyzer
+# Updated imports for unified analyzer
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+from src.core.unified_analyzer import UnifiedConnascenceAnalyzer, UnifiedAnalysisResult
 from autofix.patch_api import SafeAutofixer
 from policy.manager import PolicyManager
-from .metrics import DashboardMetrics
-from .charts import ChartGenerator
+from dashboard.metrics import DashboardMetrics
+from dashboard.charts import ChartGenerator
 
 
 class LocalDashboard:
@@ -31,8 +34,8 @@ class LocalDashboard:
         self.app = Flask(__name__, template_folder='templates', static_folder='static')
         self.socketio = SocketIO(self.app, cors_allowed_origins="*")
         
-        # Core components
-        self.analyzer = ConnascenceASTAnalyzer()
+        # Core components - using unified analyzer
+        self.analyzer = UnifiedConnascenceAnalyzer()
         self.autofixer = SafeAutofixer()
         self.policy_manager = PolicyManager()
         self.metrics = DashboardMetrics()
@@ -41,6 +44,7 @@ class LocalDashboard:
         # Dashboard state
         self.current_project: Optional[Path] = None
         self.scan_results: Dict[str, Any] = {}
+        self.unified_results: Optional[UnifiedAnalysisResult] = None
         self.historical_data: List[Dict] = []
         
         self._setup_routes()
@@ -149,12 +153,8 @@ class LocalDashboard:
             """Handle individual file scan request."""
             file_path = Path(data['file_path'])
             try:
-                violations = self.analyzer.analyze_file(file_path)
-                file_results = {
-                    'file_path': str(file_path),
-                    'violations': [self._violation_to_dict(v) for v in violations],
-                    'timestamp': datetime.now().isoformat()
-                }
+                file_results = self.analyzer.analyze_file(file_path)
+                file_results['timestamp'] = datetime.now().isoformat()
                 emit('file_scan_complete', file_results)
             except Exception as e:
                 emit('scan_error', {'error': str(e), 'file_path': str(file_path)})
@@ -171,26 +171,38 @@ class LocalDashboard:
                     'policy_preset': policy_preset
                 })
                 
-                # Perform analysis
-                violations = self.analyzer.analyze_directory(
+                # Perform unified analysis
+                self.unified_results = self.analyzer.analyze_project(
                     project_path, policy_preset=policy_preset
                 )
                 
-                # Process results
+                # Generate dashboard summary
+                dashboard_summary = self.analyzer.get_dashboard_summary(self.unified_results)
+                
+                # Process results for dashboard compatibility
                 self.scan_results = {
                     'project_path': str(project_path),
                     'policy_preset': policy_preset,
-                    'timestamp': datetime.now().isoformat(),
-                    'violations': [self._violation_to_dict(v) for v in violations],
+                    'timestamp': self.unified_results.timestamp,
+                    'violations': self.unified_results.connascence_violations,
+                    'duplication_clusters': self.unified_results.duplication_clusters,
+                    'nasa_violations': self.unified_results.nasa_violations,
                     'summary': {
-                        'total_violations': len(violations),
-                        'critical_count': len([v for v in violations if v.severity == 'critical']),
-                        'high_count': len([v for v in violations if v.severity == 'high']),
-                        'medium_count': len([v for v in violations if v.severity == 'medium']),
-                        'low_count': len([v for v in violations if v.severity == 'low']),
-                        'violations_by_type': self._group_by_type(violations),
-                        'violations_by_file': self._group_by_file(violations),
-                        'connascence_index': self._calculate_connascence_index(violations)
+                        'total_violations': self.unified_results.total_violations,
+                        'critical_count': self.unified_results.critical_count,
+                        'high_count': self.unified_results.high_count,
+                        'medium_count': self.unified_results.medium_count,
+                        'low_count': self.unified_results.low_count,
+                        'violations_by_type': self._group_by_type_from_dict(self.unified_results.connascence_violations),
+                        'violations_by_file': self._group_by_file_from_dict(self.unified_results.connascence_violations),
+                        'connascence_index': self.unified_results.connascence_index,
+                        'nasa_compliance_score': self.unified_results.nasa_compliance_score,
+                        'duplication_score': self.unified_results.duplication_score,
+                        'overall_quality_score': self.unified_results.overall_quality_score
+                    },
+                    'recommendations': {
+                        'priority_fixes': self.unified_results.priority_fixes,
+                        'improvement_actions': self.unified_results.improvement_actions
                     }
                 }
                 
@@ -235,19 +247,35 @@ class LocalDashboard:
             weight=data['weight']
         )
     
-    def _group_by_type(self, violations) -> Dict[str, int]:
-        """Group violations by connascence type."""
+    def _group_by_type_from_dict(self, violations) -> Dict[str, int]:
+        """Group violations by connascence type from dict format."""
         groups = {}
         for violation in violations:
-            conn_type = violation.connascence_type
+            conn_type = violation.get('type', 'unknown')
+            groups[conn_type] = groups.get(conn_type, 0) + 1
+        return groups
+    
+    def _group_by_file_from_dict(self, violations) -> Dict[str, int]:
+        """Group violations by file from dict format."""
+        groups = {}
+        for violation in violations:
+            file_path = Path(violation.get('file_path', '')).name
+            groups[file_path] = groups.get(file_path, 0) + 1
+        return groups
+    
+    def _group_by_type(self, violations) -> Dict[str, int]:
+        """Group violations by connascence type (legacy compatibility)."""
+        groups = {}
+        for violation in violations:
+            conn_type = getattr(violation, 'connascence_type', getattr(violation, 'type', 'unknown'))
             groups[conn_type] = groups.get(conn_type, 0) + 1
         return groups
     
     def _group_by_file(self, violations) -> Dict[str, int]:
-        """Group violations by file."""
+        """Group violations by file (legacy compatibility)."""
         groups = {}
         for violation in violations:
-            file_path = Path(violation.file_path).name
+            file_path = Path(getattr(violation, 'file_path', '')).name
             groups[file_path] = groups.get(file_path, 0) + 1
         return groups
     

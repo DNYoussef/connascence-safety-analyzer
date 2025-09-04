@@ -204,8 +204,8 @@ export class ConnascenceHoverProvider implements vscode.HoverProvider {
             return await this.connascenceService.suggestRefactoring(
                 document.fileName,
                 {
-                    start: { line: finding.line - 1, character: finding.column - 1 },
-                    end: { line: finding.line - 1, character: finding.column - 1 }
+                    start: { line: finding.line - 1, character: (finding.column ?? 1) - 1 },
+                    end: { line: finding.line - 1, character: (finding.column ?? 1) - 1 }
                 }
             );
         }

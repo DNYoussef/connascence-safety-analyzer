@@ -117,6 +117,75 @@ class MeaningAnalyzer(BaseConnascenceAnalyzer):
                     context={"name": name, "usage_count": count}
                 ))
         
+        # NASA Power of Ten Rules 7 & 8: Preprocessor use and pointer restrictions
+        violations.extend(self._check_preprocessor_and_pointers(tree))
+        
+        return violations
+    
+    def _check_preprocessor_and_pointers(self, tree: ast.AST) -> List[Violation]:
+        """Check for preprocessor-like patterns and pointer-like operations (NASA Rules 7 & 8)."""
+        violations = []
+        
+        # NASA Rule 8: Restrict function pointer use (Python equivalent: dynamic function calls)
+        dynamic_calls = []
+        exec_eval_usage = []
+        
+        for node in ast.walk(tree):
+            # Check for dynamic function calls (getattr with call)
+            if isinstance(node, ast.Call):
+                if isinstance(node.func, ast.Call):
+                    if (isinstance(node.func.func, ast.Name) and 
+                        node.func.func.id == 'getattr'):
+                        dynamic_calls.append(node)
+                
+                # Check for eval/exec usage (closest Python equivalent to preprocessor)
+                elif isinstance(node.func, ast.Name):
+                    if node.func.id in ['eval', 'exec', 'compile']:
+                        exec_eval_usage.append(node)
+            
+            # Check for __import__ usage (dynamic imports)
+            elif isinstance(node, ast.Call):
+                if isinstance(node.func, ast.Name) and node.func.id == '__import__':
+                    dynamic_calls.append(node)
+        
+        # Report dynamic function calls (NASA Rule 8 equivalent)
+        for node in dynamic_calls:
+            violations.append(Violation(
+                id="",
+                type=ConnascenceType.NAME,
+                severity=Severity.HIGH,
+                file_path=self.current_file_path,
+                line_number=node.lineno,
+                column=node.col_offset,
+                description="NASA Rule 8 violation: Dynamic function call detected (equivalent to function pointers)",
+                recommendation="REFACTOR: Use explicit function references or polymorphism instead of dynamic calls. NASA Rule 8 restricts dynamic function calls in safety-critical code",
+                locality="same_function",
+                context={
+                    "nasa_rule": "Rule_8_Function_Pointers",
+                    "call_type": "dynamic_function_call",
+                    "safety_critical": True
+                }
+            ))
+        
+        # Report eval/exec usage (NASA Rule 7 equivalent - preprocessor restrictions)
+        for node in exec_eval_usage:
+            violations.append(Violation(
+                id="",
+                type=ConnascenceType.NAME,
+                severity=Severity.CRITICAL,
+                file_path=self.current_file_path,
+                line_number=node.lineno,
+                column=node.col_offset,
+                description="NASA Rule 7 violation: Dynamic code execution detected (eval/exec equivalent to preprocessor)",
+                recommendation="REFACTOR: Remove eval/exec calls and use static code structures. NASA Rule 7 limits preprocessor use in safety-critical code",
+                locality="same_function",
+                context={
+                    "nasa_rule": "Rule_7_Preprocessor",
+                    "execution_type": node.func.id if isinstance(node.func, ast.Name) else "dynamic",
+                    "safety_critical": True
+                }
+            ))
+        
         return violations
     
     def analyze_type_connascence(self, tree: ast.AST) -> List[Violation]:
@@ -148,6 +217,88 @@ class MeaningAnalyzer(BaseConnascenceAnalyzer):
                     recommendation="REFACTOR: Add type hints for better IDE support and documentation. Pattern: def function_name(param: ParamType) -> ReturnType:",
                     function_name=func_node.name,
                     locality="same_function"
+                ))
+        
+        # NASA Power of Ten Rule 5: Assertion density should be at least 2%
+        violations.extend(self._check_assertion_density(tree))
+        
+        return violations
+    
+    def _check_assertion_density(self, tree: ast.AST) -> List[Violation]:
+        """Check assertion density for NASA Rule 5."""
+        violations = []
+        
+        # Count total statements and assertions
+        total_statements = 0
+        assertion_count = 0
+        functions_with_low_assertions = []
+        
+        for node in ast.walk(tree):
+            if isinstance(node, ast.FunctionDef):
+                # Count statements in this function
+                func_statements = len([n for n in ast.walk(node) if isinstance(n, ast.stmt)])
+                func_assertions = len([n for n in ast.walk(node) if isinstance(n, ast.Assert)])
+                
+                total_statements += func_statements
+                assertion_count += func_assertions
+                
+                # Check individual function assertion density
+                if func_statements > 10:  # Only check functions with substantial code
+                    assertion_density = (func_assertions / func_statements) * 100
+                    if assertion_density < 2.0:  # NASA Rule 5: 2% minimum
+                        functions_with_low_assertions.append({
+                            'node': node,
+                            'statements': func_statements,
+                            'assertions': func_assertions,
+                            'density': assertion_density
+                        })
+        
+        # Report functions with low assertion density
+        for func_data in functions_with_low_assertions:
+            node = func_data['node']
+            density = func_data['density']
+            violations.append(Violation(
+                id="",
+                type=ConnascenceType.TYPE,
+                severity=Severity.HIGH,
+                file_path=self.current_file_path,
+                line_number=node.lineno,
+                column=node.col_offset,
+                description=f"NASA Rule 5 violation: Function '{node.name}' has {density:.1f}% assertion density (minimum: 2%)",
+                recommendation="REFACTOR: Add assertions to validate preconditions, postconditions, and invariants. NASA Rule 5 requires ≥2% assertion density for safety-critical code",
+                function_name=node.name,
+                locality="same_function",
+                context={
+                    "nasa_rule": "Rule_5_Assertion_Density",
+                    "assertion_density": density,
+                    "assertions": func_data['assertions'],
+                    "statements": func_data['statements'],
+                    "required_density": 2.0,
+                    "safety_critical": True
+                }
+            ))
+        
+        # Report overall module assertion density if too low
+        if total_statements > 50:  # Only check substantial modules
+            overall_density = (assertion_count / total_statements) * 100
+            if overall_density < 1.5:  # Slightly lower threshold for modules
+                violations.append(Violation(
+                    id="",
+                    type=ConnascenceType.TYPE,
+                    severity=Severity.MEDIUM,
+                    file_path=self.current_file_path,
+                    line_number=1,
+                    column=0,
+                    description=f"NASA Rule 5 violation: Module has {overall_density:.1f}% assertion density (recommended: ≥2%)",
+                    recommendation="REFACTOR: Add more assertions throughout the module to validate assumptions and catch errors early. Focus on input validation, boundary conditions, and invariant checks",
+                    locality="same_module",
+                    context={
+                        "nasa_rule": "Rule_5_Assertion_Density",
+                        "module_assertion_density": overall_density,
+                        "total_assertions": assertion_count,
+                        "total_statements": total_statements,
+                        "safety_critical": True
+                    }
                 ))
         
         return violations
