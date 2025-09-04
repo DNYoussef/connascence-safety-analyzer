@@ -16,7 +16,11 @@ class ThresholdConfig:
                  max_method_lines: int = DEFAULT_MAX_METHOD_LINES,
                  max_class_lines: int = DEFAULT_MAX_CLASS_LINES, 
                  god_class_lines: int = DEFAULT_GOD_CLASS_LINES,
-                 magic_literal_exceptions: Set = None):
+                 magic_literal_exceptions: Set = None,
+                 max_function_length: int = 100,
+                 max_module_length: int = 2000,
+                 max_classes_per_module: int = 15,
+                 max_functions_per_module: int = 30):
         self.max_positional_params: int = max_positional_params
         self.god_class_methods: int = god_class_methods
         self.max_cyclomatic_complexity: int = max_cyclomatic_complexity
@@ -24,6 +28,10 @@ class ThresholdConfig:
         self.max_class_lines: int = max_class_lines
         self.god_class_lines: int = god_class_lines
         self.magic_literal_exceptions: Set = magic_literal_exceptions or MAGIC_LITERAL_EXCEPTIONS
+        self.max_function_length: int = max_function_length
+        self.max_module_length: int = max_module_length
+        self.max_classes_per_module: int = max_classes_per_module
+        self.max_functions_per_module: int = max_functions_per_module
     
     def to_dict(self) -> Dict[str, Any]:
         return {

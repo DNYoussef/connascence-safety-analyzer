@@ -213,13 +213,50 @@ export class ConnascenceApiClient {
      */
     private async loadConnascenceSystem(): Promise<any> {
         try {
-            // Try to load from the main project
-            const reportPath = this.workspaceRoot ? 
-                path.join(this.workspaceRoot, 'src', 'reports', 'index.js') :
+            // Load from the consolidated enterprise system
+            const analyzerPath = this.workspaceRoot ? 
+                path.join(this.workspaceRoot, 'analyzer', 'ast_engine', 'core_analyzer.py') :
                 undefined;
                 
-            if (reportPath) {
-                return require(reportPath);
+            if (analyzerPath) {
+                // Use Python subprocess to call our consolidated analyzer
+                const { spawn } = require('child_process');
+                return {
+                    generateConnascenceReport: async (options: any) => {
+                        return new Promise((resolve, reject) => {
+                            const pythonProcess = spawn('python', [
+                                '-c',
+                                `
+from analyzer.ast_engine.core_analyzer import ConnascenceASTAnalyzer
+from pathlib import Path
+import json
+
+analyzer = ConnascenceASTAnalyzer()
+result = analyzer.analyze_directory(Path('${options.inputPath}'))
+violations = [{'type': v.type.value, 'severity': v.severity.value, 'file_path': v.file_path, 'line_number': v.line_number, 'description': v.description, 'recommendation': v.recommendation} for v in result.violations]
+print(json.dumps({'violations': violations, 'summary': {'total_violations': len(violations)}}))
+                                `.trim()
+                            ], { cwd: this.workspaceRoot });
+
+                            let output = '';
+                            pythonProcess.stdout.on('data', (data: Buffer) => {
+                                output += data.toString();
+                            });
+
+                            pythonProcess.on('close', (code: number) => {
+                                if (code === 0) {
+                                    try {
+                                        resolve(JSON.parse(output));
+                                    } catch (e) {
+                                        reject(new Error('Failed to parse analyzer output'));
+                                    }
+                                } else {
+                                    reject(new Error(`Python analyzer failed with code ${code}`));
+                                }
+                            });
+                        });
+                    }
+                };
             }
             
             // Fallback: try to load from relative path

@@ -1,0 +1,188 @@
+"""
+Comprehensive test for all 9 connascence types detection
+Created to verify enterprise analyzer detects all patterns
+"""
+
+# CoE - Execution: Order-dependent operations
+class DatabaseConnection:
+    def __init__(self):
+        self.connected = False
+    
+    def connect(self):
+        self.connected = True
+    
+    def setup(self):
+        # Setup requires connection first
+        pass
+    
+    def query(self, sql):
+        # Requires setup and connection
+        pass
+    
+    def cleanup(self):
+        pass
+    
+    def disconnect(self):
+        self.connected = False
+
+# CoV - Values: Shared mutable state
+class SharedCounter:
+    shared_data = []  # Class-level mutable default
+    config_dict = {"count": 0}
+    
+    def increment(self):
+        self.shared_data.append(1)
+        self.config_dict["count"] += 1
+    
+    def reset(self):
+        self.shared_data.clear()
+        self.config_dict["count"] = 0
+    
+    def modify_shared(self):
+        self.config_dict.update({"new": True})
+
+# CoI - Identity: Mutable defaults and global usage
+global_counter = 0
+global_cache = {}
+
+def process_items(items=[], cache={}):  # Mutable defaults
+    global global_counter
+    items.append(1)
+    cache["processed"] = True
+    global_counter += 1
+    return items
+
+def compare_objects(obj1, obj2):
+    # Identity comparison instead of equality
+    if obj1 is obj2:
+        return True
+    return False
+
+# CoTi - Timing: Sleep and timing dependencies
+import time
+import threading
+
+class TimingDependentProcessor:
+    def process_with_sleep(self):
+        time.sleep(0.1)  # Timing dependency
+        return "processed"
+    
+    def wait_for_condition(self):
+        thread = threading.Thread(target=lambda: None)
+        thread.start()
+        thread.join()  # Blocking timing dependency
+
+# CoA - Algorithm: Duplicate algorithms and complexity
+def complex_calculation(x, y, z, a, b, c, d, e, f, g):  # High complexity
+    if x > 0:
+        if y > 0:
+            if z > 0:
+                if a > 0:
+                    if b > 0:
+                        if c > 0:
+                            if d > 0:
+                                if e > 0:
+                                    return x + y + z + a + b + c + d + e
+                                else:
+                                    return x - y
+                            else:
+                                return x * y
+                        else:
+                            return x / y
+                    else:
+                        return x % y
+                else:
+                    return x ** y
+            else:
+                return abs(x)
+        else:
+            return -x
+    else:
+        return 0
+
+def duplicate_calculation(x, y, z, a, b, c, d, e, f, g):  # Duplicate algorithm
+    if x > 0:
+        if y > 0:
+            if z > 0:
+                if a > 0:
+                    if b > 0:
+                        if c > 0:
+                            if d > 0:
+                                if e > 0:
+                                    return x + y + z + a + b + c + d + e
+                                else:
+                                    return x - y
+                            else:
+                                return x * y
+                        else:
+                            return x / y
+                    else:
+                        return x % y
+                else:
+                    return x ** y
+            else:
+                return abs(x)
+        else:
+            return -x
+    else:
+        return 0
+
+# CoP - Position: Too many positional parameters
+def many_params(a, b, c, d, e, f, g, h, i, j):
+    return a + b + c + d + e + f + g + h + i + j
+
+# CoN - Name: Magic strings and numbers
+def process_data():
+    status = "PROCESSING"  # Magic string
+    max_retries = 42  # Magic number
+    timeout = 3600  # Magic number
+    
+    if status == "PROCESSING":
+        return max_retries * timeout
+
+# CoT - Type: Type dependencies and casting
+def type_dependent_func(value):
+    if isinstance(value, str):
+        return int(value)  # Type casting dependency
+    elif isinstance(value, int):
+        return str(value)  # Type casting dependency
+    return value
+
+# CoM - Meaning: Semantic dependencies
+def calculate_total(items):
+    # Assumes items have 'price' attribute
+    return sum(item.price for item in items)
+
+def calculate_cost(products):
+    # Same semantic meaning as calculate_total but different name
+    return sum(product.price for product in products)
+
+# God Object
+class MassiveGodClass:
+    def method1(self): pass
+    def method2(self): pass
+    def method3(self): pass
+    def method4(self): pass
+    def method5(self): pass
+    def method6(self): pass
+    def method7(self): pass
+    def method8(self): pass
+    def method9(self): pass
+    def method10(self): pass
+    def method11(self): pass
+    def method12(self): pass
+    def method13(self): pass
+    def method14(self): pass
+    def method15(self): pass
+    def method16(self): pass
+    def method17(self): pass
+    def method18(self): pass
+    def method19(self): pass
+    def method20(self): pass
+    def method21(self): pass
+    def method22(self): pass
+    def method23(self): pass
+    def method24(self): pass
+    def method25(self): pass
+    def method26(self): pass
+    def method27(self): pass

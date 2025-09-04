@@ -7,13 +7,13 @@ reducing Connascence of Meaning and improving maintainability.
 
 from typing import Set
 
-# Threshold defaults
-DEFAULT_MAX_POSITIONAL_PARAMS = 4
-DEFAULT_GOD_CLASS_METHODS = 20
-DEFAULT_MAX_CYCLOMATIC_COMPLEXITY = 10
-DEFAULT_MAX_METHOD_LINES = 50
-DEFAULT_MAX_CLASS_LINES = 300
-DEFAULT_GOD_CLASS_LINES = 300
+# Threshold defaults - Adjusted for realistic analysis
+DEFAULT_MAX_POSITIONAL_PARAMS = 6  # More realistic for real codebases
+DEFAULT_GOD_CLASS_METHODS = 25     # Slightly more permissive
+DEFAULT_MAX_CYCLOMATIC_COMPLEXITY = 15  # Industry standard
+DEFAULT_MAX_METHOD_LINES = 100     # More realistic for method length
+DEFAULT_MAX_CLASS_LINES = 500      # More realistic for class size  
+DEFAULT_GOD_CLASS_LINES = 800      # True God Objects (like our original 881-line class)
 
 # Weight configuration defaults
 DEFAULT_CRITICAL_WEIGHT = 5.0

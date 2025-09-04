@@ -27,8 +27,8 @@ from typing import Dict, List, Optional
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 # Import constants and handlers to reduce connascence
-from src.constants import ExitCode, ValidationMessages
-from src.cli_handlers import (
+from experimental.src.constants import ExitCode, ValidationMessages
+from experimental.src.cli_handlers import (
     ScanCommandHandler, LicenseCommandHandler, BaselineCommandHandler,
     MCPCommandHandler, ExplainCommandHandler, AutofixCommandHandler,
     ScanDiffCommandHandler

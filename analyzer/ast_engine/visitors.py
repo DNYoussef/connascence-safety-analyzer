@@ -7,7 +7,7 @@ connascence violations within Python AST nodes.
 
 import ast
 from typing import List, Any
-from .core_analyzer import Violation
+from .violations import Violation
 from ..thresholds import ConnascenceType, Severity
 
 
