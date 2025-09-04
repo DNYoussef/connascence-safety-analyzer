@@ -29,8 +29,9 @@ class PatchGenerator:
 
 class AutofixEngine:
     """Main autofix engine."""
-    def __init__(self, config=None):
+    def __init__(self, config=None, dry_run=False):
         self.config = config or {}
+        self.dry_run = dry_run
         
 class SafeAutofixer:
     """Safe autofix application."""

@@ -20,8 +20,9 @@ class AutofixConfig:
 class AutofixEngine:
     """Main autofix engine for connascence violations."""
     
-    def __init__(self, config: Optional[AutofixConfig] = None):
+    def __init__(self, config: Optional[AutofixConfig] = None, dry_run: bool = False):
         self.config = config or AutofixConfig()
+        self.dry_run = dry_run
         self.patch_generator = PatchGenerator()
         self.safe_autofixer = SafeAutofixer(self.config)
         self._fixers = self._register_fixers()

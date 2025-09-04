@@ -2,17 +2,28 @@
 
 from typing import Dict, Any, Set
 from enum import Enum
+from .constants import (
+    DEFAULT_MAX_POSITIONAL_PARAMS, DEFAULT_GOD_CLASS_METHODS, 
+    DEFAULT_MAX_CYCLOMATIC_COMPLEXITY, DEFAULT_MAX_METHOD_LINES,
+    DEFAULT_MAX_CLASS_LINES, DEFAULT_GOD_CLASS_LINES, MAGIC_LITERAL_EXCEPTIONS
+)
 
 class ThresholdConfig:
     """Configuration for analysis thresholds."""
-    def __init__(self):
-        self.max_positional_params: int = 4
-        self.god_class_methods: int = 20
-        self.max_cyclomatic_complexity: int = 10
-        self.max_method_lines: int = 50
-        self.max_class_lines: int = 300
-        self.god_class_lines: int = 300
-        self.magic_literal_exceptions: Set = {0, 1, -1, 2, '', None, True, False}
+    def __init__(self, max_positional_params: int = DEFAULT_MAX_POSITIONAL_PARAMS, 
+                 god_class_methods: int = DEFAULT_GOD_CLASS_METHODS, 
+                 max_cyclomatic_complexity: int = DEFAULT_MAX_CYCLOMATIC_COMPLEXITY, 
+                 max_method_lines: int = DEFAULT_MAX_METHOD_LINES,
+                 max_class_lines: int = DEFAULT_MAX_CLASS_LINES, 
+                 god_class_lines: int = DEFAULT_GOD_CLASS_LINES,
+                 magic_literal_exceptions: Set = None):
+        self.max_positional_params: int = max_positional_params
+        self.god_class_methods: int = god_class_methods
+        self.max_cyclomatic_complexity: int = max_cyclomatic_complexity
+        self.max_method_lines: int = max_method_lines
+        self.max_class_lines: int = max_class_lines
+        self.god_class_lines: int = god_class_lines
+        self.magic_literal_exceptions: Set = magic_literal_exceptions or MAGIC_LITERAL_EXCEPTIONS
     
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -26,10 +37,14 @@ class ThresholdConfig:
 class WeightConfig:
     """Weight configuration for violation scoring."""
     def __init__(self):
-        self.critical: float = 5.0
-        self.high: float = 3.0
-        self.medium: float = 2.0
-        self.low: float = 1.0
+        from .constants import (
+            DEFAULT_CRITICAL_WEIGHT, DEFAULT_HIGH_WEIGHT,
+            DEFAULT_MEDIUM_WEIGHT, DEFAULT_LOW_WEIGHT
+        )
+        self.critical: float = DEFAULT_CRITICAL_WEIGHT
+        self.high: float = DEFAULT_HIGH_WEIGHT
+        self.medium: float = DEFAULT_MEDIUM_WEIGHT
+        self.low: float = DEFAULT_LOW_WEIGHT
     
 class BudgetConfig:
     """Budget configuration for violation limits."""
@@ -84,20 +99,22 @@ DEFAULT_WEIGHTS = WeightConfig()
 
 def get_severity_for_violation(conn_type: ConnascenceType, context: Dict[str, Any]) -> Severity:
     """Determine severity based on connascence type and context."""
+    from .constants import MAX_COMPLEXITY_CRITICAL, MAX_COMPLEXITY_HIGH, MAX_PARAMETERS_CRITICAL, MAX_PARAMETERS_HIGH
+    
     # High complexity or security-related violations
     if context.get('security_related', False):
         return Severity.CRITICAL
     
     # Critical patterns
-    if conn_type == ConnascenceType.ALGORITHM and context.get('complexity', 0) > 15:
+    if conn_type == ConnascenceType.ALGORITHM and context.get('complexity', 0) > MAX_COMPLEXITY_CRITICAL:
         return Severity.CRITICAL
-    if conn_type == ConnascenceType.POSITION and context.get('parameter_count', 0) > 8:
+    if conn_type == ConnascenceType.POSITION and context.get('parameter_count', 0) > MAX_PARAMETERS_CRITICAL:
         return Severity.CRITICAL
     
     # High severity patterns  
-    if conn_type == ConnascenceType.ALGORITHM and context.get('complexity', 0) > 10:
+    if conn_type == ConnascenceType.ALGORITHM and context.get('complexity', 0) > MAX_COMPLEXITY_HIGH:
         return Severity.HIGH
-    if conn_type == ConnascenceType.POSITION and context.get('parameter_count', 0) > 5:
+    if conn_type == ConnascenceType.POSITION and context.get('parameter_count', 0) > MAX_PARAMETERS_HIGH:
         return Severity.HIGH
     if conn_type == ConnascenceType.MEANING and context.get('in_conditional', False):
         return Severity.HIGH
@@ -142,21 +159,28 @@ def calculate_violation_weight(
     base_weight = severity_weights.get(severity, weights.medium)
     
     # Locality multiplier
+    from .constants import (
+        LOCALITY_SAME_FUNCTION, LOCALITY_SAME_CLASS, 
+        LOCALITY_SAME_MODULE, LOCALITY_CROSS_MODULE,
+        TYPE_MULTIPLIER_NAME, TYPE_MULTIPLIER_TYPE, TYPE_MULTIPLIER_MEANING,
+        TYPE_MULTIPLIER_POSITION, TYPE_MULTIPLIER_ALGORITHM, TYPE_MULTIPLIER_IDENTITY
+    )
+    
     locality_multiplier = {
-        'same_function': 1.0,
-        'same_class': 1.2, 
-        'same_module': 1.5,
-        'cross_module': 2.0
-    }.get(locality, 1.0)
+        'same_function': LOCALITY_SAME_FUNCTION,
+        'same_class': LOCALITY_SAME_CLASS, 
+        'same_module': LOCALITY_SAME_MODULE,
+        'cross_module': LOCALITY_CROSS_MODULE
+    }.get(locality, LOCALITY_SAME_FUNCTION)
     
     # Type-specific adjustments
     type_multipliers = {
-        ConnascenceType.NAME: 0.9,
-        ConnascenceType.TYPE: 0.8,
-        ConnascenceType.MEANING: 1.1,
-        ConnascenceType.POSITION: 1.3,
-        ConnascenceType.ALGORITHM: 1.4,
-        ConnascenceType.IDENTITY: 1.5,
+        ConnascenceType.NAME: TYPE_MULTIPLIER_NAME,
+        ConnascenceType.TYPE: TYPE_MULTIPLIER_TYPE,
+        ConnascenceType.MEANING: TYPE_MULTIPLIER_MEANING,
+        ConnascenceType.POSITION: TYPE_MULTIPLIER_POSITION,
+        ConnascenceType.ALGORITHM: TYPE_MULTIPLIER_ALGORITHM,
+        ConnascenceType.IDENTITY: TYPE_MULTIPLIER_IDENTITY,
     }
     
     type_multiplier = type_multipliers.get(conn_type, 1.0)

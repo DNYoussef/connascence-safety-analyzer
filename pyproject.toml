@@ -8,7 +8,7 @@ version = "1.0.0"
 description = "Professional connascence analysis for Python codebases"
 authors = [{name = "Connascence Analytics", email = "hello@connascence.io"}]
 license = {text = "BSL-1.1"}
-readme = "docs/README.md"
+readme = "README.md"
 keywords = ["code-quality", "coupling", "connascence", "static-analysis", "refactoring"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
@@ -78,27 +78,31 @@ connascence = "mcp.server:main"
 # Tool Configuration
 
 [tool.setuptools]
+# NOTE: only list packages that actually exist
 packages = [
-    "analyzer", 
+    "analyzer",
     "analyzer.ast_engine",
-    "analyzer.dup_detection", 
-    "analyzer.runtime_probe",
+    "analyzer.connascence_analyzer", 
+    "analyzer.core",
+    "analyzer.dup_detection",
     "analyzer.frameworks",
-    "policy",
-    "integrators",
-    "autofix", 
+    "analyzer.runtime_probe",
+    "autofix",
+    "policy", 
     "reporting",
-    "cli",
+    "grammar",
+    "integrations",
     "mcp",
     "dashboard",
-    "tooling",
-    "src",
+    "security",
+    "cli"
 ]
 
 [tool.setuptools.package-data]
-policy = ["presets/*.yml", "baselines/*.json"]
-reporting = ["templates/*.html", "templates/*.md"] 
-"*" = ["**/*"]
+# Include only files that exist and are needed at runtime
+policy = ["presets/*.yml", "*.toml"]
+grammar = ["overlays/*.yml"]
+dashboard = ["templates/*.html", "static/*.js", "static/*.css"]
 
 [tool.black]
 line-length = 120
@@ -202,6 +206,8 @@ markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
     "integration: marks tests as integration tests",
     "property: marks tests as property-based tests",
+    "e2e: marks tests as end-to-end tests",
+    "performance: marks tests as performance tests",
 ]
 
 [tool.coverage.run]

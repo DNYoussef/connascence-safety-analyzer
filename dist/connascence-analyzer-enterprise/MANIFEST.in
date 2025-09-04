@@ -1,6 +1,0 @@
-include README.md
-include requirements.txt
-recursive-include policy/presets *.yml
-recursive-include grammar/overlays *.yml
-recursive-include reporting/templates *.j2
-recursive-include security/templates *.yml

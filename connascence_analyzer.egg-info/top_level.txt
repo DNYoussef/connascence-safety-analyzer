@@ -2,9 +2,9 @@ analyzer
 autofix
 cli
 dashboard
-integrators
+grammar
+integrations
 mcp
 policy
 reporting
-src
-tooling
+security

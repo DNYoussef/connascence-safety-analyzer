@@ -11,7 +11,7 @@ from typing import Any
 
 import pytest
 
-from packages.agents.core.agent_interface import AgentInterface
+from experimental.packages.agents.core.agent_interface import AgentInterface
 
 
 class ConnascenceAnalyzer:
@@ -492,6 +492,13 @@ class TestArchitecturalCompliance:
 
 class TestDocumentationCompliance:
     """Tests that validate documentation and self-documenting code."""
+    
+    @pytest.fixture
+    def test_files(self):
+        """Provide test files for documentation compliance testing."""
+        import pathlib
+        test_dir = pathlib.Path(__file__).parent.parent
+        return list(test_dir.rglob("test_*.py"))
 
     def test_test_method_naming(self, test_files):
         """Test methods should have descriptive names."""

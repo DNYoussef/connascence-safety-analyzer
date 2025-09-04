@@ -29,7 +29,8 @@ class MagicLiteralFixer:
     
     def __init__(self):
         self.constants_module_name = "constants"
-        self.ignored_values = {0, 1, -1, 2, True, False, None, "", []}
+        self.ignored_values = {0, 1, -1, 2, True, False, None, ""}
+        self.ignored_containers = [[], (), {}]  # Keep unhashable types separately
         self.common_patterns = {
             'http_status': r'[45]\d{2}',  # HTTP status codes
             'port': r'^(80|443|8080|3000|5000)$',
