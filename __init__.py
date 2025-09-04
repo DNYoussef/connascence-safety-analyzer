@@ -1,1 +1,0 @@
-# Connascence Analysis System

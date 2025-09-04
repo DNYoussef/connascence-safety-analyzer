@@ -1,8 +1,8 @@
 
 # Claude Flow generated files
 .claude/settings.local.json
-.mcp.json
-claude-flow.config.json
+config/.mcp.json
+config/claude-flow.config.json
 .swarm/
 .hive-mind/
 memory/claude-flow-data.json
@@ -24,6 +24,45 @@ claude-flow.bat
 claude-flow.ps1
 hive-mind-prompt-*.txt
 
+# Python build artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
 # Vendor-specific files (Claude Code configuration)
 .claude/
 CLAUDE.md
+
+# Temporary directories
+out/
+*_reproduction_output/

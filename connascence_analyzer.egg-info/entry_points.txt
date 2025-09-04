@@ -1,5 +1,0 @@
-[console_scripts]
-connascence = cli.connascence:main
-
-[mcp.servers]
-connascence = mcp.server:main
