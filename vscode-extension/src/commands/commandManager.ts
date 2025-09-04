@@ -3,7 +3,7 @@ import { ConnascenceService } from '../services/connascenceService';
 import { ConnascenceDiagnosticsProvider } from '../providers/diagnosticsProvider';
 import { StatusBarManager } from '../ui/statusBarManager';
 import { OutputChannelManager } from '../ui/outputChannelManager';
-import { ConnascenceTreeDataProvider } from '../providers/treeProvider';
+import { ConnascenceTreeProvider } from '../providers/treeProvider';
 import { ExtensionLogger } from '../utils/logger';
 
 /**
@@ -17,7 +17,7 @@ export class CommandManager implements vscode.Disposable {
         private diagnosticsProvider: ConnascenceDiagnosticsProvider,
         private statusBar: StatusBarManager,
         private outputManager: OutputChannelManager,
-        private treeProvider: ConnascenceTreeDataProvider,
+        private treeProvider: ConnascenceTreeProvider,
         private logger: ExtensionLogger
     ) {
         this.registerAllCommands();

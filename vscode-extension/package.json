@@ -4,6 +4,10 @@
   "description": "Enterprise-grade code analysis with Safety Standards/High Quality safety compliance and grammar-enhanced refactoring",
   "version": "1.0.0",
   "publisher": "connascence-systems",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DNYoussef/connascence-safety-analyzer.git"
+  },
   "engines": {
     "vscode": "^1.74.0"
   },

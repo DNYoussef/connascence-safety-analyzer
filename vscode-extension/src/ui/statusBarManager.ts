@@ -52,6 +52,45 @@ export class StatusBarManager {
         this.statusBarItem.dispose();
     }
 
+    // Additional methods required by CommandManager
+    initialize(): void {
+        this.updateDisplay();
+    }
+
+    showProgress(message?: string): void {
+        this.statusBarItem.text = `$(loading~spin) ${message || 'Processing...'}`;
+        this.statusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.warningBackground');
+    }
+
+    showSuccess(message?: string): void {
+        this.statusBarItem.text = `$(check) ${message || 'Success'}`;
+        this.statusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.prominentBackground');
+        
+        // Restore original state after 3 seconds
+        setTimeout(() => {
+            this.updateDisplay();
+        }, 3000);
+    }
+
+    showError(message?: string): void {
+        this.statusBarItem.text = `$(error) ${message || 'Error'}`;
+        this.statusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.errorBackground');
+        
+        // Restore original state after 5 seconds
+        setTimeout(() => {
+            this.updateDisplay();
+        }, 5000);
+    }
+
+    clear(): void {
+        this.statusBarItem.text = '';
+        this.statusBarItem.backgroundColor = undefined;
+    }
+
+    refresh(): void {
+        this.updateDisplay();
+    }
+
     private updateDisplay(): void {
         if (this.isAnalyzing) {
             this.statusBarItem.text = '$(loading~spin) Connascence: Analyzing...';

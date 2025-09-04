@@ -34,7 +34,9 @@ export class ConnascenceCodeActions implements vscode.CodeActionProvider {
     
     private diagnosticToViolation(diagnostic: vscode.Diagnostic, document: vscode.TextDocument): ConnascenceViolation | null {
         // Extract violation info from diagnostic
-        const ruleId = typeof diagnostic.code === 'string' ? diagnostic.code : diagnostic.code?.value;
+        const ruleId = typeof diagnostic.code === 'string' ? diagnostic.code : 
+                       (typeof diagnostic.code === 'object' && diagnostic.code !== null && 'value' in diagnostic.code) 
+                       ? String(diagnostic.code.value) : String(diagnostic.code);
         if (!ruleId) return null;
         
         return {

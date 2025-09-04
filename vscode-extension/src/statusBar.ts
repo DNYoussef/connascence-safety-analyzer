@@ -72,7 +72,7 @@ export class ConnascenceStatusBar {
                 bgColor = new vscode.ThemeColor('statusBarItem.errorBackground');
             } else if (high === 0) {
                 icon = '$(info)';
-                bgColor = undefined;
+                bgColor = new vscode.ThemeColor('statusBarItem.prominentBackground');
             }
             
             this.statusBarItem.text = `${icon} Connascence: ${violationCount} (${connascenceIndex.toFixed(1)})`;

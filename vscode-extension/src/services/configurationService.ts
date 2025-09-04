@@ -216,6 +216,11 @@ export class ConfigurationService {
         });
     }
 
+    // Generic get method for compatibility
+    get<T>(key: string, defaultValue?: T): T | undefined {
+        return this.getConfig(key, defaultValue);
+    }
+
     // Helper methods
     private getConfig<T>(key: string, defaultValue: T): T {
         const config = vscode.workspace.getConfiguration(this.configSection);

@@ -6,7 +6,7 @@ import { ConnascenceCodeActionProvider } from '../providers/codeActionProvider';
 import { ConnascenceCompletionProvider } from '../providers/completionProvider';
 import { ConnascenceHoverProvider } from '../providers/hoverProvider';
 import { ConnascenceCodeLensProvider } from '../providers/codeLensProvider';
-import { ConnascenceTreeDataProvider } from '../providers/treeProvider';
+import { ConnascenceTreeProvider } from '../providers/treeProvider';
 import { StatusBarManager } from '../ui/statusBarManager';
 import { OutputChannelManager } from '../ui/outputChannelManager';
 import { ConfigurationService } from '../services/configurationService';
@@ -35,7 +35,7 @@ export class ConnascenceExtension {
     private completionProvider: ConnascenceCompletionProvider;
     private hoverProvider: ConnascenceHoverProvider;
     private codeLensProvider: ConnascenceCodeLensProvider;
-    private treeDataProvider: ConnascenceTreeDataProvider;
+    private treeDataProvider: ConnascenceTreeProvider;
     
     // Command management
     private commandManager: CommandManager;
@@ -59,7 +59,7 @@ export class ConnascenceExtension {
         this.completionProvider = new ConnascenceCompletionProvider(this.connascenceService);
         this.hoverProvider = new ConnascenceHoverProvider(this.connascenceService);
         this.codeLensProvider = new ConnascenceCodeLensProvider(this.connascenceService);
-        this.treeDataProvider = new ConnascenceTreeDataProvider(this.connascenceService);
+        this.treeDataProvider = new ConnascenceTreeProvider(this.connascenceService);
         
         // Initialize file watcher
         this.fileWatcherService = new FileWatcherService(
