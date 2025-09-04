@@ -57,7 +57,7 @@ def main():
     print("  - Autofix patches demonstrated")
     print()
     print("[READY] System ready for buyer demonstration")
-    print("  Next: Review data-room/START_HERE.md for buyer guide")
+    print("  Next: Review sale/START_HERE.md for buyer guide")
     
     return True
 

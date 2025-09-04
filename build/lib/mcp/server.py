@@ -1,5 +1,6 @@
 
 import asyncio
+import sys
 import time
 from pathlib import Path
 from typing import Dict, List, Any, Optional
@@ -79,30 +80,79 @@ class ConnascenceMCPServer:
         self._tools = self._register_tools()
     
     def _create_analyzer(self):
-        """Create analyzer instance."""
-        from analyzer.core import ConnascenceViolation
-        class MockAnalyzer:
-            def analyze_path(self, path, profile=None):
-                return [ConnascenceViolation(
-                    type_name="CoM", 
-                    severity="medium",
-                    file_path=str(path),
-                    line=1,
-                    description="Mock violation"
-                )]
+        """Create real analyzer instance using refactored ConnascenceASTAnalyzer."""
+        from analyzer.ast_engine.core_analyzer import ConnascenceASTAnalyzer
+        from integrations.tool_coordinator import ToolCoordinator
+        from pathlib import Path
+        
+        class RealAnalyzer:
+            def __init__(self):
+                # Use our new refactored analyzer  
+                self.analyzer = ConnascenceASTAnalyzer()
+                # Initialize enterprise tool coordinator for comprehensive analysis
+                self.tool_coordinator = ToolCoordinator()
             
-            def analyze_directory(self, path, profile=None):
-                return [ConnascenceViolation(
-                    id="test1",
-                    rule_id="CON_CoM",
-                    connascence_type="CoM",
-                    severity="high",
-                    description="Magic literal",
-                    file_path=str(path) + "/test.py",
-                    line_number=10,
-                    weight=3.0
-                )]
-        return MockAnalyzer()
+            def analyze_path(self, path, profile=None):
+                """Analyze a single file or directory using enterprise tooling."""
+                path_obj = Path(path)
+                
+                if path_obj.is_file() and path_obj.suffix == '.py':
+                    violations = self.analyzer.analyze_file(path_obj)
+                elif path_obj.is_dir():
+                    # Use enterprise tool coordination for directory analysis
+                    try:
+                        import asyncio
+                        # Run enterprise analysis with all tools
+                        integrated_analysis = asyncio.run(
+                            self.tool_coordinator.analyze_project(path_obj, include_connascence=True)
+                        )
+                        violations = integrated_analysis.connascence_results.get('violations', [])
+                        
+                        # Add correlation data if available
+                        if integrated_analysis.correlations:
+                            # Store correlation data for enhanced reporting
+                            self._last_correlations = integrated_analysis.correlations
+                            self._last_recommendations = integrated_analysis.recommendations
+                    except Exception as e:
+                        # Fallback to basic analyzer if enterprise tooling fails
+                        result = self.analyzer.analyze_directory(path_obj)
+                        violations = result.violations
+                else:
+                    violations = []
+                
+                # Convert to MCP format
+                converted_violations = []
+                for v in violations:
+                    # Handle both Violation objects and dict format
+                    if hasattr(v, 'id'):
+                        converted_violations.append({
+                            'id': v.id,
+                            'type': v.connascence_type if hasattr(v, 'connascence_type') else v.type.value,
+                            'severity': v.severity.value if hasattr(v.severity, 'value') else v.severity,
+                            'file': v.file_path,
+                            'line': v.line_number,
+                            'column': v.column,
+                            'description': v.description,
+                            'recommendation': v.recommendation,
+                            'context': v.context or {}
+                        })
+                    else:
+                        # Handle dict format from tool coordinator
+                        converted_violations.append({
+                            'id': v.get('id', ''),
+                            'type': v.get('type', v.get('connascence_type', 'Unknown')),
+                            'severity': v.get('severity', 'medium'),
+                            'file': v.get('file_path', v.get('file', '')),
+                            'line': v.get('line_number', v.get('line', 0)),
+                            'column': v.get('column', 0),
+                            'description': v.get('description', ''),
+                            'recommendation': v.get('recommendation', ''),
+                            'context': v.get('context', {})
+                        })
+                
+                return converted_violations
+        
+        return RealAnalyzer()
     
     def _register_tools(self):
         """Register all MCP tools."""
@@ -288,7 +338,7 @@ class ConnascenceMCPServer:
         limit_results = args.get('limit_results')
         
         try:
-            violations = self.analyzer.analyze_directory(path, profile)
+            violations = self.analyzer.analyze_path(path, profile)
         except Exception as e:
             return {
                 'error': str(e),
@@ -300,10 +350,10 @@ class ConnascenceMCPServer:
         if limit_results and len(violations) > limit_results:
             violations = violations[:limit_results]
         
-        # Count violations by severity
+        # Count violations by severity (violations are already dictionaries)
         severity_counts = {'critical': 0, 'high': 0, 'medium': 0, 'low': 0}
         for v in violations:
-            severity = getattr(v, 'severity', 'medium')
+            severity = v.get('severity', 'medium')
             if severity in severity_counts:
                 severity_counts[severity] += 1
         
@@ -315,7 +365,7 @@ class ConnascenceMCPServer:
                 'medium_count': severity_counts['medium'],
                 'low_count': severity_counts['low']
             },
-            'violations': [v.to_dict() if hasattr(v, 'to_dict') else str(v) for v in violations],
+            'violations': violations,  # Already in dictionary format
             'scan_metadata': {
                 'path': path,
                 'policy_preset': profile,
@@ -607,3 +657,41 @@ class MCPConnascenceTool:
         if self.handler:
             return await self.handler(args)
         return {'result': f'Tool {self.name} executed with args: {args}'}
+
+
+def main():
+    """Main entry point for MCP server."""
+    import json
+    import sys
+    
+    # Create server instance
+    server = ConnascenceMCPServer()
+    
+    # Simple demonstration of the MCP server capabilities
+    print("🔍 Connascence MCP Server v1.0.0", file=sys.stderr)
+    print("Available tools:", file=sys.stderr)
+    
+    for tool in server.get_tools():
+        print(f"  • {tool['name']}: {tool['description']}", file=sys.stderr)
+    
+    # For actual MCP implementation, this would handle stdin/stdout protocol
+    # For now, just demonstrate the functionality
+    demo_path = "/example/path"
+    
+    try:
+        # Test path scanning
+        result = asyncio.run(server.scan_path({
+            'path': demo_path,
+            'policy_preset': 'strict-core'
+        }))
+        
+        print(f"\nDemo scan result: {json.dumps(result, indent=2)}", file=sys.stderr)
+        
+    except Exception as e:
+        print(f"Demo failed: {e}", file=sys.stderr)
+    
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(main())

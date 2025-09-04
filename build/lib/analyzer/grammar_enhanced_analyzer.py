@@ -34,9 +34,16 @@ except ImportError:
     import warnings
     warnings.warn("Grammar backend not available, using standard AST analysis")
 
+# Define stub classes first for fallback compatibility
+class RefactoringCandidate:
+    pass
+
+class GenerationConstraints:
+    pass
+
 # Import existing analyzers
 try:
-    from .connascence_analyzer import ConnascenceAnalyzer
+    from .ast_engine.core_analyzer import ConnascenceAnalyzer
     from .core import ConnascenceViolation
     from .magic_literal_analyzer import EnhancedMagicLiteralAnalyzer, MagicLiteral, FrameworkProfile
     from .cohesion_analyzer import StatisticalGodObjectDetector, GodObjectFinding
@@ -50,10 +57,6 @@ except ImportError as e:
     class GodObjectFinding:
         pass
     class FrameworkProfile:
-        pass
-    class RefactoringCandidate:
-        pass
-    class GenerationConstraints:
         pass
 
 

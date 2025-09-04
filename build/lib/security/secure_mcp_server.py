@@ -143,7 +143,7 @@ class SecureMCPServer:
         
         try:
             # Execute the actual tool
-            start_time = datetime.utcnow()
+            start_time = datetime.now(datetime.UTC)
             
             # Add security context to arguments for tools that need it
             secure_arguments = {
@@ -154,7 +154,7 @@ class SecureMCPServer:
             
             result = self.base_server.get_tool_result(tool_name, secure_arguments)
             
-            execution_time = (datetime.utcnow() - start_time).total_seconds()
+            execution_time = (datetime.now(datetime.UTC) - start_time).total_seconds()
             
             # Log successful completion
             self.security_manager.log_analysis_event(
@@ -446,7 +446,7 @@ class SecurityMiddleware:
         """Perform pre-request security checks."""
         
         # Track activity for anomaly detection
-        now = datetime.utcnow().timestamp()
+        now = datetime.now(datetime.UTC).timestamp()
         user_activity = self.activity_tracking.get(context.user_id, [])
         
         # Clean old activity (older than 1 minute)

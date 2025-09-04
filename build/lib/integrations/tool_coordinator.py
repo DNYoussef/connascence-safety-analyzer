@@ -104,11 +104,13 @@ class ToolCoordinator:
             try:
                 from ..analyzer.ast_engine.core_analyzer import ConnascenceASTAnalyzer
                 analyzer = ConnascenceASTAnalyzer()
-                violations = analyzer.analyze_directory(project_path)
+                analysis_result = analyzer.analyze_directory(project_path)
+                violations = analysis_result.violations  # Extract violations from AnalysisResult
                 
                 connascence_results = {
                     'violations': [self._violation_to_dict(v) for v in violations],
-                    'summary': self._create_connascence_summary(violations)
+                    'summary': self._create_connascence_summary(violations),
+                    'analysis_result': analysis_result  # Include full analysis result
                 }
             except Exception as e:
                 connascence_results = {'error': str(e)}
@@ -316,10 +318,10 @@ class ToolCoordinator:
                 )
         
         if 'black' in tool_results and tool_results['black'].success:
-            unformatted_files = tool_results['black'].results.get('unformatted_files', 0)
-            if unformatted_files > 0:
+            unformatted_files = tool_results['black'].results.get('unformatted_files', [])
+            if len(unformatted_files) > 0:
                 recommendations.append(
-                    f"Run 'black .' to format {unformatted_files} unformatted files"
+                    f"Run 'black .' to format {len(unformatted_files)} unformatted files"
                 )
         
         if 'mypy' in tool_results and tool_results['mypy'].success:

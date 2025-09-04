@@ -212,7 +212,7 @@ class AccountLockoutManager:
     
     def record_failed_attempt(self, username: str, ip_address: str) -> None:
         """Record a failed login attempt."""
-        now = datetime.utcnow()
+        now = datetime.now(datetime.UTC)
         
         if username not in self.failed_attempts:
             self.failed_attempts[username] = {
@@ -247,7 +247,7 @@ class AccountLockoutManager:
             return False
         
         # Check if lockout period has expired
-        if datetime.utcnow() > locked_until:
+        if datetime.now(datetime.UTC) > locked_until:
             # Clear lockout
             del self.failed_attempts[username]
             return False
@@ -267,7 +267,7 @@ class AccountLockoutManager:
             'last_attempt': attempt_info['last_attempt'],
             'is_locked': self.is_account_locked(username),
             'locked_until': locked_until,
-            'time_remaining': (locked_until - datetime.utcnow()).total_seconds() if locked_until and locked_until > datetime.utcnow() else 0
+            'time_remaining': (locked_until - datetime.now(datetime.UTC)).total_seconds() if locked_until and locked_until > datetime.now(datetime.UTC) else 0
         }
 
 
@@ -307,7 +307,7 @@ class SecureUserStore:
                 "password_hash": "$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LeOfMxqfW5gJCx3WK",  # SecureAdmin2024!
                 "roles": ["admin"],
                 "security_clearance": "top_secret",
-                "created_at": datetime.utcnow(),
+                "created_at": datetime.now(datetime.UTC),
                 "last_login": None
             },
             "analyst": {
@@ -315,7 +315,7 @@ class SecureUserStore:
                 "password_hash": "$2b$12$8K7Qv.VL6i3K8mHxE9y2eO5qR9sT4uP2wX6zB8cF1aG4hJ7kL9mN0",  # AnalystPass2024!
                 "roles": ["analyst"],
                 "security_clearance": "confidential",
-                "created_at": datetime.utcnow(),
+                "created_at": datetime.now(datetime.UTC),
                 "last_login": None
             }
         }
@@ -337,7 +337,7 @@ class SecureUserStore:
         if self.password_manager.verify_password(password, user_data['password_hash']):
             # Successful authentication
             self.lockout_manager.record_successful_attempt(username)
-            user_data['last_login'] = datetime.utcnow()
+            user_data['last_login'] = datetime.now(datetime.UTC)
             
             logger.info(f"Successful authentication for user: {username}")
             return user_data
@@ -358,7 +358,7 @@ class SecureUserStore:
         self.users[username] = {
             "user_id": f"{username}-{secrets.token_hex(4)}",
             "password_hash": password_hash,
-            "created_at": datetime.utcnow(),
+            "created_at": datetime.now(datetime.UTC),
             "last_login": None,
             **user_data
         }

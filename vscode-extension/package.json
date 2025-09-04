@@ -33,7 +33,9 @@
     "onLanguage:c",
     "onLanguage:cpp",
     "onLanguage:javascript",
-    "onLanguage:typescript"
+    "onLanguage:typescript",
+    "onLanguage:markdown",
+    "onStartupFinished"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -90,9 +92,110 @@
         "title": "Export Analysis Report",
         "category": "Connascence",
         "icon": "$(export)"
+      },
+      {
+        "command": "connascence.showDashboard",
+        "title": "Show Dashboard",
+        "category": "Connascence",
+        "icon": "$(dashboard)"
+      },
+      {
+        "command": "connascence.showHelp",
+        "title": "Show Help Documentation",
+        "category": "Connascence",
+        "icon": "$(book)"
+      },
+      {
+        "command": "connascence.refreshMarkdownTOC",
+        "title": "Refresh",
+        "category": "Markdown TOC",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "connascence.createMarkdownFile",
+        "title": "New Markdown File",
+        "category": "Markdown TOC",
+        "icon": "$(new-file)"
+      },
+      {
+        "command": "connascence.openMarkdownFile",
+        "title": "Open",
+        "category": "Markdown TOC"
+      },
+      {
+        "command": "connascence.openMarkdownPreview",
+        "title": "Open Preview",
+        "category": "Markdown TOC",
+        "icon": "$(preview)"
+      },
+      {
+        "command": "connascence.setApiKey",
+        "title": "Set API Key",
+        "category": "Connascence AI"
+      },
+      {
+        "command": "connascence.toggleProvider",
+        "title": "Toggle AI Provider",
+        "category": "Connascence AI"
+      },
+      {
+        "command": "connascence.changeModel",
+        "title": "Change AI Model",
+        "category": "Connascence AI"
+      },
+      {
+        "command": "connascence.configureServer",
+        "title": "Configure MCP Server",
+        "category": "Connascence AI"
+      }
+    ],
+    "views": {
+      "explorer": [
+        {
+          "id": "connascenceMarkdownTOC",
+          "name": "📚 Markdown Files",
+          "when": "workspaceFolderCount > 0",
+          "contextualTitle": "Markdown Table of Contents"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "connascenceMarkdownTOC",
+        "contents": "No markdown files found in the workspace.\n[Create New Markdown File](command:connascence.createMarkdownFile)\n[Refresh](command:connascence.refreshMarkdownTOC)",
+        "when": "workspaceFolderCount > 0"
       }
     ],
     "menus": {
+      "view/title": [
+        {
+          "command": "connascence.refreshMarkdownTOC",
+          "when": "view == connascenceMarkdownTOC",
+          "group": "navigation"
+        },
+        {
+          "command": "connascence.createMarkdownFile",
+          "when": "view == connascenceMarkdownTOC",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "connascence.openMarkdownFile",
+          "when": "view == connascenceMarkdownTOC && viewItem == markdownFile",
+          "group": "1_open"
+        },
+        {
+          "command": "connascence.openMarkdownPreview",
+          "when": "view == connascenceMarkdownTOC && viewItem == markdownFile",
+          "group": "1_open"
+        },
+        {
+          "command": "connascence.createMarkdownFile",
+          "when": "view == connascenceMarkdownTOC && viewItem == markdownFolder",
+          "group": "2_create"
+        }
+      ],
       "editor/context": [
         {
           "command": "connascence.analyzeFile",
@@ -204,6 +307,31 @@
           ],
           "default": "warning",
           "description": "Severity level for diagnostics"
+        },
+        "connascence.enableVisualHighlighting": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable bright color-coded highlighting for violations"
+        },
+        "connascence.highlightingIntensity": {
+          "type": "string",
+          "enum": [
+            "subtle",
+            "normal",
+            "bright"
+          ],
+          "default": "normal",
+          "description": "Intensity of visual highlighting"
+        },
+        "connascence.showEmojis": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show emoji annotations for violation types"
+        },
+        "connascence.aiIntegration": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable AI-powered refactoring suggestions"
         }
       }
     }

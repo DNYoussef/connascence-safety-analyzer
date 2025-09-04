@@ -27,6 +27,18 @@ import threading
 from contextlib import contextmanager
 import bcrypt
 import re
+import os
+
+# Enterprise cryptography imports
+try:
+    from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+    from cryptography.hazmat.primitives import hashes, serialization
+    from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+    from cryptography.hazmat.primitives.kdf.scrypt import Scrypt
+    CRYPTO_AVAILABLE = True
+except ImportError:
+    CRYPTO_AVAILABLE = False
+    logging.warning("Enterprise cryptography not available. Install 'cryptography' for production security.")
 
 logger = logging.getLogger(__name__)
 
@@ -79,7 +91,7 @@ class SecurityContext:
     @property
     def is_expired(self) -> bool:
         """Check if security context has expired."""
-        return datetime.utcnow() > self.expires_at
+        return datetime.now(datetime.UTC) > self.expires_at
     
     def has_role(self, role: UserRole) -> bool:
         """Check if user has specific role."""
@@ -111,10 +123,24 @@ class AuditEvent:
     
     def _calculate_hash(self) -> str:
         """Calculate HMAC-SHA256 hash for integrity verification."""
-        data = f"{self.timestamp.isoformat()}{self.event_type.value}{self.user_id}{self.resource}{self.action}{self.result}"
+        # Include all critical fields in deterministic order for integrity
+        data_components = [
+            self.timestamp.isoformat(),
+            self.event_type.value,
+            self.user_id,
+            self.session_token,
+            self.ip_address,
+            self.resource,
+            self.action,
+            self.result,
+            json.dumps(self.details, sort_keys=True)  # Ensure deterministic JSON
+        ]
+        data = '|'.join(data_components)  # Use delimiter to prevent collision
+        
+        audit_key = SecurityManager._get_audit_key()
         return hmac.new(
-            SecurityManager._get_audit_key().encode(),
-            data.encode(),
+            audit_key,
+            data.encode('utf-8'),
             hashlib.sha256
         ).hexdigest()
     
@@ -150,52 +176,128 @@ class RateLimiter:
 
 
 class EncryptionManager:
-    """Handles data encryption for sensitive information."""
+    """Handles data encryption for sensitive information using enterprise-grade AES-256-GCM."""
     
     def __init__(self, master_key: Optional[str] = None):
         """Initialize with master key for encryption."""
+        if not CRYPTO_AVAILABLE:
+            raise RuntimeError("Enterprise cryptography library not available. Install 'cryptography>=41.0.0' for production security.")
+            
         if master_key:
             self.master_key = master_key.encode()
         else:
-            # Generate random key for air-gapped deployments
+            # Generate cryptographically secure master key
             self.master_key = secrets.token_bytes(32)
+            
+        # Initialize key derivation parameters
+        self.kdf_salt_size = 32  # Increased salt size for Scrypt
+        self.kdf_iterations = 100000  # PBKDF2 iterations
+        self.aes_key_size = 32  # AES-256
         
     def encrypt_data(self, data: str) -> str:
-        """Encrypt sensitive data using AES-256."""
-        # In production, use proper AES encryption library like cryptography
-        # This is a simplified implementation for demonstration
-        salt = secrets.token_bytes(16)
-        key = self._derive_key(salt)
-        
-        # Placeholder - use actual AES encryption in production
-        encrypted = self._xor_encrypt(data.encode(), key)
-        
-        # Combine salt + encrypted data and encode as hex
-        return (salt + encrypted).hex()
+        """Encrypt sensitive data using AES-256-GCM with authentication."""
+        try:
+            # Generate random salt and derive encryption key
+            salt = secrets.token_bytes(self.kdf_salt_size)
+            encryption_key = self._derive_key(salt)
+            
+            # Create AES-GCM cipher
+            aesgcm = AESGCM(encryption_key)
+            nonce = secrets.token_bytes(12)  # 96-bit nonce for GCM
+            
+            # Encrypt data with authentication
+            ciphertext = aesgcm.encrypt(nonce, data.encode('utf-8'), None)
+            
+            # Combine salt + nonce + ciphertext and encode as hex
+            encrypted_package = salt + nonce + ciphertext
+            return encrypted_package.hex()
+            
+        except Exception as e:
+            logger.error(f"Encryption failed: {e}")
+            raise ValueError("Failed to encrypt data")
     
     def decrypt_data(self, encrypted_hex: str) -> str:
         """Decrypt data encrypted with encrypt_data."""
         try:
+            # Parse encrypted package
             encrypted_bytes = bytes.fromhex(encrypted_hex)
-            salt = encrypted_bytes[:16]
-            encrypted_data = encrypted_bytes[16:]
             
-            key = self._derive_key(salt)
-            decrypted = self._xor_encrypt(encrypted_data, key)
+            # Extract components
+            salt = encrypted_bytes[:self.kdf_salt_size]
+            nonce_start = self.kdf_salt_size
+            nonce = encrypted_bytes[nonce_start:nonce_start + 12]
+            ciphertext = encrypted_bytes[nonce_start + 12:]
             
-            return decrypted.decode()
-        except Exception:
-            raise ValueError("Failed to decrypt data")
+            # Derive decryption key
+            decryption_key = self._derive_key(salt)
+            
+            # Decrypt with authentication verification
+            aesgcm = AESGCM(decryption_key)
+            plaintext = aesgcm.decrypt(nonce, ciphertext, None)
+            
+            return plaintext.decode('utf-8')
+            
+        except Exception as e:
+            logger.error(f"Decryption failed: {e}")
+            raise ValueError("Failed to decrypt data - data may be corrupted or tampered with")
     
     def _derive_key(self, salt: bytes) -> bytes:
-        """Derive encryption key from master key and salt."""
-        # Use PBKDF2 key derivation
-        import hashlib
-        return hashlib.pbkdf2_hmac('sha256', self.master_key, salt, 100000)
+        """Derive encryption key using Scrypt KDF (more secure than PBKDF2)."""
+        try:
+            # Use Scrypt for better resistance against hardware attacks
+            kdf = Scrypt(
+                algorithm=hashes.SHA256(),
+                length=self.aes_key_size,
+                salt=salt,
+                n=2**14,  # CPU/memory cost factor
+                r=8,      # Block size factor  
+                p=1,      # Parallelization factor
+            )
+            return kdf.derive(self.master_key)
+            
+        except Exception:
+            # Fallback to PBKDF2 if Scrypt fails
+            kdf = PBKDF2HMAC(
+                algorithm=hashes.SHA256(),
+                length=self.aes_key_size,
+                salt=salt,
+                iterations=self.kdf_iterations,
+            )
+            return kdf.derive(self.master_key)
     
-    def _xor_encrypt(self, data: bytes, key: bytes) -> bytes:
-        """Simple XOR encryption - use AES in production."""
-        return bytes(a ^ b for a, b in zip(data, key * (len(data) // len(key) + 1)))
+    def generate_secure_key(self) -> str:
+        """Generate a new cryptographically secure master key."""
+        return secrets.token_hex(32)  # 256-bit key as hex string
+    
+    def rotate_master_key(self, old_encrypted_data: List[str], new_master_key: Optional[str] = None) -> List[str]:
+        """Rotate master key and re-encrypt existing data."""
+        if not new_master_key:
+            new_master_key = self.generate_secure_key()
+            
+        # Store old key temporarily
+        old_master_key = self.master_key
+        
+        # Re-encrypt all data with new key
+        re_encrypted_data = []
+        
+        try:
+            for encrypted_hex in old_encrypted_data:
+                # Decrypt with old key
+                plaintext = self.decrypt_data(encrypted_hex)
+                
+                # Update to new key
+                self.master_key = new_master_key.encode()
+                
+                # Encrypt with new key
+                new_encrypted = self.encrypt_data(plaintext)
+                re_encrypted_data.append(new_encrypted)
+                
+            return re_encrypted_data
+            
+        except Exception:
+            # Restore old key on failure
+            self.master_key = old_master_key
+            raise
 
 
 class SecurityManager:
@@ -223,10 +325,42 @@ class SecurityManager:
         logger.info(f"Security manager initialized (air-gapped: {air_gapped})")
     
     @classmethod
-    def _get_audit_key(cls) -> str:
+    def _get_audit_key(cls) -> bytes:
         """Get audit key for HMAC integrity protection."""
         if not cls._audit_key:
-            cls._audit_key = secrets.token_urlsafe(32)
+            # Load key from secure storage or generate new one
+            key_file = Path(".connascence_security") / "audit.key"
+            
+            if key_file.exists():
+                try:
+                    with open(key_file, 'rb') as f:
+                        cls._audit_key = f.read()
+                    
+                    # Validate key size
+                    if len(cls._audit_key) != 32:
+                        raise ValueError("Invalid key size")
+                        
+                except Exception:
+                    logger.warning("Failed to load audit key, generating new one")
+                    cls._audit_key = None
+            
+            if not cls._audit_key:
+                # Generate new cryptographically secure key
+                cls._audit_key = secrets.token_bytes(32)
+                
+                # Save to secure file with restricted permissions
+                try:
+                    key_file.parent.mkdir(parents=True, exist_ok=True)
+                    with open(key_file, 'wb') as f:
+                        f.write(cls._audit_key)
+                    
+                    # Set file permissions (Unix-like systems)
+                    if hasattr(os, 'chmod'):
+                        os.chmod(key_file, 0o600)  # Owner read/write only
+                        
+                except Exception as e:
+                    logger.error(f"Failed to save audit key: {e}")
+                    
         return cls._audit_key
     
     def authenticate_user(self, username: str, password: str, ip_address: str) -> Optional[SecurityContext]:
@@ -249,7 +383,7 @@ class SecurityManager:
         
         # Create session token
         session_token = secrets.token_urlsafe(32)
-        expires_at = datetime.utcnow() + timedelta(hours=8)  # 8-hour session
+        expires_at = datetime.now(datetime.UTC) + timedelta(hours=8)  # 8-hour session
         
         # Build security context
         context = SecurityContext(
@@ -519,7 +653,7 @@ class SecurityManager:
         """Log audit event to database."""
         
         event = AuditEvent(
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(datetime.UTC),
             event_type=event_type,
             user_id=user_id,
             session_token=session_token,
@@ -619,7 +753,7 @@ class SecurityManager:
             else:
                 # Track failed attempts for account lockout
                 user_data["failed_attempts"] = user_data.get("failed_attempts", 0) + 1
-                user_data["last_failed_attempt"] = datetime.utcnow()
+                user_data["last_failed_attempt"] = datetime.now(datetime.UTC)
                 
                 # Lock account after 5 failed attempts
                 if user_data["failed_attempts"] >= 5:
