@@ -21,6 +21,7 @@ from .position_analyzer import PositionAnalyzer
 from .meaning_analyzer import MeaningAnalyzer
 from .algorithm_analyzer import AlgorithmAnalyzer
 from .god_object_analyzer import GodObjectAnalyzer
+from .multi_language_analyzer import MultiLanguageAnalyzer
 
 logger = logging.getLogger(__name__)
 
@@ -42,6 +43,7 @@ class AnalyzerOrchestrator(BaseConnascenceAnalyzer):
         self.meaning_analyzer = MeaningAnalyzer(thresholds, weights, policy_preset, exclusions)
         self.algorithm_analyzer = AlgorithmAnalyzer(thresholds, weights, policy_preset, exclusions)
         self.god_object_analyzer = GodObjectAnalyzer(thresholds, weights, policy_preset, exclusions)
+        self.multi_language_analyzer = MultiLanguageAnalyzer(thresholds, weights, policy_preset, exclusions)
     
     def analyze_string(self, source_code: str, filename: str = "string_input.py") -> List[Violation]:
         """Analyze source code string for connascence violations."""
@@ -99,36 +101,53 @@ class AnalyzerOrchestrator(BaseConnascenceAnalyzer):
         violations = []
         
         try:
-            # Read and parse file
-            with open(file_path, encoding="utf-8", errors="ignore") as f:
-                source = f.read()
-                self.current_source_lines = source.splitlines()
+            # Determine if this is a Python file or needs multi-language analysis
+            file_extension = file_path.suffix.lower()
             
-            if not source.strip():  # Skip empty files
-                return []
+            if file_extension == '.py':
+                # Use Python AST analysis
+                with open(file_path, encoding="utf-8", errors="ignore") as f:
+                    source = f.read()
+                    self.current_source_lines = source.splitlines()
+                
+                if not source.strip():  # Skip empty files
+                    return []
+                
+                tree = ast.parse(source, filename=str(file_path))
+                
+                # Run all analysis passes using specialized analyzers
+                violations.extend(self._run_all_analyzers(tree))
+                
+                # Collect file statistics for Python files
+                self.file_stats[self.current_file_path] = self.calculate_file_stats(
+                    tree, violations
+                )
+                
+            else:
+                # Use multi-language analyzer for non-Python files
+                violations.extend(self.multi_language_analyzer.analyze_file(file_path))
+                # Sync state from multi-language analyzer
+                self.current_source_lines = self.multi_language_analyzer.current_source_lines
+                
+                # Collect basic file statistics for non-Python files
+                self.file_stats[self.current_file_path] = {
+                    "total_lines": len(self.current_source_lines),
+                    "language": self.multi_language_analyzer.detect_language(file_path),
+                    "violations_count": len(violations)
+                }
             
-            tree = ast.parse(source, filename=str(file_path))
-            
-            # Run all analysis passes using specialized analyzers
-            violations.extend(self._run_all_analyzers(tree))
-            
-            # Calculate weights and finalize violations
+            # Calculate weights and finalize violations for all file types
             for violation in violations:
                 violation.weight = calculate_violation_weight(
                     violation.type, violation.severity, violation.locality,
                     self.current_file_path, self.weights
                 )
             
-            # Collect file statistics
-            self.file_stats[self.current_file_path] = self.calculate_file_stats(
-                tree, violations
-            )
-            
         except (SyntaxError, UnicodeDecodeError) as e:
             # Create violation for unparseable files
             violation = Violation(
                 id="",
-                type=ConnascenceType.NAME,  # Closest match
+                type=ConnascenceType.NAME,
                 severity=Severity.CRITICAL,
                 file_path=self.current_file_path,
                 line_number=getattr(e, "lineno", 1),
@@ -145,16 +164,21 @@ class AnalyzerOrchestrator(BaseConnascenceAnalyzer):
         return violations
     
     def analyze_directory(self, directory: Path) -> AnalysisResult:
-        """Analyze all Python files in a directory tree."""
+        """Analyze all supported files in a directory tree."""
         self.analysis_start_time = time.time()
         all_violations = []
         files_analyzed = 0
         
-        for py_file in directory.rglob("*.py"):
-            if self.should_analyze_file(py_file):
-                file_violations = self.analyze_file(py_file)
-                all_violations.extend(file_violations)
-                files_analyzed += 1
+        # Supported file extensions
+        supported_extensions = ['.py', '.c', '.cpp', '.cxx', '.cc', '.h', '.hpp', '.hxx', '.js', '.mjs', '.ts']
+        
+        # Find all supported files
+        for file_path in directory.rglob("*"):
+            if file_path.is_file() and file_path.suffix.lower() in supported_extensions:
+                if self.should_analyze_file(file_path):
+                    file_violations = self.analyze_file(file_path)
+                    all_violations.extend(file_violations)
+                    files_analyzed += 1
         
         analysis_duration = int((time.time() - self.analysis_start_time) * 1000)
         
