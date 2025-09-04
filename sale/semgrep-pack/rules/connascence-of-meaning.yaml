@@ -1,0 +1,87 @@
+rules:
+  - id: magic-literal-in-conditional
+    pattern-either:
+      - pattern: if $VAR > $LITERAL
+      - pattern: if $VAR >= $LITERAL  
+      - pattern: if $VAR < $LITERAL
+      - pattern: if $VAR <= $LITERAL
+      - pattern: if $VAR == $LITERAL
+      - pattern: if $VAR != $LITERAL
+    pattern-not: 
+      pattern-either:
+        - pattern: if $VAR > 0
+        - pattern: if $VAR >= 0
+        - pattern: if $VAR < 0
+        - pattern: if $VAR <= 0
+        - pattern: if $VAR == 0
+        - pattern: if $VAR != 0
+        - pattern: if $VAR > 1
+        - pattern: if $VAR >= 1
+        - pattern: if $VAR < 1
+        - pattern: if $VAR <= 1
+        - pattern: if $VAR == 1
+        - pattern: if $VAR != 1
+    message: |
+      Magic literal '$LITERAL' in conditional creates connascence of meaning. 
+      Consider extracting to a named constant to improve maintainability.
+    severity: WARNING
+    languages: [python, javascript]
+    metadata:
+      category: connascence
+      subcategory: meaning
+      confidence: HIGH
+      likelihood: HIGH
+      impact: MEDIUM
+      references:
+        - "Meilir Page-Jones: What Every Programmer Should Know About Object-Oriented Design"
+        - "Martin Fowler: Reducing Coupling"
+    fix-regex:
+      regex: 'if (\w+) ([><=!]+) (\d+(?:\.\d+)?)'
+      replacement: |
+        # TODO: Extract magic literal to named constant
+        # Example: MAX_RETRIES = $3
+        if $1 $2 $3
+
+  - id: magic-string-pattern
+    pattern-either:
+      - pattern: re.compile("$STRING")
+      - pattern: re.compile(r"$STRING")
+      - pattern: new RegExp("$STRING")
+      - pattern: /$STRING/
+    pattern-not:
+      pattern-either:
+        - pattern: re.compile("")
+        - pattern: re.compile(r"")
+    message: |
+      Magic string pattern '$STRING' creates connascence of meaning.
+      Consider extracting regex patterns to named constants for reusability.
+    severity: INFO
+    languages: [python, javascript]
+    metadata:
+      category: connascence
+      subcategory: meaning
+      confidence: MEDIUM
+      likelihood: MEDIUM
+      impact: LOW
+
+  - id: magic-timeout-values
+    pattern-either:
+      - pattern: sleep($TIMEOUT)
+      - pattern: time.sleep($TIMEOUT)
+      - pattern: setTimeout($FUNC, $TIMEOUT)
+      - pattern: setInterval($FUNC, $TIMEOUT)
+    pattern-not:
+      pattern-either:
+        - pattern: sleep(0)
+        - pattern: time.sleep(0)
+    message: |
+      Magic timeout value '$TIMEOUT' creates temporal coupling.
+      Consider extracting to a named constant with descriptive name.
+    severity: WARNING
+    languages: [python, javascript]
+    metadata:
+      category: connascence
+      subcategory: meaning
+      confidence: HIGH
+      likelihood: HIGH
+      impact: HIGH

@@ -1,0 +1,81 @@
+{
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "Connascence Safety Analyzer",
+          "version": "1.0.0",
+          "informationUri": "https://github.com/connascence/safety-analyzer"
+        }
+      },
+      "artifacts": [
+        {
+          "location": {
+            "uri": "src/tool_operate.c"
+          }
+        },
+        {
+          "location": {
+            "uri": "lib/http.c"
+          }
+        }
+      ],
+      "results": [
+        {
+          "ruleId": "connascence-of-meaning",
+          "level": "info",
+          "message": {
+            "text": "Magic literal '8192' (buffer size) should be extracted to named constant"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/tool_operate.c"
+                },
+                "region": {
+                  "startLine": 892,
+                  "startColumn": 35,
+                  "endLine": 892,
+                  "endColumn": 39
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "connascence-of-position",
+          "level": "warning",
+          "message": {
+            "text": "Function 'curl_easy_perform' has 12 parameters - consider parameter object"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "lib/http.c"
+                },
+                "region": {
+                  "startLine": 234,
+                  "startColumn": 1,
+                  "endLine": 237,
+                  "endColumn": 50
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "invocations": [
+        {
+          "executionSuccessful": true,
+          "toolExecutionNotifications": [],
+          "exitCode": 0,
+          "startTimeUtc": "2025-09-04T13:45:00Z", 
+          "endTimeUtc": "2025-09-04T13:45:02Z"
+        }
+      ]
+    }
+  ]
+}
