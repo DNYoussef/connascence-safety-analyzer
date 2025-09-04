@@ -1,0 +1,10 @@
+analyzer
+autofix
+cli
+dashboard
+integrators
+mcp
+policy
+reporting
+src
+tooling

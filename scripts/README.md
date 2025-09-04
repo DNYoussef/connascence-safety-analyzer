@@ -1,14 +1,66 @@
-# Verification Scripts - Connascence Safety Analyzer
+# Enterprise Demo and Verification Scripts - Connascence Safety Analyzer
 
-This directory contains comprehensive verification scripts that validate README numbers match demo artifacts using memory coordination and sequential thinking.
+This directory contains comprehensive scripts for reproducing enterprise demo results and verifying README claims using exact repository SHAs and systematic validation.
 
 ## Files Overview
 
 ### Core Scripts
 
+- **`reproduce_enterprise_demo.py`** - **NEW** Comprehensive enterprise demo reproduction script
+- **`test_reproduction.py`** - **NEW** Quick validation test for reproduction script
 - **`verify_counts.py`** - Main Python verification script with memory coordination
 - **`verify_counts.sh`** - Shell wrapper script with CI/CD integration  
 - **`README.md`** - This documentation
+
+### NEW: Enterprise Demo Reproduction
+
+**`reproduce_enterprise_demo.py`** provides complete enterprise demo reproduction:
+
+- ✅ Uses exact SHAs from README for reproducible results
+- ✅ Clones repositories at specific commits (Celery, curl, Express)  
+- ✅ Runs analysis with exact profiles and configurations
+- ✅ Validates expected violation counts (5,743 total)
+- ✅ Creates organized output directory structure
+- ✅ Generates comprehensive validation reports
+
+**Quick Start**:
+```bash
+# Test configuration
+python scripts/test_reproduction.py
+
+# Full enterprise validation
+python scripts/reproduce_enterprise_demo.py --validate-all
+
+# Single repository
+python scripts/reproduce_enterprise_demo.py --repo celery --verbose
+```
+
+**Expected Results**:
+- Celery: 4,630 violations (Python async framework)
+- curl: 1,061 violations (C networking library)  
+- Express: 52 violations (JavaScript framework)
+- **Total: 5,743 violations**
+
+**Exact Configuration (from README.md)**:
+```
+TOOL_VERSION=v1.0-sale
+TOOL_COMMIT=cc4f10d
+PYTHON_VERSION=3.12.5
+CELERY_SHA=6da32827cebaf332d22f906386c47e552ec0e38f
+CURL_SHA=c72bb7aec4db2ad32f9d82758b4f55663d0ebd60
+EXPRESS_SHA=aa907945cd1727483a888a0a6481f9f4861593f8
+```
+
+**Output Structure**:
+```
+enterprise_reproduction_output/
+├── reproduction_report.md          # Comprehensive results report
+├── reproduction_session.json       # Machine-readable session data
+├── validation_results.json         # Detailed validation results
+├── celery/                          # Celery analysis outputs (4,630 violations)
+├── curl/                            # curl analysis outputs (1,061 violations)
+└── express/                         # Express analysis outputs (52 violations)
+```
 
 ### Features
 

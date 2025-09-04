@@ -92,12 +92,13 @@ packages = [
     "mcp",
     "dashboard",
     "tooling",
+    "src",
 ]
 
 [tool.setuptools.package-data]
 policy = ["presets/*.yml", "baselines/*.json"]
 reporting = ["templates/*.html", "templates/*.md"] 
-vscode-extension = ["**/*"]
+"*" = ["**/*"]
 
 [tool.black]
 line-length = 120

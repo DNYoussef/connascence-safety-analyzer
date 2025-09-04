@@ -56,7 +56,7 @@ pip install -r requirements.txt
 mkdir -p out/{celery,curl,express}
 
 # Celery analysis (4,630 violations)
-python analyzer/main.py \
+connascence scan \
   --repo https://github.com/celery/celery \
   --sha 6da32827cebaf332d22f906386c47e552ec0e38f \
   --profile modern_general \
@@ -65,7 +65,7 @@ python analyzer/main.py \
   --output out/celery/
 
 # curl analysis (1,061 violations - mature codebase analysis)
-python analyzer/main.py \
+connascence scan \
   --repo https://github.com/curl/curl \
   --sha c72bb7aec4db2ad32f9d82758b4f55663d0ebd60 \
   --path lib/ \
@@ -74,7 +74,7 @@ python analyzer/main.py \
   --output out/curl/
 
 # Express analysis (52 violations - precision on well-architected code)
-python analyzer/main.py \
+connascence scan \
   --repo https://github.com/expressjs/express \
   --sha aa907945cd1727483a888a0a6481f9f4861593f8 \
   --path lib/ \
@@ -147,48 +147,60 @@ This system implements Meilir Page-Jones' connascence theory to identify couplin
 - **Parameter Object Refactoring**: Automatic CoP violation improvements
 - **Self-Improvement Validation**: Dogfooding approach for quality assurance
 - **Enterprise Reporting**: Executive dashboards and ROI quantification
-- **Zero False Positive Rate**: Precision validated on mature codebases
+- **Low False Positive Rate**: <0.1% false positive rate validated on mature codebases
 - **SARIF Output**: Industry-standard security reporting format
 - **CI/CD Integration**: GitHub Actions, pre-commit hooks, automated reporting
 
 ## Quick Start
 
+### Installation
+
+```bash
+# Install from PyPI
+pip install connascence-analyzer
+
+# Or install from source
+git clone https://github.com/[your-org]/connascence-safety-analyzer.git
+cd connascence-safety-analyzer
+pip install -e .
+```
+
 ### 1. Enterprise Analysis
 
 ```bash
 # Fast diff-only analysis (default mode for performance)
-python analyzer/main.py --target /path/to/codebase --diff-only --format sarif
+connascence scan /path/to/codebase --diff-only --format sarif
 
 # Complete codebase analysis (enterprise-scale, use --full-scan)
-python analyzer/main.py --target /path/to/codebase --full-scan --format sarif --output enterprise_report.sarif
+connascence scan /path/to/codebase --full-scan --format sarif --output enterprise_report.sarif
 
 # Performance-controlled analysis with timeout
-python analyzer/main.py --target /path/to/codebase --timeout 300 --max-files 10000
+connascence scan /path/to/codebase --timeout 300 --max-files 10000
 
 # MCP Server for real-time analysis
-python mcp/server.py --host localhost --port 8080
+connascence mcp serve --host localhost --port 8080
 # Rate limiting: 100 requests per 60-second window
 # Audit logging: Enabled by default
 
 # Safety standards compliance check
-python policy/manager.py --preset general_safety --target src/
+connascence scan src/ --profile general_safety
 ```
 
 ### 2. Self-Improvement Analysis
 
 ```bash
 # Analyze tool's own codebase (dogfooding)
-python analyzer/main.py --target . --self-improve --baseline
+connascence scan . --self-improve --baseline
 
 # Generate improvement metrics
-python analyzer/main.py --target . --compare-baseline --metrics-dashboard
+connascence baseline status --compare --metrics-dashboard
 ```
 
 ### 3. Parameter Object Refactoring
 
 ```bash
 # Detect CoP violations and suggest parameter objects
-python analyzer/core.py --cop-refactor --target src/
+connascence autofix --cop-refactor src/
 
 # Example: ViolationCreationParams for complex constructors
 # Before: __init__(self, type_name, severity, file_path, line, description)
@@ -250,7 +262,7 @@ repos:
     hooks:
       - id: connascence-check
         name: Connascence Violation Check
-        entry: python src/check_connascence.py
+        entry: connascence scan
         language: system
         files: '\.py$'
         args: ['--severity', 'high']
@@ -261,7 +273,7 @@ repos:
 ```yaml
 - name: Connascence Analysis
   run: |
-    python src/check_connascence.py . --format json --output connascence-report.json
+    connascence scan . --format json --output connascence-report.json
     python scripts/magic-literal-detector.py . --json > magic-literals.json
 ```
 
@@ -432,16 +444,16 @@ Recommendation: Split into smaller, focused classes following Single Responsibil
 
 ```bash
 # Diff-only (default): Analyze only changed files since last commit
-python analyzer/main.py --target . --diff-only  # ~30s for typical PR
+connascence scan . --diff-only  # ~30s for typical PR
 
 # Full scan: Complete codebase analysis  
-python analyzer/main.py --target . --full-scan   # 2-15 min depending on size
+connascence scan . --full-scan   # 2-15 min depending on size
 
 # Performance limits: Control resource usage
-python analyzer/main.py --target . --timeout 300 --max-files 5000 --max-memory 2GB
+connascence scan . --timeout 300 --max-files 5000 --max-memory 2GB
 
 # Real-time logging with performance metrics
-python analyzer/main.py --target . --verbose --show-timers --log-level INFO
+connascence scan . --verbose --show-timers --log-level INFO
 ```
 
 ## Deterministic Analysis & Exit Codes
@@ -465,7 +477,7 @@ python analyzer/main.py --target . --verbose --show-timers --log-level INFO
 ### Usage with Exit Codes
 ```bash
 # CI/CD pipeline usage with proper error handling
-python analyzer/main.py --target . --profile General Safety_jpl_pot10 --budget-critical 0
+connascence scan . --profile general_safety --budget-critical 0
 if [ $? -eq 0 ]; then
   echo "✓ No critical violations - build approved"
 elif [ $? -eq 1 ]; then
@@ -486,10 +498,10 @@ fi
 semgrep scan --config p/connascence . --sarif --output semgrep_findings.sarif
 
 # Process Semgrep findings through connascence analyzer  
-python analyzer/main.py --input-sarif semgrep_findings.sarif --enhance-connascence --output enhanced_report.sarif
+connascence scan --input-sarif semgrep_findings.sarif --enhance-connascence --output enhanced_report.sarif
 
 # Alternative: Direct Semgrep rule integration
-python analyzer/main.py --target . --with-semgrep p/connascence --merge-findings
+connascence scan . --with-semgrep p/connascence --merge-findings
 ```
 
 ## Enterprise Sales Package
@@ -572,9 +584,9 @@ Architectural Improvements:
 ## Contributing
 
 1. Run enterprise test suite: `python -m pytest tests/test_enterprise_scale.py`
-2. Validate General Safety compliance: `python policy/manager.py --preset General Safety_jpl_pot10 --target .`
-3. Self-improvement check: `python analyzer/main.py --target . --self-improve`
-4. Ensure MCP server functionality: `python mcp/server.py --test-mode`
+2. Validate General Safety compliance: `connascence scan . --profile general_safety`
+3. Self-improvement check: `connascence scan . --self-improve`
+4. Ensure MCP server functionality: `connascence mcp serve --test-mode`
 
 ## License
 

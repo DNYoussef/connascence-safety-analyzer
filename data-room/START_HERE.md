@@ -5,7 +5,7 @@
 **Connascence** is an enterprise-grade code quality system that prevents technical debt and reduces maintenance costs by 67% through automated detection and remediation of structural coupling anti-patterns.
 
 ### What This Is
-- **Production-ready** code quality platform with 84.8% accuracy
+- **Production-ready** code quality platform with 84.8% accuracy and <0.1% false positive rate
 - **Rule-based static analysis** detection of 9 types of connascence (coupling patterns)
 - **Enterprise-validated** with real cost savings data
 - **Zero-config** deployment with comprehensive tooling
@@ -19,7 +19,7 @@
 ### Immediate Value Propositions
 1. **Cost Reduction**: Prevent expensive refactoring by catching coupling issues early
 2. **Developer Productivity**: Automated code review reduces manual oversight by 89%
-3. **Quality Assurance**: Enterprise-grade detection with <0.1% false positive rate
+3. **Quality Assurance**: Enterprise-grade detection with 84.8% accuracy and <0.1% false positive rate
 4. **Risk Mitigation**: Comprehensive security and compliance validation
 
 ---

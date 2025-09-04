@@ -1,0 +1,247 @@
+# General Safety Standards Rules - Safety Critical Profile
+# 
+# This preset implements General Safety's "Power of Ten" rules for safety-critical systems.
+# Based on Gerard J. Holzmann's JPL Coding Standard (Spinroot.com/gerard/pdf/P10.pdf)
+#
+# These rules are designed for flight software and embedded systems where
+# reliability and predictability are paramount over performance or convenience.
+
+name: "General Safety JPL Power of Ten"
+version: "1.0.0"
+description: "Safety-critical coding standard based on General Safety Standards"
+inherit: "strict-core"
+
+# Build Requirements (Rule 10: Warnings = Errors)
+build_requirements:
+  required_flags:
+    - "-Wall"
+    - "-Wextra" 
+    - "-Werror"
+    - "-pedantic"
+  forbidden_flags:
+    - "-w"  # Suppress warnings
+  compiler_minimum:
+    gcc: "9.0"
+    clang: "10.0"
+    msvc: "19.28"  # VS 2019 16.8
+
+# General Safety Power of Ten Rule Enforcement
+nasa_rules:
+  # Rule 1: Avoid complex flow constructs
+  rule_1_flow_control:
+    ban_goto: true
+    ban_setjmp_longjmp: true
+    ban_recursion: true
+    max_loop_nesting: 2
+    severity: "critical"
+    
+  # Rule 2: All loops must have fixed upper bounds
+  rule_2_loop_bounds:
+    require_bound_annotations: true
+    allow_while_true_server_loops: false  # Only for non-critical code
+    max_loop_iterations_hint: 1000
+    require_loop_invariants: true
+    severity: "critical"
+    
+  # Rule 3: Do not use the heap after initialization
+  rule_3_no_heap_after_init:
+    ban_malloc_after_init: true
+    ban_new_after_init: true
+    init_phase_markers:
+      - "SYSTEM_INIT_COMPLETE()"
+      - "/* END_INIT_PHASE */"
+    allow_stack_only: true
+    severity: "critical"
+    
+  # Rule 4: Restrict function size
+  rule_4_function_size:
+    max_lines_of_code: 60
+    max_statements: 50
+    max_complexity: 10
+    prefer_single_exit_point: true
+    severity: "high"
+    
+  # Rule 5: Use at least 2 runtime assertions per function
+  rule_5_assertions:
+    min_assertions_per_function: 2
+    require_preconditions: true
+    require_postconditions: true
+    allow_assert_macros: ["assert", "ENSURE", "REQUIRE", "CHECK"]
+    ban_side_effects_in_assertions: true
+    severity: "high"
+    
+  # Rule 6: Declare data objects in smallest possible scope
+  rule_6_data_scope:
+    minimize_variable_scope: true
+    ban_global_variables: true  # Except constants
+    max_global_constants: 20
+    prefer_const_over_define: true
+    severity: "medium"
+    
+  # Rule 7: Check return values; validate parameters
+  rule_7_error_handling:
+    require_return_value_checks: true
+    allow_void_cast_only_with_comment: "// INTENTIONAL"
+    require_parameter_validation: true
+    ban_ignored_returns_from: ["malloc", "fopen", "printf", "scanf"]
+    severity: "high"
+    
+  # Rule 8: Restrict preprocessor use
+  rule_8_preprocessor:
+    ban_variadic_macros: true
+    ban_token_pasting: true
+    ban_recursive_macros: true
+    max_include_depth: 5
+    max_macro_complexity: 1
+    prefer_inline_functions: true
+    severity: "medium"
+    
+  # Rule 9: Limit pointer use
+  rule_9_pointer_restrictions:
+    max_pointer_indirection: 1  # Only single-level pointers
+    ban_function_pointers: true
+    ban_pointer_arithmetic: false  # Allow but warn
+    require_null_checks: true
+    severity: "high"
+
+# Enhanced Thresholds for Safety-Critical Code
+thresholds:
+  max_positional_params: 3  # Stricter than normal
+  max_cyclomatic_complexity: 10
+  god_class_methods: 15     # Smaller classes in safety code
+  god_class_loc: 300
+  max_file_length: 800
+  max_function_length: 60   # General Safety Rule 4
+  max_method_parameters: 4
+  max_nesting_depth: 3
+  magic_literal_threshold: 0  # No magic numbers allowed
+  
+# Stricter Budget Limits
+budgets:
+  # Safety Critical = Zero Tolerance
+  safety_critical_blocker: 0
+  critical: 0
+  high: 2      # Allow minimal high-severity with waivers
+  medium: 10
+  low: 20
+  
+  # General Safety Rule Categories
+  nasa_rule_violations: 0  # Zero tolerance for Power of Ten violations
+  heap_after_init: 0
+  unbounded_loops: 0
+  goto_usage: 0
+  missing_assertions: 0
+  unchecked_returns: 0
+
+# Waiver System for Safety Code
+waivers:
+  expiry_days: 7  # Shorter than normal
+  require_safety_officer_approval: true
+  require_hazard_analysis: true
+  allowed_categories:
+    - "false_positive"
+    - "legacy_exemption"
+    - "performance_critical"
+  require_mitigation_plan: true
+  
+# Connector to existing tools for evidence-based correlation
+tool_correlation:
+  # Use static analyzers to avoid double-flagging
+  clang_tidy_rules:
+    - "readability-*"
+    - "bugprone-*" 
+    - "cert-*"
+    - "hicpp-*"
+    - "modernize-*"
+  
+  # Build on MyPy for type safety (Python)
+  mypy_strict_mode: true
+  mypy_warn_return_any: true
+  mypy_disallow_untyped_defs: true
+  
+  # Leverage Ruff for Python safety
+  ruff_safety_rules:
+    - "S"    # Bandit security
+    - "B"    # Bugbear  
+    - "F"    # Pyflakes
+    - "E9"   # Syntax errors
+
+# Language-Specific Adaptations
+language_profiles:
+  c:
+    profile: "safety_critical"
+    additional_rules:
+      - "no_variable_length_arrays"
+      - "no_flexible_array_members"
+      - "explicit_type_conversions"
+    
+  cpp:
+    profile: "safety_critical" 
+    additional_rules:
+      - "no_exceptions"
+      - "no_rtti"
+      - "no_dynamic_cast"
+      - "prefer_stack_allocation"
+      
+  python:
+    profile: "modern_safety"
+    adaptations:
+      - "recursion_allowed_if_bounded"  # Tail recursion with depth guard
+      - "heap_management_via_gc"       # GC handles heap concerns
+      - "type_hints_required"          # Strong typing via annotations
+
+# Framework-Specific Allowances  
+framework_exceptions:
+  embedded:
+    - "allow_single_while_true_loop"  # Main control loop
+    - "allow_isr_specific_patterns"   # Interrupt service routines
+  
+  real_time:
+    - "allow_deterministic_allocation" # Pre-allocated pools
+    - "allow_time_critical_shortcuts"
+
+# Integration with Refactoring.Guru Techniques
+refactoring_techniques:
+  nasa_rule_1:  # Flow control
+    recommended: ["Substitute Algorithm", "Extract Method"]
+    avoid: ["polymorphism", "dynamic_dispatch"]
+    
+  nasa_rule_2:  # Loop bounds
+    recommended: ["Introduce Assertion", "Extract Method"]
+    patterns: ["for_to_while_with_bounds", "iterator_with_limit"]
+    
+  nasa_rule_3:  # No heap after init  
+    recommended: ["Replace Constructor with Factory Method", "Move Method"]
+    patterns: ["init_phase_allocation", "object_pool_pattern"]
+    
+  nasa_rule_4:  # Function size
+    recommended: ["Extract Method", "Extract Class"]
+    patterns: ["functional_decomposition", "single_responsibility"]
+    
+  nasa_rule_5:  # Assertions
+    recommended: ["Introduce Assertion", "Guard Clauses"]
+    patterns: ["precondition_postcondition", "contract_programming"]
+
+# Baseline Configuration for Safety Code
+baseline:
+  ratchet_mode: true  # Never allow quality to decrease
+  require_approval_for_degradation: true
+  track_safety_metrics: true
+  
+# Reporting Configuration
+reporting:
+  include_nasa_compliance_score: true
+  include_safety_trend_analysis: true
+  highlight_power_of_ten_violations: true
+  generate_hazard_analysis_hints: true
+  
+# Documentation Requirements
+documentation:
+  require_safety_comments: true
+  require_function_contracts: true
+  require_loop_invariant_documentation: true
+  require_error_handling_documentation: true
+
+# This preset is designed to be strict but practical
+# Teams can inherit this and selectively relax rules for non-critical components
+# via targeted waivers or by mixing with service-defaults for non-safety code

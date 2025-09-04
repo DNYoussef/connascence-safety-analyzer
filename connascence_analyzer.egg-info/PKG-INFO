@@ -1,0 +1,54 @@
+Metadata-Version: 2.4
+Name: connascence-analyzer
+Version: 1.0.0
+Summary: Professional connascence analysis for Python codebases
+Author-email: Connascence Analytics <hello@connascence.io>
+License: BSL-1.1
+Project-URL: Homepage, https://connascence.io
+Project-URL: Repository, https://github.com/connascence/connascence-analyzer
+Project-URL: Documentation, https://docs.connascence.io
+Project-URL: Changelog, https://github.com/connascence/connascence-analyzer/blob/main/CHANGELOG.md
+Project-URL: Bug Tracker, https://github.com/connascence/connascence-analyzer/issues
+Project-URL: Commercial License, https://connascence.io/pricing
+Keywords: code-quality,coupling,connascence,static-analysis,refactoring
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: Console
+Classifier: Environment :: Web Environment
+Classifier: Intended Audience :: Developers
+Classifier: License :: Other/Proprietary License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Software Development :: Quality Assurance
+Classifier: Topic :: Software Development :: Testing
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: networkx>=2.8
+Requires-Dist: radon>=5.1.0
+Requires-Dist: click>=8.0.0
+Requires-Dist: rich>=12.0.0
+Requires-Dist: pathspec>=0.10.0
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0; extra == "dev"
+Requires-Dist: pytest-cov>=4.0; extra == "dev"
+Requires-Dist: black>=22.0; extra == "dev"
+Requires-Dist: ruff>=0.1.0; extra == "dev"
+Requires-Dist: mypy>=1.0; extra == "dev"
+Requires-Dist: pre-commit>=2.20; extra == "dev"
+Requires-Dist: hypothesis>=6.0; extra == "dev"
+Provides-Extra: mcp
+Requires-Dist: mcp>=1.0.0; extra == "mcp"
+Requires-Dist: uvicorn>=0.20.0; extra == "mcp"
+Requires-Dist: fastapi>=0.95.0; extra == "mcp"
+Provides-Extra: vscode
+Requires-Dist: websocket-client>=1.0.0; extra == "vscode"
+Provides-Extra: enterprise
+Requires-Dist: redis>=4.0.0; extra == "enterprise"
+Requires-Dist: sqlalchemy>=2.0.0; extra == "enterprise"
+Requires-Dist: alembic>=1.8.0; extra == "enterprise"
