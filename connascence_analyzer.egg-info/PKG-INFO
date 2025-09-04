@@ -43,7 +43,6 @@ Requires-Dist: mypy>=1.0; extra == "dev"
 Requires-Dist: pre-commit>=2.20; extra == "dev"
 Requires-Dist: hypothesis>=6.0; extra == "dev"
 Provides-Extra: mcp
-Requires-Dist: mcp>=1.0.0; extra == "mcp"
 Requires-Dist: uvicorn>=0.20.0; extra == "mcp"
 Requires-Dist: fastapi>=0.95.0; extra == "mcp"
 Provides-Extra: vscode

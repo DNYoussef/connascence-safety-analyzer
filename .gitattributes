@@ -1,0 +1,15 @@
+# Exclude heavy directories from release tarballs to keep distribution lean
+tests/coverage/** export-ignore
+test_results/** export-ignore
+experimental/** export-ignore
+data-room/** export-ignore
+sale/complete_demo_output/** export-ignore
+htmlcov/** export-ignore
+.pytest_cache/** export-ignore
+__pycache__/** export-ignore
+*.pyc export-ignore
+build/** export-ignore
+dist/** export-ignore
+*.egg-info/** export-ignore
+.coverage export-ignore
+coverage.xml export-ignore

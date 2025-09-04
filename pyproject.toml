@@ -48,7 +48,6 @@ dev = [
     "hypothesis>=6.0",
 ]
 mcp = [
-    "mcp>=1.0.0",  # When available
     "uvicorn>=0.20.0",
     "fastapi>=0.95.0",
 ]
@@ -84,9 +83,6 @@ packages = [
     "analyzer.ast_engine",
     "analyzer.connascence_analyzer", 
     "analyzer.core",
-    "analyzer.dup_detection",
-    "analyzer.frameworks",
-    "analyzer.runtime_probe",
     "autofix",
     "policy", 
     "reporting",
@@ -102,7 +98,7 @@ packages = [
 # Include only files that exist and are needed at runtime
 policy = ["presets/*.yml", "*.toml"]
 grammar = ["overlays/*.yml"]
-dashboard = ["templates/*.html", "static/*.js", "static/*.css"]
+dashboard = ["templates/*.html", "static/*.js"]
 
 [tool.black]
 line-length = 120

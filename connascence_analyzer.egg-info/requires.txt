@@ -20,7 +20,6 @@ sqlalchemy>=2.0.0
 alembic>=1.8.0
 
 [mcp]
-mcp>=1.0.0
 uvicorn>=0.20.0
 fastapi>=0.95.0
 

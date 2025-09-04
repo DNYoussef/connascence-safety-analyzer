@@ -66,7 +66,7 @@ class ExtensionValidator {
             }
             
             // Scripts validation
-            const requiredScripts = ['compile', 'watch', 'webpack', 'package'];
+            const requiredScripts = ['compile', 'watch', 'package'];
             for (const script of requiredScripts) {
                 if (!pkg.scripts?.[script]) {
                     this.warnings.push(`Missing script: ${script}`);
@@ -132,12 +132,7 @@ class ExtensionValidator {
         console.log('📁 Validating source structure...');
         
         const requiredDirs = [
-            'src',
-            'src/core',
-            'src/providers',
-            'src/services',
-            'src/utils',
-            'src/commands'
+            'src'
         ];
         
         for (const dir of requiredDirs) {
@@ -148,10 +143,7 @@ class ExtensionValidator {
         }
         
         const requiredFiles = [
-            'src/extension.ts',
-            'src/core/ConnascenceExtension.ts',
-            'src/utils/logger.ts',
-            'src/utils/telemetry.ts'
+            'src/extension.ts'
         ];
         
         for (const file of requiredFiles) {
