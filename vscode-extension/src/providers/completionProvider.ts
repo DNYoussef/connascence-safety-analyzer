@@ -70,7 +70,7 @@ export class ConnascenceCompletionProvider implements vscode.CompletionItemProvi
         if (/\b\d+\b|\b['"`][^'"`]*['"`]\b/.test(textBeforeCursor)) {
             completions.push({
                 label: '→ Extract to Constant',
-                kind: vscode.CompletionItemKind.Refactor,
+                kind: vscode.CompletionItemKind.Snippet,
                 insertText: new vscode.SnippetString('${1:CONSTANT_NAME} = ${2:value}\\n'),
                 documentation: new vscode.MarkdownString(
                     'Extract magic literals to constants to reduce **Connascence of Meaning**\\n\\n' +
@@ -85,7 +85,7 @@ export class ConnascenceCompletionProvider implements vscode.CompletionItemProvi
         if (textBeforeCursor.includes('def ') && (textBeforeCursor.match(/,/g) || []).length >= 3) {
             completions.push({
                 label: '→ Use Parameter Object',
-                kind: vscode.CompletionItemKind.Refactor,
+                kind: vscode.CompletionItemKind.Snippet,
                 insertText: new vscode.SnippetString('${1:config}: ${2:ConfigType}'),
                 documentation: new vscode.MarkdownString(
                     'Replace long parameter lists with parameter objects to reduce **Connascence of Position**\\n\\n' +
@@ -106,7 +106,7 @@ export class ConnascenceCompletionProvider implements vscode.CompletionItemProvi
         if (textBeforeCursor.includes('class ')) {
             completions.push({
                 label: '@dataclass',
-                kind: vscode.CompletionItemKind.Decorator,
+                kind: vscode.CompletionItemKind.Text,
                 insertText: new vscode.SnippetString('@dataclass\\nclass ${1:ClassName}:\\n    ${2:field}: ${3:type}'),
                 documentation: new vscode.MarkdownString(
                     'Use dataclass to reduce constructor coupling and improve type safety'

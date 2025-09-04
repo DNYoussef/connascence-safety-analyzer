@@ -90,7 +90,7 @@ export class ConnascenceCodeActionProvider implements vscode.CodeActionProvider 
                     vscode.CodeActionKind.Refactor
                 );
 
-                action.tooltip = suggestion.description;
+                // Tooltip not supported in VS Code API - description provides similar info
                 
                 // Create command to show refactoring preview
                 action.command = {

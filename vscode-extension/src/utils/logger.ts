@@ -36,7 +36,8 @@ export class ExtensionLogger {
                 try {
                     fullMessage += `\nData: ${JSON.stringify(data, null, 2)}`;
                 } catch (e) {
-                    fullMessage += `\nData: [Unable to serialize: ${e.message}]`;
+                    const errorMessage = e instanceof Error ? e.message : String(e);
+                    fullMessage += `\nData: [Unable to serialize: ${errorMessage}]`;
                 }
             }
         }
