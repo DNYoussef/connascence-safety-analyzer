@@ -2,9 +2,7 @@ README.md
 pyproject.toml
 analyzer/__init__.py
 analyzer/architectural_analysis.py
-analyzer/check_connascence.py
 analyzer/cohesion_analyzer.py
-analyzer/connascence_analyzer.py
 analyzer/constants.py
 analyzer/core.py
 analyzer/grammar_enhanced_analyzer.py
@@ -14,7 +12,6 @@ analyzer/thresholds.py
 analyzer/ast_engine/__init__.py
 analyzer/ast_engine/core_analyzer.py
 analyzer/ast_engine/visitors.py
-analyzer/connascence_analyzer/__init__.py
 analyzer/core/__init__.py
 autofix/__init__.py
 autofix/class_splits.py
@@ -54,6 +51,7 @@ integrations/radon_integration.py
 integrations/ruff_integration.py
 integrations/tool_coordinator.py
 mcp/__init__.py
+mcp/run-server.py
 mcp/server.py
 policy/__init__.py
 policy/baselines.py
@@ -80,6 +78,7 @@ security/secure_mcp_server.py
 tests/test_ast_analyzer.py
 tests/test_autofix.py
 tests/test_cli.py
+tests/test_comprehensive_connascence.py
 tests/test_exit_codes.py
 tests/test_license_validation.py
 tests/test_license_validation_standalone.py

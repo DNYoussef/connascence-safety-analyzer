@@ -37,7 +37,7 @@ export class TelemetryService {
                 userId: this.userId,
                 timestamp: Date.now()
             },
-            measurements,
+            ...(measurements && { measurements }),
             timestamp: Date.now()
         };
 
@@ -141,7 +141,7 @@ export class TelemetryService {
             errorCount: errors.length,
             analysisCount: analyses.length,
             averageAnalysisTime: analyses.length > 0 
-                ? analyses.reduce((sum, a) => sum + (a.measurements?.analysisTime || 0), 0) / analyses.length
+                ? analyses.reduce((sum, a) => sum + (a.measurements?.['analysisTime'] || 0), 0) / analyses.length
                 : 0
         };
     }
@@ -227,7 +227,7 @@ export class TelemetryService {
         // In a real implementation, this would send the event to a telemetry service
         // For development, we can log to console or send to a local endpoint
         
-        if (process.env.NODE_ENV === 'development') {
+        if (process.env['NODE_ENV'] === 'development') {
             console.log('Telemetry Event:', event);
         }
         

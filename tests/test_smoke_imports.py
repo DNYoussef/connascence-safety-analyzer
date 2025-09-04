@@ -31,7 +31,6 @@ class TestSmokeImports:
             'analyzer.ast_engine',
             'analyzer.ast_engine.core_analyzer',
             'analyzer.ast_engine.visitors',
-            'analyzer.connascence_analyzer',
             'analyzer.check_connascence',
             'analyzer.cohesion_analyzer',
             'analyzer.architectural_analysis',

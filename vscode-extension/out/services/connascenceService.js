@@ -50,7 +50,8 @@ class ConnascenceService {
             return await this.apiClient.analyzeFile(filePath);
         }
         catch (error) {
-            this.telemetryService.logEvent('file.analysis.error', { error: error.message });
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            this.telemetryService.logEvent('file.analysis.error', { error: errorMessage });
             throw error;
         }
     }
@@ -60,7 +61,8 @@ class ConnascenceService {
             return await this.apiClient.analyzeWorkspace(workspacePath);
         }
         catch (error) {
-            this.telemetryService.logEvent('workspace.analysis.error', { error: error.message });
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            this.telemetryService.logEvent('workspace.analysis.error', { error: errorMessage });
             throw error;
         }
     }
@@ -70,7 +72,8 @@ class ConnascenceService {
             return await this.apiClient.validateSafety(filePath, profile);
         }
         catch (error) {
-            this.telemetryService.logEvent('safety.validation.error', { error: error.message });
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            this.telemetryService.logEvent('safety.validation.error', { error: errorMessage });
             throw error;
         }
     }
@@ -80,7 +83,8 @@ class ConnascenceService {
             return await this.apiClient.suggestRefactoring(filePath, selection);
         }
         catch (error) {
-            this.telemetryService.logEvent('refactoring.suggestion.error', { error: error.message });
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            this.telemetryService.logEvent('refactoring.suggestion.error', { error: errorMessage });
             throw error;
         }
     }
@@ -90,7 +94,8 @@ class ConnascenceService {
             return await this.apiClient.getAutofixes(filePath);
         }
         catch (error) {
-            this.telemetryService.logEvent('autofix.error', { error: error.message });
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            this.telemetryService.logEvent('autofix.error', { error: errorMessage });
             throw error;
         }
     }
@@ -100,7 +105,8 @@ class ConnascenceService {
             return await this.apiClient.generateReport(workspacePath);
         }
         catch (error) {
-            this.telemetryService.logEvent('report.generation.error', { error: error.message });
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            this.telemetryService.logEvent('report.generation.error', { error: errorMessage });
             throw error;
         }
     }
@@ -147,7 +153,8 @@ class ConnascenceService {
                         resolve(this.transformCLIResult(result));
                     }
                     catch (e) {
-                        reject(new Error(`Failed to parse CLI output: ${e.message}`));
+                        const errorMessage = e instanceof Error ? e.message : String(e);
+                        reject(new Error(`Failed to parse CLI output: ${errorMessage}`));
                     }
                 }
                 else {
@@ -176,7 +183,8 @@ class ConnascenceService {
                         resolve(this.transformWorkspaceResult(result));
                     }
                     catch (e) {
-                        reject(new Error(`Failed to parse CLI output: ${e.message}`));
+                        const errorMessage = e instanceof Error ? e.message : String(e);
+                        reject(new Error(`Failed to parse CLI output: ${errorMessage}`));
                     }
                 }
                 else {
@@ -206,7 +214,8 @@ class ConnascenceService {
                     });
                 }
                 catch (e) {
-                    reject(new Error(`Failed to parse safety validation output: ${e.message}`));
+                    const errorMessage = e instanceof Error ? e.message : String(e);
+                    reject(new Error(`Failed to parse safety validation output: ${errorMessage}`));
                 }
             });
             process.on('error', (err) => {
@@ -233,7 +242,8 @@ class ConnascenceService {
                         resolve(result.suggestions || []);
                     }
                     catch (e) {
-                        reject(new Error(`Failed to parse refactoring suggestions: ${e.message}`));
+                        const errorMessage = e instanceof Error ? e.message : String(e);
+                        reject(new Error(`Failed to parse refactoring suggestions: ${errorMessage}`));
                     }
                 }
                 else {
@@ -261,7 +271,8 @@ class ConnascenceService {
                         resolve(result.fixes || []);
                     }
                     catch (e) {
-                        reject(new Error(`Failed to parse autofix output: ${e.message}`));
+                        const errorMessage = e instanceof Error ? e.message : String(e);
+                        reject(new Error(`Failed to parse autofix output: ${errorMessage}`));
                     }
                 }
                 else {
@@ -289,7 +300,8 @@ class ConnascenceService {
                         resolve(result);
                     }
                     catch (e) {
-                        reject(new Error(`Failed to parse report output: ${e.message}`));
+                        const errorMessage = e instanceof Error ? e.message : String(e);
+                        reject(new Error(`Failed to parse report output: ${errorMessage}`));
                     }
                 }
                 else {

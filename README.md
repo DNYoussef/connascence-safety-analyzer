@@ -1,6 +1,6 @@
 # Connascence Safety Analyzer v1.0 - Enterprise Ready
 
-A production-grade connascence analysis tool validated through **4 rounds of self-improvement** and enterprise-scale testing. Successfully detected **5,743 violations** across complete enterprise codebases with surgical precision on mature frameworks. **Currently in Polish 4**: MCP-driven self-analysis discovered 22 genuine violations for targeted remediation.
+A production-grade connascence analysis tool validated through **4 rounds of self-improvement** and enterprise-scale testing. Successfully detected **5,743 violations** across complete enterprise codebases with surgical precision on mature frameworks. **Currently in Polish 4**: MCP-driven self-analysis discovered 310 genuine violations in our current codebase for targeted remediation.
 
 ## [PROVEN] Enterprise Validation Results
 
@@ -8,7 +8,7 @@ A production-grade connascence analysis tool validated through **4 rounds of sel
 - **4,630 violations detected** in complete Celery codebase (Python async framework)
 - **1,061 violations in curl** (C networking library) - realistic mature codebase analysis
 - **52 violations in Express.js** (JavaScript framework) - precision on well-architected code
-- **4 Polish Iterations**: Continuous self-improvement (Polish 4 in progress: 22 violations → ≤5 target)
+- **4 Polish Iterations**: Continuous self-improvement (Polish 4 in progress: 310 violations → <100 target)
 - **Self-improvement validation**: Tool improved its own code quality by 23.6% (Polish 2)
 - **Complete codebase analysis** capability - not samples or subsets
 - **High Safety Standards** achieved (100% compliance score)
@@ -51,7 +51,7 @@ git checkout v1.0-sale
 # Setup environment
 python3.12 -m venv venv
 source venv/bin/activate  # or `venv\Scripts\activate` on Windows
-pip install -r requirements.txt
+pip install .
 
 # Reproduce exact enterprise demo (writes SARIF/JSON/MD to ./out/)
 mkdir -p out/{celery,curl,express}
@@ -60,7 +60,7 @@ mkdir -p out/{celery,curl,express}
 connascence scan \
   --repo https://github.com/celery/celery \
   --sha 6da32827cebaf332d22f906386c47e552ec0e38f \
-  --profile modern_general \
+  --profile strict-core \
   --format sarif,json,md \
   --exclude "tests/,docs/,vendor/" \
   --output out/celery/
@@ -70,7 +70,7 @@ connascence scan \
   --repo https://github.com/curl/curl \
   --sha c72bb7aec4db2ad32f9d82758b4f55663d0ebd60 \
   --path lib/ \
-  --profile safety_c_strict \
+  --profile strict-core \
   --format sarif,json,md \
   --output out/curl/
 
@@ -79,7 +79,7 @@ connascence scan \
   --repo https://github.com/expressjs/express \
   --sha aa907945cd1727483a888a0a6481f9f4861593f8 \
   --path lib/ \
-  --profile modern_general \
+  --profile strict-core \
   --format sarif,json,md \
   --output out/express/
 
@@ -96,8 +96,8 @@ echo "Actual results written to out/*/report.json"
 - Express (JS): `aa907945cd` — `lib/` only
 
 **Profiles**
-- Python/JS: `modern_general` (evidence-aware connascence detection)
-- C: `safety_c_strict` (High Safety Standards overlay + clang-tidy evidence)
+- Python/JS: `strict-core` (Ultra-strict policy for core business logic)
+- C: `strict-core` (Maximum quality standards with cross-module penalties)
 
 **Headline Results**
 - **5,743** total violations detected across complete enterprise codebases
@@ -118,7 +118,7 @@ echo "Actual results written to out/*/report.json"
 - *Violation:* A finding with deterministic `ruleId` under schema v1 with stable fingerprint
 - *False positive rate:* Manual audit of 100 randomly sampled findings (50 curl + 50 Express)
 - *Maintainability improvement:* Relative drop in Connascence Index on worst 10 files (baseline vs. post-refactor)
-- All artifacts, SARIF/JSON exports, and evidence: see `/sale/DEMO_ARTIFACTS/index.json`
+- All artifacts, SARIF/JSON exports, and evidence: see `/enterprise-package/artifacts/index.json`
 
 ## Overview
 
@@ -144,7 +144,7 @@ This system implements Meilir Page-Jones' connascence theory to identify couplin
 - **Production-Scale Analysis**: Complete codebase processing (5,743 violations across enterprise codebases)
 - **Multi-Language Support**: Python, C, JavaScript with polyglot analysis capability
 - **MCP Server Integration**: Real-time analysis via Model Context Protocol (7 tools, AI agent compatible)
-- **MCP Self-Analysis**: Used own tool to discover 22 genuine violations (Polish 4)
+- **MCP Self-Analysis**: Used own tool to discover 310 genuine violations in our codebase (Polish 4)
 - **High Safety Standards**: Industry-grade safety standard validation
 - **Parameter Object Refactoring**: Automatic CoP violation improvements
 - **Self-Improvement Validation**: Dogfooding approach for quality assurance
@@ -164,7 +164,16 @@ pip install connascence-analyzer
 # Or install from source
 git clone https://github.com/[your-org]/connascence-safety-analyzer.git
 cd connascence-safety-analyzer
-pip install -e .
+pip install .
+
+# Install with optional dependencies
+pip install .[dev]        # Development tools (pytest, black, ruff, mypy)
+pip install .[mcp]        # MCP server support (uvicorn, fastapi)
+pip install .[vscode]     # VS Code extension support (websocket-client)
+pip install .[enterprise] # Enterprise features (redis, sqlalchemy, alembic)
+
+# Install all optional dependencies
+pip install .[dev,mcp,vscode,enterprise]
 ```
 
 ### 1. Enterprise Analysis
@@ -185,7 +194,7 @@ connascence mcp serve --host localhost --port 8080
 # Audit logging: Enabled by default
 
 # Safety standards compliance check
-connascence scan src/ --profile general_safety
+connascence scan src/ --profile strict-core
 ```
 
 ### 2. Self-Improvement Analysis
@@ -276,7 +285,7 @@ repos:
 - name: Connascence Analysis
   run: |
     connascence scan . --format json --output connascence-report.json
-    python scripts/magic-literal-detector.py . --json > magic-literals.json
+    python experimental/integrators/magic-literal-detector.py . --json > magic-literals.json
 ```
 
 ## Enterprise Architecture
@@ -479,7 +488,7 @@ connascence scan . --verbose --show-timers --log-level INFO
 ### Usage with Exit Codes
 ```bash
 # CI/CD pipeline usage with proper error handling
-connascence scan . --profile general_safety --budget-critical 0
+connascence scan . --profile strict-core --budget-critical 0
 if [ $? -eq 0 ]; then
   echo "✓ No critical violations - build approved"
 elif [ $? -eq 1 ]; then
@@ -509,11 +518,11 @@ connascence scan . --with-semgrep p/connascence --merge-findings
 ## Enterprise Sales Package
 
 ### Demo Materials
-- **[15-minute Demo Script](sales_artifacts/ENTERPRISE_DEMO.md)**: Complete enterprise demonstration
-- **[Ultimate Enterprise Demo](demo_scans/ULTIMATE_ENTERPRISE_DEMO.md)**: 5,743 violations proof across enterprise codebases
-- **[Polish Results](sales_artifacts/POLISH_RESULTS.md)**: Self-improvement validation
-- **[Dashboard Metrics](sales_artifacts/DASHBOARD_METRICS.md)**: Executive dashboards
-- **[Accuracy Report](sales_artifacts/ACCURACY.md)**: Precision/recall validation
+- **[Live Demo Guide](enterprise-package/demonstrations/live-demo/live-demo.md)**: 5,743 violations proof across enterprise codebases
+- **[POC Guide](enterprise-package/demonstrations/live-demo/poc-guide.md)**: Proof of concept implementation
+- **[Executive Walkthrough](enterprise-package/presentations/executive/EXECUTIVE_WALKTHROUGH_SCRIPT.md)**: Complete enterprise demonstration
+- **[Validation Report](enterprise-package/demonstrations/live-demo/VALIDATION_COMPLETE.md)**: Enterprise validation results
+- **[Technical Coverage](enterprise-package/presentations/technical/TEST_COVERAGE_REPORT.md)**: Precision/recall validation
 
 ### Key Sales Points
 1. **Scale Validation**: 5,743 violations across three enterprise codebases (Celery, curl, Express)
@@ -629,15 +638,15 @@ Quality Assurance:
 **Round 4 Polish (MCP Self-Analysis & Targeted Remediation) - CURRENT:**
 ```
 MCP-Driven Self-Discovery:
-├── Violations Found: 22 genuine violations via MCP self-analysis
-├── Critical Issues: 3 God Objects identified
-├── High-Severity: 19 Connascence of Position violations
+├── Violations Found: 310 genuine violations via MCP self-analysis
+├── Critical Issues: Magic literals (285 violations - 92% of total)
+├── High-Severity: Algorithm coupling and type issues
 └── Analysis Method: Real AST-based detection (not mock data)
 
 Target Remediation Plan:
-├── God Object Elimination: 3 → 0 (100% critical reduction)
-├── Parameter Object Pattern: 19 CoP violations → ≤3 (84% reduction)
-├── Overall Target: 22 → ≤5 violations (77% total reduction)
+├── Magic Literal Reduction: 285 → <50 (83% reduction)
+├── Algorithm Coupling: 11 violations targeted
+├── Overall Target: 310 → <100 violations (68% total reduction)
 └── Quality Goal: +15% Maintainability Index improvement
 
 Specific Violations Identified:
@@ -659,8 +668,8 @@ Implementation Status: [PLANNED - 3-week timeline]
 
 ## Contributing
 
-1. Run enterprise test suite: `python -m pytest tests/test_enterprise_scale.py`
-2. Validate General Safety compliance: `connascence scan . --profile general_safety`
+1. Run enterprise test suite: `python -m pytest tests/e2e/test_enterprise_scale.py`
+2. Validate Safety compliance: `connascence scan . --profile strict-core`
 3. Self-improvement check: `connascence scan . --self-improve`
 4. Ensure MCP server functionality: `connascence mcp serve --test-mode`
 

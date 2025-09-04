@@ -541,7 +541,8 @@ class ArchitecturalAnalyzer:
 
         # Initialize component analyzers
         self.dependency_analyzer = DependencyAnalyzer(project_root)
-        self.connascence_analyzer = ConnascenceAnalyzer(project_root)
+        from .ast_engine.core_analyzer import ConnascenceAnalyzer
+        self.connascence_analyzer = ConnascenceAnalyzer()
         self.metrics_calculator = MetricsCalculator(project_root)
         self.report_generator = ReportGenerator(project_root, self.reports_dir)
 

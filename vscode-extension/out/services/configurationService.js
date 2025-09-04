@@ -224,6 +224,10 @@ class ConfigurationService {
             }
         });
     }
+    // Generic get method for compatibility
+    get(key, defaultValue) {
+        return this.getConfig(key, defaultValue);
+    }
     // Helper methods
     getConfig(key, defaultValue) {
         const config = vscode.workspace.getConfiguration(this.configSection);

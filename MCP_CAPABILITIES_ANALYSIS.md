@@ -247,4 +247,4 @@ The system successfully bridges academic connascence theory with practical autom
 **Analysis Method**: Reverse engineering via code inspection and live testing  
 **Tools Tested**: All 7 MCP tools validated with real data  
 **Security Verified**: Input validation, rate limiting, and audit logging confirmed  
-**Performance Validated**: 138 files analyzed, 22 violations detected, <200ms response times
+**Performance Validated**: 138 files analyzed, 310 violations detected, <200ms response times

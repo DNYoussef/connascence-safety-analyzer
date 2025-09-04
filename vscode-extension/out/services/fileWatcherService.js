@@ -162,7 +162,7 @@ class FileWatcherService {
         try {
             const stats = require('fs').statSync(uri.fsPath);
             const maxFileSize = this.configService.get('maxFileSize', 1024 * 1024); // 1MB default
-            if (stats.size > maxFileSize) {
+            if (maxFileSize && stats.size > maxFileSize) {
                 this.logger.warn(`Skipping analysis of large file: ${uri.fsPath} (${stats.size} bytes)`);
                 return false;
             }

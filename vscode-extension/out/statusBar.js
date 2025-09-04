@@ -64,43 +64,115 @@ class ConnascenceStatusBar {
         const baselineMode = config.get('baselineMode', false);
         if (this.isScanning) {
             this.statusBarItem.text = '$(loading~spin) Connascence: Scanning...';
-            n;
             this.statusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.warningBackground');
-            n;
             return;
-            n;
         }
-        n;
-        n;
         if (!this.lastScanResults) {
-            n;
             this.statusBarItem.text = '$(link) Connascence: Ready';
-            n;
             this.statusBarItem.backgroundColor = undefined;
-            n;
             return;
-            n;
         }
-        n;
-        n;
         const results = this.lastScanResults;
-        n;
         const violationCount = results.violations?.length || 0;
-        n;
-        n;
         if (violationCount === 0) {
-            n;
             this.statusBarItem.text = '$(check) Connascence: Clean';
-            n;
             this.statusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.prominentBackground');
-            n;
             this.statusBarItem.tooltip = 'No connascence violations found';
-            n;
         }
         else {
-            n;
+            // Calculate connascence index if available
+            const connascenceIndex = results.summary?.connascence_index || this.calculateSimpleIndex(results.violations);
+            // Determine status based on violation severity
+            const critical = results.violations?.filter((v) => v.severity === 'critical').length || 0;
+            const high = results.violations?.filter((v) => v.severity === 'high').length || 0;
+            let icon = '$(warning)';
+            let bgColor = new vscode.ThemeColor('statusBarItem.warningBackground');
+            if (critical > 0) {
+                icon = '$(error)';
+                bgColor = new vscode.ThemeColor('statusBarItem.errorBackground');
+            }
+            else if (high === 0) {
+                icon = '$(info)';
+                bgColor = new vscode.ThemeColor('statusBarItem.prominentBackground');
+            }
+            this.statusBarItem.text = `${icon} Connascence: ${violationCount} (${connascenceIndex.toFixed(1)})`;
+            this.statusBarItem.backgroundColor = bgColor;
+            // Build detailed tooltip
+            const tooltip = this.buildTooltip(results, baselineMode);
+            this.statusBarItem.tooltip = tooltip;
         }
     }
-} // Calculate connascence index if available\n            const connascenceIndex = results.summary?.connascence_index || this.calculateSimpleIndex(results.violations);\n            \n            // Determine status based on violation severity\n            const critical = results.violations?.filter((v: any) => v.severity === 'critical').length || 0;\n            const high = results.violations?.filter((v: any) => v.severity === 'high').length || 0;\n            \n            let icon = '$(warning)';\n            let bgColor = new vscode.ThemeColor('statusBarItem.warningBackground');\n            \n            if (critical > 0) {\n                icon = '$(error)';\n                bgColor = new vscode.ThemeColor('statusBarItem.errorBackground');\n            } else if (high === 0) {\n                icon = '$(info)';\n                bgColor = undefined;\n            }\n            \n            this.statusBarItem.text = `${icon} Connascence: ${violationCount} (${connascenceIndex.toFixed(1)})`;\n            this.statusBarItem.backgroundColor = bgColor;\n            \n            // Build detailed tooltip\n            const tooltip = this.buildTooltip(results, baselineMode);\n            this.statusBarItem.tooltip = tooltip;\n        }\n    }\n    \n    private calculateSimpleIndex(violations: any[]): number {\n        if (!violations || violations.length === 0) return 0.0;\n        \n        // Simple connascence index calculation\n        // Based on violation count and severity weights\n        const weights = { critical: 10, high: 5, medium: 2, low: 1 };\n        let totalWeight = 0;\n        \n        for (const violation of violations) {\n            const weight = weights[violation.severity as keyof typeof weights] || 1;\n            totalWeight += weight;\n        }\n        \n        return totalWeight;\n    }\n    \n    private buildTooltip(results: any, baselineMode: boolean): string {\n        const violations = results.violations || [];\n        const summary = results.summary || {};\n        \n        const critical = violations.filter((v: any) => v.severity === 'critical').length;\n        const high = violations.filter((v: any) => v.severity === 'high').length;\n        const medium = violations.filter((v: any) => v.severity === 'medium').length;\n        const low = violations.filter((v: any) => v.severity === 'low').length;\n        \n        const lines = [\n            `Connascence Analysis Results`,\n            ``,\n            `Total Violations: ${violations.length}`,\n            `• Critical: ${critical}`,\n            `• High: ${high}`,\n            `• Medium: ${medium}`,\n            `• Low: ${low}`\n        ];\n        \n        if (summary.connascence_index) {\n            lines.push(``);\n            lines.push(`Connascence Index: ${summary.connascence_index.toFixed(1)}`);\n        }\n        \n        if (baselineMode) {\n            lines.push(``);\n            lines.push(`🔒 Baseline Mode: Only new violations shown`);\n        }\n        \n        // Add most common violation types\n        if (summary.violations_by_type) {\n            const topTypes = Object.entries(summary.violations_by_type)\n                .sort(([, a]: any, [, b]: any) => b - a)\n                .slice(0, 3);\n            \n            if (topTypes.length > 0) {\n                lines.push(``);\n                lines.push(`Top Issues:`);\n                for (const [type, count] of topTypes) {\n                    lines.push(`• ${type}: ${count}`);\n                }\n            }\n        }\n        \n        lines.push(``);\n        lines.push(`Click to open dashboard`);\n        \n        return lines.join('\\n');\n    }\n    \n    setScanningState(scanning: boolean): void {\n        this.isScanning = scanning;\n        this.update();\n    }\n    \n    showTemporaryMessage(message: string, durationMs = 3000): void {\n        const originalText = this.statusBarItem.text;\n        const originalBg = this.statusBarItem.backgroundColor;\n        \n        this.statusBarItem.text = message;\n        this.statusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.prominentBackground');\n        \n        setTimeout(() => {\n            this.statusBarItem.text = originalText;\n            this.statusBarItem.backgroundColor = originalBg;\n        }, durationMs);\n    }\n    \n    dispose(): void {\n        this.statusBarItem.dispose();\n    }\n}
+    calculateSimpleIndex(violations) {
+        if (!violations || violations.length === 0)
+            return 0.0;
+        // Simple connascence index calculation
+        // Based on violation count and severity weights
+        const weights = { critical: 10, high: 5, medium: 2, low: 1 };
+        let totalWeight = 0;
+        for (const violation of violations) {
+            const weight = weights[violation.severity] || 1;
+            totalWeight += weight;
+        }
+        return totalWeight;
+    }
+    buildTooltip(results, baselineMode) {
+        const violations = results.violations || [];
+        const summary = results.summary || {};
+        const critical = violations.filter((v) => v.severity === 'critical').length;
+        const high = violations.filter((v) => v.severity === 'high').length;
+        const medium = violations.filter((v) => v.severity === 'medium').length;
+        const low = violations.filter((v) => v.severity === 'low').length;
+        const lines = [
+            `Connascence Analysis Results`,
+            ``,
+            `Total Violations: ${violations.length}`,
+            `• Critical: ${critical}`,
+            `• High: ${high}`,
+            `• Medium: ${medium}`,
+            `• Low: ${low}`
+        ];
+        if (summary.connascence_index) {
+            lines.push(``);
+            lines.push(`Connascence Index: ${summary.connascence_index.toFixed(1)}`);
+        }
+        if (baselineMode) {
+            lines.push(``);
+            lines.push(`🔒 Baseline Mode: Only new violations shown`);
+        }
+        // Add most common violation types
+        if (summary.violations_by_type) {
+            const topTypes = Object.entries(summary.violations_by_type)
+                .sort(([, a], [, b]) => b - a)
+                .slice(0, 3);
+            if (topTypes.length > 0) {
+                lines.push(``);
+                lines.push(`Top Issues:`);
+                for (const [type, count] of topTypes) {
+                    lines.push(`• ${type}: ${count}`);
+                }
+            }
+        }
+        lines.push(``);
+        lines.push(`Click to open dashboard`);
+        return lines.join('\n');
+    }
+    setScanningState(scanning) {
+        this.isScanning = scanning;
+        this.update();
+    }
+    showTemporaryMessage(message, durationMs = 3000) {
+        const originalText = this.statusBarItem.text;
+        const originalBg = this.statusBarItem.backgroundColor;
+        this.statusBarItem.text = message;
+        this.statusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.prominentBackground');
+        setTimeout(() => {
+            this.statusBarItem.text = originalText;
+            this.statusBarItem.backgroundColor = originalBg;
+        }, durationMs);
+    }
+    dispose() {
+        this.statusBarItem.dispose();
+    }
+}
 exports.ConnascenceStatusBar = ConnascenceStatusBar;
 //# sourceMappingURL=statusBar.js.map

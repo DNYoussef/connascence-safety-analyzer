@@ -58,9 +58,17 @@ class ConnascenceExtension {
         this.disposables = [];
         // Initialize services first
         this.configService = new configurationService_1.ConfigurationService();
-        this.connascenceService = new connascenceService_1.ConnascenceService(this.configService, this.telemetry);
+        // Create TelemetryService adapter for TelemetryReporter
+        const telemetryServiceAdapter = {
+            logEvent: (event, data) => this.telemetry.logEvent(event, data),
+            events: {},
+            sessionId: '',
+            userId: '',
+            enabled: true
+        };
+        this.connascenceService = new connascenceService_1.ConnascenceService(this.configService, telemetryServiceAdapter);
         // Initialize UI components
-        this.statusBarManager = new statusBarManager_1.StatusBarManager(context);
+        this.statusBarManager = new statusBarManager_1.StatusBarManager(this.connascenceService, this.configService);
         this.outputManager = new outputChannelManager_1.OutputChannelManager('Connascence');
         // Initialize providers
         this.diagnosticsProvider = new diagnosticsProvider_1.ConnascenceDiagnosticsProvider(this.connascenceService);
@@ -68,7 +76,7 @@ class ConnascenceExtension {
         this.completionProvider = new completionProvider_1.ConnascenceCompletionProvider(this.connascenceService);
         this.hoverProvider = new hoverProvider_1.ConnascenceHoverProvider(this.connascenceService);
         this.codeLensProvider = new codeLensProvider_1.ConnascenceCodeLensProvider(this.connascenceService);
-        this.treeDataProvider = new treeProvider_1.ConnascenceTreeDataProvider(this.connascenceService);
+        this.treeDataProvider = new treeProvider_1.ConnascenceTreeProvider(this.connascenceService);
         // Initialize file watcher
         this.fileWatcherService = new fileWatcherService_1.FileWatcherService(this.diagnosticsProvider, this.configService, this.logger);
         // Initialize command manager

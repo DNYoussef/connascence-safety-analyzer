@@ -264,9 +264,9 @@ class ConnascenceTreeItem extends vscode.TreeItem {
     finding?: Finding;
 
     constructor(
-        public readonly label: string,
-        public readonly collapsibleState: vscode.TreeItemCollapsibleState,
-        public readonly contextValue: string
+        public override readonly label: string,
+        public override readonly collapsibleState: vscode.TreeItemCollapsibleState,
+        public override readonly contextValue: string
     ) {
         super(label, collapsibleState);
     }

@@ -1,38 +1,510 @@
 "use strict";
-n;
-nimport * as;
-vscode;
-from;
-'vscode';
-nimport * as;
-path;
-from;
-'path';
-nimport;
-{
-    ConnascenceViolation;
-}
-from;
-'./diagnostics';
-n;
-nexport;
+/**
+ * Dashboard webview for detailed connascence analysis.
+ *
+ * Provides rich visualizations and detailed violation information
+ * in a webview panel within VS Code.
+ */
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ConnascenceDashboard = void 0;
+const vscode = __importStar(require("vscode"));
+const path = __importStar(require("path"));
 class ConnascenceDashboard {
     constructor(context) {
         this.context = context;
         this.violations = [];
     }
-    show() { n; if (this.panel) {
-        n;
-        this.panel.reveal();
-        n;
-        return;
-        n;
-    } n; n; this.panel = vscode.window.createWebviewPanel(n, 'connascenceDashboard', n, 'Connascence Dashboard', n, vscode.ViewColumn.Two, n, { n, enableScripts: true, n, retainContextWhenHidden: true, n, localResourceRoots: [n, vscode.Uri.joinPath(this.context.extensionUri, 'resources'), n], n }, n); n; n; this.panel.iconPath = { n, light: vscode.Uri.joinPath(this.context.extensionUri, 'resources', 'icon-light.svg'), n, dark: vscode.Uri.joinPath(this.context.extensionUri, 'resources', 'icon-dark.svg'), n }; n; n; this.panel.onDidDispose(() => { n; this.panel = undefined; n; }, null, this.context.subscriptions); n; n; this.updateContent(); n; }
-    updateViolations(violations) { n; this.violations = violations; n; if (this.panel) {
-        n;
+    show() {
+        if (this.panel) {
+            this.panel.reveal();
+            return;
+        }
+        this.panel = vscode.window.createWebviewPanel('connascenceDashboard', 'Connascence Dashboard', vscode.ViewColumn.Two, {
+            enableScripts: true,
+            retainContextWhenHidden: true,
+            localResourceRoots: [
+                vscode.Uri.joinPath(this.context.extensionUri, 'resources')
+            ]
+        });
+        this.panel.iconPath = {
+            light: vscode.Uri.joinPath(this.context.extensionUri, 'resources', 'icon-light.svg'),
+            dark: vscode.Uri.joinPath(this.context.extensionUri, 'resources', 'icon-dark.svg')
+        };
+        this.panel.onDidDispose(() => {
+            this.panel = undefined;
+        }, null, this.context.subscriptions);
         this.updateContent();
-        n;
-    } n; }
-    explainFinding(violation) { n; this.show(); n; n; }
-} // Send message to webview to focus on specific violation\n        if (this.panel) {\n            this.panel.webview.postMessage({\n                type: 'focusViolation',\n                violation: violation\n            });\n        }\n    }\n    \n    private updateContent(): void {\n        if (!this.panel) return;\n        \n        const summary = this.generateSummary();\n        const chartData = this.generateChartData();\n        const fileAnalysis = this.generateFileAnalysis();\n        \n        this.panel.webview.html = this.getWebviewContent(summary, chartData, fileAnalysis);\n    }\n    \n    private generateSummary() {\n        const total = this.violations.length;\n        const critical = this.violations.filter(v => v.severity === 'critical').length;\n        const high = this.violations.filter(v => v.severity === 'high').length;\n        const medium = this.violations.filter(v => v.severity === 'medium').length;\n        const low = this.violations.filter(v => v.severity === 'low').length;\n        \n        // Calculate connascence index\n        const weights = { critical: 10, high: 5, medium: 2, low: 1 };\n        const connascenceIndex = this.violations.reduce((sum, v) => {\n            return sum + (weights[v.severity as keyof typeof weights] || 1);\n        }, 0);\n        \n        // Group by type\n        const byType = new Map<string, number>();\n        this.violations.forEach(v => {\n            const type = v.connascenceType;\n            byType.set(type, (byType.get(type) || 0) + 1);\n        });\n        \n        return {\n            total,\n            critical,\n            high,\n            medium,\n            low,\n            connascenceIndex,\n            byType: Object.fromEntries(byType),\n            topTypes: Array.from(byType.entries())\n                .sort(([, a], [, b]) => b - a)\n                .slice(0, 5)\n        };\n    }\n    \n    private generateChartData() {\n        // Severity distribution\n        const severityData = {\n            critical: this.violations.filter(v => v.severity === 'critical').length,\n            high: this.violations.filter(v => v.severity === 'high').length,\n            medium: this.violations.filter(v => v.severity === 'medium').length,\n            low: this.violations.filter(v => v.severity === 'low').length\n        };\n        \n        // Type distribution\n        const typeData = new Map<string, number>();\n        this.violations.forEach(v => {\n            const type = v.connascenceType;\n            typeData.set(type, (typeData.get(type) || 0) + 1);\n        });\n        \n        return {\n            severity: severityData,\n            types: Object.fromEntries(typeData)\n        };\n    }\n    \n    private generateFileAnalysis() {\n        // Group violations by file\n        const fileMap = new Map<string, ConnascenceViolation[]>();\n        this.violations.forEach(v => {\n            if (!fileMap.has(v.filePath)) {\n                fileMap.set(v.filePath, []);\n            }\n            fileMap.get(v.filePath)!.push(v);\n        });\n        \n        // Calculate metrics per file\n        const fileAnalysis = Array.from(fileMap.entries()).map(([filePath, violations]) => {\n            const fileName = path.basename(filePath);\n            const critical = violations.filter(v => v.severity === 'critical').length;\n            const high = violations.filter(v => v.severity === 'high').length;\n            \n            // Calculate file connascence index\n            const weights = { critical: 10, high: 5, medium: 2, low: 1 };\n            const fileIndex = violations.reduce((sum, v) => {\n                return sum + (weights[v.severity as keyof typeof weights] || 1);\n            }, 0);\n            \n            return {\n                fileName,\n                filePath,\n                total: violations.length,\n                critical,\n                high,\n                index: fileIndex,\n                violations\n            };\n        }).sort((a, b) => b.index - a.index); // Sort by index descending\n        \n        return fileAnalysis;\n    }\n    \n    private getWebviewContent(summary: any, chartData: any, fileAnalysis: any): string {\n        const config = vscode.workspace.getConfiguration('connascence');\n        const theme = vscode.window.activeColorTheme.kind === vscode.ColorThemeKind.Dark ? 'dark' : 'light';\n        \n        return `<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Connascence Dashboard</title>\n    <script src=\"https://cdn.jsdelivr.net/npm/chart.js\"></script>\n    <style>\n        body {\n            font-family: var(--vscode-font-family);\n            color: var(--vscode-foreground);\n            background-color: var(--vscode-editor-background);\n            margin: 0;\n            padding: 20px;\n            line-height: 1.5;\n        }\n        .header {\n            display: flex;\n            justify-content: space-between;\n            align-items: center;\n            margin-bottom: 30px;\n            border-bottom: 1px solid var(--vscode-panel-border);\n            padding-bottom: 20px;\n        }\n        .title {\n            font-size: 24px;\n            font-weight: bold;\n        }\n        .summary-cards {\n            display: grid;\n            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));\n            gap: 20px;\n            margin-bottom: 30px;\n        }\n        .card {\n            background: var(--vscode-editor-inactiveSelectionBackground);\n            border: 1px solid var(--vscode-panel-border);\n            border-radius: 8px;\n            padding: 20px;\n            text-align: center;\n        }\n        .card-value {\n            font-size: 32px;\n            font-weight: bold;\n            margin-bottom: 5px;\n        }\n        .card-label {\n            color: var(--vscode-descriptionForeground);\n            font-size: 14px;\n        }\n        .critical { color: var(--vscode-errorForeground); }\n        .high { color: var(--vscode-warningForeground); }\n        .medium { color: var(--vscode-foreground); }\n        .low { color: var(--vscode-descriptionForeground); }\n        \n        .charts-section {\n            display: grid;\n            grid-template-columns: 1fr 1fr;\n            gap: 30px;\n            margin-bottom: 30px;\n        }\n        .chart-container {\n            background: var(--vscode-editor-inactiveSelectionBackground);\n            border: 1px solid var(--vscode-panel-border);\n            border-radius: 8px;\n            padding: 20px;\n        }\n        .chart-title {\n            font-size: 18px;\n            font-weight: bold;\n            margin-bottom: 15px;\n            text-align: center;\n        }\n        \n        .file-analysis {\n            background: var(--vscode-editor-inactiveSelectionBackground);\n            border: 1px solid var(--vscode-panel-border);\n            border-radius: 8px;\n            padding: 20px;\n            margin-bottom: 30px;\n        }\n        .file-item {\n            display: flex;\n            justify-content: space-between;\n            align-items: center;\n            padding: 10px 0;\n            border-bottom: 1px solid var(--vscode-panel-border);\n            cursor: pointer;\n        }\n        .file-item:hover {\n            background: var(--vscode-list-hoverBackground);\n        }\n        .file-name {\n            font-weight: bold;\n        }\n        .file-stats {\n            display: flex;\n            gap: 15px;\n            font-size: 14px;\n        }\n        \n        .violation-details {\n            background: var(--vscode-editor-inactiveSelectionBackground);\n            border: 1px solid var(--vscode-panel-border);\n            border-radius: 8px;\n            padding: 20px;\n        }\n        .violation-item {\n            padding: 10px;\n            margin: 5px 0;\n            border-left: 4px solid var(--vscode-panel-border);\n            background: var(--vscode-input-background);\n            border-radius: 4px;\n        }\n        .violation-item.critical {\n            border-left-color: var(--vscode-errorForeground);\n        }\n        .violation-item.high {\n            border-left-color: var(--vscode-warningForeground);\n        }\n        \n        .connascence-explanation {\n            background: var(--vscode-textBlockQuote-background);\n            border: 1px solid var(--vscode-textBlockQuote-border);\n            border-radius: 8px;\n            padding: 20px;\n            margin-top: 20px;\n        }\n        \n        @media (max-width: 768px) {\n            .charts-section {\n                grid-template-columns: 1fr;\n            }\n        }\n    </style>\n</head>\n<body>\n    <div class=\"header\">\n        <div class=\"title\">🔗 Connascence Dashboard</div>\n        <div class=\"connascence-index\">\n            <strong>Index: ${summary.connascenceIndex.toFixed(1)}</strong>\n        </div>\n    </div>\n    \n    <div class=\"summary-cards\">\n        <div class=\"card\">\n            <div class=\"card-value\">${summary.total}</div>\n            <div class=\"card-label\">Total Violations</div>\n        </div>\n        <div class=\"card\">\n            <div class=\"card-value critical\">${summary.critical}</div>\n            <div class=\"card-label\">Critical</div>\n        </div>\n        <div class=\"card\">\n            <div class=\"card-value high\">${summary.high}</div>\n            <div class=\"card-label\">High</div>\n        </div>\n        <div class=\"card\">\n            <div class=\"card-value medium\">${summary.medium}</div>\n            <div class=\"card-label\">Medium</div>\n        </div>\n        <div class=\"card\">\n            <div class=\"card-value low\">${summary.low}</div>\n            <div class=\"card-label\">Low</div>\n        </div>\n    </div>\n    \n    <div class=\"charts-section\">\n        <div class=\"chart-container\">\n            <div class=\"chart-title\">Severity Distribution</div>\n            <canvas id=\"severityChart\" width=\"300\" height=\"200\"></canvas>\n        </div>\n        <div class=\"chart-container\">\n            <div class=\"chart-title\">Connascence Types</div>\n            <canvas id=\"typesChart\" width=\"300\" height=\"200\"></canvas>\n        </div>\n    </div>\n    \n    <div class=\"file-analysis\">\n        <h3>📁 File Analysis</h3>\n        ${fileAnalysis.map((file: any) => `\n            <div class=\"file-item\" onclick=\"openFile('${file.filePath}')\">\n                <div class=\"file-name\">${file.fileName}</div>\n                <div class=\"file-stats\">\n                    <span>Total: ${file.total}</span>\n                    <span class=\"critical\">Critical: ${file.critical}</span>\n                    <span class=\"high\">High: ${file.high}</span>\n                    <span>Index: ${file.index}</span>\n                </div>\n            </div>\n        `).join('')}\n    </div>\n    \n    <div class=\"violation-details\">\n        <h3>🔍 Recent Violations</h3>\n        ${this.violations.slice(0, 10).map(v => `\n            <div class=\"violation-item ${v.severity}\" onclick=\"gotoViolation('${v.filePath}', ${v.lineNumber})\">\n                <strong>${v.connascenceType}</strong> - ${v.description}\n                <br>\n                <small>${path.basename(v.filePath)}:${v.lineNumber}</small>\n            </div>\n        `).join('')}\n    </div>\n    \n    <div class=\"connascence-explanation\">\n        <h3>ℹ️ About Connascence</h3>\n        <p><strong>Connascence</strong> measures the strength of coupling between software components. Lower connascence indicates better maintainability and flexibility.</p>\n        \n        <h4>Types Detected:</h4>\n        <ul>\n            <li><strong>CoM (Meaning):</strong> Magic literals and unclear values</li>\n            <li><strong>CoP (Position):</strong> Parameter order dependencies</li>\n            <li><strong>CoT (Type):</strong> Missing or unclear type information</li>\n            <li><strong>CoA (Algorithm):</strong> Duplicated or complex logic</li>\n            <li><strong>CoN (Name):</strong> Name dependencies between components</li>\n        </ul>\n    </div>\n    \n    <script>\n        // Severity Chart\n        const severityCtx = document.getElementById('severityChart').getContext('2d');\n        new Chart(severityCtx, {\n            type: 'doughnut',\n            data: {\n                labels: ['Critical', 'High', 'Medium', 'Low'],\n                datasets: [{\n                    data: [${chartData.severity.critical}, ${chartData.severity.high}, ${chartData.severity.medium}, ${chartData.severity.low}],\n                    backgroundColor: [\n                        '#f14c4c', // Critical - red\n                        '#ff8c00', // High - orange  \n                        '#ffcd3c', // Medium - yellow\n                        '#73c991'  // Low - green\n                    ],\n                    borderWidth: 2,\n                    borderColor: '${theme === 'dark' ? '#333' : '#fff'}'\n                }]\n            },\n            options: {\n                responsive: true,\n                plugins: {\n                    legend: {\n                        position: 'bottom',\n                        labels: {\n                            color: 'var(--vscode-foreground)'\n                        }\n                    }\n                }\n            }\n        });\n        \n        // Types Chart\n        const typesCtx = document.getElementById('typesChart').getContext('2d');\n        const typeLabels = ${JSON.stringify(Object.keys(chartData.types))};\n        const typeData = ${JSON.stringify(Object.values(chartData.types))};\n        \n        new Chart(typesCtx, {\n            type: 'bar',\n            data: {\n                labels: typeLabels,\n                datasets: [{\n                    label: 'Violations',\n                    data: typeData,\n                    backgroundColor: '#007acc',\n                    borderColor: '#005a9e',\n                    borderWidth: 1\n                }]\n            },\n            options: {\n                responsive: true,\n                scales: {\n                    y: {\n                        beginAtZero: true,\n                        ticks: {\n                            color: 'var(--vscode-foreground)'\n                        }\n                    },\n                    x: {\n                        ticks: {\n                            color: 'var(--vscode-foreground)'\n                        }\n                    }\n                },\n                plugins: {\n                    legend: {\n                        labels: {\n                            color: 'var(--vscode-foreground)'\n                        }\n                    }\n                }\n            }\n        });\n        \n        // VS Code API\n        const vscode = acquireVsCodeApi();\n        \n        function openFile(filePath) {\n            vscode.postMessage({\n                type: 'openFile',\n                filePath: filePath\n            });\n        }\n        \n        function gotoViolation(filePath, lineNumber) {\n            vscode.postMessage({\n                type: 'gotoViolation',\n                filePath: filePath,\n                lineNumber: lineNumber\n            });\n        }\n        \n        // Listen for messages from extension\n        window.addEventListener('message', event => {\n            const message = event.data;\n            switch (message.type) {\n                case 'focusViolation':\n                    // Scroll to and highlight specific violation\n                    const violation = message.violation;\n                    // Implementation would scroll to the violation in the UI\n                    break;\n            }\n        });\n    </script>\n</body>\n</html>`;\n    }\n    \n    dispose(): void {\n        if (this.panel) {\n            this.panel.dispose();\n        }\n    }\n}
+    }
+    updateViolations(violations) {
+        this.violations = violations;
+        if (this.panel) {
+            this.updateContent();
+        }
+    }
+    explainFinding(violation) {
+        this.show();
+        // Send message to webview to focus on specific violation
+        if (this.panel) {
+            this.panel.webview.postMessage({
+                type: 'focusViolation',
+                violation: violation
+            });
+        }
+    }
+    updateContent() {
+        if (!this.panel)
+            return;
+        const summary = this.generateSummary();
+        const chartData = this.generateChartData();
+        const fileAnalysis = this.generateFileAnalysis();
+        this.panel.webview.html = this.getWebviewContent(summary, chartData, fileAnalysis);
+    }
+    generateSummary() {
+        const total = this.violations.length;
+        const critical = this.violations.filter(v => v.severity === 'critical').length;
+        const high = this.violations.filter(v => v.severity === 'high').length;
+        const medium = this.violations.filter(v => v.severity === 'medium').length;
+        const low = this.violations.filter(v => v.severity === 'low').length;
+        // Calculate connascence index
+        const weights = { critical: 10, high: 5, medium: 2, low: 1 };
+        const connascenceIndex = this.violations.reduce((sum, v) => {
+            return sum + (weights[v.severity] || 1);
+        }, 0);
+        // Group by type
+        const byType = new Map();
+        this.violations.forEach(v => {
+            const type = v.connascenceType;
+            byType.set(type, (byType.get(type) || 0) + 1);
+        });
+        return {
+            total,
+            critical,
+            high,
+            medium,
+            low,
+            connascenceIndex,
+            byType: Object.fromEntries(byType),
+            topTypes: Array.from(byType.entries())
+                .sort(([, a], [, b]) => b - a)
+                .slice(0, 5)
+        };
+    }
+    generateChartData() {
+        // Severity distribution
+        const severityData = {
+            critical: this.violations.filter(v => v.severity === 'critical').length,
+            high: this.violations.filter(v => v.severity === 'high').length,
+            medium: this.violations.filter(v => v.severity === 'medium').length,
+            low: this.violations.filter(v => v.severity === 'low').length
+        };
+        // Type distribution
+        const typeData = new Map();
+        this.violations.forEach(v => {
+            const type = v.connascenceType;
+            typeData.set(type, (typeData.get(type) || 0) + 1);
+        });
+        return {
+            severity: severityData,
+            types: Object.fromEntries(typeData)
+        };
+    }
+    generateFileAnalysis() {
+        // Group violations by file
+        const fileMap = new Map();
+        this.violations.forEach(v => {
+            if (!fileMap.has(v.filePath)) {
+                fileMap.set(v.filePath, []);
+            }
+            fileMap.get(v.filePath).push(v);
+        });
+        // Calculate metrics per file
+        const fileAnalysis = Array.from(fileMap.entries()).map(([filePath, violations]) => {
+            const fileName = path.basename(filePath);
+            const critical = violations.filter(v => v.severity === 'critical').length;
+            const high = violations.filter(v => v.severity === 'high').length;
+            // Calculate file connascence index
+            const weights = { critical: 10, high: 5, medium: 2, low: 1 };
+            const fileIndex = violations.reduce((sum, v) => {
+                return sum + (weights[v.severity] || 1);
+            }, 0);
+            return {
+                fileName,
+                filePath,
+                total: violations.length,
+                critical,
+                high,
+                index: fileIndex,
+                violations
+            };
+        }).sort((a, b) => b.index - a.index); // Sort by index descending
+        return fileAnalysis;
+    }
+    getWebviewContent(summary, chartData, fileAnalysis) {
+        const config = vscode.workspace.getConfiguration('connascence');
+        const theme = vscode.window.activeColorTheme.kind === vscode.ColorThemeKind.Dark ? 'dark' : 'light';
+        return `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connascence Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: var(--vscode-font-family);
+            color: var(--vscode-foreground);
+            background-color: var(--vscode-editor-background);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.5;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--vscode-panel-border);
+            padding-bottom: 20px;
+        }
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .card {
+            background: var(--vscode-editor-inactiveSelectionBackground);
+            border: 1px solid var(--vscode-panel-border);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+        .card-value {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .card-label {
+            color: var(--vscode-descriptionForeground);
+            font-size: 14px;
+        }
+        .critical { color: var(--vscode-errorForeground); }
+        .high { color: var(--vscode-warningForeground); }
+        .medium { color: var(--vscode-foreground); }
+        .low { color: var(--vscode-descriptionForeground); }
+        
+        .charts-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        .chart-container {
+            background: var(--vscode-editor-inactiveSelectionBackground);
+            border: 1px solid var(--vscode-panel-border);
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .chart-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .file-analysis {
+            background: var(--vscode-editor-inactiveSelectionBackground);
+            border: 1px solid var(--vscode-panel-border);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--vscode-panel-border);
+            cursor: pointer;
+        }
+        .file-item:hover {
+            background: var(--vscode-list-hoverBackground);
+        }
+        .file-name {
+            font-weight: bold;
+        }
+        .file-stats {
+            display: flex;
+            gap: 15px;
+            font-size: 14px;
+        }
+        
+        .violation-details {
+            background: var(--vscode-editor-inactiveSelectionBackground);
+            border: 1px solid var(--vscode-panel-border);
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .violation-item {
+            padding: 10px;
+            margin: 5px 0;
+            border-left: 4px solid var(--vscode-panel-border);
+            background: var(--vscode-input-background);
+            border-radius: 4px;
+        }
+        .violation-item.critical {
+            border-left-color: var(--vscode-errorForeground);
+        }
+        .violation-item.high {
+            border-left-color: var(--vscode-warningForeground);
+        }
+        
+        .connascence-explanation {
+            background: var(--vscode-textBlockQuote-background);
+            border: 1px solid var(--vscode-textBlockQuote-border);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="title">🔗 Connascence Dashboard</div>
+        <div class="connascence-index">
+            <strong>Index: ${summary.connascenceIndex.toFixed(1)}</strong>
+        </div>
+    </div>
+    
+    <div class="summary-cards">
+        <div class="card">
+            <div class="card-value">${summary.total}</div>
+            <div class="card-label">Total Violations</div>
+        </div>
+        <div class="card">
+            <div class="card-value critical">${summary.critical}</div>
+            <div class="card-label">Critical</div>
+        </div>
+        <div class="card">
+            <div class="card-value high">${summary.high}</div>
+            <div class="card-label">High</div>
+        </div>
+        <div class="card">
+            <div class="card-value medium">${summary.medium}</div>
+            <div class="card-label">Medium</div>
+        </div>
+        <div class="card">
+            <div class="card-value low">${summary.low}</div>
+            <div class="card-label">Low</div>
+        </div>
+    </div>
+    
+    <div class="charts-section">
+        <div class="chart-container">
+            <div class="chart-title">Severity Distribution</div>
+            <canvas id="severityChart" width="300" height="200"></canvas>
+        </div>
+        <div class="chart-container">
+            <div class="chart-title">Connascence Types</div>
+            <canvas id="typesChart" width="300" height="200"></canvas>
+        </div>
+    </div>
+    
+    <div class="file-analysis">
+        <h3>📁 File Analysis</h3>
+        ${fileAnalysis.map((file) => `
+            <div class="file-item" onclick="openFile('${file.filePath}')">
+                <div class="file-name">${file.fileName}</div>
+                <div class="file-stats">
+                    <span>Total: ${file.total}</span>
+                    <span class="critical">Critical: ${file.critical}</span>
+                    <span class="high">High: ${file.high}</span>
+                    <span>Index: ${file.index}</span>
+                </div>
+            </div>
+        `).join('')}
+    </div>
+    
+    <div class="violation-details">
+        <h3>🔍 Recent Violations</h3>
+        ${this.violations.slice(0, 10).map(v => `
+            <div class="violation-item ${v.severity}" onclick="gotoViolation('${v.filePath}', ${v.lineNumber})">
+                <strong>${v.connascenceType}</strong> - ${v.description}
+                <br>
+                <small>${path.basename(v.filePath)}:${v.lineNumber}</small>
+            </div>
+        `).join('')}
+    </div>
+    
+    <div class="connascence-explanation">
+        <h3>ℹ️ About Connascence</h3>
+        <p><strong>Connascence</strong> measures the strength of coupling between software components. Lower connascence indicates better maintainability and flexibility.</p>
+        
+        <h4>Types Detected:</h4>
+        <ul>
+            <li><strong>CoM (Meaning):</strong> Magic literals and unclear values</li>
+            <li><strong>CoP (Position):</strong> Parameter order dependencies</li>
+            <li><strong>CoT (Type):</strong> Missing or unclear type information</li>
+            <li><strong>CoA (Algorithm):</strong> Duplicated or complex logic</li>
+            <li><strong>CoN (Name):</strong> Name dependencies between components</li>
+        </ul>
+    </div>
+    
+    <script>
+        // Severity Chart
+        const severityCtx = document.getElementById('severityChart').getContext('2d');
+        new Chart(severityCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Critical', 'High', 'Medium', 'Low'],
+                datasets: [{
+                    data: [${chartData.severity.critical}, ${chartData.severity.high}, ${chartData.severity.medium}, ${chartData.severity.low}],
+                    backgroundColor: [
+                        '#f14c4c', // Critical - red
+                        '#ff8c00', // High - orange  
+                        '#ffcd3c', // Medium - yellow
+                        '#73c991'  // Low - green
+                    ],
+                    borderWidth: 2,
+                    borderColor: '${theme === 'dark' ? '#333' : '#fff'}'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: 'var(--vscode-foreground)'
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Types Chart
+        const typesCtx = document.getElementById('typesChart').getContext('2d');
+        const typeLabels = ${JSON.stringify(Object.keys(chartData.types))};
+        const typeData = ${JSON.stringify(Object.values(chartData.types))};
+        
+        new Chart(typesCtx, {
+            type: 'bar',
+            data: {
+                labels: typeLabels,
+                datasets: [{
+                    label: 'Violations',
+                    data: typeData,
+                    backgroundColor: '#007acc',
+                    borderColor: '#005a9e',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            color: 'var(--vscode-foreground)'
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: 'var(--vscode-foreground)'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: 'var(--vscode-foreground)'
+                        }
+                    }
+                }
+            }
+        });
+        
+        // VS Code API
+        const vscode = acquireVsCodeApi();
+        
+        function openFile(filePath) {
+            vscode.postMessage({
+                type: 'openFile',
+                filePath: filePath
+            });
+        }
+        
+        function gotoViolation(filePath, lineNumber) {
+            vscode.postMessage({
+                type: 'gotoViolation',
+                filePath: filePath,
+                lineNumber: lineNumber
+            });
+        }
+        
+        // Listen for messages from extension
+        window.addEventListener('message', event => {
+            const message = event.data;
+            switch (message.type) {
+                case 'focusViolation':
+                    // Scroll to and highlight specific violation
+                    const violation = message.violation;
+                    // Implementation would scroll to the violation in the UI
+                    break;
+            }
+        });
+    </script>
+</body>
+</html>`;
+    }
+    dispose() {
+        if (this.panel) {
+            this.panel.dispose();
+        }
+    }
+}
+exports.ConnascenceDashboard = ConnascenceDashboard;
 //# sourceMappingURL=dashboard.js.map

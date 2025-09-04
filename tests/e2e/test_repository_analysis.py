@@ -740,7 +740,7 @@ def update_user(user_id, username, email, full_name, phone, bio, preferences):
     for key, value in updates.items():
         setattr(user, key, value)
     
-    user.updated_at = datetime.utcnow()
+    user.updated_at = datetime.now(datetime.UTC)
     
     try:
         db.session.commit()

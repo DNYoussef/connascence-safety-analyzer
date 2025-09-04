@@ -87,7 +87,7 @@ class ConnascenceCodeActionProvider {
             });
             for (const suggestion of suggestions) {
                 const action = new vscode.CodeAction(`Refactor: ${suggestion.technique}`, vscode.CodeActionKind.Refactor);
-                action.tooltip = suggestion.description;
+                // Tooltip not supported in VS Code API - description provides similar info
                 // Create command to show refactoring preview
                 action.command = {
                     command: 'connascence.previewRefactoring',

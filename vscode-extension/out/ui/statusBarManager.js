@@ -70,6 +70,37 @@ class StatusBarManager {
     dispose() {
         this.statusBarItem.dispose();
     }
+    // Additional methods required by CommandManager
+    initialize() {
+        this.updateDisplay();
+    }
+    showProgress(message) {
+        this.statusBarItem.text = `$(loading~spin) ${message || 'Processing...'}`;
+        this.statusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.warningBackground');
+    }
+    showSuccess(message) {
+        this.statusBarItem.text = `$(check) ${message || 'Success'}`;
+        this.statusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.prominentBackground');
+        // Restore original state after 3 seconds
+        setTimeout(() => {
+            this.updateDisplay();
+        }, 3000);
+    }
+    showError(message) {
+        this.statusBarItem.text = `$(error) ${message || 'Error'}`;
+        this.statusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.errorBackground');
+        // Restore original state after 5 seconds
+        setTimeout(() => {
+            this.updateDisplay();
+        }, 5000);
+    }
+    clear() {
+        this.statusBarItem.text = '';
+        this.statusBarItem.backgroundColor = undefined;
+    }
+    refresh() {
+        this.updateDisplay();
+    }
     updateDisplay() {
         if (this.isAnalyzing) {
             this.statusBarItem.text = '$(loading~spin) Connascence: Analyzing...';

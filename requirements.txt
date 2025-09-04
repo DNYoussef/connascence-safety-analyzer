@@ -1,0 +1,5 @@
+# Install with: pip install .
+# For development: pip install .[dev]
+# For MCP server: pip install .[mcp]
+# For VS Code extension: pip install .[vscode]
+# For enterprise features: pip install .[enterprise]

@@ -18,6 +18,8 @@ hypothesis>=6.0
 redis>=4.0.0
 sqlalchemy>=2.0.0
 alembic>=1.8.0
+cryptography>=41.0.0
+bcrypt>=4.0.0
 
 [mcp]
 uvicorn>=0.20.0
