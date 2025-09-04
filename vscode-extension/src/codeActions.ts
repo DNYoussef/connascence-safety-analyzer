@@ -89,7 +89,9 @@ export class ConnascenceCodeActions implements vscode.CodeActionProvider {
         
         // Add general actions
         actions.push(this.createExplainAction(violation, diagnostic));
-        actions.push(this.createIgnoreAction(violation, document, diagnostic));\n        \n        return actions;
+        actions.push(this.createIgnoreAction(violation, document, diagnostic));
+        
+        return actions;
     }
     
     private createMagicLiteralActions(
@@ -100,7 +102,9 @@ export class ConnascenceCodeActions implements vscode.CodeActionProvider {
         const actions: vscode.CodeAction[] = [];
         
         // Extract magic literal action
-        const extractAction = new vscode.CodeAction(\n            'Extract magic literal to constant',\n            vscode.CodeActionKind.RefactorExtract
+        const extractAction = new vscode.CodeAction(
+            'Extract magic literal to constant',
+            vscode.CodeActionKind.RefactorExtract
         );
         extractAction.diagnostics = [diagnostic];
         extractAction.isPreferred = true;
@@ -109,8 +113,8 @@ export class ConnascenceCodeActions implements vscode.CodeActionProvider {
         const lineText = line.text;
         
         // Simple regex to find numeric literals
-        const numberMatch = lineText.match(/\\b(\\d+(?:\\.\\d+)?)\\b/);
-        const stringMatch = lineText.match(/[\"'](.*?)[\"']/);
+        const numberMatch = lineText.match(/\b(\d+(?:\.\d+)?)\b/);
+        const stringMatch = lineText.match(/["'](.*?)["']/);
         
         if (numberMatch || stringMatch) {
             const literal = numberMatch ? numberMatch[1] : stringMatch ? stringMatch[0] : '';
@@ -120,4 +124,208 @@ export class ConnascenceCodeActions implements vscode.CodeActionProvider {
             
             // Add constant definition at top of file
             const insertPos = new vscode.Position(0, 0);
-            const constantDef = `${constantName} = ${literal}\\n`;\n            extractAction.edit.insert(document.uri, insertPos, constantDef);\n            \n            // Replace literal with constant reference\n            extractAction.edit.replace(document.uri, diagnostic.range, constantName);\n        }\n        \n        actions.push(extractAction);\n        \n        return actions;\n    }\n    \n    private createParameterActions(\n        violation: ConnascenceViolation,\n        document: vscode.TextDocument,\n        diagnostic: vscode.Diagnostic\n    ): vscode.CodeAction[] {\n        const actions: vscode.CodeAction[] = [];\n        \n        // Convert to keyword arguments\n        const keywordAction = new vscode.CodeAction(\n            'Convert to keyword arguments',\n            vscode.CodeActionKind.RefactorRewrite\n        );\n        keywordAction.diagnostics = [diagnostic];\n        keywordAction.isPreferred = true;\n        \n        // This would require more sophisticated parsing\n        // For now, just add a command to trigger autofix\n        keywordAction.command = {\n            title: 'Apply parameter refactoring',\n            command: 'connascence.autofixCurrent'\n        };\n        \n        actions.push(keywordAction);\n        \n        return actions;\n    }\n    \n    private createTypeHintActions(\n        violation: ConnascenceViolation,\n        document: vscode.TextDocument,\n        diagnostic: vscode.Diagnostic\n    ): vscode.CodeAction[] {\n        const actions: vscode.CodeAction[] = [];\n        \n        // Add type hints action\n        const typeAction = new vscode.CodeAction(\n            'Add type hints',\n            vscode.CodeActionKind.QuickFix\n        );\n        typeAction.diagnostics = [diagnostic];\n        typeAction.isPreferred = true;\n        \n        const line = document.lineAt(diagnostic.range.start.line);\n        const lineText = line.text;\n        \n        // Simple function parameter detection\n        const functionMatch = lineText.match(/def\\s+(\\w+)\\s*\\(([^)]*)\\)/);\n        if (functionMatch) {\n            const [, functionName, params] = functionMatch;\n            \n            // Add basic type hints\n            const typedParams = params.split(',').map(p => {\n                const paramName = p.trim();\n                if (paramName === 'self' || paramName === 'cls') return paramName;\n                return `${paramName}: Any`;\n            }).join(', ');\n            \n            const newSignature = `def ${functionName}(${typedParams}) -> Any:`;\n            \n            typeAction.edit = new vscode.WorkspaceEdit();\n            \n            // Add import for Any at top of file\n            const importPos = new vscode.Position(0, 0);\n            typeAction.edit.insert(document.uri, importPos, 'from typing import Any\\n');\n            \n            // Replace function signature\n            const sigRange = new vscode.Range(\n                diagnostic.range.start,\n                line.range.end\n            );\n            typeAction.edit.replace(document.uri, sigRange, newSignature);\n        }\n        \n        actions.push(typeAction);\n        \n        return actions;\n    }\n    \n    private createComplexityActions(\n        violation: ConnascenceViolation,\n        document: vscode.TextDocument,\n        diagnostic: vscode.Diagnostic\n    ): vscode.CodeAction[] {\n        const actions: vscode.CodeAction[] = [];\n        \n        // Extract method action\n        const extractAction = new vscode.CodeAction(\n            'Extract method to reduce complexity',\n            vscode.CodeActionKind.RefactorExtract\n        );\n        extractAction.diagnostics = [diagnostic];\n        \n        // This would require sophisticated analysis\n        // For now, trigger autofix\n        extractAction.command = {\n            title: 'Apply complexity refactoring',\n            command: 'connascence.autofixCurrent'\n        };\n        \n        actions.push(extractAction);\n        \n        return actions;\n    }\n    \n    private createExplainAction(violation: ConnascenceViolation, diagnostic: vscode.Diagnostic): vscode.CodeAction {\n        const explainAction = new vscode.CodeAction(\n            `Explain ${violation.connascenceType} violation`,\n            vscode.CodeActionKind.Empty\n        );\n        explainAction.diagnostics = [diagnostic];\n        \n        explainAction.command = {\n            title: 'Explain violation',\n            command: 'connascence.explainFinding',\n            arguments: [{ finding: violation }]\n        };\n        \n        return explainAction;\n    }\n    \n    private createIgnoreAction(\n        violation: ConnascenceViolation,\n        document: vscode.TextDocument,\n        diagnostic: vscode.Diagnostic\n    ): vscode.CodeAction {\n        const ignoreAction = new vscode.CodeAction(\n            'Ignore this violation',\n            vscode.CodeActionKind.Empty\n        );\n        ignoreAction.diagnostics = [diagnostic];\n        \n        // Add ignore comment\n        const line = document.lineAt(diagnostic.range.start.line);\n        const comment = `  # connascence: ignore ${violation.ruleId}`;\n        \n        ignoreAction.edit = new vscode.WorkspaceEdit();\n        ignoreAction.edit.insert(\n            document.uri,\n            line.range.end,\n            comment\n        );\n        \n        return ignoreAction;\n    }\n    \n    private generateConstantName(literal: string, violation: ConnascenceViolation): string {\n        // Generate appropriate constant name based on literal and context\n        if (/^\\d+$/.test(literal)) {\n            // Integer literal\n            const num = parseInt(literal);\n            if (num >= 100 && num <= 999) {\n                return `HTTP_STATUS_${num}`;\n            }\n            return `DEFAULT_VALUE_${num}`;\n        }\n        \n        if (/^\\d+\\.\\d+$/.test(literal)) {\n            // Float literal\n            return `DEFAULT_RATE_${literal.replace('.', '_')}`;\n        }\n        \n        // String literal - clean up for constant name\n        const cleaned = literal.replace(/[\"']/g, '').replace(/[^\\w]/g, '_').toUpperCase();\n        return `DEFAULT_${cleaned}`;\n    }\n    \n    async autofixFile(document: vscode.TextDocument): Promise<void> {\n        const config = vscode.workspace.getConfiguration('connascence');\n        const binaryPath = config.get<string>('pathToBinary', 'connascence');\n        \n        try {\n            // Run autofix command\n            const { spawn } = require('child_process');\n            const process = spawn(binaryPath, ['autofix', '--preview', document.uri.fsPath]);\n            \n            let output = '';\n            process.stdout.on('data', (data: Buffer) => {\n                output += data.toString();\n            });\n            \n            process.on('close', (code: number) => {\n                if (code === 0) {\n                    vscode.window.showInformationMessage('Autofix preview ready');\n                    // Could show preview in a new document or panel\n                } else {\n                    vscode.window.showErrorMessage('Autofix failed');\n                }\n            });\n        } catch (error) {\n            vscode.window.showErrorMessage(`Autofix error: ${error}`);\n        }\n    }\n}
+            const constantDef = `${constantName} = ${literal}\n`;
+            extractAction.edit.insert(document.uri, insertPos, constantDef);
+            
+            // Replace literal with constant reference
+            extractAction.edit.replace(document.uri, diagnostic.range, constantName);
+        }
+        
+        actions.push(extractAction);
+        
+        return actions;
+    }
+    
+    private createParameterActions(
+        violation: ConnascenceViolation,
+        document: vscode.TextDocument,
+        diagnostic: vscode.Diagnostic
+    ): vscode.CodeAction[] {
+        const actions: vscode.CodeAction[] = [];
+        
+        // Convert to keyword arguments
+        const keywordAction = new vscode.CodeAction(
+            'Convert to keyword arguments',
+            vscode.CodeActionKind.RefactorRewrite
+        );
+        keywordAction.diagnostics = [diagnostic];
+        keywordAction.isPreferred = true;
+        
+        // This would require more sophisticated parsing
+        // For now, just add a command to trigger autofix
+        keywordAction.command = {
+            title: 'Apply parameter refactoring',
+            command: 'connascence.autofixCurrent'
+        };
+        
+        actions.push(keywordAction);
+        
+        return actions;
+    }
+    
+    private createTypeHintActions(
+        violation: ConnascenceViolation,
+        document: vscode.TextDocument,
+        diagnostic: vscode.Diagnostic
+    ): vscode.CodeAction[] {
+        const actions: vscode.CodeAction[] = [];
+        
+        // Add type hints action
+        const typeAction = new vscode.CodeAction(
+            'Add type hints',
+            vscode.CodeActionKind.QuickFix
+        );
+        typeAction.diagnostics = [diagnostic];
+        typeAction.isPreferred = true;
+        
+        const line = document.lineAt(diagnostic.range.start.line);
+        const lineText = line.text;
+        
+        // Simple function parameter detection
+        const functionMatch = lineText.match(/def\s+(\w+)\s*\(([^)]*)\)/);
+        if (functionMatch) {
+            const [, functionName, params] = functionMatch;
+            
+            // Add basic type hints
+            const typedParams = params.split(',').map(p => {
+                const paramName = p.trim();
+                if (paramName === 'self' || paramName === 'cls') return paramName;
+                return `${paramName}: Any`;
+            }).join(', ');
+            
+            const newSignature = `def ${functionName}(${typedParams}) -> Any:`;
+            
+            typeAction.edit = new vscode.WorkspaceEdit();
+            
+            // Add import for Any at top of file
+            const importPos = new vscode.Position(0, 0);
+            typeAction.edit.insert(document.uri, importPos, 'from typing import Any\n');
+            
+            // Replace function signature
+            const sigRange = new vscode.Range(
+                diagnostic.range.start,
+                line.range.end
+            );
+            typeAction.edit.replace(document.uri, sigRange, newSignature);
+        }
+        
+        actions.push(typeAction);
+        
+        return actions;
+    }
+    
+    private createComplexityActions(
+        violation: ConnascenceViolation,
+        document: vscode.TextDocument,
+        diagnostic: vscode.Diagnostic
+    ): vscode.CodeAction[] {
+        const actions: vscode.CodeAction[] = [];
+        
+        // Extract method action
+        const extractAction = new vscode.CodeAction(
+            'Extract method to reduce complexity',
+            vscode.CodeActionKind.RefactorExtract
+        );
+        extractAction.diagnostics = [diagnostic];
+        
+        // This would require sophisticated analysis
+        // For now, trigger autofix
+        extractAction.command = {
+            title: 'Apply complexity refactoring',
+            command: 'connascence.autofixCurrent'
+        };
+        
+        actions.push(extractAction);
+        
+        return actions;
+    }
+    
+    private createExplainAction(violation: ConnascenceViolation, diagnostic: vscode.Diagnostic): vscode.CodeAction {
+        const explainAction = new vscode.CodeAction(
+            `Explain ${violation.connascenceType} violation`,
+            vscode.CodeActionKind.Empty
+        );
+        explainAction.diagnostics = [diagnostic];
+        
+        explainAction.command = {
+            title: 'Explain violation',
+            command: 'connascence.explainFinding',
+            arguments: [{ finding: violation }]
+        };
+        
+        return explainAction;
+    }
+    
+    private createIgnoreAction(
+        violation: ConnascenceViolation,
+        document: vscode.TextDocument,
+        diagnostic: vscode.Diagnostic
+    ): vscode.CodeAction {
+        const ignoreAction = new vscode.CodeAction(
+            'Ignore this violation',
+            vscode.CodeActionKind.Empty
+        );
+        ignoreAction.diagnostics = [diagnostic];
+        
+        // Add ignore comment
+        const line = document.lineAt(diagnostic.range.start.line);
+        const comment = `  # connascence: ignore ${violation.ruleId}`;
+        
+        ignoreAction.edit = new vscode.WorkspaceEdit();
+        ignoreAction.edit.insert(
+            document.uri,
+            line.range.end,
+            comment
+        );
+        
+        return ignoreAction;
+    }
+    
+    private generateConstantName(literal: string, violation: ConnascenceViolation): string {
+        // Generate appropriate constant name based on literal and context
+        if (/^\d+$/.test(literal)) {
+            // Integer literal
+            const num = parseInt(literal);
+            if (num >= 100 && num <= 999) {
+                return `HTTP_STATUS_${num}`;
+            }
+            return `DEFAULT_VALUE_${num}`;
+        }
+        
+        if (/^\d+\.\d+$/.test(literal)) {
+            // Float literal
+            return `DEFAULT_RATE_${literal.replace('.', '_')}`;
+        }
+        
+        // String literal - clean up for constant name
+        const cleaned = literal.replace(/["']/g, '').replace(/[^\w]/g, '_').toUpperCase();
+        return `DEFAULT_${cleaned}`;
+    }
+    
+    async autofixFile(document: vscode.TextDocument): Promise<void> {
+        const config = vscode.workspace.getConfiguration('connascence');
+        const binaryPath = config.get<string>('pathToBinary', 'connascence');
+        
+        try {
+            // Run autofix command
+            const { spawn } = require('child_process');
+            const process = spawn(binaryPath, ['autofix', '--preview', document.uri.fsPath]);
+            
+            let output = '';
+            process.stdout.on('data', (data: Buffer) => {
+                output += data.toString();
+            });
+            
+            process.on('close', (code: number) => {
+                if (code === 0) {
+                    vscode.window.showInformationMessage('Autofix preview ready');
+                    // Could show preview in a new document or panel
+                } else {
+                    vscode.window.showErrorMessage('Autofix failed');
+                }
+            });
+        } catch (error) {
+            vscode.window.showErrorMessage(`Autofix error: ${error}`);
+        }
+    }
+}
