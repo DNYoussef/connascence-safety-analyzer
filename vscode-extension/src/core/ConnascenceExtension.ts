@@ -47,10 +47,18 @@ export class ConnascenceExtension {
     ) {
         // Initialize services first
         this.configService = new ConfigurationService();
-        this.connascenceService = new ConnascenceService(this.configService, this.telemetry);
+        // Create TelemetryService adapter for TelemetryReporter
+        const telemetryServiceAdapter: any = {
+            logEvent: (event: string, data?: any) => this.telemetry.logEvent(event, data),
+            events: {},
+            sessionId: '',
+            userId: '',
+            enabled: true
+        };
+        this.connascenceService = new ConnascenceService(this.configService, telemetryServiceAdapter);
         
         // Initialize UI components
-        this.statusBarManager = new StatusBarManager(context);
+        this.statusBarManager = new StatusBarManager(this.connascenceService, this.configService);
         this.outputManager = new OutputChannelManager('Connascence');
         
         // Initialize providers

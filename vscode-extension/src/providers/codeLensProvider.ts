@@ -70,7 +70,7 @@ export class ConnascenceCodeLensProvider implements vscode.CodeLensProvider {
             const analysis = await this.analyzeDocument(document);
             
             const totalViolations = analysis.violations.length;
-            const criticalViolations = analysis.violations.filter(v => v.severity === 'critical').length;
+            const criticalViolations = analysis.violations.filter((v: any) => v.severity === 'critical').length;
             const qualityScore = this.calculateQualityScore(analysis);
             
             let title = `📊 Connascence: ${totalViolations} issues`;
@@ -86,10 +86,11 @@ export class ConnascenceCodeLensProvider implements vscode.CodeLensProvider {
             };
             
         } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : String(error);
             return {
                 title: '❌ Connascence analysis failed',
                 command: 'connascence.showError',
-                arguments: [error.message]
+                arguments: [errorMessage]
             };
         }
     }
