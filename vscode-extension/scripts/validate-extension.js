@@ -150,6 +150,16 @@ class ExtensionValidator {
             const filePath = path.join(this.basePath, file);
             if (!fs.existsSync(filePath)) {
                 this.errors.push(`Required file not found: ${file}`);
+            } else {
+                // Check for encoding issues (warn only)
+                try {
+                    const content = fs.readFileSync(filePath, 'utf8');
+                    if (content.includes('\uFFFD')) {
+                        this.warnings.push(`File may have encoding issues: ${file}`);
+                    }
+                } catch (err) {
+                    this.warnings.push(`Could not validate encoding for: ${file}`);
+                }
             }
         }
         

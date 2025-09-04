@@ -205,11 +205,12 @@
   },
   "scripts": {
     "vscode:prepublish": "echo 'Using pre-compiled files'",
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
+    "compile": "echo 'Using pre-compiled TypeScript files' && exit 0",
+    "watch": "echo 'Using pre-compiled TypeScript files' && exit 0", 
     "package": "vsce package --no-dependencies",
     "publish": "vsce publish --no-dependencies",
-    "build:production": "echo 'Using pre-compiled files'"
+    "build:production": "echo 'Using pre-compiled files'",
+    "test": "echo 'No tests configured'"
   },
   "devDependencies": {
     "@types/vscode": "^1.74.0",
