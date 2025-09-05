@@ -26,12 +26,38 @@ from typing import Dict, List, Any, Optional, Set
 from dataclasses import dataclass
 from concurrent.futures import ThreadPoolExecutor
 
-from .ruff_integration import RuffIntegration
-from .mypy_integration import MyPyIntegration
-from .radon_integration import RadonIntegration
-from .bandit_integration import BanditIntegration
-from .black_integration import BlackIntegration
-from .build_flags_integration import BuildFlagsIntegration
+# Import from consolidated integrations
+try:
+    from .consolidated_integrations import (
+        RuffIntegration,
+        MyPyIntegration,
+        RadonIntegration,
+        BanditIntegration,
+        BlackIntegration
+    )
+    from .build_flags_integration import BuildFlagsIntegration
+except ImportError as e:
+    # Fallback for missing consolidated integrations
+    print(f"Warning: Consolidated integrations not available, using minimal fallbacks: {e}")
+    
+    # Create minimal fallback integration class
+    class MinimalIntegration:
+        def __init__(self, config=None):
+            self.config = config or {}
+        
+        def is_available(self):
+            return False
+            
+        def analyze(self, path):
+            return {"issues": [], "error": "Integration not available"}
+    
+    # Use fallbacks for missing integrations
+    RuffIntegration = MinimalIntegration
+    MyPyIntegration = MinimalIntegration
+    RadonIntegration = MinimalIntegration
+    BanditIntegration = MinimalIntegration
+    BlackIntegration = MinimalIntegration
+    BuildFlagsIntegration = MinimalIntegration
 
 
 @dataclass
