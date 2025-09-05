@@ -11,7 +11,7 @@ import pytest
 from unittest.mock import Mock, patch, AsyncMock
 from pathlib import Path
 
-from mcp.server import ConnascenceMCPServer, MCPConnascenceTool
+from src.mcp.server import ConnascenceMCPServer
 from analyzer.core import ConnascenceViolation
 
 
@@ -25,7 +25,7 @@ class TestConnascenceMCPServer:
     def test_server_initialization(self):
         """Test server initializes correctly."""
         assert self.server.name == "connascence"
-        assert self.server.version == "1.0.0"
+        assert self.server.version == "2.0.0"
         assert hasattr(self.server, 'analyzer')
         assert hasattr(self.server, 'rate_limiter')
         assert hasattr(self.server, 'audit_logger')
