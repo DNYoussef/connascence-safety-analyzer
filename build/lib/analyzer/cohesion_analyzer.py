@@ -289,6 +289,7 @@ class StatisticalGodObjectDetector:
         self.class_analyses = []
         
         # First pass: collect all classes and metrics
+        # Support multiple languages - but for now only Python supports class analysis
         for py_file in root_path.rglob("*.py"):
             if self._should_skip_file(py_file):
                 continue

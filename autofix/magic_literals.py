@@ -11,7 +11,7 @@ from typing import Dict, List, Optional, Set, Any
 from dataclasses import dataclass
 
 from .patch_api import PatchSuggestion
-from analyzer.core import ConnascenceViolation
+from .core import ConnascenceViolation
 
 
 @dataclass

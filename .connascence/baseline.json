@@ -1,0 +1,43 @@
+{
+  "created_at": "2025-09-05T00:12:48.849748",
+  "commit_hash": "b4cda81c36618d238d84e8390c2c04c478735f07",
+  "branch": "main",
+  "description": "Version 2.0 baseline",
+  "version": "2.0.0",
+  "fingerprints": [
+    {
+      "rule_id": "v1_issue",
+      "fingerprint": "1ee75491dbc78884d8800346145111728835bb998eaeeeada058703c4576f50c",
+      "file": "code.py",
+      "line": 1,
+      "column": 0,
+      "severity": "medium",
+      "context_hash": "",
+      "created_at": "2025-09-05T00:12:48.849748"
+    },
+    {
+      "rule_id": "v2_issue",
+      "fingerprint": "b44fed979b5ee26a7d30ccff439629b3416d1e6b8fbdb685db2c2b2378320f36",
+      "file": "code.py",
+      "line": 10,
+      "column": 0,
+      "severity": "high",
+      "context_hash": "",
+      "created_at": "2025-09-05T00:12:48.849748"
+    }
+  ],
+  "metadata": {
+    "total_violations": 2,
+    "severity_counts": {
+      "critical": 0,
+      "high": 1,
+      "medium": 1,
+      "low": 0
+    },
+    "rule_counts": {
+      "CoM": 1,
+      "CoP": 1
+    },
+    "files_affected": 1
+  }
+}

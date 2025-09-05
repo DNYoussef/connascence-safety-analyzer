@@ -1,0 +1,2013 @@
+{
+  "summary": {
+    "sample_size": 200,
+    "true_positives": 197,
+    "questionable": 3,
+    "false_positives": 0,
+    "true_positive_rate": 98.5,
+    "questionable_rate": 1.5,
+    "false_positive_rate": 0.0
+  },
+  "sample_analysis": [
+    {
+      "index": 1,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"SSH_SFTP_TRANS_INIT\" should be a named constant",
+      "file": "libssh.c",
+      "line": 276,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 2,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"SSL\" should be a named constant",
+      "file": "openssl.c",
+      "line": 5464,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 3,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"; includeSubDomains;\" should be a named constant",
+      "file": "unit1660.c",
+      "line": 93,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 4,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '2' should be a named constant",
+      "file": "noproxy.c",
+      "line": 46,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 5,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '256' should be a named constant",
+      "file": "curl_sha512_256.c",
+      "line": 333,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 6,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '1L' should be a named constant",
+      "file": "lib557.c",
+      "line": 799,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 7,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string 'oh no!' should be a named constant",
+      "file": "index.js",
+      "line": 40,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 8,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal 'queue' should be a named constant",
+      "file": "routes.py",
+      "line": 53,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 9,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal 'wrapped error' should be a named constant",
+      "file": "test_base.py",
+      "line": 947,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 10,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \" : \" should be a named constant",
+      "file": "openldap.c",
+      "line": 608,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 11,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '06' should be a named constant",
+      "file": "tool_writeout.c",
+      "line": 182,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 12,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '0.2' should be a named constant",
+      "file": "test_rabbitmq_chord_unlock_routing.py",
+      "line": 77,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 13,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"[SHUTDOWN] update events failed, discarding #%\" should be a named constant",
+      "file": "cshutdn.c",
+      "line": 432,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 14,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '1000' should be a named constant",
+      "file": "curl_ngtcp2.c",
+      "line": 1726,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 15,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"CWD\" should be a named constant",
+      "file": "ftp.c",
+      "line": 119,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 16,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal 'No matches' should be a named constant",
+      "file": "dictserver.py",
+      "line": 97,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 17,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"for retries.\" should be a named constant",
+      "file": "tool_operate.c",
+      "line": 460,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 18,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"against certificate name (%s)\" should be a named constant",
+      "file": "schannel_verify.c",
+      "line": 705,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 19,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal 'CallableTask' should be a named constant",
+      "file": "abstract.py",
+      "line": 5,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 20,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"hello-you-fool\" should be a named constant",
+      "file": "unit1615.c",
+      "line": 41,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 21,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal 'localhost' should be a named constant",
+      "file": "test_cassandra.py",
+      "line": 66,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 22,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"skipping %zd bytes of junk\" should be a named constant",
+      "file": "rtsp.c",
+      "line": 724,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 23,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '8' should be a named constant",
+      "file": "utils.js",
+      "line": 20,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 24,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string 'trust proxy' should be a named constant",
+      "file": "config.js",
+      "line": 136,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 25,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"resolve thread started for of %s:%d\" should be a named constant",
+      "file": "asyn-thrdd.c",
+      "line": 505,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 26,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '3' should be a named constant",
+      "file": "test_canvas.py",
+      "line": 2022,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 27,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"%o %x %X\" should be a named constant",
+      "file": "lib557.c",
+      "line": 1472,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 28,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"exitcode\" should be a named constant",
+      "file": "tool_writeout.c",
+      "line": 76,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 29,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"ldap.example.com/path/html\" should be a named constant",
+      "file": "lib1560.c",
+      "line": 712,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 30,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"*.txt\" should be a named constant",
+      "file": "unit1307.c",
+      "line": 201,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 31,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal 'Get the boto3 structure describing the DynamoDB table schema.' should be a named constant",
+      "file": "dynamodb.py",
+      "line": 193,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 32,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string 'should set the Content-Type based on a filename' should be a named constant",
+      "file": "res.type.js",
+      "line": 8,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 33,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"smtps\" should be a named constant",
+      "file": "smtp.c",
+      "line": 218,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 34,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"Chunky upload is not supported by HTTP 1.0\" should be a named constant",
+      "file": "http.c",
+      "line": 2269,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 35,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"reusing ALPN '%s'\" should be a named constant",
+      "file": "openssl.c",
+      "line": 4310,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 36,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"\\\\\\\\?\\\\C:\\\\com1\" should be a named constant",
+      "file": "tool1604.c",
+      "line": 171,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 37,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '2' should be a named constant",
+      "file": "mprintf.c",
+      "line": 820,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 38,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '42' should be a named constant",
+      "file": "base64.c",
+      "line": 52,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 39,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string 'invalid api key' should be a named constant",
+      "file": "index.js",
+      "line": 37,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 40,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '23' should be a named constant",
+      "file": "curl.h",
+      "line": 2948,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 41,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string 'should emit \" should be a named constant",
+      "file": "app.use.js",
+      "line": 9,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 42,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal 'base' should be a named constant",
+      "file": "test_17_ssl_use.py",
+      "line": 238,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 43,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string 'Content-Type' should be a named constant",
+      "file": "res.redirect.js",
+      "line": 174,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 44,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '3' should be a named constant",
+      "file": "test_tasks.py",
+      "line": 641,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 45,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal 'default' should be a named constant",
+      "file": "settings.py",
+      "line": 35,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 46,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"Mon\" should be a named constant",
+      "file": "parsedate.c",
+      "line": 111,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 47,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"unable to set private key\" should be a named constant",
+      "file": "wolfssl.c",
+      "line": 990,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 48,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string 'markdown' should be a named constant",
+      "file": "markdown.js",
+      "line": 5,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 49,
+      "type": "god_object",
+      "severity": "critical",
+      "description": "Class 'test_Request' is a God Object: 90 methods, ~1053 lines",
+      "file": "test_request.py",
+      "line": 185,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 50,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \" user-interface method\" should be a named constant",
+      "file": "openssl.c",
+      "line": 1253,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 51,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"18446744069414584320\" should be a named constant",
+      "file": "lib557.c",
+      "line": 677,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 52,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal 'eventq' should be a named constant",
+      "file": "test_events.py",
+      "line": 223,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 53,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \",   \" should be a named constant",
+      "file": "arpa_telnet.h",
+      "line": 92,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 54,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '6' should be a named constant",
+      "file": "multihandle.h",
+      "line": 58,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 55,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '250' should be a named constant",
+      "file": "ftp.c",
+      "line": 3045,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 56,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"NTLMFLAG_UNKNOWN_26 \" should be a named constant",
+      "file": "ntlm.c",
+      "line": 221,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 57,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '02' should be a named constant",
+      "file": "progress.c",
+      "line": 59,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 58,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '4' should be a named constant",
+      "file": "smtp-multi.c",
+      "line": 110,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 59,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '0L' should be a named constant",
+      "file": "cli_hx_download.c",
+      "line": 229,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 60,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"%20\" should be a named constant",
+      "file": "urlapi.c",
+      "line": 161,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 61,
+      "type": "connascence_of_meaning",
+      "severity": "high",
+      "description": "Magic literal 'foo' should be a named constant",
+      "file": "test_functional.py",
+      "line": 246,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 62,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"[WS] Not a websocket transfer\" should be a named constant",
+      "file": "ws.c",
+      "line": 1746,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 63,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"\\r\\n\" should be a named constant",
+      "file": "http2.c",
+      "line": 1148,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 64,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '--quiet' should be a named constant",
+      "file": "celery.py",
+      "line": 97,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 65,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal 'exchange' should be a named constant",
+      "file": "test_routes.py",
+      "line": 93,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 66,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"Disable .curlrc\" should be a named constant",
+      "file": "tool_listhelp.c",
+      "line": 136,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 67,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '518' should be a named constant",
+      "file": "lib1308.c",
+      "line": 72,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 68,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"-1793\" should be a named constant",
+      "file": "lib557.c",
+      "line": 953,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 69,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '200' should be a named constant",
+      "file": "http.c",
+      "line": 3745,
+      "classification": "QUESTIONABLE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 70,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"ECDH-RSA-AES128-SHA\" should be a named constant",
+      "file": "unit3205.c",
+      "line": 85,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 71,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal 'republish' should be a named constant",
+      "file": "migrate.py",
+      "line": 15,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 72,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"    --proxy-header <header/@file>\" should be a named constant",
+      "file": "tool_listhelp.c",
+      "line": 535,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 73,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal 'data-100k' should be a named constant",
+      "file": "test_10_proxy.py",
+      "line": 208,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 74,
+      "type": "connascence_of_algorithm",
+      "severity": "medium",
+      "description": "Function 'test_31_03_download_10_serial' appears to duplicate algorithm from other functions",
+      "file": "test_31_vsftpds.py",
+      "line": 105,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 75,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"set timeouts for state %d; Total % \" should be a named constant",
+      "file": "tftp.c",
+      "line": 246,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 76,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '1L' should be a named constant",
+      "file": "fileupload.c",
+      "line": 80,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 77,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal 'result' should be a named constant",
+      "file": "test_elasticsearch.py",
+      "line": 212,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 78,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '15' should be a named constant",
+      "file": "multihandle.h",
+      "line": 69,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 79,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"[%s] ftp_domore_pollset()\" should be a named constant",
+      "file": "ftp.c",
+      "line": 791,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 80,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '103' should be a named constant",
+      "file": "unit3213.c",
+      "line": 106,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 81,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string './response' should be a named constant",
+      "file": "express.js",
+      "line": 21,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 82,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal 'redis-echo' should be a named constant",
+      "file": "test_tasks.py",
+      "line": 713,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 83,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"cr_connect, init backend -> %d\" should be a named constant",
+      "file": "rustls.c",
+      "line": 1161,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 84,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal 'none' should be a named constant",
+      "file": "test_17_ssl_use.py",
+      "line": 56,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 85,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal 'memcache' should be a named constant",
+      "file": "test_cache.py",
+      "line": 179,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 86,
+      "type": "connascence_of_meaning",
+      "severity": "high",
+      "description": "Magic literal 'h3' should be a named constant",
+      "file": "test_02_download.py",
+      "line": 649,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 87,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal 'redis_max_connections' should be a named constant",
+      "file": "redis.py",
+      "line": 224,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 88,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"^_{}~\" should be a named constant",
+      "file": "unit1307.c",
+      "line": 132,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 89,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal 'Worker exited prematurely: exitcode 1' should be a named constant",
+      "file": "test_tasks.py",
+      "line": 82,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 90,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '8' should be a named constant",
+      "file": "test_chord.py",
+      "line": 126,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 91,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '1000' should be a named constant",
+      "file": "progress.c",
+      "line": 308,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 92,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal 'Queue name\u21d2 declaration mapping.' should be a named constant",
+      "file": "amqp.py",
+      "line": 608,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 93,
+      "type": "connascence_of_meaning",
+      "severity": "high",
+      "description": "Magic literal '42' should be a named constant",
+      "file": "test_canvas.py",
+      "line": 791,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 94,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '50' should be a named constant",
+      "file": "ftp-wildcard.c",
+      "line": 117,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 95,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"%c%c%c%c\" should be a named constant",
+      "file": "curl_ntlm_core.c",
+      "line": 572,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 96,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"HSTS preload '%s' until '%s'\\n\" should be a named constant",
+      "file": "hsts-preload.c",
+      "line": 63,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 97,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string 'GET' should be a named constant",
+      "file": "Route.js",
+      "line": 224,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 98,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"This is test PUT data\\n\" should be a named constant",
+      "file": "lib1948.c",
+      "line": 47,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 99,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '5' should be a named constant",
+      "file": "test_canvas.py",
+      "line": 467,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 100,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal 'Canceling queue %s' should be a named constant",
+      "file": "consumer.py",
+      "line": 568,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 101,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '547' should be a named constant",
+      "file": "lib555.c",
+      "line": 26,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 102,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"20110623 01:99:30\" should be a named constant",
+      "file": "lib517.c",
+      "line": 142,
+      "classification": "QUESTIONABLE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 103,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal 'Quitting test()' should be a named constant",
+      "file": "myapp.py",
+      "line": 135,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 104,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"port\" should be a named constant",
+      "file": "lib1560.c",
+      "line": 1169,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 105,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal 'Will retry using next failover.' should be a named constant",
+      "file": "test_broker_failover.py",
+      "line": 57,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 106,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '1024' should be a named constant",
+      "file": "tool_getparam.c",
+      "line": 554,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 107,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"AS IS\" should be a named constant",
+      "file": "asyn-thrdd.c",
+      "line": 18,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 108,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '18' should be a named constant",
+      "file": "test_schedules.py",
+      "line": 433,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 109,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '24' should be a named constant",
+      "file": "parsedate.c",
+      "line": 321,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 110,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '10' should be a named constant",
+      "file": "hsts.c",
+      "line": 413,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 111,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"shutdown, error %d flushing sendbuf\" should be a named constant",
+      "file": "curl_ngtcp2.c",
+      "line": 2115,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 112,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '11' should be a named constant",
+      "file": "md5.c",
+      "line": 423,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 113,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"824633720832\" should be a named constant",
+      "file": "lib557.c",
+      "line": 717,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 114,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"sha256\" should be a named constant",
+      "file": "x509asn1.c",
+      "line": 157,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 115,
+      "type": "connascence_of_position",
+      "severity": "high",
+      "description": "Function 'test_16_02_info_302_download' has 5 positional parameters (>3)",
+      "file": "test_16_info.py",
+      "line": 64,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 116,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \" FMT_PRId64 \" should be a named constant",
+      "file": "curl_ngtcp2.c",
+      "line": 1343,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 117,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal ' not recognized. Available ' should be a named constant",
+      "file": "control.py",
+      "line": 64,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 118,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"header\" should be a named constant",
+      "file": "transfer.h",
+      "line": 59,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 119,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal 'host' should be a named constant",
+      "file": "redis.py",
+      "line": 662,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 120,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '1024' should be a named constant",
+      "file": "express.urlencoded.js",
+      "line": 282,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 121,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal 'push' should be a named constant",
+      "file": "test_tasks.py",
+      "line": 1471,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 122,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal ''***'' should be a named constant",
+      "file": "test_tasks.py",
+      "line": 1101,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 123,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal 'uuid' should be a named constant",
+      "file": "test_state.py",
+      "line": 637,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 124,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal 'h3 not supported' should be a named constant",
+      "file": "test_07_upload.py",
+      "line": 214,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 125,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string 'fallthrough' should be a named constant",
+      "file": "express.static.js",
+      "line": 356,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 126,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"Sending quote commands\" should be a named constant",
+      "file": "libssh.c",
+      "line": 1546,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 127,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"Allow this security flaw for HTTPS proxy\" should be a named constant",
+      "file": "tool_listhelp.c",
+      "line": 566,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 128,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"::1\" should be a named constant",
+      "file": "hostip.c",
+      "line": 633,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 129,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal 'kwargs' should be a named constant",
+      "file": "test_inspect.py",
+      "line": 111,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 130,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal 'celery.backends.cosmosdbsql:CosmosDBSQLBackend' should be a named constant",
+      "file": "backends.py",
+      "line": 28,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 131,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal 'echo_errback' should be a named constant",
+      "file": "test_canvas.py",
+      "line": 3069,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 132,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"foobar\" should be a named constant",
+      "file": "unit1614.c",
+      "line": 99,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 133,
+      "type": "connascence_of_meaning",
+      "severity": "high",
+      "description": "Magic literal 'h3' should be a named constant",
+      "file": "test_14_auth.py",
+      "line": 126,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 134,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '7' should be a named constant",
+      "file": "mqtt.c",
+      "line": 78,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 135,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '515751' should be a named constant",
+      "file": "tool_cb_prg.c",
+      "line": 55,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 136,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '--trace' should be a named constant",
+      "file": "nghttpx.py",
+      "line": 155,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 137,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string 'should not add it again' should be a named constant",
+      "file": "res.vary.js",
+      "line": 72,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 138,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '100' should be a named constant",
+      "file": "lib502.c",
+      "line": 57,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 139,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string 'with no arguments' should be a named constant",
+      "file": "res.vary.js",
+      "line": 8,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 140,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '3.0' should be a named constant",
+      "file": "test_native_delayed_delivery.py",
+      "line": 163,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 141,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '2' should be a named constant",
+      "file": "socksd.c",
+      "line": 450,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 142,
+      "type": "connascence_of_algorithm",
+      "severity": "medium",
+      "description": "Function 'test_from_cls' appears to duplicate algorithm from other functions",
+      "file": "test_functional.py",
+      "line": 278,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 143,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string 'no leading space' should be a named constant",
+      "file": "express.text.js",
+      "line": 319,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 144,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string 'host' should be a named constant",
+      "file": "request.js",
+      "line": 405,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 145,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \" bytes received\" should be a named constant",
+      "file": "multi.c",
+      "line": 1745,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 146,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal 'librabbitmq://' should be a named constant",
+      "file": "bench_worker.py",
+      "line": 15,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 147,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '12345' should be a named constant",
+      "file": "rand.c",
+      "line": 143,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 148,
+      "type": "god_object",
+      "severity": "medium",
+      "description": "Function too long (95 lines) - potential god function",
+      "file": "rtspd.c",
+      "line": 1204,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 149,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal 'timeout' should be a named constant",
+      "file": "test_quorum_queue_qos_cluster_simulation.py",
+      "line": 113,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 150,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"%s:%d curl_easy_getinfo() failed with code %d (%s)\\n\" should be a named constant",
+      "file": "lib1535.c",
+      "line": 125,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 151,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"-E, --cert <certificate[:password]>\" should be a named constant",
+      "file": "tool_listhelp.c",
+      "line": 63,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 152,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '13229' should be a named constant",
+      "file": "http.c",
+      "line": 2184,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 153,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string 'views' should be a named constant",
+      "file": "app.engine.js",
+      "line": 21,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 154,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string '.use' should be a named constant",
+      "file": "Router.js",
+      "line": 433,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 155,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal 'sw_ver' should be a named constant",
+      "file": "state.py",
+      "line": 30,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 156,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string '/foo' should be a named constant",
+      "file": "app.router.js",
+      "line": 892,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 157,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"ECDHE-RSA-AES256-SHA\" should be a named constant",
+      "file": "unit3205.c",
+      "line": 474,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 158,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"passed %zd bytes payload, %\" should be a named constant",
+      "file": "ws.c",
+      "line": 498,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 159,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal 'bold' should be a named constant",
+      "file": "test_term.py",
+      "line": 34,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 160,
+      "type": "connascence_of_meaning",
+      "severity": "high",
+      "description": "Magic literal 'FAILURE' should be a named constant",
+      "file": "test_tasks.py",
+      "line": 512,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 161,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal 'celery' should be a named constant",
+      "file": "test_log.py",
+      "line": 341,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 162,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal 'g1' should be a named constant",
+      "file": "test_trace.py",
+      "line": 378,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 163,
+      "type": "connascence_of_meaning",
+      "severity": "high",
+      "description": "Magic literal 'group_id' should be a named constant",
+      "file": "test_canvas.py",
+      "line": 255,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 164,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"AS IS\" should be a named constant",
+      "file": "openssl.c",
+      "line": 18,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 165,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '3' should be a named constant",
+      "file": "unit2602.c",
+      "line": 83,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 166,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string 'should return the Host when present' should be a named constant",
+      "file": "req.hostname.js",
+      "line": 8,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 167,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal 'session' should be a named constant",
+      "file": "conftest.py",
+      "line": 268,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 168,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string 'Not Found' should be a named constant",
+      "file": "express.static.js",
+      "line": 133,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 169,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"VRFY %s%s%s%s\" should be a named constant",
+      "file": "smtp.c",
+      "line": 641,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 170,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal 'http://github.com/example/celery-tasks' should be a named constant",
+      "file": "setup.py",
+      "line": 13,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 171,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '5.0' should be a named constant",
+      "file": "asynpool.py",
+      "line": 1369,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 172,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '60' should be a named constant",
+      "file": "strcase.c",
+      "line": 54,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 173,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal 'Initialize a Celery option.' should be a named constant",
+      "file": "base.py",
+      "line": 149,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 174,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '14' should be a named constant",
+      "file": "test_state.py",
+      "line": 130,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 175,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string 's pets' should be a named constant",
+      "file": "index.js",
+      "line": 47,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 176,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"cf_recv, error on ingress\" should be a named constant",
+      "file": "curl_quiche.c",
+      "line": 871,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 177,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '8' should be a named constant",
+      "file": "test_canvas.py",
+      "line": 204,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 178,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string 'should support utf8 strings' should be a named constant",
+      "file": "utils.js",
+      "line": 69,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 179,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"OFF\" should be a named constant",
+      "file": "curlinfo.c",
+      "line": 110,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 180,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal 'Confirm the errback was called for each failed header task + body' should be a named constant",
+      "file": "test_canvas.py",
+      "line": 3104,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 181,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal 'queue' should be a named constant",
+      "file": "base.py",
+      "line": 797,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 182,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '302' should be a named constant",
+      "file": "mvc.js",
+      "line": 108,
+      "classification": "QUESTIONABLE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 183,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string 'json escape' should be a named constant",
+      "file": "res.json.js",
+      "line": 109,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 184,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"AS IS\" should be a named constant",
+      "file": "websocket-cb.c",
+      "line": 18,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 185,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string 'body' should be a named constant",
+      "file": "express.json.js",
+      "line": 115,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 186,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '0L' should be a named constant",
+      "file": "lib1525.c",
+      "line": 78,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 187,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string 'hey' should be a named constant",
+      "file": "res.format.js",
+      "line": 128,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 188,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \";sha256//\" should be a named constant",
+      "file": "vtls.c",
+      "line": 772,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 189,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"Maximum concurrency for parallel transfers\" should be a named constant",
+      "file": "tool_listhelp.c",
+      "line": 464,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 190,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal 'cli_h2_pausing' should be a named constant",
+      "file": "test_02_download.py",
+      "line": 504,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 191,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"%c%c\" should be a named constant",
+      "file": "ntlm.c",
+      "line": 701,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 192,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '42' should be a named constant",
+      "file": "test_trace.py",
+      "line": 344,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 193,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '10' should be a named constant",
+      "file": "cli_hx_upload.c",
+      "line": 269,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 194,
+      "type": "connascence_of_algorithm",
+      "severity": "medium",
+      "description": "Function 'test_hello' appears to duplicate algorithm from other functions",
+      "file": "test_control.py",
+      "line": 173,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 195,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '64' should be a named constant",
+      "file": "md5.c",
+      "line": 539,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 196,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"HTTP proxy tunnel (using CONNECT)\" should be a named constant",
+      "file": "tool_listhelp.c",
+      "line": 593,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 197,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal '1024' should be a named constant",
+      "file": "test_07_upload.py",
+      "line": 167,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 198,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic string \"rustls: ECH outername not supported\" should be a named constant",
+      "file": "rustls.c",
+      "line": 946,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 199,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal 'pop_current_task' should be a named constant",
+      "file": "__init__.py",
+      "line": 12,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    },
+    {
+      "index": 200,
+      "type": "connascence_of_meaning",
+      "severity": "medium",
+      "description": "Magic literal 'revoked' should be a named constant",
+      "file": "control.py",
+      "line": 382,
+      "classification": "TRUE_POSITIVE",
+      "reasoning": "Automated analysis based on common patterns"
+    }
+  ]
+}

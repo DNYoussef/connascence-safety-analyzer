@@ -7,7 +7,20 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Any, Optional
 from dataclasses import dataclass, field
-from analyzer.core import ConnascenceViolation
+# Need to create a mock ConnascenceViolation since analyzer.core was removed
+class ConnascenceViolation:
+    def __init__(self, id=None, rule_id=None, connascence_type=None, severity=None, 
+                 description=None, file_path=None, line_number=None, weight=None, type=None, **kwargs):
+        self.id = id
+        self.rule_id = rule_id
+        self.connascence_type = connascence_type or type
+        self.type = type or connascence_type
+        self.severity = severity
+        self.description = description
+        self.file_path = file_path
+        self.line_number = line_number
+        self.weight = weight
+        self.context = kwargs.get('context', {})
 
 # Baseline Manager Configuration Constants (CoM Improvement - Pass 2)
 DEFAULT_BASELINE_VERSION = "1.0.0"
@@ -56,10 +69,10 @@ class FindingFingerprint:
 class BaselineSnapshot:
     """Complete baseline snapshot with metadata and git integration."""
     created_at: str
-    commit_hash: Optional[str]
-    branch: Optional[str]
     description: str
     fingerprints: List[FindingFingerprint]
+    commit_hash: Optional[str] = None
+    branch: Optional[str] = None
     metadata: Dict[str, Any] = field(default_factory=dict)
     version: str = DEFAULT_FINGERPRINT_VERSION
     
@@ -174,10 +187,10 @@ class EnhancedBaselineManager:
         # Create snapshot
         snapshot = BaselineSnapshot(
             created_at=datetime.now().isoformat(),
-            commit_hash=commit_hash,
-            branch=branch,
             description=description or f"Snapshot at {commit_hash[:8] if commit_hash else 'unknown'}",
             fingerprints=fingerprints,
+            commit_hash=commit_hash,
+            branch=branch,
             metadata={
                 "total_violations": len(violations),
                 "severity_counts": self._count_by_severity(violations),
@@ -501,25 +514,7 @@ class BaselineManager(EnhancedBaselineManager):
             'version': baseline.version
         }
 
-class BaselineSnapshot:
-    def __init__(self, baseline_id: str, violations: List[ConnascenceViolation],
-                 description: str = "", version: str = DEFAULT_BASELINE_VERSION, created_at: float = None):
-        self.baseline_id = baseline_id
-        self.violations = violations
-        self.description = description
-        self.version = version
-        self.created_at = created_at or time.time()
-    
-    def to_dict(self) -> Dict[str, Any]:
-        """Convert to dictionary representation."""
-        return {
-            'baseline_id': self.baseline_id,
-            'description': self.description,
-            'version': self.version,
-            'created_at': self.created_at,
-            'violation_count': len(self.violations),
-            'violations': [v.to_dict() if hasattr(v, 'to_dict') else str(v) for v in self.violations]
-        }
+# Note: BaselineSnapshot dataclass defined above, removing duplicate class definition
     
 class BaselineComparison:
     def __init__(self, baseline_violations: List[ConnascenceViolation], 

@@ -15,7 +15,7 @@ classifiers = [
     "Environment :: Console", 
     "Environment :: Web Environment",
     "Intended Audience :: Developers",
-    "License :: Other/Proprietary License",
+    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.8",
@@ -74,7 +74,7 @@ Changelog = "https://github.com/connascence/connascence-analyzer/blob/main/CHANG
 connascence = "cli.connascence:main"
 
 [project.entry-points."mcp.servers"]
-connascence = "mcp.server:main"
+connascence = "mcp.run-server:main"
 
 # Tool Configuration
 

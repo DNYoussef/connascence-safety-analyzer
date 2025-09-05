@@ -11,7 +11,7 @@ import pytest
 from unittest.mock import Mock, patch, AsyncMock
 from pathlib import Path
 
-from src.mcp.server import ConnascenceMCPServer
+from mcp.server import ConnascenceMCPServer, MCPConnascenceTool
 from analyzer.core import ConnascenceViolation
 
 

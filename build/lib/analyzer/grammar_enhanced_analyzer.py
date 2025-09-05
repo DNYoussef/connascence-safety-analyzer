@@ -217,11 +217,14 @@ class GrammarEnhancedAnalyzer:
         
         results = []
         
-        # Collect all Python files
-        python_files = list(root_path.rglob("*.py"))
+        # Collect all supported language files
+        supported_files = []
+        file_patterns = ["*.py", "*.js", "*.mjs", "*.c", "*.h", "*.cpp", "*.cxx", "*.cc", "*.hpp", "*.hxx"]
+        for pattern in file_patterns:
+            supported_files.extend(root_path.rglob(pattern))
         
         # Filter out files to skip
-        python_files = [f for f in python_files if not self._should_skip_file(f)]
+        supported_files = [f for f in supported_files if not self._should_skip_file(f)]
         
         # First, run god object analysis on the entire codebase for statistical analysis
         if self.god_object_detector:
@@ -231,19 +234,20 @@ class GrammarEnhancedAnalyzer:
             god_objects_by_file = {}
         
         # Analyze each file
-        for py_file in python_files:
+        for source_file in supported_files:
             try:
-                result = self.analyze_file(py_file, safety_profile)
+                result = self.analyze_file(source_file, safety_profile)
                 
                 # Add god object findings for this file
-                if str(py_file) in god_objects_by_file:
-                    result.god_objects = [god_objects_by_file[str(py_file)]]
+                if str(source_file) in god_objects_by_file:
+                    result.god_objects = [god_objects_by_file[str(source_file)]]
                 
                 results.append(result)
                 
             except Exception as e:
-                logger.error(f"Failed to analyze {py_file}: {e}")
-                results.append(self._create_error_result(py_file, LanguageSupport.PYTHON, str(e)))
+                logger.error(f"Failed to analyze {source_file}: {e}")
+                language = self._detect_language(source_file)
+                results.append(self._create_error_result(source_file, language, str(e)))
         
         return results
     

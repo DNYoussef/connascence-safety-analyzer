@@ -19,21 +19,5 @@ class PatchSuggestion:
             self.rollback_info = {}
 
 
-class PatchGenerator:
-    """Generate patches for violations."""
-    def __init__(self, config=None):
-        self.config = config or {}
-        
-    def generate_patches(self, violations):
-        return []
-
-class AutofixEngine:
-    """Main autofix engine."""
-    def __init__(self, config=None, dry_run=False):
-        self.config = config or {}
-        self.dry_run = dry_run
-        
-class SafeAutofixer:
-    """Safe autofix application."""
-    def __init__(self, config=None):
-        self.config = config or {}
+# Import the real implementations from core module
+from .core import PatchGenerator, AutofixEngine, SafeAutofixer
