@@ -1,32 +1,50 @@
 {
   "name": "connascence-safety-analyzer",
   "displayName": "Connascence Safety Analyzer",
-  "description": "Enterprise-grade code analysis with Safety Standards/High Quality safety compliance and grammar-enhanced refactoring - Consolidated Package",
-  "version": "1.0.0",
+  "description": "🔗💥 Break the chains of tight coupling! Enterprise-grade connascence analysis with NASA Power of Ten compliance, AI-powered refactoring, and automated CI/CD quality control. Features self-improving dogfood capabilities and comprehensive safety validation.",
+  "version": "2.0.0",
   "publisher": "connascence-systems",
+  "icon": "images/connascence-logo.png",
+  "galleryBanner": {
+    "color": "#1e3a8a",
+    "theme": "dark"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/DNYoussef/connascence-safety-analyzer.git"
   },
+  "bugs": {
+    "url": "https://github.com/DNYoussef/connascence-safety-analyzer/issues"
+  },
+  "homepage": "https://github.com/DNYoussef/connascence-safety-analyzer#readme",
   "license": "MIT",
   "engines": {
     "vscode": "^1.74.0"
   },
   "categories": [
     "Linters",
-    "Code Quality",
+    "Code Quality", 
     "Security",
-    "Refactoring"
+    "Refactoring",
+    "Other"
   ],
   "keywords": [
     "connascence",
+    "coupling",
+    "decoupling",
     "code quality",
-    "nasa",
-    "jpl",
-    "safety",
+    "nasa power of ten",
+    "safety critical",
     "refactoring",
-    "grammar",
-    "ast"
+    "ai powered",
+    "mcp integration",
+    "dogfooding",
+    "self-improvement",
+    "architectural analysis",
+    "broken chains",
+    "enterprise",
+    "ci/cd",
+    "drift analysis"
   ],
   "activationEvents": [
     "onLanguage:python",
@@ -147,6 +165,42 @@
         "command": "connascence.configureServer",
         "title": "Configure MCP Server",
         "category": "Connascence AI"
+      },
+      {
+        "command": "connascence.createSnapshot",
+        "title": "Create Baseline Snapshot",
+        "category": "Connascence CI/CD",
+        "icon": "$(save)"
+      },
+      {
+        "command": "connascence.compareDrift",
+        "title": "Compare Drift from Baseline",
+        "category": "Connascence CI/CD",
+        "icon": "$(diff)"
+      },
+      {
+        "command": "connascence.executeCICDCycle",
+        "title": "Execute CI/CD Control Loop",
+        "category": "Connascence CI/CD",
+        "icon": "$(sync)"
+      },
+      {
+        "command": "connascence.dogfoodSelfImprovement",
+        "title": "🚀 Dogfood Self-Improvement",
+        "category": "Connascence Meta",
+        "icon": "$(rocket)"
+      },
+      {
+        "command": "connascence.planCascadeAnalysis",
+        "title": "Plan Cascading Improvements",
+        "category": "Connascence Meta",
+        "icon": "$(graph)"
+      },
+      {
+        "command": "connascence.generateAIContext",
+        "title": "Generate AI Context",
+        "category": "Connascence AI",
+        "icon": "$(robot)"
       }
     ],
     "views": {

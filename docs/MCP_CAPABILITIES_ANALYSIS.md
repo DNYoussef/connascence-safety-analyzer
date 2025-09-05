@@ -1,10 +1,35 @@
-# Connascence MCP Server - Complete Capabilities Analysis
+# Connascence MCP Server - Complete Capabilities Analysis (v2.0)
 
 ## Executive Summary
 
-Through reverse engineering the `mcp/server.py` implementation, I've identified **7 core MCP tools** with comprehensive capabilities for AI-driven connascence analysis, automated fix suggestions, policy enforcement, and security management.
+The Connascence MCP Server has evolved into a **comprehensive enterprise-grade system** with **40+ MCP tools** featuring revolutionary AI-powered analysis, automated CI/CD control loops, self-improving dogfood capabilities, and comprehensive safety validation. This represents a quantum leap from analysis-only tools to a complete autonomous improvement ecosystem.
 
-## Core Tool Inventory
+## 🚀 Revolutionary New Tool Categories (v2.0)
+
+### 🤖 **AI-Powered Analysis Tools**
+- **`generate_ai_context`**: Comprehensive AI context for external agents with NASA rules
+- **`enhanced_suggest_refactor`**: AI-powered refactoring with full multi-file context  
+- **`validate_refactoring`**: Safety validation for proposed changes
+- **`generate_refactoring_plan`**: Strategic planning for multiple violations
+
+### 🔄 **CI/CD Control Loop Tools**
+- **`execute_cicd_cycle`**: Complete automated cycle with auto-rollback
+- **`analyze_cicd_drift`**: Advanced drift analysis with statistical trends
+- **`cascade_improvement_analysis`**: Intelligent next-target identification
+- **`create_rollback_plan`**: Comprehensive rollback strategies
+
+### 🔗💥 **Self-Improving System Tools**
+- **`dogfood_self_improvement`**: **REVOLUTIONARY** - System improves its own code!
+- **`planning_agent_analyze`**: Meta-planning for architectural decisions
+- **Meta-vision tracking**: Progress toward perfect codebase
+
+### 📊 **Enhanced Enterprise Tools**
+- **40+ Baseline tools**: Comprehensive snapshot and drift management
+- **20+ Budget tools**: Advanced policy enforcement with trending analysis
+- **15+ Waiver tools**: Enterprise waiver management with audit trails
+- **10+ Drift tools**: Time-series analysis with forecasting
+
+## Legacy Core Tool Inventory (Still Available)
 
 ### 1. **SCAN_PATH** - Primary Analysis Engine
 - **Purpose**: Real-time connascence violation detection

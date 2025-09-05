@@ -5,40 +5,61 @@
 [![Installs](https://img.shields.io/visual-studio-marketplace/i/connascence-systems.connascence-safety-analyzer)](https://marketplace.visualstudio.com/items?itemName=connascence-systems.connascence-safety-analyzer)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 
-**Enterprise-grade code analysis with General Safety safety compliance and grammar-enhanced refactoring support for VS Code.**
+**🔗💥 Break the chains of tight coupling! Enterprise-grade connascence analysis with NASA Power of Ten compliance, AI-powered refactoring, and automated CI/CD quality control. Features revolutionary self-improving dogfood capabilities and comprehensive safety validation.**
 
-## Features
+## 🚀 Revolutionary Features
 
-### Real-Time Analysis
+### 🔗💥 **Self-Improving System (NEW!)**
+- **Dogfood Capabilities**: System literally improves its own codebase
+- **Meta-Vision Tracking**: Progress toward perfect code architecture
+- **AI-Driven Evolution**: Continuous learning from code improvements
+- **Safety-First Self-Modification**: Never touches main branch, always rollback-capable
+
+### 🤖 **AI-Powered Analysis Engine**
+- **MCP Integration**: Full Model Context Protocol server with 35+ tools
+- **NASA Power of Ten**: Complete compliance with all 10 safety rules
+- **Multi-File Context**: Analyzes coupling across entire codebase
+- **Intelligent Refactoring**: Context-aware suggestions with before/after examples
+
+### 🔄 **CI/CD Control Loop (NEW!)**
+- **Automated Drift Analysis**: Compares code quality before/after changes
+- **Auto-Rollback**: Automatically reverts changes that worsen metrics
+- **Cascade Analysis**: Finds next improvement targets after successful fixes
+- **Baseline Snapshots**: Git-integrated quality tracking with fingerprinting
+
+### 🎯 **Real-Time Analysis**
 - **Live Code Analysis**: Instant connascence detection as you type with intelligent debouncing
 - **Multi-Language Support**: Python, JavaScript, TypeScript, C/C++ analysis
 - **Smart Diagnostics**: Integration with VS Code's Problems panel with severity indicators
 - **Performance Optimized**: Efficient analysis with configurable file size limits and exclusion patterns
 
-### IntelliSense Integration
+### 🧠 **IntelliSense Integration**
 - **Connascence-Aware Completions**: Context-sensitive code suggestions to prevent coupling violations
 - **Safe Pattern Suggestions**: Built-in templates for dataclasses, enums, context managers, and more
 - **Refactoring Snippets**: Quick access to parameter objects, factory patterns, and builder patterns
 
-### Advanced Code Insights
+### 📊 **Advanced Code Insights**
 - **Hover Documentation**: Detailed explanations of connascence violations with fixing strategies
 - **Code Lens Metrics**: Inline display of function complexity, parameter counts, and quality scores
 - **Violation Warnings**: Critical issue indicators with one-click fixes
 
-### Quick Fixes & Refactoring
+### ⚡ **Quick Fixes & Refactoring**
 - **Automated Fixes**: One-click solutions for common violations (magic numbers, type hints, parameter objects)
-- **Refactoring Suggestions**: AI-powered recommendations with confidence scores
+- **AI-Powered Suggestions**: Context-rich recommendations with confidence scores and impact analysis
 - **Preview Mode**: Safe refactoring with diff previews before applying changes
+- **Multi-File Refactoring**: Handles coupling across multiple files intelligently
 
-### General Safety Safety Compliance
-- **Safety Profiles**: Built-in compliance for General Safety JPL POT-10, LOC-1, LOC-3 standards
+### 🛡️ **NASA Safety Compliance**
+- **Safety Profiles**: Built-in compliance for NASA Power of Ten, JPL POT-10, LOC-1, LOC-3 standards
 - **Enterprise Validation**: Automated safety rule validation with detailed violation reports
 - **Audit Trail**: Complete tracking of safety compliance status and remediation
+- **Tier Classification**: Automatic safety tier assessment (A/B/C) for all changes
 
-### Professional Reporting
-- **Comprehensive Reports**: JSON, HTML, and CSV export formats
-- **Quality Metrics**: File and project-level quality scores with trend analysis
+### 📈 **Professional Reporting**
+- **Comprehensive Reports**: JSON, HTML, and CSV export formats with trend analysis
+- **Quality Metrics**: File and project-level quality scores with historical tracking
 - **Dashboard Integration**: Visual analytics with violation statistics and recommendations
+- **Enterprise Analytics**: Drift tracking, baseline comparison, and ROI metrics
 
 ## 📋 Requirements
 

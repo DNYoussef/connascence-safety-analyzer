@@ -3,6 +3,7 @@ import { AnalysisResult, Finding } from '../services/connascenceService';
 import { ConfigurationService } from '../services/configurationService';
 import { ExtensionLogger } from '../utils/logger';
 import { generateSimpleDashboardHTML } from './simpleDashboard';
+import { generateEnterpriseDashboardHTML } from './enterpriseDashboard';
 
 // AI Provider Configuration Interface  
 export interface AIProviderConfig {
@@ -539,12 +540,105 @@ export class UIManager implements vscode.Disposable {
             this.statusBarItem.text = `$(sync~spin) Analyzing${fileName ? ` ${fileName}` : '...'}`;
             this.statusBarItem.tooltip = 'Connascence analysis in progress';
         } else if (this.totalViolations > 0) {
-            this.statusBarItem.text = `$(warning) ${this.totalViolations} connascence violations`;
-            this.statusBarItem.tooltip = `Found ${this.totalViolations} connascence violations. Click to view dashboard.`;
+            // Enhanced status bar with budget awareness
+            const budgetStatus = this.calculateBudgetStatus();
+            const icon = budgetStatus.exceeded ? '$(error)' : '$(warning)';
+            const budgetIndicator = budgetStatus.exceeded ? ' [BUDGET EXCEEDED]' : '';
+            
+            this.statusBarItem.text = `${icon} ${this.totalViolations} violations${budgetIndicator}`;
+            this.statusBarItem.tooltip = this.generateStatusBarTooltip(budgetStatus);
+            
+            // Change color based on budget status
+            this.statusBarItem.backgroundColor = budgetStatus.exceeded 
+                ? new vscode.ThemeColor('statusBarItem.errorBackground')
+                : undefined;
         } else {
             this.statusBarItem.text = `$(check) No connascence issues`;
-            this.statusBarItem.tooltip = 'No connascence violations detected';
+            this.statusBarItem.tooltip = 'No connascence violations detected - within all budget limits';
+            this.statusBarItem.backgroundColor = undefined;
         }
+    }
+
+    private calculateBudgetStatus(): {
+        exceeded: boolean;
+        criticalCount: number;
+        highCount: number;
+        mediumCount: number;
+        budgetLimits: any;
+        utilization: number;
+    } {
+        // Calculate severity breakdown
+        const criticalCount = this.countViolationsBySeverity('critical');
+        const highCount = this.countViolationsBySeverity('major') + this.countViolationsBySeverity('high');
+        const mediumCount = this.countViolationsBySeverity('minor') + this.countViolationsBySeverity('medium');
+        
+        // Get budget limits from configuration (default values)
+        const budgetLimits = {
+            total: this.configService.get('budget.totalViolations', 50),
+            critical: this.configService.get('budget.criticalViolations', 0),
+            high: this.configService.get('budget.highViolations', 5),
+            medium: this.configService.get('budget.mediumViolations', 20)
+        };
+        
+        // Check if any budget is exceeded
+        const exceeded = (
+            this.totalViolations > budgetLimits.total ||
+            criticalCount > budgetLimits.critical ||
+            highCount > budgetLimits.high ||
+            mediumCount > budgetLimits.medium
+        );
+        
+        // Calculate overall budget utilization
+        const utilization = Math.max(
+            this.totalViolations / budgetLimits.total,
+            criticalCount / Math.max(budgetLimits.critical, 1),
+            highCount / Math.max(budgetLimits.high, 1),
+            mediumCount / Math.max(budgetLimits.medium, 1)
+        );
+        
+        return {
+            exceeded,
+            criticalCount,
+            highCount,
+            mediumCount,
+            budgetLimits,
+            utilization: Math.min(utilization, 1.0)
+        };
+    }
+
+    private countViolationsBySeverity(severity: string): number {
+        let count = 0;
+        for (const results of this.currentResults.values()) {
+            count += results.findings.filter(f => f.severity.toLowerCase() === severity.toLowerCase()).length;
+        }
+        return count;
+    }
+
+    private generateStatusBarTooltip(budgetStatus: any): string {
+        const lines = [];
+        
+        lines.push('Connascence Analysis Status');
+        lines.push('─'.repeat(25));
+        
+        if (budgetStatus.exceeded) {
+            lines.push('🚨 BUDGET LIMITS EXCEEDED');
+        } else {
+            lines.push('✅ Within Budget Limits');
+        }
+        
+        lines.push('');
+        lines.push('Violation Breakdown:');
+        lines.push(`  Critical: ${budgetStatus.criticalCount}/${budgetStatus.budgetLimits.critical} ${budgetStatus.criticalCount > budgetStatus.budgetLimits.critical ? '❌' : '✅'}`);
+        lines.push(`  High: ${budgetStatus.highCount}/${budgetStatus.budgetLimits.high} ${budgetStatus.highCount > budgetStatus.budgetLimits.high ? '❌' : '✅'}`);
+        lines.push(`  Medium: ${budgetStatus.mediumCount}/${budgetStatus.budgetLimits.medium} ${budgetStatus.mediumCount > budgetStatus.budgetLimits.medium ? '❌' : '✅'}`);
+        lines.push(`  Total: ${this.totalViolations}/${budgetStatus.budgetLimits.total} ${this.totalViolations > budgetStatus.budgetLimits.total ? '❌' : '✅'}`);
+        
+        lines.push('');
+        lines.push(`Budget Utilization: ${(budgetStatus.utilization * 100).toFixed(1)}%`);
+        lines.push('');
+        lines.push('Click to open Connascence Dashboard');
+        
+        return lines.join('\n');
     }
 
     private updateTreeView(): void {
@@ -563,8 +657,9 @@ export class UIManager implements vscode.Disposable {
         const allResults = Array.from(this.currentResults.values());
         const summary = this.generateSummary(allResults);
         const charts = this.generateChartData(allResults);
+        const enterpriseData = this.getEnterpriseData();
         
-        this.dashboardPanel.webview.html = generateSimpleDashboardHTML(summary, charts);
+        this.dashboardPanel.webview.html = generateEnterpriseDashboardHTML(summary, charts, enterpriseData);
     }
 
     private createDashboardPanel(): void {
@@ -611,6 +706,54 @@ export class UIManager implements vscode.Disposable {
                     break;
                 case 'aiChat':
                     await this.handleAIChatMessage(message);
+                    break;
+                case 'budgetAction':
+                    await this.handleBudgetAction(message.action, message.data);
+                    break;
+                case 'policyAction':
+                    await this.handlePolicyAction(message.action, message.data);
+                    break;
+                case 'waiverAction':
+                    await this.handleWaiverAction(message.action, message.data);
+                    break;
+                case 'createSnapshot':
+                    await vscode.commands.executeCommand('connascence.createSnapshot');
+                    break;
+                case 'checkBudget':
+                    await vscode.commands.executeCommand('connascence.checkBudget');
+                    break;
+                case 'analyzeWorkspace':
+                    await vscode.commands.executeCommand('connascence.analyzeWorkspace');
+                    break;
+                case 'configureBudgets':
+                    await vscode.commands.executeCommand('connascence.configureBudget');
+                    break;
+                case 'generateBudgetReport':
+                    await vscode.commands.executeCommand('connascence.budgetReport');
+                    break;
+                case 'validateForCI':
+                    await vscode.commands.executeCommand('connascence.validateCI');
+                    break;
+                case 'createBaseline':
+                    await vscode.commands.executeCommand('connascence.createSnapshot');
+                    break;
+                case 'manageWaivers':
+                    await vscode.commands.executeCommand('connascence.viewWaivers');
+                    break;
+                case 'configurePolicies':
+                    await vscode.commands.executeCommand('connascence.configurePolicies');
+                    break;
+                case 'auditCompliance':
+                    await vscode.commands.executeCommand('connascence.auditCompliance');
+                    break;
+                case 'analyzeDrift':
+                    await vscode.commands.executeCommand('connascence.analyzeDrift');
+                    break;
+                case 'recordMeasurement':
+                    await vscode.commands.executeCommand('connascence.recordDrift');
+                    break;
+                case 'exportHistory':
+                    await vscode.commands.executeCommand('connascence.exportDrift');
                     break;
             }
         });
@@ -683,7 +826,85 @@ export class UIManager implements vscode.Disposable {
     }
 
     private generateDashboardHTML(summary: any, charts: any): string {
-        return generateSimpleDashboardHTML(summary, charts);
+        const enterpriseData = this.getEnterpriseData();
+        return generateEnterpriseDashboardHTML(summary, charts, enterpriseData);
+    }
+
+    /**
+     * Get enterprise data for dashboard
+     */
+    private getEnterpriseData(): any {
+        const budgetStatus = this.calculateBudgetStatus();
+        
+        return {
+            budget: {
+                exceeded: budgetStatus.exceeded,
+                mode: this.configService.get('budget.mode', 'BASELINE'),
+                compliant: !budgetStatus.exceeded
+            },
+            baseline: {
+                exists: this.configService.get('baseline.hasSnapshot', false),
+                newViolations: this.configService.get('baseline.newViolations', 0)
+            },
+            drift: {
+                direction: this.configService.get('drift.direction', 'STABLE'),
+                changeRate: this.configService.get('drift.changeRate', '0.0')
+            },
+            waivers: {
+                activeCount: this.configService.get('waivers.activeCount', 0)
+            }
+        };
+    }
+
+    /**
+     * Handle budget-related actions from dashboard
+     */
+    private async handleBudgetAction(action: string, data: any): Promise<void> {
+        switch (action) {
+            case 'configure':
+                await vscode.commands.executeCommand('connascence.configureBudget');
+                break;
+            case 'validate':
+                await vscode.commands.executeCommand('connascence.validateCI');
+                break;
+            case 'report':
+                await vscode.commands.executeCommand('connascence.budgetReport');
+                break;
+        }
+    }
+
+    /**
+     * Handle policy-related actions from dashboard
+     */
+    private async handlePolicyAction(action: string, data: any): Promise<void> {
+        switch (action) {
+            case 'createBaseline':
+                await vscode.commands.executeCommand('connascence.createSnapshot');
+                break;
+            case 'managePolicies':
+                await vscode.commands.executeCommand('connascence.configurePolicies');
+                break;
+            case 'auditCompliance':
+                await vscode.commands.executeCommand('connascence.auditCompliance');
+                break;
+        }
+    }
+
+    /**
+     * Handle waiver-related actions from dashboard
+     */
+    private async handleWaiverAction(action: string, data: any): Promise<void> {
+        switch (action) {
+            case 'view':
+                await vscode.commands.executeCommand('connascence.viewWaivers');
+                break;
+            case 'create':
+                await vscode.commands.executeCommand('connascence.createGlobalWaiver');
+                break;
+            case 'cleanup':
+                await vscode.commands.executeCommand('connascence.cleanupWaivers');
+                break;
+        }
     }
 
     dispose(): void {
@@ -743,6 +964,10 @@ class ConnascenceTreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
                 return this.getViolationGroups();
             case 'severityGroup':
                 return element.children || [];
+            case 'policySection':
+                return this.getPolicyManagementItems();
+            case 'ruleSection':
+                return this.getRuleConfigurationItems();
             case 'markdownSection':
                 return this.getMarkdownFiles();
             case 'markdownFolder':
@@ -759,7 +984,7 @@ class ConnascenceTreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
     private getRootSections(): TreeItem[] {
         const sections: TreeItem[] = [];
         
-        // Violations Section
+        // Violations Section (Enhanced with per-finding actions)
         const violationCount = this.findings.length;
         sections.push({
             label: `Violations (${violationCount})`,
@@ -767,6 +992,24 @@ class ConnascenceTreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
             contextValue: 'violationsSection',
             iconPath: new vscode.ThemeIcon('warning'),
             description: violationCount > 0 ? `${violationCount} issues found` : 'No issues'
+        });
+        
+        // Enterprise Policy Management Section
+        sections.push({
+            label: 'Policy Management',
+            collapsibleState: vscode.TreeItemCollapsibleState.Collapsed,
+            contextValue: 'policySection',
+            iconPath: new vscode.ThemeIcon('shield'),
+            description: 'Baseline • Waivers • Budgets • Drift'
+        });
+        
+        // Rule Configuration Section
+        sections.push({
+            label: 'Rule Configuration',
+            collapsibleState: vscode.TreeItemCollapsibleState.Collapsed,
+            contextValue: 'ruleSection',
+            iconPath: new vscode.ThemeIcon('settings-gear'),
+            description: 'Enable/disable rule families'
         });
         
         // AI Configuration Section
@@ -811,14 +1054,49 @@ class ConnascenceTreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
                 children: findings.map(f => ({
                     label: f.message,
                     description: `${f.file.split('/').pop()}:${f.line}`,
-                    collapsibleState: vscode.TreeItemCollapsibleState.None,
+                    collapsibleState: vscode.TreeItemCollapsibleState.Collapsed,
                     contextValue: 'violation',
                     finding: f,
                     command: {
                         command: 'vscode.open',
                         title: 'Open File',
                         arguments: [vscode.Uri.file(f.file), { selection: new vscode.Range(f.line - 1, 0, f.line - 1, 0) }]
-                    }
+                    },
+                    children: [
+                        {
+                            label: '✓ Ignore This Finding',
+                            collapsibleState: vscode.TreeItemCollapsibleState.None,
+                            contextValue: 'ignoreAction',
+                            iconPath: new vscode.ThemeIcon('circle-slash'),
+                            command: {
+                                command: 'connascence.ignoreFinding',
+                                title: 'Ignore Finding',
+                                arguments: [f]
+                            }
+                        },
+                        {
+                            label: '📝 Create Waiver',
+                            collapsibleState: vscode.TreeItemCollapsibleState.None,
+                            contextValue: 'waiverAction',
+                            iconPath: new vscode.ThemeIcon('note'),
+                            command: {
+                                command: 'connascence.createWaiver',
+                                title: 'Create Waiver',
+                                arguments: [f]
+                            }
+                        },
+                        {
+                            label: '🔧 View Fix Suggestions',
+                            collapsibleState: vscode.TreeItemCollapsibleState.None,
+                            contextValue: 'fixAction',
+                            iconPath: new vscode.ThemeIcon('lightbulb'),
+                            command: {
+                                command: 'connascence.showFixSuggestions',
+                                title: 'Show Fix Suggestions',
+                                arguments: [f]
+                            }
+                        }
+                    ]
                 }))
             });
         }
@@ -1036,6 +1314,208 @@ class ConnascenceTreeDataProvider implements vscode.TreeDataProvider<TreeItem> {
             info: new vscode.ThemeIcon('lightbulb')
         };
         return icons[severity as keyof typeof icons] || icons.info;
+    }
+
+    private getPolicyManagementItems(): TreeItem[] {
+        return [
+            {
+                label: '📸 Baseline Management',
+                collapsibleState: vscode.TreeItemCollapsibleState.Collapsed,
+                contextValue: 'baselineManagement',
+                iconPath: new vscode.ThemeIcon('archive'),
+                description: 'Snapshots and baselines',
+                children: [
+                    {
+                        label: 'Create Snapshot',
+                        collapsibleState: vscode.TreeItemCollapsibleState.None,
+                        contextValue: 'baselineAction',
+                        iconPath: new vscode.ThemeIcon('camera'),
+                        command: {
+                            command: 'connascence.createSnapshot',
+                            title: 'Create Baseline Snapshot'
+                        }
+                    },
+                    {
+                        label: 'View Snapshots',
+                        collapsibleState: vscode.TreeItemCollapsibleState.None,
+                        contextValue: 'baselineAction',
+                        iconPath: new vscode.ThemeIcon('list-unordered'),
+                        command: {
+                            command: 'connascence.listSnapshots',
+                            title: 'List Baseline Snapshots'
+                        }
+                    },
+                    {
+                        label: 'Compare with Baseline',
+                        collapsibleState: vscode.TreeItemCollapsibleState.None,
+                        contextValue: 'baselineAction',
+                        iconPath: new vscode.ThemeIcon('diff'),
+                        command: {
+                            command: 'connascence.compareBaseline',
+                            title: 'Compare with Baseline'
+                        }
+                    }
+                ]
+            },
+            {
+                label: '📝 Waiver Management',
+                collapsibleState: vscode.TreeItemCollapsibleState.Collapsed,
+                contextValue: 'waiverManagement',
+                iconPath: new vscode.ThemeIcon('note'),
+                description: 'Exception handling',
+                children: [
+                    {
+                        label: 'View Active Waivers',
+                        collapsibleState: vscode.TreeItemCollapsibleState.None,
+                        contextValue: 'waiverAction',
+                        iconPath: new vscode.ThemeIcon('list-flat'),
+                        command: {
+                            command: 'connascence.viewWaivers',
+                            title: 'View Active Waivers'
+                        }
+                    },
+                    {
+                        label: 'Create Global Waiver',
+                        collapsibleState: vscode.TreeItemCollapsibleState.None,
+                        contextValue: 'waiverAction',
+                        iconPath: new vscode.ThemeIcon('add'),
+                        command: {
+                            command: 'connascence.createGlobalWaiver',
+                            title: 'Create Global Waiver'
+                        }
+                    },
+                    {
+                        label: 'Cleanup Expired',
+                        collapsibleState: vscode.TreeItemCollapsibleState.None,
+                        contextValue: 'waiverAction',
+                        iconPath: new vscode.ThemeIcon('trash'),
+                        command: {
+                            command: 'connascence.cleanupWaivers',
+                            title: 'Cleanup Expired Waivers'
+                        }
+                    }
+                ]
+            },
+            {
+                label: '💰 Budget Enforcement',
+                collapsibleState: vscode.TreeItemCollapsibleState.Collapsed,
+                contextValue: 'budgetManagement',
+                iconPath: new vscode.ThemeIcon('graph'),
+                description: 'Quality gates and limits',
+                children: [
+                    {
+                        label: 'Check Budget Status',
+                        collapsibleState: vscode.TreeItemCollapsibleState.None,
+                        contextValue: 'budgetAction',
+                        iconPath: new vscode.ThemeIcon('pulse'),
+                        command: {
+                            command: 'connascence.checkBudget',
+                            title: 'Check Budget Status'
+                        }
+                    },
+                    {
+                        label: 'Configure Budgets',
+                        collapsibleState: vscode.TreeItemCollapsibleState.None,
+                        contextValue: 'budgetAction',
+                        iconPath: new vscode.ThemeIcon('settings'),
+                        command: {
+                            command: 'connascence.configureBudget',
+                            title: 'Configure Budget Limits'
+                        }
+                    },
+                    {
+                        label: 'Budget Report',
+                        collapsibleState: vscode.TreeItemCollapsibleState.None,
+                        contextValue: 'budgetAction',
+                        iconPath: new vscode.ThemeIcon('file-text'),
+                        command: {
+                            command: 'connascence.budgetReport',
+                            title: 'Generate Budget Report'
+                        }
+                    }
+                ]
+            },
+            {
+                label: '📈 Drift Analysis',
+                collapsibleState: vscode.TreeItemCollapsibleState.Collapsed,
+                contextValue: 'driftManagement',
+                iconPath: new vscode.ThemeIcon('trending-up'),
+                description: 'Trend monitoring',
+                children: [
+                    {
+                        label: 'Analyze Trends',
+                        collapsibleState: vscode.TreeItemCollapsibleState.None,
+                        contextValue: 'driftAction',
+                        iconPath: new vscode.ThemeIcon('graph-line'),
+                        command: {
+                            command: 'connascence.analyzeDrift',
+                            title: 'Analyze Quality Trends'
+                        }
+                    },
+                    {
+                        label: 'Record Measurement',
+                        collapsibleState: vscode.TreeItemCollapsibleState.None,
+                        contextValue: 'driftAction',
+                        iconPath: new vscode.ThemeIcon('record'),
+                        command: {
+                            command: 'connascence.recordDrift',
+                            title: 'Record Drift Measurement'
+                        }
+                    },
+                    {
+                        label: 'Export History',
+                        collapsibleState: vscode.TreeItemCollapsibleState.None,
+                        contextValue: 'driftAction',
+                        iconPath: new vscode.ThemeIcon('export'),
+                        command: {
+                            command: 'connascence.exportDrift',
+                            title: 'Export Drift History'
+                        }
+                    }
+                ]
+            }
+        ];
+    }
+
+    private getRuleConfigurationItems(): TreeItem[] {
+        const ruleCategories = [
+            { name: 'Static Connascence', enabled: true, rules: ['Name', 'Type', 'Meaning', 'Position', 'Algorithm'] },
+            { name: 'Dynamic Connascence', enabled: true, rules: ['Execution', 'Timing', 'Value', 'Identity'] },
+            { name: 'Locality Rules', enabled: false, rules: ['Within Method', 'Within Class', 'Across Classes'] },
+            { name: 'Degree Rules', enabled: true, rules: ['Fan-out', 'Complexity', 'God Objects'] }
+        ];
+
+        return ruleCategories.map(category => ({
+            label: `${category.enabled ? '✅' : '❌'} ${category.name}`,
+            collapsibleState: vscode.TreeItemCollapsibleState.Collapsed,
+            contextValue: 'ruleCategory',
+            iconPath: new vscode.ThemeIcon(category.enabled ? 'check' : 'close'),
+            description: `${category.rules.length} rules`,
+            children: [
+                {
+                    label: category.enabled ? 'Disable Category' : 'Enable Category',
+                    collapsibleState: vscode.TreeItemCollapsibleState.None,
+                    contextValue: 'ruleCategoryAction',
+                    iconPath: new vscode.ThemeIcon(category.enabled ? 'stop' : 'play'),
+                    command: {
+                        command: 'connascence.toggleRuleCategory',
+                        title: 'Toggle Rule Category',
+                        arguments: [category.name, !category.enabled]
+                    }
+                },
+                ...category.rules.map(rule => ({
+                    label: `${category.enabled ? '✓' : '○'} ${rule}`,
+                    collapsibleState: vscode.TreeItemCollapsibleState.None,
+                    contextValue: 'ruleItem',
+                    iconPath: new vscode.ThemeIcon(category.enabled ? 'check' : 'circle-outline'),
+                    command: {
+                        command: 'connascence.configureRule',
+                        title: 'Configure Rule',
+                        arguments: [rule]
+                    }
+                }))
+            ]
+        }));
     }
 }
 

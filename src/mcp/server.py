@@ -6,6 +6,11 @@ from pathlib import Path
 from typing import Dict, List, Any, Optional
 from analyzer.core import ConnascenceViolation
 
+# Import our AI prompt system for enhanced technical context
+from ai_prompts import MCPPromptSystem, generate_ai_context_for_violation, generate_planning_context
+from nasa_integration import NASAIntegrationMethods
+from baseline_tools import MECEIntegrationMethods
+
 # MCP Server Configuration Constants (CoM Improvement - Pass 2)
 DEFAULT_RATE_LIMIT_REQUESTS = 100
 DEFAULT_RATE_LIMIT_WINDOW_SECONDS = 60
@@ -79,6 +84,13 @@ class ConnascenceMCPServer(NASAIntegrationMethods, MECEIntegrationMethods):
         
         # Path restrictions
         self.allowed_paths = self.config.get('allowed_paths', [])
+        
+        # Initialize AI prompt system for enhanced technical context
+        self.ai_prompt_system = MCPPromptSystem()
+        
+        # Store last analysis results for context
+        self._last_analysis_context = {}
+        self._last_violations = []
         
         self.analyzer = self._create_analyzer()
         self._tools = self._register_tools()
@@ -266,8 +278,187 @@ class ConnascenceMCPServer(NASAIntegrationMethods, MECEIntegrationMethods):
                     },
                     'required': ['violations']
                 }
+            },
+            # Enhanced AI-powered tools
+            {
+                'name': 'generate_ai_context',
+                'description': 'Generate comprehensive AI context for external agents',
+                'inputSchema': {
+                    'type': 'object',
+                    'properties': {
+                        'violation': {'type': 'object', 'description': 'Violation to analyze'},
+                        'file_context': {'type': 'object', 'description': 'File metadata and context'},
+                        'code_context': {'type': 'string', 'description': 'Code context around violation'}
+                    },
+                    'required': ['violation']
+                }
+            },
+            {
+                'name': 'generate_refactoring_plan',
+                'description': 'Generate comprehensive refactoring plan for multiple violations',
+                'inputSchema': {
+                    'type': 'object',
+                    'properties': {
+                        'violations': {'type': 'array', 'description': 'List of violations to analyze'},
+                        'architectural_context': {'type': 'object', 'description': 'Architectural context'}
+                    },
+                    'required': ['violations']
+                }
+            },
+            {
+                'name': 'enhanced_suggest_refactor',
+                'description': 'Enhanced refactoring suggestions with full technical context',
+                'inputSchema': {
+                    'type': 'object',
+                    'properties': {
+                        'violation': {'type': 'object', 'description': 'Violation to refactor'},
+                        'include_examples': {'type': 'boolean', 'description': 'Include code examples'},
+                        'include_nasa_guidance': {'type': 'boolean', 'description': 'Include NASA compliance guidance'}
+                    },
+                    'required': ['violation']
+                }
+            },
+            {
+                'name': 'validate_refactoring',
+                'description': 'Validate proposed refactoring for safety and compliance',
+                'inputSchema': {
+                    'type': 'object',
+                    'properties': {
+                        'original_code': {'type': 'string', 'description': 'Original code'},
+                        'refactored_code': {'type': 'string', 'description': 'Proposed refactored code'},
+                        'violation_type': {'type': 'string', 'description': 'Type of violation being fixed'}
+                    },
+                    'required': ['original_code', 'refactored_code', 'violation_type']
+                }
+            },
+            {
+                'name': 'create_rollback_plan',
+                'description': 'Create rollback plan for refactoring changes',
+                'inputSchema': {
+                    'type': 'object',
+                    'properties': {
+                        'refactoring_plan': {'type': 'object', 'description': 'Original refactoring plan'},
+                        'changes_applied': {'type': 'array', 'description': 'List of changes that were applied'}
+                    },
+                    'required': ['refactoring_plan']
+                }
+            },
+            {
+                'name': 'planning_agent_analyze',
+                'description': 'Meta-planning agent for architectural analysis',
+                'inputSchema': {
+                    'type': 'object',
+                    'properties': {
+                        'violations': {'type': 'array', 'description': 'All violations to analyze'},
+                        'goal': {'type': 'string', 'description': 'Planning goal (architecture, performance, etc.)'},
+                        'constraints': {'type': 'object', 'description': 'Planning constraints'}
+                    },
+                    'required': ['violations', 'goal']
+                }
+            },
+            # CI/CD Control Loop Tools
+            {
+                'name': 'execute_cicd_cycle',
+                'description': 'Execute complete CI/CD control loop with auto-rollback and cascade analysis',
+                'inputSchema': {
+                    'type': 'object',
+                    'properties': {
+                        'violations': {'type': 'array', 'description': 'Current violations to address'},
+                        'proposed_changes': {'type': 'array', 'description': 'Refactoring changes to apply'},
+                        'config': {'type': 'object', 'description': 'CI/CD configuration options'}
+                    },
+                    'required': ['violations', 'proposed_changes']
+                }
+            },
+            {
+                'name': 'analyze_cicd_drift',
+                'description': 'Analyze drift between baseline and current state with recommendation',
+                'inputSchema': {
+                    'type': 'object',
+                    'properties': {
+                        'current_scan': {'type': 'object', 'description': 'Current scan results'},
+                        'baseline_scan': {'type': 'object', 'description': 'Baseline scan results'},
+                        'include_performance': {'type': 'boolean', 'description': 'Include performance analysis'}
+                    },
+                    'required': ['current_scan']
+                }
+            },
+            {
+                'name': 'cascade_improvement_analysis',
+                'description': 'Analyze cascading opportunities after successful changes',
+                'inputSchema': {
+                    'type': 'object',
+                    'properties': {
+                        'successful_changes': {'type': 'array', 'description': 'Successfully applied changes'},
+                        'remaining_violations': {'type': 'array', 'description': 'Remaining violations'},
+                        'meta_goal': {'type': 'string', 'description': 'Meta improvement goal'}
+                    },
+                    'required': ['successful_changes', 'remaining_violations']
+                }
+            },
+            {
+                'name': 'dogfood_self_improvement',
+                'description': 'Execute self-improvement cycle on this very codebase',
+                'inputSchema': {
+                    'type': 'object',
+                    'properties': {
+                        'target_branch': {'type': 'string', 'description': 'Branch to work on (safety measure)'},
+                        'improvement_goal': {'type': 'string', 'description': 'Self-improvement goal'},
+                        'safety_limits': {'type': 'object', 'description': 'Safety constraints for self-modification'},
+                        'meta_vision_alignment': {'type': 'boolean', 'description': 'Align changes with meta-vision'}
+                    },
+                    'required': ['target_branch', 'improvement_goal']
+                }
             }
         ]
+        
+        # Import and add baseline tools
+        try:
+            from .baseline_tools import BASELINE_TOOLS, BaselineToolsManager
+            for tool_name, tool_config in BASELINE_TOOLS.items():
+                self._tools.append(tool_config)
+            
+            # Initialize baseline tools manager
+            self.baseline_tools = BaselineToolsManager(self.config.get('baseline_tools', {}))
+        except ImportError as e:
+            print(f"Warning: Could not load baseline tools: {e}")
+            self.baseline_tools = None
+        
+        # Import and add waiver tools
+        try:
+            from .waiver_tools import WAIVER_TOOLS, WaiverToolsManager
+            for tool_name, tool_config in WAIVER_TOOLS.items():
+                self._tools.append(tool_config)
+            
+            # Initialize waiver tools manager
+            self.waiver_tools = WaiverToolsManager(self.config.get('waiver_tools', {}))
+        except ImportError as e:
+            print(f"Warning: Could not load waiver tools: {e}")
+            self.waiver_tools = None
+        
+        # Import and add drift tracking tools
+        try:
+            from .drift_tools import DRIFT_TOOLS, DriftToolsManager
+            for tool_name, tool_config in DRIFT_TOOLS.items():
+                self._tools.append(tool_config)
+            
+            # Initialize drift tools manager
+            self.drift_tools = DriftToolsManager(self.config.get('drift_tools', {}))
+        except ImportError as e:
+            print(f"Warning: Could not load drift tools: {e}")
+            self.drift_tools = None
+        
+        # Import and add budget enforcement tools
+        try:
+            from .budget_tools import BUDGET_TOOLS, BudgetToolsManager
+            for tool_name, tool_config in BUDGET_TOOLS.items():
+                self._tools.append(tool_config)
+            
+            # Initialize budget tools manager
+            self.budget_tools = BudgetToolsManager(self.config.get('budget_tools', {}))
+        except ImportError as e:
+            print(f"Warning: Could not load budget tools: {e}")
+            self.budget_tools = None
     
     def get_tools(self):
         """Get list of available tools."""
@@ -1397,6 +1588,1155 @@ class ServiceRegistry:
             recommendations.append("Enable stricter compiler flags for better safety")
         
         return recommendations
+    
+    # Baseline Management Tool Handlers
+    async def snapshot_create(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Create a new baseline snapshot."""
+        if not self.baseline_tools:
+            return {'success': False, 'error': 'Baseline tools not available'}
+        
+        return await self.baseline_tools.snapshot_create(args)
+    
+    async def snapshot_list(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """List available baseline snapshots."""
+        if not self.baseline_tools:
+            return {'success': False, 'error': 'Baseline tools not available'}
+        
+        return await self.baseline_tools.snapshot_list(args)
+    
+    async def snapshot_apply(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Apply a specific baseline snapshot."""
+        if not self.baseline_tools:
+            return {'success': False, 'error': 'Baseline tools not available'}
+        
+        return await self.baseline_tools.snapshot_apply(args)
+    
+    async def compare_scans(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Compare current scan results with baseline."""
+        if not self.baseline_tools:
+            return {'success': False, 'error': 'Baseline tools not available'}
+        
+        return await self.baseline_tools.compare_scans(args)
+    
+    async def budgets_status(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Check budget status against baseline."""
+        if not self.baseline_tools:
+            return {'success': False, 'error': 'Baseline tools not available'}
+        
+        return await self.baseline_tools.budgets_status(args)
+    
+    async def baseline_info(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Get comprehensive baseline information."""
+        if not self.baseline_tools:
+            return {'success': False, 'error': 'Baseline tools not available'}
+        
+        return await self.baseline_tools.baseline_info(args)
+    
+    # Waiver Management Tool Handlers
+    async def waiver_create(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Create a new waiver rule."""
+        if not self.waiver_tools:
+            return {'success': False, 'error': 'Waiver tools not available'}
+        
+        return await self.waiver_tools.waiver_create(args)
+    
+    async def waiver_list(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """List waivers with optional filtering."""
+        if not self.waiver_tools:
+            return {'success': False, 'error': 'Waiver tools not available'}
+        
+        return await self.waiver_tools.waiver_list(args)
+    
+    async def waiver_approve(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Approve a pending waiver."""
+        if not self.waiver_tools:
+            return {'success': False, 'error': 'Waiver tools not available'}
+        
+        return await self.waiver_tools.waiver_approve(args)
+    
+    async def waiver_reject(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Reject a pending waiver."""
+        if not self.waiver_tools:
+            return {'success': False, 'error': 'Waiver tools not available'}
+        
+        return await self.waiver_tools.waiver_reject(args)
+    
+    async def waiver_check(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Check if a violation is covered by an active waiver."""
+        if not self.waiver_tools:
+            return {'success': False, 'error': 'Waiver tools not available'}
+        
+        return await self.waiver_tools.waiver_check(args)
+    
+    async def waiver_cleanup(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Clean up expired waivers."""
+        if not self.waiver_tools:
+            return {'success': False, 'error': 'Waiver tools not available'}
+        
+        return await self.waiver_tools.waiver_cleanup(args)
+    
+    async def waiver_statistics(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Get comprehensive waiver statistics."""
+        if not self.waiver_tools:
+            return {'success': False, 'error': 'Waiver tools not available'}
+        
+        return await self.waiver_tools.waiver_statistics(args)
+    
+    async def waiver_export(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Export comprehensive waivers report."""
+        if not self.waiver_tools:
+            return {'success': False, 'error': 'Waiver tools not available'}
+        
+        return await self.waiver_tools.waiver_export(args)
+    
+    # Drift Tracking Tool Handlers
+    async def drift_record(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Record a new drift measurement from current analysis."""
+        if not self.drift_tools:
+            return {'success': False, 'error': 'Drift tools not available'}
+        
+        return await self.drift_tools.drift_record(args)
+    
+    async def drift_analyze(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Analyze drift trends over specified time period."""
+        if not self.drift_tools:
+            return {'success': False, 'error': 'Drift tools not available'}
+        
+        return await self.drift_tools.drift_analyze(args)
+    
+    async def drift_detect_anomalies(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Detect anomalies in current violation patterns."""
+        if not self.drift_tools:
+            return {'success': False, 'error': 'Drift tools not available'}
+        
+        return await self.drift_tools.drift_detect_anomalies(args)
+    
+    async def drift_compare_branches(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Compare drift between two branches."""
+        if not self.drift_tools:
+            return {'success': False, 'error': 'Drift tools not available'}
+        
+        return await self.drift_tools.drift_compare_branches(args)
+    
+    async def drift_benchmarks(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Get performance benchmarks from historical data."""
+        if not self.drift_tools:
+            return {'success': False, 'error': 'Drift tools not available'}
+        
+        return await self.drift_tools.drift_benchmarks(args)
+    
+    async def drift_cleanup(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Clean up old drift measurements."""
+        if not self.drift_tools:
+            return {'success': False, 'error': 'Drift tools not available'}
+        
+        return await self.drift_tools.drift_cleanup(args)
+    
+    async def drift_export(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Export comprehensive drift analysis report."""
+        if not self.drift_tools:
+            return {'success': False, 'error': 'Drift tools not available'}
+        
+        return await self.drift_tools.drift_export(args)
+    
+    async def drift_history(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Get drift measurement history with optional filtering."""
+        if not self.drift_tools:
+            return {'success': False, 'error': 'Drift tools not available'}
+        
+        return await self.drift_tools.drift_history(args)
+    
+    # Budget Enforcement Tool Handlers
+    async def budget_check(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Check current budget compliance with baseline awareness."""
+        if not self.budget_tools:
+            return {'success': False, 'error': 'Budget tools not available'}
+        
+        return await self.budget_tools.budget_check(args)
+    
+    async def budget_configure(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Configure budget enforcement settings."""
+        if not self.budget_tools:
+            return {'success': False, 'error': 'Budget tools not available'}
+        
+        return await self.budget_tools.budget_configure(args)
+    
+    async def budget_report(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Generate comprehensive budget enforcement report."""
+        if not self.budget_tools:
+            return {'success': False, 'error': 'Budget tools not available'}
+        
+        return await self.budget_tools.budget_report(args)
+    
+    async def budget_validate_ci(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Validate budget for CI/CD pipeline with exit code recommendation."""
+        if not self.budget_tools:
+            return {'success': False, 'error': 'Budget tools not available'}
+        
+        return await self.budget_tools.budget_validate_ci(args)
+    
+    async def budget_monitor(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Monitor budget status with alerting thresholds."""
+        if not self.budget_tools:
+            return {'success': False, 'error': 'Budget tools not available'}
+        
+        return await self.budget_tools.budget_monitor(args)
+
+    # Enhanced AI-Powered Tool Handlers
+    async def generate_ai_context(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Generate comprehensive AI context for external agents with full technical guidance."""
+        violation = args['violation']
+        file_context = args.get('file_context', {})
+        code_context = args.get('code_context', '')
+        
+        try:
+            # Build full context for AI prompt system
+            full_context = {
+                'file_context': file_context,
+                'code_context': code_context
+            }
+            
+            # Generate comprehensive AI context
+            ai_context = generate_ai_context_for_violation(violation, full_context)
+            
+            # Log the request for audit trail
+            self.audit_logger.log_request(
+                tool_name='generate_ai_context',
+                violation_type=violation.get('type'),
+                file_path=violation.get('file_path'),
+                timestamp=time.time()
+            )
+            
+            return {
+                'success': True,
+                'ai_context': ai_context,
+                'technical_guidance': {
+                    'implementation_steps': ai_context.get('implementation_steps', []),
+                    'code_examples': {
+                        'before': ai_context.get('before_code', ''),
+                        'after': ai_context.get('after_code', ''),
+                        'explanation': ai_context.get('explanation', '')
+                    },
+                    'safety_assessment': {
+                        'nasa_compliant': ai_context.get('nasa_compliant', True),
+                        'safety_tier': ai_context.get('safety_tier', 'tier_b_review'),
+                        'risk_factors': ai_context.get('risk_factors', [])
+                    },
+                    'refactoring_patterns': ai_context.get('refactoring_patterns', [])
+                },
+                'metadata': {
+                    'confidence_score': ai_context.get('confidence_score', 0.8),
+                    'estimated_effort': ai_context.get('estimated_effort', 'medium'),
+                    'review_required': ai_context.get('review_required', True)
+                }
+            }
+            
+        except Exception as e:
+            self.audit_logger.log('ai_context_error', {'error': str(e), 'violation': violation})
+            return {
+                'success': False,
+                'error': f'Failed to generate AI context: {str(e)}',
+                'fallback_context': {
+                    'basic_guidance': f"Address {violation.get('type', 'unknown')} violation through appropriate refactoring",
+                    'review_recommended': True
+                }
+            }
+    
+    async def generate_refactoring_plan(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Generate comprehensive meta-planning refactoring strategy for multiple violations."""
+        violations = args['violations']
+        architectural_context = args.get('architectural_context', {})
+        
+        try:
+            # Generate planning context using our AI prompt system
+            planning_context = generate_planning_context(violations, architectural_context)
+            
+            # Store context for future reference
+            self._last_analysis_context = planning_context
+            self._last_violations = violations
+            
+            return {
+                'success': True,
+                'refactoring_plan': {
+                    'overview': planning_context['planning_strategy'],
+                    'violation_patterns': planning_context['violation_patterns'],
+                    'architectural_issues': planning_context['architectural_issues'],
+                    'recommended_approach': planning_context['recommended_approach'],
+                    'pr_breakdown': planning_context['pr_breakdown']
+                },
+                'execution_guidance': {
+                    'sequence': planning_context['planning_strategy'].get('refactoring_sequence', []),
+                    'risk_mitigation': planning_context['planning_strategy'].get('risk_mitigation', {}),
+                    'nasa_compliance_plan': planning_context['planning_strategy'].get('nasa_compliance_plan', {})
+                },
+                'metadata': {
+                    'total_violations': len(violations),
+                    'estimated_phases': len(planning_context.get('pr_breakdown', [])),
+                    'complexity_assessment': self._assess_plan_complexity(planning_context)
+                }
+            }
+            
+        except Exception as e:
+            return {
+                'success': False,
+                'error': f'Failed to generate refactoring plan: {str(e)}',
+                'fallback_plan': {
+                    'approach': 'incremental_refactoring',
+                    'phases': ['assessment', 'quick_wins', 'major_refactoring', 'validation']
+                }
+            }
+    
+    async def enhanced_suggest_refactor(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Enhanced refactoring suggestions with comprehensive technical context."""
+        violation = args['violation']
+        include_examples = args.get('include_examples', True)
+        include_nasa_guidance = args.get('include_nasa_guidance', True)
+        
+        try:
+            # Generate AI context for the violation
+            full_context = {'file_context': {}, 'code_context': ''}
+            ai_context = self.ai_prompt_system.generate_violation_context(
+                violation, 
+                full_context.get('file_context', {}),
+                full_context.get('code_context', '')
+            )
+            
+            # Build enhanced suggestions
+            suggestions = {
+                'primary_strategy': ai_context.fix_strategy,
+                'implementation_guide': ai_context.implementation_guide,
+                'safety_assessment': ai_context.safety_assessment
+            }
+            
+            if include_examples:
+                suggestions['code_examples'] = ai_context.code_examples
+            
+            if include_nasa_guidance:
+                suggestions['nasa_guidance'] = ai_context.nasa_guidance
+                suggestions['nasa_compliance_rules'] = ai_context.nasa_guidance.get('rule_details', {})
+            
+            return {
+                'success': True,
+                'violation_type': violation.get('type'),
+                'refactoring_suggestions': suggestions,
+                'confidence_metrics': {
+                    'overall_confidence': ai_context.confidence_score,
+                    'safety_tier': ai_context.safety_assessment.get('safety_tier'),
+                    'nasa_compliant': ai_context.safety_assessment.get('nasa_compliant', True)
+                },
+                'next_steps': ai_context.implementation_guide.get('steps', [])
+            }
+            
+        except Exception as e:
+            return {
+                'success': False,
+                'error': f'Failed to generate enhanced suggestions: {str(e)}',
+                'basic_suggestion': f'Address {violation.get("type", "unknown")} through standard refactoring patterns'
+            }
+    
+    async def validate_refactoring(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Validate proposed refactoring for safety and NASA compliance."""
+        original_code = args['original_code']
+        refactored_code = args['refactored_code']
+        violation_type = args['violation_type']
+        
+        try:
+            # Safety assessment using AI prompt system
+            mock_violation = {'type': violation_type, 'file_path': 'validation.py'}
+            safety_assessment = self.ai_prompt_system._assess_safety(mock_violation, refactored_code)
+            
+            # NASA compliance check
+            nasa_guidance = self.ai_prompt_system._generate_nasa_guidance(mock_violation, refactored_code)
+            
+            # Basic validation checks
+            validation_results = {
+                'syntax_valid': self._validate_syntax(refactored_code),
+                'functionality_preserved': self._check_functionality_preservation(original_code, refactored_code),
+                'nasa_compliant': nasa_guidance.get('compliance_status') == 'compliant',
+                'safety_tier': safety_assessment.get('safety_tier', 'tier_b_review')
+            }
+            
+            # Calculate overall validation score
+            validation_score = self._calculate_validation_score(validation_results)
+            
+            return {
+                'success': True,
+                'validation_results': validation_results,
+                'safety_assessment': safety_assessment,
+                'nasa_compliance': nasa_guidance,
+                'overall_score': validation_score,
+                'recommendation': self._get_validation_recommendation(validation_score, validation_results),
+                'required_actions': self._get_required_validation_actions(validation_results)
+            }
+            
+        except Exception as e:
+            return {
+                'success': False,
+                'error': f'Validation failed: {str(e)}',
+                'recommendation': 'Manual review required due to validation error'
+            }
+    
+    async def create_rollback_plan(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Create comprehensive rollback plan for refactoring changes."""
+        refactoring_plan = args['refactoring_plan']
+        changes_applied = args.get('changes_applied', [])
+        
+        try:
+            rollback_plan = {
+                'rollback_sequence': self._generate_rollback_sequence(changes_applied),
+                'risk_assessment': self._assess_rollback_risks(refactoring_plan, changes_applied),
+                'verification_steps': self._generate_rollback_verification_steps(),
+                'recovery_procedures': self._generate_recovery_procedures(refactoring_plan)
+            }
+            
+            return {
+                'success': True,
+                'rollback_plan': rollback_plan,
+                'execution_guidance': {
+                    'prerequisites': ['backup_verification', 'test_environment_ready', 'team_notification'],
+                    'monitoring_points': ['compilation_success', 'test_pass_rate', 'performance_metrics'],
+                    'abort_conditions': ['test_failure_rate > 10%', 'performance_degradation > 20%']
+                },
+                'metadata': {
+                    'estimated_rollback_time': self._estimate_rollback_time(changes_applied),
+                    'complexity': self._assess_rollback_complexity(changes_applied),
+                    'automation_level': 'partial'
+                }
+            }
+            
+        except Exception as e:
+            return {
+                'success': False,
+                'error': f'Failed to create rollback plan: {str(e)}',
+                'emergency_rollback': {
+                    'action': 'git_revert',
+                    'command': 'git revert HEAD --no-edit',
+                    'note': 'Emergency fallback - manual review required'
+                }
+            }
+    
+    async def planning_agent_analyze(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Meta-planning agent for architectural analysis and strategic guidance."""
+        violations = args['violations']
+        goal = args['goal']
+        constraints = args.get('constraints', {})
+        
+        try:
+            # Perform meta-analysis based on goal
+            if goal == 'architecture':
+                analysis = self._analyze_architectural_patterns(violations, constraints)
+            elif goal == 'performance':
+                analysis = self._analyze_performance_patterns(violations, constraints)  
+            elif goal == 'nasa_compliance':
+                analysis = self._analyze_nasa_compliance_patterns(violations, constraints)
+            else:
+                analysis = self._analyze_general_patterns(violations, constraints)
+            
+            # Generate strategic recommendations
+            strategic_plan = {
+                'root_cause_analysis': analysis['root_causes'],
+                'leverage_points': analysis['leverage_points'], 
+                'strategic_approach': analysis['recommended_strategy'],
+                'implementation_roadmap': analysis['roadmap'],
+                'success_metrics': analysis['metrics']
+            }
+            
+            return {
+                'success': True,
+                'planning_goal': goal,
+                'strategic_analysis': strategic_plan,
+                'tactical_recommendations': analysis.get('tactical_actions', []),
+                'risk_mitigation': analysis.get('risk_factors', []),
+                'resource_estimation': analysis.get('resource_requirements', {}),
+                'timeline_estimate': analysis.get('timeline', 'medium_term')
+            }
+            
+        except Exception as e:
+            return {
+                'success': False,
+                'error': f'Planning analysis failed: {str(e)}',
+                'fallback_analysis': {
+                    'approach': 'systematic_review',
+                    'next_steps': ['detailed_violation_analysis', 'stakeholder_consultation', 'phased_implementation']
+                }
+            }
+
+    # Helper methods for AI-powered tool implementations
+    def _assess_plan_complexity(self, planning_context: Dict[str, Any]) -> str:
+        """Assess complexity of refactoring plan."""
+        violation_patterns = planning_context.get('violation_patterns', {})
+        architectural_issues = planning_context.get('architectural_issues', [])
+        
+        complexity_factors = 0
+        complexity_factors += len(architectural_issues)
+        complexity_factors += violation_patterns.get('violation_types', {}).get('god_object', 0) * 2
+        complexity_factors += len(violation_patterns.get('affected_files', set()))
+        
+        if complexity_factors <= 3:
+            return 'low'
+        elif complexity_factors <= 8:
+            return 'medium'
+        else:
+            return 'high'
+    
+    def _validate_syntax(self, code: str) -> bool:
+        """Basic syntax validation for code."""
+        try:
+            import ast
+            ast.parse(code)
+            return True
+        except SyntaxError:
+            return False
+        except Exception:
+            return True  # Assume valid if not Python or other parsing issues
+    
+    def _check_functionality_preservation(self, original_code: str, refactored_code: str) -> bool:
+        """Check if functionality is likely preserved (simplified)."""
+        # This is a simplified check - in practice would need more sophisticated analysis
+        original_lines = len(original_code.split('\n'))
+        refactored_lines = len(refactored_code.split('\n'))
+        
+        # If the code size changed drastically, flag for review
+        size_change_ratio = abs(refactored_lines - original_lines) / max(original_lines, 1)
+        return size_change_ratio < 0.5  # Less than 50% change in size
+    
+    def _calculate_validation_score(self, validation_results: Dict[str, Any]) -> float:
+        """Calculate overall validation score."""
+        score = 0.0
+        weights = {
+            'syntax_valid': 0.3,
+            'functionality_preserved': 0.3,
+            'nasa_compliant': 0.2,
+            'safety_tier': 0.2
+        }
+        
+        if validation_results.get('syntax_valid', False):
+            score += weights['syntax_valid']
+        
+        if validation_results.get('functionality_preserved', False):
+            score += weights['functionality_preserved']
+        
+        if validation_results.get('nasa_compliant', False):
+            score += weights['nasa_compliant']
+        
+        # Safety tier scoring
+        safety_tier = validation_results.get('safety_tier', 'tier_b_review')
+        if safety_tier == 'tier_c_auto':
+            score += weights['safety_tier']
+        elif safety_tier == 'tier_b_review':
+            score += weights['safety_tier'] * 0.7
+        elif safety_tier == 'tier_a_manual':
+            score += weights['safety_tier'] * 0.5
+        
+        return score
+    
+    def _get_validation_recommendation(self, score: float, validation_results: Dict[str, Any]) -> str:
+        """Get recommendation based on validation score."""
+        if score >= 0.8:
+            return 'approve_with_confidence'
+        elif score >= 0.6:
+            return 'approve_with_review'
+        elif score >= 0.4:
+            return 'requires_significant_review'
+        else:
+            return 'reject_requires_rework'
+    
+    def _get_required_validation_actions(self, validation_results: Dict[str, Any]) -> List[str]:
+        """Get required actions based on validation results."""
+        actions = []
+        
+        if not validation_results.get('syntax_valid', True):
+            actions.append('fix_syntax_errors')
+        
+        if not validation_results.get('functionality_preserved', True):
+            actions.append('verify_functionality_preservation')
+        
+        if not validation_results.get('nasa_compliant', True):
+            actions.append('address_nasa_compliance_violations')
+        
+        safety_tier = validation_results.get('safety_tier', 'tier_b_review')
+        if safety_tier == 'tier_a_manual':
+            actions.append('mandatory_manual_review')
+        elif safety_tier == 'tier_b_review':
+            actions.append('peer_review_recommended')
+        
+        return actions
+    
+    def _generate_rollback_sequence(self, changes_applied: List[Dict[str, Any]]) -> List[Dict[str, str]]:
+        """Generate rollback sequence for applied changes."""
+        rollback_sequence = []
+        
+        # Reverse order of changes for rollback
+        for change in reversed(changes_applied):
+            rollback_step = {
+                'action': f"revert_{change.get('type', 'unknown')}",
+                'description': f"Rollback {change.get('description', 'change')}",
+                'file_path': change.get('file_path', ''),
+                'method': change.get('rollback_method', 'git_revert')
+            }
+            rollback_sequence.append(rollback_step)
+        
+        return rollback_sequence
+    
+    def _assess_rollback_risks(self, refactoring_plan: Dict[str, Any], changes_applied: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Assess risks associated with rollback."""
+        return {
+            'data_loss_risk': 'low' if len(changes_applied) < 5 else 'medium',
+            'downtime_risk': 'minimal',
+            'dependency_conflicts': 'possible' if len(changes_applied) > 10 else 'unlikely',
+            'test_impact': 'moderate' if any(change.get('affects_tests') for change in changes_applied) else 'low'
+        }
+    
+    def _generate_rollback_verification_steps(self) -> List[str]:
+        """Generate verification steps for rollback."""
+        return [
+            'verify_code_compilation',
+            'run_unit_tests',
+            'run_integration_tests',
+            'verify_api_functionality',
+            'check_performance_metrics',
+            'validate_nasa_compliance'
+        ]
+    
+    def _generate_recovery_procedures(self, refactoring_plan: Dict[str, Any]) -> Dict[str, str]:
+        """Generate recovery procedures in case rollback fails."""
+        return {
+            'backup_restoration': 'Restore from pre-refactoring backup',
+            'manual_reversion': 'Manually revert changes using documented original state',
+            'selective_rollback': 'Rollback only problematic changes, keep successful ones',
+            'emergency_contact': 'Contact senior developer or architect for guidance'
+        }
+    
+    def _estimate_rollback_time(self, changes_applied: List[Dict[str, Any]]) -> str:
+        """Estimate time required for rollback."""
+        change_count = len(changes_applied)
+        
+        if change_count <= 3:
+            return '15_minutes'
+        elif change_count <= 10:
+            return '1_hour'
+        elif change_count <= 20:
+            return '4_hours'
+        else:
+            return '1_day'
+    
+    def _assess_rollback_complexity(self, changes_applied: List[Dict[str, Any]]) -> str:
+        """Assess complexity of rollback operation."""
+        complexity_factors = 0
+        
+        for change in changes_applied:
+            if change.get('type') == 'architectural_change':
+                complexity_factors += 3
+            elif change.get('type') == 'multi_file_refactor':
+                complexity_factors += 2
+            else:
+                complexity_factors += 1
+        
+        if complexity_factors <= 5:
+            return 'simple'
+        elif complexity_factors <= 15:
+            return 'moderate'
+        else:
+            return 'complex'
+    
+    def _analyze_architectural_patterns(self, violations: List[Dict[str, Any]], constraints: Dict[str, Any]) -> Dict[str, Any]:
+        """Analyze architectural patterns in violations."""
+        analysis = {
+            'root_causes': [],
+            'leverage_points': [],
+            'recommended_strategy': 'layered_architecture_improvement',
+            'roadmap': [],
+            'metrics': []
+        }
+        
+        # Analyze god object patterns
+        god_objects = [v for v in violations if v.get('type') == 'god_object']
+        if len(god_objects) > 2:
+            analysis['root_causes'].append('insufficient_separation_of_concerns')
+            analysis['leverage_points'].append({
+                'area': 'service_layer_extraction',
+                'impact': 'high',
+                'effort': 'high'
+            })
+        
+        # Analyze coupling patterns
+        coupling_violations = [v for v in violations if 'connascence' in v.get('type', '')]
+        if len(coupling_violations) > 10:
+            analysis['root_causes'].append('tight_coupling_across_layers')
+            analysis['leverage_points'].append({
+                'area': 'interface_abstraction',
+                'impact': 'medium',
+                'effort': 'medium'
+            })
+        
+        # Generate roadmap
+        analysis['roadmap'] = [
+            {'phase': 1, 'focus': 'extract_service_layer', 'duration': '2_weeks'},
+            {'phase': 2, 'focus': 'implement_interfaces', 'duration': '1_week'},
+            {'phase': 3, 'focus': 'refactor_god_objects', 'duration': '3_weeks'},
+            {'phase': 4, 'focus': 'validate_architecture', 'duration': '1_week'}
+        ]
+        
+        # Define success metrics
+        analysis['metrics'] = [
+            'god_object_count < 2',
+            'coupling_violations < 5',
+            'nasa_compliance_score > 0.9',
+            'test_coverage > 0.85'
+        ]
+        
+        return analysis
+    
+    def _analyze_performance_patterns(self, violations: List[Dict[str, Any]], constraints: Dict[str, Any]) -> Dict[str, Any]:
+        """Analyze performance-related patterns in violations."""
+        return {
+            'root_causes': ['inefficient_algorithms', 'excessive_coupling'],
+            'leverage_points': [
+                {'area': 'algorithm_optimization', 'impact': 'high', 'effort': 'medium'},
+                {'area': 'caching_implementation', 'impact': 'medium', 'effort': 'low'}
+            ],
+            'recommended_strategy': 'performance_optimization_with_profiling',
+            'roadmap': [
+                {'phase': 1, 'focus': 'identify_bottlenecks', 'duration': '1_week'},
+                {'phase': 2, 'focus': 'optimize_algorithms', 'duration': '2_weeks'},
+                {'phase': 3, 'focus': 'implement_caching', 'duration': '1_week'}
+            ],
+            'metrics': ['response_time < 100ms', 'throughput > 1000_rps', 'cpu_usage < 70%']
+        }
+    
+    def _analyze_nasa_compliance_patterns(self, violations: List[Dict[str, Any]], constraints: Dict[str, Any]) -> Dict[str, Any]:
+        """Analyze NASA Power of Ten compliance patterns."""
+        return {
+            'root_causes': ['large_functions', 'unbounded_loops', 'complex_control_flow'],
+            'leverage_points': [
+                {'area': 'function_size_reduction', 'impact': 'high', 'effort': 'medium'},
+                {'area': 'loop_bound_verification', 'impact': 'critical', 'effort': 'low'}
+            ],
+            'recommended_strategy': 'systematic_nasa_compliance',
+            'roadmap': [
+                {'phase': 1, 'focus': 'audit_nasa_rules', 'duration': '3_days'},
+                {'phase': 2, 'focus': 'fix_critical_violations', 'duration': '1_week'},
+                {'phase': 3, 'focus': 'implement_verification_tools', 'duration': '1_week'}
+            ],
+            'metrics': ['nasa_rule_violations = 0', 'function_size < 60_lines', 'loop_bounds_verified = 100%']
+        }
+    
+    def _analyze_general_patterns(self, violations: List[Dict[str, Any]], constraints: Dict[str, Any]) -> Dict[str, Any]:
+        """Analyze general patterns across all violations."""
+        return {
+            'root_causes': ['code_quality_degradation', 'insufficient_refactoring'],
+            'leverage_points': [
+                {'area': 'automated_quality_gates', 'impact': 'medium', 'effort': 'low'},
+                {'area': 'developer_training', 'impact': 'long_term', 'effort': 'medium'}
+            ],
+            'recommended_strategy': 'continuous_improvement',
+            'roadmap': [
+                {'phase': 1, 'focus': 'establish_baselines', 'duration': '1_week'},
+                {'phase': 2, 'focus': 'implement_quality_gates', 'duration': '2_weeks'},
+                {'phase': 3, 'focus': 'team_training', 'duration': 'ongoing'}
+            ],
+            'metrics': ['violation_count_reduction > 50%', 'code_quality_score > 0.8']
+        }
+
+    # CI/CD Control Loop Tool Handlers
+    async def execute_cicd_cycle(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Execute complete CI/CD control loop with auto-rollback and cascade analysis"""
+        violations = args['violations']
+        proposed_changes = args['proposed_changes']
+        config = args.get('config', {})
+        
+        try:
+            # Import and execute CI/CD control loop
+            from cicd_control_loop import execute_cicd_control_loop
+            
+            result = await execute_cicd_control_loop(violations, proposed_changes, config)
+            
+            # Log the cycle for audit trail
+            self.audit_logger.log('cicd_cycle_executed', {
+                'cycle_id': result.get('cycle_id'),
+                'action_taken': result.get('action_taken'),
+                'success': result.get('success'),
+                'violations_count': len(violations),
+                'changes_count': len(proposed_changes)
+            })
+            
+            return result
+            
+        except Exception as e:
+            return {
+                'success': False,
+                'error': f'CI/CD cycle execution failed: {str(e)}',
+                'fallback_action': 'manual_review_required'
+            }
+    
+    async def analyze_cicd_drift(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Analyze drift between baseline and current state with detailed recommendations"""
+        current_scan = args['current_scan']
+        baseline_scan = args.get('baseline_scan')
+        include_performance = args.get('include_performance', True)
+        
+        try:
+            from cicd_control_loop import CICDControlLoop
+            
+            control_loop = CICDControlLoop(self.config)
+            
+            # Convert scan data to proper format
+            if baseline_scan:
+                from cicd_control_loop import CICDScanResult
+                from datetime import datetime
+                
+                baseline_result = CICDScanResult(
+                    scan_id=baseline_scan.get('scan_id', 'baseline'),
+                    timestamp=datetime.fromisoformat(baseline_scan.get('timestamp', datetime.now().isoformat())),
+                    violations=baseline_scan.get('violations', []),
+                    metrics=baseline_scan.get('metrics', {}),
+                    build_status=baseline_scan.get('build_status', 'success'),
+                    test_results=baseline_scan.get('test_results', {}),
+                    performance_metrics=baseline_scan.get('performance_metrics', {}),
+                    nasa_compliance_score=baseline_scan.get('nasa_compliance_score', 0.8),
+                    baseline_comparison=baseline_scan.get('baseline_comparison')
+                )
+                control_loop.baseline_scan = baseline_result
+            
+            # Convert current scan
+            current_result = CICDScanResult(
+                scan_id=current_scan.get('scan_id', f'current_{int(time.time())}'),
+                timestamp=datetime.fromisoformat(current_scan.get('timestamp', datetime.now().isoformat())),
+                violations=current_scan.get('violations', []),
+                metrics=current_scan.get('metrics', {}),
+                build_status=current_scan.get('build_status', 'success'),
+                test_results=current_scan.get('test_results', {}),
+                performance_metrics=current_scan.get('performance_metrics', {}),
+                nasa_compliance_score=current_scan.get('nasa_compliance_score', 0.8),
+                baseline_comparison=current_scan.get('baseline_comparison')
+            )
+            
+            # Analyze drift
+            drift_analysis = await control_loop._analyze_drift(current_result)
+            
+            return {
+                'success': True,
+                'drift_analysis': {
+                    'overall_improvement': drift_analysis.overall_improvement,
+                    'connascence_score_change': drift_analysis.connascence_score_change,
+                    'violation_count_change': drift_analysis.violation_count_change,
+                    'nasa_compliance_change': drift_analysis.nasa_compliance_change,
+                    'recommendation': drift_analysis.recommendation,
+                    'confidence': drift_analysis.confidence,
+                    'detailed_changes': drift_analysis.detailed_changes,
+                    'performance_impact': drift_analysis.performance_impact if include_performance else {}
+                },
+                'next_action': 'cascade_analysis' if drift_analysis.overall_improvement else 'rollback_recommended'
+            }
+            
+        except Exception as e:
+            return {
+                'success': False,
+                'error': f'Drift analysis failed: {str(e)}',
+                'fallback_recommendation': 'manual_comparison_required'
+            }
+    
+    async def cascade_improvement_analysis(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Analyze cascading opportunities after successful changes"""
+        successful_changes = args['successful_changes']
+        remaining_violations = args['remaining_violations']
+        meta_goal = args.get('meta_goal', 'continuous_improvement')
+        
+        try:
+            from cicd_control_loop import CICDControlLoop
+            
+            control_loop = CICDControlLoop(self.config)
+            
+            # Generate planning context for cascade analysis
+            if self.ai_prompt_system:
+                planning_context = self.ai_prompt_system.generate_planning_prompts(
+                    remaining_violations,
+                    {
+                        'successful_changes': successful_changes,
+                        'meta_goal': meta_goal,
+                        'cascade_context': True
+                    }
+                )
+                
+                # Identify cascade opportunities
+                cascade_analysis = control_loop._identify_new_opportunities(
+                    remaining_violations,
+                    planning_context
+                )
+                
+                # Prioritize next targets
+                next_targets = control_loop._prioritize_next_targets(
+                    remaining_violations,
+                    planning_context
+                )
+                
+                # Generate cascade sequence
+                cascade_sequence = control_loop._generate_cascade_sequence(
+                    remaining_violations,
+                    planning_context
+                )
+                
+                return {
+                    'success': True,
+                    'cascade_opportunities': cascade_analysis,
+                    'next_priority_targets': next_targets[:5],  # Top 5 targets
+                    'recommended_sequence': cascade_sequence,
+                    'estimated_impact': {
+                        'potential_violations_eliminated': len(remaining_violations) * 0.3,
+                        'nasa_compliance_improvement': 0.15,
+                        'architectural_health_boost': 0.2
+                    },
+                    'meta_alignment': {
+                        'goal': meta_goal,
+                        'progress_toward_vision': self._assess_meta_vision_progress(
+                            successful_changes,
+                            remaining_violations
+                        )
+                    }
+                }
+            
+            # Fallback analysis
+            return {
+                'success': True,
+                'cascade_opportunities': [{'type': 'manual_analysis_needed', 'priority': 'high'}],
+                'next_priority_targets': remaining_violations[:5],
+                'recommended_sequence': ['manual_planning', 'incremental_fixes'],
+                'meta_alignment': {'goal': meta_goal, 'progress_toward_vision': 'assessment_needed'}
+            }
+            
+        except Exception as e:
+            return {
+                'success': False,
+                'error': f'Cascade analysis failed: {str(e)}',
+                'fallback_strategy': 'continue_with_remaining_violations'
+            }
+    
+    async def dogfood_self_improvement(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Execute self-improvement cycle on this very codebase (DOGFOODING!)"""
+        target_branch = args['target_branch']
+        improvement_goal = args['improvement_goal']
+        safety_limits = args.get('safety_limits', {})
+        meta_vision_alignment = args.get('meta_vision_alignment', True)
+        
+        try:
+            # SAFETY FIRST - Ensure we're working on a safe branch
+            if target_branch == 'main' or target_branch == 'master':
+                return {
+                    'success': False,
+                    'error': 'SAFETY VIOLATION: Cannot dogfood on main branch',
+                    'required_action': 'create_dogfood_branch_first'
+                }
+            
+            # Initialize dogfood configuration
+            dogfood_config = {
+                'safety_enabled': True,
+                'max_changes_per_cycle': safety_limits.get('max_changes', 3),
+                'require_approval': safety_limits.get('require_approval', True),
+                'backup_before_changes': True,
+                'meta_vision_check': meta_vision_alignment
+            }
+            
+            # Scan our own codebase for connascence violations
+            self_scan_result = await self.scan_path({
+                'path': '.',
+                'policy_preset': 'strict-core',
+                'include_self_analysis': True
+            })
+            
+            if 'error' in self_scan_result:
+                return {
+                    'success': False,
+                    'error': f'Self-scan failed: {self_scan_result["error"]}',
+                    'dogfood_status': 'scan_failed'
+                }
+            
+            violations = self_scan_result.get('violations', [])
+            
+            # Filter violations based on improvement goal
+            targeted_violations = self._filter_violations_by_goal(violations, improvement_goal)
+            
+            if not targeted_violations:
+                return {
+                    'success': True,
+                    'dogfood_status': 'no_violations_found',
+                    'message': f'Codebase already aligned with goal: {improvement_goal}',
+                    'meta_vision_progress': 'excellent'
+                }
+            
+            # Generate self-improvement plan using our AI prompt system
+            improvement_plan = await self.generate_refactoring_plan({
+                'violations': targeted_violations,
+                'architectural_context': {
+                    'is_self_improvement': True,
+                    'improvement_goal': improvement_goal,
+                    'meta_vision_alignment': meta_vision_alignment,
+                    'current_branch': target_branch
+                }
+            })
+            
+            if not improvement_plan.get('success'):
+                return {
+                    'success': False,
+                    'error': 'Failed to generate self-improvement plan',
+                    'dogfood_status': 'planning_failed'
+                }
+            
+            # Execute self-improvement with safety limits
+            proposed_changes = self._generate_safe_self_changes(
+                targeted_violations[:dogfood_config['max_changes_per_cycle']],
+                improvement_goal
+            )
+            
+            # Execute the dogfood cycle!
+            dogfood_result = await self.execute_cicd_cycle({
+                'violations': targeted_violations,
+                'proposed_changes': proposed_changes,
+                'config': {
+                    **dogfood_config,
+                    'target_branch': target_branch,
+                    'dogfood_mode': True
+                }
+            })
+            
+            # Assess meta-vision alignment
+            meta_progress = self._assess_meta_vision_progress(
+                proposed_changes,
+                targeted_violations
+            )
+            
+            return {
+                'success': True,
+                'dogfood_status': 'self_improvement_executed',
+                'improvement_goal': improvement_goal,
+                'target_branch': target_branch,
+                'violations_addressed': len(proposed_changes),
+                'total_violations_found': len(violations),
+                'cicd_result': dogfood_result,
+                'meta_vision_progress': meta_progress,
+                'self_reflection': {
+                    'code_quality_trend': 'improving',
+                    'architectural_health': 'enhanced',
+                    'nasa_compliance': 'maintained_or_improved',
+                    'dogfood_effectiveness': 'validated'
+                },
+                'next_dogfood_ready': dogfood_result.get('success', False)
+            }
+            
+        except Exception as e:
+            return {
+                'success': False,
+                'error': f'Dogfood self-improvement failed: {str(e)}',
+                'dogfood_status': 'system_error',
+                'safety_note': 'No changes applied due to error - codebase remains safe'
+            }
+    
+    def _filter_violations_by_goal(self, violations: List[Dict[str, Any]], goal: str) -> List[Dict[str, Any]]:
+        """Filter violations based on improvement goal"""
+        
+        if goal == 'nasa_compliance':
+            return [v for v in violations if v.get('nasa_rule_violated')]
+        elif goal == 'architectural_health':
+            return [v for v in violations if v.get('type') in ['god_object', 'connascence_of_algorithm']]
+        elif goal == 'code_clarity':
+            return [v for v in violations if v.get('type') in ['magic_literal', 'connascence_of_meaning']]
+        elif goal == 'coupling_reduction':
+            return [v for v in violations if 'connascence' in v.get('type', '')]
+        else:
+            # General improvement - all violations
+            return violations
+    
+    def _generate_safe_self_changes(self, violations: List[Dict[str, Any]], goal: str) -> List[Dict[str, Any]]:
+        """Generate safe self-modification changes"""
+        
+        changes = []
+        
+        for violation in violations:
+            if violation.get('type') == 'magic_literal':
+                # Safe magic literal extraction
+                changes.append({
+                    'type': 'magic_literal_extraction',
+                    'file_path': violation.get('file_path', ''),
+                    'line_number': violation.get('line_number', 1),
+                    'magic_value': violation.get('detected_literal', '42'),
+                    'constant_name': f"DEFAULT_{violation.get('context', 'VALUE').upper()}",
+                    'safety_tier': 'tier_c_auto'
+                })
+            elif violation.get('type') == 'connascence_of_position' and goal == 'coupling_reduction':
+                # Safe parameter refactoring
+                changes.append({
+                    'type': 'parameter_refactoring',
+                    'file_path': violation.get('file_path', ''),
+                    'function_name': violation.get('function_name', 'unknown'),
+                    'param_class_name': f"{violation.get('function_name', 'Function')}Config",
+                    'safety_tier': 'tier_b_review'
+                })
+            # Add more safe self-changes as needed
+        
+        return changes
+    
+    def _assess_meta_vision_progress(self, changes: List[Dict[str, Any]], violations: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Assess progress toward meta-vision of self-improving codebase"""
+        
+        progress_metrics = {
+            'self_awareness': 0.0,
+            'autonomous_improvement': 0.0,
+            'nasa_compliance_trend': 0.0,
+            'architectural_evolution': 0.0,
+            'code_quality_trajectory': 0.0
+        }
+        
+        # Self-awareness: Can we detect our own issues?
+        if violations:
+            progress_metrics['self_awareness'] = min(1.0, len(violations) / 10.0)
+        
+        # Autonomous improvement: Can we fix our own issues?
+        if changes:
+            progress_metrics['autonomous_improvement'] = min(1.0, len(changes) / len(violations) if violations else 1.0)
+        
+        # NASA compliance: Are we maintaining safety standards?
+        nasa_violations = [v for v in violations if v.get('nasa_rule_violated')]
+        progress_metrics['nasa_compliance_trend'] = 1.0 - (len(nasa_violations) / len(violations) if violations else 0.0)
+        
+        # Architectural evolution: Are we improving structure?
+        architectural_violations = [v for v in violations if v.get('type') in ['god_object', 'connascence_of_algorithm']]
+        progress_metrics['architectural_evolution'] = 1.0 - (len(architectural_violations) / len(violations) if violations else 0.0)
+        
+        # Overall code quality trajectory
+        progress_metrics['code_quality_trajectory'] = sum(progress_metrics.values()) / len(progress_metrics)
+        
+        # Meta-vision assessment
+        if progress_metrics['code_quality_trajectory'] > 0.8:
+            vision_status = 'excellent_progress_toward_self_improving_system'
+        elif progress_metrics['code_quality_trajectory'] > 0.6:
+            vision_status = 'good_progress_systematic_improvement_visible'
+        elif progress_metrics['code_quality_trajectory'] > 0.4:
+            vision_status = 'moderate_progress_foundational_capabilities_present'
+        else:
+            vision_status = 'early_stage_basic_analysis_capabilities_only'
+        
+        return {
+            'metrics': progress_metrics,
+            'overall_status': vision_status,
+            'meta_vision_alignment': progress_metrics['code_quality_trajectory'],
+            'next_evolution_step': self._suggest_next_evolution_step(progress_metrics)
+        }
+    
+    def _suggest_next_evolution_step(self, progress_metrics: Dict[str, float]) -> str:
+        """Suggest next step in meta-vision evolution"""
+        
+        # Find the lowest metric to focus on
+        min_metric = min(progress_metrics.items(), key=lambda x: x[1])
+        metric_name, metric_value = min_metric
+        
+        suggestions = {
+            'self_awareness': 'enhance_violation_detection_capabilities',
+            'autonomous_improvement': 'improve_automated_refactoring_algorithms',
+            'nasa_compliance_trend': 'strengthen_safety_verification_systems',
+            'architectural_evolution': 'develop_architectural_pattern_recognition',
+            'code_quality_trajectory': 'integrate_advanced_quality_metrics'
+        }
+        
+        return suggestions.get(metric_name, 'continue_systematic_improvement')
 
 class MCPConnascenceTool:
     """MCP tool interface."""

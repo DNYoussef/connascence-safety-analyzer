@@ -1,11 +1,246 @@
+#!/usr/bin/env python3
+"""
+Enhanced Budget Enforcement with Baseline Awareness
+=================================================
+
+Provides enterprise-grade budget enforcement for connascence violations including:
+- Baseline-aware budget tracking and enforcement
+- Integration with waiver system for budget exemptions
+- Drift analysis for budget trend monitoring
+- CI/CD integration with fail-fast budget checking
+- Comprehensive budget reporting and alerting
+
+Author: Connascence Safety Analyzer Team
+"""
+
 import time
+import json
+from datetime import datetime, timedelta
+from pathlib import Path
 from typing import Dict, List, Any, Optional
+from dataclasses import dataclass, asdict
+from enum import Enum
+
 from analyzer.core import ConnascenceViolation
 
 # BudgetTracker Configuration Constants (CoM Improvement - Pass 2)
 DEFAULT_USAGE_HISTORY_LIMIT = 10  # Last N entries to keep in usage history
 
+class BudgetMode(Enum):
+    """Budget enforcement modes."""
+    STRICT = "strict"          # Fail immediately on budget violation
+    BASELINE = "baseline"      # Only fail on new violations beyond baseline
+    TRENDING = "trending"      # Fail based on trend analysis
+    ADVISORY = "advisory"      # Report but don't fail
+
+
+@dataclass
+class BudgetConfiguration:
+    """Budget configuration settings."""
+    mode: BudgetMode = BudgetMode.BASELINE
+    total_violations: int = 50
+    critical_violations: int = 0
+    high_violations: int = 5
+    medium_violations: int = 20
+    new_violations_per_pr: int = 3
+    trend_degradation_rate: float = 1.0  # violations per day threshold
+    waiver_exemptions_enabled: bool = True
+    drift_analysis_enabled: bool = True
+    ci_fail_on_budget_exceeded: bool = True
+
+
+class EnhancedBudgetTracker:
+    """Enhanced budget tracker with baseline awareness and enterprise features."""
+    
+    def __init__(self, project_root: Optional[Path] = None, config: Optional[BudgetConfiguration] = None):
+        self.project_root = project_root or Path.cwd()
+        self.config = config or BudgetConfiguration()
+        self.budget_limits = {}
+        self.current_usage = {}
+        self.violations = []
+        self.usage_history = []
+        
+        # Initialize integrated systems
+        self._init_integrated_systems()
+    
+    def _init_integrated_systems(self):
+        """Initialize baseline, waiver, and drift systems."""
+        try:
+            from .baselines import EnhancedBaselineManager
+            self.baseline_manager = EnhancedBaselineManager()
+        except ImportError:
+            self.baseline_manager = None
+        
+        try:
+            from .waivers import EnhancedWaiverSystem
+            self.waiver_system = EnhancedWaiverSystem(self.project_root)
+        except ImportError:
+            self.waiver_system = None
+        
+        try:
+            from .drift import EnhancedDriftTracker
+            self.drift_tracker = EnhancedDriftTracker(self.project_root)
+        except ImportError:
+            self.drift_tracker = None
+    
+    def check_baseline_aware_budget(self, current_violations: List[ConnascenceViolation]) -> Dict[str, Any]:
+        """Check budget compliance with baseline awareness."""
+        
+        if self.config.mode == BudgetMode.STRICT:
+            return self._check_strict_budget(current_violations)
+        elif self.config.mode == BudgetMode.BASELINE:
+            return self._check_baseline_budget(current_violations)
+        elif self.config.mode == BudgetMode.TRENDING:
+            return self._check_trending_budget(current_violations)
+        else:  # ADVISORY
+            return self._check_advisory_budget(current_violations)
+    
+    def _check_strict_budget(self, violations: List[ConnascenceViolation]) -> Dict[str, Any]:
+        """Strict budget checking - fail on any budget violation."""
+        
+        # Apply waivers if enabled
+        effective_violations = self._apply_waivers(violations) if self.config.waiver_exemptions_enabled else violations
+        
+        # Count violations by severity
+        severity_counts = self._count_by_severity(effective_violations)
+        total_count = len(effective_violations)
+        
+        # Check against configured budgets
+        budget_violations = []
+        
+        if total_count > self.config.total_violations:
+            budget_violations.append({
+                'type': 'total_violations',
+                'current': total_count,
+                'limit': self.config.total_violations,
+                'exceeded_by': total_count - self.config.total_violations
+            })
+        
+        if severity_counts.get('critical', 0) > self.config.critical_violations:
+            budget_violations.append({
+                'type': 'critical_violations',
+                'current': severity_counts['critical'],
+                'limit': self.config.critical_violations,
+                'exceeded_by': severity_counts['critical'] - self.config.critical_violations
+            })
+        
+        if severity_counts.get('high', 0) > self.config.high_violations:
+            budget_violations.append({
+                'type': 'high_violations',
+                'current': severity_counts['high'],
+                'limit': self.config.high_violations,
+                'exceeded_by': severity_counts['high'] - self.config.high_violations
+            })
+        
+        if severity_counts.get('medium', 0) > self.config.medium_violations:
+            budget_violations.append({
+                'type': 'medium_violations',
+                'current': severity_counts['medium'],
+                'limit': self.config.medium_violations,
+                'exceeded_by': severity_counts['medium'] - self.config.medium_violations
+            })
+        
+        is_compliant = len(budget_violations) == 0
+        
+        return {
+            'mode': 'strict',
+            'compliant': is_compliant,
+            'should_fail_ci': not is_compliant and self.config.ci_fail_on_budget_exceeded,
+            'budget_violations': budget_violations,
+            'total_violations': total_count,
+            'violations_by_severity': severity_counts,
+            'waived_violations': len(violations) - len(effective_violations) if self.config.waiver_exemptions_enabled else 0
+        }
+    
+    def _apply_waivers(self, violations: List[ConnascenceViolation]) -> List[ConnascenceViolation]:
+        """Apply waiver system to filter out waived violations."""        
+        if not self.waiver_system:
+            return violations
+        
+        non_waived_violations = []
+        for violation in violations:
+            # Create fingerprint for violation (simplified)
+            fingerprint = f"{getattr(violation, 'file_path', '')}-{getattr(violation, 'line_number', 0)}-{getattr(violation, 'connascence_type', '')}"
+            
+            waiver = self.waiver_system.is_violation_waived(
+                violation_fingerprint=fingerprint,
+                file_path=getattr(violation, 'file_path', ''),
+                rule_type=getattr(violation, 'connascence_type', '')
+            )
+            
+            if not waiver:
+                non_waived_violations.append(violation)
+        
+        return non_waived_violations
+    
+    def _count_by_severity(self, violations: List[ConnascenceViolation]) -> Dict[str, int]:
+        """Count violations by severity level."""        
+        counts = {'critical': 0, 'high': 0, 'medium': 0, 'low': 0}
+        
+        for violation in violations:
+            severity = str(getattr(violation, 'severity', 'medium')).lower()
+            if severity in counts:
+                counts[severity] += 1
+        
+        return counts
+    
+    def generate_budget_report(self, violations: List[ConnascenceViolation]) -> Dict[str, Any]:
+        """Generate comprehensive budget enforcement report."""        
+        budget_result = self.check_baseline_aware_budget(violations)
+        
+        # Add configuration info
+        budget_result['configuration'] = {
+            'mode': self.config.mode.value,
+            'budgets': {
+                'total_violations': self.config.total_violations,
+                'critical_violations': self.config.critical_violations,
+                'high_violations': self.config.high_violations,
+                'medium_violations': self.config.medium_violations,
+                'new_violations_per_pr': self.config.new_violations_per_pr
+            },
+            'features': {
+                'waiver_exemptions_enabled': self.config.waiver_exemptions_enabled,
+                'drift_analysis_enabled': self.config.drift_analysis_enabled,
+                'ci_fail_on_budget_exceeded': self.config.ci_fail_on_budget_exceeded
+            }
+        }
+        
+        # Add system availability
+        budget_result['system_status'] = {
+            'baseline_manager': self.baseline_manager is not None,
+            'waiver_system': self.waiver_system is not None,
+            'drift_tracker': self.drift_tracker is not None
+        }
+        
+        # Add recommendations
+        budget_result['recommendations'] = self._generate_enhanced_recommendations(budget_result)
+        
+        return budget_result
+    
+    def _generate_enhanced_recommendations(self, budget_result: Dict[str, Any]) -> List[str]:
+        """Generate enhanced recommendations based on budget analysis."""        
+        recommendations = []
+        
+        if not budget_result['compliant'] and budget_result['mode'] != 'advisory':
+            recommendations.append("🚨 Budget limits exceeded - immediate action required")
+            
+            for violation in budget_result.get('budget_violations', []):
+                if violation['type'] == 'new_violations':
+                    recommendations.append(f"Reduce new violations: {violation['current']} > {violation['limit']} (over by {violation['exceeded_by']})")
+                elif violation['type'] == 'total_violations':
+                    recommendations.append(f"Reduce total violations: {violation['current']} > {violation['limit']} (over by {violation['exceeded_by']})")
+                else:
+                    recommendations.append(f"Address {violation['type']}: {violation['current']} > {violation['limit']}")
+        
+        # Waiver recommendations
+        if budget_result.get('waived_violations', 0) > 0:
+            recommendations.append(f"✅ {budget_result['waived_violations']} violations waived - review waiver justifications")
+        
+        return recommendations
+
+
 class BudgetTracker:
+    """Legacy budget tracker for backward compatibility."""
     def __init__(self):
         self.budget_limits = {}
         self.current_usage = {}
