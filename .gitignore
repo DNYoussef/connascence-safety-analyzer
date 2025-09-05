@@ -8,6 +8,9 @@ config/claude-flow.config.json
 memory/claude-flow-data.json
 memory/sessions/*
 !memory/sessions/README.md
+
+# Temporary artifacts and reproduction files
+temp-artifacts/
 memory/agents/*
 !memory/agents/README.md
 coordination/memory_bank/*
