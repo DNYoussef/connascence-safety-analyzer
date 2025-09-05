@@ -66,3 +66,4 @@ CLAUDE.md
 # Temporary directories
 out/
 *_reproduction_output/
+vscode-extension/node_modules/
