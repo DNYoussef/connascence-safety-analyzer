@@ -212,8 +212,8 @@ jobs:
         uses: trufflesecurity/trufflehog@main
         with:
           path: ./vscode-extension
-          base: main
-          head: HEAD
+          # Remove base/head to avoid "same commit" error
+          # TruffleHog will automatically scan the current commit and recent changes
 
   performance-test:
     name: Performance Testing

@@ -17,7 +17,23 @@ from dataclasses import dataclass
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from constants import MECE_SIMILARITY_THRESHOLD, MECE_CLUSTER_MIN_SIZE
 
-from mcp.server import ConnascenceViolation
+# Fixed: Import ConnascenceViolation from utils instead of missing mcp.server
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+try:
+    from utils.config_loader import ConnascenceViolation
+except ImportError:
+    # Fallback for environments where utils is not available
+    from dataclasses import dataclass
+    
+    @dataclass
+    class ConnascenceViolation:
+        """Fallback ConnascenceViolation class for MECE analysis."""
+        violation_type: str
+        severity: str
+        description: str
+        file_path: str
+        line_number: int = 0
+        column_number: int = 0
 
 
 @dataclass
