@@ -10,9 +10,125 @@ class SmartIntegrationEngine:
     
     def __init__(self):
         self.violations = []
+        self.correlations = []
+        self.recommendations = []
     
     def integrate(self, *args, **kwargs):
+        """Legacy integration method for backward compatibility."""
         return []
+    
+    def analyze_correlations(self, findings, duplication_clusters, nasa_violations):
+        """Analyze correlations between different analyzer findings."""
+        correlations = []
+        
+        try:
+            # Find correlations between connascence violations and duplications
+            for cluster in duplication_clusters:
+                related_violations = []
+                for violation in findings:
+                    if violation.get('file_path') in cluster.get('files_involved', []):
+                        related_violations.append(violation)
+                
+                if related_violations:
+                    correlations.append({
+                        'analyzer1': 'connascence',
+                        'analyzer2': 'duplication',
+                        'correlation_score': 0.8,
+                        'common_findings': related_violations,
+                        'description': f"Duplication cluster correlates with {len(related_violations)} connascence violations"
+                    })
+            
+            # Find correlations between NASA violations and connascence violations
+            nasa_files = set(v.get('file_path', '') for v in nasa_violations)
+            connascence_files = set(v.get('file_path', '') for v in findings)
+            common_files = nasa_files.intersection(connascence_files)
+            
+            if common_files:
+                correlations.append({
+                    'analyzer1': 'nasa_compliance',
+                    'analyzer2': 'connascence',
+                    'correlation_score': len(common_files) / max(len(nasa_files), 1),
+                    'common_findings': list(common_files),
+                    'description': f"NASA violations and connascence violations overlap in {len(common_files)} files"
+                })
+                
+        except Exception as e:
+            print(f"Warning: Correlation analysis failed: {e}")
+        
+        return correlations
+    
+    def generate_intelligent_recommendations(self, findings, duplication_clusters, nasa_violations):
+        """Generate intelligent recommendations based on analysis results."""
+        recommendations = []
+        
+        try:
+            # High-priority recommendations for critical violations
+            critical_violations = [f for f in findings if f.get('severity') == 'critical']
+            if critical_violations:
+                recommendations.append({
+                    'priority': 'high',
+                    'category': 'critical_violations',
+                    'description': f'Address {len(critical_violations)} critical connascence violations immediately',
+                    'impact': 'High - critical violations can lead to system instability and maintenance issues',
+                    'effort': 'high',
+                    'suggested_actions': [
+                        f"Review and refactor {v.get('file_path', 'unknown')} line {v.get('line_number', 0)}" 
+                        for v in critical_violations[:3]
+                    ]
+                })
+            
+            # Duplication cluster recommendations
+            high_similarity_clusters = [c for c in duplication_clusters if c.get('similarity_score', 0) >= 0.9]
+            if high_similarity_clusters:
+                recommendations.append({
+                    'priority': 'high',
+                    'category': 'code_duplication',
+                    'description': f'Eliminate {len(high_similarity_clusters)} high-similarity duplication clusters',
+                    'impact': 'High - code duplication increases maintenance burden and bug risk',
+                    'effort': 'medium',
+                    'suggested_actions': [
+                        'Extract common functionality into shared modules',
+                        'Use inheritance or composition patterns',
+                        'Create utility functions for repeated code blocks'
+                    ]
+                })
+            
+            # NASA compliance recommendations
+            if nasa_violations:
+                recommendations.append({
+                    'priority': 'medium',
+                    'category': 'nasa_compliance',
+                    'description': f'Improve NASA Power of Ten compliance ({len(nasa_violations)} violations)',
+                    'impact': 'Medium - improves code safety and reliability',
+                    'effort': 'medium',
+                    'suggested_actions': [
+                        'Limit function parameters to 6 or fewer',
+                        'Reduce cyclomatic complexity',
+                        'Limit nesting depth to 4 levels maximum',
+                        'Replace goto statements with structured control flow'
+                    ]
+                })
+            
+            # General quality improvement
+            if len(findings) > 10:
+                recommendations.append({
+                    'priority': 'medium',
+                    'category': 'general_quality',
+                    'description': 'Implement systematic code quality improvements',
+                    'impact': 'Medium - gradual improvement in overall codebase quality',
+                    'effort': 'low',
+                    'suggested_actions': [
+                        'Establish coding standards and review processes',
+                        'Integrate automated quality checks in CI/CD',
+                        'Schedule regular refactoring sessions',
+                        'Set up code quality metrics tracking'
+                    ]
+                })
+                
+        except Exception as e:
+            print(f"Warning: Recommendation generation failed: {e}")
+        
+        return recommendations
     
     def comprehensive_analysis(self, path: str, policy: str = "default") -> Dict[str, Any]:
         """Perform comprehensive analysis on real files."""
@@ -40,6 +156,13 @@ class SmartIntegrationEngine:
         # Calculate summary
         critical_violations = len([v for v in violations if v.get('severity') == 'critical'])
         
+        # Generate intelligent analysis
+        duplication_clusters = []  # Placeholder for duplication detection
+        nasa_violations = [v for v in violations if 'nasa' in v.get('rule_id', '').lower()]
+        
+        correlations = self.analyze_correlations(violations, duplication_clusters, nasa_violations)
+        recommendations = self.generate_intelligent_recommendations(violations, duplication_clusters, nasa_violations)
+        
         return {
             'violations': violations,
             'summary': {
@@ -48,8 +171,28 @@ class SmartIntegrationEngine:
             },
             'nasa_compliance': {
                 'score': 1.0 if critical_violations == 0 else 0.5,
-                'violations': [],
+                'violations': nasa_violations,
                 'passing': critical_violations == 0
+            },
+            'correlations': correlations,
+            'recommendations': recommendations,
+            'quality_trends': [{
+                'metric': 'overall_quality',
+                'current': 0.8 if critical_violations == 0 else 0.5,
+                'trend': 'stable',
+                'projection': 0.8 if critical_violations == 0 else 0.5
+            }],
+            'risk_assessment': {
+                'overall_risk': 'high' if critical_violations > 5 else 'medium' if critical_violations > 0 else 'low',
+                'risk_factors': [
+                    {
+                        'factor': f'critical_violations',
+                        'impact': critical_violations * 2,
+                        'likelihood': 8 if critical_violations > 0 else 2,
+                        'description': f'{critical_violations} critical violations found'
+                    }
+                ] if critical_violations > 0 else [],
+                'mitigation': ['Address critical violations immediately', 'Implement code review process'] if critical_violations > 0 else []
             }
         }
     

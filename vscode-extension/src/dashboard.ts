@@ -34,10 +34,7 @@ export class ConnascenceDashboard {
             }
         );
         
-        this.panel.iconPath = {
-            light: vscode.Uri.joinPath(this.context.extensionUri, 'resources', 'icon-light.svg'),
-            dark: vscode.Uri.joinPath(this.context.extensionUri, 'resources', 'icon-dark.svg')
-        };
+        this.panel.iconPath = vscode.Uri.joinPath(this.context.extensionUri, 'images', 'broken-chain-logo.png');
         
         this.panel.onDidDispose(() => {
             this.panel = undefined;

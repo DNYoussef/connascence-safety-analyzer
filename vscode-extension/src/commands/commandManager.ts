@@ -5,12 +5,15 @@ import { StatusBarManager } from '../ui/statusBarManager';
 import { OutputChannelManager } from '../ui/outputChannelManager';
 import { ConnascenceTreeProvider } from '../providers/treeProvider';
 import { ExtensionLogger } from '../utils/logger';
+import { SettingsPanel } from '../features/settingsPanel';
+import { ConfigurationService } from '../services/configurationService';
 
 /**
  * Centralized command manager for all extension commands
  */
 export class CommandManager implements vscode.Disposable {
     private commands = new Map<string, (...args: any[]) => any>();
+    private settingsPanel: SettingsPanel;
 
     constructor(
         private connascenceService: ConnascenceService,
@@ -18,8 +21,11 @@ export class CommandManager implements vscode.Disposable {
         private statusBar: StatusBarManager,
         private outputManager: OutputChannelManager,
         private treeProvider: ConnascenceTreeProvider,
-        private logger: ExtensionLogger
+        private logger: ExtensionLogger,
+        private configService: ConfigurationService,
+        private context: vscode.ExtensionContext
     ) {
+        this.settingsPanel = new SettingsPanel(this.configService);
         this.registerAllCommands();
     }
 
@@ -426,7 +432,7 @@ export class CommandManager implements vscode.Disposable {
 
     // UI Commands
     private async openSettings(): Promise<void> {
-        await vscode.commands.executeCommand('workbench.action.openSettings', 'connascence');
+        await this.settingsPanel.show(this.context);
     }
 
     private async openDashboard(): Promise<void> {

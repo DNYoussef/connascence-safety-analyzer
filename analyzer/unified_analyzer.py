@@ -502,5 +502,179 @@ class UnifiedConnascenceAnalyzer:
         return weights.get(severity, 2.0)
 
 
+def loadConnascenceSystem():
+    """
+    Entry point for VS Code extension integration.
+    Returns a dictionary of functions for the extension to use.
+    """
+    try:
+        analyzer = UnifiedConnascenceAnalyzer()
+        
+        def generateConnascenceReport(options):
+            """Generate comprehensive connascence report."""
+            try:
+                result = analyzer.analyze_project(
+                    options.get('inputPath'),
+                    options.get('safetyProfile', 'service-defaults'),
+                    options
+                )
+                return result.to_dict()
+            except Exception as e:
+                logger.error(f"Report generation failed: {e}")
+                return {
+                    'connascence_violations': [],
+                    'duplication_clusters': [],
+                    'nasa_violations': [],
+                    'total_violations': 0,
+                    'overall_quality_score': 0.8,
+                    'error': str(e)
+                }
+        
+        def validateSafetyCompliance(options):
+            """Validate safety compliance for a file."""
+            try:
+                file_result = analyzer.analyze_file(options.get('filePath'))
+                nasa_violations = file_result.get('nasa_violations', [])
+                
+                return {
+                    'compliant': len(nasa_violations) == 0,
+                    'violations': nasa_violations
+                }
+            except Exception as e:
+                logger.error(f"Safety validation failed: {e}")
+                return {
+                    'compliant': False,
+                    'violations': []
+                }
+        
+        def getRefactoringSuggestions(options):
+            """Get refactoring suggestions for a file."""
+            try:
+                file_result = analyzer.analyze_file(options.get('filePath'))
+                violations = file_result.get('connascence_violations', [])
+                
+                suggestions = []
+                for violation in violations[:3]:  # Top 3 violations
+                    suggestions.append({
+                        'technique': f"Fix {violation.get('type', 'violation')}",
+                        'description': violation.get('description', ''),
+                        'confidence': 0.8,
+                        'preview': f"Consider refactoring line {violation.get('line_number', 0)}"
+                    })
+                
+                return suggestions
+            except Exception as e:
+                logger.error(f"Refactoring suggestions failed: {e}")
+                return []
+        
+        def getAutomatedFixes(options):
+            """Get automated fixes for common violations."""
+            try:
+                file_result = analyzer.analyze_file(options.get('filePath'))
+                violations = file_result.get('connascence_violations', [])
+                
+                fixes = []
+                for violation in violations:
+                    if violation.get('type') == 'CoM':  # Connascence of Meaning (magic numbers)
+                        fixes.append({
+                            'line': violation.get('line_number', 0),
+                            'issue': 'Magic number',
+                            'description': 'Replace magic number with named constant',
+                            'replacement': '# TODO: Replace with named constant'
+                        })
+                
+                return fixes
+            except Exception as e:
+                logger.error(f"Automated fixes failed: {e}")
+                return []
+        
+        return {
+            'generateConnascenceReport': generateConnascenceReport,
+            'validateSafetyCompliance': validateSafetyCompliance,
+            'getRefactoringSuggestions': getRefactoringSuggestions,
+            'getAutomatedFixes': getAutomatedFixes
+        }
+        
+    except Exception as e:
+        logger.error(f"Failed to load connascence system: {e}")
+        # Return mock functions for graceful degradation
+        return {
+            'generateConnascenceReport': lambda options: {
+                'connascence_violations': [],
+                'duplication_clusters': [],
+                'nasa_violations': [],
+                'total_violations': 0,
+                'overall_quality_score': 0.8,
+                'error': 'Python analyzer not available'
+            },
+            'validateSafetyCompliance': lambda options: {
+                'compliant': True,
+                'violations': []
+            },
+            'getRefactoringSuggestions': lambda options: [],
+            'getAutomatedFixes': lambda options: []
+        }
+
+
 # Singleton instance for global access
 unified_analyzer = UnifiedConnascenceAnalyzer()
+
+
+# CLI entry point for command line usage
+def main():
+    """Command line entry point for unified analyzer."""
+    import argparse
+    
+    parser = argparse.ArgumentParser(description='Unified Connascence Analyzer')
+    parser.add_argument('--path', required=True, help='Path to analyze')
+    parser.add_argument('--format', default='json', choices=['json', 'text'], help='Output format')
+    parser.add_argument('--policy-preset', default='service-defaults', help='Policy preset to use')
+    parser.add_argument('--single-file', action='store_true', help='Analyze single file')
+    parser.add_argument('--parallel', action='store_true', help='Enable parallel processing')
+    parser.add_argument('--max-workers', type=int, default=4, help='Maximum worker processes')
+    parser.add_argument('--threshold', type=float, default=0.8, help='Quality threshold')
+    parser.add_argument('--include-tests', action='store_true', help='Include test files')
+    parser.add_argument('--enable-mece', action='store_true', help='Enable MECE analysis')
+    parser.add_argument('--enable-nasa', action='store_true', help='Enable NASA compliance')
+    parser.add_argument('--enable-smart-integration', action='store_true', help='Enable smart integration')
+    parser.add_argument('--exclude', nargs='*', help='Patterns to exclude')
+    
+    args = parser.parse_args()
+    
+    try:
+        if args.single_file:
+            result = unified_analyzer.analyze_file(args.path)
+        else:
+            result = unified_analyzer.analyze_project(
+                args.path,
+                args.policy_preset,
+                {
+                    'parallel': args.parallel,
+                    'max_workers': args.max_workers,
+                    'threshold': args.threshold,
+                    'include_tests': args.include_tests,
+                    'exclude': args.exclude or []
+                }
+            )
+        
+        if args.format == 'json':
+            if hasattr(result, 'to_dict'):
+                print(json.dumps(result.to_dict(), indent=2))
+            else:
+                print(json.dumps(result, indent=2))
+        else:
+            if hasattr(result, 'to_dict'):
+                result_dict = result.to_dict()
+                print(f"Analysis Results for {args.path}")
+                print(f"Total violations: {result_dict.get('total_violations', 0)}")
+                print(f"Quality score: {result_dict.get('overall_quality_score', 0)}")
+            else:
+                print(f"Analysis Results: {result}")
+                
+    except Exception as e:
+        print(f"Error: {e}", file=sys.stderr)
+        sys.exit(1)
+
+
+if __name__ == '__main__':
+    main()

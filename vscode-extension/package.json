@@ -4,7 +4,7 @@
   "description": "Enterprise-grade code analysis with Safety Standards/High Quality safety compliance and grammar-enhanced refactoring - Consolidated Package",
   "version": "2.0.2",
   "publisher": "connascence-systems",
-  "icon": "images/connascence-logo.png",
+  "icon": "images/broken-chain-logo.png",
   "repository": {
     "type": "git",
     "url": "https://github.com/DNYoussef/connascence-safety-analyzer.git"
@@ -29,11 +29,15 @@
     "ast"
   ],
   "activationEvents": [
+    "onStartupFinished",
+    "*",
     "onLanguage:python",
     "onLanguage:c",
     "onLanguage:cpp",
     "onLanguage:javascript",
-    "onLanguage:typescript"
+    "onLanguage:typescript",
+    "onCommand:connascence.analyzeFile",
+    "onCommand:connascence.analyzeWorkspace"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -204,6 +208,178 @@
           ],
           "default": "warning",
           "description": "Severity level for diagnostics"
+        },
+        "connascence.confidenceThreshold": {
+          "type": "number",
+          "default": 0.8,
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Confidence threshold for analysis suggestions (0.0-1.0)"
+        },
+        "connascence.excludePatterns": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "**/node_modules/**",
+            "**/venv/**",
+            "**/env/**",
+            "**/__pycache__/**",
+            "**/dist/**",
+            "**/build/**",
+            "**/.git/**"
+          ],
+          "description": "File and directory patterns to exclude from analysis"
+        },
+        "connascence.includePatterns": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "**/*.py",
+            "**/*.c",
+            "**/*.cpp",
+            "**/*.js",
+            "**/*.ts"
+          ],
+          "description": "File patterns to include in analysis"
+        },
+        "connascence.nasaComplianceThreshold": {
+          "type": "number",
+          "default": 0.95,
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "NASA compliance threshold for safety-critical code (0.0-1.0)"
+        },
+        "connascence.meceQualityThreshold": {
+          "type": "number",
+          "default": 0.85,
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "MECE (Mutually Exclusive, Collectively Exhaustive) quality threshold (0.0-1.0)"
+        },
+        "connascence.performanceAnalysis": {
+          "type": "object",
+          "properties": {
+            "enableProfiling": {
+              "type": "boolean",
+              "default": true,
+              "description": "Enable performance profiling during analysis"
+            },
+            "maxAnalysisTime": {
+              "type": "number",
+              "default": 30000,
+              "description": "Maximum analysis time per file in milliseconds"
+            },
+            "memoryThreshold": {
+              "type": "number",
+              "default": 512,
+              "description": "Memory usage threshold in MB before warnings"
+            },
+            "enableCaching": {
+              "type": "boolean",
+              "default": true,
+              "description": "Enable result caching for better performance"
+            },
+            "cacheSize": {
+              "type": "number",
+              "default": 1000,
+              "description": "Maximum number of cached analysis results"
+            }
+          },
+          "default": {
+            "enableProfiling": true,
+            "maxAnalysisTime": 30000,
+            "memoryThreshold": 512,
+            "enableCaching": true,
+            "cacheSize": 1000
+          },
+          "description": "Performance analysis configuration options"
+        },
+        "connascence.advancedFiltering": {
+          "type": "object",
+          "properties": {
+            "enableGitIgnore": {
+              "type": "boolean",
+              "default": true,
+              "description": "Respect .gitignore patterns"
+            },
+            "enableCustomIgnore": {
+              "type": "boolean",
+              "default": true,
+              "description": "Enable custom .connascence-ignore file"
+            },
+            "minFileSize": {
+              "type": "number",
+              "default": 10,
+              "description": "Minimum file size in bytes to analyze"
+            },
+            "maxFileSize": {
+              "type": "number",
+              "default": 10485760,
+              "description": "Maximum file size in bytes to analyze (10MB default)"
+            },
+            "excludeBinaryFiles": {
+              "type": "boolean",
+              "default": true,
+              "description": "Automatically exclude binary files from analysis"
+            }
+          },
+          "default": {
+            "enableGitIgnore": true,
+            "enableCustomIgnore": true,
+            "minFileSize": 10,
+            "maxFileSize": 10485760,
+            "excludeBinaryFiles": true
+          },
+          "description": "Advanced file filtering options"
+        },
+        "connascence.analysisDepth": {
+          "type": "string",
+          "enum": [
+            "surface",
+            "standard",
+            "deep",
+            "comprehensive"
+          ],
+          "default": "standard",
+          "description": "Analysis depth level affecting thoroughness and performance"
+        },
+        "connascence.enableExperimentalFeatures": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable experimental features (may be unstable)"
+        },
+        "connascence.customRules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "pattern": {
+                "type": "string"
+              },
+              "severity": {
+                "type": "string",
+                "enum": ["error", "warning", "info", "hint"]
+              },
+              "message": {
+                "type": "string"
+              }
+            },
+            "required": ["name", "pattern", "severity", "message"]
+          },
+          "default": [],
+          "description": "Custom analysis rules"
+        },
+        "connascence.analyzeOnStartup": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically analyze workspace files when VS Code starts (may impact startup performance)"
         }
       }
     }

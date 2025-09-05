@@ -19,7 +19,8 @@ export class BrokenChainLogoManager {
     }
 
     private setupStatusBarLogo(): void {
-        this.statusBarItem.text = '🔗💔 Connascence';
+        const logoPath = path.join(__dirname, '..', '..', 'images', 'broken-chain-logo.png');
+        this.statusBarItem.text = '$(link-external) Connascence';
         this.statusBarItem.tooltip = 'Break the chains of tight coupling! Click to view dashboard';
         this.statusBarItem.command = 'connascence.showDashboard';
         this.statusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.warningBackground');
@@ -33,31 +34,31 @@ export class BrokenChainLogoManager {
         isAnalyzing?: boolean
     }): void {
         if (metrics.isAnalyzing) {
-            this.statusBarItem.text = '🔗⚡ Analyzing...';
+            this.statusBarItem.text = '$(sync~spin) Analyzing...';
             this.statusBarItem.tooltip = 'Breaking chains in progress...';
             this.statusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.prominentBackground');
             return;
         }
 
-        const chainEmoji = this.getChainStatusEmoji(metrics.qualityScore, metrics.criticalIssues);
+        const chainIcon = this.getChainStatusIcon(metrics.qualityScore, metrics.criticalIssues);
         const statusColor = this.getStatusColor(metrics.qualityScore, metrics.criticalIssues);
         
-        this.statusBarItem.text = `${chainEmoji} ${metrics.totalIssues} issues`;
+        this.statusBarItem.text = `${chainIcon} ${metrics.totalIssues} issues`;
         this.statusBarItem.tooltip = this.buildTooltip(metrics);
         this.statusBarItem.backgroundColor = statusColor;
     }
 
-    private getChainStatusEmoji(qualityScore: number, criticalIssues: number): string {
+    private getChainStatusIcon(qualityScore: number, criticalIssues: number): string {
         if (criticalIssues > 0) {
-            return '🔗💥'; // Chain explosion - critical issues
+            return '$(error)'; // Critical issues
         } else if (qualityScore >= 90) {
-            return '✨🔓'; // Sparkles unlocked - excellent quality
+            return '$(check)'; // Excellent quality
         } else if (qualityScore >= 75) {
-            return '🔗✂️'; // Chain with scissors - good progress
+            return '$(link)'; // Good progress
         } else if (qualityScore >= 50) {
-            return '🔗⚠️'; // Chain warning - needs work
+            return '$(warning)'; // Needs work
         } else {
-            return '⛓️💔'; // Heavy broken chains - poor quality
+            return '$(link-external)'; // Poor quality - broken chain
         }
     }
 
@@ -78,7 +79,7 @@ export class BrokenChainLogoManager {
         criticalIssues: number,
         qualityScore: number
     }): string {
-        let tooltip = `🔗💔 Connascence Safety Analyzer\n\n`;
+        let tooltip = `$(link-external) Connascence Safety Analyzer\n\n`;
         tooltip += `Quality Score: ${metrics.qualityScore}/100\n`;
         tooltip += `Total Issues: ${metrics.totalIssues}\n`;
         
@@ -100,7 +101,7 @@ export class BrokenChainLogoManager {
 
         this.webviewPanel = vscode.window.createWebviewPanel(
             'brokenChainAnimation',
-            '🔗💔 Breaking Chains Animation',
+            '$(link-external) Breaking Chains Animation',
             vscode.ViewColumn.One,
             {
                 enableScripts: true,
@@ -143,9 +144,14 @@ export class BrokenChainLogoManager {
         }
         
         .logo {
-            font-size: 8rem;
+            width: 120px;
+            height: 120px;
             margin-bottom: 2rem;
             animation: breakChain 3s infinite;
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M8 7a1.5 1.5 0 0 0-1.5 1.5v1A1.5 1.5 0 0 0 8 11h1a1.5 1.5 0 0 0 1.5-1.5v-1A1.5 1.5 0 0 0 9 7H8zM15 7a1.5 1.5 0 0 0-1.5 1.5v1A1.5 1.5 0 0 0 15 11h1a1.5 1.5 0 0 0 1.5-1.5v-1A1.5 1.5 0 0 0 16 7h-1z"/><path d="M8 13a1.5 1.5 0 0 0-1.5 1.5v1A1.5 1.5 0 0 0 8 17h1a1.5 1.5 0 0 0 1.5-1.5v-1A1.5 1.5 0 0 0 9 13H8zM12.5 9.5v1c0 .28.22.5.5.5h1c.28 0 .5-.22.5-.5v-1c0-.28-.22-.5-.5-.5h-1c-.28 0-.5.22-.5.5z"/></svg>');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
         }
         
         @keyframes breakChain {
@@ -301,7 +307,7 @@ export class BrokenChainLogoManager {
     <div class="floating-icons" id="floatingIcons"></div>
     
     <div class="container">
-        <div class="logo">🔗💔</div>
+        <div class="logo"></div>
         
         <div class="title">Break the Chains!</div>
         
@@ -350,7 +356,7 @@ export class BrokenChainLogoManager {
 
     <script>
         // Create floating chain icons
-        const icons = ['🔗', '⛓️', '💔', '✂️', '🔓', '💥', '⚡', '✨'];
+        const icons = ['⛓', '🔗', '💔', '✂', '🔓', '💥', '⚡', '✨'];
         const container = document.getElementById('floatingIcons');
         
         function createFloatingIcon() {

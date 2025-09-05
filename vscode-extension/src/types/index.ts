@@ -24,6 +24,70 @@ export interface ConnascenceConfiguration {
     strictMode: boolean;
     safeMode: boolean;
     exclude: string[];
+    // Enhanced configuration options
+    confidenceThreshold: number;
+    excludePatterns: string[];
+    includePatterns: string[];
+    nasaComplianceThreshold: number;
+    meceQualityThreshold: number;
+    performanceAnalysis: PerformanceAnalysisConfig;
+    advancedFiltering: AdvancedFilteringConfig;
+    analysisDepth: 'surface' | 'standard' | 'deep' | 'comprehensive';
+    enableExperimentalFeatures: boolean;
+    customRules: CustomAnalysisRule[];
+}
+
+export interface PerformanceAnalysisConfig {
+    enableProfiling: boolean;
+    maxAnalysisTime: number;
+    memoryThreshold: number;
+    enableCaching: boolean;
+    cacheSize: number;
+}
+
+export interface AdvancedFilteringConfig {
+    enableGitIgnore: boolean;
+    enableCustomIgnore: boolean;
+    minFileSize: number;
+    maxFileSize: number;
+    excludeBinaryFiles: boolean;
+}
+
+export interface CustomAnalysisRule {
+    name: string;
+    pattern: string;
+    severity: 'error' | 'warning' | 'info' | 'hint';
+    message: string;
+    enabled?: boolean;
+    category?: string;
+    tags?: string[];
+}
+
+export interface FrameworkSpecificConfig {
+    [key: string]: any;
+    confidenceThreshold: number;
+    analysisDepth: string;
+    customRules: CustomAnalysisRule[];
+    performanceSettings: PerformanceAnalysisConfig;
+    filteringSettings: AdvancedFilteringConfig;
+}
+
+export interface SafetyProfileConfig {
+    strictMode: boolean;
+    maxComplexity: number;
+    maxNestedLoops: number;
+    maxFunctionParams: number;
+    maxLineLength: number;
+    requireDocstrings: boolean;
+    enforceTypeHints: boolean;
+    enableNasaCompliance: boolean;
+    confidenceThreshold: number;
+    nasaComplianceThreshold: number;
+    meceQualityThreshold: number;
+    analysisDepth: string;
+    experimentalFeatures: boolean;
+    noRecursion?: boolean;
+    noDynamicAllocation?: boolean;
 }
 
 export interface AnalysisOptions {

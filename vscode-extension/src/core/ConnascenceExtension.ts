@@ -101,7 +101,9 @@ export class ConnascenceExtension {
             this.statusBarManager,
             this.outputManager,
             this.treeDataProvider,
-            this.logger
+            this.logger,
+            this.configService,
+            this.context
         );
     }
 

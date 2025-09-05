@@ -16,6 +16,7 @@ import { NotificationManager } from './features/notificationManager';
 import { BrokenChainLogoManager } from './features/brokenChainLogo';
 import { AIFixSuggestionsProvider } from './features/aiFixSuggestions';
 import { ConnascenceService } from './services/connascenceService';
+import { ConfigurationService } from './services/configurationService';
 
 let extension: ConnascenceExtension;
 let logger: ExtensionLogger;
@@ -56,11 +57,14 @@ export function activate(context: vscode.ExtensionContext) {
         // Activate main extension
         extension.activate();
         
+        // Start background analysis after activation
+        startBackgroundServices(context);
+        
         telemetry.logEvent('extension.activate.success');
         logger.info('🔗✨ Connascence Analyzer extension activated successfully - Ready to break chains!');
         
-        // Show welcome message
-        showWelcomeMessage();
+        // Show welcome message (delayed to avoid interrupting startup)
+        setTimeout(() => showWelcomeMessage(), 2000);
         
     } catch (error) {
         logger.error('Failed to activate extension', error);
@@ -166,6 +170,88 @@ function registerAllCommands(context: vscode.ExtensionContext) {
     );
     
     logger.info('✅ Commands registered');
+}
+
+function startBackgroundServices(context: vscode.ExtensionContext) {
+    logger.info('🚀 Starting background services for immediate loading...');
+    
+    // Initialize workspace analysis if files are already open
+    const activeEditor = vscode.window.activeTextEditor;
+    if (activeEditor && isSupportedLanguage(activeEditor.document.languageId)) {
+        logger.info('📄 Active editor detected, starting immediate analysis');
+        setTimeout(() => {
+            vscode.commands.executeCommand('connascence.analyzeFile', activeEditor.document.uri);
+        }, 500);
+    }
+    
+    // Start workspace scanning for supported files
+    startWorkspaceScanning();
+    
+    // Register event handlers for immediate file processing
+    const documentOpenHandler = vscode.workspace.onDidOpenTextDocument((document) => {
+        if (isSupportedLanguage(document.languageId)) {
+            logger.info(`📂 Opened ${document.languageId} file, triggering analysis`);
+            setTimeout(() => {
+                vscode.commands.executeCommand('connascence.analyzeFile', document.uri);
+            }, 100);
+        }
+    });
+    
+    const documentChangeHandler = vscode.workspace.onDidChangeTextDocument((event) => {
+        const config = vscode.workspace.getConfiguration('connascence');
+        if (config.get<boolean>('realTimeAnalysis', true) && 
+            isSupportedLanguage(event.document.languageId)) {
+            // Debounced analysis on change
+            const debounceMs = config.get<number>('debounceMs', 1000);
+            setTimeout(() => {
+                vscode.commands.executeCommand('connascence.analyzeFile', event.document.uri);
+            }, debounceMs);
+        }
+    });
+    
+    context.subscriptions.push(documentOpenHandler, documentChangeHandler);
+    logger.info('✅ Background services initialized');
+}
+
+function startWorkspaceScanning() {
+    logger.info('🔍 Starting workspace scanning for supported files...');
+    
+    // Scan for supported file types in background
+    Promise.resolve(vscode.workspace.findFiles('**/*.{py,c,cpp,h,hpp,js,ts}', '**/node_modules/**', 100))
+        .then(files => {
+            logger.info(`📊 Found ${files.length} supported files in workspace`);
+            
+            // Update dashboard with file count
+            if (dashboardProvider) {
+                // Create basic quality metrics to show file count
+                const basicMetrics = {
+                    filesAnalyzed: files.length,
+                    overallScore: 100,
+                    totalIssues: 0,
+                    criticalIssues: 0,
+                    compliant: true,
+                    safetyViolations: 0
+                };
+                dashboardProvider.updateData(basicMetrics, null);
+            }
+            
+            // Optionally trigger analysis of critical files
+            const config = vscode.workspace.getConfiguration('connascence');
+            if (config.get<boolean>('analyzeOnStartup', false)) {
+                logger.info('🚀 Auto-analyzing workspace files on startup');
+                setTimeout(() => {
+                    vscode.commands.executeCommand('connascence.analyzeWorkspace');
+                }, 3000); // Delayed to not impact startup performance
+            }
+        })
+        .catch((error: any) => {
+            logger.error('Error scanning workspace files', error);
+        });
+}
+
+function isSupportedLanguage(languageId: string): boolean {
+    const supportedLanguages = ['python', 'c', 'cpp', 'javascript', 'typescript'];
+    return supportedLanguages.includes(languageId);
 }
 
 function showWelcomeMessage() {

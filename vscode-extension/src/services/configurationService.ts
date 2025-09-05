@@ -44,7 +44,52 @@ export class ConfigurationService {
     }
 
     getDebounceDelay(): number {
-        return this.getConfig('debounceDelay', 500);
+        return this.getConfig('debounceMs', 1000);
+    }
+
+    // New advanced configuration methods
+    getConfidenceThreshold(): number {
+        return this.getConfig('confidenceThreshold', 0.8);
+    }
+
+    getNasaComplianceThreshold(): number {
+        return this.getConfig('nasaComplianceThreshold', 0.95);
+    }
+
+    getMeceQualityThreshold(): number {
+        return this.getConfig('meceQualityThreshold', 0.85);
+    }
+
+    getPerformanceAnalysisConfig(): any {
+        return this.getConfig('performanceAnalysis', {
+            enableProfiling: true,
+            maxAnalysisTime: 30000,
+            memoryThreshold: 512,
+            enableCaching: true,
+            cacheSize: 1000
+        });
+    }
+
+    getAdvancedFilteringConfig(): any {
+        return this.getConfig('advancedFiltering', {
+            enableGitIgnore: true,
+            enableCustomIgnore: true,
+            minFileSize: 10,
+            maxFileSize: 10485760,
+            excludeBinaryFiles: true
+        });
+    }
+
+    getAnalysisDepth(): string {
+        return this.getConfig('analysisDepth', 'standard');
+    }
+
+    isExperimentalFeaturesEnabled(): boolean {
+        return this.getConfig('enableExperimentalFeatures', false);
+    }
+
+    getCustomRules(): any[] {
+        return this.getConfig('customRules', []);
     }
 
     shouldScanOnStartup(): boolean {
@@ -56,7 +101,7 @@ export class ConfigurationService {
     }
 
     getExcludePatterns(): string[] {
-        return this.getConfig('exclude', [
+        return this.getConfig('excludePatterns', [
             '**/node_modules/**',
             '**/venv/**',
             '**/env/**',
@@ -68,7 +113,7 @@ export class ConfigurationService {
     }
 
     getIncludePatterns(): string[] {
-        return this.getConfig('include', [
+        return this.getConfig('includePatterns', [
             '**/*.py',
             '**/*.c',
             '**/*.cpp',
@@ -97,10 +142,146 @@ export class ConfigurationService {
         await this.updateConfig('frameworkProfile', profile);
     }
 
-    // Validation methods
+    // New update methods for advanced settings
+    async updateConfidenceThreshold(threshold: number): Promise<void> {
+        if (this.isValidConfidenceThreshold(threshold)) {
+            await this.updateConfig('confidenceThreshold', threshold);
+        }
+    }
+
+    async updateNasaComplianceThreshold(threshold: number): Promise<void> {
+        if (this.isValidConfidenceThreshold(threshold)) {
+            await this.updateConfig('nasaComplianceThreshold', threshold);
+        }
+    }
+
+    async updateMeceQualityThreshold(threshold: number): Promise<void> {
+        if (this.isValidConfidenceThreshold(threshold)) {
+            await this.updateConfig('meceQualityThreshold', threshold);
+        }
+    }
+
+    async updateAnalysisDepth(depth: string): Promise<void> {
+        if (this.isValidAnalysisDepth(depth)) {
+            await this.updateConfig('analysisDepth', depth);
+        }
+    }
+
+    async updateExperimentalFeatures(enabled: boolean): Promise<void> {
+        await this.updateConfig('enableExperimentalFeatures', enabled);
+    }
+
+    async updateExcludePatterns(patterns: string[]): Promise<void> {
+        await this.updateConfig('excludePatterns', patterns);
+    }
+
+    async updateIncludePatterns(patterns: string[]): Promise<void> {
+        await this.updateConfig('includePatterns', patterns);
+    }
+
+    async updatePerformanceAnalysis(config: any): Promise<void> {
+        await this.updateConfig('performanceAnalysis', config);
+    }
+
+    async updateAdvancedFiltering(config: any): Promise<void> {
+        await this.updateConfig('advancedFiltering', config);
+    }
+
+    // Advanced analyzer capabilities configuration
+    getEnableParallelAnalysis(): boolean {
+        return this.getConfig('enableParallelAnalysis', true);
+    }
+
+    getEnableMECEAnalysis(): boolean {
+        return this.getConfig('enableMECEAnalysis', true);
+    }
+
+    getEnableNASACompliance(): boolean {
+        return this.getConfig('enableNASACompliance', true);
+    }
+
+    getEnableSmartIntegration(): boolean {
+        return this.getConfig('enableSmartIntegration', true);
+    }
+
+    getMaxWorkers(): number {
+        return this.getConfig('maxWorkers', 4);
+    }
+
+    getMECESimilarityThreshold(): number {
+        return this.getConfig('meceSimilarityThreshold', 0.7);
+    }
+
+    getMECEClusterMinSize(): number {
+        return this.getConfig('meceClusterMinSize', 2);
+    }
+
+    getParallelAnalysisConfig(): any {
+        return this.getConfig('parallelAnalysis', {
+            maxWorkers: this.getMaxWorkers(),
+            chunkSize: 5,
+            useProcesses: true,
+            timeoutSeconds: 300,
+            memoryLimitMb: 1024,
+            enableProfiling: false
+        });
+    }
+
+    async updateEnableParallelAnalysis(enabled: boolean): Promise<void> {
+        await this.updateConfig('enableParallelAnalysis', enabled);
+    }
+
+    async updateEnableMECEAnalysis(enabled: boolean): Promise<void> {
+        await this.updateConfig('enableMECEAnalysis', enabled);
+    }
+
+    async updateEnableNASACompliance(enabled: boolean): Promise<void> {
+        await this.updateConfig('enableNASACompliance', enabled);
+    }
+
+    async updateEnableSmartIntegration(enabled: boolean): Promise<void> {
+        await this.updateConfig('enableSmartIntegration', enabled);
+    }
+
+    async updateMaxWorkers(workers: number): Promise<void> {
+        if (workers >= 1 && workers <= 16) {
+            await this.updateConfig('maxWorkers', workers);
+        }
+    }
+
+    async updateMECESimilarityThreshold(threshold: number): Promise<void> {
+        if (this.isValidConfidenceThreshold(threshold)) {
+            await this.updateConfig('meceSimilarityThreshold', threshold);
+        }
+    }
+
+    async updateCustomRules(rules: any[]): Promise<void> {
+        const validRules = rules.filter(rule => this.validateCustomRule(rule));
+        await this.updateConfig('customRules', validRules);
+    }
+
+    // Enhanced validation methods
     isValidSafetyProfile(profile: string): boolean {
-        const validProfiles = ['none', 'nasa_jpl_pot10', 'nasa_loc_1', 'nasa_loc_3', 'modern_general'];
+        const validProfiles = ['none', 'general_safety_strict', 'safety_level_1', 'safety_level_3', 'modern_general'];
         return validProfiles.includes(profile);
+    }
+
+    isValidConfidenceThreshold(threshold: number): boolean {
+        return typeof threshold === 'number' && threshold >= 0.0 && threshold <= 1.0;
+    }
+
+    isValidAnalysisDepth(depth: string): boolean {
+        const validDepths = ['surface', 'standard', 'deep', 'comprehensive'];
+        return validDepths.includes(depth);
+    }
+
+    validateCustomRule(rule: any): boolean {
+        if (!rule || typeof rule !== 'object') return false;
+        return rule.name && rule.pattern && rule.severity && rule.message &&
+               typeof rule.name === 'string' &&
+               typeof rule.pattern === 'string' &&
+               ['error', 'warning', 'info', 'hint'].includes(rule.severity) &&
+               typeof rule.message === 'string';
     }
 
     isValidFrameworkProfile(profile: string): boolean {
@@ -116,9 +297,24 @@ export class ConfigurationService {
     // Get profile-specific configuration
     getSafetyProfileConfig(): any {
         const profile = this.getSafetyProfile();
+        const baseConfig = this.getBaseProfileConfig(profile);
+        const confidenceThreshold = this.getConfidenceThreshold();
+        const nasaThreshold = this.getNasaComplianceThreshold();
+        const meceThreshold = this.getMeceQualityThreshold();
         
+        return {
+            ...baseConfig,
+            confidenceThreshold,
+            nasaComplianceThreshold: nasaThreshold,
+            meceQualityThreshold: meceThreshold,
+            analysisDepth: this.getAnalysisDepth(),
+            experimentalFeatures: this.isExperimentalFeaturesEnabled()
+        };
+    }
+
+    private getBaseProfileConfig(profile: string): any {
         switch (profile) {
-            case 'nasa_jpl_pot10':
+            case 'general_safety_strict':
                 return {
                     strictMode: true,
                     maxComplexity: 10,
@@ -126,9 +322,10 @@ export class ConfigurationService {
                     maxFunctionParams: 4,
                     maxLineLength: 80,
                     requireDocstrings: true,
-                    enforceTypeHints: true
+                    enforceTypeHints: true,
+                    enableNasaCompliance: true
                 };
-            case 'nasa_loc_1':
+            case 'safety_level_1':
                 return {
                     strictMode: true,
                     maxComplexity: 5,
@@ -138,9 +335,10 @@ export class ConfigurationService {
                     requireDocstrings: true,
                     enforceTypeHints: true,
                     noRecursion: true,
-                    noDynamicAllocation: true
+                    noDynamicAllocation: true,
+                    enableNasaCompliance: true
                 };
-            case 'nasa_loc_3':
+            case 'safety_level_3':
                 return {
                     strictMode: true,
                     maxComplexity: 15,
@@ -148,7 +346,8 @@ export class ConfigurationService {
                     maxFunctionParams: 6,
                     maxLineLength: 120,
                     requireDocstrings: true,
-                    enforceTypeHints: true
+                    enforceTypeHints: true,
+                    enableNasaCompliance: true
                 };
             case 'modern_general':
                 return {
@@ -158,7 +357,8 @@ export class ConfigurationService {
                     maxFunctionParams: 8,
                     maxLineLength: 120,
                     requireDocstrings: false,
-                    enforceTypeHints: false
+                    enforceTypeHints: false,
+                    enableNasaCompliance: false
                 };
             default:
                 return {
@@ -168,15 +368,31 @@ export class ConfigurationService {
                     maxFunctionParams: 10,
                     maxLineLength: 150,
                     requireDocstrings: false,
-                    enforceTypeHints: false
+                    enforceTypeHints: false,
+                    enableNasaCompliance: false
                 };
         }
     }
 
-    // Get framework-specific configuration
+    // Get framework-specific configuration with enhanced options
     getFrameworkProfileConfig(): any {
         const framework = this.getFrameworkProfile();
+        const confidenceThreshold = this.getConfidenceThreshold();
+        const analysisDepth = this.getAnalysisDepth();
         
+        const baseConfig = this.getFrameworkSpecificConfig(framework);
+        
+        return {
+            ...baseConfig,
+            confidenceThreshold,
+            analysisDepth,
+            customRules: this.getCustomRules(),
+            performanceSettings: this.getPerformanceAnalysisConfig(),
+            filteringSettings: this.getAdvancedFilteringConfig()
+        };
+    }
+
+    private getFrameworkSpecificConfig(framework: string): any {
         switch (framework) {
             case 'django':
                 return {
@@ -184,25 +400,37 @@ export class ConfigurationService {
                     viewComplexity: true,
                     templateAnalysis: false,
                     migrationChecks: true,
-                    settingsValidation: true
+                    settingsValidation: true,
+                    ormPatterns: true,
+                    securityPatterns: true,
+                    middlewareAnalysis: true
                 };
             case 'fastapi':
                 return {
                     dependencyInjection: true,
                     schemaValidation: true,
                     routeComplexity: true,
-                    asyncPatterns: true
+                    asyncPatterns: true,
+                    pydanticModels: true,
+                    swaggerCompliance: true,
+                    authPatterns: true
                 };
             case 'react':
                 return {
                     componentComplexity: true,
                     hookUsage: true,
                     stateManagement: true,
-                    propValidation: true
+                    propValidation: true,
+                    jsxPatterns: true,
+                    performancePatterns: true,
+                    accessibilityChecks: true
                 };
             default:
                 return {
-                    genericAnalysis: true
+                    genericAnalysis: true,
+                    codeSmells: true,
+                    designPatterns: true,
+                    maintainabilityMetrics: true
                 };
         }
     }
@@ -232,7 +460,7 @@ export class ConfigurationService {
         await config.update(key, value, target);
     }
 
-    // Export/Import configuration
+    // Export/Import configuration with all advanced settings
     exportConfiguration(): any {
         const config = vscode.workspace.getConfiguration(this.configSection);
         return {
@@ -245,11 +473,29 @@ export class ConfigurationService {
             showInlineHints: this.showInlineHints(),
             diagnosticSeverity: this.getDiagnosticSeverity(),
             maxDiagnostics: this.getMaxDiagnostics(),
-            debounceDelay: this.getDebounceDelay(),
+            debounceMs: this.getDebounceDelay(),
             scanOnStartup: this.shouldScanOnStartup(),
             scanOnSave: this.shouldScanOnSave(),
-            exclude: this.getExcludePatterns(),
-            include: this.getIncludePatterns()
+            excludePatterns: this.getExcludePatterns(),
+            includePatterns: this.getIncludePatterns(),
+            // Advanced settings
+            confidenceThreshold: this.getConfidenceThreshold(),
+            nasaComplianceThreshold: this.getNasaComplianceThreshold(),
+            meceQualityThreshold: this.getMeceQualityThreshold(),
+            performanceAnalysis: this.getPerformanceAnalysisConfig(),
+            advancedFiltering: this.getAdvancedFilteringConfig(),
+            analysisDepth: this.getAnalysisDepth(),
+            enableExperimentalFeatures: this.isExperimentalFeaturesEnabled(),
+            customRules: this.getCustomRules(),
+            // Advanced analyzer capabilities
+            enableParallelAnalysis: this.getEnableParallelAnalysis(),
+            enableMECEAnalysis: this.getEnableMECEAnalysis(),
+            enableNASACompliance: this.getEnableNASACompliance(),
+            enableSmartIntegration: this.getEnableSmartIntegration(),
+            maxWorkers: this.getMaxWorkers(),
+            meceSimilarityThreshold: this.getMECESimilarityThreshold(),
+            meceClusterMinSize: this.getMECEClusterMinSize(),
+            parallelAnalysis: this.getParallelAnalysisConfig()
         };
     }
 
@@ -268,7 +514,15 @@ export class ConfigurationService {
             'safetyProfile', 'grammarValidation', 'realTimeAnalysis', 
             'autoFixSuggestions', 'serverUrl', 'frameworkProfile',
             'showInlineHints', 'diagnosticSeverity', 'maxDiagnostics',
-            'debounceDelay', 'scanOnStartup', 'scanOnSave', 'exclude', 'include'
+            'debounceMs', 'scanOnStartup', 'scanOnSave', 'excludePatterns', 'includePatterns',
+            // Advanced settings keys
+            'confidenceThreshold', 'nasaComplianceThreshold', 'meceQualityThreshold',
+            'performanceAnalysis', 'advancedFiltering', 'analysisDepth',
+            'enableExperimentalFeatures', 'customRules',
+            // Advanced analyzer capabilities keys
+            'enableParallelAnalysis', 'enableMECEAnalysis', 'enableNASACompliance',
+            'enableSmartIntegration', 'maxWorkers', 'meceSimilarityThreshold',
+            'meceClusterMinSize', 'parallelAnalysis'
         ];
 
         for (const key of keys) {

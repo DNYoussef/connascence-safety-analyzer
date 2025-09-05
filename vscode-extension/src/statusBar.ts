@@ -44,7 +44,7 @@ export class ConnascenceStatusBar {
         }
         
         if (!this.lastScanResults) {
-            this.statusBarItem.text = '$(link) Connascence: Ready';
+            this.statusBarItem.text = '$(link-external) Connascence: Ready';
             this.statusBarItem.backgroundColor = undefined;
             return;
         }
@@ -53,7 +53,7 @@ export class ConnascenceStatusBar {
         const violationCount = results.violations?.length || 0;
         
         if (violationCount === 0) {
-            this.statusBarItem.text = '$(check) Connascence: Clean';
+            this.statusBarItem.text = '$(link-external) Connascence: Clean';
             this.statusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.prominentBackground');
             this.statusBarItem.tooltip = 'No connascence violations found';
         } else {
