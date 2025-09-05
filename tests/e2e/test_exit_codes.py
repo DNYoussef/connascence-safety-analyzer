@@ -1213,34 +1213,34 @@ def función_con_parámetros(param1, param2, param3, param4, param5):  # Paramet
     número_mágico = 42  # Magic literal with Unicode comment
     cadena_secreta = "clave_súper_secreta_123"  # Magic string
     
-    if param1 > número_mágico:
+    if param1 > nmero_mgico:
         return param1 * 2.5  # Magic literal
     
     return param1
 
-class ClaseÚnicode:
+class Clasenicode:
     '''Clase con muchos métodos y caracteres Unicode.'''
     
-    def método_01(self): pass
-    def método_02(self): pass
-    def método_03(self): pass
-    def método_04(self): pass
-    def método_05(self): pass
-    def método_06(self): pass
-    def método_07(self): pass
-    def método_08(self): pass
-    def método_09(self): pass
-    def método_10(self): pass
-    def método_11(self): pass
-    def método_12(self): pass
-    def método_13(self): pass
-    def método_14(self): pass
-    def método_15(self): pass
-    def método_16(self): pass
-    def método_17(self): pass
-    def método_18(self): pass
-    def método_19(self): pass
-    def método_20(self): pass
+    def mtodo_01(self): pass
+    def mtodo_02(self): pass
+    def mtodo_03(self): pass
+    def mtodo_04(self): pass
+    def mtodo_05(self): pass
+    def mtodo_06(self): pass
+    def mtodo_07(self): pass
+    def mtodo_08(self): pass
+    def mtodo_09(self): pass
+    def mtodo_10(self): pass
+    def mtodo_11(self): pass
+    def mtodo_12(self): pass
+    def mtodo_13(self): pass
+    def mtodo_14(self): pass
+    def mtodo_15(self): pass
+    def mtodo_16(self): pass
+    def mtodo_17(self): pass
+    def mtodo_18(self): pass
+    def mtodo_19(self): pass
+    def mtodo_20(self): pass
     def método_21(self): pass  # God class
 """, encoding='utf-8')
     

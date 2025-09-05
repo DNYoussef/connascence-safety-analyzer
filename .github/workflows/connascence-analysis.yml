@@ -35,6 +35,28 @@ jobs:
         # Install additional analysis dependencies
         pip install radon bandit ruff mypy black
 
+    - name: 🔤 Unicode Code Safety Check
+      id: unicode-check
+      run: |
+        echo "::group::Unicode Safety Validation"
+        echo "Checking for Unicode characters in code..."
+        
+        # Run Unicode removal script in check mode
+        cd scripts
+        python remove_unicode.py .. > unicode_check.log 2>&1
+        
+        # Check if any Unicode was found
+        if grep -q "Replaced\|Removed" unicode_check.log; then
+          echo "::error::Unicode characters found in code!"
+          echo "Please run: cd scripts && python remove_unicode.py .. to fix"
+          echo "Unicode violations found:"
+          grep "Replaced\|Removed" unicode_check.log | head -5
+          exit 1
+        else
+          echo "✅ No Unicode characters found in code - all clear!"
+        fi
+        echo "::endgroup::"
+
     - name: 🛡️ NASA Power of Ten Rules Validation
       id: nasa-validation
       run: |

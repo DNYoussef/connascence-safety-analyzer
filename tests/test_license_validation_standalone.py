@@ -76,7 +76,7 @@ def create_test_project_with_enterprise(project_path: Path):
     enterprise_content = """CONNASCENCE ENTERPRISE LICENSE AGREEMENT
 
 Version 1.0.0
-Copyright © 2024 Connascence Systems. All rights reserved.
+Copyright (c) 2024 Connascence Systems. All rights reserved.
 
 This software is licensed, not sold. By installing or using this software, 
 you agree to be bound by the terms of this license agreement.

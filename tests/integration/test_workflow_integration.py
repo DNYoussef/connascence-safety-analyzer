@@ -15,7 +15,7 @@
 
 """
 Complete Workflow Integration Tests - End-to-End System Testing
-Tests complete analysis workflows including CLI → analyzer → reports → autofix → validation
+Tests complete analysis workflows including CLI -> analyzer -> reports -> autofix -> validation
 """
 
 import pytest
