@@ -153,10 +153,48 @@ def main():
     print(f"Improvements: {len(comparison['improvements'])}")
     print(f"Regressions: {len(comparison['regressions'])}")
     
-    # Exit with appropriate code
-    if comparison['regressions']:
-        print("Warning: Regressions detected in self-analysis")
+    # Exit with appropriate code based on significant regression thresholds
+    significant_regressions = []
+    
+    # Extract metrics for threshold evaluation
+    metrics = comparison['metrics_comparison']
+    violations_change = metrics['total_violations']['change']
+    critical_change = metrics['critical_violations']['change']
+    nasa_change = metrics['nasa_score']['change']
+    
+    # Define thresholds for significant regressions
+    VIOLATION_INCREASE_THRESHOLD = 50  # More than 50 additional violations
+    CRITICAL_INCREASE_THRESHOLD = 10   # More than 10 additional critical violations  
+    NASA_DECREASE_THRESHOLD = 0.05     # NASA score drops by more than 5%
+    VIOLATION_PERCENTAGE_THRESHOLD = 0.10  # More than 10% increase in violations
+    
+    baseline_violations = metrics['total_violations']['baseline']
+    violation_percentage_increase = violations_change / max(baseline_violations, 1) if baseline_violations > 0 else 0
+    
+    # Check for significant regressions
+    if violations_change > VIOLATION_INCREASE_THRESHOLD:
+        significant_regressions.append(f"Total violations increased significantly by {violations_change} (threshold: {VIOLATION_INCREASE_THRESHOLD})")
+    
+    if violation_percentage_increase > VIOLATION_PERCENTAGE_THRESHOLD:
+        significant_regressions.append(f"Total violations increased by {violation_percentage_increase:.1%} (threshold: {VIOLATION_PERCENTAGE_THRESHOLD:.1%})")
+    
+    if critical_change > CRITICAL_INCREASE_THRESHOLD:
+        significant_regressions.append(f"Critical violations increased significantly by {critical_change} (threshold: {CRITICAL_INCREASE_THRESHOLD})")
+        
+    if nasa_change < -NASA_DECREASE_THRESHOLD:
+        significant_regressions.append(f"NASA score decreased significantly by {-nasa_change:.3f} (threshold: {NASA_DECREASE_THRESHOLD:.3f})")
+    
+    if significant_regressions:
+        print("ERROR: Significant regressions detected in self-analysis:")
+        for regression in significant_regressions:
+            print(f"  - {regression}")
+        print(f"\nTotal minor regressions: {len(comparison['regressions'])}")
+        print("CI failure triggered due to significant quality degradation")
         return 1
+    elif comparison['regressions']:
+        print(f"Info: {len(comparison['regressions'])} minor regressions detected but within acceptable thresholds")
+        print("CI continues - no significant quality degradation detected")
+    
     return 0
 
 
