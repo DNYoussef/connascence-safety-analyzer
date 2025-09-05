@@ -646,11 +646,11 @@ def create_user(username, email, password, full_name, phone, role):
         return jsonify({'error': 'Password too short (min 8 chars)'}), 400  # Magic literal/string
     
     # Magic regex patterns
-    email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'  # Magic string
+    email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$'  # Magic string
     if not re.match(email_pattern, email):
         return jsonify({'error': 'Invalid email format'}), 400  # Magic string/literal
     
-    phone_pattern = r'^\+?1?d{9,15}$'  # Magic string
+    phone_pattern = r'^\\+?1?d{9,15}$'  # Magic string
     if phone and not re.match(phone_pattern, phone):
         return jsonify({'error': 'Invalid phone format'}), 400  # Magic string/literal
     
@@ -715,7 +715,7 @@ def update_user(user_id, username, email, full_name, phone, bio, preferences):
         return jsonify({'error': 'Username too short'}), 400  # Magic string/literal
     
     if email:
-        email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'  # Magic string
+        email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$'  # Magic string
         if not re.match(email_pattern, email):
             return jsonify({'error': 'Invalid email'}), 400  # Magic string/literal
     
@@ -742,7 +742,7 @@ def update_user(user_id, username, email, full_name, phone, bio, preferences):
         updates['full_name'] = full_name
     
     if phone:
-        phone_pattern = r'^\+?1?d{9,15}$'  # Magic string
+        phone_pattern = r'^\\+?1?d{9,15}$'  # Magic string
         if not re.match(phone_pattern, phone):
             return jsonify({'error': 'Invalid phone format'}), 400  # Magic string/literal
         updates['phone'] = phone

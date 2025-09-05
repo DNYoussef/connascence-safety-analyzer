@@ -208,7 +208,7 @@ class JavaScriptStrategy(LanguageStrategy):
     def get_magic_literal_patterns(self) -> Dict[str, re.Pattern]:
         return {
             'numeric': re.compile(r'\b(?!0\b|1\b|-1\b)\d+\.?\d*\b'),
-            'string': re.compile(r'["\'][^"\']{3,}["\']')
+            'string': re.compile(r'''["'][^"']{3,}["']''')
         }
     
     def get_function_detector(self) -> re.Pattern:
@@ -272,7 +272,7 @@ class PythonStrategy(LanguageStrategy):
     def get_magic_literal_patterns(self) -> Dict[str, re.Pattern]:
         return {
             'numeric': re.compile(r'\b(?!0\b|1\b|-1\b)\d+\.?\d*\b'),
-            'string': re.compile(r'["\'][^"\']{3,}["\']')
+            'string': re.compile(r'''["'][^"']{3,}["']''')
         }
     
     def get_function_detector(self) -> re.Pattern:
