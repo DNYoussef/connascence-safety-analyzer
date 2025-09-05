@@ -1,0 +1,2910 @@
+{
+  "success": true,
+  "workspace_path": "C:\\Users\\17175\\Desktop\\AIVillage",
+  "summary": {
+    "total_files_analyzed": 100,
+    "total_violations": 40,
+    "files_with_violations": 31,
+    "execution_time": 9.504120588302612
+  },
+  "file_results": [
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\.claude\\dspy_memory_integration.py",
+      "violations": [
+        {
+          "id": "long_function_store_complete_dspy_integration",
+          "rule_id": "long_function",
+          "type": "long_function",
+          "severity": "medium",
+          "description": "Function \"store_complete_dspy_integration\" is 236 lines long (threshold: 50)",
+          "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\.claude\\dspy_memory_integration.py",
+          "line_number": 19,
+          "weight": 2.0
+        }
+      ],
+      "summary": {
+        "total_violations": 1,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 1,
+          "low": 0
+        },
+        "by_type": {
+          "long_function": 1
+        }
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\.claude\\dspy_memory_integration.py",
+        "timestamp": 1757093674.2302868,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.0009970664978027344
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\.claude\\load_style_guide.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\.claude\\load_style_guide.py",
+        "timestamp": 1757093674.2312841,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.000997304916381836
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\.claude\\__init__.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\.claude\\__init__.py",
+        "timestamp": 1757093674.2322817,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.0009975433349609375
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\apps\\__init__.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\apps\\__init__.py",
+        "timestamp": 1757093674.2322817,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.0
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\config\\unified_config.py",
+      "violations": [
+        {
+          "id": "data_class_UnifiedConfigManager",
+          "rule_id": "data_class",
+          "type": "data_class",
+          "severity": "medium",
+          "description": "Data Class smell: Class \"UnifiedConfigManager\" has 13 instance variables (threshold: 10)",
+          "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\config\\unified_config.py",
+          "line_number": 144,
+          "weight": 2.5
+        }
+      ],
+      "summary": {
+        "total_violations": 1,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 1,
+          "low": 0
+        },
+        "by_type": {
+          "data_class": 1
+        }
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\config\\unified_config.py",
+        "timestamp": 1757093674.236271,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.003989219665527344
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\config\\unified_p2p_config.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\config\\unified_p2p_config.py",
+        "timestamp": 1757093674.2402604,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.003989458084106445
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\core\\agent_forge.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\core\\agent_forge.py",
+        "timestamp": 1757093674.2422552,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.0019948482513427734
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\core\\__init__.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\core\\__init__.py",
+        "timestamp": 1757093674.2422552,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.0
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\examples\\aivillage_integration_example.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\examples\\aivillage_integration_example.py",
+        "timestamp": 1757093674.2472415,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.004986286163330078
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\examples\\betanet_fog_example.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\examples\\betanet_fog_example.py",
+        "timestamp": 1757093674.249236,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.001994609832763672
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\examples\\demo_integration.py",
+      "violations": [
+        {
+          "id": "long_function_demo_unified_cognate_system",
+          "rule_id": "long_function",
+          "type": "long_function",
+          "severity": "medium",
+          "description": "Function \"demo_unified_cognate_system\" is 71 lines long (threshold: 50)",
+          "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\examples\\demo_integration.py",
+          "line_number": 19,
+          "weight": 2.0
+        }
+      ],
+      "summary": {
+        "total_violations": 1,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 1,
+          "low": 0
+        },
+        "by_type": {
+          "long_function": 1
+        }
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\examples\\demo_integration.py",
+        "timestamp": 1757093674.2502337,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.0009975433349609375
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\examples\\edge_integration_example.py",
+      "violations": [
+        {
+          "id": "config_magic_literal_215",
+          "rule_id": "connascence_of_meaning",
+          "type": "CoM",
+          "severity": "medium",
+          "description": "Configuration value \"2048\" should be a named constant (likely port/timeout/limit)",
+          "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\examples\\edge_integration_example.py",
+          "line_number": 215,
+          "weight": 2.0
+        }
+      ],
+      "summary": {
+        "total_violations": 1,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 1,
+          "low": 0
+        },
+        "by_type": {
+          "CoM": 1
+        }
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\examples\\edge_integration_example.py",
+        "timestamp": 1757093674.2552202,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.00498652458190918
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\examples\\gateway_integration.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\examples\\gateway_integration.py",
+        "timestamp": 1757093674.2562177,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.0009975433349609375
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\examples\\hyper_rag_example.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\examples\\hyper_rag_example.py",
+        "timestamp": 1757093674.257215,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.000997304916381836
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\examples\\proof_system_demo.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\examples\\proof_system_demo.py",
+        "timestamp": 1757093674.2622015,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.00498652458190918
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\examples\\resilient_chat_demo.py",
+      "violations": [
+        {
+          "id": "long_function_demo_chat_modes",
+          "rule_id": "long_function",
+          "type": "long_function",
+          "severity": "medium",
+          "description": "Function \"demo_chat_modes\" is 62 lines long (threshold: 50)",
+          "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\examples\\resilient_chat_demo.py",
+          "line_number": 32,
+          "weight": 2.0
+        }
+      ],
+      "summary": {
+        "total_violations": 1,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 1,
+          "low": 0
+        },
+        "by_type": {
+          "long_function": 1
+        }
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\examples\\resilient_chat_demo.py",
+        "timestamp": 1757093674.2641962,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.001994609832763672
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\examples\\sdk_usage_example.py",
+      "violations": [
+        {
+          "id": "config_magic_literal_54",
+          "rule_id": "connascence_of_meaning",
+          "type": "CoM",
+          "severity": "medium",
+          "description": "Configuration value \"1024\" should be a named constant (likely port/timeout/limit)",
+          "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\examples\\sdk_usage_example.py",
+          "line_number": 54,
+          "weight": 2.0
+        },
+        {
+          "id": "config_magic_literal_90",
+          "rule_id": "connascence_of_meaning",
+          "type": "CoM",
+          "severity": "medium",
+          "description": "Configuration value \"2048\" should be a named constant (likely port/timeout/limit)",
+          "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\examples\\sdk_usage_example.py",
+          "line_number": 90,
+          "weight": 2.0
+        },
+        {
+          "id": "config_magic_literal_90",
+          "rule_id": "connascence_of_meaning",
+          "type": "CoM",
+          "severity": "medium",
+          "description": "Configuration value \"10240\" should be a named constant (likely port/timeout/limit)",
+          "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\examples\\sdk_usage_example.py",
+          "line_number": 90,
+          "weight": 2.0
+        },
+        {
+          "id": "config_magic_literal_186",
+          "rule_id": "connascence_of_meaning",
+          "type": "CoM",
+          "severity": "medium",
+          "description": "Configuration value \"4096\" should be a named constant (likely port/timeout/limit)",
+          "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\examples\\sdk_usage_example.py",
+          "line_number": 186,
+          "weight": 2.0
+        },
+        {
+          "id": "config_magic_literal_238",
+          "rule_id": "connascence_of_meaning",
+          "type": "CoM",
+          "severity": "medium",
+          "description": "Configuration value \"2048\" should be a named constant (likely port/timeout/limit)",
+          "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\examples\\sdk_usage_example.py",
+          "line_number": 238,
+          "weight": 2.0
+        }
+      ],
+      "summary": {
+        "total_violations": 5,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 5,
+          "low": 0
+        },
+        "by_type": {
+          "CoM": 5
+        }
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\examples\\sdk_usage_example.py",
+        "timestamp": 1757093674.2691844,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.004988193511962891
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\examples\\start_backend_services.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\examples\\start_backend_services.py",
+        "timestamp": 1757093674.2721748,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.0029904842376708984
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\examples\\training_service_example.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\examples\\training_service_example.py",
+        "timestamp": 1757093674.2731721,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.000997304916381836
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\experiments\\__init__.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\experiments\\__init__.py",
+        "timestamp": 1757093674.2741697,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.0009975433349609375
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\infrastructure\\__init__.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\infrastructure\\__init__.py",
+        "timestamp": 1757093674.2741697,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.0
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\integrations\\__init__.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\integrations\\__init__.py",
+        "timestamp": 1757093674.2751667,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.0009970664978027344
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\packages\\__init__.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\packages\\__init__.py",
+        "timestamp": 1757093674.2751667,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.0
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\analyze-test-failures.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\analyze-test-failures.py",
+        "timestamp": 1757093674.2791562,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.003989458084106445
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\architectural_analysis.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\architectural_analysis.py",
+        "timestamp": 1757093674.2841437,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.004987478256225586
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\architectural_analysis_original.py",
+      "violations": [
+        {
+          "id": "god_object_ArchitecturalAnalyzer",
+          "rule_id": "god_object",
+          "type": "god_object",
+          "severity": "high",
+          "description": "God Object detected: Class \"ArchitecturalAnalyzer\" has 35 methods (threshold: 15)",
+          "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\architectural_analysis_original.py",
+          "line_number": 277,
+          "weight": 4.0
+        }
+      ],
+      "summary": {
+        "total_violations": 1,
+        "by_severity": {
+          "critical": 0,
+          "high": 1,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {
+          "god_object": 1
+        }
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\architectural_analysis_original.py",
+        "timestamp": 1757093674.294117,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.009973287582397461
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\architectural_fitness_functions.py",
+      "violations": [
+        {
+          "id": "god_object_ArchitecturalFitnessChecker",
+          "rule_id": "god_object",
+          "type": "god_object",
+          "severity": "high",
+          "description": "God Object detected: Class \"ArchitecturalFitnessChecker\" has 18 methods (threshold: 15)",
+          "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\architectural_fitness_functions.py",
+          "line_number": 68,
+          "weight": 4.0
+        },
+        {
+          "id": "long_function_main",
+          "rule_id": "long_function",
+          "type": "long_function",
+          "severity": "medium",
+          "description": "Function \"main\" is 55 lines long (threshold: 50)",
+          "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\architectural_fitness_functions.py",
+          "line_number": 582,
+          "weight": 2.0
+        }
+      ],
+      "summary": {
+        "total_violations": 2,
+        "by_severity": {
+          "critical": 0,
+          "high": 1,
+          "medium": 1,
+          "low": 0
+        },
+        "by_type": {
+          "god_object": 1,
+          "long_function": 1
+        }
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\architectural_fitness_functions.py",
+        "timestamp": 1757093674.2991028,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.004985809326171875
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\architecture_dashboard.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\architecture_dashboard.py",
+        "timestamp": 1757093674.3040893,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.00498652458190918
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\auto-fix-tests.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\auto-fix-tests.py",
+        "timestamp": 1757093674.3080788,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.003989458084106445
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\benchmark_process_task.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\benchmark_process_task.py",
+        "timestamp": 1757093674.3120685,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.003989696502685547
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\check_circular_deps.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\check_circular_deps.py",
+        "timestamp": 1757093674.3150613,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.002992868423461914
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\check_connascence.py",
+      "violations": [
+        {
+          "id": "long_function_main",
+          "rule_id": "long_function",
+          "type": "long_function",
+          "severity": "medium",
+          "description": "Function \"main\" is 80 lines long (threshold: 50)",
+          "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\check_connascence.py",
+          "line_number": 461,
+          "weight": 2.0
+        }
+      ],
+      "summary": {
+        "total_violations": 1,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 1,
+          "low": 0
+        },
+        "by_type": {
+          "long_function": 1
+        }
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\check_connascence.py",
+        "timestamp": 1757093674.3210442,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.005982875823974609
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\ci-cd-fixes.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\ci-cd-fixes.py",
+        "timestamp": 1757093674.323039,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.0019948482513427734
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\ci_health_check.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\ci_health_check.py",
+        "timestamp": 1757093674.3240364,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.000997304916381836
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\ci_integration.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\ci_integration.py",
+        "timestamp": 1757093674.3290226,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.004986286163330078
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\ci_pipeline_analyzer.py",
+      "violations": [
+        {
+          "id": "long_function_main",
+          "rule_id": "long_function",
+          "type": "long_function",
+          "severity": "medium",
+          "description": "Function \"main\" is 59 lines long (threshold: 50)",
+          "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\ci_pipeline_analyzer.py",
+          "line_number": 286,
+          "weight": 2.0
+        }
+      ],
+      "summary": {
+        "total_violations": 1,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 1,
+          "low": 0
+        },
+        "by_type": {
+          "long_function": 1
+        }
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\ci_pipeline_analyzer.py",
+        "timestamp": 1757093674.3330123,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.003989696502685547
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\cogment_cleanup.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\cogment_cleanup.py",
+        "timestamp": 1757093674.3379998,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.004987478256225586
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\complete_phase2_migrations.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\complete_phase2_migrations.py",
+        "timestamp": 1757093674.3410945,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.0030946731567382812
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\connascence_analyzer.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\connascence_analyzer.py",
+        "timestamp": 1757093674.3430893,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.0019948482513427734
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\coupling_metrics.py",
+      "violations": [
+        {
+          "id": "god_object_CouplingAnalyzer",
+          "rule_id": "god_object",
+          "type": "god_object",
+          "severity": "high",
+          "description": "God Object detected: Class \"CouplingAnalyzer\" has 16 methods (threshold: 15)",
+          "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\coupling_metrics.py",
+          "line_number": 83,
+          "weight": 4.0
+        },
+        {
+          "id": "data_class_CouplingAnalyzer",
+          "rule_id": "data_class",
+          "type": "data_class",
+          "severity": "medium",
+          "description": "Data Class smell: Class \"CouplingAnalyzer\" has 16 instance variables (threshold: 10)",
+          "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\coupling_metrics.py",
+          "line_number": 83,
+          "weight": 2.5
+        },
+        {
+          "id": "long_function_main",
+          "rule_id": "long_function",
+          "type": "long_function",
+          "severity": "medium",
+          "description": "Function \"main\" is 94 lines long (threshold: 50)",
+          "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\coupling_metrics.py",
+          "line_number": 588,
+          "weight": 2.0
+        }
+      ],
+      "summary": {
+        "total_violations": 3,
+        "by_severity": {
+          "critical": 0,
+          "high": 1,
+          "medium": 2,
+          "low": 0
+        },
+        "by_type": {
+          "god_object": 1,
+          "data_class": 1,
+          "long_function": 1
+        }
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\coupling_metrics.py",
+        "timestamp": 1757093674.3480759,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.00498652458190918
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\coupling_metrics_analysis.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\coupling_metrics_analysis.py",
+        "timestamp": 1757093674.3520653,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.003989458084106445
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\create_real_cognate_models.py",
+      "violations": [
+        {
+          "id": "long_function_create_real_cognate_models",
+          "rule_id": "long_function",
+          "type": "long_function",
+          "severity": "medium",
+          "description": "Function \"create_real_cognate_models\" is 115 lines long (threshold: 50)",
+          "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\create_real_cognate_models.py",
+          "line_number": 30,
+          "weight": 2.0
+        }
+      ],
+      "summary": {
+        "total_violations": 1,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 1,
+          "low": 0
+        },
+        "by_type": {
+          "long_function": 1
+        }
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\create_real_cognate_models.py",
+        "timestamp": 1757093674.35406,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.001994609832763672
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\critical_syntax_issues.py",
+      "violations": [
+        {
+          "id": "long_function_analyze_critical_files",
+          "rule_id": "long_function",
+          "type": "long_function",
+          "severity": "medium",
+          "description": "Function \"analyze_critical_files\" is 86 lines long (threshold: 50)",
+          "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\critical_syntax_issues.py",
+          "line_number": 10,
+          "weight": 2.0
+        }
+      ],
+      "summary": {
+        "total_violations": 1,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 1,
+          "low": 0
+        },
+        "by_type": {
+          "long_function": 1
+        }
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\critical_syntax_issues.py",
+        "timestamp": 1757093674.3560545,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.001994609832763672
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\demo_unified_system.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\demo_unified_system.py",
+        "timestamp": 1757093674.3591754,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.003120899200439453
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\demo_vrf_neighbor_selection.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\demo_vrf_neighbor_selection.py",
+        "timestamp": 1757093674.3631656,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.00399017333984375
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\deployment_rollback_strategy.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\deployment_rollback_strategy.py",
+        "timestamp": 1757093674.3661566,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.0029909610748291016
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\deploy_enhanced_fog_system.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\deploy_enhanced_fog_system.py",
+        "timestamp": 1757093674.3712442,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.005087614059448242
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\deploy_production.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\deploy_production.py",
+        "timestamp": 1757093674.3762307,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.00498652458190918
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\detect_anti_patterns.py",
+      "violations": [
+        {
+          "id": "god_object_AntiPatternDetector",
+          "rule_id": "god_object",
+          "type": "god_object",
+          "severity": "high",
+          "description": "God Object detected: Class \"AntiPatternDetector\" has 16 methods (threshold: 15)",
+          "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\detect_anti_patterns.py",
+          "line_number": 47,
+          "weight": 4.0
+        },
+        {
+          "id": "data_class_AntiPatternDetector",
+          "rule_id": "data_class",
+          "type": "data_class",
+          "severity": "medium",
+          "description": "Data Class smell: Class \"AntiPatternDetector\" has 15 instance variables (threshold: 10)",
+          "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\detect_anti_patterns.py",
+          "line_number": 47,
+          "weight": 2.5
+        },
+        {
+          "id": "long_function_main",
+          "rule_id": "long_function",
+          "type": "long_function",
+          "severity": "medium",
+          "description": "Function \"main\" is 85 lines long (threshold: 50)",
+          "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\detect_anti_patterns.py",
+          "line_number": 682,
+          "weight": 2.0
+        }
+      ],
+      "summary": {
+        "total_violations": 3,
+        "by_severity": {
+          "critical": 0,
+          "high": 1,
+          "medium": 2,
+          "low": 0
+        },
+        "by_type": {
+          "god_object": 1,
+          "data_class": 1,
+          "long_function": 1
+        }
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\detect_anti_patterns.py",
+        "timestamp": 1757093674.3823478,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.006117105484008789
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\enhanced_security_validation.py",
+      "violations": [
+        {
+          "id": "long_function_main",
+          "rule_id": "long_function",
+          "type": "long_function",
+          "severity": "medium",
+          "description": "Function \"main\" is 102 lines long (threshold: 50)",
+          "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\enhanced_security_validation.py",
+          "line_number": 421,
+          "weight": 2.0
+        }
+      ],
+      "summary": {
+        "total_violations": 1,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 1,
+          "low": 0
+        },
+        "by_type": {
+          "long_function": 1
+        }
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\enhanced_security_validation.py",
+        "timestamp": 1757093674.3873339,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.0049860477447509766
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\fix_agent_forge_paths.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\fix_agent_forge_paths.py",
+        "timestamp": 1757093674.3893287,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.0019948482513427734
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\fix_ci_preflight.py",
+      "violations": [
+        {
+          "id": "long_function_fix_security_issues",
+          "rule_id": "long_function",
+          "type": "long_function",
+          "severity": "medium",
+          "description": "Function \"fix_security_issues\" is 72 lines long (threshold: 50)",
+          "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\fix_ci_preflight.py",
+          "line_number": 11,
+          "weight": 2.0
+        }
+      ],
+      "summary": {
+        "total_violations": 1,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 1,
+          "low": 0
+        },
+        "by_type": {
+          "long_function": 1
+        }
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\fix_ci_preflight.py",
+        "timestamp": 1757093674.390326,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.000997304916381836
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\fix_tool_calling_errors.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\fix_tool_calling_errors.py",
+        "timestamp": 1757093674.3923204,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.0019943714141845703
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\focused_syntax_check.py",
+      "violations": [
+        {
+          "id": "long_function_check_file_syntax",
+          "rule_id": "long_function",
+          "type": "long_function",
+          "severity": "medium",
+          "description": "Function \"check_file_syntax\" is 63 lines long (threshold: 50)",
+          "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\focused_syntax_check.py",
+          "line_number": 12,
+          "weight": 2.0
+        }
+      ],
+      "summary": {
+        "total_violations": 1,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 1,
+          "low": 0
+        },
+        "by_type": {
+          "long_function": 1
+        }
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\focused_syntax_check.py",
+        "timestamp": 1757093674.393318,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.0009975433349609375
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\gateway_performance_monitor.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\gateway_performance_monitor.py",
+        "timestamp": 1757093674.397307,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.003988981246948242
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\generate_constants_imports.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\generate_constants_imports.py",
+        "timestamp": 1757093674.3993015,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.001994609832763672
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\generate_cost_analysis.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\generate_cost_analysis.py",
+        "timestamp": 1757093674.4022934,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.002991914749145508
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\god_object_detector.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\god_object_detector.py",
+        "timestamp": 1757093674.4042883,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.0019948482513427734
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\import_migration_fix.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\import_migration_fix.py",
+        "timestamp": 1757093674.4052858,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.0009975433349609375
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\magic_literal_analyzer.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\magic_literal_analyzer.py",
+        "timestamp": 1757093674.4092748,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.003988981246948242
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\mcp_server_diagnostics.py",
+      "violations": [
+        {
+          "id": "long_function_main",
+          "rule_id": "long_function",
+          "type": "long_function",
+          "severity": "medium",
+          "description": "Function \"main\" is 56 lines long (threshold: 50)",
+          "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\mcp_server_diagnostics.py",
+          "line_number": 359,
+          "weight": 2.0
+        }
+      ],
+      "summary": {
+        "total_violations": 1,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 1,
+          "low": 0
+        },
+        "by_type": {
+          "long_function": 1
+        }
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\mcp_server_diagnostics.py",
+        "timestamp": 1757093674.4132648,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.0039899349212646484
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\monitor_performance.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\monitor_performance.py",
+        "timestamp": 1757093674.4132648,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.0
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\p2p_validation.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\p2p_validation.py",
+        "timestamp": 1757093674.4162564,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.0019943714141845703
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\performance_benchmark_manager.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\performance_benchmark_manager.py",
+        "timestamp": 1757093674.419373,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.003116607666015625
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\pipeline_health_monitor.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\pipeline_health_monitor.py",
+        "timestamp": 1757093674.422365,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.002991914749145508
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\pipeline_monitoring_final_report.py",
+      "violations": [
+        {
+          "id": "long_function_create_final_pipeline_report",
+          "rule_id": "long_function",
+          "type": "long_function",
+          "severity": "medium",
+          "description": "Function \"create_final_pipeline_report\" is 306 lines long (threshold: 50)",
+          "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\pipeline_monitoring_final_report.py",
+          "line_number": 13,
+          "weight": 2.0
+        }
+      ],
+      "summary": {
+        "total_violations": 1,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 1,
+          "low": 0
+        },
+        "by_type": {
+          "long_function": 1
+        }
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\pipeline_monitoring_final_report.py",
+        "timestamp": 1757093674.4253569,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.002991914749145508
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\pipeline_status_report.py",
+      "violations": [
+        {
+          "id": "long_function_generate_pipeline_status_report",
+          "rule_id": "long_function",
+          "type": "long_function",
+          "severity": "medium",
+          "description": "Function \"generate_pipeline_status_report\" is 226 lines long (threshold: 50)",
+          "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\pipeline_status_report.py",
+          "line_number": 13,
+          "weight": 2.0
+        }
+      ],
+      "summary": {
+        "total_violations": 1,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 1,
+          "low": 0
+        },
+        "by_type": {
+          "long_function": 1
+        }
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\pipeline_status_report.py",
+        "timestamp": 1757093674.427352,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.001995086669921875
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\playbook-driven-test-fixer.py",
+      "violations": [
+        {
+          "id": "god_object_PlaybookDrivenTestFixer",
+          "rule_id": "god_object",
+          "type": "god_object",
+          "severity": "high",
+          "description": "God Object detected: Class \"PlaybookDrivenTestFixer\" has 24 methods (threshold: 15)",
+          "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\playbook-driven-test-fixer.py",
+          "line_number": 22,
+          "weight": 4.0
+        }
+      ],
+      "summary": {
+        "total_violations": 1,
+        "by_severity": {
+          "critical": 0,
+          "high": 1,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {
+          "god_object": 1
+        }
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\playbook-driven-test-fixer.py",
+        "timestamp": 1757093674.43439,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.007038116455078125
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\pretrain_cognate_models.py",
+      "violations": [
+        {
+          "id": "long_function_pretrain_cognate_models",
+          "rule_id": "long_function",
+          "type": "long_function",
+          "severity": "medium",
+          "description": "Function \"pretrain_cognate_models\" is 160 lines long (threshold: 50)",
+          "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\pretrain_cognate_models.py",
+          "line_number": 37,
+          "weight": 2.0
+        }
+      ],
+      "summary": {
+        "total_violations": 1,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 1,
+          "low": 0
+        },
+        "by_type": {
+          "long_function": 1
+        }
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\pretrain_cognate_models.py",
+        "timestamp": 1757093674.4373808,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.00299072265625
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\production_linting_validator.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\production_linting_validator.py",
+        "timestamp": 1757093674.4433653,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.00598454475402832
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\rag_cli.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\rag_cli.py",
+        "timestamp": 1757093674.444362,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.0009965896606445312
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\run_architecture_suite.py",
+      "violations": [
+        {
+          "id": "long_function_main",
+          "rule_id": "long_function",
+          "type": "long_function",
+          "severity": "medium",
+          "description": "Function \"main\" is 92 lines long (threshold: 50)",
+          "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\run_architecture_suite.py",
+          "line_number": 247,
+          "weight": 2.0
+        }
+      ],
+      "summary": {
+        "total_violations": 1,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 1,
+          "low": 0
+        },
+        "by_type": {
+          "long_function": 1
+        }
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\run_architecture_suite.py",
+        "timestamp": 1757093674.447354,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.0029921531677246094
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\run_cognate_consolidation.py",
+      "violations": [
+        {
+          "id": "long_function_main",
+          "rule_id": "long_function",
+          "type": "long_function",
+          "severity": "medium",
+          "description": "Function \"main\" is 101 lines long (threshold: 50)",
+          "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\run_cognate_consolidation.py",
+          "line_number": 388,
+          "weight": 2.0
+        }
+      ],
+      "summary": {
+        "total_violations": 1,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 1,
+          "low": 0
+        },
+        "by_type": {
+          "long_function": 1
+        }
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\run_cognate_consolidation.py",
+        "timestamp": 1757093674.452341,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.004987001419067383
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\run_evomerge_analysis.py",
+      "violations": [
+        {
+          "id": "long_function_analyze_evomerge_results",
+          "rule_id": "long_function",
+          "type": "long_function",
+          "severity": "medium",
+          "description": "Function \"analyze_evomerge_results\" is 112 lines long (threshold: 50)",
+          "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\run_evomerge_analysis.py",
+          "line_number": 12,
+          "weight": 2.0
+        }
+      ],
+      "summary": {
+        "total_violations": 1,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 1,
+          "low": 0
+        },
+        "by_type": {
+          "long_function": 1
+        }
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\run_evomerge_analysis.py",
+        "timestamp": 1757093674.4543355,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.0019943714141845703
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\run_quality_analysis.py",
+      "violations": [
+        {
+          "id": "long_function_run_command",
+          "rule_id": "long_function",
+          "type": "long_function",
+          "severity": "medium",
+          "description": "Function \"run_command\" is 53 lines long (threshold: 50)",
+          "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\run_quality_analysis.py",
+          "line_number": 19,
+          "weight": 2.0
+        }
+      ],
+      "summary": {
+        "total_violations": 1,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 1,
+          "low": 0
+        },
+        "by_type": {
+          "long_function": 1
+        }
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\run_quality_analysis.py",
+        "timestamp": 1757093674.4583247,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.003989219665527344
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\run_real_cognate_pretraining.py",
+      "violations": [
+        {
+          "id": "long_function_run_real_cognate_pretraining",
+          "rule_id": "long_function",
+          "type": "long_function",
+          "severity": "medium",
+          "description": "Function \"run_real_cognate_pretraining\" is 183 lines long (threshold: 50)",
+          "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\run_real_cognate_pretraining.py",
+          "line_number": 32,
+          "weight": 2.0
+        }
+      ],
+      "summary": {
+        "total_violations": 1,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 1,
+          "low": 0
+        },
+        "by_type": {
+          "long_function": 1
+        }
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\run_real_cognate_pretraining.py",
+        "timestamp": 1757093674.462314,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.003989219665527344
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\run_zk_demo.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\run_zk_demo.py",
+        "timestamp": 1757093674.462314,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.0
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\security_audit_websocket_endpoints.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\security_audit_websocket_endpoints.py",
+        "timestamp": 1757093674.465306,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.0029921531677246094
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\security_consolidation_plan.py",
+      "violations": [
+        {
+          "id": "long_function_main",
+          "rule_id": "long_function",
+          "type": "long_function",
+          "severity": "medium",
+          "description": "Function \"main\" is 53 lines long (threshold: 50)",
+          "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\security_consolidation_plan.py",
+          "line_number": 324,
+          "weight": 2.0
+        }
+      ],
+      "summary": {
+        "total_violations": 1,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 1,
+          "low": 0
+        },
+        "by_type": {
+          "long_function": 1
+        }
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\security_consolidation_plan.py",
+        "timestamp": 1757093674.4692962,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.00399017333984375
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\security_demo.py",
+      "violations": [
+        {
+          "id": "long_function_demonstrate_security_enhancements",
+          "rule_id": "long_function",
+          "type": "long_function",
+          "severity": "medium",
+          "description": "Function \"demonstrate_security_enhancements\" is 202 lines long (threshold: 50)",
+          "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\security_demo.py",
+          "line_number": 20,
+          "weight": 2.0
+        }
+      ],
+      "summary": {
+        "total_violations": 1,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 1,
+          "low": 0
+        },
+        "by_type": {
+          "long_function": 1
+        }
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\security_demo.py",
+        "timestamp": 1757093674.47129,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.001993894577026367
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\security_migration.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\security_migration.py",
+        "timestamp": 1757093674.4752793,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.003989219665527344
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\security_remediation_sequential_implementation.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\security_remediation_sequential_implementation.py",
+        "timestamp": 1757093674.4813476,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.006068229675292969
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\security_rollback_manager.py",
+      "violations": [
+        {
+          "id": "long_function_main",
+          "rule_id": "long_function",
+          "type": "long_function",
+          "severity": "medium",
+          "description": "Function \"main\" is 57 lines long (threshold: 50)",
+          "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\security_rollback_manager.py",
+          "line_number": 454,
+          "weight": 2.0
+        }
+      ],
+      "summary": {
+        "total_violations": 1,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 1,
+          "low": 0
+        },
+        "by_type": {
+          "long_function": 1
+        }
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\security_rollback_manager.py",
+        "timestamp": 1757093674.4863331,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.0049855709075927734
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\security_suppression_fixer.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\security_suppression_fixer.py",
+        "timestamp": 1757093674.488328,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.0019948482513427734
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\setup_architecture_tools.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\setup_architecture_tools.py",
+        "timestamp": 1757093674.4903226,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.001994609832763672
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\simple_validation.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\simple_validation.py",
+        "timestamp": 1757093674.4933152,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.0029926300048828125
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\startup-initialization.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\startup-initialization.py",
+        "timestamp": 1757093674.4973042,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.003988981246948242
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\start_admin_dashboard.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\start_admin_dashboard.py",
+        "timestamp": 1757093674.4983015,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.000997304916381836
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\start_service_mesh.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\start_service_mesh.py",
+        "timestamp": 1757093674.4993958,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.0010943412780761719
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\syntax_validator.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\syntax_validator.py",
+        "timestamp": 1757093674.5043824,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.00498652458190918
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\test_enhanced_fog_integration.py",
+      "violations": [
+        {
+          "id": "god_object_FogSystemTestSuite",
+          "rule_id": "god_object",
+          "type": "god_object",
+          "severity": "high",
+          "description": "God Object detected: Class \"FogSystemTestSuite\" has 26 methods (threshold: 15)",
+          "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\test_enhanced_fog_integration.py",
+          "line_number": 31,
+          "weight": 4.0
+        }
+      ],
+      "summary": {
+        "total_violations": 1,
+        "by_severity": {
+          "critical": 0,
+          "high": 1,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {
+          "god_object": 1
+        }
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\test_enhanced_fog_integration.py",
+        "timestamp": 1757093674.5294297,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.02504730224609375
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\test_fog_onion_integration.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\test_fog_onion_integration.py",
+        "timestamp": 1757093674.5413985,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.011968851089477539
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\unified_cleanup_framework.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\unified_cleanup_framework.py",
+        "timestamp": 1757093674.546385,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.00498652458190918
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\validate_cognate_config.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\validate_cognate_config.py",
+        "timestamp": 1757093674.5513723,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.004987239837646484
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\validate_constitutional_pricing.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\validate_constitutional_pricing.py",
+        "timestamp": 1757093674.5563583,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.0049860477447509766
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\validate_decomposition.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\validate_decomposition.py",
+        "timestamp": 1757093674.5634267,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.0070683956146240234
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\validate_fog_service_extraction.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\validate_fog_service_extraction.py",
+        "timestamp": 1757093674.5674171,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.0039904117584228516
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\validate_imports.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\validate_imports.py",
+        "timestamp": 1757093674.5695083,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.0020911693572998047
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\validate_p2p_test_suite.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\validate_p2p_test_suite.py",
+        "timestamp": 1757093674.58155,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.012041568756103516
+    },
+    {
+      "success": true,
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\validate_process_task.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {},
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\scripts\\validate_process_task.py",
+        "timestamp": 1757093674.5845423,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 0.002992391586303711
+    }
+  ]
+}

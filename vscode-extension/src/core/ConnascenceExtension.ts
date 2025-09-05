@@ -1,6 +1,31 @@
 import * as vscode from 'vscode';
 import { ExtensionLogger } from '../utils/logger';
 import { TelemetryReporter } from '../utils/telemetry';
+import { TelemetryService } from '../services/telemetryService';
+
+/**
+ * Adapter to bridge TelemetryReporter and TelemetryService interfaces
+ */
+class TelemetryServiceAdapter extends TelemetryService {
+    constructor(private reporter: TelemetryReporter) {
+        super();
+    }
+    
+    logEvent(name: string, properties?: { [key: string]: any }, measurements?: { [key: string]: number }): void {
+        super.logEvent(name, properties, measurements);
+        this.reporter.logEvent(name, properties);
+    }
+    
+    logError(error: Error, context?: string): void {
+        super.logError(error, context);
+        this.reporter.logError(error, context);
+    }
+    
+    logPerformance(operation: string, duration: number, success: boolean): void {
+        super.logPerformance(operation, duration, success);
+        this.reporter.logPerformance(operation, duration, success);
+    }
+}
 import { ConnascenceDiagnosticsProvider } from '../providers/diagnosticsProvider';
 import { ConnascenceCodeActionProvider } from '../providers/codeActionProvider';
 import { ConnascenceCompletionProvider } from '../providers/completionProvider';
@@ -47,15 +72,8 @@ export class ConnascenceExtension {
     ) {
         // Initialize services first
         this.configService = new ConfigurationService();
-        // Create TelemetryService adapter for TelemetryReporter
-        const telemetryServiceAdapter: any = {
-            logEvent: (event: string, data?: any) => this.telemetry.logEvent(event, data),
-            events: {},
-            sessionId: '',
-            userId: '',
-            enabled: true
-        };
-        this.connascenceService = new ConnascenceService(this.configService, telemetryServiceAdapter);
+        // TelemetryService adapter will be created in the constructor
+        this.connascenceService = new ConnascenceService(this.configService, new TelemetryServiceAdapter(this.telemetry));
         
         // Initialize UI components
         this.statusBarManager = new StatusBarManager(this.connascenceService, this.configService);

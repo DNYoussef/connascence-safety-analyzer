@@ -1,9 +1,10 @@
 import * as vscode from 'vscode';
 import { ConnascenceService, AnalysisResult, Finding } from '../services/connascenceService';
+import { AnalysisCache } from '../utils/cache';
 
 export class ConnascenceDiagnosticsProvider {
     private diagnosticsCollection: vscode.DiagnosticCollection;
-    private cache = new Map<string, AnalysisResult>();
+    private cache = new AnalysisCache();
 
     constructor(private connascenceService: ConnascenceService) {
         this.diagnosticsCollection = vscode.languages.createDiagnosticCollection('connascence');
@@ -12,7 +13,7 @@ export class ConnascenceDiagnosticsProvider {
     async updateDiagnostics(uri: vscode.Uri, results: AnalysisResult): Promise<void> {
         const diagnostics = this.findingsToDiagnostics(results.findings, uri);
         this.diagnosticsCollection.set(uri, diagnostics);
-        this.cache.set(uri.toString(), results);
+        await this.cache.setCachedResult(uri.fsPath, results);
     }
 
     async updateFile(document: vscode.TextDocument): Promise<void> {
@@ -32,7 +33,7 @@ export class ConnascenceDiagnosticsProvider {
 
     clearDiagnostics(uri: vscode.Uri): void {
         this.diagnosticsCollection.delete(uri);
-        this.cache.delete(uri.toString());
+        this.cache.delete(uri.fsPath);
     }
 
     clearAllDiagnostics(): void {
@@ -44,8 +45,8 @@ export class ConnascenceDiagnosticsProvider {
         return this.diagnosticsCollection.get(uri) || [];
     }
 
-    getCachedResults(uri: vscode.Uri): AnalysisResult | undefined {
-        return this.cache.get(uri.toString());
+    async getCachedResults(uri: vscode.Uri): Promise<AnalysisResult | undefined> {
+        return await this.cache.getCachedResult(uri.fsPath);
     }
 
     dispose(): void {
@@ -155,11 +156,11 @@ export class ConnascenceDiagnosticsProvider {
 
     // Batch operations for performance
     async updateMultipleDiagnostics(updates: { uri: vscode.Uri; results: AnalysisResult }[]): Promise<void> {
-        const batch = updates.map(({ uri, results }) => {
+        const batch = await Promise.all(updates.map(async ({ uri, results }) => {
             const diagnostics = this.findingsToDiagnostics(results.findings, uri);
-            this.cache.set(uri.toString(), results);
+            await this.cache.setCachedResult(uri.fsPath, results);
             return { uri, diagnostics };
-        });
+        }));
 
         // Apply all updates at once
         for (const { uri, diagnostics } of batch) {
@@ -188,7 +189,7 @@ export class ConnascenceDiagnosticsProvider {
         }
 
         return {
-            totalFiles: this.cache.size,
+            totalFiles: this.cache.size(),
             totalFindings,
             findingsBySeverity,
             findingsByType
@@ -197,18 +198,23 @@ export class ConnascenceDiagnosticsProvider {
 
     // Filter diagnostics based on configuration
     applyFilter(severityFilter?: string[], typeFilter?: string[]): void {
-        for (const [uriString, results] of this.cache.entries()) {
-            const uri = vscode.Uri.parse(uriString);
+        const keys = this.cache.keys();
+        
+        for (const filePath of keys) {
+            const results = this.cache.get(filePath);
+            if (!results) continue;
+            
+            const uri = vscode.Uri.file(filePath);
             let filteredFindings = results.findings;
 
             if (severityFilter && severityFilter.length > 0) {
-                filteredFindings = filteredFindings.filter(f => 
+                filteredFindings = filteredFindings.filter((f: Finding) => 
                     severityFilter.includes(f.severity)
                 );
             }
 
             if (typeFilter && typeFilter.length > 0) {
-                filteredFindings = filteredFindings.filter(f => 
+                filteredFindings = filteredFindings.filter((f: Finding) => 
                     typeFilter.some(type => f.type.includes(type))
                 );
             }

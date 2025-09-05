@@ -1,0 +1,24 @@
+{
+  "success": true,
+  "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\.claude\\agents\\stub_killer\\code_generator.py",
+  "violations": [],
+  "summary": {
+    "total_violations": 0,
+    "by_severity": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0
+    },
+    "by_type": {}
+  },
+  "integrations": {},
+  "metadata": {
+    "analysis_type": "full",
+    "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\.claude\\agents\\stub_killer\\code_generator.py",
+    "timestamp": 1757091873.392673,
+    "server_version": "2.0.0"
+  },
+  "error_message": null,
+  "execution_time": 0.0
+}

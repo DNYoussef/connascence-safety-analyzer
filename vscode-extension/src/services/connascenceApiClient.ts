@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
+import { spawn } from 'child_process';
 import { AnalysisResult, Finding } from './connascenceService';
 
 /**
@@ -17,26 +18,13 @@ export class ConnascenceApiClient {
      */
     public async analyzeFile(filePath: string): Promise<AnalysisResult> {
         try {
-            // Import and use the existing analysis system from src/reports/
-            const { generateConnascenceReport } = await this.loadConnascenceSystem();
-            
-            // Create a mock options object for single file analysis
-            const options = {
+            const result = await this.runPythonAnalyzer({
                 inputPath: filePath,
-                outputPath: path.join(path.dirname(filePath), '.connascence-temp.json'),
-                format: 'json' as const,
-                verbose: false,
-                includeTests: false,
-                safetyProfile: this.getSafetyProfile(),
-                threshold: this.getThreshold(),
-                exclude: this.getExcludePatterns()
-            };
-
-            // Generate the report
-            const report = await generateConnascenceReport(options);
+                mode: 'single-file',
+                safetyProfile: this.getSafetyProfile()
+            });
             
-            // Convert to VS Code format
-            return this.convertReportToAnalysisResult(report, filePath);
+            return this.convertReportToAnalysisResult(result, filePath);
             
         } catch (error) {
             console.error('Failed to analyze file with main system:', error);
@@ -209,27 +197,16 @@ export class ConnascenceApiClient {
     }
 
     /**
-     * Load the main connascence analysis system
+     * Load the main connascence analysis system via Python subprocess
      */
     private async loadConnascenceSystem(): Promise<any> {
-        try {
-            // Try to load from the main project
-            const reportPath = this.workspaceRoot ? 
-                path.join(this.workspaceRoot, 'src', 'reports', 'index.js') :
-                undefined;
-                
-            if (reportPath) {
-                return require(reportPath);
-            }
-            
-            // Fallback: try to load from relative path
-            const relativePath = path.join(__dirname, '..', '..', '..', 'src', 'reports', 'index.js');
-            return require(relativePath);
-            
-        } catch (error) {
-            console.error('Failed to load connascence system:', error);
-            throw new Error('Main connascence analysis system not available');
-        }
+        // Use Python subprocess to run the analyzer
+        return {
+            generateConnascenceReport: this.runPythonAnalyzer.bind(this),
+            validateSafetyCompliance: this.runSafetyValidation.bind(this),
+            getRefactoringSuggestions: this.getRefactoringSuggestions.bind(this),
+            getAutomatedFixes: this.getAutomatedFixes.bind(this)
+        };
     }
 
     /**
@@ -458,5 +435,145 @@ export class ConnascenceApiClient {
     private calculateOverallQualityScore(fileResults: { [filePath: string]: AnalysisResult }): number {
         const scores = Object.values(fileResults).map(r => r.qualityScore);
         return scores.length > 0 ? scores.reduce((sum, score) => sum + score, 0) / scores.length : 100;
+    }
+
+    /**
+     * Run Python analyzer as subprocess
+     */
+    private async runPythonAnalyzer(options: any): Promise<any> {
+        const analyzerPath = this.getAnalyzerPath();
+        const pythonPath = this.getPythonPath();
+        
+        const args = [
+            analyzerPath,
+            options.inputPath,
+            '--format', 'json',
+            '--profile', options.safetyProfile || 'modern_general'
+        ];
+        
+        if (options.mode === 'single-file') {
+            args.push('--single-file');
+        }
+        
+        return new Promise((resolve, reject) => {
+            const process = spawn(pythonPath, args, {
+                cwd: this.workspaceRoot
+            });
+            
+            let stdout = '';
+            let stderr = '';
+            
+            process.stdout.on('data', (data) => {
+                stdout += data.toString();
+            });
+            
+            process.stderr.on('data', (data) => {
+                stderr += data.toString();
+            });
+            
+            process.on('close', (code) => {
+                if (code === 0) {
+                    try {
+                        const result = JSON.parse(stdout);
+                        resolve(result);
+                    } catch (parseError) {
+                        reject(new Error(`Failed to parse analyzer output: ${parseError}`));
+                    }
+                } else {
+                    reject(new Error(`Analyzer failed with code ${code}: ${stderr}`));
+                }
+            });
+            
+            process.on('error', (error) => {
+                reject(new Error(`Failed to run analyzer: ${error.message}`));
+            });
+        });
+    }
+    
+    /**
+     * Run safety validation via Python
+     */
+    private async runSafetyValidation(options: any): Promise<any> {
+        const result = await this.runPythonAnalyzer({
+            ...options,
+            mode: 'safety-validation'
+        });
+        
+        return {
+            compliant: result.safety_compliant || false,
+            violations: result.safety_violations || []
+        };
+    }
+    
+    /**
+     * Get refactoring suggestions via Python
+     */
+    private async getRefactoringSuggestions(options: any): Promise<any[]> {
+        try {
+            const result = await this.runPythonAnalyzer({
+                ...options,
+                mode: 'refactoring-suggestions'
+            });
+            
+            return result.suggestions || [];
+        } catch (error) {
+            console.warn('Refactoring suggestions not available:', error);
+            return [];
+        }
+    }
+    
+    /**
+     * Get automated fixes via Python
+     */
+    private async getAutomatedFixes(options: any): Promise<any[]> {
+        try {
+            const result = await this.runPythonAnalyzer({
+                ...options,
+                mode: 'automated-fixes'
+            });
+            
+            return result.fixes || [];
+        } catch (error) {
+            console.warn('Automated fixes not available:', error);
+            return [];
+        }
+    }
+    
+    /**
+     * Get the path to the Python analyzer
+     */
+    private getAnalyzerPath(): string {
+        if (this.workspaceRoot) {
+            return path.join(this.workspaceRoot, 'analyzer', 'check_connascence.py');
+        }
+        
+        // Fallback to relative path from extension
+        return path.join(__dirname, '..', '..', '..', 'analyzer', 'check_connascence.py');
+    }
+    
+    /**
+     * Get the Python executable path
+     */
+    private getPythonPath(): string {
+        const config = vscode.workspace.getConfiguration('connascence');
+        const configuredPath = config.get<string>('pythonPath');
+        
+        if (configuredPath) {
+            return configuredPath;
+        }
+        
+        // Try common Python paths
+        const commonPaths = [
+            'python3',
+            'python',
+            '/usr/bin/python3',
+            '/usr/local/bin/python3',
+            'C:\\Python39\\python.exe',
+            'C:\\Python310\\python.exe',
+            'C:\\Python311\\python.exe'
+        ];
+        
+        // For now, default to 'python'
+        return 'python';
     }
 }
