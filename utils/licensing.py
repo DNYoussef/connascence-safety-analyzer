@@ -16,26 +16,26 @@ Mock licensing module for import compatibility.
 """
 from dataclasses import dataclass
 from typing import Optional, Dict, Any
+import sys
+from pathlib import Path
+
+# Import central constants
+sys.path.append(str(Path(__file__).parent.parent))
+from config.central_constants import LicenseConstants
 
 
 @dataclass
 class LicenseValidationResult:
     """Mock license validation result."""
     is_valid: bool = True
-    license_type: str = "MIT"
+    license_type: str = LicenseConstants.MIT
     expires_at: Optional[str] = None
     features_enabled: Dict[str, bool] = None
-    message: str = "Mock license validation"
+    message: str = LicenseConstants.MOCK_VALIDATION_MESSAGE
     
     def __post_init__(self):
         if self.features_enabled is None:
-            self.features_enabled = {
-                'basic_analysis': True,
-                'advanced_patterns': True,
-                'enterprise_features': True,
-                'mcp_server': True,
-                'vscode_extension': True
-            }
+            self.features_enabled = LicenseConstants.DEFAULT_FEATURES.copy()
 
 
 class LicenseValidator:
@@ -48,8 +48,8 @@ class LicenseValidator:
         """Mock validation - always returns valid."""
         return LicenseValidationResult(
             is_valid=True,
-            license_type="MIT",
-            message="Mock license - all features enabled"
+            license_type=LicenseConstants.MIT,
+            message=LicenseConstants.MOCK_ALL_FEATURES_MESSAGE
         )
     
     def check_feature(self, feature_name: str) -> bool:
@@ -59,7 +59,7 @@ class LicenseValidator:
     def get_license_info(self) -> Dict[str, Any]:
         """Get mock license information."""
         return {
-            'type': 'MIT',
+            'type': LicenseConstants.MIT,
             'valid': True,
             'features': ['all'],
             'expires': None

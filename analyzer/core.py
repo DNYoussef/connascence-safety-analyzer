@@ -11,43 +11,53 @@ import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-# Import constants to eliminate magic numbers
-try:
-    from .constants import (
-        NASA_COMPLIANCE_THRESHOLD, MECE_QUALITY_THRESHOLD, 
-        OVERALL_QUALITY_THRESHOLD, VIOLATION_WEIGHTS
-    )
-except ImportError:
-    # Fallback when running as script
-    from constants import (
-        NASA_COMPLIANCE_THRESHOLD, MECE_QUALITY_THRESHOLD, 
-        OVERALL_QUALITY_THRESHOLD, VIOLATION_WEIGHTS
-    )
+# Import using unified import strategy
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from core.unified_imports import IMPORT_MANAGER, ImportSpec
 
-# Import unified analyzer components (now in same directory)
-try:
-    from .unified_analyzer import UnifiedConnascenceAnalyzer
-    UNIFIED_ANALYZER_AVAILABLE = True
-except ImportError:
-    try:
-        from unified_analyzer import UnifiedConnascenceAnalyzer
-        UNIFIED_ANALYZER_AVAILABLE = True
-    except ImportError:
-        UNIFIED_ANALYZER_AVAILABLE = False
-        print("[WARNING] Unified analyzer not available, using fallback mode")
+# Import constants with unified strategy
+constants_result = IMPORT_MANAGER.import_constants()
+if constants_result.has_module:
+    constants = constants_result.module
+    NASA_COMPLIANCE_THRESHOLD = getattr(constants, 'NASA_COMPLIANCE_THRESHOLD', 0.95)
+    MECE_QUALITY_THRESHOLD = getattr(constants, 'MECE_QUALITY_THRESHOLD', 0.80)
+    OVERALL_QUALITY_THRESHOLD = getattr(constants, 'OVERALL_QUALITY_THRESHOLD', 0.75)
+    VIOLATION_WEIGHTS = getattr(constants, 'VIOLATION_WEIGHTS', {'critical': 10, 'high': 5, 'medium': 2, 'low': 1})
+else:
+    # Fallback constants
+    NASA_COMPLIANCE_THRESHOLD = 0.95
+    MECE_QUALITY_THRESHOLD = 0.80
+    OVERALL_QUALITY_THRESHOLD = 0.75
+    VIOLATION_WEIGHTS = {'critical': 10, 'high': 5, 'medium': 2, 'low': 1}
 
-# Import MCP server components
-try:
-    from ..mcp.server import ConnascenceViolation
-except ImportError:
-    # Fallback for direct execution
-    sys.path.insert(0, str(Path(__file__).parent.parent))
-    from mcp.server import ConnascenceViolation
+# Import unified analyzer with fallback
+analyzer_result = IMPORT_MANAGER.import_unified_analyzer()
+UNIFIED_ANALYZER_AVAILABLE = analyzer_result.has_module
+if UNIFIED_ANALYZER_AVAILABLE:
+    UnifiedConnascenceAnalyzer = analyzer_result.module
+else:
+    print("[WARNING] Unified analyzer not available, using fallback mode")
+    UnifiedConnascenceAnalyzer = None
 
-try:
-    from .reporting.sarif_export import SARIFReporter
-    from .reporting.json_export import JSONReporter
-except ImportError:
+# Import MCP server components with unified strategy
+mcp_result = IMPORT_MANAGER.import_mcp_server()
+if mcp_result.has_module:
+    ConnascenceViolation = getattr(mcp_result.module, 'ConnascenceViolation', None)
+else:
+    # Create minimal ConnascenceViolation for fallback
+    class ConnascenceViolation:
+        def __init__(self, **kwargs):
+            for key, value in kwargs.items():
+                setattr(self, key, value)
+
+# Import reporting with unified strategy
+json_reporter_result = IMPORT_MANAGER.import_reporting("json")
+sarif_reporter_result = IMPORT_MANAGER.import_reporting("sarif")
+
+JSONReporter = getattr(json_reporter_result.module, 'JSONReporter', None) if json_reporter_result.has_module else None
+SARIFReporter = getattr(sarif_reporter_result.module, 'SARIFReporter', None) if sarif_reporter_result.has_module else None
+
+if not JSONReporter or not SARIFReporter:
     # Fallback for direct execution
     from reporting.sarif_export import SARIFReporter
     from reporting.json_export import JSONReporter

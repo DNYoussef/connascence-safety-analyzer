@@ -1,0 +1,111 @@
+{
+  "metadata": {
+    "version": "2.0.0",
+    "created": "2025-09-05",
+    "description": "Central configuration defaults for connascence analyzer"
+  },
+  "analysis": {
+    "thresholds": {
+      "nasa_parameter_threshold": 6,
+      "nasa_global_threshold": 5,
+      "nasa_compliance_threshold": 0.95,
+      "god_object_method_threshold": 20,
+      "god_object_loc_threshold": 500,
+      "mece_similarity_threshold": 0.8,
+      "mece_quality_threshold": 0.80,
+      "overall_quality_threshold": 0.75
+    },
+    "limits": {
+      "critical_violation_limit": 0,
+      "high_violation_limit": 5,
+      "magic_literal_threshold": 3,
+      "position_coupling_threshold": 4,
+      "algorithm_complexity_threshold": 10
+    }
+  },
+  "performance": {
+    "max_analysis_time_seconds": 300,
+    "max_file_size_kb": 1000,
+    "max_files_per_batch": 100,
+    "max_memory_mb": 1024,
+    "default_timeout_seconds": 30
+  },
+  "filesystem": {
+    "supported_extensions": {
+      "python": [".py", ".pyx", ".pyi"],
+      "javascript": [".js", ".mjs", ".jsx", ".ts", ".tsx"],
+      "c_cpp": [".c", ".cpp", ".cxx", ".cc", ".h", ".hpp", ".hxx"]
+    },
+    "exclusion_patterns": [
+      "__pycache__", ".git", ".pytest_cache", "node_modules",
+      ".venv", "venv", ".env", "build", "dist", ".tox", "coverage"
+    ]
+  },
+  "licensing": {
+    "default_type": "MIT",
+    "mock_features": {
+      "basic_analysis": true,
+      "advanced_patterns": true,
+      "enterprise_features": true,
+      "mcp_server": true,
+      "vscode_extension": true
+    },
+    "messages": {
+      "description": "Mock licensing module for import compatibility.",
+      "validation_result": "Mock license validation result.",
+      "validation_message": "Mock license validation",
+      "all_features_message": "Mock license - all features enabled"
+    }
+  },
+  "integration": {
+    "tools": {
+      "black": {
+        "command": "black --check --diff",
+        "enabled": true
+      },
+      "mypy": {
+        "command": "mypy --strict",
+        "enabled": true
+      },
+      "ruff": {
+        "command": "ruff check",
+        "enabled": true
+      },
+      "radon": {
+        "command": "radon cc",
+        "enabled": true
+      }
+    },
+    "rate_limiting": {
+      "max_requests_per_minute": 60,
+      "max_concurrent_analyses": 5
+    }
+  },
+  "mcp_server": {
+    "name": "connascence-analyzer-mcp",
+    "description": "MCP server for connascence analysis",
+    "default_rate_limit": 60,
+    "audit_enabled": true,
+    "max_file_size": 1000
+  },
+  "quality_gates": {
+    "violation_weights": {
+      "critical": 10,
+      "high": 5,
+      "medium": 2,
+      "low": 1
+    },
+    "severity_levels": {
+      "10": "CATASTROPHIC",
+      "9": "CRITICAL",
+      "8": "MAJOR",
+      "7": "SIGNIFICANT",
+      "6": "MODERATE",
+      "5": "MINOR",
+      "4": "TRIVIAL",
+      "3": "INFORMATIONAL",
+      "2": "ADVISORY",
+      "1": "NOTICE"
+    }
+  }
+}
