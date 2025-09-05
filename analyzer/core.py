@@ -442,7 +442,11 @@ def main():
                 print(f"SARIF report written to: {args.output}")
             else:
                 sarif_output = sarif_reporter.export_results(result)
-                print(sarif_output)
+                # Handle Unicode characters for Windows terminal
+                try:
+                    print(sarif_output)
+                except UnicodeEncodeError:
+                    print(sarif_output.encode('ascii', errors='replace').decode('ascii'))
         elif args.format == 'json':
             # Use JSONReporter for consistent formatting
             json_reporter = JSONReporter()
@@ -451,7 +455,11 @@ def main():
                 print(f"JSON report written to: {args.output}")
             else:
                 json_output = json_reporter.export_results(result)
-                print(json_output)
+                # Handle Unicode characters for Windows terminal
+                try:
+                    print(json_output)
+                except UnicodeEncodeError:
+                    print(json_output.encode('ascii', errors='replace').decode('ascii'))
         else:
             # Fallback to simple output
             if args.output:

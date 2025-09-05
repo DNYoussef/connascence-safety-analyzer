@@ -10,8 +10,14 @@ A production-grade multi-layered analysis platform validated through enterprise-
 # Complete verification with consolidated analyzer
 python scripts/run_reproducible_verification.py
 
-# Or use the consolidated analyzer directly
-cd analyzer && python core.py --path=../your_project --policy=default
+# Or use the consolidated analyzer directly (RECOMMENDED)
+cd analyzer && python core.py --path .. --format json
+
+# NASA Power of Ten compliance analysis
+cd analyzer && python core.py --path .. --policy nasa_jpl_pot10
+
+# MECE duplication analysis
+cd analyzer && python -m dup_detection.mece_analyzer --path .. --comprehensive
 ```
 
 **This single command demonstrates our complete multi-layered analysis system:**
@@ -86,26 +92,26 @@ cd connascence-safety-analyzer
 # Install the analyzer
 pip install -e .
 
-# Analyze your code
-python -m cli.connascence scan /path/to/your/project
+# Analyze your code (RECOMMENDED - Consolidated Analyzer)
+cd analyzer && python core.py --path ../your_project --format json
 
-# Generate reports
-python -m cli.connascence scan . --format json --output report.json
+# Generate comprehensive reports
+cd analyzer && python core.py --path .. --format json --output ../reports/analysis_report.json
 ```
 
 ### Advanced Usage
 ```bash
-# Scan with specific policy
-python -m cli.connascence scan . --policy strict-core
+# Scan with specific policy (NASA Power of Ten)
+cd analyzer && python core.py --path .. --policy nasa_jpl_pot10
 
-# Exclude patterns
-python -m cli.connascence scan . --exclude "tests/,docs/,vendor/"
+# SARIF report for security tools
+cd analyzer && python core.py --path .. --format sarif --output ../reports/security.sarif
 
-# Generate SARIF report for security tools
-python -m cli.connascence scan . --format sarif --output results.sarif
+# MECE duplication analysis
+cd analyzer && python -m dup_detection.mece_analyzer --path .. --comprehensive
 
-# Markdown report
-python -m cli.connascence scan . --format markdown --output report.md
+# Multiple format outputs
+cd analyzer && python core.py --path .. --format json --output ../reports/report.json
 ```
 
 ### VS Code Extension - Real-Time Analysis
@@ -171,7 +177,10 @@ cd connascence-safety-analyzer
 cd analyzer
 pip install -e .
 
-# Verify installation
+# Verify installation (Consolidated Analyzer)
+cd analyzer && python core.py --help
+
+# Or verify CLI installation
 python -m cli.connascence --help
 ```
 
@@ -198,42 +207,47 @@ pip install redis sqlalchemy
 ```bash
 # Using consolidated analyzer (RECOMMENDED - Real Analysis)
 cd analyzer
-python core.py --path=../your_project --policy=default
+python core.py --path .. --format json
 
 # Real MECE duplication detection
 cd analyzer
-python -m dup_detection.mece_analyzer --path=../your_project --comprehensive
+python -m dup_detection.mece_analyzer --path .. --comprehensive
 
 # NASA compliance with real thresholds
 cd analyzer
-python core.py --path=../your_project --policy=nasa_jpl_pot10
+python core.py --path .. --policy nasa_jpl_pot10
 
-# Legacy CLI (still available)
-python -m cli.connascence scan . --policy strict-core
+# SARIF output for security tools
+cd analyzer
+python core.py --path .. --format sarif
 ```
 
 ### Output Formats (Real Data)
 ```bash
 # JSON output with real violations and line numbers
 cd analyzer
-python core.py --path=../your_project --format=json --output=report.json
+python core.py --path .. --format json --output ../reports/connascence_analysis_report.json
 
 # SARIF output for security tools (real file paths)
 cd analyzer  
-python core.py --path=../your_project --format=sarif --output=report.sarif
+python core.py --path .. --format sarif --output ../reports/connascence_analysis.sarif
 
-# YAML output available
+# NASA compliance analysis
 cd analyzer
-python core.py --path=../your_project --format=yaml
+python core.py --path .. --policy nasa_jpl_pot10 --format json --output ../reports/nasa_compliance_report.json
 
-# Legacy CLI formats (still available)
-python -m cli.connascence scan . --format json --output report.json
+# MECE duplication analysis
+cd analyzer
+python -m dup_detection.mece_analyzer --path .. --comprehensive --output ../reports/mece_duplication_report.json
 ```
 
 ### MCP Server (AI Agent Integration)
 ```bash
 # Start MCP server
 python -m cli.connascence mcp serve
+
+# Or use consolidated analyzer with MCP integration
+cd analyzer && python core.py --path .. --format json | python -m mcp.server
 
 # Server provides 7 tools for AI agents:
 # - scan_path: Analyze code paths
