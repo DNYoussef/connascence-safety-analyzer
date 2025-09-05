@@ -1,0 +1,137 @@
+{
+  "mcp_configuration": {
+    "name": "Fallback MCP Configuration",
+    "version": "2.0.0",
+    "description": "Production-ready MCP configuration with pinned versions and fallback modes",
+    "last_updated": "2025-01-04"
+  },
+  
+  "mcpServers": {
+    "claude-flow": {
+      "command": "npx",
+      "args": [
+        "claude-flow@2.0.0-alpha.3",
+        "mcp",
+        "start"
+      ],
+      "type": "stdio",
+      "description": "Claude Flow v2.0.0-alpha.3 - Pinned version for reproducibility",
+      "capabilities": [
+        "swarm_coordination",
+        "neural_processing", 
+        "task_orchestration",
+        "memory_management"
+      ],
+      "integration_priority": "high",
+      "enabled": true,
+      "fallback_enabled": true,
+      "version_pinned": "2.0.0-alpha.3",
+      "sha256_checksum": "TBD - will be populated during verification"
+    },
+    
+    "ruv-swarm": {
+      "command": "npx",
+      "args": [
+        "ruv-swarm@1.2.1",
+        "mcp",
+        "start",
+        "--stability"
+      ],
+      "type": "stdio",
+      "description": "ruv-swarm v1.2.1 - Pinned stable version",
+      "capabilities": [
+        "distributed_processing",
+        "consensus_algorithms",
+        "performance_optimization",
+        "adaptive_coordination"
+      ],
+      "integration_priority": "high",
+      "enabled": true,
+      "fallback_enabled": true,
+      "version_pinned": "1.2.1",
+      "sha256_checksum": "TBD - will be populated during verification"
+    },
+    
+    "flow-nexus": {
+      "command": "npx", 
+      "args": [
+        "flow-nexus@3.1.0",
+        "mcp",
+        "start"
+      ],
+      "type": "stdio",
+      "description": "Flow Nexus v3.1.0 - Pinned stable version",
+      "capabilities": [
+        "advanced_orchestration",
+        "multi_agent_coordination",
+        "workflow_automation",
+        "integration_management"
+      ],
+      "integration_priority": "high",
+      "enabled": true,
+      "fallback_enabled": true,
+      "version_pinned": "3.1.0",
+      "sha256_checksum": "TBD - will be populated during verification"
+    }
+  },
+  
+  "fallback_configuration": {
+    "enable_graceful_degradation": true,
+    "offline_mode": true,
+    "standalone_analyzer": true,
+    "cache_responses": true,
+    "cache_ttl_seconds": 3600,
+    "local_processing_fallback": true,
+    "max_connection_attempts": 3,
+    "connection_timeout_seconds": 5,
+    "retry_backoff_seconds": 2
+  },
+  
+  "core_analyzer_config": {
+    "enable_without_mcp": true,
+    "standalone_mode": {
+      "enabled": true,
+      "features": [
+        "violation_detection",
+        "multi_language_analysis", 
+        "json_output",
+        "sarif_output",
+        "basic_reporting"
+      ],
+      "disabled_features": [
+        "ai_recommendations",
+        "neural_processing",
+        "swarm_coordination",
+        "advanced_autofix"
+      ]
+    }
+  },
+  
+  "reproducibility": {
+    "pin_dependency_versions": true,
+    "checksum_verification": true,
+    "deterministic_analysis": true,
+    "seed_random_generators": true,
+    "stable_sort_violations": true,
+    "version_control": {
+      "track_analyzer_version": true,
+      "track_dependency_versions": true,
+      "track_configuration_changes": true
+    }
+  },
+  
+  "verification_commands": {
+    "single_command_verification": "python scripts/verify_claims.py --full-verification",
+    "quick_verification": "python scripts/verify_claims.py",
+    "analyzer_only_test": "python -m analyzer.check_connascence test_packages/celery --no-mcp",
+    "reproducibility_check": "python scripts/verify_claims.py --check-reproducibility"
+  },
+  
+  "testing_configuration": {
+    "enable_mcp_integration_tests": true,
+    "enable_fallback_tests": true,
+    "enable_standalone_tests": true,
+    "test_timeout_seconds": 30,
+    "mock_mcp_servers_in_tests": true
+  }
+}

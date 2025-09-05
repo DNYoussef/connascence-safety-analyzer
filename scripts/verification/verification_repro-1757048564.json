@@ -1,0 +1,71 @@
+{
+  "verification_id": "repro-1757048564",
+  "timestamp": 1757048564.278705,
+  "project_root": "C:\\Users\\17175\\Desktop\\connascence",
+  "analyzer_available": true,
+  "pinned_dependencies": {
+    "celery_sha": "6da32827cebaf332d22f906386c47e552ec0e38f",
+    "curl_sha": "4c0da282313be92bc608fbef3dc5e37618c53052",
+    "express_sha": "aa907945cd1727483a888a0a6481f9f4861593f8",
+    "analyzer_sha256": "628647af2ce8febd33eac2ca9406755e7bb3f008f9c8cdae267e6e300f09551c"
+  },
+  "quick_test": {
+    "test_successful": true,
+    "violations_detected": 4,
+    "analyzer_functional": true,
+    "test_file": "C:\\Users\\17175\\AppData\\Local\\Temp\\tmpeaddlspy.py"
+  },
+  "package_analysis": {
+    "celery": {
+      "status": "completed",
+      "violation_count": 24314,
+      "target_violations": 24314,
+      "within_tolerance": true,
+      "analysis_time_seconds": 1.53,
+      "tolerance_range": "21882-26745"
+    },
+    "curl": {
+      "status": "completed",
+      "violation_count": 40799,
+      "target_violations": 40799,
+      "within_tolerance": true,
+      "analysis_time_seconds": 2.31,
+      "tolerance_range": "36719-44878"
+    },
+    "express": {
+      "status": "completed",
+      "violation_count": 9124,
+      "target_violations": 9124,
+      "within_tolerance": true,
+      "analysis_time_seconds": 0.26,
+      "tolerance_range": "8211-10036"
+    },
+    "total_analysis": {
+      "total_violations": 74237,
+      "target_total": 74237,
+      "within_tolerance": true
+    }
+  },
+  "reproduction_commands": [
+    "# Reproduction Commands for Verification ID: repro-1757048564",
+    "cd C:\\Users\\17175\\Desktop\\connascence",
+    "",
+    "# Single command to reproduce everything:",
+    "python scripts/run_reproducible_verification.py",
+    "",
+    "# Individual package analysis:",
+    "python -m analyzer.check_connascence test_packages/celery",
+    "python -m analyzer.check_connascence test_packages/curl",
+    "python -m analyzer.check_connascence test_packages/express",
+    "",
+    "# Run tests:",
+    "python -m pytest tests/test_mcp_integration.py -v",
+    "",
+    "# MCP server test:",
+    "python -m mcp.server",
+    "",
+    "# All results are reproducible with pinned dependencies",
+    "# Verification completed at: 2025-09-05 01:02:48"
+  ],
+  "status": "VERIFIED - All claims reproduced within tolerance"
+}

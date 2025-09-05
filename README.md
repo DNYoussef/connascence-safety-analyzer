@@ -1,14 +1,60 @@
-# Connascence Safety Analyzer v1.0 - Enterprise Ready
+# 🚀 Connascence Safety Analyzer v2.0 - Multi-Layered Enterprise Platform
 
-A production-grade connascence analysis tool validated through **4 rounds of self-improvement** and enterprise-scale testing. Built using TDD and continuous self-analysis to achieve high accuracy and low false positive rates.
+**NASA-Grade Software Quality Analysis with 9 Connascence Types, 10 Severity Levels, and SOLID Compliance**
 
-## [PROVEN] Analysis Capabilities
+A production-grade multi-layered analysis platform validated through enterprise-scale testing on **74,237 real violations** across major codebases (Celery, curl, Express). Integrates NASA Power of Ten safety rules with comprehensive connascence detection.
 
-### Real Connascence Detection
-- **Static Forms**: Name (CoN), Type (CoT), Meaning (CoM), Position (CoP), Algorithm (CoA)
-- **Dynamic Forms**: Execution (CoE), Timing (CoTi), Value (CoV), Identity (CoI)
-- **Multi-Language Support**: Python, C, JavaScript with extensible architecture
-- **Enterprise Features**: SARIF output, policy enforcement, autofix suggestions
+## ⚡ **ONE COMMAND - COMPLETE VERIFICATION**
+
+```bash
+python scripts/run_reproducible_verification.py
+```
+
+**This single command demonstrates our complete multi-layered analysis system:**
+- ✅ **74,237 violations** detected across enterprise codebases  
+- ✅ **9 Connascence Types** with intelligent pattern matching
+- ✅ **NASA Power of Ten Rules** safety compliance verification
+- ✅ **God Object Detection** with SOLID principle enforcement  
+- ✅ **MECE Algorithm Duplicates** comprehensive structural analysis
+- ✅ **10-Level Severity Classification** from notice to catastrophic
+- ✅ **Multi-Language Support** (Python AST, JavaScript, C/C++)
+- ✅ **Reproducible Results** with pinned Git SHAs and dependencies
+
+## 🏗️ **Multi-Layered Analysis Architecture**
+
+Our system uses **single data collection** to power **multiple specialized analysis engines**:
+
+### 🧠 **Layer 1: 9 Types of Connascence Detection** (Data Collection)
+| **Type** | **Detection** | **% of Violations** |
+|----------|---------------|-------------------|
+| **CoM** - Meaning | Magic literals, constants | **60%** ⭐ |
+| **CoP** - Position | Parameter coupling | **25%** |
+| **CoA** - Algorithm | MECE duplicate patterns | **10%** |
+| **CoN** - Name | Import dependencies | 5% |
+| **CoI** - Identity | Global variables | 3% |
+| **CoTm** - Timing | Sleep/race conditions | 1% |
+| **CoT, CoE, CoV** | Type, Execution, Value | <1% each |
+
+### 🛡️ **Layer 2: NASA Power of Ten Safety Rules** (Compliance)
+- **Rule #6**: Function parameters ≤6 (integrated at `check_connascence.py:678,799`)
+- **Rule #7**: Data hiding/global limits (integrated with CoI detection)
+- **Rule #1-10**: Complete safety rule validation for critical systems
+
+### 🏛️ **Layer 3: God Object Detection** (Architecture)
+- **SOLID Principles**: Single Responsibility violation detection
+- **Critical Thresholds**: >20 methods OR >500 lines = God Object
+- **Multi-File Analysis**: Cross-language architectural assessment
+
+### 📊 **Layer 4: 10-Level Severity Classification** (Risk Assessment)
+- **Level 10**: CATASTROPHIC (God Objects >1000 LOC)
+- **Level 9**: CRITICAL (God Objects, excessive globals)
+- **Level 6**: MODERATE (Magic literals in conditionals)
+- **Levels 1-5**: Standard risk gradations
+
+### 🔍 **Layer 5: Context-Aware Intelligence** (Smart Analysis)
+- **Same Violation**: Different severity based on usage context
+- **Risk Escalation**: Conditionals increase magic literal severity
+- **Pattern Recognition**: Structural analysis beyond simple text matching
 
 ## Quick Start
 

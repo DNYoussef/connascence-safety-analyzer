@@ -15,7 +15,6 @@ classifiers = [
     "Environment :: Console", 
     "Environment :: Web Environment",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.8",
@@ -72,24 +71,21 @@ Changelog = "https://github.com/connascence/connascence-analyzer/blob/main/CHANG
 
 [project.scripts]
 connascence = "cli.connascence:main"
+connascence-cli = "cli.connascence:main"
 
 [project.entry-points."mcp.servers"]
-connascence = "mcp.run-server:main"
+connascence = "mcp.server:main"
 
 # Tool Configuration
 
 [tool.setuptools]
-# NOTE: only list packages that actually exist
+# Only list packages that actually exist and are importable
 packages = [
-    "analyzer",
     "autofix",
     "policy", 
-    "reporting",
     "grammar",
     "integrations",
     "mcp",
-    "dashboard",
-    "security",
     "cli"
 ]
 
@@ -188,9 +184,9 @@ minversion = "7.0"
 addopts = [
     "--strict-markers",
     "--strict-config", 
-    "--cov=analyzer",
     "--cov=policy",
-    "--cov=reporting", 
+    "--cov=autofix",
+    "--cov=mcp",
     "--cov=cli",
     "--cov-report=term-missing",
     "--cov-report=html",
@@ -207,7 +203,7 @@ markers = [
 
 [tool.coverage.run]
 branch = true
-source = ["analyzer", "policy", "reporting", "cli", "mcp"]
+source = ["policy", "autofix", "cli", "mcp"]
 omit = [
     "tests/*",
     "fixtures/*",

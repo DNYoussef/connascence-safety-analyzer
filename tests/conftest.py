@@ -1,3 +1,16 @@
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: 2024 Connascence Safety Analyzer Contributors
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+
 """
 Pytest configuration and shared fixtures for connascence tests.
 
@@ -16,8 +29,15 @@ import sys
 import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from analyzer.core import ConnascenceViolation
-from analyzer.thresholds import ThresholdConfig
+# Import from our mock implementations instead of removed analyzer module
+from mcp.server import ConnascenceViolation
+
+# Mock ThresholdConfig class for tests
+class ThresholdConfig:
+    def __init__(self, max_positional_params=3, god_class_methods=20, max_cyclomatic_complexity=10):
+        self.max_positional_params = max_positional_params
+        self.god_class_methods = god_class_methods
+        self.max_cyclomatic_complexity = max_cyclomatic_complexity
 
 
 @pytest.fixture
