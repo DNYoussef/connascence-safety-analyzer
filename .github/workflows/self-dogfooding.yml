@@ -1,0 +1,319 @@
+name: Self-Dogfooding Analysis
+on:
+  schedule:
+    - cron: '0 6 * * *'  # Daily at 6 AM UTC
+  workflow_dispatch:     # Manual trigger
+  push:
+    branches: [main]
+    paths:
+      - 'analyzer/**'
+      - 'policy/**'
+      - 'mcp/**'
+      - 'dashboard/**'
+
+jobs:
+  self-analysis:
+    runs-on: ubuntu-latest
+    name: "Self-Dogfooding Analysis"
+    
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
+
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: 🔬 Self-Analysis with NASA Rules
+      run: |
+        echo "::group::Self Analysis - NASA Compliance"
+        python -m analyzer.core \
+          --path . \
+          --policy nasa_jpl_pot10 \
+          --nasa-validation \
+          --exclude ".git/**" "vscode-extension/node_modules/**" "**/__pycache__/**" \
+          --format json \
+          --output self_analysis_nasa.json
+        
+        # Generate comparison with previous self-analysis
+        if [ -f "analysis/self-analysis/baseline_report.md" ]; then
+          python scripts/compare_self_analysis.py \
+            --current self_analysis_nasa.json \
+            --baseline analysis/self-analysis/baseline_report.md \
+            --output self_analysis_comparison.json
+        fi
+        echo "::endgroup::"
+
+    - name: 🎯 God Object & MECE Self-Analysis
+      run: |
+        echo "::group::Self Analysis - God Objects & MECE"
+        # Comprehensive MECE analysis of our own codebase
+        python -m analyzer.dup_detection.mece_analyzer \
+          --path . \
+          --comprehensive \
+          --threshold 0.8 \
+          --exclude ".git/**" "vscode-extension/node_modules/**" \
+          --output self_mece_analysis.json
+          
+        # God object detection on our own analyzer classes
+        python -m analyzer.ast_engine.analyzer_orchestrator \
+          --path analyzer/ \
+          --analyzer god_object \
+          --threshold 12 \
+          --output self_god_objects.json
+        echo "::endgroup::"
+
+    - name: 📊 Validate Demo Claims
+      run: |
+        echo "::group::Validate Enterprise Demo Claims"
+        # Verify our own claims about violation counts
+        python scripts/verify_counts.py --verbose --generate-validation-report
+        
+        # Reproduce enterprise demo results
+        python scripts/reproduce_enterprise_demo.py --validate-performance --quick-mode
+        echo "::endgroup::"
+
+    - name: 🔗 Tool Correlation Self-Test
+      run: |
+        echo "::group::Tool Correlation Self-Test"
+        # Test our enhanced tool coordinator on itself
+        python -m integrations.enhanced_tool_coordinator \
+          --self-test \
+          --validate-correlations \
+          --confidence-threshold 0.85 \
+          --output tool_correlation_self_test.json
+        echo "::endgroup::"
+
+    - name: 📈 Update Self-Analysis Metrics
+      run: |
+        echo "::group::Update Historical Self-Analysis"
+        # Update our own analysis baseline
+        python -m dashboard.metrics \
+          --update-self-analysis \
+          --nasa-results self_analysis_nasa.json \
+          --mece-results self_mece_analysis.json \
+          --god-object-results self_god_objects.json \
+          --output updated_baseline_report.md
+          
+        # Compare with previous self-analysis from docs/reports/
+        if [ -f "docs/reports/self-analysis/baseline_report.md" ]; then
+          python scripts/compare_baselines.py \
+            --current updated_baseline_report.md \
+            --previous docs/reports/self-analysis/baseline_report.md \
+            --output self_analysis_trends.json
+        fi
+        echo "::endgroup::"
+
+    - name: 🎯 Quality Gate Self-Assessment
+      id: self-quality-gates
+      run: |
+        echo "::group::Quality Gate Self-Assessment"
+        
+        # Extract metrics from our self-analysis
+        NASA_SCORE=$(python -c "import json; data=json.load(open('self_analysis_nasa.json')); print(data.get('nasa_compliance', {}).get('score', 0.0))")
+        TOTAL_VIOLATIONS=$(python -c "import json; data=json.load(open('self_analysis_nasa.json')); print(len(data.get('violations', [])))")
+        CRITICAL_VIOLATIONS=$(python -c "import json; data=json.load(open('self_analysis_nasa.json')); print(len([v for v in data.get('violations', []) if v.get('severity') == 'critical']))")
+        GOD_OBJECTS=$(python -c "import json; data=json.load(open('self_god_objects.json')); print(len([v for v in data.get('violations', []) if 'God Object' in v.get('description', '')]))")
+        MECE_SCORE=$(python -c "import json; data=json.load(open('self_mece_analysis.json')); print(data.get('mece_score', 0.0))")
+        
+        echo "Self-Analysis Results:"
+        echo "===================="
+        echo "NASA Compliance Score: $NASA_SCORE"
+        echo "Total Violations: $TOTAL_VIOLATIONS"
+        echo "Critical Violations: $CRITICAL_VIOLATIONS"
+        echo "God Objects: $GOD_OBJECTS"
+        echo "MECE Score: $MECE_SCORE"
+        
+        # Set outputs for later use
+        echo "nasa_score=$NASA_SCORE" >> $GITHUB_OUTPUT
+        echo "total_violations=$TOTAL_VIOLATIONS" >> $GITHUB_OUTPUT
+        echo "critical_violations=$CRITICAL_VIOLATIONS" >> $GITHUB_OUTPUT
+        echo "god_objects=$GOD_OBJECTS" >> $GITHUB_OUTPUT
+        echo "mece_score=$MECE_SCORE" >> $GITHUB_OUTPUT
+        
+        # Self-assessment quality gates (more lenient for development)
+        SELF_NASA_THRESHOLD=0.85
+        SELF_MAX_CRITICAL=50
+        SELF_MAX_GOD_OBJECTS=15
+        SELF_MECE_THRESHOLD=0.7
+        
+        PASSED=true
+        
+        if (( $(echo "$NASA_SCORE < $SELF_NASA_THRESHOLD" | bc -l) )); then
+          echo "⚠️ NASA Compliance below threshold ($NASA_SCORE < $SELF_NASA_THRESHOLD)"
+          PASSED=false
+        fi
+        
+        if [[ $CRITICAL_VIOLATIONS -gt $SELF_MAX_CRITICAL ]]; then
+          echo "⚠️ Too many critical violations ($CRITICAL_VIOLATIONS > $SELF_MAX_CRITICAL)"
+          PASSED=false
+        fi
+        
+        if [[ $GOD_OBJECTS -gt $SELF_MAX_GOD_OBJECTS ]]; then
+          echo "⚠️ Too many god objects ($GOD_OBJECTS > $SELF_MAX_GOD_OBJECTS)"
+          PASSED=false
+        fi
+        
+        if (( $(echo "$MECE_SCORE < $SELF_MECE_THRESHOLD" | bc -l) )); then
+          echo "⚠️ MECE score below threshold ($MECE_SCORE < $SELF_MECE_THRESHOLD)"
+          PASSED=false
+        fi
+        
+        if [[ "$PASSED" == "true" ]]; then
+          echo "✅ Self-analysis quality gates passed!"
+        else
+          echo "⚠️ Self-analysis identified improvement opportunities"
+        fi
+        
+        echo "self_assessment_passed=$PASSED" >> $GITHUB_OUTPUT
+        echo "::endgroup::"
+
+    - name: 📊 Generate Self-Analysis Dashboard
+      run: |
+        echo "::group::Generate Self-Analysis Dashboard"
+        python -m dashboard.ci_integration \
+          --generate-self-analysis-dashboard \
+          --nasa-results self_analysis_nasa.json \
+          --mece-results self_mece_analysis.json \
+          --god-object-results self_god_objects.json \
+          --correlation-results tool_correlation_self_test.json \
+          --output self_analysis_dashboard.html
+        echo "::endgroup::"
+
+    - name: 🔄 Update Documentation with Latest Results
+      run: |
+        echo "::group::Update Documentation"
+        # Update the self-analysis documentation
+        cp updated_baseline_report.md docs/reports/self-analysis/
+        
+        # Update README with latest self-analysis metrics if significantly changed
+        TOTAL_VIOLATIONS=${{ steps.self-quality-gates.outputs.total_violations }}
+        
+        # Check if we need to update README claims
+        python scripts/update_readme_metrics.py \
+          --current-violations $TOTAL_VIOLATIONS \
+          --nasa-score ${{ steps.self-quality-gates.outputs.nasa_score }} \
+          --update-if-changed
+        echo "::endgroup::"
+
+    - name: 📤 Upload Self-Analysis Results
+      uses: actions/upload-artifact@v3
+      with:
+        name: self-analysis-results-${{ github.run_number }}
+        path: |
+          self_analysis_nasa.json
+          self_mece_analysis.json
+          self_god_objects.json
+          tool_correlation_self_test.json
+          self_analysis_dashboard.html
+          updated_baseline_report.md
+          self_analysis_comparison.json
+          self_analysis_trends.json
+
+    - name: 🔔 Create Issue for Critical Self-Analysis Issues
+      if: steps.self-quality-gates.outputs.critical_violations > 25
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const criticalCount = ${{ steps.self-quality-gates.outputs.critical_violations }};
+          const totalCount = ${{ steps.self-quality-gates.outputs.total_violations }};
+          const nasaScore = ${{ steps.self-quality-gates.outputs.nasa_score }};
+          
+          const issueBody = `## 🚨 Self-Analysis Alert: High Critical Violations
+          
+          Our automated self-analysis has detected a significant number of critical violations in the codebase.
+          
+          ### 📊 Current Metrics
+          - **Critical Violations:** ${criticalCount}
+          - **Total Violations:** ${totalCount}  
+          - **NASA Compliance Score:** ${(nasaScore * 100).toFixed(1)}%
+          - **God Objects:** ${{ steps.self-quality-gates.outputs.god_objects }}
+          - **MECE Score:** ${{ steps.self-quality-gates.outputs.mece_score }}
+          
+          ### 🎯 Recommended Actions
+          1. Review critical violations in the [self-analysis dashboard](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          2. Prioritize fixing god objects and parameter bombs
+          3. Address NASA Power of Ten rule violations
+          4. Reduce code duplication identified by MECE analysis
+          
+          ### 📁 Analysis Files
+          - NASA Analysis: \`self_analysis_nasa.json\`
+          - MECE Analysis: \`self_mece_analysis.json\`
+          - God Objects: \`self_god_objects.json\`
+          
+          This issue was created automatically by the self-dogfooding analysis workflow.
+          `;
+          
+          github.rest.issues.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            title: `🚨 Self-Analysis Alert: ${criticalCount} Critical Violations Detected`,
+            body: issueBody,
+            labels: ['technical-debt', 'self-analysis', 'high-priority']
+          });
+
+    - name: 📈 Update Project Metrics
+      if: always()
+      run: |
+        echo "::group::Update Project Metrics"
+        # Store metrics for historical tracking
+        TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+        
+        # Create metrics entry
+        cat > current_metrics.json << EOF
+        {
+          "timestamp": "$TIMESTAMP",
+          "commit_sha": "${{ github.sha }}",
+          "nasa_compliance_score": ${{ steps.self-quality-gates.outputs.nasa_score }},
+          "total_violations": ${{ steps.self-quality-gates.outputs.total_violations }},
+          "critical_violations": ${{ steps.self-quality-gates.outputs.critical_violations }},
+          "god_objects": ${{ steps.self-quality-gates.outputs.god_objects }},
+          "mece_score": ${{ steps.self-quality-gates.outputs.mece_score }},
+          "self_assessment_passed": ${{ steps.self-quality-gates.outputs.self_assessment_passed }}
+        }
+        EOF
+        
+        # Append to historical metrics (if file exists)
+        if [ -f "docs/reports/historical_metrics.jsonl" ]; then
+          cat current_metrics.json >> docs/reports/historical_metrics.jsonl
+        else
+          mkdir -p docs/reports/
+          cat current_metrics.json > docs/reports/historical_metrics.jsonl
+        fi
+        echo "::endgroup::"
+
+    - name: 📝 Summary Comment
+      run: |
+        echo "## 🔬 Self-Dogfooding Analysis Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 📊 Key Metrics" >> $GITHUB_STEP_SUMMARY
+        echo "- **NASA Compliance:** ${{ steps.self-quality-gates.outputs.nasa_score }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Total Violations:** ${{ steps.self-quality-gates.outputs.total_violations }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Critical Violations:** ${{ steps.self-quality-gates.outputs.critical_violations }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **God Objects:** ${{ steps.self-quality-gates.outputs.god_objects }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **MECE Score:** ${{ steps.self-quality-gates.outputs.mece_score }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        if [[ "${{ steps.self-quality-gates.outputs.self_assessment_passed }}" == "true" ]]; then
+          echo "### ✅ Self-Assessment Result: PASSED" >> $GITHUB_STEP_SUMMARY
+          echo "The analyzer meets its own quality standards!" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "### ⚠️ Self-Assessment Result: NEEDS IMPROVEMENT" >> $GITHUB_STEP_SUMMARY
+          echo "The analyzer has identified areas for improvement in its own codebase." >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 🔗 Analysis Artifacts" >> $GITHUB_STEP_SUMMARY
+        echo "- [Self-Analysis Dashboard](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
+        echo "- [Detailed Results](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
+        
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "_This analysis demonstrates our commitment to eating our own dog food and continuously improving the analyzer using itself._" >> $GITHUB_STEP_SUMMARY

@@ -1,0 +1,388 @@
+name: Connascence Safety Analysis
+on:
+  push:
+    branches: [main, develop, feature/*]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  connascence-analysis:
+    runs-on: ubuntu-latest
+    name: "Complete Connascence Analysis Pipeline"
+    
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0  # Full history for trend analysis
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
+
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        # Install additional analysis dependencies
+        pip install ast-grep radon bandit ruff mypy black
+
+    - name: 🛡️ NASA Power of Ten Rules Validation
+      id: nasa-validation
+      run: |
+        echo "::group::NASA Power of Ten Rules Analysis"
+        python -m analyzer.core \
+          --path . \
+          --policy nasa_jpl_pot10 \
+          --nasa-validation \
+          --strict-mode \
+          --format json \
+          --output nasa_analysis.json
+        
+        # Extract NASA compliance score
+        NASA_SCORE=$(python -c "import json; data=json.load(open('nasa_analysis.json')); print(data['nasa_compliance']['score'])")
+        echo "nasa_score=$NASA_SCORE" >> $GITHUB_OUTPUT
+        echo "NASA Compliance Score: $NASA_SCORE"
+        echo "::endgroup::"
+
+    - name: 🔍 God Object Detection 
+      id: god-object-detection
+      run: |
+        echo "::group::God Object Analysis"
+        python -m analyzer.ast_engine.analyzer_orchestrator \
+          --path . \
+          --analyzer god_object \
+          --threshold 15 \
+          --output god_objects.json
+        
+        # Count god objects
+        GOD_OBJECTS=$(python -c "import json; data=json.load(open('god_objects.json')); print(len([v for v in data['violations'] if v['type'] == 'CoA' and 'God Object' in v['description']]))")
+        echo "god_objects_count=$GOD_OBJECTS" >> $GITHUB_OUTPUT
+        echo "God Objects Found: $GOD_OBJECTS"
+        echo "::endgroup::"
+
+    - name: 🎯 MECE Duplication Analysis
+      id: mece-analysis
+      run: |
+        echo "::group::MECE Duplication Detection"
+        python -m analyzer.dup_detection.mece_analyzer \
+          --path . \
+          --comprehensive \
+          --threshold 0.8 \
+          --output mece_analysis.json
+        
+        # Extract MECE score
+        MECE_SCORE=$(python -c "import json; data=json.load(open('mece_analysis.json')); print(data.get('mece_score', 0.0))")
+        DUPLICATION_COUNT=$(python -c "import json; data=json.load(open('mece_analysis.json')); print(len(data.get('duplications', [])))")
+        echo "mece_score=$MECE_SCORE" >> $GITHUB_OUTPUT
+        echo "duplication_count=$DUPLICATION_COUNT" >> $GITHUB_OUTPUT
+        echo "MECE Score: $MECE_SCORE"
+        echo "Duplications Found: $DUPLICATION_COUNT"
+        echo "::endgroup::"
+
+    - name: 📊 Complete Connascence Scoring
+      id: connascence-scoring
+      run: |
+        echo "::group::Full Connascence Analysis"
+        python -m analyzer.core \
+          --path . \
+          --policy strict-core \
+          --enable-tool-correlation \
+          --confidence-threshold 0.8 \
+          --format json \
+          --output connascence_full.json
+        
+        # Extract comprehensive metrics
+        TOTAL_VIOLATIONS=$(python -c "import json; data=json.load(open('connascence_full.json')); print(len(data['violations']))")
+        CRITICAL_VIOLATIONS=$(python -c "import json; data=json.load(open('connascence_full.json')); print(len([v for v in data['violations'] if v['severity'] == 'critical']))")
+        OVERALL_SCORE=$(python -c "import json; data=json.load(open('connascence_full.json')); print(data.get('summary', {}).get('overall_quality_score', 0.0))")
+        
+        echo "total_violations=$TOTAL_VIOLATIONS" >> $GITHUB_OUTPUT
+        echo "critical_violations=$CRITICAL_VIOLATIONS" >> $GITHUB_OUTPUT
+        echo "overall_score=$OVERALL_SCORE" >> $GITHUB_OUTPUT
+        
+        echo "Total Violations: $TOTAL_VIOLATIONS"
+        echo "Critical Violations: $CRITICAL_VIOLATIONS" 
+        echo "Overall Quality Score: $OVERALL_SCORE"
+        echo "::endgroup::"
+
+    - name: 🔗 Enhanced Tool Correlation
+      id: tool-correlation
+      run: |
+        echo "::group::Cross-Tool Analysis Correlation"
+        
+        # Run individual tools
+        echo "Running Ruff..."
+        ruff check . --output-format json --output ruff_results.json || true
+        
+        echo "Running MyPy..."
+        mypy . --json-report mypy_results || true
+        
+        echo "Running Radon..." 
+        radon cc . --json --output radon_results.json || true
+        
+        echo "Running Bandit..."
+        bandit -r . -f json -o bandit_results.json || true
+        
+        # Enhanced tool correlation
+        python -m integrations.enhanced_tool_coordinator \
+          --correlate \
+          --connascence-results connascence_full.json \
+          --external-results ruff_results.json,mypy_results,radon_results.json,bandit_results.json \
+          --confidence-threshold 0.8 \
+          --output correlated_results.json
+        
+        # Extract correlation metrics
+        HIGH_CONFIDENCE_CORRELATIONS=$(python -c "import json; data=json.load(open('correlated_results.json')); print(len([c for c in data.get('correlations', []) if c.get('confidence', 0) > 0.9]))")
+        echo "high_confidence_correlations=$HIGH_CONFIDENCE_CORRELATIONS" >> $GITHUB_OUTPUT
+        echo "High Confidence Correlations: $HIGH_CONFIDENCE_CORRELATIONS"
+        echo "::endgroup::"
+
+    - name: 📈 Generate Comprehensive Dashboard
+      run: |
+        echo "::group::Dashboard Generation"
+        python -m dashboard.ci_integration \
+          --generate-comprehensive-report \
+          --nasa-results nasa_analysis.json \
+          --god-object-results god_objects.json \
+          --mece-results mece_analysis.json \
+          --connascence-results connascence_full.json \
+          --correlation-results correlated_results.json \
+          --output comprehensive_dashboard.html
+        echo "::endgroup::"
+
+    - name: ✅ Quality Gate Evaluation
+      run: |
+        echo "::group::Quality Gates"
+        
+        # Define quality gates
+        NASA_THRESHOLD=0.95
+        MAX_GOD_OBJECTS=5
+        MECE_THRESHOLD=0.8
+        MAX_CRITICAL_VIOLATIONS=10
+        MIN_OVERALL_SCORE=0.75
+        
+        # Get values from previous steps
+        NASA_SCORE=${{ steps.nasa-validation.outputs.nasa_score }}
+        GOD_OBJECTS=${{ steps.god-object-detection.outputs.god_objects_count }}
+        MECE_SCORE=${{ steps.mece-analysis.outputs.mece_score }}
+        CRITICAL_VIOLATIONS=${{ steps.connascence-scoring.outputs.critical_violations }}
+        OVERALL_SCORE=${{ steps.connascence-scoring.outputs.overall_score }}
+        
+        echo "Quality Gate Results:"
+        echo "==================="
+        
+        # NASA Compliance Gate
+        if (( $(echo "$NASA_SCORE >= $NASA_THRESHOLD" | bc -l) )); then
+          echo "✅ NASA Compliance: PASS ($NASA_SCORE >= $NASA_THRESHOLD)"
+          NASA_PASS=true
+        else
+          echo "❌ NASA Compliance: FAIL ($NASA_SCORE < $NASA_THRESHOLD)"
+          NASA_PASS=false
+        fi
+        
+        # God Object Gate
+        if [[ $GOD_OBJECTS -le $MAX_GOD_OBJECTS ]]; then
+          echo "✅ God Objects: PASS ($GOD_OBJECTS <= $MAX_GOD_OBJECTS)"
+          GOD_PASS=true
+        else
+          echo "❌ God Objects: FAIL ($GOD_OBJECTS > $MAX_GOD_OBJECTS)"
+          GOD_PASS=false
+        fi
+        
+        # MECE Gate
+        if (( $(echo "$MECE_SCORE >= $MECE_THRESHOLD" | bc -l) )); then
+          echo "✅ MECE Score: PASS ($MECE_SCORE >= $MECE_THRESHOLD)"
+          MECE_PASS=true
+        else
+          echo "❌ MECE Score: FAIL ($MECE_SCORE < $MECE_THRESHOLD)"
+          MECE_PASS=false
+        fi
+        
+        # Critical Violations Gate
+        if [[ $CRITICAL_VIOLATIONS -le $MAX_CRITICAL_VIOLATIONS ]]; then
+          echo "✅ Critical Violations: PASS ($CRITICAL_VIOLATIONS <= $MAX_CRITICAL_VIOLATIONS)"
+          CRITICAL_PASS=true
+        else
+          echo "❌ Critical Violations: FAIL ($CRITICAL_VIOLATIONS > $MAX_CRITICAL_VIOLATIONS)"
+          CRITICAL_PASS=false
+        fi
+        
+        # Overall Score Gate
+        if (( $(echo "$OVERALL_SCORE >= $MIN_OVERALL_SCORE" | bc -l) )); then
+          echo "✅ Overall Score: PASS ($OVERALL_SCORE >= $MIN_OVERALL_SCORE)"
+          OVERALL_PASS=true
+        else
+          echo "❌ Overall Score: FAIL ($OVERALL_SCORE < $MIN_OVERALL_SCORE)"
+          OVERALL_PASS=false
+        fi
+        
+        # Final gate decision
+        if [[ "$NASA_PASS" == "true" && "$GOD_PASS" == "true" && "$MECE_PASS" == "true" && "$CRITICAL_PASS" == "true" && "$OVERALL_PASS" == "true" ]]; then
+          echo ""
+          echo "🎉 ALL QUALITY GATES PASSED!"
+          echo "Repository meets all quality standards."
+          exit 0
+        else
+          echo ""
+          echo "🚫 QUALITY GATES FAILED!"
+          echo "Repository does not meet quality standards."
+          exit 1
+        fi
+        echo "::endgroup::"
+
+    - name: 📊 Update GitHub Status
+      if: always()
+      run: |
+        # Set GitHub commit status
+        TOTAL_VIOLATIONS=${{ steps.connascence-scoring.outputs.total_violations }}
+        CRITICAL_VIOLATIONS=${{ steps.connascence-scoring.outputs.critical_violations }}
+        NASA_SCORE=${{ steps.nasa-validation.outputs.nasa_score }}
+        
+        if [[ $? -eq 0 ]]; then
+          STATE="success"
+          DESCRIPTION="✅ All quality gates passed - $TOTAL_VIOLATIONS violations ($CRITICAL_VIOLATIONS critical)"
+        else
+          STATE="failure" 
+          DESCRIPTION="❌ Quality gates failed - $TOTAL_VIOLATIONS violations ($CRITICAL_VIOLATIONS critical)"
+        fi
+        
+        curl -X POST \
+          -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          -H "Content-Type: application/json" \
+          "https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }}" \
+          -d "{
+            \"state\": \"$STATE\",
+            \"description\": \"$DESCRIPTION\",
+            \"context\": \"connascence-analysis\"
+          }"
+
+    - name: 📄 Generate SARIF Report
+      if: always()
+      run: |
+        echo "::group::SARIF Generation"
+        python -m analyzer.core \
+          --path . \
+          --policy nasa_jpl_pot10 \
+          --format sarif \
+          --include-nasa-rules \
+          --include-god-objects \
+          --include-mece-analysis \
+          --output connascence_analysis.sarif
+        echo "::endgroup::"
+
+    - name: 📤 Upload SARIF Results
+      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      with:
+        sarif_file: connascence_analysis.sarif
+        category: connascence-analysis
+
+    - name: 📦 Upload Analysis Artifacts
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: connascence-analysis-results
+        path: |
+          nasa_analysis.json
+          god_objects.json
+          mece_analysis.json
+          connascence_full.json
+          correlated_results.json
+          comprehensive_dashboard.html
+          connascence_analysis.sarif
+          ruff_results.json
+          mypy_results/
+          radon_results.json
+          bandit_results.json
+
+    - name: 📝 Comment PR with Results
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const fs = require('fs');
+          
+          // Read analysis results
+          const nasaResults = JSON.parse(fs.readFileSync('nasa_analysis.json', 'utf8'));
+          const meceResults = JSON.parse(fs.readFileSync('mece_analysis.json', 'utf8'));
+          const connascenceResults = JSON.parse(fs.readFileSync('connascence_full.json', 'utf8'));
+          
+          // Format comment
+          const comment = `## 🔍 Connascence Analysis Results
+          
+          ### 🛡️ NASA Power of Ten Compliance
+          - **Score:** ${nasaResults.nasa_compliance.score * 100}%
+          - **Rules Violated:** ${nasaResults.nasa_compliance.violations.length}
+          
+          ### 👹 God Object Detection  
+          - **God Objects Found:** ${{ steps.god-object-detection.outputs.god_objects_count }}
+          - **Threshold:** 15 methods/400 lines
+          
+          ### 🎯 MECE Duplication Analysis
+          - **MECE Score:** ${meceResults.mece_score}
+          - **Duplications Found:** ${{ steps.mece-analysis.outputs.duplication_count }}
+          
+          ### 📊 Overall Connascence Analysis
+          - **Total Violations:** ${{ steps.connascence-scoring.outputs.total_violations }}
+          - **Critical Violations:** ${{ steps.connascence-scoring.outputs.critical_violations }}
+          - **Quality Score:** ${(connascenceResults.summary.overall_quality_score * 100).toFixed(1)}%
+          
+          ### 🔗 Tool Correlations
+          - **High Confidence Correlations:** ${{ steps.tool-correlation.outputs.high_confidence_correlations }}
+          
+          ---
+          
+          📊 [View Detailed Dashboard](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) | 🛡️ [SARIF Report](https://github.com/${{ github.repository }}/security/code-scanning)
+          `;
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          });
+
+  # Separate job for trend analysis (runs on schedule)
+  trend-analysis:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: connascence-analysis
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
+    
+    - name: Download Analysis Results
+      uses: actions/download-artifact@v3
+      with:
+        name: connascence-analysis-results
+    
+    - name: 📈 Update Historical Trends
+      run: |
+        python -m dashboard.metrics \
+          --update-trends \
+          --nasa-results nasa_analysis.json \
+          --connascence-results connascence_full.json \
+          --mece-results mece_analysis.json \
+          --commit-sha ${{ github.sha }}
+    
+    - name: 📊 Generate Trend Dashboard
+      run: |
+        python -m dashboard.metrics \
+          --generate-trends-dashboard \
+          --days 30 \
+          --output trend_dashboard.html
+    
+    - name: 📤 Upload Trend Analysis
+      uses: actions/upload-artifact@v3
+      with:
+        name: trend-analysis
+        path: |
+          trend_dashboard.html
+          historical_metrics.json
