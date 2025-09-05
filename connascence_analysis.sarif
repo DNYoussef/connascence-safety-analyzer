@@ -1,0 +1,73 @@
+{
+  "$schema": "https://docs.oasis-open.org/sarif/sarif/v2.1.0/cos02/schemas/sarif-schema-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "Connascence Safety Analyzer",
+          "version": "2.0.0",
+          "informationUri": "https://github.com/DNYoussef/connascence-safety-analyzer",
+          "rules": [
+            {
+              "id": "CON_CoP",
+              "name": "ConnascenceOfPosition",
+              "shortDescription": {
+                "text": "Connascence of Position"
+              },
+              "fullDescription": {
+                "text": "Functions with too many positional parameters create coupling through parameter order."
+              },
+              "help": {
+                "text": "Consider using parameter objects or keyword arguments to reduce positional coupling."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            },
+            {
+              "id": "CON_CoM", 
+              "name": "ConnascenceOfMeaning",
+              "shortDescription": {
+                "text": "Connascence of Meaning"
+              },
+              "fullDescription": {
+                "text": "Magic literals and hardcoded values create coupling through shared understanding of meaning."
+              },
+              "help": {
+                "text": "Replace magic literals with named constants."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "CON_CoP",
+          "message": {
+            "text": "Function has 6 positional parameters, consider using parameter objects"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/analyzer/core.py"
+                },
+                "region": {
+                  "startLine": 45,
+                  "startColumn": 1,
+                  "endLine": 45,
+                  "endColumn": 80
+                }
+              }
+            }
+          ],
+          "level": "warning"
+        }
+      ]
+    }
+  ]
+}

@@ -10,6 +10,7 @@ from analyzer.core import ConnascenceViolation
 from ai_prompts import MCPPromptSystem, generate_ai_context_for_violation, generate_planning_context
 from nasa_integration import NASAIntegrationMethods
 from baseline_tools import MECEIntegrationMethods
+from dogfood_integration import create_dogfood_integration
 
 # MCP Server Configuration Constants (CoM Improvement - Pass 2)
 DEFAULT_RATE_LIMIT_REQUESTS = 100
@@ -88,12 +89,25 @@ class ConnascenceMCPServer(NASAIntegrationMethods, MECEIntegrationMethods):
         # Initialize AI prompt system for enhanced technical context
         self.ai_prompt_system = MCPPromptSystem()
         
+        # Initialize dogfood system
+        self.dogfood_controller = None
+        self._init_dogfood_system()
+        
         # Store last analysis results for context
         self._last_analysis_context = {}
         self._last_violations = []
         
         self.analyzer = self._create_analyzer()
         self._tools = self._register_tools()
+    
+    def _init_dogfood_system(self):
+        """Initialize dogfood self-improvement system"""
+        try:
+            self.dogfood_integration = create_dogfood_integration(self.config)
+            self.logger.info("✅ Dogfood system initialized")
+        except Exception as e:
+            self.logger.error(f"❌ Failed to initialize dogfood system: {e}")
+            self.dogfood_integration = None
     
     def _create_analyzer(self):
         """Create real analyzer instance using refactored ConnascenceASTAnalyzer."""
