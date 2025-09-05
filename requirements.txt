@@ -1,5 +1,75 @@
-# Install with: pip install .
-# For development: pip install .[dev]
-# For MCP server: pip install .[mcp]
-# For VS Code extension: pip install .[vscode]
-# For enterprise features: pip install .[enterprise]
+# Core dependencies for connascence-safety-analyzer
+# Install with: pip install -r requirements.txt
+
+# Core analysis dependencies
+ast-decompiler>=0.6.0
+astunparse>=1.6.3
+radon>=6.0.1
+bandit>=1.8.0
+ruff>=0.1.0
+mypy>=1.0.0
+black>=23.0.0
+isort>=5.12.0
+
+# Type checking and static analysis
+typing-extensions>=4.5.0
+pathspec>=0.11.0
+
+# Data handling and utilities
+pyyaml>=6.0
+click>=8.1.0
+rich>=13.0.0
+colorama>=0.4.6
+
+# Testing frameworks (for CI)
+pytest>=7.2.0
+pytest-cov>=4.0.0
+pytest-xdist>=3.2.0
+
+# JSON and data processing
+jsonschema>=4.17.0
+numpy>=1.24.0
+pandas>=2.0.0
+
+# Development tools
+setuptools>=65.0.0
+wheel>=0.38.0
+twine>=4.0.0
+
+# Web and API frameworks (for dashboard)
+fastapi>=0.100.0
+uvicorn>=0.23.0
+jinja2>=3.1.0
+aiofiles>=23.0.0
+
+# File watching and monitoring
+watchdog>=3.0.0
+
+# Configuration management
+python-dotenv>=1.0.0
+configparser>=5.3.0
+
+# Logging and monitoring
+structlog>=23.1.0
+
+# Security
+cryptography>=41.0.0
+
+# Compatibility
+six>=1.16.0
+packaging>=23.0
+
+# MCP server dependencies
+httpx>=0.24.0
+pydantic>=2.0.0
+anyio>=3.7.0
+
+# VS Code extension support
+websockets>=11.0.0
+pyzmq>=25.0.0
+
+# Enterprise features
+sqlalchemy>=2.0.0
+alembic>=1.11.0
+psycopg2-binary>=2.9.0
+redis>=4.5.0
