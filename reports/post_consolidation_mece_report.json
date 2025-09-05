@@ -1,0 +1,70 @@
+{
+  "success": true,
+  "path": ".",
+  "threshold": 0.8,
+  "comprehensive": true,
+  "mece_score": 0.981,
+  "duplications": [
+    {
+      "id": "cluster_1",
+      "similarity_score": 0.833,
+      "block_count": 4,
+      "files_involved": [
+        "autofix\\type_hints.py",
+        "autofix\\magic_literals.py",
+        "autofix\\core.py",
+        "autofix\\class_splits.py"
+      ],
+      "blocks": [
+        {
+          "file_path": "autofix\\class_splits.py",
+          "start_line": 350,
+          "end_line": 352,
+          "lines": [
+            350,
+            351,
+            352
+          ]
+        },
+        {
+          "file_path": "autofix\\core.py",
+          "start_line": 474,
+          "end_line": 476,
+          "lines": [
+            474,
+            475,
+            476
+          ]
+        },
+        {
+          "file_path": "autofix\\magic_literals.py",
+          "start_line": 231,
+          "end_line": 233,
+          "lines": [
+            231,
+            232,
+            233
+          ]
+        },
+        {
+          "file_path": "autofix\\type_hints.py",
+          "start_line": 313,
+          "end_line": 315,
+          "lines": [
+            313,
+            314,
+            315
+          ]
+        }
+      ],
+      "description": "Found 4 similar code blocks with 83.3% average similarity"
+    }
+  ],
+  "summary": {
+    "total_duplications": 1,
+    "high_similarity_count": 1,
+    "coverage_score": 0.981,
+    "files_analyzed": 20,
+    "blocks_analyzed": 293
+  }
+}

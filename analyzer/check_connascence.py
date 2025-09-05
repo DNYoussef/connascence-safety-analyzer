@@ -571,245 +571,40 @@ class ConnascenceAnalyzer:
             ]
 
     def _detect_js_magic_literals(self, file_path: Path, source_lines: list[str]) -> list[ConnascenceViolation]:
-        """Detect magic literals in JavaScript code."""
-        violations = []
-        import re
-        
-        # Pattern for numeric literals (excluding 0, 1, -1 which are often not magic)
-        number_pattern = re.compile(r'\b(?!0\b|1\b|-1\b)\d+\.?\d*\b')
-        # Pattern for string literals (excluding very short ones)
-        string_pattern = re.compile(r'["\'][^"\']{3,}["\']')
-        
-        for line_num, line in enumerate(source_lines, 1):
-            # Skip comments
-            if '//' in line:
-                line = line[:line.index('//')]
-            if '/*' in line and '*/' in line:
-                continue
-                
-            # Find numeric magic literals
-            for match in number_pattern.finditer(line):
-                violations.append(ConnascenceViolation(
-                    type="connascence_of_meaning",
-                    severity="medium",
-                    file_path=str(file_path),
-                    line_number=line_num,
-                    column=match.start(),
-                    description=f"Magic literal '{match.group()}' should be a named constant",
-                    recommendation="Extract to a const or #define",
-                    code_snippet=line.strip(),
-                    context={"literal_type": "number", "value": match.group()},
-                ))
-            
-            # Find string magic literals (common patterns)
-            for match in string_pattern.finditer(line):
-                literal = match.group()
-                # Skip very common patterns
-                if not any(skip in literal.lower() for skip in ['test', 'error', 'warning', 'debug']):
-                    violations.append(ConnascenceViolation(
-                        type="connascence_of_meaning", 
-                        severity="medium",
-                        file_path=str(file_path),
-                        line_number=line_num,
-                        column=match.start(),
-                        description=f"Magic string {literal} should be a named constant",
-                        recommendation="Extract to a const or enum",
-                        code_snippet=line.strip(),
-                        context={"literal_type": "string", "value": literal},
-                    ))
-        
-        return violations
+        """Detect magic literals in JavaScript code using consolidated strategy."""
+        from .language_strategies import JavaScriptStrategy
+        strategy = JavaScriptStrategy()
+        return strategy.detect_magic_literals(file_path, source_lines)
 
     def _detect_js_god_functions(self, file_path: Path, source_lines: list[str]) -> list[ConnascenceViolation]:
-        """Detect god functions in JavaScript (functions that are too long)."""
-        violations = []
-        import re
-        
-        function_pattern = re.compile(r'^\s*(?:function\s+\w+|(?:const|let|var)\s+\w+\s*=\s*(?:function|\(.*?\)\s*=>)|\w+\s*:\s*function)')
-        
-        in_function = False
-        function_start = 0
-        function_name = ""
-        brace_count = 0
-        
-        for line_num, line in enumerate(source_lines, 1):
-            if not in_function:
-                match = function_pattern.match(line)
-                if match:
-                    in_function = True
-                    function_start = line_num
-                    function_name = line.strip()[:50] + "..." if len(line.strip()) > 50 else line.strip()
-                    brace_count = line.count('{') - line.count('}')
-            else:
-                brace_count += line.count('{') - line.count('}')
-                if brace_count <= 0:
-                    # Function ended
-                    function_length = line_num - function_start + 1
-                    if function_length > 50:  # Threshold for god function
-                        violations.append(ConnascenceViolation(
-                            type="god_object",
-                            severity="high" if function_length > 100 else "medium",
-                            file_path=str(file_path),
-                            line_number=function_start,
-                            column=0,
-                            description=f"Function too long ({function_length} lines) - potential god function",
-                            recommendation="Break into smaller, focused functions",
-                            code_snippet=function_name,
-                            context={"function_length": function_length, "threshold": 50},
-                        ))
-                    in_function = False
-        
-        return violations
+        """Detect god functions in JavaScript using consolidated strategy."""
+        from .language_strategies import JavaScriptStrategy
+        strategy = JavaScriptStrategy()
+        return strategy.detect_god_functions(file_path, source_lines)
 
     def _detect_js_parameter_coupling(self, file_path: Path, source_lines: list[str]) -> list[ConnascenceViolation]:
-        """Detect parameter coupling in JavaScript functions."""
-        violations = []
-        import re
-        
-        # Pattern for function definitions with parameters
-        func_pattern = re.compile(r'(?:function\s+\w+|(?:const|let|var)\s+\w+\s*=\s*(?:function|\(.*?\)\s*=>))\s*\(([^)]+)\)')
-        
-        for line_num, line in enumerate(source_lines, 1):
-            match = func_pattern.search(line)
-            if match:
-                params = match.group(1)
-                param_count = len([p.strip() for p in params.split(',') if p.strip()])
-                
-                if param_count > 6:  # NASA Power of Ten rule adaptation
-                    violations.append(ConnascenceViolation(
-                        type="connascence_of_position",
-                        severity="high" if param_count > 10 else "medium",
-                        file_path=str(file_path),
-                        line_number=line_num,
-                        column=match.start(),
-                        description=f"Too many parameters ({param_count}) - high connascence of position",
-                        recommendation="Use parameter objects or reduce parameters",
-                        code_snippet=line.strip(),
-                        context={"parameter_count": param_count, "threshold": 6},
-                    ))
-        
-        return violations
+        """Detect parameter coupling in JavaScript using consolidated strategy."""
+        from .language_strategies import JavaScriptStrategy
+        strategy = JavaScriptStrategy()
+        return strategy.detect_parameter_coupling(file_path, source_lines)
 
     def _detect_c_magic_literals(self, file_path: Path, source_lines: list[str]) -> list[ConnascenceViolation]:
-        """Detect magic literals in C/C++ code."""
-        violations = []
-        import re
-        
-        # C-style numeric literals
-        number_pattern = re.compile(r'\b(?!0\b|1\b|-1\b)\d+[UuLl]*\b')
-        # C-style string literals
-        string_pattern = re.compile(r'"[^"]{3,}"')
-        
-        for line_num, line in enumerate(source_lines, 1):
-            # Skip comments and preprocessor directives
-            if line.strip().startswith('//') or line.strip().startswith('#') or line.strip().startswith('/*'):
-                continue
-                
-            # Find numeric magic literals
-            for match in number_pattern.finditer(line):
-                violations.append(ConnascenceViolation(
-                    type="connascence_of_meaning",
-                    severity="medium", 
-                    file_path=str(file_path),
-                    line_number=line_num,
-                    column=match.start(),
-                    description=f"Magic literal '{match.group()}' should be a named constant",
-                    recommendation="Use #define or const",
-                    code_snippet=line.strip(),
-                    context={"literal_type": "number", "value": match.group()},
-                ))
-            
-            # Find string literals
-            for match in string_pattern.finditer(line):
-                literal = match.group()
-                violations.append(ConnascenceViolation(
-                    type="connascence_of_meaning",
-                    severity="medium",
-                    file_path=str(file_path), 
-                    line_number=line_num,
-                    column=match.start(),
-                    description=f"Magic string {literal} should be a named constant",
-                    recommendation="Use #define or const char*",
-                    code_snippet=line.strip(),
-                    context={"literal_type": "string", "value": literal},
-                ))
-        
-        return violations
+        """Detect magic literals in C/C++ code using consolidated strategy."""
+        from .language_strategies import CStrategy
+        strategy = CStrategy()
+        return strategy.detect_magic_literals(file_path, source_lines)
 
     def _detect_c_god_functions(self, file_path: Path, source_lines: list[str]) -> list[ConnascenceViolation]:
-        """Detect god functions in C/C++ (functions that are too long)."""
-        violations = []
-        import re
-        
-        # C function definition pattern
-        func_pattern = re.compile(r'^\s*(?:\w+\s+)*\*?\s*\w+\s*\([^)]*\)\s*\{?')
-        
-        in_function = False
-        function_start = 0
-        function_name = ""
-        brace_count = 0
-        
-        for line_num, line in enumerate(source_lines, 1):
-            stripped = line.strip()
-            if not stripped or stripped.startswith('//') or stripped.startswith('/*') or stripped.startswith('#'):
-                continue
-                
-            if not in_function:
-                if func_pattern.match(line) and '{' in line:
-                    in_function = True
-                    function_start = line_num
-                    function_name = line.strip()[:50] + "..." if len(line.strip()) > 50 else line.strip()
-                    brace_count = line.count('{') - line.count('}')
-            else:
-                brace_count += line.count('{') - line.count('}')
-                if brace_count <= 0:
-                    # Function ended
-                    function_length = line_num - function_start + 1
-                    if function_length > 50:  # Threshold for god function
-                        violations.append(ConnascenceViolation(
-                            type="god_object",
-                            severity="high" if function_length > 100 else "medium",
-                            file_path=str(file_path),
-                            line_number=function_start,
-                            column=0,
-                            description=f"Function too long ({function_length} lines) - potential god function",
-                            recommendation="Break into smaller functions",
-                            code_snippet=function_name,
-                            context={"function_length": function_length, "threshold": 50},
-                        ))
-                    in_function = False
-        
-        return violations
+        """Detect god functions in C/C++ using consolidated strategy."""
+        from .language_strategies import CStrategy
+        strategy = CStrategy()
+        return strategy.detect_god_functions(file_path, source_lines)
 
     def _detect_c_parameter_coupling(self, file_path: Path, source_lines: list[str]) -> list[ConnascenceViolation]:
-        """Detect parameter coupling in C functions."""
-        violations = []
-        import re
-        
-        # C function parameter pattern
-        func_pattern = re.compile(r'^\s*(?:\w+\s+)*\*?\s*\w+\s*\(([^)]+)\)')
-        
-        for line_num, line in enumerate(source_lines, 1):
-            match = func_pattern.match(line)
-            if match:
-                params = match.group(1)
-                # Count parameters (rough estimate)
-                param_count = len([p.strip() for p in params.split(',') if p.strip() and p.strip() != 'void'])
-                
-                if param_count > 6:  # NASA Power of Ten rule
-                    violations.append(ConnascenceViolation(
-                        type="connascence_of_position",
-                        severity="high" if param_count > 10 else "medium", 
-                        file_path=str(file_path),
-                        line_number=line_num,
-                        column=match.start(),
-                        description=f"Too many parameters ({param_count}) - high connascence of position",
-                        recommendation="Use structures or reduce parameters",
-                        code_snippet=line.strip(),
-                        context={"parameter_count": param_count, "threshold": 6},
-                    ))
-        
-        return violations
+        """Detect parameter coupling in C functions using consolidated strategy."""
+        from .language_strategies import CStrategy
+        strategy = CStrategy()
+        return strategy.detect_parameter_coupling(file_path, source_lines)
 
 
 def main():
