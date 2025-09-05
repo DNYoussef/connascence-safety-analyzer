@@ -22,53 +22,16 @@ from pathlib import Path
 from typing import Dict, List, Any, Optional
 
 
-# Mock ConnascenceViolation for removed analyzer dependency
-class ConnascenceViolation:
-    def __init__(self, id=None, rule_id=None, connascence_type=None, severity=None, 
-                 description=None, file_path=None, line_number=None, weight=None, type=None, **kwargs):
-        self.id = id
-        self.rule_id = rule_id
-        self.connascence_type = connascence_type or type
-        self.type = type or connascence_type
-        self.severity = severity
-        self.description = description
-        self.file_path = file_path
-        self.line_number = line_number
-        self.weight = weight
-        for k, v in kwargs.items():
-            setattr(self, k, v)
+# Import shared utilities
+import sys
+from pathlib import Path
+sys.path.append(str(Path(__file__).parent.parent))
+
+from utils.config_loader import ConnascenceViolation, RateLimiter, load_config_defaults
 
 
-# MCP Server Configuration Constants (CoM Improvement - Pass 2)
-DEFAULT_RATE_LIMIT_REQUESTS = 100
-DEFAULT_RATE_LIMIT_WINDOW_SECONDS = 60
-DEFAULT_AUDIT_ENABLED = True
-
-class RateLimiter:
-    """Rate limiter for MCP server."""
-    def __init__(self, max_requests=DEFAULT_RATE_LIMIT_REQUESTS, window_seconds=DEFAULT_RATE_LIMIT_WINDOW_SECONDS):
-        self.max_requests = max_requests
-        self.window_seconds = window_seconds
-        self.requests = {}
-    
-    def is_allowed(self, client_id: str) -> bool:
-        now = time.time()
-        if client_id not in self.requests:
-            self.requests[client_id] = []
-        
-        # Clean old requests
-        self.requests[client_id] = [req_time for req_time in self.requests[client_id] 
-                                   if now - req_time < self.window_seconds]
-        
-        # Check if within limit
-        if len(self.requests[client_id]) < self.max_requests:
-            self.requests[client_id].append(now)
-            return True
-        return False
-    
-    def check_rate_limit(self, client_id: str = 'default') -> bool:
-        """Check if client is within rate limits."""
-        return self.is_allowed(client_id)
+# Load configuration defaults
+MCP_DEFAULTS = load_config_defaults('mcp_server')
 
 class AuditLogger:
     """Audit logger for MCP server."""

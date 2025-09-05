@@ -18,28 +18,28 @@ Integrates with Bandit security linter to identify security-related
 connascence patterns and correlate security issues with code quality.
 """
 
-import subprocess
 import json
 from pathlib import Path
 from typing import Dict, List, Any, Optional
 
+from .base_integration import BaseIntegration
 
-class BanditIntegration:
+
+class BanditIntegration(BaseIntegration):
     """Integration with Bandit security linter."""
     
-    def __init__(self, config: Optional[Dict] = None):
-        self.config = config or {}
-        self.description = "Python security linter"
-        self._version_cache: Optional[str] = None
+    @property
+    def tool_name(self) -> str:
+        return "bandit"
     
-    def is_available(self) -> bool:
-        """Check if Bandit is available in the environment."""
-        try:
-            result = subprocess.run(['bandit', '--version'], 
-                                  capture_output=True, text=True)
-            return result.returncode == 0
-        except FileNotFoundError:
-            return False
+    @property
+    def description(self) -> str:
+        return "Python security linter"
+    
+    @property
+    def version_command(self) -> List[str]:
+        return ['bandit', '--version']
+    
     
     def get_version(self) -> str:
         """Get Bandit version."""

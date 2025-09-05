@@ -15,39 +15,15 @@ import yaml
 import json
 from pathlib import Path
 from typing import Dict, List, Any, Optional, Union
-# Mock ConnascenceViolation for removed analyzer dependency
-class ConnascenceViolation:
-    def __init__(self, id=None, rule_id=None, connascence_type=None, severity=None, 
-                 description=None, file_path=None, line_number=None, weight=None, type=None, **kwargs):
-        self.id = id
-        self.rule_id = rule_id
-        self.connascence_type = connascence_type or type
-        self.type = type or connascence_type
-        self.severity = severity
-        self.description = description
-        self.file_path = file_path
-        self.line_number = line_number
-        self.weight = weight
-        for k, v in kwargs.items():
-            setattr(self, k, v)
+# Import shared utilities
+import sys
+from pathlib import Path
+sys.path.append(str(Path(__file__).parent.parent))
 
-# Mock ThresholdConfig for removed analyzer dependency
-class ThresholdConfig:
-    def __init__(self, max_positional_params=3, god_class_methods=20, max_cyclomatic_complexity=10):
-        self.max_positional_params = max_positional_params
-        self.god_class_methods = god_class_methods
-        self.max_cyclomatic_complexity = max_cyclomatic_complexity
+from utils.config_loader import ConnascenceViolation, ThresholdConfig, load_config_defaults
 
-# Policy Manager Configuration Constants (CoM Improvement - Pass 2)
-STRICT_CORE_MAX_POSITIONAL_PARAMS = 2
-STRICT_CORE_GOD_CLASS_METHODS = 15
-STRICT_CORE_MAX_CYCLOMATIC_COMPLEXITY = 8
-STRICT_CORE_COM_LIMIT = 3
-STRICT_CORE_COP_LIMIT = 2
-STRICT_CORE_TOTAL_VIOLATIONS_LIMIT = 10
-
-SERVICE_DEFAULTS_MAX_POSITIONAL_PARAMS = 4
-SERVICE_DEFAULTS_GOD_CLASS_METHODS = 25
+# Load configuration defaults
+POLICY_DEFAULTS = load_config_defaults('policy_manager')
 SERVICE_DEFAULTS_MAX_CYCLOMATIC_COMPLEXITY = 12
 SERVICE_DEFAULTS_COM_LIMIT = 8
 SERVICE_DEFAULTS_COP_LIMIT = 5

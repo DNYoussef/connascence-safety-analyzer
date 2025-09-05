@@ -48,8 +48,7 @@ class MyPyIntegration:
             return self._version_cache
         
         try:
-            result = subprocess.run(['mypy', '--version'], 
-                                  capture_output=True, text=True)
+            result = self.run_command(['--version'])
             if result.returncode == 0:
                 # Parse version from "mypy 1.5.1 (compiled: yes)"
                 version_match = re.search(r'mypy (\\d+\\.\\d+\\.\\d+)', result.stdout)

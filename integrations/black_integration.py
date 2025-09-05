@@ -18,15 +18,28 @@ Integrates with Black code formatter to correlate formatting consistency
 with connascence violations and overall code quality.
 """
 
-import subprocess
 from pathlib import Path
 from typing import Dict, List, Any, Optional
 import tempfile
 import difflib
 
+from .base_integration import BaseIntegration
 
-class BlackIntegration:
+
+class BlackIntegration(BaseIntegration):
     """Integration with Black Python code formatter."""
+    
+    @property
+    def tool_name(self) -> str:
+        return "black"
+    
+    @property
+    def description(self) -> str:
+        return "Python code formatter"
+    
+    @property
+    def version_command(self) -> List[str]:
+        return ['black', '--version']
     
     def __init__(self, config: Optional[Dict] = None):
         self.config = config or {}
