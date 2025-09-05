@@ -69,6 +69,20 @@ export interface WorkspaceAnalysisResult {
 }
 
 export class ConnascenceService {
+    
+    /**
+     * Call MCP server tool
+     */
+    public async callMcpTool(toolName: string, args: any): Promise<any> {
+        // Placeholder for MCP tool integration
+        // This would connect to the MCP server
+        return {
+            success: false,
+            error: 'MCP integration not yet implemented',
+            tool: toolName,
+            args
+        };
+    }
     private apiClient: ConnascenceApiClient;
 
     constructor(
