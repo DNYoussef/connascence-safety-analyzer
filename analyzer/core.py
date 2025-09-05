@@ -13,7 +13,12 @@ from typing import Any, Dict, List, Optional
 
 # Import using unified import strategy
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from core.unified_imports import IMPORT_MANAGER, ImportSpec
+try:
+    from core.unified_imports import IMPORT_MANAGER, ImportSpec
+except ImportError:
+    # Fallback for legacy execution
+    sys.path.insert(0, str(Path(__file__).parent.parent / "core"))
+    from unified_imports import IMPORT_MANAGER, ImportSpec
 
 # Import constants with unified strategy
 constants_result = IMPORT_MANAGER.import_constants()

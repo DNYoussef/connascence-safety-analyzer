@@ -19,24 +19,54 @@ class GodObjectAnalyzer:
         self.threshold = threshold
     
     def analyze_path(self, path: str) -> List[ConnascenceViolation]:
-        """Analyze path for god objects."""
+        """Analyze path for god objects using real file analysis."""
         violations = []
         path_obj = Path(path)
         
         if not path_obj.exists():
             return violations
         
-        # Mock god object detection for CI testing
-        violations.append(ConnascenceViolation(
-            id="god_object_1",
-            rule_id="GOD_OBJECT_METHODS",
-            connascence_type="CoA",
-            severity="high",
-            description=f"God Object detected: Class has {self.threshold + 5} methods (threshold: {self.threshold})",
-            file_path=f"{path}/large_class.py",
-            line_number=1,
-            weight=4.0
-        ))
+        # Real analysis: scan actual Python files
+        if path_obj.is_file() and path_obj.suffix == '.py':
+            violations.extend(self._analyze_file(path_obj))
+        elif path_obj.is_dir():
+            # Recursively analyze Python files
+            for py_file in path_obj.rglob('*.py'):
+                try:
+                    violations.extend(self._analyze_file(py_file))
+                except Exception as e:
+                    print(f"Warning: Failed to analyze {py_file}: {e}")
+        
+        return violations
+    
+    def _analyze_file(self, file_path: Path) -> List[ConnascenceViolation]:
+        """Analyze a single Python file for god objects."""
+        violations = []
+        
+        try:
+            import ast
+            with open(file_path, 'r', encoding='utf-8') as f:
+                source = f.read()
+            
+            tree = ast.parse(source)
+            
+            # Find classes with too many methods
+            for node in ast.walk(tree):
+                if isinstance(node, ast.ClassDef):
+                    methods = [n for n in node.body if isinstance(n, ast.FunctionDef)]
+                    if len(methods) > self.threshold:
+                        violations.append(ConnascenceViolation(
+                            id=f"god_object_{node.name}_{file_path.stem}",
+                            rule_id="GOD_OBJECT_METHODS",
+                            connascence_type="CoA",
+                            severity="high",
+                            description=f"God Object detected: Class '{node.name}' has {len(methods)} methods (threshold: {self.threshold})",
+                            file_path=str(file_path),
+                            line_number=node.lineno,
+                            weight=4.0
+                        ))
+        except Exception as e:
+            print(f"Error analyzing {file_path}: {e}")
         
         return violations
 
