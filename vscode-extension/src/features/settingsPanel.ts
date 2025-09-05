@@ -4,7 +4,7 @@
  */
 
 import * as vscode from 'vscode';
-import { ConfigurationService } from '../services/configurationService';
+import { ConfigurationService, PolicyPreset, PolicyComparison, ImpactAnalysis } from '../services/configurationService';
 import { CustomAnalysisRule, PerformanceAnalysisConfig, AdvancedFilteringConfig } from '../types/index';
 
 export class SettingsPanel {
@@ -65,6 +65,24 @@ export class SettingsPanel {
                     break;
                 case 'validateRule':
                     await this.handleRuleValidation(message.rule);
+                    break;
+                case 'getPolicyPresets':
+                    await this.handleGetPolicyPresets();
+                    break;
+                case 'applyPolicyPreset':
+                    await this.handleApplyPolicyPreset(message.presetId);
+                    break;
+                case 'comparePolicyPresets':
+                    await this.handleComparePolicyPresets(message.preset1Id, message.preset2Id);
+                    break;
+                case 'createCustomPolicy':
+                    await this.handleCreateCustomPolicy(message.name, message.description, message.settings);
+                    break;
+                case 'exportPolicyConfiguration':
+                    await this.handleExportPolicyConfiguration(message.presetId);
+                    break;
+                case 'getPolicyImpactPreview':
+                    await this.handleGetPolicyImpactPreview(message.presetId);
                     break;
             }
         });
@@ -208,6 +226,161 @@ export class SettingsPanel {
             type: 'ruleValidation',
             isValid: isValid,
             rule: rule
+        });
+    }
+
+    // =====================================================
+    // POLICY MANAGEMENT MESSAGE HANDLERS
+    // =====================================================
+
+    private async handleGetPolicyPresets(): Promise<void> {
+        if (!this.panel) return;
+
+        const presets = this.configService.getPolicyPresets();
+        const customPresets: any[] = []; // Custom presets are stored in the configuration
+        const allPresets = [...presets, ...customPresets];
+        
+        await this.panel.webview.postMessage({
+            type: 'policyPresets',
+            presets: allPresets,
+            appliedPreset: this.configService.getAppliedPolicyPreset()
+        });
+    }
+
+    private async handleApplyPolicyPreset(presetId: string): Promise<void> {
+        if (!this.panel) return;
+
+        try {
+            const result = await this.configService.applyPolicyPreset(presetId);
+            
+            if (result.success) {
+                vscode.window.showInformationMessage('Policy preset applied successfully');
+                await this.sendConfigToPanel(); // Refresh UI with new settings
+            } else {
+                const errors = result.errors?.join(', ') || 'Unknown error';
+                vscode.window.showErrorMessage(`Failed to apply policy preset: ${errors}`);
+            }
+
+            await this.panel.webview.postMessage({
+                type: 'policyApplyResult',
+                success: result.success,
+                errors: result.errors
+            });
+
+        } catch (error) {
+            vscode.window.showErrorMessage(`Error applying policy preset: ${error}`);
+            await this.panel.webview.postMessage({
+                type: 'policyApplyResult',
+                success: false,
+                errors: [`Error: ${error}`]
+            });
+        }
+    }
+
+    private async handleComparePolicyPresets(preset1Id: string, preset2Id: string): Promise<void> {
+        if (!this.panel) return;
+
+        const comparison = this.configService.comparePolicyPresets(preset1Id, preset2Id);
+        
+        await this.panel.webview.postMessage({
+            type: 'policyComparison',
+            comparison: comparison
+        });
+    }
+
+    private async handleCreateCustomPolicy(name: string, description: string, settings: any): Promise<void> {
+        if (!this.panel) return;
+
+        try {
+            const result = await this.configService.createCustomPolicy(name, description, settings);
+            
+            if (result.success) {
+                vscode.window.showInformationMessage('Custom policy created successfully');
+                await this.handleGetPolicyPresets(); // Refresh presets list
+            } else {
+                const errors = result.errors?.join(', ') || 'Unknown error';
+                vscode.window.showErrorMessage(`Failed to create custom policy: ${errors}`);
+            }
+
+            await this.panel.webview.postMessage({
+                type: 'customPolicyCreateResult',
+                success: result.success,
+                preset: result.preset,
+                errors: result.errors
+            });
+
+        } catch (error) {
+            vscode.window.showErrorMessage(`Error creating custom policy: ${error}`);
+            await this.panel.webview.postMessage({
+                type: 'customPolicyCreateResult',
+                success: false,
+                errors: [`Error: ${error}`]
+            });
+        }
+    }
+
+    private async handleExportPolicyConfiguration(presetId?: string): Promise<void> {
+        if (!this.panel) return;
+
+        try {
+            const result = await this.configService.exportPolicyConfiguration(presetId);
+            
+            if (result.success && result.data) {
+                const configJson = JSON.stringify(result.data, null, 2);
+                const fileName = presetId ? `${presetId}-policy.json` : 'policy-export.json';
+                
+                const uri = await vscode.window.showSaveDialog({
+                    filters: {
+                        'JSON files': ['json']
+                    },
+                    defaultUri: vscode.Uri.file(fileName)
+                });
+
+                if (uri) {
+                    await vscode.workspace.fs.writeFile(uri, Buffer.from(configJson));
+                    vscode.window.showInformationMessage('Policy configuration exported successfully');
+                }
+            } else {
+                const errors = result.errors?.join(', ') || 'Unknown error';
+                vscode.window.showErrorMessage(`Failed to export policy configuration: ${errors}`);
+            }
+
+            await this.panel.webview.postMessage({
+                type: 'policyExportResult',
+                success: result.success,
+                errors: result.errors
+            });
+
+        } catch (error) {
+            vscode.window.showErrorMessage(`Error exporting policy configuration: ${error}`);
+        }
+    }
+
+    private async handleGetPolicyImpactPreview(presetId: string): Promise<void> {
+        if (!this.panel) return;
+
+        const preset = this.configService.getPolicyPresetById(presetId);
+        if (!preset) {
+            await this.panel.webview.postMessage({
+                type: 'policyImpactPreview',
+                error: 'Policy preset not found'
+            });
+            return;
+        }
+
+        // Calculate impact analysis by comparing with current settings
+        const currentPresetId = this.configService.getAppliedPolicyPreset();
+        let impactAnalysis: ImpactAnalysis | null = null;
+        
+        if (currentPresetId) {
+            const comparison = this.configService.comparePolicyPresets(currentPresetId, presetId);
+            impactAnalysis = comparison?.impactAnalysis || null;
+        }
+
+        await this.panel.webview.postMessage({
+            type: 'policyImpactPreview',
+            preset: preset,
+            impactAnalysis: impactAnalysis
         });
     }
 
@@ -412,6 +585,300 @@ export class SettingsPanel {
         .status-invalid {
             background-color: var(--vscode-terminal-ansiRed);
         }
+        
+        /* Policy Management Styles */
+        .preset-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+        
+        .preset-card {
+            border: 2px solid var(--vscode-panel-border);
+            border-radius: 8px;
+            padding: 15px;
+            background-color: var(--vscode-editor-background);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        
+        .preset-card:hover {
+            border-color: var(--vscode-button-background);
+            background-color: var(--vscode-panel-background);
+        }
+        
+        .preset-card.active {
+            border-color: var(--vscode-button-background);
+            background-color: var(--vscode-button-background);
+            color: var(--vscode-button-foreground);
+        }
+        
+        .preset-card.active::before {
+            content: "✓ Applied";
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            font-size: 12px;
+            font-weight: bold;
+            color: var(--vscode-terminal-ansiGreen);
+        }
+        
+        .preset-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .preset-title {
+            font-weight: bold;
+            font-size: 16px;
+            margin: 0;
+        }
+        
+        .preset-impact {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .impact-low {
+            background-color: var(--vscode-terminal-ansiGreen);
+            color: var(--vscode-editor-background);
+        }
+        
+        .impact-medium {
+            background-color: var(--vscode-terminal-ansiYellow);
+            color: var(--vscode-editor-background);
+        }
+        
+        .impact-high {
+            background-color: var(--vscode-terminal-ansiRed);
+            color: var(--vscode-editor-foreground);
+        }
+        
+        .preset-description {
+            color: var(--vscode-descriptionForeground);
+            font-size: 14px;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+        
+        .preset-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+        
+        .preset-tag {
+            background-color: var(--vscode-panel-border);
+            color: var(--vscode-foreground);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+        
+        .preset-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 5px;
+            margin-top: 10px;
+        }
+        
+        .preset-action-btn {
+            padding: 4px 8px;
+            font-size: 12px;
+            border: 1px solid var(--vscode-button-border);
+            background-color: var(--vscode-button-secondaryBackground);
+            color: var(--vscode-button-secondaryForeground);
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        
+        .preset-action-btn:hover {
+            background-color: var(--vscode-button-background);
+            color: var(--vscode-button-foreground);
+        }
+        
+        .policy-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid var(--vscode-panel-border);
+        }
+        
+        .policy-impact-preview {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid var(--vscode-panel-border);
+            border-radius: 8px;
+            background-color: var(--vscode-panel-background);
+        }
+        
+        .impact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .impact-metric {
+            text-align: center;
+            padding: 10px;
+            border: 1px solid var(--vscode-panel-border);
+            border-radius: 6px;
+        }
+        
+        .impact-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--vscode-button-background);
+            display: block;
+        }
+        
+        .impact-label {
+            font-size: 12px;
+            color: var(--vscode-descriptionForeground);
+            margin-top: 5px;
+        }
+        
+        .policy-comparison {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid var(--vscode-panel-border);
+            border-radius: 8px;
+            background-color: var(--vscode-panel-background);
+        }
+        
+        .comparison-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .comparison-controls select {
+            flex: 1;
+        }
+        
+        .vs-label {
+            font-weight: bold;
+            color: var(--vscode-button-background);
+            font-size: 16px;
+        }
+        
+        .comparison-results {
+            margin-top: 20px;
+        }
+        
+        .differences-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        .differences-table th,
+        .differences-table td {
+            padding: 8px 12px;
+            border: 1px solid var(--vscode-panel-border);
+            text-align: left;
+        }
+        
+        .differences-table th {
+            background-color: var(--vscode-panel-background);
+            font-weight: bold;
+        }
+        
+        .difference-high {
+            background-color: var(--vscode-diffEditor-removedTextBackground);
+        }
+        
+        .difference-medium {
+            background-color: var(--vscode-diffEditor-insertedTextBackground);
+        }
+        
+        .difference-low {
+            background-color: var(--vscode-panel-background);
+        }
+        
+        .custom-policy-builder {
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid var(--vscode-panel-border);
+            border-radius: 8px;
+            background-color: var(--vscode-panel-background);
+        }
+        
+        .builder-form .setting-group {
+            margin-bottom: 20px;
+        }
+        
+        .builder-settings {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px dashed var(--vscode-panel-border);
+            border-radius: 6px;
+            min-height: 100px;
+        }
+        
+        .builder-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid var(--vscode-panel-border);
+        }
+        
+        .drag-drop-area {
+            border: 2px dashed var(--vscode-panel-border);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            color: var(--vscode-descriptionForeground);
+            margin: 10px 0;
+            transition: border-color 0.2s ease;
+        }
+        
+        .drag-drop-area.drag-over {
+            border-color: var(--vscode-button-background);
+            background-color: var(--vscode-button-background);
+            color: var(--vscode-button-foreground);
+        }
+        
+        .rule-component {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid var(--vscode-panel-border);
+            border-radius: 4px;
+            background-color: var(--vscode-editor-background);
+            cursor: move;
+        }
+        
+        .rule-component:hover {
+            border-color: var(--vscode-button-background);
+        }
+        
+        .toggle-button {
+            background: none;
+            border: none;
+            color: var(--vscode-button-background);
+            cursor: pointer;
+            font-size: 14px;
+            padding: 5px;
+        }
+        
+        .toggle-button:hover {
+            color: var(--vscode-button-hoverBackground);
+        }
     </style>
 </head>
 <body>
@@ -419,6 +886,78 @@ export class SettingsPanel {
         <div class="header">
             <h1>🔗 Connascence Safety Analyzer Settings</h1>
             <p>Configure advanced options for code quality analysis and safety compliance</p>
+        </div>
+
+        <div class="section">
+            <h2>Policy Management</h2>
+            <p class="setting-description">Quickly apply comprehensive policy presets or create custom configurations</p>
+            
+            <div class="policy-preset-selector">
+                <h3>Available Policy Presets</h3>
+                <div id="policyPresets" class="preset-grid">
+                    <!-- Dynamic content -->
+                </div>
+                
+                <div class="policy-actions">
+                    <button class="secondary-button" onclick="showPolicyComparison()">Compare Policies</button>
+                    <button class="secondary-button" onclick="showCustomPolicyBuilder()">Create Custom Policy</button>
+                    <button class="secondary-button" onclick="exportCurrentPolicy()">Export Current Policy</button>
+                </div>
+            </div>
+            
+            <div id="policyImpactPreview" class="policy-impact-preview" style="display: none;">
+                <h3>Policy Impact Preview</h3>
+                <div class="impact-details">
+                    <!-- Dynamic content -->
+                </div>
+            </div>
+            
+            <div id="policyComparison" class="policy-comparison" style="display: none;">
+                <h3>Policy Comparison</h3>
+                <div class="comparison-controls">
+                    <select id="comparePreset1">
+                        <option value="">Select first policy...</option>
+                    </select>
+                    <span class="vs-label">vs</span>
+                    <select id="comparePreset2">
+                        <option value="">Select second policy...</option>
+                    </select>
+                    <button class="primary-button" onclick="comparePolicies()">Compare</button>
+                </div>
+                <div id="comparisonResults" class="comparison-results">
+                    <!-- Dynamic content -->
+                </div>
+            </div>
+            
+            <div id="customPolicyBuilder" class="custom-policy-builder" style="display: none;">
+                <h3>Custom Policy Builder</h3>
+                <div class="builder-form">
+                    <div class="setting-group">
+                        <label class="setting-label" for="customPolicyName">Policy Name</label>
+                        <input type="text" id="customPolicyName" placeholder="My Custom Policy">
+                    </div>
+                    <div class="setting-group">
+                        <label class="setting-label" for="customPolicyDescription">Description</label>
+                        <textarea id="customPolicyDescription" rows="2" placeholder="Description of this policy..."></textarea>
+                    </div>
+                    <div class="setting-group">
+                        <label class="setting-label">Base Template</label>
+                        <select id="customPolicyBase">
+                            <option value="default_balanced">Default Balanced</option>
+                            <option value="strict_core">Strict Core Safety</option>
+                            <option value="lenient_dev">Lenient Development</option>
+                            <option value="nasa_jpl_pot10">NASA JPL Power of Ten</option>
+                        </select>
+                    </div>
+                    <div class="builder-settings">
+                        <!-- Will be populated with draggable rule components -->
+                    </div>
+                    <div class="builder-actions">
+                        <button class="primary-button" onclick="createCustomPolicy()">Create Policy</button>
+                        <button class="secondary-button" onclick="hideCustomPolicyBuilder()">Cancel</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="section">
@@ -627,6 +1166,24 @@ export class SettingsPanel {
                     break;
                 case 'ruleValidation':
                     handleRuleValidation(message.isValid, message.rule);
+                    break;
+                case 'policyPresets':
+                    populatePolicyPresets(message.presets, message.appliedPreset);
+                    break;
+                case 'policyApplyResult':
+                    handlePolicyApplyResult(message.success, message.errors);
+                    break;
+                case 'policyComparison':
+                    displayPolicyComparison(message.comparison);
+                    break;
+                case 'policyImpactPreview':
+                    displayPolicyImpactPreview(message.preset, message.impactAnalysis, message.error);
+                    break;
+                case 'customPolicyCreateResult':
+                    handleCustomPolicyCreateResult(message.success, message.preset, message.errors);
+                    break;
+                case 'policyExportResult':
+                    handlePolicyExportResult(message.success, message.errors);
                     break;
             }
         });
@@ -858,6 +1415,368 @@ export class SettingsPanel {
         function handleRuleValidation(isValid, rule) {
             // Update UI to show validation status
             console.log('Rule validation:', isValid, rule);
+        }
+
+        // =====================================================
+        // POLICY MANAGEMENT FUNCTIONS
+        // =====================================================
+
+        // Request policy presets when the page loads
+        vscode.postMessage({ type: 'getPolicyPresets' });
+
+        function populatePolicyPresets(presets, appliedPreset) {
+            const container = document.getElementById('policyPresets');
+            container.innerHTML = '';
+
+            presets.forEach(preset => {
+                const presetCard = document.createElement('div');
+                presetCard.className = 'preset-card' + (preset.id === appliedPreset ? ' active' : '');
+                presetCard.onclick = () => applyPolicyPreset(preset.id);
+                
+                presetCard.innerHTML = \`
+                    <div class="preset-header">
+                        <h4 class="preset-title">\${preset.name}</h4>
+                        <span class="preset-impact impact-\${preset.impact}">\${preset.impact}</span>
+                    </div>
+                    <div class="preset-description">\${preset.description}</div>
+                    <div class="preset-tags">
+                        \${preset.tags.map(tag => \`<span class="preset-tag">\${tag}</span>\`).join('')}
+                    </div>
+                    <div class="preset-actions">
+                        <button class="preset-action-btn" onclick="event.stopPropagation(); previewPolicyImpact('\${preset.id}')">Preview</button>
+                        <button class="preset-action-btn" onclick="event.stopPropagation(); exportPolicyPreset('\${preset.id}')">Export</button>
+                    </div>
+                \`;
+                
+                container.appendChild(presetCard);
+            });
+
+            // Populate comparison dropdowns
+            populateComparisonDropdowns(presets);
+        }
+
+        function populateComparisonDropdowns(presets) {
+            const dropdown1 = document.getElementById('comparePreset1');
+            const dropdown2 = document.getElementById('comparePreset2');
+            
+            dropdown1.innerHTML = '<option value="">Select first policy...</option>';
+            dropdown2.innerHTML = '<option value="">Select second policy...</option>';
+            
+            presets.forEach(preset => {
+                dropdown1.innerHTML += \`<option value="\${preset.id}">\${preset.name}</option>\`;
+                dropdown2.innerHTML += \`<option value="\${preset.id}">\${preset.name}</option>\`;
+            });
+        }
+
+        function applyPolicyPreset(presetId) {
+            vscode.postMessage({ 
+                type: 'applyPolicyPreset', 
+                presetId: presetId 
+            });
+        }
+
+        function handlePolicyApplyResult(success, errors) {
+            if (success) {
+                // Refresh the policy presets to show the new applied state
+                vscode.postMessage({ type: 'getPolicyPresets' });
+                // Refresh config to update all other settings
+                vscode.postMessage({ type: 'getConfig' });
+            } else {
+                console.error('Policy apply failed:', errors);
+            }
+        }
+
+        function previewPolicyImpact(presetId) {
+            vscode.postMessage({ 
+                type: 'getPolicyImpactPreview', 
+                presetId: presetId 
+            });
+        }
+
+        function displayPolicyImpactPreview(preset, impactAnalysis, error) {
+            const container = document.getElementById('policyImpactPreview');
+            
+            if (error) {
+                container.innerHTML = \`<p style="color: var(--vscode-errorForeground);">Error: \${error}</p>\`;
+                container.style.display = 'block';
+                return;
+            }
+
+            const impactDetails = document.querySelector('.impact-details');
+            
+            let impactHtml = \`
+                <h4>\${preset.name} - Impact Analysis</h4>
+                <p>\${preset.description}</p>
+            \`;
+
+            if (impactAnalysis) {
+                impactHtml += \`
+                    <div class="impact-grid">
+                        <div class="impact-metric">
+                            <span class="impact-value">\${impactAnalysis.performanceImpact > 0 ? '+' : ''}\${impactAnalysis.performanceImpact}%</span>
+                            <div class="impact-label">Performance Impact</div>
+                        </div>
+                        <div class="impact-metric">
+                            <span class="impact-value">\${impactAnalysis.thoroughnessImpact}%</span>
+                            <div class="impact-label">Thoroughness</div>
+                        </div>
+                        <div class="impact-metric">
+                            <span class="impact-value">\${impactAnalysis.falsePositiveRate.toFixed(1)}%</span>
+                            <div class="impact-label">Est. False Positives</div>
+                        </div>
+                        <div class="impact-metric">
+                            <span class="impact-value">\${impactAnalysis.estimatedAnalysisTime}</span>
+                            <div class="impact-label">Analysis Time</div>
+                        </div>
+                        <div class="impact-metric">
+                            <span class="impact-value">\${impactAnalysis.memoryUsage}</span>
+                            <div class="impact-label">Memory Usage</div>
+                        </div>
+                    </div>
+                \`;
+            } else {
+                impactHtml += '<p>No current policy for comparison. Impact will be calculated after applying a policy.</p>';
+            }
+
+            impactDetails.innerHTML = impactHtml;
+            container.style.display = 'block';
+        }
+
+        function showPolicyComparison() {
+            document.getElementById('policyComparison').style.display = 'block';
+        }
+
+        function hidePolicyComparison() {
+            document.getElementById('policyComparison').style.display = 'none';
+        }
+
+        function comparePolicies() {
+            const preset1Id = document.getElementById('comparePreset1').value;
+            const preset2Id = document.getElementById('comparePreset2').value;
+            
+            if (!preset1Id || !preset2Id) {
+                alert('Please select two policies to compare');
+                return;
+            }
+            
+            if (preset1Id === preset2Id) {
+                alert('Please select different policies to compare');
+                return;
+            }
+            
+            vscode.postMessage({ 
+                type: 'comparePolicyPresets', 
+                preset1Id: preset1Id,
+                preset2Id: preset2Id
+            });
+        }
+
+        function displayPolicyComparison(comparison) {
+            const container = document.getElementById('comparisonResults');
+            
+            if (!comparison) {
+                container.innerHTML = '<p>Comparison failed. Please try again.</p>';
+                return;
+            }
+
+            let html = \`
+                <div class="comparison-header">
+                    <h4>Comparing: \${comparison.preset1.name} vs \${comparison.preset2.name}</h4>
+                </div>
+                
+                <div class="impact-grid">
+                    <div class="impact-metric">
+                        <span class="impact-value">\${comparison.impactAnalysis.performanceImpact > 0 ? '+' : ''}\${comparison.impactAnalysis.performanceImpact}%</span>
+                        <div class="impact-label">Performance Difference</div>
+                    </div>
+                    <div class="impact-metric">
+                        <span class="impact-value">\${comparison.impactAnalysis.thoroughnessImpact}%</span>
+                        <div class="impact-label">Thoroughness Level</div>
+                    </div>
+                    <div class="impact-metric">
+                        <span class="impact-value">\${comparison.differences.length}</span>
+                        <div class="impact-label">Different Settings</div>
+                    </div>
+                </div>
+            \`;
+            
+            if (comparison.differences.length > 0) {
+                html += \`
+                    <table class="differences-table">
+                        <thead>
+                            <tr>
+                                <th>Setting</th>
+                                <th>\${comparison.preset1.name}</th>
+                                <th>\${comparison.preset2.name}</th>
+                                <th>Impact</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                \`;
+                
+                comparison.differences.forEach(diff => {
+                    html += \`
+                        <tr class="difference-\${diff.impact}">
+                            <td><strong>\${diff.setting}</strong></td>
+                            <td>\${formatSettingValue(diff.value1)}</td>
+                            <td>\${formatSettingValue(diff.value2)}</td>
+                            <td><span class="preset-impact impact-\${diff.impact}">\${diff.impact}</span></td>
+                            <td>\${diff.description}</td>
+                        </tr>
+                    \`;
+                });
+                
+                html += \`
+                        </tbody>
+                    </table>
+                \`;
+            }
+            
+            container.innerHTML = html;
+        }
+
+        function formatSettingValue(value) {
+            if (typeof value === 'object') {
+                return JSON.stringify(value, null, 1);
+            }
+            return String(value);
+        }
+
+        function showCustomPolicyBuilder() {
+            document.getElementById('customPolicyBuilder').style.display = 'block';
+            initializeCustomPolicyBuilder();
+        }
+
+        function hideCustomPolicyBuilder() {
+            document.getElementById('customPolicyBuilder').style.display = 'none';
+        }
+
+        function initializeCustomPolicyBuilder() {
+            const builderSettings = document.querySelector('.builder-settings');
+            builderSettings.innerHTML = \`
+                <div class="drag-drop-area">
+                    <p>Drag and drop configuration components here to build your custom policy</p>
+                    <div class="available-components">
+                        <h4>Available Components:</h4>
+                        <div class="rule-component" draggable="true" data-setting="analysisDepth">
+                            <span>Analysis Depth</span>
+                            <select>
+                                <option value="surface">Surface</option>
+                                <option value="standard">Standard</option>
+                                <option value="deep">Deep</option>
+                                <option value="comprehensive">Comprehensive</option>
+                            </select>
+                        </div>
+                        <div class="rule-component" draggable="true" data-setting="confidenceThreshold">
+                            <span>Confidence Threshold</span>
+                            <input type="range" min="0" max="1" step="0.05" value="0.8">
+                        </div>
+                        <div class="rule-component" draggable="true" data-setting="realTimeAnalysis">
+                            <span>Real-time Analysis</span>
+                            <input type="checkbox" checked>
+                        </div>
+                        <div class="rule-component" draggable="true" data-setting="grammarValidation">
+                            <span>Grammar Validation</span>
+                            <input type="checkbox" checked>
+                        </div>
+                        <div class="rule-component" draggable="true" data-setting="autoFixSuggestions">
+                            <span>Auto-fix Suggestions</span>
+                            <input type="checkbox" checked>
+                        </div>
+                    </div>
+                </div>
+            \`;
+        }
+
+        function createCustomPolicy() {
+            const name = document.getElementById('customPolicyName').value;
+            const description = document.getElementById('customPolicyDescription').value;
+            const baseTemplate = document.getElementById('customPolicyBase').value;
+            
+            if (!name.trim()) {
+                alert('Please enter a policy name');
+                return;
+            }
+            
+            if (!description.trim()) {
+                alert('Please enter a policy description');
+                return;
+            }
+            
+            // Collect settings from the builder
+            const settings = collectBuilderSettings(baseTemplate);
+            
+            vscode.postMessage({ 
+                type: 'createCustomPolicy', 
+                name: name,
+                description: description,
+                settings: settings
+            });
+        }
+
+        function collectBuilderSettings(baseTemplate) {
+            // For now, return the base template settings
+            // In a full implementation, this would collect from the drag-and-drop interface
+            const baseSettings = {};
+            
+            // Add any custom overrides based on the builder interface
+            const analysisDepth = document.querySelector('[data-setting="analysisDepth"] select')?.value;
+            if (analysisDepth) {
+                baseSettings.analysisDepth = analysisDepth;
+            }
+            
+            const confidenceThreshold = document.querySelector('[data-setting="confidenceThreshold"] input')?.value;
+            if (confidenceThreshold) {
+                baseSettings.confidenceThreshold = parseFloat(confidenceThreshold);
+            }
+            
+            const realTimeAnalysis = document.querySelector('[data-setting="realTimeAnalysis"] input')?.checked;
+            if (realTimeAnalysis !== undefined) {
+                baseSettings.realTimeAnalysis = realTimeAnalysis;
+            }
+            
+            const grammarValidation = document.querySelector('[data-setting="grammarValidation"] input')?.checked;
+            if (grammarValidation !== undefined) {
+                baseSettings.grammarValidation = grammarValidation;
+            }
+            
+            const autoFixSuggestions = document.querySelector('[data-setting="autoFixSuggestions"] input')?.checked;
+            if (autoFixSuggestions !== undefined) {
+                baseSettings.autoFixSuggestions = autoFixSuggestions;
+            }
+            
+            return baseSettings;
+        }
+
+        function handleCustomPolicyCreateResult(success, preset, errors) {
+            if (success) {
+                alert('Custom policy created successfully!');
+                hideCustomPolicyBuilder();
+                vscode.postMessage({ type: 'getPolicyPresets' }); // Refresh presets
+            } else {
+                const errorMessage = errors ? errors.join('\\n') : 'Unknown error';
+                alert('Failed to create custom policy:\\n' + errorMessage);
+            }
+        }
+
+        function exportCurrentPolicy() {
+            vscode.postMessage({ type: 'exportPolicyConfiguration' });
+        }
+
+        function exportPolicyPreset(presetId) {
+            vscode.postMessage({ 
+                type: 'exportPolicyConfiguration', 
+                presetId: presetId 
+            });
+        }
+
+        function handlePolicyExportResult(success, errors) {
+            if (!success) {
+                const errorMessage = errors ? errors.join('\\n') : 'Export failed';
+                alert('Export failed:\\n' + errorMessage);
+            }
+            // Success message is shown by the extension
         }
     </script>
 </body>

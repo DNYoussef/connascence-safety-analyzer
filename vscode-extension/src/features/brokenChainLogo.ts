@@ -31,28 +31,34 @@ export class BrokenChainLogoManager {
         totalIssues: number,
         criticalIssues: number,
         qualityScore: number,
-        isAnalyzing?: boolean
+        isAnalyzing?: boolean,
+        qualityGateStatus?: 'passed' | 'warning' | 'failed',
+        connascenceIndex?: number
     }): void {
         if (metrics.isAnalyzing) {
-            this.statusBarItem.text = '$(sync~spin) Analyzing...';
-            this.statusBarItem.tooltip = 'Breaking chains in progress...';
+            this.statusBarItem.text = '$(sync~spin) Breaking chains...';
+            this.statusBarItem.tooltip = 'Quality analysis in progress...';
             this.statusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.prominentBackground');
             return;
         }
 
-        const chainIcon = this.getChainStatusIcon(metrics.qualityScore, metrics.criticalIssues);
-        const statusColor = this.getStatusColor(metrics.qualityScore, metrics.criticalIssues);
+        const chainIcon = this.getChainStatusIcon(metrics.qualityScore, metrics.criticalIssues, metrics.qualityGateStatus);
+        const statusColor = this.getStatusColor(metrics.qualityScore, metrics.criticalIssues, metrics.qualityGateStatus);
+        const gateStatusText = this.getGateStatusText(metrics.qualityGateStatus);
         
-        this.statusBarItem.text = `${chainIcon} ${metrics.totalIssues} issues`;
+        this.statusBarItem.text = `${chainIcon} ${gateStatusText}`;
         this.statusBarItem.tooltip = this.buildTooltip(metrics);
         this.statusBarItem.backgroundColor = statusColor;
     }
 
-    private getChainStatusIcon(qualityScore: number, criticalIssues: number): string {
-        if (criticalIssues > 0) {
-            return '$(error)'; // Critical issues
-        } else if (qualityScore >= 90) {
-            return '$(check)'; // Excellent quality
+    private getChainStatusIcon(qualityScore: number, criticalIssues: number, gateStatus?: string): string {
+        // Priority: Gate status overrides individual metrics
+        if (gateStatus === 'failed' || criticalIssues > 0) {
+            return '$(error)'; // Gates failed or critical issues
+        } else if (gateStatus === 'warning') {
+            return '$(warning)'; // Gates warning
+        } else if (gateStatus === 'passed' && qualityScore >= 90) {
+            return '$(check)'; // All gates passed, excellent quality
         } else if (qualityScore >= 75) {
             return '$(link)'; // Good progress
         } else if (qualityScore >= 50) {
@@ -62,10 +68,13 @@ export class BrokenChainLogoManager {
         }
     }
 
-    private getStatusColor(qualityScore: number, criticalIssues: number): vscode.ThemeColor {
-        if (criticalIssues > 0) {
+    private getStatusColor(qualityScore: number, criticalIssues: number, gateStatus?: string): vscode.ThemeColor {
+        // Priority: Gate status overrides individual metrics
+        if (gateStatus === 'failed' || criticalIssues > 0) {
             return new vscode.ThemeColor('statusBarItem.errorBackground');
-        } else if (qualityScore >= 75) {
+        } else if (gateStatus === 'warning') {
+            return new vscode.ThemeColor('statusBarItem.warningBackground');
+        } else if (gateStatus === 'passed' && qualityScore >= 75) {
             return new vscode.ThemeColor('statusBarItem.prominentBackground');
         } else if (qualityScore >= 50) {
             return new vscode.ThemeColor('statusBarItem.warningBackground');
@@ -74,21 +83,59 @@ export class BrokenChainLogoManager {
         }
     }
 
+    private getGateStatusText(gateStatus?: string): string {
+        switch (gateStatus) {
+            case 'passed':
+                return 'Gates Passed';
+            case 'warning':
+                return 'Gates Warning';
+            case 'failed':
+                return 'Gates Failed';
+            default:
+                return 'Quality Check';
+        }
+    }
+
     private buildTooltip(metrics: {
         totalIssues: number,
         criticalIssues: number,
-        qualityScore: number
+        qualityScore: number,
+        qualityGateStatus?: string,
+        connascenceIndex?: number
     }): string {
-        let tooltip = `$(link-external) Connascence Safety Analyzer\n\n`;
+        let tooltip = `$(link-external) Connascence Quality Gates\n\n`;
+        
+        // Quality Gates Status
+        if (metrics.qualityGateStatus) {
+            const statusIcon = metrics.qualityGateStatus === 'passed' ? '✅' : 
+                             metrics.qualityGateStatus === 'warning' ? '⚠️' : '❌';
+            tooltip += `Quality Gates: ${statusIcon} ${metrics.qualityGateStatus.toUpperCase()}\n`;
+        }
+        
         tooltip += `Quality Score: ${metrics.qualityScore}/100\n`;
+        if (metrics.connascenceIndex !== undefined) {
+            tooltip += `Connascence Index: ${metrics.connascenceIndex.toFixed(1)}\n`;
+        }
         tooltip += `Total Issues: ${metrics.totalIssues}\n`;
         
         if (metrics.criticalIssues > 0) {
             tooltip += `Critical Issues: ${metrics.criticalIssues} 🚨\n`;
         }
         
-        tooltip += `\n💡 Break the chains of tight coupling!`;
-        tooltip += `\nClick to view dashboard`;
+        // Status-specific messages
+        if (metrics.qualityGateStatus === 'failed') {
+            tooltip += `\n🚫 Quality gates are blocking progress`;
+            tooltip += `\n🔧 Fix critical issues to pass gates`;
+        } else if (metrics.qualityGateStatus === 'warning') {
+            tooltip += `\n⚠️ Quality gates show warnings`;
+            tooltip += `\n📊 Review quality metrics`;
+        } else if (metrics.qualityGateStatus === 'passed') {
+            tooltip += `\n🎉 All quality gates passed!`;
+            tooltip += `\n✨ Great code quality`;
+        }
+        
+        tooltip += `\n\n💡 Break the chains of tight coupling!`;
+        tooltip += `\nClick to view quality dashboard`;
         
         return tooltip;
     }

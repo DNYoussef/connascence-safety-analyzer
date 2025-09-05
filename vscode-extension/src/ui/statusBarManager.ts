@@ -91,6 +91,32 @@ export class StatusBarManager {
         this.updateDisplay();
     }
 
+    private qualityGateStatus: 'passed' | 'warning' | 'failed' = 'passed';
+    private qualityMetrics: {
+        criticalViolations: number;
+        connascenceIndex: number;
+        totalViolations: number;
+        qualityScore: number;
+    } = {
+        criticalViolations: 0,
+        connascenceIndex: 0,
+        totalViolations: 0,
+        qualityScore: 100
+    };
+
+    updateQualityGateStatus(status: 'passed' | 'warning' | 'failed', metrics?: any): void {
+        this.qualityGateStatus = status;
+        if (metrics) {
+            this.qualityMetrics = {
+                criticalViolations: metrics.criticalViolations || 0,
+                connascenceIndex: metrics.connascenceIndex || 0,
+                totalViolations: metrics.totalViolations || 0,
+                qualityScore: metrics.qualityScore || 100
+            };
+        }
+        this.updateDisplay();
+    }
+
     private updateDisplay(): void {
         if (this.isAnalyzing) {
             this.statusBarItem.text = '$(loading~spin) Connascence: Analyzing...';
@@ -99,10 +125,39 @@ export class StatusBarManager {
             this.statusBarItem.command = undefined;
         } else {
             const profileIcon = this.getProfileIcon(this.currentProfile);
-            this.statusBarItem.text = `${profileIcon} Connascence: ${this.formatProfile(this.currentProfile)}`;
+            const gateStatusIcon = this.getQualityGateIcon();
+            
+            // Include quality gate status in display
+            this.statusBarItem.text = `${profileIcon}${gateStatusIcon} Connascence: ${this.formatProfile(this.currentProfile)}`;
             this.statusBarItem.tooltip = this.createTooltip();
-            this.statusBarItem.backgroundColor = undefined;
-            this.statusBarItem.command = 'connascence.toggleSafetyProfile';
+            this.statusBarItem.backgroundColor = this.getQualityGateColor();
+            this.statusBarItem.command = 'connascence.showDashboard'; // Changed to show dashboard instead
+        }
+    }
+
+    private getQualityGateIcon(): string {
+        switch (this.qualityGateStatus) {
+            case 'passed':
+                return ' ✅';
+            case 'warning':
+                return ' ⚠️';
+            case 'failed':
+                return ' ❌';
+            default:
+                return '';
+        }
+    }
+
+    private getQualityGateColor(): vscode.ThemeColor | undefined {
+        switch (this.qualityGateStatus) {
+            case 'failed':
+                return new vscode.ThemeColor('statusBarItem.errorBackground');
+            case 'warning':
+                return new vscode.ThemeColor('statusBarItem.warningBackground');
+            case 'passed':
+                return new vscode.ThemeColor('statusBarItem.prominentBackground');
+            default:
+                return undefined;
         }
     }
 
@@ -142,12 +197,18 @@ export class StatusBarManager {
         const lines = [
             'Connascence Safety Analyzer',
             '',
+            `Quality Gates: ${this.qualityGateStatus.toUpperCase()}`,
+            `Critical Issues: ${this.qualityMetrics.criticalViolations}`,
+            `Connascence Index: ${this.qualityMetrics.connascenceIndex.toFixed(1)}`,
+            `Total Violations: ${this.qualityMetrics.totalViolations}`,
+            `Quality Score: ${this.qualityMetrics.qualityScore.toFixed(1)}/100`,
+            '',
             `Active Profile: ${this.formatProfile(this.currentProfile)}`,
             `Real-time Analysis: ${this.configService.isRealTimeAnalysisEnabled() ? 'On' : 'Off'}`,
             `Grammar Validation: ${this.configService.isGrammarValidationEnabled() ? 'On' : 'Off'}`,
             `Framework: ${this.configService.getFrameworkProfile()}`,
             '',
-            'Click to change safety profile'
+            'Click to view quality dashboard'
         ];
 
         return lines.join('\n');
