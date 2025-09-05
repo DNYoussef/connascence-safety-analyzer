@@ -18,12 +18,12 @@ jobs:
     
     steps:
     - name: Checkout Repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
 
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: '3.12'
 
@@ -205,7 +205,7 @@ jobs:
         echo "::endgroup::"
 
     - name: 📤 Upload Self-Analysis Results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: self-analysis-results-${{ github.run_number }}
         path: |
@@ -220,7 +220,7 @@ jobs:
 
     - name: 🔔 Create Issue for Critical Self-Analysis Issues
       if: steps.self-quality-gates.outputs.critical_violations > 25
-      uses: actions/github-script@v6
+      uses: actions/github-script@v7
       with:
         script: |
           const criticalCount = ${{ steps.self-quality-gates.outputs.critical_violations }};

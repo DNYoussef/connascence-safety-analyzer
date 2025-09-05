@@ -12,12 +12,12 @@ jobs:
     
     steps:
     - name: Checkout Repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0  # Full history for trend analysis
 
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: '3.12'
 
@@ -273,14 +273,14 @@ jobs:
         echo "::endgroup::"
 
     - name: 📤 Upload SARIF Results
-      uses: github/codeql-action/upload-sarif@v2
+      uses: github/codeql-action/upload-sarif@v3
       if: always()
       with:
         sarif_file: connascence_analysis.sarif
         category: connascence-analysis
 
     - name: 📦 Upload Analysis Artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: connascence-analysis-results
@@ -299,7 +299,7 @@ jobs:
 
     - name: 📝 Comment PR with Results
       if: github.event_name == 'pull_request'
-      uses: actions/github-script@v6
+      uses: actions/github-script@v7
       with:
         script: |
           const fs = require('fs');
@@ -351,15 +351,15 @@ jobs:
     needs: connascence-analysis
     
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: '3.12'
     
     - name: Download Analysis Results
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: connascence-analysis-results
     
@@ -380,7 +380,7 @@ jobs:
           --output trend_dashboard.html
     
     - name: 📤 Upload Trend Analysis
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: trend-analysis
         path: |
