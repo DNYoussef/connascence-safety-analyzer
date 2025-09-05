@@ -1,29 +1,29 @@
 {
-  "created_at": "2025-09-05T00:12:48.849748",
-  "commit_hash": "b4cda81c36618d238d84e8390c2c04c478735f07",
+  "created_at": "2025-09-05T00:23:33.784086",
+  "commit_hash": "69b81a5922f84e385653c56df896f89b858b93ee",
   "branch": "main",
-  "description": "Version 2.0 baseline",
+  "description": "Initial legacy code baseline",
   "version": "2.0.0",
   "fingerprints": [
     {
-      "rule_id": "v1_issue",
-      "fingerprint": "1ee75491dbc78884d8800346145111728835bb998eaeeeada058703c4576f50c",
-      "file": "code.py",
-      "line": 1,
+      "rule_id": "baseline1",
+      "fingerprint": "c582905734cac14dc9bdf4b62255b4a95b14285bfc211b29f801062630ddbe7c",
+      "file": "legacy.py",
+      "line": 10,
       "column": 0,
       "severity": "medium",
       "context_hash": "",
-      "created_at": "2025-09-05T00:12:48.849748"
+      "created_at": "2025-09-05T00:23:33.784086"
     },
     {
-      "rule_id": "v2_issue",
-      "fingerprint": "b44fed979b5ee26a7d30ccff439629b3416d1e6b8fbdb685db2c2b2378320f36",
-      "file": "code.py",
-      "line": 10,
+      "rule_id": "baseline2",
+      "fingerprint": "29a8f9b136fab263f60b188b5f1eadcbe0f21f3748d73907bf33929eedf23aa4",
+      "file": "legacy.py",
+      "line": 20,
       "column": 0,
       "severity": "high",
       "context_hash": "",
-      "created_at": "2025-09-05T00:12:48.849748"
+      "created_at": "2025-09-05T00:23:33.784086"
     }
   ],
   "metadata": {

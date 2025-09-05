@@ -21,7 +21,21 @@ from typing import Dict, List, Any, Optional
 from dataclasses import dataclass, asdict
 from enum import Enum
 
-from analyzer.core import ConnascenceViolation
+# Mock ConnascenceViolation for removed analyzer dependency
+class ConnascenceViolation:
+    def __init__(self, id=None, rule_id=None, connascence_type=None, severity=None, 
+                 description=None, file_path=None, line_number=None, weight=None, type=None, **kwargs):
+        self.id = id
+        self.rule_id = rule_id
+        self.connascence_type = connascence_type or type
+        self.type = type or connascence_type
+        self.severity = severity
+        self.description = description
+        self.file_path = file_path
+        self.line_number = line_number
+        self.weight = weight
+        for k, v in kwargs.items():
+            setattr(self, k, v)
 
 # BudgetTracker Configuration Constants (CoM Improvement - Pass 2)
 DEFAULT_USAGE_HISTORY_LIMIT = 10  # Last N entries to keep in usage history
@@ -274,7 +288,10 @@ class BudgetTracker:
         compliance_status = {}
         
         for budget_type, limit in self.budget_limits.items():
-            current_usage = usage.get(budget_type, 0)
+            if budget_type == 'total_violations':
+                current_usage = len(violations)  # Total count for total_violations
+            else:
+                current_usage = usage.get(budget_type, 0)
             is_compliant = current_usage <= limit
             compliance_status[budget_type] = {
                 'limit': limit,
@@ -285,21 +302,40 @@ class BudgetTracker:
         
         overall_compliant = all(status['compliant'] for status in compliance_status.values())
         
+        # Calculate which budget types are violated
+        violations_list = []
+        for budget_type, status in compliance_status.items():
+            if not status['compliant']:
+                violations_list.append(budget_type)
+        
+        # Also check total violations limit
+        total_violations_limit = self.budget_limits.get('total_violations', float('inf'))
+        if len(violations) > total_violations_limit:
+            violations_list.append('total_violations')
+        
         return {
             'overall_compliant': overall_compliant,
             'compliant': overall_compliant,  # For backwards compatibility
             'budget_status': compliance_status,
             'total_violations': len(violations),
-            'violations': []  # For test compatibility
+            'violations': violations_list  # List of violated budget types
         }
     
     def get_budget_report(self) -> Dict[str, Any]:
         """Get comprehensive budget usage report."""
         compliance = self.check_compliance()
         
+        # Calculate utilization percentages
+        utilization = {}
+        for budget_type, limit in self.budget_limits.items():
+            current_usage = self.current_usage.get(budget_type, 0)
+            utilization[budget_type] = current_usage / limit if limit > 0 else 0
+        
         return {
             'budget_limits': self.budget_limits,
             'current_usage': self.current_usage,
+            'utilization': utilization,
+            'compliance_status': compliance['budget_status'],
             'current_compliance': compliance,
             'usage_history': self.usage_history[-DEFAULT_USAGE_HISTORY_LIMIT:],  # Last N entries
             'recommendations': self._generate_recommendations(compliance)

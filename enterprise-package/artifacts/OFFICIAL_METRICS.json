@@ -61,10 +61,13 @@
   "quality_analysis": {
     "sample_validation": {
       "sample_size": 200,
-      "true_positives": 197,
-      "questionable": 3, 
-      "false_positives": 0,
-      "accuracy_percentage": 98.5
+      "true_positives": 180,
+      "questionable": 16, 
+      "false_positives": 4,
+      "accuracy_percentage": 90.0,
+      "conservative_accuracy": 90.0,
+      "optimistic_accuracy": 98.0,
+      "realistic_accuracy": 94.0
     },
     "enterprise_validation": {
       "largest_codebase_analyzed": "curl_40799_violations",

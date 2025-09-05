@@ -11,11 +11,9 @@ import yaml
 from pathlib import Path
 from unittest.mock import Mock, patch
 
-from policy.manager import PolicyManager
+from policy.manager import PolicyManager, ConnascenceViolation, ThresholdConfig
 from policy.budgets import BudgetTracker
 from policy.baselines import BaselineManager
-from analyzer.core import ConnascenceViolation
-from analyzer.thresholds import ThresholdConfig
 
 
 class TestPolicyManager:
@@ -241,7 +239,8 @@ class TestBudgetTracker:
         
         assert compliance_result['compliant'] is False
         assert 'CoM' in compliance_result['violations']
-        assert 'total_violations' in compliance_result['violations']
+        # 10 violations is within total_violations limit of 15, so total_violations should not be violated
+        assert 'total_violations' not in compliance_result['violations']
     
     def test_budget_reporting(self):
         """Test budget usage reporting."""

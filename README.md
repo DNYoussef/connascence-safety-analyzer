@@ -219,20 +219,21 @@ The complete enterprise package includes:
 - **Validation Results**: Real analysis of 74,237 violations
 
 ```bash
-# Access buyer materials
-ls sale/
-# START_HERE.md - Buyer navigation guide
-# EXECUTIVE_SUMMARY.md - Business case
-# legal/ - Legal documentation
-# executive/ - Executive presentations
-# technical/ - Technical architecture
+# Access enterprise package
+ls enterprise-package/
+# README.md - Enterprise navigation guide
+# executive/ - Executive summaries and presentations
+# technical/ - Architecture and implementation guides
+# validation/ - Quality assurance and accuracy reports
+# legal/ - Legal documentation and compliance
+# artifacts/ - Authoritative metrics and generated reports
 ```
 
 ### Buyer Quick Start
-1. **Executive Review (5 min)**: `sale/EXECUTIVE_SUMMARY.md`
-2. **Technical Demo (10 min)**: `python sale/simple_demo.py`  
-3. **Legal Review (10 min)**: `sale/legal/` directory
-4. **Architecture Overview (5 min)**: `sale/technical/MCP_TOOL_CATALOG.md`
+1. **Executive Review (5 min)**: `enterprise-package/executive/EXECUTIVE_SUMMARY.md`
+2. **Technical Validation (10 min)**: Verify 74,237 violations in analysis results
+3. **Legal Review (10 min)**: `enterprise-package/legal/` directory
+4. **Architecture Overview (5 min)**: `enterprise-package/technical/MCP_TOOL_CATALOG.md`
 
 ## Architecture
 
