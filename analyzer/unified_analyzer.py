@@ -119,6 +119,173 @@ class UnifiedAnalysisResult:
         return asdict(self)
 
 
+class ComponentInitializer:
+    """Handles initialization of optional components with fallbacks."""
+    
+    @staticmethod
+    def init_smart_engine():
+        """Initialize smart integration engine with fallback."""
+        try:
+            return SmartIntegrationEngine()
+        except:
+            return None
+    
+    @staticmethod
+    def init_failure_detector():
+        """Initialize failure detector with fallback."""
+        if FailureDetectionSystem:
+            try:
+                return FailureDetectionSystem()
+            except:
+                return None
+        return None
+    
+    @staticmethod
+    def init_nasa_integration():
+        """Initialize NASA integration with fallback."""
+        if NASAPowerOfTenIntegration:
+            try:
+                return NASAPowerOfTenIntegration()
+            except:
+                return None
+        return None
+    
+    @staticmethod
+    def init_policy_manager():
+        """Initialize policy manager with fallback."""
+        if PolicyManager:
+            try:
+                return PolicyManager()
+            except:
+                return None
+        return None
+    
+    @staticmethod
+    def init_budget_tracker():
+        """Initialize budget tracker with fallback."""
+        if BudgetTracker:
+            try:
+                return BudgetTracker()
+            except:
+                return None
+        return None
+
+
+class MetricsCalculator:
+    """Handles calculation of quality metrics and scores."""
+    
+    def calculate_comprehensive_metrics(self, connascence_violations, duplication_clusters, nasa_violations, nasa_integration=None):
+        """Calculate comprehensive quality metrics."""
+        all_violations = connascence_violations + duplication_clusters
+        
+        severity_counts = self._count_by_severity(all_violations)
+        connascence_index = self._calculate_connascence_index(connascence_violations)
+        nasa_compliance_score = self._calculate_nasa_score(nasa_violations, nasa_integration)
+        duplication_score = self._calculate_duplication_score(duplication_clusters)
+        overall_quality_score = self._calculate_overall_quality(
+            connascence_index, nasa_compliance_score, duplication_score
+        )
+        
+        return {
+            'total_violations': len(all_violations),
+            'critical_count': severity_counts['critical'],
+            'high_count': severity_counts['high'],
+            'medium_count': severity_counts['medium'],
+            'low_count': severity_counts['low'],
+            'connascence_index': round(connascence_index, 2),
+            'nasa_compliance_score': round(nasa_compliance_score, 3),
+            'duplication_score': round(duplication_score, 3),
+            'overall_quality_score': round(overall_quality_score, 3)
+        }
+    
+    def _count_by_severity(self, violations):
+        """Count violations by severity level."""
+        severity_counts = {'critical': 0, 'high': 0, 'medium': 0, 'low': 0}
+        for violation in violations:
+            severity = violation.get('severity', 'medium')
+            if severity in severity_counts:
+                severity_counts[severity] += 1
+        return severity_counts
+    
+    def _calculate_connascence_index(self, connascence_violations):
+        """Calculate connascence index from violations."""
+        weight_map = {'critical': 10, 'high': 5, 'medium': 2, 'low': 1}
+        return sum(
+            weight_map.get(v.get('severity', 'medium'), 1) * v.get('weight', 1)
+            for v in connascence_violations
+        )
+    
+    def _calculate_nasa_score(self, nasa_violations, nasa_integration):
+        """Calculate NASA compliance score."""
+        if nasa_integration:
+            return nasa_integration.calculate_nasa_compliance_score(nasa_violations)
+        return max(0.0, 1.0 - (len(nasa_violations) * 0.1))
+    
+    def _calculate_duplication_score(self, duplication_clusters):
+        """Calculate duplication score."""
+        return max(0.0, 1.0 - (len(duplication_clusters) * 0.1))
+    
+    def _calculate_overall_quality(self, connascence_index, nasa_compliance_score, duplication_score):
+        """Calculate overall quality score as weighted average."""
+        connascence_weight = 0.4
+        nasa_weight = 0.3
+        duplication_weight = 0.3
+        
+        connascence_score = max(0.0, 1.0 - (connascence_index * 0.01))
+        return (
+            connascence_score * connascence_weight +
+            nasa_compliance_score * nasa_weight +
+            duplication_score * duplication_weight
+        )
+
+
+class RecommendationGenerator:
+    """Generates unified improvement recommendations."""
+    
+    def generate_unified_recommendations(self, connascence_violations, duplication_clusters, nasa_violations, nasa_integration=None):
+        """Generate comprehensive improvement recommendations."""
+        priority_fixes = []
+        improvement_actions = []
+        
+        priority_fixes.extend(self._get_critical_fixes(connascence_violations))
+        improvement_actions.extend(self._get_nasa_actions(nasa_violations, nasa_integration))
+        improvement_actions.extend(self._get_duplication_actions(duplication_clusters))
+        improvement_actions.extend(self._get_general_actions(connascence_violations))
+        
+        return {
+            'priority_fixes': priority_fixes,
+            'improvement_actions': improvement_actions
+        }
+    
+    def _get_critical_fixes(self, connascence_violations):
+        """Get priority fixes for critical violations."""
+        critical_violations = [v for v in connascence_violations if v.get('severity') == 'critical']
+        return [
+            f"Fix critical {violation.get('type', 'violation')} in {violation.get('file_path', 'unknown file')}"
+            for violation in critical_violations[:3]  # Top 3 critical
+        ]
+    
+    def _get_nasa_actions(self, nasa_violations, nasa_integration):
+        """Get NASA compliance improvement actions."""
+        if nasa_integration:
+            return nasa_integration.get_nasa_compliance_actions(nasa_violations)[:3]
+        elif nasa_violations:
+            return [f"Address {len(nasa_violations)} NASA compliance violations"]
+        return []
+    
+    def _get_duplication_actions(self, duplication_clusters):
+        """Get duplication reduction actions."""
+        if duplication_clusters:
+            return [f"Refactor {len(duplication_clusters)} duplication clusters to reduce code repetition"]
+        return []
+    
+    def _get_general_actions(self, connascence_violations):
+        """Get general improvement actions."""
+        if len(connascence_violations) > 10:
+            return ["Consider breaking down large modules to reduce connascence violations"]
+        return []
+
+
 class UnifiedConnascenceAnalyzer:
     """
     Unified analyzer that orchestrates all Phase 1-6 analysis capabilities.
@@ -129,50 +296,22 @@ class UnifiedConnascenceAnalyzer:
     
     def __init__(self, config_path: Optional[str] = None):
         """Initialize the unified analyzer with available components."""
-        
         # Initialize core analyzers (always available)
         self.ast_analyzer = ConnascenceASTAnalyzer()
         self.orchestrator = AnalyzerOrchestrator()
         self.mece_analyzer = MECEAnalyzer()
         
-        # Initialize optional components with fallbacks
-        try:
-            self.smart_engine = SmartIntegrationEngine()
-        except:
-            self.smart_engine = None
-            
-        if FailureDetectionSystem:
-            try:
-                self.failure_detector = FailureDetectionSystem()
-            except:
-                self.failure_detector = None
-        else:
-            self.failure_detector = None
+        # Initialize optional components
+        initializer = ComponentInitializer()
+        self.smart_engine = initializer.init_smart_engine()
+        self.failure_detector = initializer.init_failure_detector()
+        self.nasa_integration = initializer.init_nasa_integration()
+        self.policy_manager = initializer.init_policy_manager()
+        self.budget_tracker = initializer.init_budget_tracker()
         
-        # Initialize integrations with fallbacks
-        if NASAPowerOfTenIntegration:
-            try:
-                self.nasa_integration = NASAPowerOfTenIntegration()
-            except:
-                self.nasa_integration = None
-        else:
-            self.nasa_integration = None
-            
-        if PolicyManager:
-            try:
-                self.policy_manager = PolicyManager()
-            except:
-                self.policy_manager = None
-        else:
-            self.policy_manager = None
-            
-        if BudgetTracker:
-            try:
-                self.budget_tracker = BudgetTracker()
-            except:
-                self.budget_tracker = None
-        else:
-            self.budget_tracker = None
+        # Initialize helper classes
+        self.metrics_calculator = MetricsCalculator()
+        self.recommendation_generator = RecommendationGenerator()
         
         # Load configuration
         self.config = self._load_config(config_path)
@@ -199,15 +338,61 @@ class UnifiedConnascenceAnalyzer:
         Returns:
             Complete analysis result with all findings and recommendations
         """
-        
         project_path = Path(project_path)
         options = options or {}
         start_time = self._get_timestamp_ms()
         
         logger.info(f"Starting unified analysis of {project_path}")
         
-        # Phase 1-2: Core AST Analysis  
+        # Run all analysis phases
+        violations = self._run_analysis_phases(project_path, policy_preset)
+        
+        # Calculate metrics and generate recommendations
+        metrics = self.metrics_calculator.calculate_comprehensive_metrics(
+            violations['connascence'], violations['duplication'], violations['nasa'], self.nasa_integration
+        )
+        
+        recommendations = self.recommendation_generator.generate_unified_recommendations(
+            violations['connascence'], violations['duplication'], violations['nasa'], self.nasa_integration
+        )
+        
+        # Build and return result
+        analysis_time = self._get_timestamp_ms() - start_time
+        result = self._build_unified_result(
+            violations, metrics, recommendations, project_path, policy_preset, analysis_time
+        )
+        
+        logger.info(f"Unified analysis complete in {analysis_time}ms")
+        logger.info(f"Found {result.total_violations} total violations across all analyzers")
+        
+        return result
+    
+    def _run_analysis_phases(self, project_path: Path, policy_preset: str) -> Dict[str, Any]:
+        """Run all analysis phases and collect violations."""
+        violations = {
+            'connascence': [],
+            'duplication': [],
+            'nasa': []
+        }
+        
+        # Phase 1-2: Core AST Analysis
+        violations['connascence'] = self._run_ast_analysis(project_path)
+        
+        # Phase 3-4: MECE Duplication Detection  
+        violations['duplication'] = self._run_duplication_analysis(project_path)
+        
+        # Phase 5: Smart Integration (if available)
+        self._run_smart_integration(project_path, policy_preset)
+        
+        # Phase 6: NASA Compliance Check
+        violations['nasa'] = self._run_nasa_analysis(violations['connascence'])
+        
+        return violations
+    
+    def _run_ast_analysis(self, project_path: Path) -> List[Dict[str, Any]]:
+        """Run core AST analysis phases."""
         logger.info("Phase 1-2: Running core AST analysis")
+        
         ast_results = self.ast_analyzer.analyze_directory(project_path)
         connascence_violations = [self._violation_to_dict(v) for v in ast_results]
         
@@ -215,26 +400,31 @@ class UnifiedConnascenceAnalyzer:
         god_results = self.orchestrator.analyze_directory(str(project_path))
         connascence_violations.extend([self._violation_to_dict(v) for v in god_results])
         
-        # Phase 3-4: MECE Duplication Detection
+        return connascence_violations
+    
+    def _run_duplication_analysis(self, project_path: Path) -> List[Dict[str, Any]]:
+        """Run MECE duplication detection."""
         logger.info("Phase 3-4: Running MECE duplication analysis")
-        dup_analysis = self.mece_analyzer.analyze_path(str(project_path), comprehensive=True)
-        duplication_clusters = dup_analysis.get('duplications', [])
         
-        # Phase 5: Smart Integration (if available)
-        smart_results = None
+        dup_analysis = self.mece_analyzer.analyze_path(str(project_path), comprehensive=True)
+        return dup_analysis.get('duplications', [])
+    
+    def _run_smart_integration(self, project_path: Path, policy_preset: str):
+        """Run smart integration engine if available."""
         if self.smart_engine:
             logger.info("Phase 5: Running smart integration engine")
             try:
-                smart_results = self.smart_engine.comprehensive_analysis(
-                    str(project_path), policy_preset
-                )
+                return self.smart_engine.comprehensive_analysis(str(project_path), policy_preset)
             except Exception as e:
                 logger.warning(f"Smart integration failed: {e}")
         else:
             logger.info("Phase 5: Smart integration engine not available")
-        
-        # Phase 6: NASA Compliance Check (if available)
+        return None
+    
+    def _run_nasa_analysis(self, connascence_violations: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """Run NASA compliance analysis."""
         nasa_violations = []
+        
         if self.nasa_integration:
             logger.info("Phase 6: Checking NASA Power of Ten compliance")
             try:
@@ -247,23 +437,15 @@ class UnifiedConnascenceAnalyzer:
             # Extract NASA violations from existing connascence violations
             nasa_violations = [v for v in connascence_violations if 'NASA' in v.get('rule_id', '')]
         
-        # Calculate metrics and scores
-        metrics = self._calculate_comprehensive_metrics(
-            connascence_violations, duplication_clusters, nasa_violations
-        )
-        
-        # Generate recommendations
-        recommendations = self._generate_unified_recommendations(
-            connascence_violations, duplication_clusters, nasa_violations
-        )
-        
-        # Build unified result
-        analysis_time = self._get_timestamp_ms() - start_time
-        
-        result = UnifiedAnalysisResult(
-            connascence_violations=connascence_violations,
-            duplication_clusters=duplication_clusters,
-            nasa_violations=nasa_violations,
+        return nasa_violations
+    
+    def _build_unified_result(self, violations: Dict, metrics: Dict, recommendations: Dict, 
+                             project_path: Path, policy_preset: str, analysis_time: int) -> UnifiedAnalysisResult:
+        """Build the unified analysis result."""
+        return UnifiedAnalysisResult(
+            connascence_violations=violations['connascence'],
+            duplication_clusters=violations['duplication'],
+            nasa_violations=violations['nasa'],
             
             total_violations=metrics['total_violations'],
             critical_count=metrics['critical_count'],
@@ -279,17 +461,12 @@ class UnifiedConnascenceAnalyzer:
             project_path=str(project_path),
             policy_preset=policy_preset,
             analysis_duration_ms=analysis_time,
-            files_analyzed=len(connascence_violations),
+            files_analyzed=len(violations['connascence']),
             timestamp=self._get_iso_timestamp(),
             
             priority_fixes=recommendations['priority_fixes'],
             improvement_actions=recommendations['improvement_actions']
         )
-        
-        logger.info(f"Unified analysis complete in {analysis_time}ms")
-        logger.info(f"Found {result.total_violations} total violations across all analyzers")
-        
-        return result
     
     def analyze_file(self, file_path: Union[str, Path]) -> Dict[str, Any]:
         """Analyze a single file with all available analyzers."""
@@ -376,95 +553,7 @@ class UnifiedConnascenceAnalyzer:
             'similarity_score': getattr(cluster, 'similarity_score', 0.0)
         }
     
-    def _calculate_comprehensive_metrics(self, 
-                                       connascence_violations: List[Dict], 
-                                       duplication_clusters: List[Dict], 
-                                       nasa_violations: List[Dict]) -> Dict[str, Any]:
-        """Calculate comprehensive quality metrics."""
-        
-        all_violations = connascence_violations + duplication_clusters
-        
-        # Count by severity
-        severity_counts = {'critical': 0, 'high': 0, 'medium': 0, 'low': 0}
-        for violation in all_violations:
-            severity = violation.get('severity', 'medium')
-            if severity in severity_counts:
-                severity_counts[severity] += 1
-        
-        # Calculate connascence index
-        weight_map = {'critical': 10, 'high': 5, 'medium': 2, 'low': 1}
-        connascence_index = sum(
-            weight_map.get(v.get('severity', 'medium'), 1) * v.get('weight', 1)
-            for v in connascence_violations
-        )
-        
-        # NASA compliance score
-        if self.nasa_integration:
-            nasa_compliance_score = self.nasa_integration.calculate_nasa_compliance_score(nasa_violations)
-        else:
-            nasa_compliance_score = max(0.0, 1.0 - (len(nasa_violations) * 0.1))
-        
-        # Duplication score
-        duplication_score = max(0.0, 1.0 - (len(duplication_clusters) * 0.1))
-        
-        # Overall quality score (weighted average)
-        connascence_weight = 0.4
-        nasa_weight = 0.3
-        duplication_weight = 0.3
-        
-        connascence_score = max(0.0, 1.0 - (connascence_index * 0.01))
-        overall_quality_score = (
-            connascence_score * connascence_weight +
-            nasa_compliance_score * nasa_weight +
-            duplication_score * duplication_weight
-        )
-        
-        return {
-            'total_violations': len(all_violations),
-            'critical_count': severity_counts['critical'],
-            'high_count': severity_counts['high'],
-            'medium_count': severity_counts['medium'],
-            'low_count': severity_counts['low'],
-            'connascence_index': round(connascence_index, 2),
-            'nasa_compliance_score': round(nasa_compliance_score, 3),
-            'duplication_score': round(duplication_score, 3),
-            'overall_quality_score': round(overall_quality_score, 3)
-        }
     
-    def _generate_unified_recommendations(self,
-                                        connascence_violations: List[Dict],
-                                        duplication_clusters: List[Dict],
-                                        nasa_violations: List[Dict]) -> Dict[str, List[str]]:
-        """Generate comprehensive improvement recommendations."""
-        
-        priority_fixes = []
-        improvement_actions = []
-        
-        # Priority fixes from critical violations
-        critical_violations = [v for v in connascence_violations if v.get('severity') == 'critical']
-        for violation in critical_violations[:3]:  # Top 3 critical
-            priority_fixes.append(f"Fix critical {violation.get('type', 'violation')} in {violation.get('file_path', 'unknown file')}")
-        
-        # NASA compliance actions
-        if self.nasa_integration:
-            nasa_actions = self.nasa_integration.get_nasa_compliance_actions(nasa_violations)
-            improvement_actions.extend(nasa_actions[:3])
-        else:
-            if nasa_violations:
-                improvement_actions.append(f"Address {len(nasa_violations)} NASA compliance violations")
-        
-        # Duplication reduction
-        if duplication_clusters:
-            improvement_actions.append(f"Refactor {len(duplication_clusters)} duplication clusters to reduce code repetition")
-        
-        # General improvement suggestions
-        if len(connascence_violations) > 10:
-            improvement_actions.append("Consider breaking down large modules to reduce connascence violations")
-        
-        return {
-            'priority_fixes': priority_fixes,
-            'improvement_actions': improvement_actions
-        }
     
     def _load_config(self, config_path: Optional[str]) -> Dict[str, Any]:
         """Load analyzer configuration."""
@@ -614,6 +703,26 @@ def loadConnascenceSystem():
             'getRefactoringSuggestions': lambda options: [],
             'getAutomatedFixes': lambda options: []
         }
+
+
+def _get_fallback_functions():
+    """Get fallback functions for graceful degradation."""
+    return {
+        'generateConnascenceReport': lambda options: {
+            'connascence_violations': [],
+            'duplication_clusters': [],
+            'nasa_violations': [],
+            'total_violations': 0,
+            'overall_quality_score': 0.8,
+            'error': 'Python analyzer not available'
+        },
+        'validateSafetyCompliance': lambda options: {
+            'compliant': True,
+            'violations': []
+        },
+        'getRefactoringSuggestions': lambda options: [],
+        'getAutomatedFixes': lambda options: []
+    }
 
 
 # Singleton instance for global access

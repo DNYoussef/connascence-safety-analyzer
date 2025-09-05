@@ -44,79 +44,300 @@
     "commands": [
       {
         "command": "connascence.analyzeFile",
-        "title": "Analyze File",
-        "category": "Connascence",
-        "icon": "$(search)"
+        "title": "Analyze Current File",
+        "category": "Connascence: Analysis",
+        "icon": "$(search)",
+        "enablement": "!inOutput"
       },
       {
         "command": "connascence.analyzeWorkspace",
-        "title": "Analyze Workspace",
-        "category": "Connascence"
+        "title": "Analyze Entire Workspace",
+        "category": "Connascence: Analysis",
+        "icon": "$(folder-opened)",
+        "enablement": "workspaceFolderCount > 0"
+      },
+      {
+        "command": "connascence.analyzeSelection",
+        "title": "Analyze Selected Code",
+        "category": "Connascence: Analysis",
+        "icon": "$(selection)",
+        "enablement": "editorHasSelection"
       },
       {
         "command": "connascence.validateSafety",
-        "title": "Validate Safety Standards/High Quality Safety",
-        "category": "Connascence"
+        "title": "Validate Safety Standards",
+        "category": "Connascence: Analysis",
+        "icon": "$(shield)",
+        "enablement": "!inOutput"
       },
       {
         "command": "connascence.suggestRefactoring",
-        "title": "Suggest Refactoring",
-        "category": "Connascence"
+        "title": "Suggest Code Improvements",
+        "category": "Connascence: Refactoring",
+        "icon": "$(lightbulb)",
+        "enablement": "editorTextFocus"
       },
       {
         "command": "connascence.applyAutofix",
-        "title": "Apply Safe Autofix",
-        "category": "Connascence"
+        "title": "Apply Safe Auto-Fixes",
+        "category": "Connascence: Refactoring",
+        "icon": "$(wand)",
+        "enablement": "editorTextFocus"
       },
       {
         "command": "connascence.generateReport",
         "title": "Generate Quality Report",
-        "category": "Connascence"
-      },
-      {
-        "command": "connascence.toggleSafetyProfile",
-        "title": "Toggle Safety Profile",
-        "category": "Connascence"
-      },
-      {
-        "command": "connascence.openSettings",
-        "title": "Open Settings Panel",
-        "category": "Connascence",
-        "icon": "$(gear)"
-      },
-      {
-        "command": "connascence.clearCache",
-        "title": "Clear Analysis Cache",
-        "category": "Connascence"
+        "category": "Connascence: Reports",
+        "icon": "$(graph)",
+        "enablement": "workspaceFolderCount > 0"
       },
       {
         "command": "connascence.exportReport",
         "title": "Export Analysis Report",
-        "category": "Connascence",
+        "category": "Connascence: Reports",
         "icon": "$(export)"
+      },
+      {
+        "command": "connascence.exportSarif",
+        "title": "Export SARIF Report",
+        "category": "Connascence: Reports",
+        "icon": "$(file-code)",
+        "enablement": "workspaceFolderCount > 0"
+      },
+      {
+        "command": "connascence.exportJson",
+        "title": "Export JSON Report",
+        "category": "Connascence: Reports",
+        "icon": "$(file-text)",
+        "enablement": "workspaceFolderCount > 0"
+      },
+      {
+        "command": "connascence.openSettings",
+        "title": "Open Settings",
+        "category": "Connascence: Configuration",
+        "icon": "$(gear)"
+      },
+      {
+        "command": "connascence.toggleSafetyProfile",
+        "title": "Switch Safety Profile",
+        "category": "Connascence: Configuration",
+        "icon": "$(settings-gear)"
+      },
+      {
+        "command": "connascence.exportConfiguration",
+        "title": "Export Configuration",
+        "category": "Connascence: Configuration",
+        "icon": "$(save)"
+      },
+      {
+        "command": "connascence.importConfiguration",
+        "title": "Import Configuration",
+        "category": "Connascence: Configuration",
+        "icon": "$(folder-opened)"
+      },
+      {
+        "command": "connascence.showDashboard",
+        "title": "Show Quality Dashboard",
+        "category": "Connascence: View",
+        "icon": "$(dashboard)",
+        "enablement": "workspaceFolderCount > 0"
+      },
+      {
+        "command": "connascence.toggleHighlighting",
+        "title": "Toggle Code Highlighting",
+        "category": "Connascence: View",
+        "icon": "$(eye)"
+      },
+      {
+        "command": "connascence.showBrokenChainAnimation",
+        "title": "Show Broken Chain Animation",
+        "category": "Connascence: View",
+        "icon": "$(debug-breakpoint-log)"
+      },
+      {
+        "command": "connascence.clearCache",
+        "title": "Clear Analysis Cache",
+        "category": "Connascence: Utilities",
+        "icon": "$(clear-all)"
+      },
+      {
+        "command": "connascence.refreshAnalysis",
+        "title": "Refresh Analysis",
+        "category": "Connascence: Utilities",
+        "icon": "$(refresh)",
+        "enablement": "workspaceFolderCount > 0"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "connascence.analyzeFile",
+        "key": "ctrl+alt+a",
+        "mac": "cmd+alt+a",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "connascence.analyzeSelection",
+        "key": "ctrl+alt+s",
+        "mac": "cmd+alt+s",
+        "when": "editorHasSelection"
+      },
+      {
+        "command": "connascence.analyzeWorkspace",
+        "key": "ctrl+alt+w",
+        "mac": "cmd+alt+w",
+        "when": "workspaceFolderCount > 0"
+      },
+      {
+        "command": "connascence.suggestRefactoring",
+        "key": "ctrl+alt+r",
+        "mac": "cmd+alt+r",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "connascence.showDashboard",
+        "key": "ctrl+alt+d",
+        "mac": "cmd+alt+d",
+        "when": "workspaceFolderCount > 0"
       }
     ],
     "menus": {
-      "editor/context": [
+      "commandPalette": [
         {
-          "command": "connascence.analyzeFile",
-          "when": "editorHasSelection",
-          "group": "connascence"
+          "command": "connascence.analyzeSelection",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "connascence.validateSafety",
+          "when": "editorTextFocus"
         },
         {
           "command": "connascence.suggestRefactoring",
-          "when": "editorHasSelection",
-          "group": "connascence"
+          "when": "editorTextFocus"
+        },
+        {
+          "command": "connascence.applyAutofix",
+          "when": "editorTextFocus"
+        },
+        {
+          "command": "connascence.showDashboard",
+          "when": "workspaceFolderCount > 0"
+        },
+        {
+          "command": "connascence.exportSarif",
+          "when": "workspaceFolderCount > 0"
+        },
+        {
+          "command": "connascence.exportJson",
+          "when": "workspaceFolderCount > 0"
+        },
+        {
+          "command": "connascence.refreshAnalysis",
+          "when": "workspaceFolderCount > 0"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "connascence.analyzeFile",
+          "when": "resourceLangId in connascence.supportedLanguages",
+          "group": "1_connascence@1"
+        },
+        {
+          "command": "connascence.analyzeSelection",
+          "when": "editorHasSelection && resourceLangId in connascence.supportedLanguages",
+          "group": "1_connascence@2"
+        },
+        {
+          "command": "connascence.validateSafety",
+          "when": "resourceLangId in connascence.supportedLanguages",
+          "group": "1_connascence@3"
+        },
+        {
+          "submenu": "connascence.refactoring",
+          "when": "editorTextFocus && resourceLangId in connascence.supportedLanguages",
+          "group": "1_connascence@4"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "connascence.analyzeFile",
+          "when": "resourceLangId in connascence.supportedLanguages",
+          "group": "navigation@1"
+        },
+        {
+          "command": "connascence.showDashboard",
+          "when": "workspaceFolderCount > 0",
+          "group": "navigation@2"
         }
       ],
       "explorer/context": [
         {
           "command": "connascence.analyzeFile",
-          "when": "resourceExtname == .py || resourceExtname == .c || resourceExtname == .cpp",
-          "group": "connascence"
+          "when": "resourceLangId in connascence.supportedLanguages",
+          "group": "2_connascence@1"
+        },
+        {
+          "command": "connascence.analyzeWorkspace",
+          "when": "explorerResourceIsFolder",
+          "group": "2_connascence@2"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "connascence.refreshAnalysis",
+          "when": "view == connascence.resultsView",
+          "group": "navigation@1"
+        },
+        {
+          "command": "connascence.clearCache",
+          "when": "view == connascence.resultsView",
+          "group": "navigation@2"
+        }
+      ],
+      "connascence.refactoring": [
+        {
+          "command": "connascence.suggestRefactoring",
+          "group": "1_suggestions@1"
+        },
+        {
+          "command": "connascence.applyAutofix",
+          "group": "1_suggestions@2"
         }
       ]
     },
+    "submenus": [
+      {
+        "id": "connascence.refactoring",
+        "label": "Connascence Refactoring",
+        "icon": "$(lightbulb)"
+      }
+    ],
+    "languages": [
+      {
+        "id": "python",
+        "aliases": ["Python", "py"],
+        "extensions": [".py"]
+      },
+      {
+        "id": "c",
+        "aliases": ["C", "c"],
+        "extensions": [".c", ".h"]
+      },
+      {
+        "id": "cpp",
+        "aliases": ["C++", "cpp"],
+        "extensions": [".cpp", ".hpp", ".cc", ".cxx"]
+      },
+      {
+        "id": "javascript",
+        "aliases": ["JavaScript", "js"],
+        "extensions": [".js", ".mjs"]
+      },
+      {
+        "id": "typescript",
+        "aliases": ["TypeScript", "ts"],
+        "extensions": [".ts", ".tsx"]
+      }
+    ],
     "configuration": {
       "title": "Connascence Safety Analyzer",
       "properties": {
@@ -380,6 +601,14 @@
           "type": "boolean",
           "default": false,
           "description": "Automatically analyze workspace files when VS Code starts (may impact startup performance)"
+        },
+        "connascence.supportedLanguages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": ["python", "c", "cpp", "javascript", "typescript"],
+          "description": "List of programming languages supported by Connascence analysis"
         }
       }
     }
