@@ -2,7 +2,7 @@
   "name": "connascence-safety-analyzer",
   "displayName": "Connascence Safety Analyzer",
   "description": "Enterprise-grade code analysis with Safety Standards/High Quality safety compliance and grammar-enhanced refactoring - Consolidated Package",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "publisher": "connascence-systems",
   "icon": "images/connascence-logo.png",
   "repository": {
