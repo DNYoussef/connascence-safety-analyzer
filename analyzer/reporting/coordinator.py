@@ -43,7 +43,7 @@ from reporting.sarif_export import SARIFReporter
 from reporting.md_summary import MarkdownReporter
 
 # Import unified analyzer
-from src.core.unified_analyzer import UnifiedAnalysisResult
+from analyzer.unified_analyzer import UnifiedAnalysisResult
 
 logger = logging.getLogger(__name__)
 

@@ -67,3 +67,5 @@ CLAUDE.md
 out/
 *_reproduction_output/
 vscode-extension/node_modules/
+# Windows artifacts
+*.stackdump

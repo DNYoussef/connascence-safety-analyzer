@@ -79,21 +79,30 @@ connascence = "mcp.server:main"
 # Tool Configuration
 
 [tool.setuptools]
-# Only list packages that actually exist and are importable
+# Complete package list including all migrated components
 packages = [
     "autofix",
     "policy", 
     "grammar",
     "integrations",
     "mcp",
-    "cli"
+    "cli",
+    "analyzer",
+    "reporting", 
+    "dashboard",
+    "utils",
+    "security",
+    "dogfood"
 ]
 
 [tool.setuptools.package-data]
-# Include only files that exist and are needed at runtime
+# Include runtime files for all packages
 policy = ["presets/*.yml", "*.toml"]
-grammar = ["overlays/*.yml"]
-dashboard = ["templates/*.html", "static/*.js"]
+grammar = ["overlays/*.yml"] 
+dashboard = ["templates/*.html", "static/*.js", "static/*.css"]
+analyzer = ["*.yml", "*.json", "templates/*.html"]
+reporting = ["templates/*.html", "templates/*.md", "*.json"]
+"*" = ["LICENSE", "*.md", "py.typed"]
 
 [tool.black]
 line-length = 120

@@ -245,7 +245,7 @@ class LicenseCommandHandler(BaseCommandHandler):
         print(f"Validating license compliance for {project_path}...")
         
         try:
-            from src.licensing import LicenseValidationResult
+            from licensing import LicenseValidationResult
             report = self.license_validator.validate_license(project_path)
             
             if args.format == OutputFormats.JSON:
@@ -282,7 +282,7 @@ class LicenseCommandHandler(BaseCommandHandler):
         project_path = Path(args.path)
         
         try:
-            from src.licensing import LicenseValidationResult
+            from licensing import LicenseValidationResult
             report = self.license_validator.validate_license(project_path)
             
             if report.validation_result == LicenseValidationResult.VALID:

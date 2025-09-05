@@ -41,7 +41,7 @@ import psutil
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 # Import existing infrastructure
-from src.core.unified_analyzer import UnifiedConnascenceAnalyzer, UnifiedAnalysisResult
+from analyzer.unified_analyzer import UnifiedConnascenceAnalyzer, UnifiedAnalysisResult
 from dashboard.metrics import DashboardMetrics
 
 logger = logging.getLogger(__name__)

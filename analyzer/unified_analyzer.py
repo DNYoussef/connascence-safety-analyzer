@@ -38,14 +38,27 @@ import json
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 # Core analyzer components (Phase 1-5) - now all in analyzer/
-from .ast_engine.core_analyzer import ConnascenceASTAnalyzer
-from .ast_engine.analyzer_orchestrator import AnalyzerOrchestrator
-from .dup_detection.mece_analyzer import MECEAnalyzer
-from .smart_integration_engine import SmartIntegrationEngine
-from .constants import (
-    NASA_COMPLIANCE_THRESHOLD, MECE_QUALITY_THRESHOLD, 
-    OVERALL_QUALITY_THRESHOLD, VIOLATION_WEIGHTS
-)
+try:
+    from .check_connascence import ConnascenceAnalyzer as ConnascenceASTAnalyzer
+    from .ast_engine.analyzer_orchestrator import AnalyzerOrchestrator
+    from .dup_detection.mece_analyzer import MECEAnalyzer
+    from .smart_integration_engine import SmartIntegrationEngine
+except ImportError:
+    # Fallback when running as script
+    from check_connascence import ConnascenceAnalyzer as ConnascenceASTAnalyzer
+    from ast_engine.analyzer_orchestrator import AnalyzerOrchestrator
+    from dup_detection.mece_analyzer import MECEAnalyzer
+    from smart_integration_engine import SmartIntegrationEngine
+try:
+    from .constants import (
+        NASA_COMPLIANCE_THRESHOLD, MECE_QUALITY_THRESHOLD, 
+        OVERALL_QUALITY_THRESHOLD, VIOLATION_WEIGHTS
+    )
+except ImportError:
+    from constants import (
+        NASA_COMPLIANCE_THRESHOLD, MECE_QUALITY_THRESHOLD, 
+        OVERALL_QUALITY_THRESHOLD, VIOLATION_WEIGHTS
+    )
 
 # Try to import optional components with fallbacks
 try:
@@ -193,10 +206,14 @@ class UnifiedConnascenceAnalyzer:
         
         logger.info(f"Starting unified analysis of {project_path}")
         
-        # Phase 1-2: Core AST Analysis
+        # Phase 1-2: Core AST Analysis  
         logger.info("Phase 1-2: Running core AST analysis")
-        ast_results = self.orchestrator.analyze_directory(project_path)
-        connascence_violations = [self._violation_to_dict(v) for v in ast_results.violations]
+        ast_results = self.ast_analyzer.analyze_directory(project_path)
+        connascence_violations = [self._violation_to_dict(v) for v in ast_results]
+        
+        # Also run god object analysis from orchestrator
+        god_results = self.orchestrator.analyze_directory(str(project_path))
+        connascence_violations.extend([self._violation_to_dict(v) for v in god_results])
         
         # Phase 3-4: MECE Duplication Detection
         logger.info("Phase 3-4: Running MECE duplication analysis")
@@ -262,7 +279,7 @@ class UnifiedConnascenceAnalyzer:
             project_path=str(project_path),
             policy_preset=policy_preset,
             analysis_duration_ms=analysis_time,
-            files_analyzed=getattr(ast_results, 'analyzed_files', len(connascence_violations)),
+            files_analyzed=len(connascence_violations),
             timestamp=self._get_iso_timestamp(),
             
             priority_fixes=recommendations['priority_fixes'],
@@ -286,16 +303,20 @@ class UnifiedConnascenceAnalyzer:
         
         # Check NASA compliance for each violation
         nasa_violations = []
-        for violation in violations:
-            nasa_checks = self.nasa_integration.check_nasa_violations(violation)
-            nasa_violations.extend(nasa_checks)
+        if self.nasa_integration:
+            for violation in violations:
+                nasa_checks = self.nasa_integration.check_nasa_violations(violation)
+                nasa_violations.extend(nasa_checks)
+        else:
+            # Extract NASA violations from existing connascence violations
+            nasa_violations = [v for v in violations if 'NASA' in v.get('rule_id', '')]
         
         return {
             'file_path': str(file_path),
             'connascence_violations': violations,
             'nasa_violations': nasa_violations,
             'violation_count': len(violations),
-            'nasa_compliance_score': self.nasa_integration.calculate_nasa_compliance_score(nasa_violations)
+            'nasa_compliance_score': max(0.0, 1.0 - (len(nasa_violations) * 0.1)) if not self.nasa_integration else self.nasa_integration.calculate_nasa_compliance_score(nasa_violations)
         }
     
     def get_dashboard_summary(self, analysis_result: UnifiedAnalysisResult) -> Dict[str, Any]:
@@ -330,14 +351,19 @@ class UnifiedConnascenceAnalyzer:
     
     def _violation_to_dict(self, violation) -> Dict[str, Any]:
         """Convert violation object to dictionary."""
+        if isinstance(violation, dict):
+            return violation  # Already a dictionary
+            
+        # Handle both ConnascenceViolation from check_connascence.py and MCP violations
         return {
             'id': getattr(violation, 'id', str(hash(str(violation)))),
-            'type': getattr(violation, 'type', 'unknown'),
+            'rule_id': getattr(violation, 'type', getattr(violation, 'rule_id', 'CON_UNKNOWN')),
+            'type': getattr(violation, 'type', getattr(violation, 'connascence_type', 'unknown')),
             'severity': getattr(violation, 'severity', 'medium'),
             'description': getattr(violation, 'description', str(violation)),
             'file_path': getattr(violation, 'file_path', ''),
             'line_number': getattr(violation, 'line_number', 0),
-            'weight': getattr(violation, 'weight', 1)
+            'weight': getattr(violation, 'weight', self._severity_to_weight(getattr(violation, 'severity', 'medium')))
         }
     
     def _cluster_to_dict(self, cluster) -> Dict[str, Any]:
@@ -373,7 +399,10 @@ class UnifiedConnascenceAnalyzer:
         )
         
         # NASA compliance score
-        nasa_compliance_score = self.nasa_integration.calculate_nasa_compliance_score(nasa_violations)
+        if self.nasa_integration:
+            nasa_compliance_score = self.nasa_integration.calculate_nasa_compliance_score(nasa_violations)
+        else:
+            nasa_compliance_score = max(0.0, 1.0 - (len(nasa_violations) * 0.1))
         
         # Duplication score
         duplication_score = max(0.0, 1.0 - (len(duplication_clusters) * 0.1))
@@ -417,8 +446,12 @@ class UnifiedConnascenceAnalyzer:
             priority_fixes.append(f"Fix critical {violation.get('type', 'violation')} in {violation.get('file_path', 'unknown file')}")
         
         # NASA compliance actions
-        nasa_actions = self.nasa_integration.get_nasa_compliance_actions(nasa_violations)
-        improvement_actions.extend(nasa_actions[:3])
+        if self.nasa_integration:
+            nasa_actions = self.nasa_integration.get_nasa_compliance_actions(nasa_violations)
+            improvement_actions.extend(nasa_actions[:3])
+        else:
+            if nasa_violations:
+                improvement_actions.append(f"Address {len(nasa_violations)} NASA compliance violations")
         
         # Duplication reduction
         if duplication_clusters:
@@ -456,6 +489,17 @@ class UnifiedConnascenceAnalyzer:
         """Get current timestamp in ISO format."""
         from datetime import datetime
         return datetime.now().isoformat()
+
+
+    def _severity_to_weight(self, severity: str) -> float:
+        """Convert severity string to numeric weight."""
+        weights = {
+            'critical': 10.0,
+            'high': 5.0,
+            'medium': 2.0,
+            'low': 1.0
+        }
+        return weights.get(severity, 2.0)
 
 
 # Singleton instance for global access

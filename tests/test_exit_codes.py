@@ -42,7 +42,7 @@ class TestCLIExitCodes:
         """Test that successful operations return exit code 0."""
         try:
             from cli.connascence import ConnascenceCLI
-            from src.constants import ExitCode
+            from analyzer.constants import EXIT_SUCCESS as ExitCode
             
             cli = ConnascenceCLI()
             
@@ -60,7 +60,7 @@ class TestCLIExitCodes:
         """Test exit code when no command is provided."""
         try:
             from cli.connascence import ConnascenceCLI
-            from src.constants import ExitCode
+            from analyzer.constants import EXIT_SUCCESS as ExitCode
             
             cli = ConnascenceCLI()
             exit_code = cli.run([])
@@ -75,7 +75,7 @@ class TestCLIExitCodes:
         """Test exit code for invalid commands."""
         try:
             from cli.connascence import ConnascenceCLI
-            from src.constants import ExitCode
+            from analyzer.constants import EXIT_SUCCESS as ExitCode
             
             cli = ConnascenceCLI()
             
@@ -93,7 +93,7 @@ class TestCLIExitCodes:
         """Test exit code when user interrupts with Ctrl+C."""
         try:
             from cli.connascence import ConnascenceCLI
-            from src.constants import ExitCode
+            from analyzer.constants import EXIT_SUCCESS as ExitCode
             
             cli = ConnascenceCLI()
             
@@ -109,7 +109,7 @@ class TestCLIExitCodes:
         """Test exit code for general errors."""
         try:
             from cli.connascence import ConnascenceCLI
-            from src.constants import ExitCode
+            from analyzer.constants import EXIT_SUCCESS as ExitCode
             
             cli = ConnascenceCLI()
             
@@ -125,7 +125,7 @@ class TestCLIExitCodes:
         """Test exit code for license validation errors."""
         try:
             from cli.connascence import ConnascenceCLI
-            from src.constants import ExitCode
+            from analyzer.constants import EXIT_SUCCESS as ExitCode
             import cli.connascence
             
             cli = ConnascenceCLI()
@@ -152,7 +152,7 @@ class TestCLIExitCodes:
     def test_configuration_error_exit_code(self):
         """Test exit code for configuration errors."""
         try:
-            from src.constants import ExitCode
+            from analyzer.constants import EXIT_SUCCESS as ExitCode
             
             # Configuration errors typically happen in handler classes
             # This tests that the constant exists and has correct value
@@ -341,7 +341,7 @@ class TestExitCodeConstants:
     def test_exit_code_enum_values(self):
         """Test that all expected exit codes are defined."""
         try:
-            from src.constants import ExitCode
+            from analyzer.constants import EXIT_SUCCESS as ExitCode
             
             # Test all expected exit codes
             expected_codes = {

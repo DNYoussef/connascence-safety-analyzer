@@ -1,0 +1,30 @@
+{
+  "metadata": {
+    "timestamp": "2025-09-05T12:20:57.061689",
+    "version": "2.0.0",
+    "analyzer": "connascence-safety-analyzer"
+  },
+  "summary": {
+    "total_violations": 4,
+    "critical_violations": 0,
+    "overall_quality_score": 0.83
+  },
+  "violations": [
+    {
+      "id": "god_object_1",
+      "type": "CoA",
+      "severity": "high",
+      "description": "God Object detected: Class has 20 methods (threshold: 15)",
+      "file_path": "../large_class.py",
+      "line_number": 1,
+      "weight": 4.0
+    }
+  ],
+  "nasa_compliance": {
+    "score": 1.0,
+    "violations": [],
+    "passing": true
+  },
+  "policy": "default",
+  "path": ".."
+}

@@ -82,3 +82,37 @@ DEFAULT_EXCLUSIONS = [
     '.tox',
     'coverage'
 ]
+
+# Legacy compatibility - from src/constants.py
+EXCLUDED_PATTERNS = DEFAULT_EXCLUSIONS  # Alias for backwards compatibility
+PYTHON_EXTENSIONS = SUPPORTED_EXTENSIONS['python']  # Legacy alias
+
+# Exit codes from src/constants.py
+EXIT_SUCCESS = 0
+EXIT_VIOLATIONS_FOUND = 1
+EXIT_ERROR = 2
+EXIT_INVALID_ARGUMENTS = 3
+EXIT_CONFIGURATION_ERROR = 4
+EXIT_INTERRUPTED = 130
+
+# Version information (merged from src/constants.py)
+__version__ = "2.0.0"  # Updated version
+__version_info__ = (2, 0, 0)
+
+# Legacy analysis constants (merged)
+DEFAULT_MAX_COMPLEXITY = ALGORITHM_COMPLEXITY_THRESHOLD  # Use the more specific threshold
+DEFAULT_MAX_PARAMS = POSITION_COUPLING_THRESHOLD         # Use the more specific threshold
+DEFAULT_GOD_CLASS_THRESHOLD = GOD_OBJECT_METHOD_THRESHOLD # Use the more specific threshold
+
+# Connascence types (merged from src/constants.py)
+CONNASCENCE_TYPES = [
+    "CoN",  # Name
+    "CoT",  # Type
+    "CoM",  # Meaning
+    "CoP",  # Position
+    "CoA",  # Algorithm
+    "CoE",  # Execution
+    "CoTm", # Timing
+    "CoV",  # Value
+    "CoI",  # Identity
+]

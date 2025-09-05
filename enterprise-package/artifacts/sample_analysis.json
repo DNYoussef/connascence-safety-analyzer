@@ -1,0 +1,2675 @@
+[
+  {
+    "type": "connascence_of_position",
+    "severity": "high",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 105,
+    "column": 0,
+    "description": "Function 'pydantic_wrapper' has 6 positional parameters (>3)",
+    "recommendation": "Consider using keyword arguments, data classes, or parameter objects",
+    "code_snippet": "    103: \n    104: \n>>> 105: def pydantic_wrapper(\n    106:     app: \"Celery\",\n    107:     task_fun: typing.Callable[..., typing.Any],",
+    "context": {
+      "parameter_count": 6,
+      "function_name": "pydantic_wrapper"
+    }
+  },
+  {
+    "type": "god_object",
+    "severity": "critical",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 230,
+    "column": 0,
+    "description": "Class 'Celery' is a God Object: 84 methods, ~1292 lines",
+    "recommendation": "Split into smaller, focused classes following Single Responsibility Principle",
+    "code_snippet": "    228: \n    229: \n>>> 230: class Celery:\n    231:     \"\"\"Celery application.\n    232: ",
+    "context": {
+      "method_count": 84,
+      "estimated_loc": 1292,
+      "class_name": "Celery"
+    }
+  },
+  {
+    "type": "connascence_of_position",
+    "severity": "high",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 317,
+    "column": 4,
+    "description": "Function '__init__' has 19 positional parameters (>3)",
+    "recommendation": "Consider using keyword arguments, data classes, or parameter objects",
+    "code_snippet": "    315:     on_after_fork = None\n    316: \n>>> 317:     def __init__(self, main=None, loader=None, backend=None,\n    318:                  amqp=None, events=None, log=None, control=None,\n    319:                  set_as_current=True, tasks=None, broker=None, include=None,",
+    "context": {
+      "parameter_count": 19,
+      "function_name": "__init__"
+    }
+  },
+  {
+    "type": "connascence_of_position",
+    "severity": "high",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 564,
+    "column": 4,
+    "description": "Function '_task_from_fun' has 9 positional parameters (>3)",
+    "recommendation": "Consider using keyword arguments, data classes, or parameter objects",
+    "code_snippet": "    562:         return staticmethod(head_from_fun(fun, bound=bound))\n    563: \n>>> 564:     def _task_from_fun(\n    565:         self,\n    566:         fun,",
+    "context": {
+      "parameter_count": 9,
+      "function_name": "_task_from_fun"
+    }
+  },
+  {
+    "type": "connascence_of_position",
+    "severity": "high",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 677,
+    "column": 4,
+    "description": "Function 'config_from_object' has 5 positional parameters (>3)",
+    "recommendation": "Consider using keyword arguments, data classes, or parameter objects",
+    "code_snippet": "    675:         self._pending_defaults.append(fun)\n    676: \n>>> 677:     def config_from_object(self, obj,\n    678:                            silent=False, force=False, namespace=None):\n    679:         \"\"\"Read configuration from object.",
+    "context": {
+      "parameter_count": 5,
+      "function_name": "config_from_object"
+    }
+  },
+  {
+    "type": "connascence_of_position",
+    "severity": "high",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 701,
+    "column": 4,
+    "description": "Function 'config_from_envvar' has 4 positional parameters (>3)",
+    "recommendation": "Consider using keyword arguments, data classes, or parameter objects",
+    "code_snippet": "    699:                 return self.conf\n    700: \n>>> 701:     def config_from_envvar(self, variable_name, silent=False, force=False):\n    702:         \"\"\"Read configuration from environment variable.\n    703: ",
+    "context": {
+      "parameter_count": 4,
+      "function_name": "config_from_envvar"
+    }
+  },
+  {
+    "type": "connascence_of_position",
+    "severity": "high",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 724,
+    "column": 4,
+    "description": "Function 'setup_security' has 8 positional parameters (>3)",
+    "recommendation": "Consider using keyword arguments, data classes, or parameter objects",
+    "code_snippet": "    722:         )\n    723: \n>>> 724:     def setup_security(self, allowed_serializers=None, key=None, key_password=None, cert=None,\n    725:                        store=None, digest=DEFAULT_SECURITY_DIGEST,\n    726:                        serializer='json'):",
+    "context": {
+      "parameter_count": 8,
+      "function_name": "setup_security"
+    }
+  },
+  {
+    "type": "connascence_of_position",
+    "severity": "high",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 756,
+    "column": 4,
+    "description": "Function 'autodiscover_tasks' has 4 positional parameters (>3)",
+    "recommendation": "Consider using keyword arguments, data classes, or parameter objects",
+    "code_snippet": "    754:                               store, digest, serializer, app=self)\n    755: \n>>> 756:     def autodiscover_tasks(self, packages=None,\n    757:                            related_name='tasks', force=False):\n    758:         \"\"\"Auto-discover task modules.",
+    "context": {
+      "parameter_count": 4,
+      "function_name": "autodiscover_tasks"
+    }
+  },
+  {
+    "type": "connascence_of_position",
+    "severity": "high",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 820,
+    "column": 4,
+    "description": "Function 'send_task' has 30 positional parameters (>3)",
+    "recommendation": "Consider using keyword arguments, data classes, or parameter objects",
+    "code_snippet": "    818:         ], related_name=related_name)\n    819: \n>>> 820:     def send_task(self, name, args=None, kwargs=None, countdown=None,\n    821:                   eta=None, task_id=None, producer=None, connection=None,\n    822:                   router=None, result_cls=None, expires=None,",
+    "context": {
+      "parameter_count": 30,
+      "function_name": "send_task"
+    }
+  },
+  {
+    "type": "connascence_of_position",
+    "severity": "high",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 977,
+    "column": 4,
+    "description": "Function 'connection' has 13 positional parameters (>3)",
+    "recommendation": "Consider using keyword arguments, data classes, or parameter objects",
+    "code_snippet": "    975:         return self._connection(url or self.conf.broker_write_url, **kwargs)\n    976: \n>>> 977:     def connection(self, hostname=None, userid=None, password=None,\n    978:                    virtual_host=None, port=None, ssl=None,\n    979:                    connect_timeout=None, transport=None,",
+    "context": {
+      "parameter_count": 13,
+      "function_name": "connection"
+    }
+  },
+  {
+    "type": "connascence_of_position",
+    "severity": "high",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1020,
+    "column": 4,
+    "description": "Function '_connection' has 13 positional parameters (>3)",
+    "recommendation": "Consider using keyword arguments, data classes, or parameter objects",
+    "code_snippet": "    1018:         )\n    1019: \n>>> 1020:     def _connection(self, url, userid=None, password=None,\n    1021:                     virtual_host=None, port=None, ssl=None,\n    1022:                     connect_timeout=None, transport=None,",
+    "context": {
+      "parameter_count": 13,
+      "function_name": "_connection"
+    }
+  },
+  {
+    "type": "connascence_of_position",
+    "severity": "high",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1187,
+    "column": 4,
+    "description": "Function 'add_periodic_task' has 6 positional parameters (>3)",
+    "recommendation": "Consider using keyword arguments, data classes, or parameter objects",
+    "code_snippet": "    1185:         return self._canvas.signature(*args, **kwargs)\n    1186: \n>>> 1187:     def add_periodic_task(self, schedule, sig,\n    1188:                           args=(), kwargs=(), name=None, **opts):\n    1189:         \"\"\"",
+    "context": {
+      "parameter_count": 6,
+      "function_name": "add_periodic_task"
+    }
+  },
+  {
+    "type": "connascence_of_position",
+    "severity": "high",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1204,
+    "column": 4,
+    "description": "Function '_sig_to_periodic_task_entry' has 6 positional parameters (>3)",
+    "recommendation": "Consider using keyword arguments, data classes, or parameter objects",
+    "code_snippet": "    1202:         return key\n    1203: \n>>> 1204:     def _sig_to_periodic_task_entry(self, schedule, sig,\n    1205:                                     args=(), kwargs=None, name=None, **opts):\n    1206:         kwargs = {} if not kwargs else kwargs",
+    "context": {
+      "parameter_count": 6,
+      "function_name": "_sig_to_periodic_task_entry"
+    }
+  },
+  {
+    "type": "connascence_of_position",
+    "severity": "high",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1218,
+    "column": 4,
+    "description": "Function '_add_periodic_task' has 4 positional parameters (>3)",
+    "recommendation": "Consider using keyword arguments, data classes, or parameter objects",
+    "code_snippet": "    1216:         }\n    1217: \n>>> 1218:     def _add_periodic_task(self, key, entry, name=None):\n    1219:         if name is None and key in self._conf.beat_schedule:\n    1220:             logger.warning(",
+    "context": {
+      "parameter_count": 4,
+      "function_name": "_add_periodic_task"
+    }
+  },
+  {
+    "type": "connascence_of_position",
+    "severity": "high",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1234,
+    "column": 4,
+    "description": "Function 'subclass_with_self' has 6 positional parameters (>3)",
+    "recommendation": "Consider using keyword arguments, data classes, or parameter objects",
+    "code_snippet": "    1232:         )\n    1233: \n>>> 1234:     def subclass_with_self(self, Class, name=None, attribute='app',\n    1235:                            reverse=None, keep_reduce=False, **kw):\n    1236:         \"\"\"Subclass an app-compatible class.",
+    "context": {
+      "parameter_count": 6,
+      "function_name": "subclass_with_self"
+    }
+  },
+  {
+    "type": "connascence_of_algorithm",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 473,
+    "column": 4,
+    "description": "Function 'worker_main' appears to duplicate algorithm from other functions",
+    "recommendation": "Extract common algorithm into shared function or module",
+    "code_snippet": "    471:             celery.params[0].default = None\n    472: \n>>> 473:     def worker_main(self, argv=None):\n    474:         \"\"\"Run :program:`celery worker` using `argv`.\n    475: ",
+    "context": {
+      "duplicate_count": 2,
+      "function_name": "worker_main",
+      "similar_functions": [
+        "add_defaults"
+      ]
+    }
+  },
+  {
+    "type": "connascence_of_algorithm",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 653,
+    "column": 4,
+    "description": "Function 'add_defaults' appears to duplicate algorithm from other functions",
+    "recommendation": "Extract common algorithm into shared function or module",
+    "code_snippet": "    651:                 self.on_after_finalize.send(sender=self)\n    652: \n>>> 653:     def add_defaults(self, fun):\n    654:         \"\"\"Add default configuration from dict ``d``.\n    655: ",
+    "context": {
+      "duplicate_count": 2,
+      "function_name": "add_defaults",
+      "similar_functions": [
+        "worker_main"
+      ]
+    }
+  },
+  {
+    "type": "connascence_of_algorithm",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 701,
+    "column": 4,
+    "description": "Function 'config_from_envvar' appears to duplicate algorithm from other functions",
+    "recommendation": "Extract common algorithm into shared function or module",
+    "code_snippet": "    699:                 return self.conf\n    700: \n>>> 701:     def config_from_envvar(self, variable_name, silent=False, force=False):\n    702:         \"\"\"Read configuration from environment variable.\n    703: ",
+    "context": {
+      "duplicate_count": 2,
+      "function_name": "config_from_envvar",
+      "similar_functions": [
+        "timezone"
+      ]
+    }
+  },
+  {
+    "type": "connascence_of_algorithm",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1510,
+    "column": 4,
+    "description": "Function 'timezone' appears to duplicate algorithm from other functions",
+    "recommendation": "Extract common algorithm into shared function or module",
+    "code_snippet": "    1508: \n    1509:     @cached_property\n>>> 1510:     def timezone(self):\n    1511:         \"\"\"Current timezone for this app.\n    1512: ",
+    "context": {
+      "duplicate_count": 2,
+      "function_name": "timezone",
+      "similar_functions": [
+        "config_from_envvar"
+      ]
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1,
+    "column": 0,
+    "description": "Magic literal 'Actual App instance implementation.' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": ">>>   1: \"\"\"Actual App instance implementation.\"\"\"\n      2: import functools\n      3: import importlib",
+    "context": {
+      "literal_value": "Actual App instance implementation.",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 56,
+    "column": 11,
+    "description": "Magic literal 'Celery' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "     54:     from pydantic import BaseModel  # noqa: F401\n     55: \n>>>  56: __all__ = ('Celery',)\n     57: \n     58: logger = get_logger(__name__)",
+    "context": {
+      "literal_value": "Celery",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 61,
+    "column": 4,
+    "description": "Magic literal 'celery.fixups.django:fixup' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "     59: \n     60: BUILTIN_FIXUPS = {\n>>>  61:     'celery.fixups.django:fixup',\n     62: }\n     63: USING_EXECV = os.environ.get('FORKED_BY_MULTIPROCESSING')",
+    "context": {
+      "literal_value": "celery.fixups.django:fixup",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 63,
+    "column": 29,
+    "description": "Magic literal 'FORKED_BY_MULTIPROCESSING' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "     61:     'celery.fixups.django:fixup',\n     62: }\n>>>  63: USING_EXECV = os.environ.get('FORKED_BY_MULTIPROCESSING')\n     64: \n     65: ERR_ENVVAR_NOT_SET = \"\"\"",
+    "context": {
+      "literal_value": "FORKED_BY_MULTIPROCESSING",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 65,
+    "column": 21,
+    "description": "Magic literal '\nThe environment variable {0!r} is not set,\nand as such the configuration could not be loaded.\n\nPlease set this variable and make sure it points to\na valid configuration module.\n\nExample:\n    {0}=\"proj.celeryconfig\"\n' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "     63: USING_EXECV = os.environ.get('FORKED_BY_MULTIPROCESSING')\n     64: \n>>>  65: ERR_ENVVAR_NOT_SET = \"\"\"\n     66: The environment variable {0!r} is not set,\n     67: and as such the configuration could not be loaded.",
+    "context": {
+      "literal_value": "\nThe environment variable {0!r} is not set,\nand as such the configuration could not be loaded.\n\nPlease set this variable and make sure it points to\na valid configuration module.\n\nExample:\n    {0}=\"proj.celeryconfig\"\n",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "high",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 78,
+    "column": 4,
+    "description": "Magic literal 'Return true if app has customized method `attr`.\n\n    Note:\n        This is used for optimizations in cases where we know\n        how the default behavior works, but need to account\n        for someone using inheritance to override a method/property.\n    ' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "     76: \n     77: def app_has_custom(app, attr):\n>>>  78:     \"\"\"Return true if app has customized method `attr`.\n     79: \n     80:     Note:",
+    "context": {
+      "literal_value": "Return true if app has customized method `attr`.\n\n    Note:\n        This is used for optimizations in cases where we know\n        how the default behavior works, but need to account\n        for someone using inheritance to override a method/property.\n    ",
+      "in_conditional": true
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 90,
+    "column": 4,
+    "description": "Magic literal 'Unpickle app.' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "     88: \n     89: def _unpickle_appattr(reverse_name, args):\n>>>  90:     \"\"\"Unpickle app.\"\"\"\n     91:     # Given an attribute name and a list of args, gets\n     92:     # the attribute from the current app and calls it.",
+    "context": {
+      "literal_value": "Unpickle app.",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 102,
+    "column": 20,
+    "description": "Magic literal 'after forker raised exception: %r' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    100:         app._after_fork()\n    101:     except Exception as exc:  # pylint: disable=broad-except\n>>> 102:         logger.info('after forker raised exception: %r', exc, exc_info=1)\n    103: \n    104: ",
+    "context": {
+      "literal_value": "after forker raised exception: %r",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 106,
+    "column": 9,
+    "description": "Magic literal 'Celery' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    104: \n    105: def pydantic_wrapper(\n>>> 106:     app: \"Celery\",\n    107:     task_fun: typing.Callable[..., typing.Any],\n    108:     task_name: str,",
+    "context": {
+      "literal_value": "Celery",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 113,
+    "column": 4,
+    "description": "Magic literal 'Wrapper to validate arguments and serialize return values using Pydantic.' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    111:     dump_kwargs: typing.Optional[typing.Dict[str, typing.Any]] = None\n    112: ):\n>>> 113:     \"\"\"Wrapper to validate arguments and serialize return values using Pydantic.\"\"\"\n    114:     try:\n    115:         pydantic = importlib.import_module('pydantic')",
+    "context": {
+      "literal_value": "Wrapper to validate arguments and serialize return values using Pydantic.",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 115,
+    "column": 43,
+    "description": "Magic literal 'pydantic' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    113:     \"\"\"Wrapper to validate arguments and serialize return values using Pydantic.\"\"\"\n    114:     try:\n>>> 115:         pydantic = importlib.import_module('pydantic')\n    116:     except ModuleNotFoundError as ex:\n    117:         raise ImproperlyConfigured('You need to install pydantic to use pydantic model serialization.') from ex",
+    "context": {
+      "literal_value": "pydantic",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 117,
+    "column": 35,
+    "description": "Magic literal 'You need to install pydantic to use pydantic model serialization.' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    115:         pydantic = importlib.import_module('pydantic')\n    116:     except ModuleNotFoundError as ex:\n>>> 117:         raise ImproperlyConfigured('You need to install pydantic to use pydantic model serialization.') from ex\n    118: \n    119:     BaseModel: typing.Type['BaseModel'] = pydantic.BaseModel  # noqa: F811  # only defined when type checking",
+    "context": {
+      "literal_value": "You need to install pydantic to use pydantic model serialization.",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 119,
+    "column": 27,
+    "description": "Magic literal 'BaseModel' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    117:         raise ImproperlyConfigured('You need to install pydantic to use pydantic model serialization.') from ex\n    118: \n>>> 119:     BaseModel: typing.Type['BaseModel'] = pydantic.BaseModel  # noqa: F811  # only defined when type checking\n    120: \n    121:     if context is None:",
+    "context": {
+      "literal_value": "BaseModel",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 125,
+    "column": 27,
+    "description": "Magic literal 'mode' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    123:     if dump_kwargs is None:\n    124:         dump_kwargs = {}\n>>> 125:     dump_kwargs.setdefault('mode', 'json')\n    126: \n    127:     # If a file uses `from __future__ import annotations`, all annotations will",
+    "context": {
+      "literal_value": "mode",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 125,
+    "column": 35,
+    "description": "Magic literal 'json' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    123:     if dump_kwargs is None:\n    124:         dump_kwargs = {}\n>>> 125:     dump_kwargs.setdefault('mode', 'json')\n    126: \n    127:     # If a file uses `from __future__ import annotations`, all annotations will",
+    "context": {
+      "literal_value": "json",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 157,
+    "column": 40,
+    "description": "Magic literal 'celery_app' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    155:                     arg_value,\n    156:                     strict=strict,\n>>> 157:                     context={**context, 'celery_app': app, 'celery_task_name': task_name},\n    158:                 )\n    159: ",
+    "context": {
+      "literal_value": "celery_app",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 157,
+    "column": 59,
+    "description": "Magic literal 'celery_task_name' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    155:                     arg_value,\n    156:                     strict=strict,\n>>> 157:                     context={**context, 'celery_app': app, 'celery_task_name': task_name},\n    158:                 )\n    159: ",
+    "context": {
+      "literal_value": "celery_task_name",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "high",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 165,
+    "column": 26,
+    "description": "Magic literal 'return' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    163:         # Dump Pydantic model if the returned value is an instance of pydantic.BaseModel *and* its\n    164:         # class matches the typehint\n>>> 165:         if type_hints and 'return' in type_hints:\n    166:             return_annotation = type_hints['return']\n    167:         else:",
+    "context": {
+      "literal_value": "return",
+      "in_conditional": true
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 166,
+    "column": 43,
+    "description": "Magic literal 'return' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    164:         # class matches the typehint\n    165:         if type_hints and 'return' in type_hints:\n>>> 166:             return_annotation = type_hints['return']\n    167:         else:\n    168:             return_annotation = task_signature.return_annotation",
+    "context": {
+      "literal_value": "return",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 198,
+    "column": 33,
+    "description": "Magic literal '_data' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    196: \n    197:     def __init__(self, conf, callback):\n>>> 198:         object.__setattr__(self, '_data', conf)\n    199:         object.__setattr__(self, 'callback', callback)\n    200: ",
+    "context": {
+      "literal_value": "_data",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 199,
+    "column": 33,
+    "description": "Magic literal 'callback' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    197:     def __init__(self, conf, callback):\n    198:         object.__setattr__(self, '_data', conf)\n>>> 199:         object.__setattr__(self, 'callback', callback)\n    200: \n    201:     def __setitem__(self, key, value):",
+    "context": {
+      "literal_value": "callback",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 231,
+    "column": 4,
+    "description": "Magic literal 'Celery application.\n\n    Arguments:\n        main (str): Name of the main module if running as `__main__`.\n            This is used as the prefix for auto-generated task names.\n\n    Keyword Arguments:\n        broker (str): URL of the default broker used.\n        backend (Union[str, Type[celery.backends.base.Backend]]):\n            The result store backend class, or the name of the backend\n            class to use.\n\n            Default is the value of the :setting:`result_backend` setting.\n        autofinalize (bool): If set to False a :exc:`RuntimeError`\n            will be raised if the task registry or tasks are used before\n            the app is finalized.\n        set_as_current (bool):  Make this the global current app.\n        include (List[str]): List of modules every worker should import.\n\n        amqp (Union[str, Type[AMQP]]): AMQP object or class name.\n        events (Union[str, Type[celery.app.events.Events]]): Events object or\n            class name.\n        log (Union[str, Type[Logging]]): Log object or class name.\n        control (Union[str, Type[celery.app.control.Control]]): Control object\n            or class name.\n        tasks (Union[str, Type[TaskRegistry]]): A task registry, or the name of\n            a registry class.\n        fixups (List[str]): List of fix-up plug-ins (e.g., see\n            :mod:`celery.fixups.django`).\n        config_source (Union[str, class]): Take configuration from a class,\n            or object.  Attributes may include any settings described in\n            the documentation.\n        task_cls (Union[str, Type[celery.app.task.Task]]): base task class to\n            use. See :ref:`this section <custom-task-cls-app-wide>` for usage.\n    ' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    229: \n    230: class Celery:\n>>> 231:     \"\"\"Celery application.\n    232: \n    233:     Arguments:",
+    "context": {
+      "literal_value": "Celery application.\n\n    Arguments:\n        main (str): Name of the main module if running as `__main__`.\n            This is used as the prefix for auto-generated task names.\n\n    Keyword Arguments:\n        broker (str): URL of the default broker used.\n        backend (Union[str, Type[celery.backends.base.Backend]]):\n            The result store backend class, or the name of the backend\n            class to use.\n\n            Default is the value of the :setting:`result_backend` setting.\n        autofinalize (bool): If set to False a :exc:`RuntimeError`\n            will be raised if the task registry or tasks are used before\n            the app is finalized.\n        set_as_current (bool):  Make this the global current app.\n        include (List[str]): List of modules every worker should import.\n\n        amqp (Union[str, Type[AMQP]]): AMQP object or class name.\n        events (Union[str, Type[celery.app.events.Events]]): Events object or\n            class name.\n        log (Union[str, Type[Logging]]): Log object or class name.\n        control (Union[str, Type[celery.app.control.Control]]): Control object\n            or class name.\n        tasks (Union[str, Type[TaskRegistry]]): A task registry, or the name of\n            a registry class.\n        fixups (List[str]): List of fix-up plug-ins (e.g., see\n            :mod:`celery.fixups.django`).\n        config_source (Union[str, class]): Take configuration from a class,\n            or object.  Attributes may include any settings described in\n            the documentation.\n        task_cls (Union[str, Type[celery.app.task.Task]]): base task class to\n            use. See :ref:`this section <custom-task-cls-app-wide>` for usage.\n    ",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 289,
+    "column": 15,
+    "description": "Magic literal 'celery.app.amqp:AMQP' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    287:     builtin_fixups = BUILTIN_FIXUPS\n    288: \n>>> 289:     amqp_cls = 'celery.app.amqp:AMQP'\n    290:     backend_cls = None\n    291:     events_cls = 'celery.app.events:Events'",
+    "context": {
+      "literal_value": "celery.app.amqp:AMQP",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 291,
+    "column": 17,
+    "description": "Magic literal 'celery.app.events:Events' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    289:     amqp_cls = 'celery.app.amqp:AMQP'\n    290:     backend_cls = None\n>>> 291:     events_cls = 'celery.app.events:Events'\n    292:     loader_cls = None\n    293:     log_cls = 'celery.app.log:Logging'",
+    "context": {
+      "literal_value": "celery.app.events:Events",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 293,
+    "column": 14,
+    "description": "Magic literal 'celery.app.log:Logging' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    291:     events_cls = 'celery.app.events:Events'\n    292:     loader_cls = None\n>>> 293:     log_cls = 'celery.app.log:Logging'\n    294:     control_cls = 'celery.app.control:Control'\n    295:     task_cls = 'celery.app.task:Task'",
+    "context": {
+      "literal_value": "celery.app.log:Logging",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 294,
+    "column": 18,
+    "description": "Magic literal 'celery.app.control:Control' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    292:     loader_cls = None\n    293:     log_cls = 'celery.app.log:Logging'\n>>> 294:     control_cls = 'celery.app.control:Control'\n    295:     task_cls = 'celery.app.task:Task'\n    296:     registry_cls = 'celery.app.registry:TaskRegistry'",
+    "context": {
+      "literal_value": "celery.app.control:Control",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 295,
+    "column": 15,
+    "description": "Magic literal 'celery.app.task:Task' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    293:     log_cls = 'celery.app.log:Logging'\n    294:     control_cls = 'celery.app.control:Control'\n>>> 295:     task_cls = 'celery.app.task:Task'\n    296:     registry_cls = 'celery.app.registry:TaskRegistry'\n    297: ",
+    "context": {
+      "literal_value": "celery.app.task:Task",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 296,
+    "column": 19,
+    "description": "Magic literal 'celery.app.registry:TaskRegistry' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    294:     control_cls = 'celery.app.control:Control'\n    295:     task_cls = 'celery.app.task:Task'\n>>> 296:     registry_cls = 'celery.app.registry:TaskRegistry'\n    297: \n    298:     #: Thread local storage.",
+    "context": {
+      "literal_value": "celery.app.registry:TaskRegistry",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 338,
+    "column": 72,
+    "description": "Magic literal 'task_cls' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    336:             bool(task_cls)\n    337:             # subclass of Celery with a task_cls attribute\n>>> 338:             or self.__class__ is not Celery and hasattr(self.__class__, 'task_cls')\n    339:         )\n    340:         self.task_cls = task_cls or self.task_cls",
+    "context": {
+      "literal_value": "task_cls",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 364,
+    "column": 53,
+    "description": "Magic literal '__reduce_args__' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    362:         # the old way of pickling apps: pickling a list of\n    363:         # args instead of the new way that pickles a dict of keywords.\n>>> 364:         self._using_v1_reduce = app_has_custom(self, '__reduce_args__')\n    365: \n    366:         # these options are moved to the config to",
+    "context": {
+      "literal_value": "__reduce_args__",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 370,
+    "column": 23,
+    "description": "Magic literal 'broker_url' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    368:         self._preconf = changes or {}\n    369:         self._preconf_set_by_auto = set()\n>>> 370:         self.__autoset('broker_url', broker)\n    371:         self.__autoset('result_backend', backend)\n    372:         self.__autoset('include', include)",
+    "context": {
+      "literal_value": "broker_url",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 371,
+    "column": 23,
+    "description": "Magic literal 'result_backend' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    369:         self._preconf_set_by_auto = set()\n    370:         self.__autoset('broker_url', broker)\n>>> 371:         self.__autoset('result_backend', backend)\n    372:         self.__autoset('include', include)\n    373: ",
+    "context": {
+      "literal_value": "result_backend",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 372,
+    "column": 23,
+    "description": "Magic literal 'include' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    370:         self.__autoset('broker_url', broker)\n    371:         self.__autoset('result_backend', backend)\n>>> 372:         self.__autoset('include', include)\n    373: \n    374:         for key, value in kwargs.items():",
+    "context": {
+      "literal_value": "include",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 395,
+    "column": 44,
+    "description": "Magic literal 'app.on_configure' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    393:         if self.on_configure is None:\n    394:             # used to be a method pre 4.0\n>>> 395:             self.on_configure = Signal(name='app.on_configure')\n    396:         self.on_after_configure = Signal(\n    397:             name='app.on_after_configure',",
+    "context": {
+      "literal_value": "app.on_configure",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 397,
+    "column": 17,
+    "description": "Magic literal 'app.on_after_configure' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    395:             self.on_configure = Signal(name='app.on_configure')\n    396:         self.on_after_configure = Signal(\n>>> 397:             name='app.on_after_configure',\n    398:             providing_args={'source'},\n    399:         )",
+    "context": {
+      "literal_value": "app.on_after_configure",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 398,
+    "column": 28,
+    "description": "Magic literal 'source' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    396:         self.on_after_configure = Signal(\n    397:             name='app.on_after_configure',\n>>> 398:             providing_args={'source'},\n    399:         )\n    400:         self.on_after_finalize = Signal(name='app.on_after_finalize')",
+    "context": {
+      "literal_value": "source",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 400,
+    "column": 45,
+    "description": "Magic literal 'app.on_after_finalize' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    398:             providing_args={'source'},\n    399:         )\n>>> 400:         self.on_after_finalize = Signal(name='app.on_after_finalize')\n    401:         self.on_after_fork = Signal(name='app.on_after_fork')\n    402: ",
+    "context": {
+      "literal_value": "app.on_after_finalize",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 401,
+    "column": 41,
+    "description": "Magic literal 'app.on_after_fork' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    399:         )\n    400:         self.on_after_finalize = Signal(name='app.on_after_finalize')\n>>> 401:         self.on_after_fork = Signal(name='app.on_after_fork')\n    402: \n    403:         # Boolean signalling, whether fast_trace_task are enabled.",
+    "context": {
+      "literal_value": "app.on_after_fork",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 413,
+    "column": 27,
+    "description": "Magic literal 'CELERY_LOADER' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    411:         # the --loader command-line argument sets the environment variable.\n    412:         return (\n>>> 413:             os.environ.get('CELERY_LOADER') or\n    414:             self.loader_cls or\n    415:             'celery.loaders.app:AppLoader'",
+    "context": {
+      "literal_value": "CELERY_LOADER",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 415,
+    "column": 12,
+    "description": "Magic literal 'celery.loaders.app:AppLoader' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    413:             os.environ.get('CELERY_LOADER') or\n    414:             self.loader_cls or\n>>> 415:             'celery.loaders.app:AppLoader'\n    416:         )\n    417: ",
+    "context": {
+      "literal_value": "celery.loaders.app:AppLoader",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 419,
+    "column": 8,
+    "description": "Magic literal 'Optional callback called at init.' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    417: \n    418:     def on_init(self):\n>>> 419:         \"\"\"Optional callback called at init.\"\"\"\n    420: \n    421:     def __autoset(self, key, value):",
+    "context": {
+      "literal_value": "Optional callback called at init.",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 427,
+    "column": 8,
+    "description": "Magic literal 'Make this the current app for this thread.' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    425: \n    426:     def set_current(self):\n>>> 427:         \"\"\"Make this the current app for this thread.\"\"\"\n    428:         _set_current_app(self)\n    429: ",
+    "context": {
+      "literal_value": "Make this the current app for this thread.",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 431,
+    "column": 8,
+    "description": "Magic literal 'Make this the default app for all threads.' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    429: \n    430:     def set_default(self):\n>>> 431:         \"\"\"Make this the default app for all threads.\"\"\"\n    432:         set_default_app(self)\n    433: ",
+    "context": {
+      "literal_value": "Make this the default app for all threads.",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 441,
+    "column": 8,
+    "description": "Magic literal 'Clean up after the application.\n\n        Only necessary for dynamically created apps, and you should\n        probably use the :keyword:`with` statement instead.\n\n        Example:\n            >>> with Celery(set_as_current=False) as app:\n            ...     with app.connection_for_write() as conn:\n            ...         pass\n        ' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    439: \n    440:     def close(self):\n>>> 441:         \"\"\"Clean up after the application.\n    442: \n    443:         Only necessary for dynamically created apps, and you should",
+    "context": {
+      "literal_value": "Clean up after the application.\n\n        Only necessary for dynamically created apps, and you should\n        probably use the :keyword:`with` statement instead.\n\n        Example:\n            >>> with Celery(set_as_current=False) as app:\n            ...     with app.connection_for_write() as conn:\n            ...         pass\n        ",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 455,
+    "column": 8,
+    "description": "Magic literal 'Run :program:`celery` using `argv`.\n\n        Uses :data:`sys.argv` if `argv` is not specified.\n        ' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    453: \n    454:     def start(self, argv=None):\n>>> 455:         \"\"\"Run :program:`celery` using `argv`.\n    456: \n    457:         Uses :data:`sys.argv` if `argv` is not specified.",
+    "context": {
+      "literal_value": "Run :program:`celery` using `argv`.\n\n        Uses :data:`sys.argv` if `argv` is not specified.\n        ",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 474,
+    "column": 8,
+    "description": "Magic literal 'Run :program:`celery worker` using `argv`.\n\n        Uses :data:`sys.argv` if `argv` is not specified.\n        ' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    472: \n    473:     def worker_main(self, argv=None):\n>>> 474:         \"\"\"Run :program:`celery worker` using `argv`.\n    475: \n    476:         Uses :data:`sys.argv` if `argv` is not specified.",
+    "context": {
+      "literal_value": "Run :program:`celery worker` using `argv`.\n\n        Uses :data:`sys.argv` if `argv` is not specified.\n        ",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "high",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 481,
+    "column": 11,
+    "description": "Magic literal 'worker' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    479:             argv = sys.argv\n    480: \n>>> 481:         if 'worker' not in argv:\n    482:             raise ValueError(\n    483:                 \"The worker sub-command must be specified in argv.\\n\"",
+    "context": {
+      "literal_value": "worker",
+      "in_conditional": true
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 483,
+    "column": 16,
+    "description": "Magic literal 'The worker sub-command must be specified in argv.\nUse app.start() to programmatically start other commands.' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    481:         if 'worker' not in argv:\n    482:             raise ValueError(\n>>> 483:                 \"The worker sub-command must be specified in argv.\\n\"\n    484:                 \"Use app.start() to programmatically start other commands.\"\n    485:             )",
+    "context": {
+      "literal_value": "The worker sub-command must be specified in argv.\nUse app.start() to programmatically start other commands.",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 490,
+    "column": 8,
+    "description": "Magic literal 'Decorator to create a task class out of any callable.\n\n        See :ref:`Task options<task-options>` for a list of the\n        arguments that can be passed to this decorator.\n\n        Examples:\n            .. code-block:: python\n\n                @app.task\n                def refresh_feed(url):\n                    store_feed(feedparser.parse(url))\n\n            with setting extra options:\n\n            .. code-block:: python\n\n                @app.task(exchange='feeds')\n                def refresh_feed(url):\n                    return store_feed(feedparser.parse(url))\n\n        Note:\n            App Binding: For custom apps the task decorator will return\n            a proxy object, so that the act of creating the task is not\n            performed until the task is used or the task registry is accessed.\n\n            If you're depending on binding to be deferred, then you must\n            not access any attributes on the returned object until the\n            application is fully set up (finalized).\n        ' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    488: \n    489:     def task(self, *args, **opts):\n>>> 490:         \"\"\"Decorator to create a task class out of any callable.\n    491: \n    492:         See :ref:`Task options<task-options>` for a list of the",
+    "context": {
+      "literal_value": "Decorator to create a task class out of any callable.\n\n        See :ref:`Task options<task-options>` for a list of the\n        arguments that can be passed to this decorator.\n\n        Examples:\n            .. code-block:: python\n\n                @app.task\n                def refresh_feed(url):\n                    store_feed(feedparser.parse(url))\n\n            with setting extra options:\n\n            .. code-block:: python\n\n                @app.task(exchange='feeds')\n                def refresh_feed(url):\n                    return store_feed(feedparser.parse(url))\n\n        Note:\n            App Binding: For custom apps the task decorator will return\n            a proxy object, so that the act of creating the task is not\n            performed until the task is used or the task registry is accessed.\n\n            If you're depending on binding to be deferred, then you must\n            not access any attributes on the returned object until the\n            application is fully set up (finalized).\n        ",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "high",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 519,
+    "column": 36,
+    "description": "Magic literal 'lazy' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    517:             application is fully set up (finalized).\n    518:         \"\"\"\n>>> 519:         if USING_EXECV and opts.get('lazy', True):\n    520:             # When using execv the task in the original module will point to a\n    521:             # different app, so doing things like 'add.request' will point to",
+    "context": {
+      "literal_value": "lazy",
+      "in_conditional": true
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 554,
+    "column": 28,
+    "description": "Magic literal 'argument 1 to @task() must be a callable' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    552:             if callable(args[0]):\n    553:                 return inner_create_task_cls(**opts)(*args)\n>>> 554:             raise TypeError('argument 1 to @task() must be a callable')\n    555:         if args:\n    556:             raise TypeError(",
+    "context": {
+      "literal_value": "argument 1 to @task() must be a callable",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 557,
+    "column": 16,
+    "description": "Magic literal '@task() takes exactly 1 argument ({} given)' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    555:         if args:\n    556:             raise TypeError(\n>>> 557:                 '@task() takes exactly 1 argument ({} given)'.format(\n    558:                     sum([len(args), len(opts)])))\n    559:         return inner_create_task_cls(**opts)",
+    "context": {
+      "literal_value": "@task() takes exactly 1 argument ({} given)",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 577,
+    "column": 31,
+    "description": "Magic literal 'Contract breach: app not finalized' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    575:     ):\n    576:         if not self.finalized and not self.autofinalize:\n>>> 577:             raise RuntimeError('Contract breach: app not finalized')\n    578:         name = name or self.gen_task_name(fun.__name__, fun.__module__)\n    579:         base = base or self.Task",
+    "context": {
+      "literal_value": "Contract breach: app not finalized",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 587,
+    "column": 16,
+    "description": "Magic literal 'app' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    585:             run = fun if bind else staticmethod(fun)\n    586:             task = type(fun.__name__, (base,), dict({\n>>> 587:                 'app': self,\n    588:                 'name': name,\n    589:                 'run': run,",
+    "context": {
+      "literal_value": "app",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 588,
+    "column": 16,
+    "description": "Magic literal 'name' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    586:             task = type(fun.__name__, (base,), dict({\n    587:                 'app': self,\n>>> 588:                 'name': name,\n    589:                 'run': run,\n    590:                 '_decorated': True,",
+    "context": {
+      "literal_value": "name",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 589,
+    "column": 16,
+    "description": "Magic literal 'run' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    587:                 'app': self,\n    588:                 'name': name,\n>>> 589:                 'run': run,\n    590:                 '_decorated': True,\n    591:                 '__doc__': fun.__doc__,",
+    "context": {
+      "literal_value": "run",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 590,
+    "column": 16,
+    "description": "Magic literal '_decorated' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    588:                 'name': name,\n    589:                 'run': run,\n>>> 590:                 '_decorated': True,\n    591:                 '__doc__': fun.__doc__,\n    592:                 '__module__': fun.__module__,",
+    "context": {
+      "literal_value": "_decorated",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 591,
+    "column": 16,
+    "description": "Magic literal '__doc__' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    589:                 'run': run,\n    590:                 '_decorated': True,\n>>> 591:                 '__doc__': fun.__doc__,\n    592:                 '__module__': fun.__module__,\n    593:                 '__annotations__': fun.__annotations__,",
+    "context": {
+      "literal_value": "__doc__",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 592,
+    "column": 16,
+    "description": "Magic literal '__module__' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    590:                 '_decorated': True,\n    591:                 '__doc__': fun.__doc__,\n>>> 592:                 '__module__': fun.__module__,\n    593:                 '__annotations__': fun.__annotations__,\n    594:                 '__header__': self.type_checker(fun, bound=bind),",
+    "context": {
+      "literal_value": "__module__",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 593,
+    "column": 16,
+    "description": "Magic literal '__annotations__' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    591:                 '__doc__': fun.__doc__,\n    592:                 '__module__': fun.__module__,\n>>> 593:                 '__annotations__': fun.__annotations__,\n    594:                 '__header__': self.type_checker(fun, bound=bind),\n    595:                 '__wrapped__': run}, **options))()",
+    "context": {
+      "literal_value": "__annotations__",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 594,
+    "column": 16,
+    "description": "Magic literal '__header__' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    592:                 '__module__': fun.__module__,\n    593:                 '__annotations__': fun.__annotations__,\n>>> 594:                 '__header__': self.type_checker(fun, bound=bind),\n    595:                 '__wrapped__': run}, **options))()\n    596:             # for some reason __qualname__ cannot be set in type()",
+    "context": {
+      "literal_value": "__header__",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 595,
+    "column": 16,
+    "description": "Magic literal '__wrapped__' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    593:                 '__annotations__': fun.__annotations__,\n    594:                 '__header__': self.type_checker(fun, bound=bind),\n>>> 595:                 '__wrapped__': run}, **options))()\n    596:             # for some reason __qualname__ cannot be set in type()\n    597:             # so we have to set it here.",
+    "context": {
+      "literal_value": "__wrapped__",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 610,
+    "column": 8,
+    "description": "Magic literal 'Utility for registering a task-based class.\n\n        Note:\n            This is here for compatibility with old Celery 1.0\n            style task classes, you should not need to use this for\n            new projects.\n        ' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    608: \n    609:     def register_task(self, task, **options):\n>>> 610:         \"\"\"Utility for registering a task-based class.\n    611: \n    612:         Note:",
+    "context": {
+      "literal_value": "Utility for registering a task-based class.\n\n        Note:\n            This is here for compatibility with old Celery 1.0\n            style task classes, you should not need to use this for\n            new projects.\n        ",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 632,
+    "column": 8,
+    "description": "Magic literal 'Finalize the app.\n\n        This loads built-in tasks, evaluates pending task decorators,\n        reads configuration, etc.\n        ' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    630: \n    631:     def finalize(self, auto=False):\n>>> 632:         \"\"\"Finalize the app.\n    633: \n    634:         This loads built-in tasks, evaluates pending task decorators,",
+    "context": {
+      "literal_value": "Finalize the app.\n\n        This loads built-in tasks, evaluates pending task decorators,\n        reads configuration, etc.\n        ",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 640,
+    "column": 39,
+    "description": "Magic literal 'Contract breach: app not finalized' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    638:             if not self.finalized:\n    639:                 if auto and not self.autofinalize:\n>>> 640:                     raise RuntimeError('Contract breach: app not finalized')\n    641:                 self.finalized = True\n    642:                 _announce_app_finalized(self)",
+    "context": {
+      "literal_value": "Contract breach: app not finalized",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 654,
+    "column": 8,
+    "description": "Magic literal 'Add default configuration from dict ``d``.\n\n        If the argument is a callable function then it will be regarded\n        as a promise, and it won't be loaded until the configuration is\n        actually needed.\n\n        This method can be compared to:\n\n        .. code-block:: pycon\n\n            >>> celery.conf.update(d)\n\n        with a difference that 1) no copy will be made and 2) the dict will\n        not be transferred when the worker spawns child processes, so\n        it's important that the same configuration happens at import time\n        when pickle restores the object on the other side.\n        ' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    652: \n    653:     def add_defaults(self, fun):\n>>> 654:         \"\"\"Add default configuration from dict ``d``.\n    655: \n    656:         If the argument is a callable function then it will be regarded",
+    "context": {
+      "literal_value": "Add default configuration from dict ``d``.\n\n        If the argument is a callable function then it will be regarded\n        as a promise, and it won't be loaded until the configuration is\n        actually needed.\n\n        This method can be compared to:\n\n        .. code-block:: pycon\n\n            >>> celery.conf.update(d)\n\n        with a difference that 1) no copy will be made and 2) the dict will\n        not be transferred when the worker spawns child processes, so\n        it's important that the same configuration happens at import time\n        when pickle restores the object on the other side.\n        ",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 679,
+    "column": 8,
+    "description": "Magic literal 'Read configuration from object.\n\n        Object is either an actual object or the name of a module to import.\n\n        Example:\n            >>> celery.config_from_object('myapp.celeryconfig')\n\n            >>> from myapp import celeryconfig\n            >>> celery.config_from_object(celeryconfig)\n\n        Arguments:\n            silent (bool): If true then import errors will be ignored.\n            force (bool): Force reading configuration immediately.\n                By default the configuration will be read only when required.\n        ' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    677:     def config_from_object(self, obj,\n    678:                            silent=False, force=False, namespace=None):\n>>> 679:         \"\"\"Read configuration from object.\n    680: \n    681:         Object is either an actual object or the name of a module to import.",
+    "context": {
+      "literal_value": "Read configuration from object.\n\n        Object is either an actual object or the name of a module to import.\n\n        Example:\n            >>> celery.config_from_object('myapp.celeryconfig')\n\n            >>> from myapp import celeryconfig\n            >>> celery.config_from_object(celeryconfig)\n\n        Arguments:\n            silent (bool): If true then import errors will be ignored.\n            force (bool): Force reading configuration immediately.\n                By default the configuration will be read only when required.\n        ",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 702,
+    "column": 8,
+    "description": "Magic literal 'Read configuration from environment variable.\n\n        The value of the environment variable must be the name\n        of a module to import.\n\n        Example:\n            >>> os.environ['CELERY_CONFIG_MODULE'] = 'myapp.celeryconfig'\n            >>> celery.config_from_envvar('CELERY_CONFIG_MODULE')\n        ' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    700: \n    701:     def config_from_envvar(self, variable_name, silent=False, force=False):\n>>> 702:         \"\"\"Read configuration from environment variable.\n    703: \n    704:         The value of the environment variable must be the name",
+    "context": {
+      "literal_value": "Read configuration from environment variable.\n\n        The value of the environment variable must be the name\n        of a module to import.\n\n        Example:\n            >>> os.environ['CELERY_CONFIG_MODULE'] = 'myapp.celeryconfig'\n            >>> celery.config_from_envvar('CELERY_CONFIG_MODULE')\n        ",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 719,
+    "column": 50,
+    "description": "Magic literal 'celery' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    717:         return self.config_from_object(module_name, silent=silent, force=force)\n    718: \n>>> 719:     def config_from_cmdline(self, argv, namespace='celery'):\n    720:         self._conf.update(\n    721:             self.loader.cmdline_config_parser(argv, namespace)",
+    "context": {
+      "literal_value": "celery",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 726,
+    "column": 34,
+    "description": "Magic literal 'json' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    724:     def setup_security(self, allowed_serializers=None, key=None, key_password=None, cert=None,\n    725:                        store=None, digest=DEFAULT_SECURITY_DIGEST,\n>>> 726:                        serializer='json'):\n    727:         \"\"\"Setup the message-signing serializer.\n    728: ",
+    "context": {
+      "literal_value": "json",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 727,
+    "column": 8,
+    "description": "Magic literal 'Setup the message-signing serializer.\n\n        This will affect all application instances (a global operation).\n\n        Disables untrusted serializers and if configured to use the ``auth``\n        serializer will register the ``auth`` serializer with the provided\n        settings into the Kombu serializer registry.\n\n        Arguments:\n            allowed_serializers (Set[str]): List of serializer names, or\n                content_types that should be exempt from being disabled.\n            key (str): Name of private key file to use.\n                Defaults to the :setting:`security_key` setting.\n            key_password (bytes): Password to decrypt the private key.\n                Defaults to the :setting:`security_key_password` setting.\n            cert (str): Name of certificate file to use.\n                Defaults to the :setting:`security_certificate` setting.\n            store (str): Directory containing certificates.\n                Defaults to the :setting:`security_cert_store` setting.\n            digest (str): Digest algorithm used when signing messages.\n                Default is ``sha256``.\n            serializer (str): Serializer used to encode messages after\n                they've been signed.  See :setting:`task_serializer` for\n                the serializers supported.  Default is ``json``.\n        ' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    725:                        store=None, digest=DEFAULT_SECURITY_DIGEST,\n    726:                        serializer='json'):\n>>> 727:         \"\"\"Setup the message-signing serializer.\n    728: \n    729:         This will affect all application instances (a global operation).",
+    "context": {
+      "literal_value": "Setup the message-signing serializer.\n\n        This will affect all application instances (a global operation).\n\n        Disables untrusted serializers and if configured to use the ``auth``\n        serializer will register the ``auth`` serializer with the provided\n        settings into the Kombu serializer registry.\n\n        Arguments:\n            allowed_serializers (Set[str]): List of serializer names, or\n                content_types that should be exempt from being disabled.\n            key (str): Name of private key file to use.\n                Defaults to the :setting:`security_key` setting.\n            key_password (bytes): Password to decrypt the private key.\n                Defaults to the :setting:`security_key_password` setting.\n            cert (str): Name of certificate file to use.\n                Defaults to the :setting:`security_certificate` setting.\n            store (str): Directory containing certificates.\n                Defaults to the :setting:`security_cert_store` setting.\n            digest (str): Digest algorithm used when signing messages.\n                Default is ``sha256``.\n            serializer (str): Serializer used to encode messages after\n                they've been signed.  See :setting:`task_serializer` for\n                the serializers supported.  Default is ``json``.\n        ",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 757,
+    "column": 40,
+    "description": "Magic literal 'tasks' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    755: \n    756:     def autodiscover_tasks(self, packages=None,\n>>> 757:                            related_name='tasks', force=False):\n    758:         \"\"\"Auto-discover task modules.\n    759: ",
+    "context": {
+      "literal_value": "tasks",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 758,
+    "column": 8,
+    "description": "Magic literal 'Auto-discover task modules.\n\n        Searches a list of packages for a \"tasks.py\" module (or use\n        related_name argument).\n\n        If the name is empty, this will be delegated to fix-ups (e.g., Django).\n\n        For example if you have a directory layout like this:\n\n        .. code-block:: text\n\n            foo/__init__.py\n               tasks.py\n               models.py\n\n            bar/__init__.py\n                tasks.py\n                models.py\n\n            baz/__init__.py\n                models.py\n\n        Then calling ``app.autodiscover_tasks(['foo', 'bar', 'baz'])`` will\n        result in the modules ``foo.tasks`` and ``bar.tasks`` being imported.\n\n        Arguments:\n            packages (List[str]): List of packages to search.\n                This argument may also be a callable, in which case the\n                value returned is used (for lazy evaluation).\n            related_name (Optional[str]): The name of the module to find.  Defaults\n                to \"tasks\": meaning \"look for 'module.tasks' for every\n                module in ``packages``.\".  If ``None`` will only try to import\n                the package, i.e. \"look for 'module'\".\n            force (bool): By default this call is lazy so that the actual\n                auto-discovery won't happen until an application imports\n                the default modules.  Forcing will cause the auto-discovery\n                to happen immediately.\n        ' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    756:     def autodiscover_tasks(self, packages=None,\n    757:                            related_name='tasks', force=False):\n>>> 758:         \"\"\"Auto-discover task modules.\n    759: \n    760:         Searches a list of packages for a \"tasks.py\" module (or use",
+    "context": {
+      "literal_value": "Auto-discover task modules.\n\n        Searches a list of packages for a \"tasks.py\" module (or use\n        related_name argument).\n\n        If the name is empty, this will be delegated to fix-ups (e.g., Django).\n\n        For example if you have a directory layout like this:\n\n        .. code-block:: text\n\n            foo/__init__.py\n               tasks.py\n               models.py\n\n            bar/__init__.py\n                tasks.py\n                models.py\n\n            baz/__init__.py\n                models.py\n\n        Then calling ``app.autodiscover_tasks(['foo', 'bar', 'baz'])`` will\n        result in the modules ``foo.tasks`` and ``bar.tasks`` being imported.\n\n        Arguments:\n            packages (List[str]): List of packages to search.\n                This argument may also be a callable, in which case the\n                value returned is used (for lazy evaluation).\n            related_name (Optional[str]): The name of the module to find.  Defaults\n                to \"tasks\": meaning \"look for 'module.tasks' for every\n                module in ``packages``.\".  If ``None`` will only try to import\n                the package, i.e. \"look for 'module'\".\n            force (bool): By default this call is lazy so that the actual\n                auto-discovery won't happen until an application imports\n                the default modules.  Forcing will cause the auto-discovery\n                to happen immediately.\n        ",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "high",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 816,
+    "column": 30,
+    "description": "Magic literal 'autodiscover_tasks' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    814:         return self._autodiscover_tasks_from_names([\n    815:             pkg for fixup in self._fixups\n>>> 816:             if hasattr(fixup, 'autodiscover_tasks')\n    817:             for pkg in fixup.autodiscover_tasks()\n    818:         ], related_name=related_name)",
+    "context": {
+      "literal_value": "autodiscover_tasks",
+      "in_conditional": true
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 829,
+    "column": 8,
+    "description": "Magic literal 'Send task by name.\n\n        Supports the same arguments as :meth:`@-Task.apply_async`.\n\n        Arguments:\n            name (str): Name of task to call (e.g., `\"tasks.add\"`).\n            result_cls (AsyncResult): Specify custom result class.\n        ' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    827:                   root_id=None, parent_id=None, route_name=None,\n    828:                   shadow=None, chain=None, task_type=None, replaced_task_nesting=0, **options):\n>>> 829:         \"\"\"Send task by name.\n    830: \n    831:         Supports the same arguments as :meth:`@-Task.apply_async`.",
+    "context": {
+      "literal_value": "Send task by name.\n\n        Supports the same arguments as :meth:`@-Task.apply_async`.\n\n        Arguments:\n            name (str): Name of task to call (e.g., `\"tasks.add\"`).\n            result_cls (AsyncResult): Specify custom result class.\n        ",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 845,
+    "column": 16,
+    "description": "Magic literal 'task_always_eager has no effect on send_task' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    843:         if conf.task_always_eager:  # pragma: no cover\n    844:             warnings.warn(AlwaysEagerIgnored(\n>>> 845:                 'task_always_eager has no effect on send_task',\n    846:             ), stacklevel=2)\n    847: ",
+    "context": {
+      "literal_value": "task_always_eager has no effect on send_task",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 848,
+    "column": 36,
+    "description": "Magic literal 'ignore_result' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    846:             ), stacklevel=2)\n    847: \n>>> 848:         ignore_result = options.pop('ignore_result', False)\n    849:         options = router.route(\n    850:             options, route_name or name, args, kwargs, task_type)",
+    "context": {
+      "literal_value": "ignore_result",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 856,
+    "column": 32,
+    "description": "Magic literal 'queue' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    854:         if (eta or countdown) and detect_quorum_queues(self, driver_type)[0]:\n    855: \n>>> 856:             queue = options.get(\"queue\")\n    857:             exchange_type = queue.exchange.type if queue else options[\"exchange_type\"]\n    858:             routing_key = queue.routing_key if queue else options[\"routing_key\"]",
+    "context": {
+      "literal_value": "queue",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "high",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 857,
+    "column": 70,
+    "description": "Magic literal 'exchange_type' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    855: \n    856:             queue = options.get(\"queue\")\n>>> 857:             exchange_type = queue.exchange.type if queue else options[\"exchange_type\"]\n    858:             routing_key = queue.routing_key if queue else options[\"routing_key\"]\n    859:             exchange_name = queue.exchange.name if queue else options[\"exchange\"]",
+    "context": {
+      "literal_value": "exchange_type",
+      "in_conditional": true
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "high",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 858,
+    "column": 66,
+    "description": "Magic literal 'routing_key' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    856:             queue = options.get(\"queue\")\n    857:             exchange_type = queue.exchange.type if queue else options[\"exchange_type\"]\n>>> 858:             routing_key = queue.routing_key if queue else options[\"routing_key\"]\n    859:             exchange_name = queue.exchange.name if queue else options[\"exchange\"]\n    860: ",
+    "context": {
+      "literal_value": "routing_key",
+      "in_conditional": true
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "high",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 859,
+    "column": 70,
+    "description": "Magic literal 'exchange' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    857:             exchange_type = queue.exchange.type if queue else options[\"exchange_type\"]\n    858:             routing_key = queue.routing_key if queue else options[\"routing_key\"]\n>>> 859:             exchange_name = queue.exchange.name if queue else options[\"exchange\"]\n    860: \n    861:             if exchange_type != 'direct':",
+    "context": {
+      "literal_value": "exchange",
+      "in_conditional": true
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "high",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 861,
+    "column": 32,
+    "description": "Magic literal 'direct' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    859:             exchange_name = queue.exchange.name if queue else options[\"exchange\"]\n    860: \n>>> 861:             if exchange_type != 'direct':\n    862:                 if eta:\n    863:                     if isinstance(eta, str):",
+    "context": {
+      "literal_value": "direct",
+      "in_conditional": true
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 871,
+    "column": 28,
+    "description": "Magic literal 'celery_delayed_27' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    869:                         routing_key = calculate_routing_key(int(countdown), routing_key)\n    870:                         exchange = Exchange(\n>>> 871:                             'celery_delayed_27',\n    872:                             type='topic',\n    873:                         )",
+    "context": {
+      "literal_value": "celery_delayed_27",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 872,
+    "column": 33,
+    "description": "Magic literal 'topic' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    870:                         exchange = Exchange(\n    871:                             'celery_delayed_27',\n>>> 872:                             type='topic',\n    873:                         )\n    874:                         options.pop(\"queue\", None)",
+    "context": {
+      "literal_value": "topic",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 874,
+    "column": 36,
+    "description": "Magic literal 'queue' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    872:                             type='topic',\n    873:                         )\n>>> 874:                         options.pop(\"queue\", None)\n    875:                         options['routing_key'] = routing_key\n    876:                         options['exchange'] = exchange",
+    "context": {
+      "literal_value": "queue",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 875,
+    "column": 32,
+    "description": "Magic literal 'routing_key' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    873:                         )\n    874:                         options.pop(\"queue\", None)\n>>> 875:                         options['routing_key'] = routing_key\n    876:                         options['exchange'] = exchange\n    877: ",
+    "context": {
+      "literal_value": "routing_key",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 876,
+    "column": 32,
+    "description": "Magic literal 'exchange' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    874:                         options.pop(\"queue\", None)\n    875:                         options['routing_key'] = routing_key\n>>> 876:                         options['exchange'] = exchange\n    877: \n    878:             else:",
+    "context": {
+      "literal_value": "exchange",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 880,
+    "column": 20,
+    "description": "Magic literal 'Direct exchanges are not supported with native delayed delivery.\n' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    878:             else:\n    879:                 logger.warning(\n>>> 880:                     'Direct exchanges are not supported with native delayed delivery.\\n'\n    881:                     f'{exchange_name} is a direct exchange but should be a topic exchange or '\n    882:                     'a fanout exchange in order for native delayed delivery to work properly.\\n'",
+    "context": {
+      "literal_value": "Direct exchanges are not supported with native delayed delivery.\n",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 881,
+    "column": 37,
+    "description": "Magic literal ' is a direct exchange but should be a topic exchange or a fanout exchange in order for native delayed delivery to work properly.\nIf quorum queues are used, this task may block the worker process until the ETA arrives.' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    879:                 logger.warning(\n    880:                     'Direct exchanges are not supported with native delayed delivery.\\n'\n>>> 881:                     f'{exchange_name} is a direct exchange but should be a topic exchange or '\n    882:                     'a fanout exchange in order for native delayed delivery to work properly.\\n'\n    883:                     'If quorum queues are used, this task may block the worker process until the ETA arrives.'",
+    "context": {
+      "literal_value": " is a direct exchange but should be a topic exchange or a fanout exchange in order for native delayed delivery to work properly.\nIf quorum queues are used, this task may block the worker process until the ETA arrives.",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 898,
+    "column": 31,
+    "description": "Magic literal ' has an expiration date in the past (' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    896:             if expires_s < 0:\n    897:                 logger.warning(\n>>> 898:                     f\"{task_id} has an expiration date in the past ({-expires_s}s ago).\\n\"\n    899:                     \"We assume this is intended and so we have set the \"\n    900:                     \"expiration date to 0 instead.\\n\"",
+    "context": {
+      "literal_value": " has an expiration date in the past (",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 898,
+    "column": 80,
+    "description": "Magic literal 's ago).\nWe assume this is intended and so we have set the expiration date to 0 instead.\nAccording to RabbitMQ's documentation:\n\"Setting the TTL to 0 causes messages to be expired upon reaching a queue unless they can be delivered to a consumer immediately.\"\nIf this was unintended, please check the code which published this task.' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    896:             if expires_s < 0:\n    897:                 logger.warning(\n>>> 898:                     f\"{task_id} has an expiration date in the past ({-expires_s}s ago).\\n\"\n    899:                     \"We assume this is intended and so we have set the \"\n    900:                     \"expiration date to 0 instead.\\n\"",
+    "context": {
+      "literal_value": "s ago).\nWe assume this is intended and so we have set the expiration date to 0 instead.\nAccording to RabbitMQ's documentation:\n\"Setting the TTL to 0 causes messages to be expired upon reaching a queue unless they can be delivered to a consumer immediately.\"\nIf this was unintended, please check the code which published this task.",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 910,
+    "column": 20,
+    "description": "Magic literal 'expiration' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    908:                 expires_s = 0\n    909: \n>>> 910:             options[\"expiration\"] = expires_s\n    911: \n    912:         if not root_id or not parent_id:",
+    "context": {
+      "literal_value": "expiration",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 921,
+    "column": 39,
+    "description": "Magic literal 'priority' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    919: \n    920:                 if conf.task_inherit_parent_priority:\n>>> 921:                     options.setdefault('priority',\n    922:                                        parent.request.delivery_info.get('priority'))\n    923: ",
+    "context": {
+      "literal_value": "priority",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 922,
+    "column": 72,
+    "description": "Magic literal 'priority' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    920:                 if conf.task_inherit_parent_priority:\n    921:                     options.setdefault('priority',\n>>> 922:                                        parent.request.delivery_info.get('priority'))\n    923: \n    924:         # alias for 'task_as_v2'",
+    "context": {
+      "literal_value": "priority",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 936,
+    "column": 38,
+    "description": "Magic literal 'stamped_headers' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    934:         )\n    935: \n>>> 936:         stamped_headers = options.pop('stamped_headers', [])\n    937:         for stamp in stamped_headers:\n    938:             options.pop(stamp)",
+    "context": {
+      "literal_value": "stamped_headers",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 962,
+    "column": 8,
+    "description": "Magic literal 'Establish connection used for consuming.\n\n        See Also:\n            :meth:`connection` for supported arguments.\n        ' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    960: \n    961:     def connection_for_read(self, url=None, **kwargs):\n>>> 962:         \"\"\"Establish connection used for consuming.\n    963: \n    964:         See Also:",
+    "context": {
+      "literal_value": "Establish connection used for consuming.\n\n        See Also:\n            :meth:`connection` for supported arguments.\n        ",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 970,
+    "column": 8,
+    "description": "Magic literal 'Establish connection used for producing.\n\n        See Also:\n            :meth:`connection` for supported arguments.\n        ' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    968: \n    969:     def connection_for_write(self, url=None, **kwargs):\n>>> 970:         \"\"\"Establish connection used for producing.\n    971: \n    972:         See Also:",
+    "context": {
+      "literal_value": "Establish connection used for producing.\n\n        See Also:\n            :meth:`connection` for supported arguments.\n        ",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 982,
+    "column": 8,
+    "description": "Magic literal 'Establish a connection to the message broker.\n\n        Please use :meth:`connection_for_read` and\n        :meth:`connection_for_write` instead, to convey the intent\n        of use for this connection.\n\n        Arguments:\n            url: Either the URL or the hostname of the broker to use.\n            hostname (str): URL, Hostname/IP-address of the broker.\n                If a URL is used, then the other argument below will\n                be taken from the URL instead.\n            userid (str): Username to authenticate as.\n            password (str): Password to authenticate with\n            virtual_host (str): Virtual host to use (domain).\n            port (int): Port to connect to.\n            ssl (bool, Dict): Defaults to the :setting:`broker_use_ssl`\n                setting.\n            transport (str): defaults to the :setting:`broker_transport`\n                setting.\n            transport_options (Dict): Dictionary of transport specific options.\n            heartbeat (int): AMQP Heartbeat in seconds (``pyamqp`` only).\n            login_method (str): Custom login method to use (AMQP only).\n            failover_strategy (str, Callable): Custom failover strategy.\n            **kwargs: Additional arguments to :class:`kombu.Connection`.\n\n        Returns:\n            kombu.Connection: the lazy connection instance.\n        ' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    980:                    transport_options=None, heartbeat=None,\n    981:                    login_method=None, failover_strategy=None, **kwargs):\n>>> 982:         \"\"\"Establish a connection to the message broker.\n    983: \n    984:         Please use :meth:`connection_for_read` and",
+    "context": {
+      "literal_value": "Establish a connection to the message broker.\n\n        Please use :meth:`connection_for_read` and\n        :meth:`connection_for_write` instead, to convey the intent\n        of use for this connection.\n\n        Arguments:\n            url: Either the URL or the hostname of the broker to use.\n            hostname (str): URL, Hostname/IP-address of the broker.\n                If a URL is used, then the other argument below will\n                be taken from the URL instead.\n            userid (str): Username to authenticate as.\n            password (str): Password to authenticate with\n            virtual_host (str): Virtual host to use (domain).\n            port (int): Port to connect to.\n            ssl (bool, Dict): Defaults to the :setting:`broker_use_ssl`\n                setting.\n            transport (str): defaults to the :setting:`broker_transport`\n                setting.\n            transport_options (Dict): Dictionary of transport specific options.\n            heartbeat (int): AMQP Heartbeat in seconds (``pyamqp`` only).\n            login_method (str): Custom login method to use (AMQP only).\n            failover_strategy (str, Callable): Custom failover strategy.\n            **kwargs: Additional arguments to :class:`kombu.Connection`.\n\n        Returns:\n            kombu.Connection: the lazy connection instance.\n        ",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1033,
+    "column": 28,
+    "description": "Magic literal 'broker_use_ssl' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1031:             port or conf.broker_port,\n    1032:             transport=transport or conf.broker_transport,\n>>> 1033:             ssl=self.either('broker_use_ssl', ssl),\n    1034:             heartbeat=heartbeat,\n    1035:             login_method=login_method or conf.broker_login_method,",
+    "context": {
+      "literal_value": "broker_use_ssl",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1043,
+    "column": 16,
+    "description": "Magic literal 'broker_connection_timeout' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1041:             ),\n    1042:             connect_timeout=self.either(\n>>> 1043:                 'broker_connection_timeout', connect_timeout\n    1044:             ),\n    1045:         )",
+    "context": {
+      "literal_value": "broker_connection_timeout",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1050,
+    "column": 8,
+    "description": "Magic literal 'Helper for :meth:`connection_or_acquire`.' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1048: \n    1049:     def _acquire_connection(self, pool=True):\n>>> 1050:         \"\"\"Helper for :meth:`connection_or_acquire`.\"\"\"\n    1051:         if pool:\n    1052:             return self.pool.acquire(block=True)",
+    "context": {
+      "literal_value": "Helper for :meth:`connection_or_acquire`.",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1056,
+    "column": 8,
+    "description": "Magic literal 'Context used to acquire a connection from the pool.\n\n        For use within a :keyword:`with` statement to get a connection\n        from the pool if one is not already provided.\n\n        Arguments:\n            connection (kombu.Connection): If not provided, a connection\n                will be acquired from the connection pool.\n        ' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1054: \n    1055:     def connection_or_acquire(self, connection=None, pool=True, *_, **__):\n>>> 1056:         \"\"\"Context used to acquire a connection from the pool.\n    1057: \n    1058:         For use within a :keyword:`with` statement to get a connection",
+    "context": {
+      "literal_value": "Context used to acquire a connection from the pool.\n\n        For use within a :keyword:`with` statement to get a connection\n        from the pool if one is not already provided.\n\n        Arguments:\n            connection (kombu.Connection): If not provided, a connection\n                will be acquired from the connection pool.\n        ",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1070,
+    "column": 8,
+    "description": "Magic literal 'Context used to acquire a producer from the pool.\n\n        For use within a :keyword:`with` statement to get a producer\n        from the pool if one is not already provided\n\n        Arguments:\n            producer (kombu.Producer): If not provided, a producer\n                will be acquired from the producer pool.\n        ' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1068: \n    1069:     def producer_or_acquire(self, producer=None):\n>>> 1070:         \"\"\"Context used to acquire a producer from the pool.\n    1071: \n    1072:         For use within a :keyword:`with` statement to get a producer",
+    "context": {
+      "literal_value": "Context used to acquire a producer from the pool.\n\n        For use within a :keyword:`with` statement to get a producer\n        from the pool if one is not already provided\n\n        Arguments:\n            producer (kombu.Producer): If not provided, a producer\n                will be acquired from the producer pool.\n        ",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1086,
+    "column": 8,
+    "description": "Magic literal 'Prepare configuration before it is merged with the defaults.' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1084: \n    1085:     def prepare_config(self, c):\n>>> 1086:         \"\"\"Prepare configuration before it is merged with the defaults.\"\"\"\n    1087:         return find_deprecated_settings(c)\n    1088: ",
+    "context": {
+      "literal_value": "Prepare configuration before it is merged with the defaults.",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1090,
+    "column": 8,
+    "description": "Magic literal 'Return the current time and date as a datetime.' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1088: \n    1089:     def now(self):\n>>> 1090:         \"\"\"Return the current time and date as a datetime.\"\"\"\n    1091:         now_in_utc = to_utc(datetime.now(datetime_timezone.utc))\n    1092:         return now_in_utc.astimezone(self.timezone)",
+    "context": {
+      "literal_value": "Return the current time and date as a datetime.",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1095,
+    "column": 8,
+    "description": "Magic literal 'Select subset of queues.\n\n        Arguments:\n            queues (Sequence[str]): a list of queue names to keep.\n        ' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1093: \n    1094:     def select_queues(self, queues=None):\n>>> 1095:         \"\"\"Select subset of queues.\n    1096: \n    1097:         Arguments:",
+    "context": {
+      "literal_value": "Select subset of queues.\n\n        Arguments:\n            queues (Sequence[str]): a list of queue names to keep.\n        ",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1103,
+    "column": 8,
+    "description": "Magic literal 'Get key from configuration or use default values.\n\n        Fallback to the value of a configuration key if none of the\n        `*values` are true.\n        ' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1101: \n    1102:     def either(self, default_key, *defaults):\n>>> 1103:         \"\"\"Get key from configuration or use default values.\n    1104: \n    1105:         Fallback to the value of a configuration key if none of the",
+    "context": {
+      "literal_value": "Get key from configuration or use default values.\n\n        Fallback to the value of a configuration key if none of the\n        `*values` are true.\n        ",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1113,
+    "column": 8,
+    "description": "Magic literal 'Return information useful in bug reports.' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1111: \n    1112:     def bugreport(self):\n>>> 1113:         \"\"\"Return information useful in bug reports.\"\"\"\n    1114:         return bugreport(self)\n    1115: ",
+    "context": {
+      "literal_value": "Return information useful in bug reports.",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1123,
+    "column": 8,
+    "description": "Magic literal 'Get config value by key and finalize loading the configuration.\n\n        Note:\n            This is used by PendingConfiguration:\n                as soon as you access a key the configuration is read.\n        ' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1121: \n    1122:     def _finalize_pending_conf(self):\n>>> 1123:         \"\"\"Get config value by key and finalize loading the configuration.\n    1124: \n    1125:         Note:",
+    "context": {
+      "literal_value": "Get config value by key and finalize loading the configuration.\n\n        Note:\n            This is used by PendingConfiguration:\n                as soon as you access a key the configuration is read.\n        ",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1177,
+    "column": 26,
+    "description": "Magic literal 'amqp' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1175:         self._pool = None\n    1176:         try:\n>>> 1177:             self.__dict__['amqp']._producer_pool = None\n    1178:         except (AttributeError, KeyError):\n    1179:             pass",
+    "context": {
+      "literal_value": "amqp",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1183,
+    "column": 8,
+    "description": "Magic literal 'Return a new :class:`~celery.Signature` bound to this app.' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1181: \n    1182:     def signature(self, *args, **kwargs):\n>>> 1183:         \"\"\"Return a new :class:`~celery.Signature` bound to this app.\"\"\"\n    1184:         kwargs['app'] = self\n    1185:         return self._canvas.signature(*args, **kwargs)",
+    "context": {
+      "literal_value": "Return a new :class:`~celery.Signature` bound to this app.",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1184,
+    "column": 15,
+    "description": "Magic literal 'app' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1182:     def signature(self, *args, **kwargs):\n    1183:         \"\"\"Return a new :class:`~celery.Signature` bound to this app.\"\"\"\n>>> 1184:         kwargs['app'] = self\n    1185:         return self._canvas.signature(*args, **kwargs)\n    1186: ",
+    "context": {
+      "literal_value": "app",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1189,
+    "column": 8,
+    "description": "Magic literal '\n        Add a periodic task to beat schedule.\n\n        Celery beat store tasks based on `sig` or `name` if provided. Adding the\n        same signature twice make the second task override the first one. To\n        avoid the override, use distinct `name` for them.\n        ' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1187:     def add_periodic_task(self, schedule, sig,\n    1188:                           args=(), kwargs=(), name=None, **opts):\n>>> 1189:         \"\"\"\n    1190:         Add a periodic task to beat schedule.\n    1191: ",
+    "context": {
+      "literal_value": "\n        Add a periodic task to beat schedule.\n\n        Celery beat store tasks based on `sig` or `name` if provided. Adding the\n        same signature twice make the second task override the first one. To\n        avoid the override, use distinct `name` for them.\n        ",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1201,
+    "column": 64,
+    "description": "Magic literal 'name' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1199:             self._add_periodic_task(key, entry, name=name)\n    1200:         else:\n>>> 1201:             self._pending_periodic_tasks.append([(key, entry), {\"name\": name}])\n    1202:         return key\n    1203: ",
+    "context": {
+      "literal_value": "name",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1211,
+    "column": 12,
+    "description": "Magic literal 'schedule' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1209:                else self.signature(sig.name, args, kwargs))\n    1210:         return name or repr(sig), {\n>>> 1211:             'schedule': schedule,\n    1212:             'task': sig.name,\n    1213:             'args': sig.args,",
+    "context": {
+      "literal_value": "schedule",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1212,
+    "column": 12,
+    "description": "Magic literal 'task' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1210:         return name or repr(sig), {\n    1211:             'schedule': schedule,\n>>> 1212:             'task': sig.name,\n    1213:             'args': sig.args,\n    1214:             'kwargs': sig.kwargs,",
+    "context": {
+      "literal_value": "task",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1213,
+    "column": 12,
+    "description": "Magic literal 'args' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1211:             'schedule': schedule,\n    1212:             'task': sig.name,\n>>> 1213:             'args': sig.args,\n    1214:             'kwargs': sig.kwargs,\n    1215:             'options': dict(sig.options, **opts),",
+    "context": {
+      "literal_value": "args",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1214,
+    "column": 12,
+    "description": "Magic literal 'kwargs' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1212:             'task': sig.name,\n    1213:             'args': sig.args,\n>>> 1214:             'kwargs': sig.kwargs,\n    1215:             'options': dict(sig.options, **opts),\n    1216:         }",
+    "context": {
+      "literal_value": "kwargs",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1215,
+    "column": 12,
+    "description": "Magic literal 'options' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1213:             'args': sig.args,\n    1214:             'kwargs': sig.kwargs,\n>>> 1215:             'options': dict(sig.options, **opts),\n    1216:         }\n    1217: ",
+    "context": {
+      "literal_value": "options",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1221,
+    "column": 18,
+    "description": "Magic literal 'Periodic task key='' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1219:         if name is None and key in self._conf.beat_schedule:\n    1220:             logger.warning(\n>>> 1221:                 f\"Periodic task key='{key}' shadowed a previous unnamed periodic task.\"\n    1222:                 \" Pass a name kwarg to add_periodic_task to silence this warning.\"\n    1223:             )",
+    "context": {
+      "literal_value": "Periodic task key='",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1221,
+    "column": 42,
+    "description": "Magic literal '' shadowed a previous unnamed periodic task. Pass a name kwarg to add_periodic_task to silence this warning.' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1219:         if name is None and key in self._conf.beat_schedule:\n    1220:             logger.warning(\n>>> 1221:                 f\"Periodic task key='{key}' shadowed a previous unnamed periodic task.\"\n    1222:                 \" Pass a name kwarg to add_periodic_task to silence this warning.\"\n    1223:             )",
+    "context": {
+      "literal_value": "' shadowed a previous unnamed periodic task. Pass a name kwarg to add_periodic_task to silence this warning.",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1228,
+    "column": 8,
+    "description": "Magic literal 'Create a base task class bound to this app.' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1226: \n    1227:     def create_task_cls(self):\n>>> 1228:         \"\"\"Create a base task class bound to this app.\"\"\"\n    1229:         return self.subclass_with_self(\n    1230:             self.task_cls, name='Task', attribute='_app',",
+    "context": {
+      "literal_value": "Create a base task class bound to this app.",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1230,
+    "column": 32,
+    "description": "Magic literal 'Task' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1228:         \"\"\"Create a base task class bound to this app.\"\"\"\n    1229:         return self.subclass_with_self(\n>>> 1230:             self.task_cls, name='Task', attribute='_app',\n    1231:             keep_reduce=True, abstract=True,\n    1232:         )",
+    "context": {
+      "literal_value": "Task",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1230,
+    "column": 50,
+    "description": "Magic literal '_app' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1228:         \"\"\"Create a base task class bound to this app.\"\"\"\n    1229:         return self.subclass_with_self(\n>>> 1230:             self.task_cls, name='Task', attribute='_app',\n    1231:             keep_reduce=True, abstract=True,\n    1232:         )",
+    "context": {
+      "literal_value": "_app",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1234,
+    "column": 61,
+    "description": "Magic literal 'app' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1232:         )\n    1233: \n>>> 1234:     def subclass_with_self(self, Class, name=None, attribute='app',\n    1235:                            reverse=None, keep_reduce=False, **kw):\n    1236:         \"\"\"Subclass an app-compatible class.",
+    "context": {
+      "literal_value": "app",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1236,
+    "column": 8,
+    "description": "Magic literal 'Subclass an app-compatible class.\n\n        App-compatible means that the class has a class attribute that\n        provides the default app it should use, for example:\n        ``class Foo: app = None``.\n\n        Arguments:\n            Class (type): The app-compatible class to subclass.\n            name (str): Custom name for the target class.\n            attribute (str): Name of the attribute holding the app,\n                Default is 'app'.\n            reverse (str): Reverse path to this object used for pickling\n                purposes. For example, to get ``app.AsyncResult``,\n                use ``\"AsyncResult\"``.\n            keep_reduce (bool): If enabled a custom ``__reduce__``\n                implementation won't be provided.\n        ' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1234:     def subclass_with_self(self, Class, name=None, attribute='app',\n    1235:                            reverse=None, keep_reduce=False, **kw):\n>>> 1236:         \"\"\"Subclass an app-compatible class.\n    1237: \n    1238:         App-compatible means that the class has a class attribute that",
+    "context": {
+      "literal_value": "Subclass an app-compatible class.\n\n        App-compatible means that the class has a class attribute that\n        provides the default app it should use, for example:\n        ``class Foo: app = None``.\n\n        Arguments:\n            Class (type): The app-compatible class to subclass.\n            name (str): Custom name for the target class.\n            attribute (str): Name of the attribute holding the app,\n                Default is 'app'.\n            reverse (str): Reverse path to this object used for pickling\n                purposes. For example, to get ``app.AsyncResult``,\n                use ``\"AsyncResult\"``.\n            keep_reduce (bool): If enabled a custom ``__reduce__``\n                implementation won't be provided.\n        ",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1265,
+    "column": 18,
+    "description": "Magic literal '__reduce__' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1263:             **kw)\n    1264:         if not keep_reduce:\n>>> 1265:             attrs['__reduce__'] = __reduce__\n    1266: \n    1267:         return type(name or Class.__name__, (Class,), attrs)",
+    "context": {
+      "literal_value": "__reduce__",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1296,
+    "column": 8,
+    "description": "Magic literal 'Keyword arguments used to reconstruct the object when unpickling.' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1294: \n    1295:     def __reduce_keys__(self):\n>>> 1296:         \"\"\"Keyword arguments used to reconstruct the object when unpickling.\"\"\"\n    1297:         return {\n    1298:             'main': self.main,",
+    "context": {
+      "literal_value": "Keyword arguments used to reconstruct the object when unpickling.",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1298,
+    "column": 12,
+    "description": "Magic literal 'main' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1296:         \"\"\"Keyword arguments used to reconstruct the object when unpickling.\"\"\"\n    1297:         return {\n>>> 1298:             'main': self.main,\n    1299:             'changes':\n    1300:                 self._conf.changes if self.configured else self._preconf,",
+    "context": {
+      "literal_value": "main",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1299,
+    "column": 12,
+    "description": "Magic literal 'changes' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1297:         return {\n    1298:             'main': self.main,\n>>> 1299:             'changes':\n    1300:                 self._conf.changes if self.configured else self._preconf,\n    1301:             'loader': self.loader_cls,",
+    "context": {
+      "literal_value": "changes",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1301,
+    "column": 12,
+    "description": "Magic literal 'loader' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1299:             'changes':\n    1300:                 self._conf.changes if self.configured else self._preconf,\n>>> 1301:             'loader': self.loader_cls,\n    1302:             'backend': self.backend_cls,\n    1303:             'amqp': self.amqp_cls,",
+    "context": {
+      "literal_value": "loader",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1302,
+    "column": 12,
+    "description": "Magic literal 'backend' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1300:                 self._conf.changes if self.configured else self._preconf,\n    1301:             'loader': self.loader_cls,\n>>> 1302:             'backend': self.backend_cls,\n    1303:             'amqp': self.amqp_cls,\n    1304:             'events': self.events_cls,",
+    "context": {
+      "literal_value": "backend",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1303,
+    "column": 12,
+    "description": "Magic literal 'amqp' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1301:             'loader': self.loader_cls,\n    1302:             'backend': self.backend_cls,\n>>> 1303:             'amqp': self.amqp_cls,\n    1304:             'events': self.events_cls,\n    1305:             'log': self.log_cls,",
+    "context": {
+      "literal_value": "amqp",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1304,
+    "column": 12,
+    "description": "Magic literal 'events' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1302:             'backend': self.backend_cls,\n    1303:             'amqp': self.amqp_cls,\n>>> 1304:             'events': self.events_cls,\n    1305:             'log': self.log_cls,\n    1306:             'control': self.control_cls,",
+    "context": {
+      "literal_value": "events",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1305,
+    "column": 12,
+    "description": "Magic literal 'log' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1303:             'amqp': self.amqp_cls,\n    1304:             'events': self.events_cls,\n>>> 1305:             'log': self.log_cls,\n    1306:             'control': self.control_cls,\n    1307:             'fixups': self.fixups,",
+    "context": {
+      "literal_value": "log",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1306,
+    "column": 12,
+    "description": "Magic literal 'control' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1304:             'events': self.events_cls,\n    1305:             'log': self.log_cls,\n>>> 1306:             'control': self.control_cls,\n    1307:             'fixups': self.fixups,\n    1308:             'config_source': self._config_source,",
+    "context": {
+      "literal_value": "control",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1307,
+    "column": 12,
+    "description": "Magic literal 'fixups' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1305:             'log': self.log_cls,\n    1306:             'control': self.control_cls,\n>>> 1307:             'fixups': self.fixups,\n    1308:             'config_source': self._config_source,\n    1309:             'task_cls': self.task_cls,",
+    "context": {
+      "literal_value": "fixups",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1308,
+    "column": 12,
+    "description": "Magic literal 'config_source' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1306:             'control': self.control_cls,\n    1307:             'fixups': self.fixups,\n>>> 1308:             'config_source': self._config_source,\n    1309:             'task_cls': self.task_cls,\n    1310:             'namespace': self.namespace,",
+    "context": {
+      "literal_value": "config_source",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1309,
+    "column": 12,
+    "description": "Magic literal 'task_cls' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1307:             'fixups': self.fixups,\n    1308:             'config_source': self._config_source,\n>>> 1309:             'task_cls': self.task_cls,\n    1310:             'namespace': self.namespace,\n    1311:         }",
+    "context": {
+      "literal_value": "task_cls",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1310,
+    "column": 12,
+    "description": "Magic literal 'namespace' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1308:             'config_source': self._config_source,\n    1309:             'task_cls': self.task_cls,\n>>> 1310:             'namespace': self.namespace,\n    1311:         }\n    1312: ",
+    "context": {
+      "literal_value": "namespace",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1314,
+    "column": 8,
+    "description": "Magic literal 'Deprecated method, please use :meth:`__reduce_keys__` instead.' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1312: \n    1313:     def __reduce_args__(self):\n>>> 1314:         \"\"\"Deprecated method, please use :meth:`__reduce_keys__` instead.\"\"\"\n    1315:         return (self.main, self._conf.changes if self.configured else {},\n    1316:                 self.loader_cls, self.backend_cls, self.amqp_cls,",
+    "context": {
+      "literal_value": "Deprecated method, please use :meth:`__reduce_keys__` instead.",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1322,
+    "column": 8,
+    "description": "Magic literal 'Worker application.\n\n        See Also:\n            :class:`~@Worker`.\n        ' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1320:     @cached_property\n    1321:     def Worker(self):\n>>> 1322:         \"\"\"Worker application.\n    1323: \n    1324:         See Also:",
+    "context": {
+      "literal_value": "Worker application.\n\n        See Also:\n            :class:`~@Worker`.\n        ",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1327,
+    "column": 39,
+    "description": "Magic literal 'celery.apps.worker:Worker' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1325:             :class:`~@Worker`.\n    1326:         \"\"\"\n>>> 1327:         return self.subclass_with_self('celery.apps.worker:Worker')\n    1328: \n    1329:     @cached_property",
+    "context": {
+      "literal_value": "celery.apps.worker:Worker",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1331,
+    "column": 8,
+    "description": "Magic literal 'Embeddable worker.\n\n        See Also:\n            :class:`~@WorkController`.\n        ' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1329:     @cached_property\n    1330:     def WorkController(self, **kwargs):\n>>> 1331:         \"\"\"Embeddable worker.\n    1332: \n    1333:         See Also:",
+    "context": {
+      "literal_value": "Embeddable worker.\n\n        See Also:\n            :class:`~@WorkController`.\n        ",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1336,
+    "column": 39,
+    "description": "Magic literal 'celery.worker:WorkController' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1334:             :class:`~@WorkController`.\n    1335:         \"\"\"\n>>> 1336:         return self.subclass_with_self('celery.worker:WorkController')\n    1337: \n    1338:     @cached_property",
+    "context": {
+      "literal_value": "celery.worker:WorkController",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1340,
+    "column": 8,
+    "description": "Magic literal ':program:`celery beat` scheduler application.\n\n        See Also:\n            :class:`~@Beat`.\n        ' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1338:     @cached_property\n    1339:     def Beat(self, **kwargs):\n>>> 1340:         \"\"\":program:`celery beat` scheduler application.\n    1341: \n    1342:         See Also:",
+    "context": {
+      "literal_value": ":program:`celery beat` scheduler application.\n\n        See Also:\n            :class:`~@Beat`.\n        ",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1345,
+    "column": 39,
+    "description": "Magic literal 'celery.apps.beat:Beat' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1343:             :class:`~@Beat`.\n    1344:         \"\"\"\n>>> 1345:         return self.subclass_with_self('celery.apps.beat:Beat')\n    1346: \n    1347:     @cached_property",
+    "context": {
+      "literal_value": "celery.apps.beat:Beat",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1349,
+    "column": 8,
+    "description": "Magic literal 'Base task class for this app.' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1347:     @cached_property\n    1348:     def Task(self):\n>>> 1349:         \"\"\"Base task class for this app.\"\"\"\n    1350:         return self.create_task_cls()\n    1351: ",
+    "context": {
+      "literal_value": "Base task class for this app.",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1358,
+    "column": 8,
+    "description": "Magic literal 'Create new result instance.\n\n        See Also:\n            :class:`celery.result.AsyncResult`.\n        ' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1356:     @cached_property\n    1357:     def AsyncResult(self):\n>>> 1358:         \"\"\"Create new result instance.\n    1359: \n    1360:         See Also:",
+    "context": {
+      "literal_value": "Create new result instance.\n\n        See Also:\n            :class:`celery.result.AsyncResult`.\n        ",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1363,
+    "column": 39,
+    "description": "Magic literal 'celery.result:AsyncResult' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1361:             :class:`celery.result.AsyncResult`.\n    1362:         \"\"\"\n>>> 1363:         return self.subclass_with_self('celery.result:AsyncResult')\n    1364: \n    1365:     @cached_property",
+    "context": {
+      "literal_value": "celery.result:AsyncResult",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1367,
+    "column": 39,
+    "description": "Magic literal 'celery.result:ResultSet' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1365:     @cached_property\n    1366:     def ResultSet(self):\n>>> 1367:         return self.subclass_with_self('celery.result:ResultSet')\n    1368: \n    1369:     @cached_property",
+    "context": {
+      "literal_value": "celery.result:ResultSet",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1371,
+    "column": 8,
+    "description": "Magic literal 'Create new group result instance.\n\n        See Also:\n            :class:`celery.result.GroupResult`.\n        ' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1369:     @cached_property\n    1370:     def GroupResult(self):\n>>> 1371:         \"\"\"Create new group result instance.\n    1372: \n    1373:         See Also:",
+    "context": {
+      "literal_value": "Create new group result instance.\n\n        See Also:\n            :class:`celery.result.GroupResult`.\n        ",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1376,
+    "column": 39,
+    "description": "Magic literal 'celery.result:GroupResult' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1374:             :class:`celery.result.GroupResult`.\n    1375:         \"\"\"\n>>> 1376:         return self.subclass_with_self('celery.result:GroupResult')\n    1377: \n    1378:     @property",
+    "context": {
+      "literal_value": "celery.result:GroupResult",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1380,
+    "column": 8,
+    "description": "Magic literal 'Broker connection pool: :class:`~@pool`.\n\n        Note:\n            This attribute is not related to the workers concurrency pool.\n        ' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1378:     @property\n    1379:     def pool(self):\n>>> 1380:         \"\"\"Broker connection pool: :class:`~@pool`.\n    1381: \n    1382:         Note:",
+    "context": {
+      "literal_value": "Broker connection pool: :class:`~@pool`.\n\n        Note:\n            This attribute is not related to the workers concurrency pool.\n        ",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1394,
+    "column": 8,
+    "description": "Magic literal 'Instance of task being executed, or :const:`None`.' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1392:     @property\n    1393:     def current_task(self):\n>>> 1394:         \"\"\"Instance of task being executed, or :const:`None`.\"\"\"\n    1395:         return _task_stack.top\n    1396: ",
+    "context": {
+      "literal_value": "Instance of task being executed, or :const:`None`.",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1399,
+    "column": 8,
+    "description": "Magic literal 'The task currently being executed by a worker or :const:`None`.\n\n        Differs from :data:`current_task` in that it's not affected\n        by tasks calling other tasks directly, or eagerly.\n        ' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1397:     @property\n    1398:     def current_worker_task(self):\n>>> 1399:         \"\"\"The task currently being executed by a worker or :const:`None`.\n    1400: \n    1401:         Differs from :data:`current_task` in that it's not affected",
+    "context": {
+      "literal_value": "The task currently being executed by a worker or :const:`None`.\n\n        Differs from :data:`current_task` in that it's not affected\n        by tasks calling other tasks directly, or eagerly.\n        ",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1408,
+    "column": 8,
+    "description": "Magic literal 'Universally unique identifier for this app.' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1406:     @cached_property\n    1407:     def oid(self):\n>>> 1408:         \"\"\"Universally unique identifier for this app.\"\"\"\n    1409:         # since 4.0: thread.get_ident() is not included when\n    1410:         # generating the process id.  This is due to how the RPC",
+    "context": {
+      "literal_value": "Universally unique identifier for this app.",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1417,
+    "column": 8,
+    "description": "Magic literal 'Per-thread unique identifier for this app.' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1415:     @property\n    1416:     def thread_oid(self):\n>>> 1417:         \"\"\"Per-thread unique identifier for this app.\"\"\"\n    1418:         try:\n    1419:             return self._local.oid",
+    "context": {
+      "literal_value": "Per-thread unique identifier for this app.",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1426,
+    "column": 8,
+    "description": "Magic literal 'AMQP related functionality: :class:`~@amqp`.' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1424:     @cached_property\n    1425:     def amqp(self):\n>>> 1426:         \"\"\"AMQP related functionality: :class:`~@amqp`.\"\"\"\n    1427:         return instantiate(self.amqp_cls, app=self)\n    1428: ",
+    "context": {
+      "literal_value": "AMQP related functionality: :class:`~@amqp`.",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1431,
+    "column": 8,
+    "description": "Magic literal 'A reference to the backend object\n\n        Uses self._backend_cache if it is thread safe.\n        Otherwise, use self._local\n        ' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1429:     @property\n    1430:     def _backend(self):\n>>> 1431:         \"\"\"A reference to the backend object\n    1432: \n    1433:         Uses self._backend_cache if it is thread safe.",
+    "context": {
+      "literal_value": "A reference to the backend object\n\n        Uses self._backend_cache if it is thread safe.\n        Otherwise, use self._local\n        ",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1438,
+    "column": 36,
+    "description": "Magic literal 'backend' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1436:         if self._backend_cache is not None:\n    1437:             return self._backend_cache\n>>> 1438:         return getattr(self._local, \"backend\", None)\n    1439: \n    1440:     @_backend.setter",
+    "context": {
+      "literal_value": "backend",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1442,
+    "column": 8,
+    "description": "Magic literal 'Set the backend object on the app' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1440:     @_backend.setter\n    1441:     def _backend(self, backend):\n>>> 1442:         \"\"\"Set the backend object on the app\"\"\"\n    1443:         if backend.thread_safe:\n    1444:             self._backend_cache = backend",
+    "context": {
+      "literal_value": "Set the backend object on the app",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1450,
+    "column": 8,
+    "description": "Magic literal 'Current backend instance.' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1448:     @property\n    1449:     def backend(self):\n>>> 1450:         \"\"\"Current backend instance.\"\"\"\n    1451:         if self._backend is None:\n    1452:             self._backend = self._get_backend()",
+    "context": {
+      "literal_value": "Current backend instance.",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1457,
+    "column": 8,
+    "description": "Magic literal 'Current configuration.' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1455:     @property\n    1456:     def conf(self):\n>>> 1457:         \"\"\"Current configuration.\"\"\"\n    1458:         if self._conf is None:\n    1459:             self._conf = self._load_config()",
+    "context": {
+      "literal_value": "Current configuration.",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1468,
+    "column": 8,
+    "description": "Magic literal 'Remote control: :class:`~@control`.' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1466:     @cached_property\n    1467:     def control(self):\n>>> 1468:         \"\"\"Remote control: :class:`~@control`.\"\"\"\n    1469:         return instantiate(self.control_cls, app=self)\n    1470: ",
+    "context": {
+      "literal_value": "Remote control: :class:`~@control`.",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1473,
+    "column": 8,
+    "description": "Magic literal 'Consuming and sending events: :class:`~@events`.' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1471:     @cached_property\n    1472:     def events(self):\n>>> 1473:         \"\"\"Consuming and sending events: :class:`~@events`.\"\"\"\n    1474:         return instantiate(self.events_cls, app=self)\n    1475: ",
+    "context": {
+      "literal_value": "Consuming and sending events: :class:`~@events`.",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1478,
+    "column": 8,
+    "description": "Magic literal 'Current loader instance.' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1476:     @cached_property\n    1477:     def loader(self):\n>>> 1478:         \"\"\"Current loader instance.\"\"\"\n    1479:         return get_loader_cls(self.loader_cls)(app=self)\n    1480: ",
+    "context": {
+      "literal_value": "Current loader instance.",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1483,
+    "column": 8,
+    "description": "Magic literal 'Logging: :class:`~@log`.' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1481:     @cached_property\n    1482:     def log(self):\n>>> 1483:         \"\"\"Logging: :class:`~@log`.\"\"\"\n    1484:         return instantiate(self.log_cls, app=self)\n    1485: ",
+    "context": {
+      "literal_value": "Logging: :class:`~@log`.",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1493,
+    "column": 8,
+    "description": "Magic literal 'Task registry.\n\n        Warning:\n            Accessing this attribute will also auto-finalize the app.\n        ' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1491:     @cached_property\n    1492:     def tasks(self):\n>>> 1493:         \"\"\"Task registry.\n    1494: \n    1495:         Warning:",
+    "context": {
+      "literal_value": "Task registry.\n\n        Warning:\n            Accessing this attribute will also auto-finalize the app.\n        ",
+      "in_conditional": false
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "high",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1506,
+    "column": 8,
+    "description": "Magic literal 'Check if the application uses the UTC timezone.' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1504: \n    1505:     def uses_utc_timezone(self):\n>>> 1506:         \"\"\"Check if the application uses the UTC timezone.\"\"\"\n    1507:         return self.timezone == timezone.utc\n    1508: ",
+    "context": {
+      "literal_value": "Check if the application uses the UTC timezone.",
+      "in_conditional": true
+    }
+  },
+  {
+    "type": "connascence_of_meaning",
+    "severity": "medium",
+    "file_path": "..\\test_packages\\celery\\celery\\app\\base.py",
+    "line_number": 1511,
+    "column": 8,
+    "description": "Magic literal 'Current timezone for this app.\n\n        This is a cached property taking the time zone from the\n        :setting:`timezone` setting.\n        ' should be a named constant",
+    "recommendation": "Replace with a well-named constant or configuration value",
+    "code_snippet": "    1509:     @cached_property\n    1510:     def timezone(self):\n>>> 1511:         \"\"\"Current timezone for this app.\n    1512: \n    1513:         This is a cached property taking the time zone from the",
+    "context": {
+      "literal_value": "Current timezone for this app.\n\n        This is a cached property taking the time zone from the\n        :setting:`timezone` setting.\n        ",
+      "in_conditional": false
+    }
+  }
+]

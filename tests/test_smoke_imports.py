@@ -223,7 +223,7 @@ class TestSmokeImports:
         """Test that optional dependencies are handled gracefully."""
         # Test license validation (optional)
         try:
-            from src.licensing import LicenseValidator, LicenseValidationResult
+            from licensing import LicenseValidator, LicenseValidationResult
             license_available = True
         except ImportError:
             license_available = False

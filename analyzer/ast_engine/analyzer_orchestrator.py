@@ -57,6 +57,24 @@ class AnalyzerOrchestrator:
         """Legacy orchestrate method for backward compatibility."""
         return []
     
+    def analyze_directory(self, path: str, policy: str = "default") -> List[ConnascenceViolation]:
+        """Analyze a directory using all available analyzers."""
+        violations = []
+        path_obj = Path(path)
+        
+        if not path_obj.exists():
+            return violations
+        
+        # Run god object analysis
+        try:
+            god_object_analyzer = self.analyzers['god_object'](threshold=15)
+            god_violations = god_object_analyzer.analyze_path(path)
+            violations.extend(god_violations)
+        except Exception as e:
+            print(f"Warning: God object analysis failed: {e}")
+        
+        return violations
+    
     def run_analyzer(self, analyzer_type: str, path: str, threshold: int = 15) -> List[ConnascenceViolation]:
         """Run a specific analyzer."""
         if analyzer_type not in self.analyzers:

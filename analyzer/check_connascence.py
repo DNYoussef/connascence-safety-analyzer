@@ -690,7 +690,7 @@ Examples:
 
     # Check for license validation (exit code 4)
     try:
-        from src.licensing import LicenseValidator, LicenseValidationResult
+        from licensing import LicenseValidator, LicenseValidationResult
         license_validator = LicenseValidator()
         project_root = target_path if target_path.is_dir() else target_path.parent
         

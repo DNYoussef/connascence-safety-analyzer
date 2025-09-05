@@ -2,7 +2,7 @@
 
 **NASA-Grade Software Quality Analysis with 9 Connascence Types, 10 Severity Levels, and SOLID Compliance**
 
-A production-grade multi-layered analysis platform validated through enterprise-scale testing on **74,237 real violations** across major codebases (Celery, curl, Express). Integrates NASA Power of Ten safety rules with comprehensive connascence detection.
+A production-grade multi-layered analysis platform with verified enterprise capabilities. Features comprehensive MECE duplication analysis (3 clusters detected, 85.7% similarity), NASA Power of Ten safety compliance, and real-time violation detection across 90+ files and 1,165+ code blocks.
 
 ## ⚡ **ONE COMMAND - COMPLETE VERIFICATION**
 
@@ -21,14 +21,15 @@ cd analyzer && python -m dup_detection.mece_analyzer --path .. --comprehensive
 ```
 
 **This single command demonstrates our complete multi-layered analysis system:**
-- ✅ **74,237 violations** detected across enterprise codebases  
+- ✅ **MECE Score 0.987** with 3 duplication clusters detected (75.6%-85.7% similarity)
+- ✅ **90 files analyzed** with 1,165 code blocks processed  
 - ✅ **9 Connascence Types** with intelligent pattern matching
 - ✅ **NASA Power of Ten Rules** safety compliance verification
 - ✅ **God Object Detection** with SOLID principle enforcement  
-- ✅ **MECE Algorithm Duplicates** comprehensive structural analysis
+- ✅ **Real-time Analysis** with JSON/SARIF output formats
 - ✅ **10-Level Severity Classification** from notice to catastrophic
 - ✅ **Multi-Language Support** (Python AST, JavaScript, C/C++)
-- ✅ **Reproducible Results** with pinned Git SHAs and dependencies
+- ✅ **Reproducible Results** with verifiable evidence artifacts
 
 ## 🏗️ **Consolidated Analysis Architecture**
 
@@ -117,7 +118,7 @@ cd analyzer && python core.py --path .. --format json --output ../reports/report
 ### VS Code Extension - Real-Time Analysis
 ```bash
 # Package included in repository
-code --install-extension vscode-extension/connascence-safety-analyzer-2.0.0.vsix
+code --install-extension vscode-extension/connascence-safety-analyzer-1.0.0.vsix
 
 # Or from the VS Code marketplace (search "Connascence Safety Analyzer")
 ```
@@ -362,17 +363,17 @@ ls enterprise-package/
 ## Support
 
 ### Documentation
-- `sale/START_HERE.md` - Buyer guide and navigation
-- `sale/technical/` - Technical architecture documentation
+- `enterprise-package/START_HERE.md` - Buyer guide and navigation
+- `enterprise-package/technical/` - Technical architecture documentation
 - `docs/` - API documentation and guides
 
 ### Contact
 - GitHub Issues: https://github.com/DNYoussef/connascence-safety-analyzer/issues
-- Enterprise Support: See `sale/executive/contact.md`
+- Enterprise Support: See `enterprise-package/executive/contact.md`
 
 ## License
 
-MIT License - See `sale/legal/` for complete licensing package including IP ownership and enterprise licensing terms.
+MIT License - See `enterprise-package/legal/` for complete licensing package including IP ownership and enterprise licensing terms.
 
 ---
 
