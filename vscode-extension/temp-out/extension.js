@@ -45,46 +45,163 @@ const vscode = __importStar(require("vscode"));
 const ConnascenceExtension_1 = require("./core/ConnascenceExtension");
 const logger_1 = require("./utils/logger");
 const telemetry_1 = require("./utils/telemetry");
+const dashboardProvider_1 = require("./providers/dashboardProvider");
+const analysisResultsProvider_1 = require("./providers/analysisResultsProvider");
+const visualHighlighting_1 = require("./features/visualHighlighting");
+const notificationManager_1 = require("./features/notificationManager");
+const brokenChainLogo_1 = require("./features/brokenChainLogo");
+const aiFixSuggestions_1 = require("./features/aiFixSuggestions");
 let extension;
 let logger;
 let telemetry;
+// Global managers for all features
+let dashboardProvider;
+let analysisResultsProvider;
+let visualHighlighting;
+let notificationManager;
+let brokenChainLogo;
+let aiFixSuggestions;
+let connascenceService;
 function activate(context) {
     // Initialize logger and telemetry
     logger = new logger_1.ExtensionLogger('Connascence');
     telemetry = new telemetry_1.TelemetryReporter(context, logger);
-    logger.info('Connascence Analyzer extension activating...');
+    logger.info('🔗💔 Connascence Analyzer extension activating - Breaking chains!');
     telemetry.logEvent('extension.activate.start');
     try {
-        // Initialize main extension class
+        // Initialize core services
+        // These will be initialized after extension is created
+        connascenceService = null;
         extension = new ConnascenceExtension_1.ConnascenceExtension(context, logger, telemetry);
-        // Activate all components
+        // Initialize all feature managers
+        initializeFeatureManagers(context);
+        // Initialize tree data providers
+        initializeTreeProviders(context);
+        // Register all commands
+        registerAllCommands(context);
+        // Activate main extension
         extension.activate();
         telemetry.logEvent('extension.activate.success');
-        logger.info('Connascence Analyzer extension activated successfully');
+        logger.info('🔗✨ Connascence Analyzer extension activated successfully - Ready to break chains!');
+        // Show welcome message
+        showWelcomeMessage();
     }
     catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         logger.error('Failed to activate extension', error);
-        telemetry.logEvent('extension.activate.error', { error: errorMessage });
-        vscode.window.showErrorMessage(`Connascence extension failed to activate: ${errorMessage}`);
+        telemetry.logEvent('extension.activate.error', {
+            error: error instanceof Error ? error.message : String(error)
+        });
         throw error;
     }
 }
+function initializeFeatureManagers(context) {
+    logger.info('🔧 Initializing feature managers...');
+    // Initialize visual highlighting
+    visualHighlighting = new visualHighlighting_1.VisualHighlightingManager();
+    context.subscriptions.push(visualHighlighting);
+    // Initialize notification manager
+    notificationManager = notificationManager_1.NotificationManager.getInstance();
+    // Initialize broken chain logo
+    brokenChainLogo = brokenChainLogo_1.BrokenChainLogoManager.getInstance();
+    context.subscriptions.push(brokenChainLogo);
+    // Initialize AI fix suggestions
+    aiFixSuggestions = aiFixSuggestions_1.AIFixSuggestionsProvider.getInstance();
+    logger.info('✅ Feature managers initialized');
+}
+function initializeTreeProviders(context) {
+    logger.info('🌳 Initializing tree data providers...');
+    // Initialize dashboard provider
+    dashboardProvider = new dashboardProvider_1.ConnascenceDashboardProvider(connascenceService);
+    vscode.window.registerTreeDataProvider('connascenceDashboard', dashboardProvider);
+    // Initialize analysis results provider
+    analysisResultsProvider = new analysisResultsProvider_1.AnalysisResultsProvider();
+    vscode.window.registerTreeDataProvider('connascenceAnalysisResults', analysisResultsProvider);
+    logger.info('✅ Tree data providers registered');
+}
+function registerAllCommands(context) {
+    logger.info('📋 Registering commands...');
+    // Notification management commands
+    const notificationControlsCommand = vscode.commands.registerCommand('connascence.manageNotifications', () => {
+        notificationManager.showFilterManagementQuickPick();
+    });
+    // Broken chain logo commands
+    const showLogoCommand = vscode.commands.registerCommand('connascence.showBrokenChainAnimation', () => {
+        brokenChainLogo.showBrokenChainAnimation();
+    });
+    // Dashboard refresh command
+    const refreshDashboardCommand = vscode.commands.registerCommand('connascence.refreshDashboard', () => {
+        dashboardProvider.refresh();
+        analysisResultsProvider.refresh();
+    });
+    // Analysis results grouping commands
+    const groupByFileCommand = vscode.commands.registerCommand('connascence.groupByFile', () => {
+        analysisResultsProvider.setGroupBy('file');
+    });
+    const groupBySeverityCommand = vscode.commands.registerCommand('connascence.groupBySeverity', () => {
+        analysisResultsProvider.setGroupBy('severity');
+    });
+    const groupByTypeCommand = vscode.commands.registerCommand('connascence.groupByType', () => {
+        analysisResultsProvider.setGroupBy('type');
+    });
+    // Highlighting commands
+    const toggleHighlightingCommand = vscode.commands.registerCommand('connascence.toggleHighlighting', () => {
+        const config = vscode.workspace.getConfiguration('connascence');
+        const currentValue = config.get('enableVisualHighlighting', true);
+        config.update('enableVisualHighlighting', !currentValue, vscode.ConfigurationTarget.Workspace);
+        vscode.window.showInformationMessage(`🔗 Visual highlighting ${!currentValue ? 'enabled' : 'disabled'}`);
+    });
+    const refreshHighlightingCommand = vscode.commands.registerCommand('connascence.refreshHighlighting', () => {
+        // Refresh highlighting for all visible editors
+        for (const editor of vscode.window.visibleTextEditors) {
+            // This would be called by the diagnostics provider
+            vscode.commands.executeCommand('connascence.analyzeFile', editor.document.uri);
+        }
+    });
+    // Add all commands to context subscriptions
+    context.subscriptions.push(notificationControlsCommand, showLogoCommand, refreshDashboardCommand, groupByFileCommand, groupBySeverityCommand, groupByTypeCommand, toggleHighlightingCommand, refreshHighlightingCommand);
+    logger.info('✅ Commands registered');
+}
+function showWelcomeMessage() {
+    const config = vscode.workspace.getConfiguration('connascence');
+    const hasShownWelcome = config.get('hasShownWelcome', false);
+    if (!hasShownWelcome) {
+        vscode.window.showInformationMessage('🔗💔 Welcome to Connascence Safety Analyzer! Ready to break the chains of tight coupling?', 'Show Dashboard', 'View Documentation', 'Configure Settings').then(selection => {
+            switch (selection) {
+                case 'Show Dashboard':
+                    vscode.commands.executeCommand('connascence.showBrokenChainAnimation');
+                    break;
+                case 'View Documentation':
+                    vscode.env.openExternal(vscode.Uri.parse('https://docs.connascence.io'));
+                    break;
+                case 'Configure Settings':
+                    vscode.commands.executeCommand('connascence.openSettings');
+                    break;
+            }
+        });
+        // Mark as shown
+        config.update('hasShownWelcome', true, vscode.ConfigurationTarget.Global);
+    }
+}
 function deactivate() {
-    logger?.info('Connascence Analyzer extension deactivating...');
-    telemetry?.logEvent('extension.deactivate.start');
+    logger?.info('🔗💔 Connascence Analyzer extension deactivating...');
+    // Dispose all managers
     try {
-        // Clean up extension resources
-        if (extension) {
-            extension.dispose();
-        }
-        if (telemetry) {
-            telemetry.dispose();
-        }
-        logger?.info('Connascence Analyzer extension deactivated successfully');
+        visualHighlighting?.dispose();
+        brokenChainLogo?.dispose();
+        extension?.dispose();
+        logger?.info('✅ Extension deactivated successfully');
+        telemetry?.logEvent('extension.deactivate.success');
     }
     catch (error) {
         logger?.error('Error during deactivation', error);
+        telemetry?.logEvent('extension.deactivate.error', {
+            error: error instanceof Error ? error.message : String(error)
+        });
+    }
+    finally {
+        // Dispose logger and telemetry last
+        telemetry?.dispose();
+        logger?.dispose();
     }
 }
 //# sourceMappingURL=extension.js.map
