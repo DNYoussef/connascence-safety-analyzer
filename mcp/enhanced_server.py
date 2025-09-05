@@ -149,15 +149,30 @@ class EnhancedConnascenceMCPServer:
     def _load_analyzer(self):
         """Load analyzer using unified import strategy."""
         from core.unified_imports import ImportSpec
+        
+        # Try SmartIntegrationEngine first (the real analyzer)
         spec = ImportSpec(
-            module_name="analyzer.core",
+            module_name="analyzer.smart_integration_engine",
+            attribute_name="SmartIntegrationEngine",
             fallback_modules=["analyzer.unified_analyzer"],
             required=False
         )
         analyzer_result = IMPORT_MANAGER.import_module(spec)
         
         if analyzer_result.has_module:
-            return analyzer_result.module
+            # Create instance and add analyze_file method to match interface
+            engine_instance = analyzer_result.module()
+            
+            def analyze_file_wrapper(file_path, **kwargs):
+                result = engine_instance.comprehensive_analysis(file_path)
+                return {
+                    'violations': result.get('violations', []),
+                    'summary': result.get('summary', {'total_violations': 0}),
+                    'success': True
+                }
+            
+            engine_instance.analyze_file = analyze_file_wrapper
+            return engine_instance
         
         # Create mock analyzer for fallback
         class MockAnalyzer:

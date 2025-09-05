@@ -113,4 +113,4 @@ __all__ = [
 # Log the architecture improvement
 import logging
 logger = logging.getLogger(__name__)
-logger.info("Integration architecture consolidated: 9 files → 4 files (85.7% duplication eliminated)")
+logger.info("Integration architecture consolidated: 9 files -> 4 files (85.7% duplication eliminated)")
