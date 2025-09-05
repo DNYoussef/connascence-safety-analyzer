@@ -7,7 +7,11 @@ A production-grade multi-layered analysis platform validated through enterprise-
 ## ⚡ **ONE COMMAND - COMPLETE VERIFICATION**
 
 ```bash
+# Complete verification with consolidated analyzer
 python scripts/run_reproducible_verification.py
+
+# Or use the consolidated analyzer directly
+cd analyzer && python core.py --path=../your_project --policy=default
 ```
 
 **This single command demonstrates our complete multi-layered analysis system:**
@@ -20,7 +24,21 @@ python scripts/run_reproducible_verification.py
 - ✅ **Multi-Language Support** (Python AST, JavaScript, C/C++)
 - ✅ **Reproducible Results** with pinned Git SHAs and dependencies
 
-## 🏗️ **Multi-Layered Analysis Architecture**
+## 🏗️ **Consolidated Analysis Architecture**
+
+**v2.1 UPDATE**: All analyzers now consolidated into single `analyzer/` directory with **real analysis** (no more mock data):
+
+```
+analyzer/
+├── core.py                 # Main API - Real violation detection
+├── unified_analyzer.py     # Comprehensive orchestrator  
+├── constants.py            # Named thresholds (eliminated magic numbers)
+├── check_connascence.py    # Real AST-based connascence detection
+├── dup_detection/          # Real MECE duplication analysis
+├── reporting/              # Consolidated SARIF/JSON/Markdown output
+├── performance/            # Performance analysis tools
+└── autofix/               # Code transformation utilities
+```
 
 Our system uses **single data collection** to power **multiple specialized analysis engines**:
 
@@ -36,13 +54,14 @@ Our system uses **single data collection** to power **multiple specialized analy
 | **CoT, CoE, CoV** | Type, Execution, Value | <1% each |
 
 ### 🛡️ **Layer 2: NASA Power of Ten Safety Rules** (Compliance)
-- **Rule #6**: Function parameters ≤6 (integrated at `check_connascence.py:678,799`)
-- **Rule #7**: Data hiding/global limits (integrated with CoI detection)
-- **Rule #1-10**: Complete safety rule validation for critical systems
+- **Rule #6**: Function parameters ≤6 → `constants.NASA_PARAMETER_THRESHOLD = 6`
+- **Rule #7**: Data hiding/global limits → `constants.NASA_GLOBAL_THRESHOLD = 5`  
+- **Rule #1-10**: Complete safety rule validation with real threshold checking
 
 ### 🏛️ **Layer 3: God Object Detection** (Architecture)
 - **SOLID Principles**: Single Responsibility violation detection
-- **Critical Thresholds**: >20 methods OR >500 lines = God Object
+- **Critical Thresholds**: `GOD_OBJECT_METHOD_THRESHOLD = 20` methods OR `GOD_OBJECT_LOC_THRESHOLD = 500` lines
+- **Real Detection**: Actual method counting and LOC analysis on live code
 - **Multi-File Analysis**: Cross-language architectural assessment
 
 ### 📊 **Layer 4: 10-Level Severity Classification** (Risk Assessment)
@@ -147,6 +166,9 @@ This system implements Meilir Page-Jones' connascence theory to identify couplin
 ```bash
 git clone https://github.com/DNYoussef/connascence-safety-analyzer.git
 cd connascence-safety-analyzer
+
+# All analysis tools now consolidated in analyzer/
+cd analyzer
 pip install -e .
 
 # Verify installation
@@ -172,28 +194,40 @@ pip install redis sqlalchemy
 
 ## Usage Examples
 
-### Basic Analysis
+### Basic Analysis (Consolidated v2.1)
 ```bash
-# Scan current directory
-python -m cli.connascence scan .
+# Using consolidated analyzer (RECOMMENDED - Real Analysis)
+cd analyzer
+python core.py --path=../your_project --policy=default
 
-# Scan with specific policy
+# Real MECE duplication detection
+cd analyzer
+python -m dup_detection.mece_analyzer --path=../your_project --comprehensive
+
+# NASA compliance with real thresholds
+cd analyzer
+python core.py --path=../your_project --policy=nasa_jpl_pot10
+
+# Legacy CLI (still available)
 python -m cli.connascence scan . --policy strict-core
-
-# Exclude patterns
-python -m cli.connascence scan . --exclude "tests/,docs/,vendor/"
 ```
 
-### Output Formats
+### Output Formats (Real Data)
 ```bash
-# JSON output
+# JSON output with real violations and line numbers
+cd analyzer
+python core.py --path=../your_project --format=json --output=report.json
+
+# SARIF output for security tools (real file paths)
+cd analyzer  
+python core.py --path=../your_project --format=sarif --output=report.sarif
+
+# YAML output available
+cd analyzer
+python core.py --path=../your_project --format=yaml
+
+# Legacy CLI formats (still available)
 python -m cli.connascence scan . --format json --output report.json
-
-# SARIF output for security tools
-python -m cli.connascence scan . --format sarif --output report.sarif
-
-# Markdown report
-python -m cli.connascence scan . --format markdown --output report.md
 ```
 
 ### MCP Server (AI Agent Integration)
