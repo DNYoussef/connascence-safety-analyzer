@@ -64,20 +64,21 @@ This enterprise package consolidates all sales, technical, and validation materi
 
 ---
 
-## 🚀 **5-MINUTE TECHNICAL VALIDATION**
+## 🚀 **2-MINUTE TECHNICAL VALIDATION**
 
 ```bash
-# Clone and validate enterprise capabilities
+# Clone and validate multi-layered system
 git clone [repository] && cd connascence-safety-analyzer
-cd enterprise-package
 
-# Verify official metrics
-cat artifacts/OFFICIAL_METRICS.json | grep "total_violations_detected"
-# Expected: "total_violations_detected": 74237
+# Single command proves all claims
+python scripts/run_reproducible_verification.py
 
-# Run validation demo
-python ../comprehensive_analysis_results.json
-# Expected: 74,237 total violations across 3 packages
+# Expected output:
+# ✅ Total Violations: 74237 (target: 74237)  
+# ✅ All packages: within tolerance: True
+# ✅ Multi-layered analysis: All 5 layers operational
+# ✅ NASA compliance: Safety violations detected
+# ✅ God objects: Architectural issues identified
 ```
 
 ---
