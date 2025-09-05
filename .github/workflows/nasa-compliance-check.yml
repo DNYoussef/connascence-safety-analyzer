@@ -217,19 +217,16 @@ jobs:
     
     - name: [ENHANCED] Run Unified Connascence Analysis with NASA Integration
       run: |
-        echo "[ANALYSIS] Running enhanced connascence analysis with unified analyzer..."
+        echo "[ANALYSIS] Running enhanced connascence analysis with consolidated analyzer..."
         
-        # Run the unified connascence analyzer with all features enabled
-        python scripts/unified_connascence_analyzer.py . \
-          --config config/main_config.yml \
+        # Run the consolidated connascence analyzer with NASA policy
+        cd analyzer && python core.py \
+          --path .. \
+          --policy nasa_jpl_pot10 \
           --format json \
-          --output nasa-connascence-report.json \
-          --nasa-compliance \
-          --mece-analysis \
-          --enable-tools \
-          --comprehensive \
-          --policy-preset nasa_power_of_ten \
+          --output ../nasa-connascence-report.json \
           || echo "[WARN] Analysis completed with findings"
+        cd ..
         
         # Display summary
         if [ -f nasa-connascence-report.json ]; then
@@ -270,11 +267,20 @@ jobs:
         import os
         sys.path.append('.')
         
+        # Use consolidated MECE analyzer
+        import subprocess
+        import sys
+        
         try:
-            from analyzer.dup_detection import MECEAnalyzer
+            result = subprocess.run([
+                sys.executable, "-m", "dup_detection.mece_analyzer",
+                "--path", "..", 
+                "--comprehensive"
+            ], cwd="analyzer", capture_output=True, text=True)
             
-            analyzer = MECEAnalyzer()
-            results = analyzer.analyze_codebase('.', ['*.py'])
+            if result.returncode == 0:
+                import json
+                results = json.loads(result.stdout)
             
             print(f"📊 MECE Analysis Results:")
             print(f"Files analyzed: {results.get('files_analyzed', 0)}")
