@@ -1,0 +1,183 @@
+{
+  "analysis_type": "nasa_safety",
+  "codebase": "celery",
+  "compliance_score": 0.975,
+  "total_violations": 25,
+  "violations": [
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "test_packages\\celery\\celery\\canvas.py",
+      "line_number": 905,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "test_packages\\celery\\celery\\utils\\functional.py",
+      "line_number": 174,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "test_packages\\celery\\examples\\eventlet\\webcrawler.py",
+      "line_number": 38,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "test_packages\\celery\\t\\integration\\test_canvas.py",
+      "line_number": 1105,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "test_packages\\celery\\t\\integration\\test_canvas.py",
+      "line_number": 2958,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "test_packages\\celery\\t\\integration\\test_canvas.py",
+      "line_number": 3024,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "test_packages\\celery\\t\\integration\\test_canvas.py",
+      "line_number": 3083,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "test_packages\\celery\\t\\integration\\test_canvas.py",
+      "line_number": 3566,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "test_packages\\celery\\t\\unit\\tasks\\test_stamping.py",
+      "line_number": 477,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "test_packages\\celery\\t\\unit\\tasks\\test_stamping.py",
+      "line_number": 483,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "test_packages\\celery\\t\\unit\\tasks\\test_stamping.py",
+      "line_number": 488,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "test_packages\\celery\\t\\unit\\tasks\\test_stamping.py",
+      "line_number": 489,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "test_packages\\celery\\t\\unit\\tasks\\test_stamping.py",
+      "line_number": 522,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "test_packages\\celery\\t\\unit\\tasks\\test_stamping.py",
+      "line_number": 555,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "test_packages\\celery\\t\\unit\\tasks\\test_stamping.py",
+      "line_number": 595,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "test_packages\\celery\\t\\unit\\tasks\\test_stamping.py",
+      "line_number": 596,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "test_packages\\celery\\t\\unit\\utils\\test_annotations.py",
+      "line_number": 13,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "test_packages\\celery\\t\\unit\\utils\\test_collections.py",
+      "line_number": 96,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "test_packages\\celery\\t\\unit\\utils\\test_collections.py",
+      "line_number": 97,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "test_packages\\celery\\t\\unit\\utils\\test_collections.py",
+      "line_number": 403,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "test_packages\\celery\\t\\unit\\utils\\test_functional.py",
+      "line_number": 50,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "test_packages\\celery\\t\\unit\\utils\\test_functional.py",
+      "line_number": 71,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "test_packages\\celery\\t\\unit\\utils\\test_saferepr.py",
+      "line_number": 47,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "test_packages\\celery\\t\\unit\\utils\\test_saferepr.py",
+      "line_number": 160,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "test_packages\\celery\\t\\unit\\bin\\proj\\pyramid_celery_app.py",
+      "line_number": 39,
+      "severity": "low"
+    }
+  ]
+}

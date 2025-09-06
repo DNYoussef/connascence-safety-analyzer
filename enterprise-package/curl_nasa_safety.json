@@ -1,0 +1,64 @@
+{
+  "analysis_type": "nasa_safety",
+  "codebase": "curl",
+  "compliance_score": 0.992,
+  "total_violations": 8,
+  "violations": [
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "test_packages\\curl\\tests\\http\\test_17_ssl_use.py",
+      "line_number": 363,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "test_packages\\curl\\tests\\http\\test_17_ssl_use.py",
+      "line_number": 367,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "test_packages\\curl\\tests\\http\\test_17_ssl_use.py",
+      "line_number": 507,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "test_packages\\curl\\tests\\http\\test_17_ssl_use.py",
+      "line_number": 510,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "test_packages\\curl\\tests\\http\\test_17_ssl_use.py",
+      "line_number": 513,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "test_packages\\curl\\tests\\http\\test_17_ssl_use.py",
+      "line_number": 516,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "test_packages\\curl\\tests\\http\\test_17_ssl_use.py",
+      "line_number": 519,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "test_packages\\curl\\tests\\http\\testenv\\certs.py",
+      "line_number": 389,
+      "severity": "low"
+    }
+  ]
+}

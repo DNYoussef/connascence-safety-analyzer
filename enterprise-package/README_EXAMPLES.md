@@ -1,8 +1,8 @@
 # Enterprise Connascence Analysis Examples
 
-## Real-World Codebase Analysis Results
+## Complete Multi-Dimensional Analysis Results
 
-This directory contains comprehensive analysis results from three major open-source projects, demonstrating the enterprise capabilities of the Connascence Safety Analyzer.
+This directory contains **4 comprehensive analysis types** for each of the three major open-source projects, demonstrating the full enterprise capabilities of the Connascence Safety Analyzer with **18 total analysis files**.
 
 ## Analyzed Projects
 
@@ -10,7 +10,11 @@ This directory contains comprehensive analysis results from three major open-sou
 - **Repository**: https://github.com/celery/celery
 - **Language**: Python
 - **Domain**: Distributed Computing, Task Queues
-- **Analysis File**: `celery_full_analysis.json`
+- **Analysis Files**: 
+  - `celery_connascence.json` (7.4MB) - 19,939 connascence violations
+  - `celery_nasa_safety.json` (6KB) - NASA Power of Ten compliance (97.5% score)
+  - `celery_duplication.json` (26KB) - 2,580 code duplications found
+  - `celery_mece_duplication.json` (27KB) - MECE analysis (1.00 score)
 
 **Representative Example** (`celery/app/base.py`):
 ```python
@@ -44,7 +48,11 @@ from vine import starpromise
 - **Repository**: https://github.com/expressjs/express
 - **Language**: JavaScript/Node.js
 - **Domain**: Web Development, HTTP Servers
-- **Analysis File**: `express_full_analysis.json`
+- **Analysis Files**:
+  - `express_connascence.json` (111B) - Clean codebase with minimal violations
+  - `express_nasa_safety.json` (139B) - Full NASA compliance achieved
+  - `express_duplication.json` (115B) - Zero duplications detected
+  - `express_mece_duplication.json` (495B) - Perfect MECE score (1.00)
 
 **Representative Example** (`lib/express.js`):
 ```javascript
@@ -75,7 +83,11 @@ var res = require('./response');
 - **Repository**: https://github.com/curl/curl
 - **Language**: C
 - **Domain**: Network Programming, HTTP/HTTPS
-- **Analysis File**: `curl_full_analysis.json`
+- **Analysis Files**:
+  - `curl_connascence.json` (1.9MB) - 5,189 total violations analyzed
+  - `curl_nasa_safety.json` (2KB) - 8 NASA compliance violations
+  - `curl_duplication.json` (26KB) - 314 code duplications identified
+  - `curl_safety_analysis.json` (13KB) - 57 C-specific safety violations
 
 **Representative Example** (`lib/curl_setup.h`):
 ```c

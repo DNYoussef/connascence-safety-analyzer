@@ -1,0 +1,407 @@
+{
+  "analysis_type": "safety_analysis",
+  "codebase": "curl",
+  "language": "c",
+  "total_violations": 57,
+  "violations": [
+    {
+      "rule": "SAFETY-02",
+      "description": "Memory allocation without corresponding free",
+      "file_path": "test_packages\\curl\\lib\\asyn-ares.c",
+      "line_number": 634,
+      "severity": "medium"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\lib\\content_encoding.c",
+      "line_number": 644,
+      "severity": "high"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\lib\\content_encoding.c",
+      "line_number": 651,
+      "severity": "high"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\lib\\content_encoding.c",
+      "line_number": 859,
+      "severity": "high"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\lib\\curl_gethostname.c",
+      "line_number": 63,
+      "severity": "high"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\lib\\curl_gssapi.c",
+      "line_number": 212,
+      "severity": "high"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\lib\\curl_trc.c",
+      "line_number": 195,
+      "severity": "high"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\lib\\hostip.c",
+      "line_number": 645,
+      "severity": "high"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\lib\\hostip.c",
+      "line_number": 682,
+      "severity": "high"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\lib\\hsts.c",
+      "line_number": 316,
+      "severity": "high"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\lib\\imap.c",
+      "line_number": 1603,
+      "severity": "high"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\lib\\krb5.c",
+      "line_number": 91,
+      "severity": "high"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\lib\\krb5.c",
+      "line_number": 760,
+      "severity": "high"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\lib\\mime.c",
+      "line_number": 621,
+      "severity": "high"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\lib\\progress.c",
+      "line_number": 44,
+      "severity": "high"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\lib\\smb.c",
+      "line_number": 790,
+      "severity": "high"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\lib\\socks.c",
+      "line_number": 417,
+      "severity": "high"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\lib\\strerror.c",
+      "line_number": 747,
+      "severity": "high"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\lib\\strerror.c",
+      "line_number": 996,
+      "severity": "high"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\lib\\tftp.c",
+      "line_number": 388,
+      "severity": "high"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\lib\\ws.c",
+      "line_number": 1054,
+      "severity": "high"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\src\\tool_main.c",
+      "line_number": 122,
+      "severity": "high"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\src\\tool_progress.c",
+      "line_number": 109,
+      "severity": "high"
+    },
+    {
+      "rule": "SAFETY-02",
+      "description": "Memory allocation without corresponding free",
+      "file_path": "test_packages\\curl\\src\\tool_strdup.c",
+      "line_number": 38,
+      "severity": "medium"
+    },
+    {
+      "rule": "SAFETY-02",
+      "description": "Memory allocation without corresponding free",
+      "file_path": "test_packages\\curl\\src\\tool_strdup.c",
+      "line_number": 49,
+      "severity": "medium"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\docs\\examples\\hsts-preload.c",
+      "line_number": 60,
+      "severity": "high"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\docs\\examples\\hsts-preload.c",
+      "line_number": 62,
+      "severity": "high"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\lib\\curlx\\inet_ntop.c",
+      "line_number": 84,
+      "severity": "high"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\lib\\curlx\\inet_ntop.c",
+      "line_number": 198,
+      "severity": "high"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\lib\\curlx\\winapi.c",
+      "line_number": 121,
+      "severity": "high"
+    },
+    {
+      "rule": "SAFETY-02",
+      "description": "Memory allocation without corresponding free",
+      "file_path": "test_packages\\curl\\lib\\vauth\\cleartext.c",
+      "line_number": 82,
+      "severity": "medium"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\lib\\vquic\\curl_osslq.c",
+      "line_number": 154,
+      "severity": "high"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\lib\\vtls\\openssl.c",
+      "line_number": 931,
+      "severity": "high"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\lib\\vtls\\vtls.c",
+      "line_number": 1066,
+      "severity": "high"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\lib\\vtls\\wolfssl.c",
+      "line_number": 1540,
+      "severity": "high"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\packages\\OS400\\os400sys.c",
+      "line_number": 725,
+      "severity": "high"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\packages\\OS400\\os400sys.c",
+      "line_number": 756,
+      "severity": "high"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\packages\\OS400\\os400sys.c",
+      "line_number": 787,
+      "severity": "high"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\tests\\libtest\\lib1901.c",
+      "line_number": 43,
+      "severity": "high"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\tests\\libtest\\lib1915.c",
+      "line_number": 64,
+      "severity": "high"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\tests\\libtest\\lib1915.c",
+      "line_number": 66,
+      "severity": "high"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\tests\\libtest\\lib544.c",
+      "line_number": 67,
+      "severity": "high"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\tests\\libtest\\lib547.c",
+      "line_number": 49,
+      "severity": "high"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\tests\\libtest\\lib555.c",
+      "line_number": 53,
+      "severity": "high"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\tests\\server\\getpart.c",
+      "line_number": 396,
+      "severity": "high"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\tests\\server\\getpart.c",
+      "line_number": 402,
+      "severity": "high"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\tests\\server\\getpart.c",
+      "line_number": 408,
+      "severity": "high"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\tests\\server\\socksd.c",
+      "line_number": 104,
+      "severity": "high"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\tests\\server\\socksd.c",
+      "line_number": 105,
+      "severity": "high"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\tests\\server\\socksd.c",
+      "line_number": 106,
+      "severity": "high"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\tests\\server\\socksd.c",
+      "line_number": 139,
+      "severity": "high"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\tests\\server\\socksd.c",
+      "line_number": 147,
+      "severity": "high"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\tests\\server\\socksd.c",
+      "line_number": 151,
+      "severity": "high"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\tests\\server\\tftpd.c",
+      "line_number": 1366,
+      "severity": "high"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\tests\\server\\util.c",
+      "line_number": 708,
+      "severity": "high"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\tests\\unit\\unit3205.c",
+      "line_number": 564,
+      "severity": "high"
+    },
+    {
+      "rule": "SAFETY-01",
+      "description": "Unsafe string function (buffer overflow risk)",
+      "file_path": "test_packages\\curl\\tests\\unit\\unit3205.c",
+      "line_number": 566,
+      "severity": "high"
+    }
+  ]
+}
