@@ -35,12 +35,31 @@ Comprehensive CI/CD integration patterns including GitHub Actions, Jenkins, Azur
 
 ## 🔌 **API Documentation**
 
-### **[Complete API Overview](api/api-overview.md)**
-Comprehensive API documentation covering:
-- **MCP Server API** - Claude Code integration with tool coordination
-- **REST API** - HTTP-based analysis requests and reporting
-- **VS Code Extension API** - IDE integration with real-time analysis  
-- **CLI API** - Command-line interface with JSON/SARIF output
+**Complete, MECE-compliant API documentation:**
+
+### **[Quick Start Guide](tutorials/getting-started-quickstart.md)**
+Get running in 5 minutes - installation, first analysis, and basic fixes
+
+### **[API Reference](api/api-reference.md)**
+Complete interface documentation covering:
+- **CLI API** (`python -m analyzer.core`) - Command-line analysis with JSON/SARIF output
+- **MCP Server API** (`python -m mcp.cli`) - Enhanced MCP server for Claude Code integration  
+- **VS Code Extension API** - Internal interfaces and data types
+- **Configuration API** - Shared configuration interfaces
+
+### **[VS Code Extension Guide](api/vscode-extension-guide.md)**
+Extension development documentation:
+- Architecture and components
+- Service layer implementation
+- Provider patterns and features
+- Development workflow and customization
+
+### **[CLI Reference](api/cli-reference.md)**
+Complete command-line interface reference:
+- All commands and options
+- Output format specifications  
+- Exit codes and error handling
+- CI/CD integration examples
 
 ## 🛠️ **Key Features & Capabilities**
 
@@ -100,15 +119,20 @@ Comprehensive API documentation covering:
 
 ## 🎯 **Getting Started**
 
+**New to Connascence Analysis?** 
+→ **[Quick Start Guide](tutorials/getting-started-quickstart.md)** - Complete walkthrough in 5 minutes
+
 ### **For Developers**
-1. **VS Code Extension** - Install from `vscode-extension/connascence-safety-analyzer-1.0.0.vsix`
-2. **CLI Analysis** - `python -m analyzer.core --path . --policy nasa_jpl_pot10`
-3. **Real-time Integration** - Configure pre-commit hooks for immediate feedback
+1. **Quick Start** - Follow [Quick Start Guide](tutorials/getting-started-quickstart.md) 
+2. **VS Code Extension** - Install from `vscode-extension/connascence-safety-analyzer-1.0.0.vsix`
+3. **CLI Analysis** - `python -m analyzer.core --path . --policy nasa_jpl_pot10`
+4. **Development** - See [VS Code Extension Guide](api/vscode-extension-guide.md)
 
 ### **For DevOps Engineers** 
-1. **CI/CD Setup** - Follow [CI/CD Setup Guide](deployment/ci-cd-setup.md)
-2. **Policy Configuration** - Choose from NASA, strict-core, or enterprise-standard policies
-3. **Quality Gates** - Configure failure thresholds and notification systems
+1. **CLI Reference** - Complete command documentation: [CLI Reference](api/cli-reference.md)
+2. **CI/CD Setup** - Follow [CI/CD Setup Guide](deployment/ci-cd-setup.md)
+3. **API Integration** - See [API Reference](api/api-reference.md)
+4. **Policy Configuration** - Choose from NASA, strict-core, or enterprise-standard policies
 
 ### **For Enterprise**
 1. **Deployment Guide** - Follow [Enterprise Deployment Guide](deployment/enterprise-guide.md)  

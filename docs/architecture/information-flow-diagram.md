@@ -1,8 +1,9 @@
-# Connascence Analysis - Information Flow Architecture
+# Information Flow Architecture (Legacy)
 
-## System Information Flow Diagram
+**Status**: DEPRECATED - Replaced by [Data Flow Diagrams](./data-flow-diagrams.md)  
+**Migration**: See [Data Flow Diagrams](./data-flow-diagrams.md) for current system flows
 
-This document details how information flows through the Connascence Safety Analyzer system, from source code input through analysis processing to final reporting and CI/CD integration.
+## Legacy Information Flow Diagram
 
 ## 🏗️ **Complete Information Flow Architecture**
 
