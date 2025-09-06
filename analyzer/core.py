@@ -218,7 +218,7 @@ class ConnascenceAnalyzer:
                 'god_objects': []
             }
     
-    def _run_fallback_analysis(self, path: str, policy: str, **kwargs) -> Dict[str, Any]:
+    def _run_fallback_analysis(self, path: str, policy: str, duplication_result: Optional[Any] = None, **kwargs) -> Dict[str, Any]:
         """Run analysis using fallback analyzer."""
         try:
             path_obj = Path(path)

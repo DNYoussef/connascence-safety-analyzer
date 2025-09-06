@@ -30,7 +30,7 @@ def run_complete_analysis(codebase_path: str, output_dir: str):
         duplication_available = False
     
     # 1. NASA Safety Analysis
-    print("  1/4 NASA safety analysis...")
+    print("  1/5 NASA safety analysis...")
     try:
         # Run NASA Power of Ten analysis
         nasa_violations = []
@@ -90,7 +90,7 @@ def run_complete_analysis(codebase_path: str, output_dir: str):
         print(f"    FAILED: NASA safety analysis failed: {e}")
     
     # 2. Unified Duplication Analysis
-    print("  2/4 Unified duplication analysis...")
+    print("  2/5 Unified duplication analysis...")
     try:
         if duplication_available:
             # Use unified duplication analyzer
@@ -149,7 +149,7 @@ def run_complete_analysis(codebase_path: str, output_dir: str):
         print(f"    FAILED: Duplication analysis failed: {e}")
     
     # 4. MECE Duplication Analysis
-    print("  3/4 MECE duplication analysis...")
+    print("  3/5 MECE duplication analysis...")
     try:
         # MECE (Mutually Exclusive, Collectively Exhaustive) analysis
         mece_categories = {
@@ -232,7 +232,7 @@ def run_complete_analysis(codebase_path: str, output_dir: str):
         print(f"    FAILED: MECE analysis failed: {e}")
         
     # 4. Safety Analysis (C/C++ specific for curl)
-    print("  4/4 Safety analysis...")
+    print("  4/5 Safety analysis...")
     try:
         safety_violations = []
         
@@ -280,6 +280,31 @@ def run_complete_analysis(codebase_path: str, output_dir: str):
         
     except Exception as e:
         print(f"    FAILED: Safety analysis failed: {e}")
+    
+    # 5. Connascence Analysis (Core functionality)
+    print("  5/5 Connascence analysis...")
+    try:
+        from core import ConnascenceAnalyzer
+        
+        analyzer = ConnascenceAnalyzer()
+        results = analyzer.analyze_path(codebase_path)
+        
+        connascence_data = {
+            "analysis_type": "connascence",
+            "codebase": codebase_name,
+            "total_violations": len(results.get('violations', [])),
+            "violations": results.get('violations', []),
+            "coupling_types": results.get('coupling_types', {}),
+            "severity_breakdown": results.get('severity_breakdown', {}),
+            "files_analyzed": results.get('files_analyzed', 0)
+        }
+        
+        with open(output_path / f"{codebase_name}_connascence.json", 'w') as f:
+            json.dump(connascence_data, f, indent=2)
+        print(f"    SUCCESS: {len(results.get('violations', []))} connascence violations found")
+        
+    except Exception as e:
+        print(f"    FAILED: Connascence analysis failed: {e}")
     
     print(f"Complete analysis finished for {codebase_name}")
     print(f"Generated files in {output_path}:")

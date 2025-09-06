@@ -216,7 +216,7 @@ python -m analyzer.core --path . --policy nasa_jpl_pot10
 python -m analyzer.core --path . --format json --output analysis.json
 
 # Duplication-only analysis with custom threshold
-python -m analyzer.core --path . --duplication-threshold 0.8 --no-connascence
+python -m analyzer.core --path . --duplication-threshold 0.8 --no-duplication
 
 # SARIF output for GitHub Code Scanning
 python -m analyzer.core --path . --format sarif --output results.sarif

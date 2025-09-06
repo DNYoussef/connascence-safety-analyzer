@@ -2,5 +2,8 @@
   "analysis_type": "connascence",
   "codebase": "express",
   "total_violations": 0,
-  "violations": []
+  "violations": [],
+  "coupling_types": {},
+  "severity_breakdown": {},
+  "files_analyzed": 0
 }
