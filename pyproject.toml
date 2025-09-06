@@ -70,7 +70,7 @@ Changelog = "https://github.com/connascence/connascence-analyzer/blob/main/CHANG
 "Commercial License" = "https://connascence.io/pricing"
 
 [project.scripts]
-connascence = "analyzer.core:main"
+connascence = "interfaces.cli.simple_cli:main"
 connascence-analyzer = "analyzer.core:main"
 
 [project.entry-points."mcp.servers"]
@@ -79,7 +79,7 @@ connascence = "mcp.server:main"
 # Tool Configuration
 
 [tool.setuptools]
-packages = ["analyzer", "cli", "autofix", "policy", "mcp", "utils", "security"]
+packages = ["analyzer", "interfaces", "autofix", "policy", "mcp", "utils", "security"]
 
 [tool.setuptools.package-data]
 # Include runtime files for all packages

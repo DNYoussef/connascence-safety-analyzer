@@ -1,0 +1,2423 @@
+{
+  "analysis_type": "nasa_safety",
+  "codebase": "",
+  "compliance_score": 0.655,
+  "total_violations": 345,
+  "violations": [
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "analyzer\\check_connascence.py",
+      "line_number": 157,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "analyzer\\check_connascence.py",
+      "line_number": 158,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "analyzer\\check_connascence.py",
+      "line_number": 450,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "analyzer\\check_connascence.py",
+      "line_number": 693,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "analyzer\\check_connascence.py",
+      "line_number": 712,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "analyzer\\context_analyzer.py",
+      "line_number": 189,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "analyzer\\context_analyzer.py",
+      "line_number": 289,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "analyzer\\context_analyzer.py",
+      "line_number": 400,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "analyzer\\context_analyzer.py",
+      "line_number": 490,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "analyzer\\core.py",
+      "line_number": 76,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "analyzer\\core.py",
+      "line_number": 159,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "analyzer\\core.py",
+      "line_number": 260,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "analyzer\\duplication_helper.py",
+      "line_number": 23,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "analyzer\\language_strategies.py",
+      "line_number": 200,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "analyzer\\language_strategies.py",
+      "line_number": 290,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "analyzer\\smart_integration_engine.py",
+      "line_number": 41,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-01",
+      "description": "Avoid goto statements",
+      "file_path": "analyzer\\smart_integration_engine.py",
+      "line_number": 133,
+      "severity": "high"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "analyzer\\smart_integration_engine.py",
+      "line_number": 232,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "analyzer\\smart_integration_engine.py",
+      "line_number": 326,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "analyzer\\smart_integration_engine.py",
+      "line_number": 332,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "analyzer\\smart_integration_engine.py",
+      "line_number": 395,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-01",
+      "description": "Avoid goto statements",
+      "file_path": "analyzer\\thresholds.py",
+      "line_number": 78,
+      "severity": "high"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "analyzer\\unified_analyzer.py",
+      "line_number": 216,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "analyzer\\unified_analyzer.py",
+      "line_number": 300,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "analyzer\\unified_analyzer.py",
+      "line_number": 368,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "autofix\\class_splits.py",
+      "line_number": 251,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "autofix\\core.py",
+      "line_number": 121,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "autofix\\core.py",
+      "line_number": 132,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "autofix\\magic_literals.py",
+      "line_number": 125,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-01",
+      "description": "Avoid goto statements",
+      "file_path": "autofix\\patch_generator.py",
+      "line_number": 458,
+      "severity": "high"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "autofix\\patch_generator.py",
+      "line_number": 635,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-01",
+      "description": "Avoid goto statements",
+      "file_path": "autofix\\tier_classifier.py",
+      "line_number": 138,
+      "severity": "high"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "autofix\\tier_classifier.py",
+      "line_number": 339,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "autofix\\tier_classifier.py",
+      "line_number": 340,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "autofix\\tier_classifier.py",
+      "line_number": 345,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "grammar\\ast_safe_refactoring.py",
+      "line_number": 342,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-01",
+      "description": "Avoid goto statements",
+      "file_path": "grammar\\constrained_generator.py",
+      "line_number": 189,
+      "severity": "high"
+    },
+    {
+      "rule": "NASA-01",
+      "description": "Avoid goto statements",
+      "file_path": "grammar\\constrained_generator.py",
+      "line_number": 190,
+      "severity": "high"
+    },
+    {
+      "rule": "NASA-01",
+      "description": "Avoid goto statements",
+      "file_path": "grammar\\constrained_generator.py",
+      "line_number": 279,
+      "severity": "high"
+    },
+    {
+      "rule": "NASA-01",
+      "description": "Avoid goto statements",
+      "file_path": "grammar\\constrained_generator.py",
+      "line_number": 327,
+      "severity": "high"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "grammar\\constrained_generator.py",
+      "line_number": 370,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-01",
+      "description": "Avoid goto statements",
+      "file_path": "grammar\\constrained_generator.py",
+      "line_number": 430,
+      "severity": "high"
+    },
+    {
+      "rule": "NASA-01",
+      "description": "Avoid goto statements",
+      "file_path": "grammar\\constrained_generator.py",
+      "line_number": 431,
+      "severity": "high"
+    },
+    {
+      "rule": "NASA-01",
+      "description": "Avoid goto statements",
+      "file_path": "grammar\\overlay_manager.py",
+      "line_number": 18,
+      "severity": "high"
+    },
+    {
+      "rule": "NASA-01",
+      "description": "Avoid goto statements",
+      "file_path": "grammar\\overlay_manager.py",
+      "line_number": 201,
+      "severity": "high"
+    },
+    {
+      "rule": "NASA-01",
+      "description": "Avoid goto statements",
+      "file_path": "grammar\\overlay_manager.py",
+      "line_number": 202,
+      "severity": "high"
+    },
+    {
+      "rule": "NASA-01",
+      "description": "Avoid goto statements",
+      "file_path": "grammar\\overlay_manager.py",
+      "line_number": 203,
+      "severity": "high"
+    },
+    {
+      "rule": "NASA-01",
+      "description": "Avoid goto statements",
+      "file_path": "grammar\\overlay_manager.py",
+      "line_number": 206,
+      "severity": "high"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "integrations\\build_flags_integration.py",
+      "line_number": 607,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "integrations\\consolidated_integrations.py",
+      "line_number": 96,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "integrations\\consolidated_integrations.py",
+      "line_number": 216,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-01",
+      "description": "Avoid goto statements",
+      "file_path": "integrations\\enhanced_linter_integration.py",
+      "line_number": 197,
+      "severity": "high"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "integrations\\enhanced_linter_integration.py",
+      "line_number": 352,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "integrations\\enhanced_linter_integration.py",
+      "line_number": 354,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "integrations\\enhanced_linter_integration.py",
+      "line_number": 356,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "integrations\\enhanced_linter_integration.py",
+      "line_number": 358,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "mcp\\enhanced_server.py",
+      "line_number": 235,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "mcp\\enhanced_server.py",
+      "line_number": 236,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "mcp\\enhanced_server.py",
+      "line_number": 244,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "mcp\\enhanced_server.py",
+      "line_number": 246,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "mcp\\enhanced_server.py",
+      "line_number": 253,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "mcp\\enhanced_server.py",
+      "line_number": 254,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "mcp\\enhanced_server.py",
+      "line_number": 255,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "mcp\\enhanced_server.py",
+      "line_number": 612,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "mcp\\server.py",
+      "line_number": 356,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "mcp\\server.py",
+      "line_number": 561,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "mcp\\server.py",
+      "line_number": 613,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "mcp\\server.py",
+      "line_number": 620,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "mcp\\server.py",
+      "line_number": 621,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "mcp\\server.py",
+      "line_number": 622,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "mcp\\server.py",
+      "line_number": 623,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "mcp\\server.py",
+      "line_number": 747,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "policy\\baselines.py",
+      "line_number": 119,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "policy\\baselines.py",
+      "line_number": 182,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "policy\\baselines.py",
+      "line_number": 290,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "policy\\baselines.py",
+      "line_number": 294,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "policy\\budgets.py",
+      "line_number": 180,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "policy\\budgets.py",
+      "line_number": 191,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "policy\\budgets.py",
+      "line_number": 257,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "policy\\budgets.py",
+      "line_number": 259,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "policy\\budgets.py",
+      "line_number": 261,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "policy\\budgets.py",
+      "line_number": 265,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "policy\\manager.py",
+      "line_number": 277,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "policy\\manager.py",
+      "line_number": 357,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "policy\\manager.py",
+      "line_number": 380,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "scripts\\analyze_duplication.py",
+      "line_number": 73,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "scripts\\architecture_visualizer.py",
+      "line_number": 133,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "scripts\\architecture_visualizer.py",
+      "line_number": 146,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "scripts\\architecture_visualizer.py",
+      "line_number": 172,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "scripts\\cleanup_markdown.py",
+      "line_number": 260,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "scripts\\compare_self_analysis.py",
+      "line_number": 176,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "scripts\\compare_self_analysis.py",
+      "line_number": 179,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "scripts\\compare_self_analysis.py",
+      "line_number": 182,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "scripts\\compare_self_analysis.py",
+      "line_number": 185,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "scripts\\comprehensive_analysis.py",
+      "line_number": 217,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "scripts\\consolidation_roadmap.py",
+      "line_number": 434,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-01",
+      "description": "Avoid goto statements",
+      "file_path": "scripts\\generate_complete_analysis.py",
+      "line_number": 82,
+      "severity": "high"
+    },
+    {
+      "rule": "NASA-01",
+      "description": "Avoid goto statements",
+      "file_path": "scripts\\generate_complete_analysis.py",
+      "line_number": 85,
+      "severity": "high"
+    },
+    {
+      "rule": "NASA-01",
+      "description": "Avoid goto statements",
+      "file_path": "scripts\\generate_complete_analysis_fixed.py",
+      "line_number": 48,
+      "severity": "high"
+    },
+    {
+      "rule": "NASA-01",
+      "description": "Avoid goto statements",
+      "file_path": "scripts\\generate_complete_analysis_fixed.py",
+      "line_number": 51,
+      "severity": "high"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "scripts\\generate_complete_analysis_fixed.py",
+      "line_number": 107,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "scripts\\generate_realistic_violations.py",
+      "line_number": 78,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "scripts\\generate_realistic_violations.py",
+      "line_number": 133,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "scripts\\intelligent_consolidation.py",
+      "line_number": 118,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "scripts\\intelligent_consolidation.py",
+      "line_number": 186,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "scripts\\intelligent_consolidation.py",
+      "line_number": 187,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "scripts\\quality_gate_evaluator.py",
+      "line_number": 236,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "scripts\\quality_gate_evaluator.py",
+      "line_number": 295,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "scripts\\quality_gate_evaluator.py",
+      "line_number": 298,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "scripts\\remove_unicode.py",
+      "line_number": 145,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "scripts\\reproduce_enterprise_demo.py",
+      "line_number": 509,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "scripts\\reproduce_enterprise_demo.py",
+      "line_number": 557,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "scripts\\reproduce_enterprise_demo.py",
+      "line_number": 611,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "scripts\\reproduce_enterprise_demo.py",
+      "line_number": 752,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "scripts\\reproduce_enterprise_demo.py",
+      "line_number": 857,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "scripts\\run_all_tests.py",
+      "line_number": 44,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "scripts\\run_all_tests.py",
+      "line_number": 380,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "scripts\\run_reproducible_verification.py",
+      "line_number": 198,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "scripts\\run_reproducible_verification.py",
+      "line_number": 223,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "scripts\\run_reproducible_verification.py",
+      "line_number": 280,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "scripts\\run_reproducible_verification.py",
+      "line_number": 281,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "scripts\\self_analysis_with_nasa_compliance.py",
+      "line_number": 138,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "scripts\\self_analysis_with_nasa_compliance.py",
+      "line_number": 257,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "scripts\\self_analysis_with_nasa_compliance.py",
+      "line_number": 259,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "scripts\\self_analysis_with_nasa_compliance.py",
+      "line_number": 280,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "scripts\\self_analysis_with_nasa_compliance.py",
+      "line_number": 370,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "scripts\\validate_consolidation.py",
+      "line_number": 122,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "scripts\\violation_heatmap_generator.py",
+      "line_number": 233,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "scripts\\violation_heatmap_generator.py",
+      "line_number": 234,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "security\\enterprise_security.py",
+      "line_number": 198,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "security\\enterprise_security.py",
+      "line_number": 716,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "security\\enterprise_security.py",
+      "line_number": 727,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "security\\enterprise_security.py",
+      "line_number": 738,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "security\\secure_auth_utils.py",
+      "line_number": 127,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "security\\secure_auth_utils.py",
+      "line_number": 186,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "security\\secure_auth_utils.py",
+      "line_number": 284,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "security\\secure_mcp_server.py",
+      "line_number": 104,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "security\\secure_mcp_server.py",
+      "line_number": 135,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "security\\secure_mcp_server.py",
+      "line_number": 425,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\test_autofix.py",
+      "line_number": 216,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\test_context_aware_detection.py",
+      "line_number": 183,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\test_enhanced_analysis.py",
+      "line_number": 382,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\test_license_validation_standalone.py",
+      "line_number": 53,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\test_license_validation_standalone.py",
+      "line_number": 55,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\test_license_validation_standalone.py",
+      "line_number": 64,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\test_performance_regression.py",
+      "line_number": 216,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\test_performance_regression.py",
+      "line_number": 310,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\test_refactored_architecture.py",
+      "line_number": 535,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\test_refactored_architecture.py",
+      "line_number": 539,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "analyzer\\ast_engine\\analyzer_orchestrator.py",
+      "line_number": 63,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "analyzer\\caching\\ast_cache.py",
+      "line_number": 160,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "analyzer\\caching\\ast_cache.py",
+      "line_number": 269,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "analyzer\\dup_detection\\mece_analyzer.py",
+      "line_number": 227,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "analyzer\\optimization\\ast_optimizer.py",
+      "line_number": 129,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "analyzer\\optimization\\ast_optimizer.py",
+      "line_number": 248,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "analyzer\\optimization\\ast_optimizer.py",
+      "line_number": 585,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "analyzer\\optimization\\incremental_analyzer.py",
+      "line_number": 249,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "analyzer\\optimization\\incremental_analyzer.py",
+      "line_number": 251,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "analyzer\\optimization\\incremental_analyzer.py",
+      "line_number": 448,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "analyzer\\optimization\\incremental_analyzer.py",
+      "line_number": 567,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "analyzer\\performance\\parallel_analyzer.py",
+      "line_number": 202,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "analyzer\\performance\\parallel_analyzer.py",
+      "line_number": 515,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "analyzer\\reporting\\markdown.py",
+      "line_number": 79,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-01",
+      "description": "Avoid goto statements",
+      "file_path": "grammar\\backends\\tree_sitter_backend.py",
+      "line_number": 406,
+      "severity": "high"
+    },
+    {
+      "rule": "NASA-01",
+      "description": "Avoid goto statements",
+      "file_path": "grammar\\backends\\tree_sitter_backend.py",
+      "line_number": 407,
+      "severity": "high"
+    },
+    {
+      "rule": "NASA-01",
+      "description": "Avoid goto statements",
+      "file_path": "grammar\\backends\\tree_sitter_backend.py",
+      "line_number": 408,
+      "severity": "high"
+    },
+    {
+      "rule": "NASA-01",
+      "description": "Avoid goto statements",
+      "file_path": "grammar\\backends\\tree_sitter_backend.py",
+      "line_number": 411,
+      "severity": "high"
+    },
+    {
+      "rule": "NASA-01",
+      "description": "Avoid goto statements",
+      "file_path": "grammar\\backends\\tree_sitter_backend.py",
+      "line_number": 412,
+      "severity": "high"
+    },
+    {
+      "rule": "NASA-01",
+      "description": "Avoid goto statements",
+      "file_path": "grammar\\backends\\tree_sitter_backend.py",
+      "line_number": 436,
+      "severity": "high"
+    },
+    {
+      "rule": "NASA-01",
+      "description": "Avoid goto statements",
+      "file_path": "grammar\\backends\\tree_sitter_backend.py",
+      "line_number": 458,
+      "severity": "high"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "grammar\\backends\\tree_sitter_backend.py",
+      "line_number": 483,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "interfaces\\cli\\main_python.py",
+      "line_number": 546,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "interfaces\\web\\charts.py",
+      "line_number": 104,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "interfaces\\web\\charts.py",
+      "line_number": 151,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "interfaces\\web\\charts.py",
+      "line_number": 413,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "interfaces\\web\\ci_integration.py",
+      "line_number": 341,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "interfaces\\web\\server_flask.py",
+      "line_number": 209,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "interfaces\\web\\server_flask.py",
+      "line_number": 210,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "scripts\\release\\bump_version.py",
+      "line_number": 37,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "scripts\\release\\generate_release_notes.py",
+      "line_number": 98,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_cli_workflows.py",
+      "line_number": 92,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_cli_workflows.py",
+      "line_number": 461,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_enterprise_scale.py",
+      "line_number": 483,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_enterprise_scale.py",
+      "line_number": 712,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_enterprise_scale.py",
+      "line_number": 713,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_enterprise_scale.py",
+      "line_number": 716,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_enterprise_scale.py",
+      "line_number": 733,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "tests\\e2e\\test_enterprise_scale.py",
+      "line_number": 796,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_enterprise_scale.py",
+      "line_number": 796,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_enterprise_scale.py",
+      "line_number": 797,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_enterprise_scale.py",
+      "line_number": 799,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_enterprise_scale.py",
+      "line_number": 933,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_enterprise_scale.py",
+      "line_number": 962,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_enterprise_scale.py",
+      "line_number": 1116,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_enterprise_scale.py",
+      "line_number": 1139,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_enterprise_scale.py",
+      "line_number": 1255,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_error_handling.py",
+      "line_number": 98,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_error_handling.py",
+      "line_number": 121,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_error_handling.py",
+      "line_number": 126,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_error_handling.py",
+      "line_number": 131,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_error_handling.py",
+      "line_number": 865,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_error_handling.py",
+      "line_number": 950,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_error_handling.py",
+      "line_number": 960,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_error_handling.py",
+      "line_number": 1000,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_error_handling.py",
+      "line_number": 1001,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_error_handling.py",
+      "line_number": 1002,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_error_handling.py",
+      "line_number": 1024,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_error_handling.py",
+      "line_number": 1040,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_error_handling.py",
+      "line_number": 1041,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_exit_codes.py",
+      "line_number": 126,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_exit_codes.py",
+      "line_number": 232,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_exit_codes.py",
+      "line_number": 653,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_exit_codes.py",
+      "line_number": 716,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_exit_codes.py",
+      "line_number": 743,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_exit_codes.py",
+      "line_number": 814,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_exit_codes.py",
+      "line_number": 829,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_exit_codes.py",
+      "line_number": 988,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_exit_codes.py",
+      "line_number": 995,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_exit_codes.py",
+      "line_number": 1003,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_exit_codes.py",
+      "line_number": 1102,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_memory_coordination.py",
+      "line_number": 301,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_performance.py",
+      "line_number": 137,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_performance.py",
+      "line_number": 438,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_performance.py",
+      "line_number": 439,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_performance.py",
+      "line_number": 588,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_performance.py",
+      "line_number": 589,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_performance.py",
+      "line_number": 590,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_performance.py",
+      "line_number": 812,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_performance.py",
+      "line_number": 838,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_performance.py",
+      "line_number": 839,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_performance.py",
+      "line_number": 840,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_performance.py",
+      "line_number": 1004,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_performance.py",
+      "line_number": 1024,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_performance.py",
+      "line_number": 1026,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_performance.py",
+      "line_number": 1027,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_performance.py",
+      "line_number": 1129,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_performance.py",
+      "line_number": 1162,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_performance.py",
+      "line_number": 1164,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_performance.py",
+      "line_number": 1241,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_performance.py",
+      "line_number": 1243,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_report_generation.py",
+      "line_number": 494,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_report_generation.py",
+      "line_number": 611,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_report_generation.py",
+      "line_number": 613,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_report_generation.py",
+      "line_number": 627,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_report_generation.py",
+      "line_number": 629,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "tests\\e2e\\test_report_generation.py",
+      "line_number": 630,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_report_generation.py",
+      "line_number": 630,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_report_generation.py",
+      "line_number": 664,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_report_generation.py",
+      "line_number": 721,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_report_generation.py",
+      "line_number": 724,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_report_generation.py",
+      "line_number": 725,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_report_generation.py",
+      "line_number": 726,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_report_generation.py",
+      "line_number": 738,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_report_generation.py",
+      "line_number": 760,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "tests\\e2e\\test_report_generation.py",
+      "line_number": 1032,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_repository_analysis.py",
+      "line_number": 932,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_repository_analysis.py",
+      "line_number": 933,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "tests\\e2e\\test_repository_analysis.py",
+      "line_number": 935,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_repository_analysis.py",
+      "line_number": 935,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_repository_analysis.py",
+      "line_number": 936,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_repository_analysis.py",
+      "line_number": 937,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_repository_analysis.py",
+      "line_number": 944,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_repository_analysis.py",
+      "line_number": 948,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_repository_analysis.py",
+      "line_number": 1018,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_repository_analysis.py",
+      "line_number": 1019,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_repository_analysis.py",
+      "line_number": 1020,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_repository_analysis.py",
+      "line_number": 1078,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_repository_analysis.py",
+      "line_number": 1079,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_repository_analysis.py",
+      "line_number": 1081,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_repository_analysis.py",
+      "line_number": 1092,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_sales_scenarios.py",
+      "line_number": 179,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\e2e\\test_sales_scenarios.py",
+      "line_number": 782,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\fixtures\\test_connascence_refactoring.py",
+      "line_number": 366,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\integration\\run_integration_tests.py",
+      "line_number": 418,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\integration\\run_integration_tests.py",
+      "line_number": 476,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\integration\\test_autofix_engine_integration.py",
+      "line_number": 488,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\integration\\test_autofix_engine_integration.py",
+      "line_number": 816,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\integration\\test_autofix_engine_integration.py",
+      "line_number": 817,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\integration\\test_autofix_engine_integration.py",
+      "line_number": 818,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\integration\\test_autofix_engine_integration.py",
+      "line_number": 819,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\integration\\test_cross_component_validation.py",
+      "line_number": 760,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\integration\\test_cross_component_validation.py",
+      "line_number": 785,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\integration\\test_mcp_server_integration.py",
+      "line_number": 322,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\integration\\test_mcp_server_integration.py",
+      "line_number": 328,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\integration\\test_mcp_server_integration.py",
+      "line_number": 367,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\integration\\test_workflow_integration.py",
+      "line_number": 92,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\integration\\test_workflow_integration.py",
+      "line_number": 93,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\integration\\test_workflow_integration.py",
+      "line_number": 609,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\integration\\test_workflow_integration.py",
+      "line_number": 655,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\integration\\test_workflow_integration.py",
+      "line_number": 656,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\integration\\test_workflow_integration.py",
+      "line_number": 657,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\integration\\test_workflow_integration.py",
+      "line_number": 1127,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\integration\\__init__.py",
+      "line_number": 92,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\integration\\__init__.py",
+      "line_number": 103,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\performance\\benchmark_runner.py",
+      "line_number": 409,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\performance\\benchmark_runner.py",
+      "line_number": 646,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\performance\\run_benchmarks.py",
+      "line_number": 263,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\performance\\run_benchmarks.py",
+      "line_number": 344,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\performance\\run_benchmarks.py",
+      "line_number": 369,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\performance\\run_benchmarks.py",
+      "line_number": 372,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\performance\\run_benchmarks.py",
+      "line_number": 375,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "tests\\performance\\simple_benchmark.py",
+      "line_number": 40,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\performance\\test_benchmarks.py",
+      "line_number": 398,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\performance\\validate_accuracy.py",
+      "line_number": 197,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\performance\\validate_accuracy.py",
+      "line_number": 198,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\performance\\validate_accuracy.py",
+      "line_number": 213,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\performance\\validate_accuracy.py",
+      "line_number": 263,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\performance\\validate_accuracy.py",
+      "line_number": 293,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\performance\\validate_accuracy.py",
+      "line_number": 341,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\performance\\validate_accuracy.py",
+      "line_number": 387,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\performance\\validate_accuracy.py",
+      "line_number": 453,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "tests\\performance\\validate_accuracy.py",
+      "line_number": 549,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "test_packages\\celery\\celery\\canvas.py",
+      "line_number": 905,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "test_packages\\celery\\celery\\utils\\functional.py",
+      "line_number": 174,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "test_packages\\celery\\examples\\eventlet\\webcrawler.py",
+      "line_number": 38,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "test_packages\\celery\\t\\integration\\test_canvas.py",
+      "line_number": 1105,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "test_packages\\celery\\t\\integration\\test_canvas.py",
+      "line_number": 2958,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "test_packages\\celery\\t\\integration\\test_canvas.py",
+      "line_number": 3024,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "test_packages\\celery\\t\\integration\\test_canvas.py",
+      "line_number": 3083,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "test_packages\\celery\\t\\integration\\test_canvas.py",
+      "line_number": 3566,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "test_packages\\celery\\t\\unit\\tasks\\test_stamping.py",
+      "line_number": 477,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "test_packages\\celery\\t\\unit\\tasks\\test_stamping.py",
+      "line_number": 483,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "test_packages\\celery\\t\\unit\\tasks\\test_stamping.py",
+      "line_number": 488,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "test_packages\\celery\\t\\unit\\tasks\\test_stamping.py",
+      "line_number": 489,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "test_packages\\celery\\t\\unit\\tasks\\test_stamping.py",
+      "line_number": 522,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "test_packages\\celery\\t\\unit\\tasks\\test_stamping.py",
+      "line_number": 555,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "test_packages\\celery\\t\\unit\\tasks\\test_stamping.py",
+      "line_number": 595,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "test_packages\\celery\\t\\unit\\tasks\\test_stamping.py",
+      "line_number": 596,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "test_packages\\celery\\t\\unit\\utils\\test_annotations.py",
+      "line_number": 13,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "test_packages\\celery\\t\\unit\\utils\\test_collections.py",
+      "line_number": 96,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "test_packages\\celery\\t\\unit\\utils\\test_collections.py",
+      "line_number": 97,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "test_packages\\celery\\t\\unit\\utils\\test_collections.py",
+      "line_number": 403,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "test_packages\\celery\\t\\unit\\utils\\test_functional.py",
+      "line_number": 50,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "test_packages\\celery\\t\\unit\\utils\\test_functional.py",
+      "line_number": 71,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "test_packages\\celery\\t\\unit\\utils\\test_saferepr.py",
+      "line_number": 47,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-08",
+      "description": "Limit expression complexity",
+      "file_path": "test_packages\\celery\\t\\unit\\utils\\test_saferepr.py",
+      "line_number": 160,
+      "severity": "medium"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "test_packages\\celery\\t\\unit\\bin\\proj\\pyramid_celery_app.py",
+      "line_number": 39,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "test_packages\\curl\\tests\\http\\test_17_ssl_use.py",
+      "line_number": 363,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "test_packages\\curl\\tests\\http\\test_17_ssl_use.py",
+      "line_number": 367,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "test_packages\\curl\\tests\\http\\test_17_ssl_use.py",
+      "line_number": 507,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "test_packages\\curl\\tests\\http\\test_17_ssl_use.py",
+      "line_number": 510,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "test_packages\\curl\\tests\\http\\test_17_ssl_use.py",
+      "line_number": 513,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "test_packages\\curl\\tests\\http\\test_17_ssl_use.py",
+      "line_number": 516,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "test_packages\\curl\\tests\\http\\test_17_ssl_use.py",
+      "line_number": 519,
+      "severity": "low"
+    },
+    {
+      "rule": "NASA-03",
+      "description": "Keep lines under 120 characters",
+      "file_path": "test_packages\\curl\\tests\\http\\testenv\\certs.py",
+      "line_number": 389,
+      "severity": "low"
+    }
+  ]
+}

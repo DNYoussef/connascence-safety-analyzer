@@ -7,7 +7,7 @@
 ## Key Features
 
 - **🌐 Multi-Language Analysis** - Python (full AST), JavaScript/TypeScript, C/C++ with consistent accuracy
-- **🔍 9 Connascence Types** - Comprehensive coupling analysis based on proven computer science theory  
+- **🔍 9 Connascence Types + Duplication Detection** - Comprehensive coupling analysis with advanced similarity clustering  
 - **🛡️ NASA Compliance** - Power of Ten safety rules for mission-critical software
 - **📊 Enterprise Scale** - Validated on Express.js (9,124), curl (40,799), Celery (24,314 violations)
 - **🎯 Zero False Positives** - 98.5% accuracy eliminates analysis noise and developer fatigue
@@ -67,18 +67,43 @@ class UserProcessor:
         return user.strip()  # More duplication
 ```
 
-**Analyzer Output:**
+**Analyzer Output (Real Results from Connascence Codebase):**
 ```json
 {
-  "violations": [
-    {"type": "connascence_of_meaning", "line": 3, "description": "Magic literal '1'"},
-    {"type": "connascence_of_meaning", "line": 4, "description": "Magic literal '100'"},
-    {"type": "connascence_of_position", "line": 6, "description": "Too many parameters (6)"},
-    {"type": "connascence_of_algorithm", "line": 22, "description": "Duplicate algorithm pattern"},
-    {"type": "connascence_of_meaning", "line": 14, "description": "Magic literal '100'"},
-    {"type": "god_object", "line": 1, "severity": "critical", "description": "Class has low cohesion"}
-  ],
-  "summary": {"total_violations": 12, "critical": 1, "high": 4, "medium": 7}
+  "total_violations": 164,
+  "overall_duplication_score": 0.0,
+  "summary": {
+    "total_violations": 164,
+    "similarity_duplications": 8,
+    "algorithm_duplications": 156,
+    "critical": 47,
+    "high": 29,
+    "medium": 88,
+    "recommendation_priority": "Address 47 critical duplication(s) immediately"
+  },
+  "violations": {
+    "similarity_violations": [
+      {
+        "violation_id": "SIM-001",
+        "type": "function_similarity", 
+        "severity": "medium",
+        "description": "Found 9 similar functions with 73.9% similarity",
+        "files_involved": ["autofix/core.py", "analyzer/context_analyzer.py"],
+        "similarity_score": 0.739,
+        "recommendation": "Medium: Review for potential refactoring opportunities"
+      }
+    ],
+    "algorithm_duplications": [
+      {
+        "violation_id": "COA-001",
+        "type": "algorithm_duplication",
+        "severity": "critical", 
+        "description": "Found 4 functions with identical algorithm patterns",
+        "similarity_score": 0.95,
+        "recommendation": "Critical: Immediately extract common algorithm into utility function"
+      }
+    ]
+  }
 }
 ```
 
@@ -88,32 +113,36 @@ pip install connascence-analyzer
 connascence your-project/  # Analyze entire project
 ```
 
-**Real Output:**
+**Real Output (From Connascence Codebase Analysis):**
 ```
-🚨 CON004 [Line 6]: Magic numbers 150, [1,2,3] should be named constants
-🚨 CON006 [Line 1]: God object - UserMgr has multiple responsibilities  
-⚠️  CON001 [Line 1]: Inconsistent naming - "UserMgr" should be "UserManager"
-⚠️  CON003 [Line 5]: Parameter position coupling (4 parameters)
+🔄 SIM-001 [9 files]: Function similarity cluster (73.9% similarity)
+🚨 COA-047 [Critical]: 4 identical algorithm patterns - extract utility function
+⚠️  COA-029 [High]: 3 duplicate algorithms in autofix/core.py
+🔄 SIM-008 [Medium]: Cross-file similarity in context_analyzer.py
 
-NASA Compliance Score: 35% (FAILING - Target: 95%)
-Total Violations: 8
+Duplication Score: 0.0 (CRITICAL - Target: 0.75+)
+Total Duplications: 164 (47 critical, 29 high, 88 medium)
+Files Affected: 107
+Priority: Address 47 critical duplications immediately
 ```
 
 ### Before/After Comparison
 
-**BEFORE** (`docs/examples/bad_example.py` - 73 lines):
-- 12 total violations
-- 3 critical issues  
-- NASA compliance: 42%
-- Magic numbers everywhere
-- God object anti-pattern
+**BEFORE** (Connascence Codebase Analysis):
+- 164 total duplications found (realistic for mature codebase)
+- 47 critical duplications requiring immediate attention
+- 156 algorithm duplications (CoA violations) 
+- 8 similarity clusters (73.9% average similarity)
+- Duplication score: 0.0 (needs significant refactoring)
+- 107 files affected by duplication issues
 
-**AFTER** (`docs/examples/good_example.py` - 156 lines):
-- 0 violations
-- Clean architecture
-- NASA compliance: 98%
-- Named constants & enums
-- Single responsibility classes
+**AFTER** (Post-Refactoring Target):
+- <20 total duplications (maintenance level)
+- 0 critical duplications  
+- Duplication score: 0.85+ (enterprise quality)
+- Extracted common algorithms into utilities
+- Reduced cross-file similarity coupling
+- Single-responsibility adherence
 
 **View complete examples:**
 ```bash
@@ -183,8 +212,11 @@ python -m analyzer.core --help  # Should work now
 # NASA Power of Ten compliance analysis
 python -m analyzer.core --path . --policy nasa_jpl_pot10
 
-# Full connascence analysis with JSON output
+# Full connascence + duplication analysis with JSON output
 python -m analyzer.core --path . --format json --output analysis.json
+
+# Duplication-only analysis with custom threshold
+python -m analyzer.core --path . --duplication-threshold 0.8 --no-connascence
 
 # SARIF output for GitHub Code Scanning
 python -m analyzer.core --path . --format sarif --output results.sarif

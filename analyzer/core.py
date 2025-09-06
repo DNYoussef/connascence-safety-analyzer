@@ -44,6 +44,19 @@ else:
     print("[WARNING] Unified analyzer not available, using fallback mode")
     UnifiedConnascenceAnalyzer = None
 
+# Import unified duplication analyzer
+try:
+    from .duplication_unified import UnifiedDuplicationAnalyzer
+    from .duplication_helper import format_duplication_analysis
+    DUPLICATION_ANALYZER_AVAILABLE = True
+except ImportError:
+    print("[WARNING] Unified duplication analyzer not available")
+    DUPLICATION_ANALYZER_AVAILABLE = False
+    UnifiedDuplicationAnalyzer = None
+    
+    def format_duplication_analysis(result):
+        return {'score': 1.0, 'violations': [], 'available': False}
+
 # Import MCP server components with unified strategy
 mcp_result = IMPORT_MANAGER.import_mcp_server()
 if mcp_result.has_module:
@@ -85,6 +98,12 @@ class ConnascenceAnalyzer:
     def __init__(self):
         self.version = "2.0.0"
         
+        # Initialize duplication analyzer
+        if DUPLICATION_ANALYZER_AVAILABLE:
+            self.duplication_analyzer = UnifiedDuplicationAnalyzer(similarity_threshold=0.7)
+        else:
+            self.duplication_analyzer = None
+        
         # Initialize the appropriate analyzer
         if UNIFIED_ANALYZER_AVAILABLE:
             self.unified_analyzer = UnifiedConnascenceAnalyzer()
@@ -109,6 +128,7 @@ class ConnascenceAnalyzer:
                     'summary': {'total_violations': 0},
                     'nasa_compliance': {'score': 0.0, 'violations': []},
                     'mece_analysis': {'score': 0.0, 'duplications': []},
+                    'duplication_analysis': {'score': 1.0, 'violations': []},
                     'god_objects': []
                 }
         except Exception as e:
@@ -119,18 +139,24 @@ class ConnascenceAnalyzer:
                 'summary': {'total_violations': 0},
                 'nasa_compliance': {'score': 0.0, 'violations': []},
                 'mece_analysis': {'score': 0.0, 'duplications': []},
+                'duplication_analysis': {'score': 1.0, 'violations': []},
                 'god_objects': []
             }
         
+        # Run duplication analysis if requested
+        duplication_result = None
+        if kwargs.get('include_duplication', True) and self.duplication_analyzer:
+            duplication_result = self.duplication_analyzer.analyze_path(path, comprehensive=True)
+        
         # Use real analysis based on available components
         if self.analysis_mode == "unified":
-            return self._run_unified_analysis(path, policy, **kwargs)
+            return self._run_unified_analysis(path, policy, duplication_result, **kwargs)
         elif self.analysis_mode == "fallback":
-            return self._run_fallback_analysis(path, policy, **kwargs)
+            return self._run_fallback_analysis(path, policy, duplication_result, **kwargs)
         else:
-            return self._run_mock_analysis(path, policy, **kwargs)
+            return self._run_mock_analysis(path, policy, duplication_result, **kwargs)
     
-    def _run_unified_analysis(self, path: str, policy: str, **kwargs) -> Dict[str, Any]:
+    def _run_unified_analysis(self, path: str, policy: str, duplication_result: Optional[Any] = None, **kwargs) -> Dict[str, Any]:
         """Run analysis using the unified analyzer pipeline."""
         try:
             start_time = time.time()
@@ -166,6 +192,7 @@ class ConnascenceAnalyzer:
                     'duplications': result.duplication_clusters,
                     'passing': result.duplication_score >= MECE_QUALITY_THRESHOLD
                 },
+                'duplication_analysis': format_duplication_analysis(duplication_result),
                 'god_objects': self._extract_god_objects(result.connascence_violations),
                 'metrics': {
                     'files_analyzed': result.files_analyzed,
@@ -376,6 +403,26 @@ def create_parser() -> argparse.ArgumentParser:
     )
     
     parser.add_argument(
+        '--duplication-analysis',
+        action='store_true',
+        default=True,
+        help='Enable unified duplication analysis (default: enabled)'
+    )
+    
+    parser.add_argument(
+        '--no-duplication',
+        action='store_true',
+        help='Disable duplication analysis'
+    )
+    
+    parser.add_argument(
+        '--duplication-threshold',
+        type=float,
+        default=0.7,
+        help='Similarity threshold for duplication detection (0.0-1.0, default: 0.7)'
+    )
+    
+    parser.add_argument(
         '--strict-mode',
         action='store_true',
         help='Enable strict analysis mode'
@@ -437,13 +484,22 @@ def main():
     else:
         policy = args.policy
     
+    # Handle duplication analysis options
+    include_duplication = args.duplication_analysis and not args.no_duplication
+    duplication_threshold = args.duplication_threshold
+    
+    if include_duplication and DUPLICATION_ANALYZER_AVAILABLE:
+        analyzer.duplication_analyzer.similarity_threshold = duplication_threshold
+    
     try:
         # Run analysis
         result = analyzer.analyze_path(
             path=args.path,
             policy=policy,
+            include_duplication=include_duplication,
+            duplication_threshold=duplication_threshold,
+            nasa_validation=args.nasa_validation,
             strict_mode=args.strict_mode,
-            exclude=args.exclude,
             enable_tool_correlation=args.enable_tool_correlation,
             confidence_threshold=args.confidence_threshold
         )

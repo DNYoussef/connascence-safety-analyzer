@@ -20,7 +20,16 @@ def run_complete_analysis(codebase_path: str, output_dir: str):
     
     print(f"Running complete analysis for {codebase_name}")
     
-    # 2. NASA Safety Analysis
+    # Import unified duplication analyzer
+    try:
+        sys.path.insert(0, str(project_root / "analyzer"))
+        from duplication_unified import UnifiedDuplicationAnalyzer
+        duplication_available = True
+    except ImportError:
+        print("Warning: Unified duplication analyzer not available")
+        duplication_available = False
+    
+    # 1. NASA Safety Analysis
     print("  1/4 NASA safety analysis...")
     try:
         # Run NASA Power of Ten analysis
@@ -80,60 +89,61 @@ def run_complete_analysis(codebase_path: str, output_dir: str):
     except Exception as e:
         print(f"    FAILED: NASA safety analysis failed: {e}")
     
-    # 3. Duplication Analysis
-    print("  2/4 Duplication analysis...")
+    # 2. Unified Duplication Analysis
+    print("  2/4 Unified duplication analysis...")
     try:
-        duplications = []
-        
-        # Simple duplication detection
-        file_contents = {}
-        function_signatures = {}
-        
-        for file_path in codebase_path_obj.rglob("**/*.py"):
-            try:
-                with open(file_path, 'r', encoding='utf-8') as f:
-                    content = f.read()
-                    lines = [line.strip() for line in content.split('\n') if line.strip()]
-                    
-                    # Look for duplicate function signatures
-                    for i, line in enumerate(lines):
-                        if line.startswith('def ') and len(line) > 20:
-                            signature = line[:50]  # First 50 chars
-                            if signature in function_signatures:
-                                duplications.append({
-                                    "type": "function_signature",
-                                    "pattern": signature,
-                                    "files": [function_signatures[signature], str(file_path)],
-                                    "severity": "medium"
-                                })
-                            else:
-                                function_signatures[signature] = str(file_path)
+        if duplication_available:
+            # Use unified duplication analyzer
+            analyzer = UnifiedDuplicationAnalyzer(similarity_threshold=0.7)
+            result = analyzer.analyze_path(codebase_path, comprehensive=True)
+            
+            if result.success:
+                # Export unified analysis
+                duplication_output = analyzer.export_results(result)
+                duplication_data = json.loads(duplication_output)
+                
+                with open(output_path / f"{codebase_name}_duplication.json", 'w') as f:
+                    json.dump(duplication_data, f, indent=2)
+                print(f"    SUCCESS: {result.total_violations} unified duplications found (score: {result.overall_duplication_score})")
+            else:
+                raise Exception(result.error or "Analysis failed")
+        else:
+            # Fallback to simple duplication detection
+            duplications = []
+            function_signatures = {}
+            
+            for file_path in codebase_path_obj.rglob("**/*.py"):
+                try:
+                    with open(file_path, 'r', encoding='utf-8') as f:
+                        content = f.read()
+                        lines = [line.strip() for line in content.split('\n') if line.strip()]
                         
-                        # Look for duplicate imports
-                        if line.startswith('import ') or line.startswith('from '):
-                            if line in file_contents:
-                                if file_contents[line] != str(file_path):
+                        # Look for duplicate function signatures
+                        for i, line in enumerate(lines):
+                            if line.startswith('def ') and len(line) > 20:
+                                signature = line[:50]  # First 50 chars
+                                if signature in function_signatures:
                                     duplications.append({
-                                        "type": "duplicate_import",
-                                        "pattern": line,
-                                        "files": [file_contents[line], str(file_path)],
-                                        "severity": "low"
+                                        "type": "function_signature",
+                                        "pattern": signature,
+                                        "files": [function_signatures[signature], str(file_path)],
+                                        "severity": "medium"
                                     })
-                            else:
-                                file_contents[line] = str(file_path)
-            except:
-                continue
-        
-        duplication_data = {
-            "analysis_type": "duplication",
-            "codebase": codebase_name,
-            "total_duplications": len(duplications),
-            "duplications": duplications[:100]  # Limit to first 100
-        }
-        
-        with open(output_path / f"{codebase_name}_duplication.json", 'w') as f:
-            json.dump(duplication_data, f, indent=2)
-        print(f"    SUCCESS: {len(duplications)} duplications found")
+                                else:
+                                    function_signatures[signature] = str(file_path)
+                except:
+                    continue
+            
+            duplication_data = {
+                "analysis_type": "duplication_fallback",
+                "codebase": codebase_name,
+                "total_duplications": len(duplications),
+                "duplications": duplications[:50]
+            }
+            
+            with open(output_path / f"{codebase_name}_duplication.json", 'w') as f:
+                json.dump(duplication_data, f, indent=2)
+            print(f"    SUCCESS: {len(duplications)} duplications found (fallback mode)")
         
     except Exception as e:
         print(f"    FAILED: Duplication analysis failed: {e}")
