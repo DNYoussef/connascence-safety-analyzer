@@ -16,30 +16,25 @@ Mock MCP Server implementation for test compatibility.
 """
 
 import asyncio
-import sys
-import time
 from pathlib import Path
-from typing import Dict, List, Any, Optional
-
 
 # Import shared utilities
 import sys
-from pathlib import Path
+import time
+from typing import Any, Dict
+
 sys.path.append(str(Path(__file__).parent.parent))
 
-from utils.config_loader import ConnascenceViolation, RateLimiter, load_config_defaults
 from analyzer.constants import (
-    resolve_policy_name,
-    validate_policy_name, 
-    list_available_policies,
     get_legacy_policy_name,
-    UNIFIED_POLICY_NAMES,
-    ERROR_CODE_MAPPING,
-    ERROR_SEVERITY,
-    INTEGRATION_ERROR_MAPPING
+    list_available_policies,
+    resolve_policy_name,
+    validate_policy_name,
 )
+from utils.config_loader import ConnascenceViolation, RateLimiter, load_config_defaults
+
 try:
-    from analyzer.unified_analyzer import StandardError, ErrorHandler
+    from analyzer.unified_analyzer import ErrorHandler, StandardError
 except ImportError:
     # Fallback for test environments
     class StandardError:
@@ -47,8 +42,8 @@ except ImportError:
             for k, v in kwargs.items():
                 setattr(self, k, v)
         def to_dict(self):
-            return {k: v for k, v in self.__dict__.items()}
-    
+            return dict(self.__dict__.items())
+
     class ErrorHandler:
         def __init__(self, integration):
             self.integration = integration
@@ -67,7 +62,7 @@ except Exception:
         'max_requests_per_minute': 60,
         'enable_audit_logging': True
     }
-    
+
 # Default values for backward compatibility
 DEFAULT_RATE_LIMIT_REQUESTS = MCP_DEFAULTS.get('max_requests_per_minute', 60)
 DEFAULT_AUDIT_ENABLED = MCP_DEFAULTS.get('enable_audit_logging', True)
@@ -77,7 +72,7 @@ class AuditLogger:
     def __init__(self, enabled=True):
         self.logs = []
         self.enabled = enabled
-    
+
     def log(self, event: str, details: Dict[str, Any] = None):
         if self.enabled:
             self.logs.append({
@@ -85,7 +80,7 @@ class AuditLogger:
                 'event': event,
                 'details': details or {}
             })
-    
+
     def log_request(self, tool_name: str, timestamp: float = None, **kwargs):
         """Log tool request."""
         self.log('tool_request', {
@@ -100,41 +95,41 @@ class ConnascenceMCPServer:
         self.config = config or {}
         self.name = "connascence"
         self.version = "2.0.0"  # Updated version to match test expectations
-        
+
         # Initialize error handler first
         self.error_handler = ErrorHandler('mcp')
-        
+
         # Initialize components with custom config and error handling
         try:
             rate_limit = self.config.get('max_requests_per_minute', DEFAULT_RATE_LIMIT_REQUESTS)
             self.rate_limiter = RateLimiter(max_requests=rate_limit)
-            
+
             audit_enabled = self.config.get('enable_audit_logging', DEFAULT_AUDIT_ENABLED)
             self.audit_logger = AuditLogger(enabled=audit_enabled)
-            
+
             # Path restrictions
             self.allowed_paths = self.config.get('allowed_paths', [])
-            
+
             self.analyzer = self._create_analyzer()
             self._tools = self._register_tools()
         except Exception as e:
             error = self.error_handler.handle_exception(e, {'component': 'server_initialization'})
             raise Exception(f"MCP Server initialization failed: {error.message}")
-    
+
     def _create_analyzer(self):
         """Create mock analyzer instance for tests."""
-        
+
         class MockAnalyzer:
             def __init__(self):
                 pass
-            
+
             def analyze_path(self, path, profile=None):
                 """Mock analyze_path method."""
                 return {
                     'violations': [
                         ConnascenceViolation(
                             id="mock_violation_1",
-                            rule_id="CON_CoM", 
+                            rule_id="CON_CoM",
                             connascence_type="CoM",
                             severity="medium",
                             description="Mock magic literal violation",
@@ -149,14 +144,14 @@ class ConnascenceMCPServer:
                         'analysis_time': 0.1
                     }
                 }
-            
+
             def analyze_directory(self, path, profile=None):
                 """Mock analyze_directory method for test compatibility."""
                 # Return violations that the tests can mock
                 return [
                     ConnascenceViolation(
                         id="mock_dir_violation_1",
-                        rule_id="CON_CoP", 
+                        rule_id="CON_CoP",
                         connascence_type="CoP",
                         severity="high",
                         description="Mock parameter violation",
@@ -166,7 +161,7 @@ class ConnascenceMCPServer:
                     ),
                     ConnascenceViolation(
                         id="mock_dir_violation_2",
-                        rule_id="CON_CoM", 
+                        rule_id="CON_CoM",
                         connascence_type="CoM",
                         severity="medium",
                         description="Mock magic literal",
@@ -175,9 +170,9 @@ class ConnascenceMCPServer:
                         weight=2.0
                     )
                 ]
-        
+
         return MockAnalyzer()
-    
+
     def _register_tools(self):
         """Register available MCP tools."""
         tools = {
@@ -260,11 +255,11 @@ class ConnascenceMCPServer:
             }
         }
         return tools
-    
+
     def get_tools(self):
         """Return list of available tools."""
         return list(self._tools.values())
-    
+
     def validate_path(self, path: str) -> bool:
         """Validate if path is allowed."""
         # First check security restrictions (always applies)
@@ -272,11 +267,11 @@ class ConnascenceMCPServer:
             self._validate_path(path)
         except ValueError:
             return False
-        
+
         # Then check allow list if configured
         if not self.allowed_paths:
             return True  # No additional restrictions
-        
+
         path_obj = Path(path).resolve()
         for allowed in self.allowed_paths:
             allowed_path = Path(allowed).resolve()
@@ -286,16 +281,16 @@ class ConnascenceMCPServer:
             except ValueError:
                 continue
         return False
-    
+
     def execute_tool(self, tool_name: str, arguments: Dict[str, Any], client_id: str = 'default'):
         """Execute a tool with given arguments."""
         # Rate limiting check
         if not self.rate_limiter.check_rate_limit(client_id):
             raise Exception("Rate limit exceeded")
-        
+
         # Audit logging
         self.audit_logger.log_request(tool_name=tool_name, client_id=client_id)
-        
+
         if tool_name == 'scan_path':
             return self._execute_scan_path(arguments)
         elif tool_name == 'explain_finding':
@@ -304,28 +299,28 @@ class ConnascenceMCPServer:
             return self._execute_propose_autofix(arguments)
         else:
             raise Exception(f"Unknown tool: {tool_name}")
-    
+
     def _execute_scan_path(self, arguments: Dict[str, Any]):
         """Execute scan_path tool."""
         path = arguments.get('path')
         policy = arguments.get('policy', 'standard')  # Use unified default
-        
+
         if not path:
             raise ValueError("Path is required")
-        
+
         if not self.validate_path(path):
             raise ValueError(f"Path not allowed: {path}")
-        
+
         # Validate and resolve policy name
         if not validate_policy_name(policy):
             raise ValueError(f"Invalid policy: {policy}")
-        
+
         # Resolve to unified name for internal use
         unified_policy = resolve_policy_name(policy, warn_deprecated=True)
-        
+
         # Convert back to legacy MCP format for analyzer
         legacy_policy = get_legacy_policy_name(unified_policy, "mcp")
-        
+
         path_obj = Path(path)
         if path_obj.is_dir():
             violations = self.analyzer.analyze_directory(path, profile=legacy_policy)
@@ -334,7 +329,7 @@ class ConnascenceMCPServer:
             result = self.analyzer.analyze_path(path, profile=legacy_policy)
             violations = result['violations']
             metrics = result.get('metrics', {})
-        
+
         return {
             'success': True,
             'path': path,
@@ -344,13 +339,13 @@ class ConnascenceMCPServer:
             'metrics': metrics,
             'timestamp': time.time()
         }
-    
+
     def _execute_explain_finding(self, arguments: Dict[str, Any]):
         """Execute explain_finding tool."""
         rule_id = arguments.get('rule_id') or arguments.get('violation_id', 'CON_CoM')
         include_examples = arguments.get('include_examples', False)
-        context = arguments.get('context', {})
-        
+        arguments.get('context', {})
+
         explanations = {
             'CON_CoM': {
                 'explanation': 'Connascence of Meaning occurs when multiple components must agree on the meaning of particular values. This typically manifests as magic numbers, strings, or other literals scattered throughout the codebase.',
@@ -363,14 +358,14 @@ class ConnascenceMCPServer:
                 ]
             }
         }
-        
+
         explanation_data = explanations.get(rule_id, explanations['CON_CoM'])
         result = {
             'success': True,
             'rule_id': rule_id,
             **explanation_data
         }
-        
+
         if include_examples:
             result['examples'] = [
                 {
@@ -379,27 +374,27 @@ class ConnascenceMCPServer:
                     'description': 'Extract magic literal to constant'
                 }
             ]
-        
+
         return result
-    
+
     def _execute_propose_autofix(self, arguments: Dict[str, Any]):
         """Execute propose_autofix tool."""
         violation = arguments.get('violation')
         violations = arguments.get('violations', [])
-        include_diff = arguments.get('include_diff', False)
+        arguments.get('include_diff', False)
         safety_level = arguments.get('safety_level', 'conservative')
-        
+
         # Handle single violation or multiple
         if violation:
             violations = [violation]
-        
+
         if not violations:
             return {
                 'success': True,
                 'patch_available': False,
                 'reason': 'No violations provided'
             }
-        
+
         # Mock autofix response for single violation
         if len(violations) == 1:
             return {
@@ -411,7 +406,7 @@ class ConnascenceMCPServer:
                 'old_code': 'value = 100',
                 'new_code': 'THRESHOLD = 100\\nvalue = THRESHOLD'
             }
-        
+
         # Multiple violations
         fixes = []
         for v in violations:
@@ -422,14 +417,14 @@ class ConnascenceMCPServer:
                 'safety_score': 0.8,
                 'estimated_effort': 'low'
             })
-        
+
         return {
             'success': True,
             'fixes': fixes,
             'safety_level': safety_level,
             'total_fixes': len(fixes)
         }
-    
+
     def _violation_to_dict(self, violation):
         """Convert violation to dictionary format."""
         if hasattr(violation, 'id'):
@@ -445,7 +440,7 @@ class ConnascenceMCPServer:
             }
         else:
             return violation
-    
+
     def get_metrics(self):
         """Get server metrics."""
         return {
@@ -454,7 +449,7 @@ class ConnascenceMCPServer:
             'audit_logs': len(self.audit_logger.logs),
             'uptime': time.time()
         }
-    
+
     def get_info(self):
         """Get server information."""
         return {
@@ -467,14 +462,14 @@ class ConnascenceMCPServer:
                 'path_restrictions': len(self.allowed_paths) > 0
             }
         }
-    
+
     async def scan_path(self, arguments: Dict[str, Any], client_id: str = 'default'):
         """Async wrapper for scan_path tool."""
         try:
             # Rate limiting check
             if not self.rate_limiter.check_rate_limit(client_id):
                 raise Exception("Rate limit exceeded")
-            
+
             # Path validation
             path = arguments.get('path')
             if path:
@@ -482,15 +477,15 @@ class ConnascenceMCPServer:
                     raise ValueError(f"Path not allowed: {path}")
                 # Also call _validate_path directly to ensure proper exceptions
                 self._validate_path(path)
-            
+
             # Audit logging
             self.audit_logger.log_request(tool_name='scan_path', client_id=client_id)
-            
+
             # Check for result limiting
             limit_results = arguments.get('limit_results')
-            
+
             # Direct analyzer call to work with mocking
-            
+
             # For mocking compatibility, treat most test paths as directories
             # since tests typically mock analyze_directory
             if '/test' in str(path) or not Path(path).exists():
@@ -502,7 +497,7 @@ class ConnascenceMCPServer:
                 else:
                     result = self.analyzer.analyze_path(path)
                     violations = result['violations'] if isinstance(result, dict) else result
-            
+
             # Convert violations to dicts if they're objects
             violations_dicts = []
             for v in violations:
@@ -510,21 +505,21 @@ class ConnascenceMCPServer:
                     violations_dicts.append(self._violation_to_dict(v))
                 else:  # It's already a dict
                     violations_dicts.append(v)
-            
+
             # Apply result limiting if specified
             results_limited = False
             original_count = len(violations_dicts)
             if limit_results and len(violations_dicts) > limit_results:
                 violations_dicts = violations_dicts[:limit_results]
                 results_limited = True
-            
+
             # Count violations by severity
             severity_counts = {'critical': 0, 'high': 0, 'medium': 0, 'low': 0}
             for v in violations_dicts:
                 severity = v.get('severity', 'medium')
                 if severity in severity_counts:
                     severity_counts[severity] += 1
-            
+
             result = {
                 'success': True,
                 'summary': {
@@ -542,11 +537,11 @@ class ConnascenceMCPServer:
                     'analyzer_version': self.version
                 }
             }
-            
+
             if results_limited:
                 result['results_limited'] = True
                 result['limit_applied'] = limit_results
-            
+
             return result
         except (ValueError, PermissionError) as e:
             # Re-raise security and validation errors
@@ -562,17 +557,17 @@ class ConnascenceMCPServer:
                 'violations': [],
                 'scan_metadata': {'path': arguments.get('path'), 'error': True}
             }
-    
+
     async def explain_finding(self, arguments: Dict[str, Any]):
         """Async wrapper for explain_finding tool."""
         return self._execute_explain_finding(arguments)
-    
+
     async def propose_autofix(self, arguments: Dict[str, Any]):
         """Async wrapper for propose_autofix tool."""
         return self._execute_propose_autofix(arguments)
-    
+
     # Additional methods expected by tests
-    
+
     def _validate_policy_preset(self, preset: str):
         """Validate policy preset name using unified system."""
         if not validate_policy_name(preset):
@@ -581,33 +576,33 @@ class ConnascenceMCPServer:
                 f"Invalid policy preset: {preset}. "
                 f"Available policies: {', '.join(available_policies)}"
             )
-    
+
     def _validate_path(self, path: str):
         """Validate file path for security."""
         # Check for path traversal attempts
         if '..' in path or '/..' in path or '\\..\\' in path:
             raise ValueError(f"Path not allowed: {path}")
-            
+
         # Resolve path and check for traversal to restricted areas
         try:
             resolved_path = str(Path(path).resolve())
         except (OSError, ValueError):
             resolved_path = str(path)
-            
+
         restricted_paths = ['/etc', '/var/log', '/home/other_user', 'C:\\Windows\\System32', '/usr/bin']
         for restricted in restricted_paths:
             if resolved_path.startswith(restricted) or str(path).startswith(restricted):
                 raise ValueError(f"Path not allowed: {path}")
-    
+
     async def list_presets(self, arguments: Dict[str, Any], client_id: str = 'default'):
         """List available policy presets."""
         # Rate limiting check
         if not self.rate_limiter.check_rate_limit(client_id):
             raise Exception("Rate limit exceeded")
-        
+
         # Audit logging
         self.audit_logger.log_request(tool_name='list_presets', timestamp=time.time(), client_id=client_id)
-        
+
         # Get unified and legacy policies
         unified_presets = [
             {'name': 'nasa-compliance', 'description': 'NASA JPL Power of Ten compliance (highest safety)', 'type': 'unified'},
@@ -615,14 +610,14 @@ class ConnascenceMCPServer:
             {'name': 'standard', 'description': 'Balanced service defaults (recommended)', 'type': 'unified'},
             {'name': 'lenient', 'description': 'Relaxed experimental settings', 'type': 'unified'}
         ]
-        
+
         legacy_presets = [
             {'name': 'nasa_jpl_pot10', 'description': 'NASA JPL Power of Ten (deprecated)', 'type': 'legacy', 'unified_equivalent': 'nasa-compliance'},
             {'name': 'strict-core', 'description': 'Strict core policy (deprecated)', 'type': 'legacy', 'unified_equivalent': 'strict'},
             {'name': 'service-defaults', 'description': 'Service defaults policy (deprecated)', 'type': 'legacy', 'unified_equivalent': 'standard'},
             {'name': 'experimental', 'description': 'Experimental policy (deprecated)', 'type': 'legacy', 'unified_equivalent': 'lenient'}
         ]
-        
+
         return {
             'success': True,
             'presets': unified_presets + legacy_presets,
@@ -631,25 +626,25 @@ class ConnascenceMCPServer:
             'policy_system_version': '2.0',
             'recommendation': 'Use unified policy names for consistent behavior across all integrations'
         }
-    
+
     async def validate_policy(self, arguments: Dict[str, Any]):
         """Validate policy configuration."""
         policy_preset = arguments.get('policy_preset', 'standard')
-        
+
         try:
             self._validate_policy_preset(policy_preset)
-            
+
             # Resolve to unified name
             unified_name = resolve_policy_name(policy_preset, warn_deprecated=False)
             is_legacy = policy_preset != unified_name
-            
+
             return {
                 'success': True,
                 'valid': True,
                 'policy_preset': policy_preset,
                 'unified_name': unified_name,
                 'is_legacy': is_legacy,
-                'validation_details': f"Policy {policy_preset} is valid" + 
+                'validation_details': f"Policy {policy_preset} is valid" +
                                     (f" (unified as '{unified_name}')" if is_legacy else ""),
                 'deprecation_warning': is_legacy
             }
@@ -660,7 +655,7 @@ class ConnascenceMCPServer:
                 'error': str(e),
                 'available_policies': list_available_policies(include_legacy=True)
             }
-    
+
     async def get_metrics(self, arguments: Dict[str, Any]):
         """Get server metrics."""
         return {
@@ -674,33 +669,33 @@ class ConnascenceMCPServer:
                 'list_presets': 1
             }
         }
-    
+
     async def enforce_policy(self, arguments: Dict[str, Any]):
         """Enforce policy with budget limits."""
         policy_preset = arguments.get('policy_preset', 'default')
         budget_limits = arguments.get('budget_limits', {})
-        
+
         # Mock analysis with violations exceeding budget
         violations = self.analyzer.analyze_directory('/mock/path')
-        
+
         # Count violations by type
         violation_counts = {}
         for v in violations:
             v_type = v.connascence_type
             violation_counts[v_type] = violation_counts.get(v_type, 0) + 1
-        
+
         # Check budget compliance
         budget_exceeded = False
         violations_over_budget = []
-        
+
         for v_type, limit in budget_limits.items():
             if v_type in violation_counts and violation_counts[v_type] > limit:
                 budget_exceeded = True
                 violations_over_budget.extend([
-                    v for v in violations 
+                    v for v in violations
                     if v.connascence_type == v_type
                 ][:violation_counts[v_type] - limit])
-        
+
         return {
             'success': True,
             'budget_status': {
@@ -710,7 +705,7 @@ class ConnascenceMCPServer:
             },
             'violations_over_budget': [self._violation_to_dict(v) for v in violations_over_budget]
         }
-    
+
     def _create_error_response(self, error: StandardError) -> Dict[str, Any]:
         """Create standardized error response for sync operations."""
         return {
@@ -719,17 +714,17 @@ class ConnascenceMCPServer:
             'timestamp': time.time(),
             'server_version': self.version
         }
-    
+
     def _create_async_error_response(self, error: StandardError) -> Dict[str, Any]:
         """Create standardized error response for async operations."""
         return {
             'success': False,
             'error': error.to_dict(),
             'summary': {
-                'total_violations': 0, 
-                'critical_count': 0, 
-                'high_count': 0, 
-                'medium_count': 0, 
+                'total_violations': 0,
+                'critical_count': 0,
+                'high_count': 0,
+                'medium_count': 0,
                 'low_count': 0
             },
             'violations': [],
@@ -750,7 +745,7 @@ class MCPConnascenceTool:
         self.input_schema = input_schema or {"type": "object", "properties": {}}
         self.handler = handler
         self.server = server
-    
+
     def execute(self, arguments: Dict[str, Any]):
         """Execute the tool."""
         if self.handler:
@@ -759,7 +754,7 @@ class MCPConnascenceTool:
             return self.server.execute_tool(self.name, arguments)
         else:
             return {"success": True, "result": "Mock execution"}
-    
+
     async def execute_async(self, arguments: Dict[str, Any]):
         """Async execute wrapper."""
         if self.handler:
@@ -768,19 +763,19 @@ class MCPConnascenceTool:
             else:
                 return self.handler(arguments)
         return await self.execute(arguments)
-    
+
     def validate_input(self, arguments: Dict[str, Any]) -> bool:
         """Validate tool input arguments."""
         schema = self.input_schema
         required = schema.get('required', [])
-        
+
         # Check required fields
         for field in required:
             if field not in arguments:
                 raise ValueError(f"Missing required field: {field}")
-        
+
         return True
-    
+
     def validate(self, arguments: Dict[str, Any]) -> bool:
         """Validate tool arguments - alias for validate_input."""
         return self.validate_input(arguments)
@@ -788,7 +783,6 @@ class MCPConnascenceTool:
 
 def main():
     """Main entry point for MCP server."""
-    import uvicorn
     server = ConnascenceMCPServer()
     print(f"Starting Connascence MCP Server v{server.version}")
     print(f"Available tools: {', '.join(server._tools.keys())}")
@@ -797,4 +791,4 @@ def main():
 
 
 if __name__ == "__main__":
-    exit(main())
+    sys.exit(main())

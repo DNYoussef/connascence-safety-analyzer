@@ -18,18 +18,20 @@ Integration Test Data Fixtures and Mock Scenarios
 Provides comprehensive test data and mock scenarios for integration testing
 """
 
-import pytest
+import asyncio
+from dataclasses import dataclass
 import json
+from pathlib import Path
 import tempfile
 import time
-from pathlib import Path
-from typing import Dict, List, Any, Tuple
-from dataclasses import dataclass
-import asyncio
-from unittest.mock import Mock, AsyncMock
+from typing import Any, Dict, List
+from unittest.mock import Mock
+
+import pytest
 
 # Import memory coordination
-from . import store_integration_result, INTEGRATION_COORDINATOR
+from . import store_integration_result
+
 
 @dataclass
 class TestScenario:
@@ -43,29 +45,29 @@ class TestScenario:
 
 class IntegrationTestDataManager:
     """Manages test data and mock scenarios for integration tests"""
-    
+
     def __init__(self):
         self.scenarios = {}
         self.test_workspaces = {}
         self.mock_data_cache = {}
-        
+
     def create_scenario(self, scenario: TestScenario):
         """Create and register a test scenario"""
         self.scenarios[scenario.name] = scenario
-        
+
     def get_scenario(self, name: str) -> TestScenario:
         """Get test scenario by name"""
         return self.scenarios.get(name)
-        
+
     def create_test_workspace(self, scenario_name: str) -> Path:
         """Create test workspace for scenario"""
         workspace = Path(tempfile.mkdtemp(prefix=f'integration_test_{scenario_name}_'))
         self.test_workspaces[scenario_name] = workspace
         return workspace
-        
+
     def populate_workspace_with_violations(self, workspace: Path, violation_types: List[str]):
         """Populate workspace with files containing specific violation types"""
-        
+
         violation_code_templates = {
             'CoP': '''
 def function_with_too_many_params(a, b, c, d, e, f, g, h, i, j):
@@ -78,7 +80,7 @@ def function_with_magic_literals():
     threshold = 100  # Magic number
     rate = 0.08  # Magic number
     timeout = 5000  # Magic number
-    
+
     if threshold > 50:
         return rate * timeout
     return 0
@@ -86,7 +88,7 @@ def function_with_magic_literals():
             'CoA': '''
 class GodClass:
     """Class with too many methods - architectural violation"""
-    
+
     def method_01(self): pass
     def method_02(self): pass
     def method_03(self): pass
@@ -117,12 +119,12 @@ class GodClass:
 def function_without_type_hints(data, options, callback):
     """Function lacking type hints - type violation"""
     result = []
-    
+
     for item in data:
         if item.is_valid():
             processed = callback(item, options)
             result.append(processed)
-            
+
     return result
 
 def another_untyped_function(param1, param2):
@@ -168,17 +170,17 @@ def calculate_discount_standard(price):
     return price * (1 - base_rate)  # Same fallback
 '''
         }
-        
+
         # Create source directory
         src_dir = workspace / 'src'
         src_dir.mkdir(exist_ok=True)
-        
+
         # Create files with requested violations
         for i, violation_type in enumerate(violation_types):
             if violation_type in violation_code_templates:
                 filename = f'{violation_type.lower()}_violations.py'
                 filepath = src_dir / filename
-                
+
                 code = f'''#!/usr/bin/env python3
 """
 Test file containing {violation_type} violations
@@ -191,12 +193,12 @@ Generated for integration testing
 def helper_function():
     """Helper function for testing"""
     return "test"
-    
+
 if __name__ == "__main__":
     print("Integration test file")
 '''
                 filepath.write_text(code)
-                
+
         # Create configuration file
         config_file = workspace / 'connascence_config.json'
         config_file.write_text(json.dumps({
@@ -215,7 +217,7 @@ if __name__ == "__main__":
                 'total_violations': 25
             }
         }, indent=2))
-        
+
         return workspace
 
 # Pre-defined test scenarios
@@ -223,7 +225,7 @@ TEST_DATA_MANAGER = IntegrationTestDataManager()
 
 def create_standard_scenarios():
     """Create standard integration test scenarios"""
-    
+
     # Simple MCP Integration Scenario
     TEST_DATA_MANAGER.create_scenario(TestScenario(
         name='simple_mcp_integration',
@@ -241,7 +243,7 @@ def create_standard_scenarios():
         },
         complexity='simple'
     ))
-    
+
     # Moderate Autofix Workflow Scenario
     TEST_DATA_MANAGER.create_scenario(TestScenario(
         name='autofix_workflow',
@@ -261,7 +263,7 @@ def create_standard_scenarios():
         },
         complexity='moderate'
     ))
-    
+
     # Complex System Integration Scenario
     TEST_DATA_MANAGER.create_scenario(TestScenario(
         name='complete_system_integration',
@@ -283,7 +285,7 @@ def create_standard_scenarios():
         },
         complexity='complex'
     ))
-    
+
     # Performance Stress Test Scenario
     TEST_DATA_MANAGER.create_scenario(TestScenario(
         name='performance_stress_test',
@@ -304,7 +306,7 @@ def create_standard_scenarios():
         },
         complexity='complex'
     ))
-    
+
     # Error Handling Scenario
     TEST_DATA_MANAGER.create_scenario(TestScenario(
         name='error_handling_integration',
@@ -337,9 +339,9 @@ def simple_integration_workspace():
     """Create simple integration test workspace"""
     workspace = TEST_DATA_MANAGER.create_test_workspace('simple_integration')
     TEST_DATA_MANAGER.populate_workspace_with_violations(workspace, ['CoM', 'CoP'])
-    
+
     yield workspace
-    
+
     # Cleanup
     import shutil
     shutil.rmtree(workspace, ignore_errors=True)
@@ -348,11 +350,11 @@ def simple_integration_workspace():
 def complex_integration_workspace():
     """Create complex integration test workspace"""
     workspace = TEST_DATA_MANAGER.create_test_workspace('complex_integration')
-    TEST_DATA_MANAGER.populate_workspace_with_violations(workspace, 
+    TEST_DATA_MANAGER.populate_workspace_with_violations(workspace,
         ['CoM', 'CoP', 'CoA', 'CoT', 'nesting', 'duplicate'])
-    
+
     yield workspace
-    
+
     # Cleanup
     import shutil
     shutil.rmtree(workspace, ignore_errors=True)
@@ -361,40 +363,40 @@ def complex_integration_workspace():
 def performance_test_workspace():
     """Create performance testing workspace with many violations"""
     workspace = TEST_DATA_MANAGER.create_test_workspace('performance_test')
-    
+
     # Create multiple files with violations for stress testing
     violation_types = ['CoM', 'CoP', 'CoA', 'CoT', 'nesting']
-    
+
     for i in range(4):  # Create 4 copies of each violation type
         TEST_DATA_MANAGER.populate_workspace_with_violations(
-            workspace, 
+            workspace,
             [vtype + f'_{i}' if vtype in violation_types else vtype for vtype in violation_types]
         )
-    
+
     yield workspace
-    
+
     # Cleanup
     import shutil
     shutil.rmtree(workspace, ignore_errors=True)
 
 class MockComponentFactory:
     """Factory for creating mock components with realistic behavior"""
-    
+
     @staticmethod
     def create_analyzer_mock(response_delay: float = 0.1, failure_rate: float = 0.0):
         """Create mock analyzer with configurable behavior"""
-        
+
         async def mock_analyze_path(path: Path, profile: str = "modern_general"):
             await asyncio.sleep(response_delay)
-            
+
             # Simulate occasional failures
             if failure_rate > 0 and time.time() % 1.0 < failure_rate:
                 raise Exception(f"Mock analyzer failure for {path}")
-            
+
             # Generate realistic findings based on path
             findings = []
             file_count = len(list(path.glob('**/*.py'))) if path.exists() else 1
-            
+
             for i in range(min(file_count * 2, 10)):  # 2 findings per file, max 10
                 findings.append({
                     'id': f'mock_finding_{i:03d}',
@@ -405,7 +407,7 @@ class MockComponentFactory:
                     'line_number': i + 1,
                     'weight': 1.0 + (i % 5)
                 })
-                
+
             return {
                 'status': 'success',
                 'findings': findings,
@@ -417,21 +419,21 @@ class MockComponentFactory:
                     'analysis_time_ms': int(response_delay * 1000)
                 }
             }
-            
+
         mock = Mock()
         mock.analyze_path = mock_analyze_path
         return mock
-        
+
     @staticmethod
     def create_mcp_server_mock(response_delay: float = 0.05, failure_rate: float = 0.0):
         """Create mock MCP server with configurable behavior"""
-        
+
         async def mock_call_tool(tool_name: str, args: Dict[str, Any]):
             await asyncio.sleep(response_delay)
-            
+
             if failure_rate > 0 and time.time() % 1.0 < failure_rate:
                 raise Exception(f"Mock MCP server failure for tool {tool_name}")
-                
+
             if tool_name == 'scan_path':
                 findings = args.get('findings', [])
                 return {
@@ -457,22 +459,22 @@ class MockComponentFactory:
                 }
             else:
                 return {'status': 'success', 'result': f'mock_result_{tool_name}'}
-                
+
         mock = Mock()
         mock.call_tool = mock_call_tool
         mock.is_running = True
         return mock
-        
+
     @staticmethod
     def create_autofix_engine_mock(response_delay: float = 0.2, failure_rate: float = 0.0):
         """Create mock autofix engine with configurable behavior"""
-        
+
         async def mock_generate_fixes(violations: List[Dict[str, Any]]):
             await asyncio.sleep(response_delay)
-            
+
             if failure_rate > 0 and time.time() % 1.0 < failure_rate:
                 raise Exception("Mock autofix engine failure")
-                
+
             fixes = []
             for i, violation in enumerate(violations):
                 fix_type_mapping = {
@@ -481,11 +483,11 @@ class MockComponentFactory:
                     'CoT': 'add_type_hints',
                     'CoA': 'extract_class'
                 }
-                
+
                 fix_type = fix_type_mapping.get(violation.get('connascence_type', 'CoM'), 'manual_review')
                 confidence = 0.9 if fix_type == 'extract_constant' else 0.75
                 safety = 'safe' if fix_type in ['extract_constant', 'add_type_hints'] else 'moderate'
-                
+
                 fixes.append({
                     'id': f'fix_{i:03d}',
                     'violation_id': violation.get('id', f'violation_{i}'),
@@ -494,21 +496,21 @@ class MockComponentFactory:
                     'safety_level': safety,
                     'estimated_effort': 'low' if safety == 'safe' else 'medium'
                 })
-                
+
             return fixes
-            
+
         async def mock_apply_fixes(fixes: List[Dict[str, Any]], target_path: Path):
             await asyncio.sleep(response_delay * 0.5)
-            
+
             if failure_rate > 0 and time.time() % 1.0 < failure_rate:
                 return {
                     'status': 'error',
                     'fixes_applied': 0,
                     'error': 'Mock application failure'
                 }
-                
+
             safe_fixes = [f for f in fixes if f.get('safety_level') == 'safe']
-            
+
             return {
                 'status': 'success',
                 'fixes_attempted': len(fixes),
@@ -516,7 +518,7 @@ class MockComponentFactory:
                 'fixes_skipped': len(fixes) - len(safe_fixes),
                 'success_rate': (len(safe_fixes) / len(fixes)) * 100 if fixes else 0
             }
-            
+
         mock = Mock()
         mock.generate_fixes = mock_generate_fixes
         mock.apply_fixes = mock_apply_fixes
@@ -556,14 +558,14 @@ def slow_mock_components(mock_component_factory):
 
 class IntegrationTestValidator:
     """Validates integration test results against expected outcomes"""
-    
+
     @staticmethod
-    def validate_analyzer_mcp_integration(analyzer_result: Dict[str, Any], 
+    def validate_analyzer_mcp_integration(analyzer_result: Dict[str, Any],
                                         mcp_result: Dict[str, Any]) -> Dict[str, bool]:
         """Validate analyzer → MCP server integration"""
         return {
             'data_transfer_successful': (
-                len(analyzer_result.get('findings', [])) == 
+                len(analyzer_result.get('findings', [])) ==
                 mcp_result.get('findings_processed', 0)
             ),
             'quality_metrics_consistent': (
@@ -574,9 +576,9 @@ class IntegrationTestValidator:
                 mcp_result.get('status') == 'success'
             )
         }
-        
+
     @staticmethod
-    def validate_mcp_autofix_integration(mcp_result: Dict[str, Any], 
+    def validate_mcp_autofix_integration(mcp_result: Dict[str, Any],
                                        autofix_result: Dict[str, Any]) -> Dict[str, bool]:
         """Validate MCP server → autofix engine integration"""
         return {
@@ -589,17 +591,17 @@ class IntegrationTestValidator:
             ),
             'mcp_context_preserved': mcp_result.get('status') == 'success'
         }
-        
+
     @staticmethod
     def validate_complete_workflow(workflow_results: Dict[str, Any]) -> Dict[str, bool]:
         """Validate complete workflow integration"""
         return {
             'all_stages_completed': all(
-                stage.get('status') == 'success' 
+                stage.get('status') == 'success'
                 for stage in workflow_results.values()
             ),
             'quality_improvement_achieved': (
-                workflow_results.get('final_quality_score', 0) > 
+                workflow_results.get('final_quality_score', 0) >
                 workflow_results.get('initial_quality_score', 0)
             ),
             'fixes_successfully_applied': (
@@ -618,11 +620,11 @@ def integration_validator():
 # Test scenario runner utility
 async def run_integration_scenario(scenario_name: str, components: Dict[str, Any]) -> Dict[str, Any]:
     """Run a complete integration scenario with provided components"""
-    
+
     scenario = TEST_DATA_MANAGER.get_scenario(scenario_name)
     if not scenario:
         raise ValueError(f"Scenario {scenario_name} not found")
-        
+
     # Store scenario start
     start_time = time.time()
     store_integration_result(
@@ -632,9 +634,9 @@ async def run_integration_scenario(scenario_name: str, components: Dict[str, Any
         'scenario_runner',
         {'scenario': scenario.name, 'components': scenario.components}
     )
-    
+
     results = {'scenario': scenario.name, 'results': {}}
-    
+
     try:
         # Execute scenario based on components required
         if 'analyzer' in scenario.components and 'mcp_server' in scenario.components:
@@ -643,15 +645,15 @@ async def run_integration_scenario(scenario_name: str, components: Dict[str, Any
             TEST_DATA_MANAGER.populate_workspace_with_violations(
                 workspace, scenario.test_data.get('violation_types', ['CoM'])
             )
-            
+
             analyzer_result = await components['analyzer'].analyze_path(workspace)
             mcp_result = await components['mcp_server'].call_tool('scan_path', {
                 'findings': analyzer_result.get('findings', [])
             })
-            
+
             results['results']['analyzer'] = analyzer_result
             results['results']['mcp_server'] = mcp_result
-            
+
         if 'autofix' in scenario.components:
             # Run autofix workflow
             violations = results['results'].get('analyzer', {}).get('findings', [])
@@ -660,15 +662,15 @@ async def run_integration_scenario(scenario_name: str, components: Dict[str, Any
                 application_result = await components['autofix'].apply_fixes(
                     fixes, workspace
                 )
-                
+
                 results['results']['autofix_generation'] = fixes
                 results['results']['autofix_application'] = application_result
-                
+
         # Calculate execution metrics
         execution_time = time.time() - start_time
         results['execution_time'] = execution_time
         results['success'] = True
-        
+
         # Store scenario completion
         store_integration_result(
             f"{scenario_name}_completed",
@@ -677,17 +679,17 @@ async def run_integration_scenario(scenario_name: str, components: Dict[str, Any
             'scenario_runner',
             results
         )
-        
+
         # Cleanup
         import shutil
         if 'workspace' in locals():
             shutil.rmtree(workspace, ignore_errors=True)
-            
+
         return results
-        
+
     except Exception as e:
         execution_time = time.time() - start_time
-        
+
         # Store scenario failure
         store_integration_result(
             f"{scenario_name}_failed",
@@ -696,28 +698,28 @@ async def run_integration_scenario(scenario_name: str, components: Dict[str, Any
             'scenario_runner',
             {'error': str(e), 'scenario': scenario.name}
         )
-        
+
         # Cleanup
         import shutil
         if 'workspace' in locals():
             shutil.rmtree(workspace, ignore_errors=True)
-            
+
         raise e
 
 if __name__ == '__main__':
     # Test fixture creation
     print("Integration test data fixtures initialized")
     print(f"Available scenarios: {list(TEST_DATA_MANAGER.scenarios.keys())}")
-    
+
     # Create sample workspace for verification
     sample_workspace = TEST_DATA_MANAGER.create_test_workspace('sample')
     TEST_DATA_MANAGER.populate_workspace_with_violations(sample_workspace, ['CoM', 'CoP'])
     print(f"Sample workspace created at: {sample_workspace}")
-    
+
     # List created files
     for file_path in sample_workspace.rglob('*.py'):
         print(f"  - {file_path.relative_to(sample_workspace)}")
-        
+
     # Cleanup sample workspace
     import shutil
     shutil.rmtree(sample_workspace, ignore_errors=True)

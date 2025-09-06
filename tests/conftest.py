@@ -18,19 +18,21 @@ Provides common test fixtures, configuration, and utilities
 for the entire test suite.
 """
 
-import pytest
-import tempfile
-import shutil
+import os
 from pathlib import Path
+import shutil
+import sys
+import tempfile
 from typing import Dict, List
 from unittest.mock import Mock
 
-import sys
-import os
+import pytest
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 # Import from our mock implementations instead of removed analyzer module
 from mcp.server import ConnascenceViolation
+
 
 # Mock ThresholdConfig class for tests
 class ThresholdConfig:
@@ -55,7 +57,7 @@ def sample_violations():
             weight=2.5
         ),
         ConnascenceViolation(
-            id="test_params_1", 
+            id="test_params_1",
             rule_id="CON_CoP",
             connascence_type="CoP",
             severity="high",
@@ -66,7 +68,7 @@ def sample_violations():
         ),
         ConnascenceViolation(
             id="test_types_1",
-            rule_id="CON_CoT", 
+            rule_id="CON_CoT",
             connascence_type="CoT",
             severity="medium",
             description="Function lacks type hints",
@@ -77,7 +79,7 @@ def sample_violations():
         ConnascenceViolation(
             id="test_complexity_1",
             rule_id="CON_CoA",
-            connascence_type="CoA", 
+            connascence_type="CoA",
             severity="critical",
             description="Class has 30 methods (max: 20)",
             file_path="/test/large_class.py",
@@ -97,22 +99,22 @@ def calculate_discount(price, customer_type, season, promo_code, region, members
     '''Function with too many positional parameters (CoP violation).'''
     if price > 1000:  # Magic literal (CoM violation)
         base_discount = 0.15  # Magic literal (CoM violation)
-        
+
         if customer_type == "premium":  # Magic string (CoM violation)
             if season == "winter":
                 seasonal_boost = 0.05
             else:
                 seasonal_boost = 0.02
-                
+
             if promo_code == "SAVE20":  # Magic string (CoM violation)
                 promo_discount = 0.2
             else:
                 promo_discount = 0.0
-                
+
             total_discount = base_discount + seasonal_boost + promo_discount
         else:
             total_discount = 0.1  # Magic literal (CoM violation)
-            
+
         return price * (1 - total_discount)
     else:
         return price * 0.95  # Magic literal (CoM violation)
@@ -120,86 +122,86 @@ def calculate_discount(price, customer_type, season, promo_code, region, members
 
 class OrderProcessor:
     '''God class with too many methods (CoA violation).'''
-    
+
     def __init__(self):
         self.orders = []
         self.customers = {}
         self.inventory = {}
         self.shipping_rates = {}
         self.tax_rates = {}
-        
+
     def validate_order(self, order):  # Missing type hints (CoT violation)
         pass
-        
+
     def calculate_tax(self, amount, region):  # Missing type hints (CoT violation)
         pass
-        
-    def calculate_shipping(self, weight, destination):  # Missing type hints (CoT violation)  
+
+    def calculate_shipping(self, weight, destination):  # Missing type hints (CoT violation)
         pass
-        
+
     def process_payment(self, payment_info):  # Missing type hints (CoT violation)
         pass
-        
+
     def send_confirmation_email(self, customer_email):  # Missing type hints (CoT violation)
         pass
-        
+
     def update_inventory(self, item_id, quantity):  # Missing type hints (CoT violation)
         pass
-        
+
     def generate_invoice(self, order_id):  # Missing type hints (CoT violation)
         pass
-        
+
     def handle_returns(self, return_request):  # Missing type hints (CoT violation)
         pass
-        
+
     def calculate_loyalty_points(self, order_total):  # Missing type hints (CoT violation)
         pass
-        
+
     def send_tracking_info(self, order_id, tracking_number):  # Missing type hints (CoT violation)
         pass
-        
+
     def validate_promo_code(self, code):  # Missing type hints (CoT violation)
         pass
-        
+
     def calculate_estimated_delivery(self, shipping_method):  # Missing type hints (CoT violation)
         pass
-        
+
     def handle_order_cancellation(self, order_id):  # Missing type hints (CoT violation)
         pass
-        
+
     def generate_shipping_label(self, order):  # Missing type hints (CoT violation)
         pass
-        
+
     def process_bulk_orders(self, orders):  # Missing type hints (CoT violation)
         pass
-        
+
     def handle_payment_failures(self, payment_id):  # Missing type hints (CoT violation)
         pass
-        
+
     def calculate_seasonal_discounts(self, season):  # Missing type hints (CoT violation)
         pass
-        
+
     def validate_shipping_address(self, address):  # Missing type hints (CoT violation)
         pass
-        
+
     def generate_order_summary(self, order_id):  # Missing type hints (CoT violation)
         pass
-        
+
     def handle_customer_complaints(self, complaint):  # Missing type hints (CoT violation)
         pass
-        
+
     def process_refunds(self, refund_request):  # Missing type hints (CoT violation)
         pass
-        
+
     def generate_sales_report(self, date_range):  # Missing type hints (CoT violation)
         pass
-        
+
     def manage_product_catalog(self, products):  # Missing type hints (CoT violation)
         pass
-        
+
     def handle_subscription_renewals(self, subscription_id):  # Missing type hints (CoT violation)
         pass
-        
+
     def calculate_affiliate_commissions(self, sales_data):  # Missing type hints (CoT violation)
         pass
 
@@ -217,12 +219,12 @@ def temp_project_dir():
     """Create temporary project directory with sample files."""
     temp_dir = tempfile.mkdtemp()
     project_path = Path(temp_dir)
-    
+
     # Create directory structure
     (project_path / "src").mkdir()
     (project_path / "tests").mkdir()
     (project_path / "docs").mkdir()
-    
+
     # Create Python files with various issues
     (project_path / "src" / "main.py").write_text("""
 def main(arg1, arg2, arg3, arg4, arg5):  # Too many params
@@ -231,7 +233,7 @@ def main(arg1, arg2, arg3, arg4, arg5):  # Too many params
         return True
     return False
 """)
-    
+
     (project_path / "src" / "utils.py").write_text("""
 def clean_function(x: int) -> int:
     return x * 2
@@ -239,16 +241,16 @@ def clean_function(x: int) -> int:
 def problematic_function(a, b, c):  # Missing types
     return a + b + 999  # Magic literal
 """)
-    
+
     (project_path / "tests" / "test_main.py").write_text("""
 import pytest
 
 def test_main():
     assert True
 """)
-    
+
     yield project_path
-    
+
     # Cleanup
     shutil.rmtree(temp_dir)
 
@@ -269,7 +271,7 @@ def threshold_configs():
     return {
         'strict': ThresholdConfig(
             max_positional_params=2,
-            god_class_methods=15, 
+            god_class_methods=15,
             max_cyclomatic_complexity=8
         ),
         'balanced': ThresholdConfig(
@@ -290,7 +292,7 @@ def budget_limits():
     """Create sample budget limits for testing."""
     return {
         'CoM': 5,      # Magic literals
-        'CoP': 3,      # Parameter bombs  
+        'CoP': 3,      # Parameter bombs
         'CoT': 8,      # Type issues
         'CoA': 2,      # Algorithm/complexity issues
         'total_violations': 20,
@@ -340,8 +342,8 @@ def sample_autofix_patches():
     # from autofix.patch_api import PatchSuggestion
     # Mock PatchSuggestion for testing
     from dataclasses import dataclass
-    from typing import Dict, Any, Tuple
-    
+    from typing import Any, Dict, Tuple
+
     @dataclass
     class PatchSuggestion:
         violation_id: str
@@ -353,11 +355,11 @@ def sample_autofix_patches():
         line_range: Tuple[int, int]
         safety_level: str = "safe"
         rollback_info: Dict[str, Any] = None
-        
+
         def __post_init__(self):
             if self.rollback_info is None:
                 self.rollback_info = {}
-    
+
     return [
         PatchSuggestion(
             violation_id="magic_literal_1",
@@ -376,7 +378,7 @@ def sample_autofix_patches():
             description="Convert function to use keyword-only parameters",
             old_code="def func(a, b, c, d, e):",
             new_code="def func(a, b, *, c, d, e):",
-            file_path="/test/sample.py", 
+            file_path="/test/sample.py",
             line_range=(15, 15),
             safety_level="moderate",
             rollback_info={}
@@ -389,7 +391,7 @@ def sample_autofix_patches():
             new_code="def process_data(data: Any, options: Dict[str, Any]) -> Any:",
             file_path="/test/sample.py",
             line_range=(20, 20),
-            safety_level="safe", 
+            safety_level="safe",
             rollback_info={}
         )
     ]
@@ -427,15 +429,15 @@ def pytest_collection_modifyitems(config, items):
         # Mark integration tests
         if "integration" in item.nodeid or "test_integration" in item.nodeid:
             item.add_marker(pytest.mark.integration)
-        
-        # Mark autofix tests  
+
+        # Mark autofix tests
         if "autofix" in item.nodeid:
             item.add_marker(pytest.mark.autofix)
-            
+
         # Mark MCP tests
         if "mcp" in item.nodeid:
             item.add_marker(pytest.mark.mcp)
-        
+
         # Mark slow tests
         if "slow" in item.keywords or "performance" in item.nodeid:
             item.add_marker(pytest.mark.slow)
@@ -450,29 +452,29 @@ def create_temp_file(content: str, suffix: str = ".py") -> Path:
     return Path(temp_file.name)
 
 
-def assert_violation_present(violations: List[ConnascenceViolation], 
-                           connascence_type: str, 
+def assert_violation_present(violations: List[ConnascenceViolation],
+                           connascence_type: str,
                            severity: str = None,
                            description_contains: str = None) -> bool:
     """Assert that a specific type of violation is present in the list."""
     matching_violations = [
-        v for v in violations 
+        v for v in violations
         if v.connascence_type == connascence_type
     ]
-    
+
     assert len(matching_violations) > 0, f"No {connascence_type} violations found"
-    
+
     if severity:
         severity_matches = [v for v in matching_violations if v.severity == severity]
         assert len(severity_matches) > 0, f"No {connascence_type} violations with severity {severity}"
-    
+
     if description_contains:
         description_matches = [
-            v for v in matching_violations 
+            v for v in matching_violations
             if description_contains.lower() in v.description.lower()
         ]
         assert len(description_matches) > 0, f"No {connascence_type} violations containing '{description_contains}'"
-    
+
     return True
 
 

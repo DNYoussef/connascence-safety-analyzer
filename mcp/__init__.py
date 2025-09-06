@@ -15,6 +15,6 @@
 Mock MCP module for connascence analysis.
 """
 
-from .server import ConnascenceMCPServer, MCPConnascenceTool, ConnascenceViolation
+from .server import ConnascenceMCPServer, ConnascenceViolation, MCPConnascenceTool
 
 __all__ = ['ConnascenceMCPServer', 'MCPConnascenceTool', 'ConnascenceViolation']

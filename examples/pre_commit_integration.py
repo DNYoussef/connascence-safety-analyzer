@@ -22,13 +22,12 @@ development workflow using pre-commit hooks.
 
 import subprocess
 import sys
-from pathlib import Path
 
 
 def run_connascence_checks():
     """Run connascence checks as part of pre-commit."""
     print("Running connascence analysis...")
-    
+
     # Run analysis on staged Python files using unified CLI
     try:
         result = subprocess.run([
@@ -37,7 +36,7 @@ def run_connascence_checks():
             "--severity", "high",
             "--format", "json"
         ], capture_output=True, text=True, timeout=60)
-        
+
         if result.returncode == 0:
             print("[DONE] No high-severity connascence violations found!")
             return True
@@ -45,7 +44,7 @@ def run_connascence_checks():
             print(" Connascence violations detected:")
             print(result.stdout)
             return False
-            
+
     except subprocess.TimeoutExpired:
         print(" Connascence analysis timed out")
         return False
@@ -57,15 +56,15 @@ def run_connascence_checks():
 def run_magic_literal_checks():
     """Run magic literal detection."""
     print("Running magic literal detection...")
-    
+
     try:
         result = subprocess.run([
             "connascence", "detect-literals",
-            ".", 
+            ".",
             "--threshold", "25.0",  # Allow up to 25% magic literals
             "--severity", "medium"
         ], capture_output=True, text=True, timeout=30)
-        
+
         if result.returncode == 0:
             print("[DONE] Magic literal usage within acceptable limits!")
             return True
@@ -73,7 +72,7 @@ def run_magic_literal_checks():
             print(" Excessive magic literals detected:")
             print(result.stdout)
             return False
-            
+
     except Exception as e:
         print(f" Error running magic literal detection: {e}")
         return False
@@ -82,18 +81,18 @@ def run_magic_literal_checks():
 if __name__ == "__main__":
     """Main pre-commit check."""
     print("[SEARCH] Running connascence pre-commit checks...")
-    
+
     checks_passed = 0
     total_checks = 2
-    
+
     # Run connascence checks
     if run_connascence_checks():
         checks_passed += 1
-    
-    # Run magic literal checks  
+
+    # Run magic literal checks
     if run_magic_literal_checks():
         checks_passed += 1
-    
+
     # Final result
     if checks_passed == total_checks:
         print(f"[DONE] All {total_checks} connascence checks passed!")

@@ -155,14 +155,10 @@ max-args = 4  # Connascence of Position (CoP) threshold
 max-branches = 8  # Connascence of Algorithm (CoA) complexity threshold
 max-returns = 6  # Connascence of Algorithm (CoA) threshold
 max-statements = 25  # Connascence of Algorithm (CoA) threshold
-max-public-methods = 15  # God class detection threshold
+# max-public-methods = 15  # God class detection threshold (handled by connascence analyzer)
 
 # Magic literal detection aligned with Connascence of Meaning (CoM)
-[tool.ruff.flake8-magic-value]
-# Custom configuration for magic literal detection
-ignore-magic-value-types = ["str", "bytes"]
-ignore-names-ending-with = ["_test", "_Test"]
-ignore-functions = ["range", "enumerate"]
+# Note: Magic literal detection handled by connascence analyzer
 
 # McCabe complexity aligned with Connascence of Algorithm (CoA)
 [tool.ruff.mccabe]

@@ -18,28 +18,24 @@ Autofix Engine Integration Tests - Complete Autofix System Testing
 Tests autofix engine with real violation data, patch generation, and safety validation
 """
 
-import pytest
-import json
-import tempfile
-import shutil
-import time
 from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock
-from typing import Dict, List, Any, Tuple
-import ast
-import difflib
+import tempfile
+import time
+from typing import Any, Dict, List
+
+import pytest
 
 # Memory coordination for autofix test results
 AUTOFIX_MEMORY = {}
 
 class AutofixTestCoordinator:
     """Coordinates autofix engine testing with memory tracking and sequential thinking"""
-    
+
     def __init__(self):
         self.memory_store = AUTOFIX_MEMORY
         self.test_session_id = f"autofix_integration_{int(time.time())}"
         self.sequential_results = []
-        
+
     def store_test_result(self, test_name: str, result: Dict[str, Any]):
         """Store test result with sequential thinking pattern"""
         self.memory_store[f"{self.test_session_id}_{test_name}"] = {
@@ -49,33 +45,33 @@ class AutofixTestCoordinator:
             'sequence_order': len(self.sequential_results)
         }
         self.sequential_results.append(test_name)
-        
+
     def get_sequential_results(self) -> List[str]:
         """Get results in sequential order"""
         return self.sequential_results.copy()
-        
+
     def calculate_autofix_effectiveness(self) -> Dict[str, float]:
         """Calculate autofix engine effectiveness metrics"""
         results = self.get_test_results()
-        
+
         total_violations = 0
         fixed_violations = 0
         safe_fixes = 0
         confidence_sum = 0
         fix_attempts = 0
-        
+
         for test_key, test_data in results.items():
             result = test_data.get('result', {})
-            
+
             if 'violations_processed' in result:
                 total_violations += result['violations_processed']
                 fixed_violations += result.get('fixes_generated', 0)
                 safe_fixes += result.get('safe_fixes', 0)
-                
+
             if 'average_confidence' in result:
                 confidence_sum += result['average_confidence']
                 fix_attempts += 1
-                
+
         return {
             'fix_rate': (fixed_violations / total_violations) * 100 if total_violations > 0 else 0,
             'safety_rate': (safe_fixes / fixed_violations) * 100 if fixed_violations > 0 else 0,
@@ -83,10 +79,10 @@ class AutofixTestCoordinator:
             'total_violations_processed': total_violations,
             'total_fixes_generated': fixed_violations
         }
-        
+
     def get_test_results(self) -> Dict[str, Any]:
         """Retrieve all test results for this session"""
-        return {k: v for k, v in self.memory_store.items() 
+        return {k: v for k, v in self.memory_store.items()
                 if k.startswith(self.test_session_id)}
 
 @pytest.fixture
@@ -103,21 +99,21 @@ def calculate_price(base_price):
     tax_rate = 0.08  # Magic literal
     discount_threshold = 1000  # Magic literal
     premium_multiplier = 1.5  # Magic literal
-    
+
     if base_price > discount_threshold:
         return base_price * (1 + tax_rate) * premium_multiplier
     return base_price * (1 + tax_rate)
 ''',
         'parameter_bomb': '''
-def process_order(customer_id, product_id, quantity, price, tax_rate, 
-                  shipping_cost, discount_code, payment_method, 
+def process_order(customer_id, product_id, quantity, price, tax_rate,
+                  shipping_cost, discount_code, payment_method,
                   billing_address, shipping_address, notes):
     # Function with too many parameters - CoP violation
     total = quantity * price * (1 + tax_rate) + shipping_cost
-    
+
     if discount_code == "SAVE10":  # Magic string
         total *= 0.9
-    
+
     return {
         'customer': customer_id,
         'total': total,
@@ -130,7 +126,7 @@ class OrderManager:
         self.orders = []
         self.customers = {}
         self.inventory = {}
-        
+
     def create_order(self): pass
     def update_order(self): pass
     def cancel_order(self): pass
@@ -162,12 +158,12 @@ def process_data(data, options, callback):
     # Function without type hints - CoT violation
     results = []
     threshold = 100  # Magic literal
-    
+
     for item in data:
         if item.value > threshold:
             processed = callback(item, options)
             results.append(processed)
-    
+
     return results
 
 def transform_items(items, transformer):
@@ -214,16 +210,16 @@ def calculate_discount_standard(price):
 @pytest.fixture
 def mock_autofix_engine():
     """Create mock autofix engine with realistic behavior"""
-    
+
     class MockAutofixEngine:
         def __init__(self):
             self.patches_generated = 0
             self.safety_validator = MockSafetyValidator()
-            
+
         def generate_fix(self, violation: Dict[str, Any], context: Dict[str, Any] = None) -> Dict[str, Any]:
             """Generate autofix for a violation"""
             self.patches_generated += 1
-            
+
             fix_generators = {
                 'CoM': self._generate_magic_literal_fix,
                 'CoP': self._generate_parameter_bomb_fix,
@@ -231,12 +227,12 @@ def mock_autofix_engine():
                 'CoT': self._generate_type_hint_fix,
                 'CoA_nesting': self._generate_nesting_fix
             }
-            
+
             violation_type = violation.get('connascence_type', 'CoM')
             generator = fix_generators.get(violation_type, self._generate_generic_fix)
-            
+
             return generator(violation, context or {})
-            
+
         def _generate_magic_literal_fix(self, violation: Dict[str, Any], context: Dict[str, Any]) -> Dict[str, Any]:
             """Generate fix for magic literal violations"""
             return {
@@ -264,7 +260,7 @@ def mock_autofix_engine():
                 'requires_imports': [],
                 'validation_result': self.safety_validator.validate_fix('extract_constant', violation)
             }
-            
+
         def _generate_parameter_bomb_fix(self, violation: Dict[str, Any], context: Dict[str, Any]) -> Dict[str, Any]:
             """Generate fix for parameter bomb violations"""
             return {
@@ -292,7 +288,7 @@ def mock_autofix_engine():
                 'requires_imports': ['from dataclasses import dataclass', 'from typing import Any'],
                 'validation_result': self.safety_validator.validate_fix('parameter_object', violation)
             }
-            
+
         def _generate_god_class_fix(self, violation: Dict[str, Any], context: Dict[str, Any]) -> Dict[str, Any]:
             """Generate fix for god class violations"""
             return {
@@ -321,7 +317,7 @@ def mock_autofix_engine():
                 'validation_result': self.safety_validator.validate_fix('extract_class', violation),
                 'complexity_warning': 'This refactoring affects multiple components'
             }
-            
+
         def _generate_type_hint_fix(self, violation: Dict[str, Any], context: Dict[str, Any]) -> Dict[str, Any]:
             """Generate fix for missing type hints"""
             return {
@@ -343,7 +339,7 @@ def mock_autofix_engine():
                 'requires_imports': ['from typing import Any, List, Dict, Optional'],
                 'validation_result': self.safety_validator.validate_fix('add_type_hints', violation)
             }
-            
+
         def _generate_nesting_fix(self, violation: Dict[str, Any], context: Dict[str, Any]) -> Dict[str, Any]:
             """Generate fix for deep nesting violations"""
             return {
@@ -365,7 +361,7 @@ def mock_autofix_engine():
                 'requires_imports': [],
                 'validation_result': self.safety_validator.validate_fix('reduce_nesting', violation)
             }
-            
+
         def _generate_generic_fix(self, violation: Dict[str, Any], context: Dict[str, Any]) -> Dict[str, Any]:
             """Generate generic fix for unknown violation types"""
             return {
@@ -380,7 +376,7 @@ def mock_autofix_engine():
                 'validation_result': {'safe': False, 'reason': 'No automated fix available'},
                 'manual_instructions': 'Please review this violation and apply appropriate refactoring'
             }
-            
+
         def batch_generate_fixes(self, violations: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
             """Generate fixes for multiple violations"""
             fixes = []
@@ -398,7 +394,7 @@ def mock_autofix_engine():
                         'safety_level': 'error'
                     })
             return fixes
-            
+
         def apply_fix(self, fix: Dict[str, Any], target_file: Path) -> Dict[str, Any]:
             """Apply fix to target file (mock implementation)"""
             return {
@@ -408,19 +404,19 @@ def mock_autofix_engine():
                 'backup_created': True,
                 'validation_passed': fix.get('validation_result', {}).get('safe', False)
             }
-            
+
         # Helper methods for fix generation
         def _create_constant_extraction(self, violation: Dict[str, Any]) -> str:
             context = violation.get('context', '')
             # Simple mock transformation
             return context.replace('0.08', 'TAX_RATE').replace('1000', 'DISCOUNT_THRESHOLD')
-            
+
         def _create_constant_definition(self, violation: Dict[str, Any]) -> str:
             return "# Constants\\nTAX_RATE = 0.08\\nDISCOUNT_THRESHOLD = 1000"
-            
+
         def _create_parameter_object_usage(self, violation: Dict[str, Any]) -> str:
             return "def process_order(params: OrderParams):"
-            
+
         def _create_parameter_object_class(self, violation: Dict[str, Any]) -> str:
             return '''@dataclass
 class OrderParams:
@@ -435,29 +431,29 @@ class OrderParams:
     billing_address: str
     shipping_address: str
     notes: str'''
-            
+
         def _create_class_split(self, violation: Dict[str, Any]) -> str:
             return '''class OrderManager:
     def __init__(self):
         self.order_processor = OrderProcessor()
         self.inventory_manager = InventoryManager()
         self.payment_processor = PaymentProcessor()
-        
+
     def create_order(self):
         return self.order_processor.create_order()'''
-        
+
         def _create_extracted_classes(self, violation: Dict[str, Any]) -> str:
             return '''# Extracted classes would be created in separate files
 # class OrderProcessor: ...
 # class InventoryManager: ...
 # class PaymentProcessor: ...'''
-        
+
         def _add_type_hints(self, violation: Dict[str, Any]) -> str:
             context = violation.get('context', '')
             if 'def process_data(' in context:
                 return "def process_data(data: List[Any], options: Dict[str, Any], callback: Callable) -> List[Any]:"
             return context
-            
+
         def _create_early_returns(self, violation: Dict[str, Any]) -> str:
             return '''def complex_validation(data):
     if not data:
@@ -472,12 +468,12 @@ class OrderParams:
         return "Security error"
     if not data.is_properly_formatted():
         return "Format error"
-    
+
     return process_valid_data(data)'''
 
     class MockSafetyValidator:
         """Mock safety validator for autofix changes"""
-        
+
         def validate_fix(self, fix_type: str, violation: Dict[str, Any]) -> Dict[str, Any]:
             """Validate if a fix is safe to apply"""
             safety_levels = {
@@ -487,17 +483,17 @@ class OrderParams:
                 'reduce_nesting': {'safe': True, 'risk_level': 'medium'},
                 'extract_class': {'safe': False, 'risk_level': 'high', 'reason': 'Complex refactoring requires manual review'},
             }
-            
+
             return safety_levels.get(fix_type, {'safe': False, 'risk_level': 'unknown'})
-    
+
     return MockAutofixEngine()
 
 class TestAutofixEngineIntegration:
     """Comprehensive autofix engine integration tests"""
-    
+
     def test_magic_literal_fix_generation(self, autofix_coordinator, mock_autofix_engine, test_code_samples):
         """Test autofix engine generates correct fixes for magic literal violations"""
-        
+
         # Create mock violation for magic literals
         violation = {
             'id': 'CoM_001',
@@ -508,27 +504,27 @@ class TestAutofixEngineIntegration:
             'line_number': 3,
             'context': 'tax_rate = 0.08  # Magic literal'
         }
-        
+
         # Generate fix
         fix = mock_autofix_engine.generate_fix(violation)
-        
+
         # Validate fix structure
         assert fix['fix_type'] == 'extract_constant'
         assert fix['confidence'] > 0.8
         assert fix['safety_level'] == 'safe'
         assert len(fix['changes']) == 1
-        
+
         # Validate fix content
         change = fix['changes'][0]
         assert change['file_path'] == 'test_magic.py'
         assert 'TAX_RATE' in change['fixed_code']
         assert len(change['additional_changes']) == 1
-        
+
         # Validate constant definition
         constant_addition = change['additional_changes'][0]
         assert constant_addition['action'] == 'add_constant'
         assert 'TAX_RATE = 0.08' in constant_addition['code']
-        
+
         # Store results with sequential thinking
         autofix_coordinator.store_test_result('magic_literal_fix', {
             'violations_processed': 1,
@@ -538,10 +534,10 @@ class TestAutofixEngineIntegration:
             'fix_type': fix['fix_type'],
             'validation_passed': fix['validation_result']['safe']
         })
-        
+
     def test_parameter_bomb_fix_generation(self, autofix_coordinator, mock_autofix_engine):
         """Test autofix for parameter bomb (CoP) violations"""
-        
+
         violation = {
             'id': 'CoP_001',
             'connascence_type': 'CoP',
@@ -551,25 +547,25 @@ class TestAutofixEngineIntegration:
             'line_number': 2,
             'context': 'def process_order(customer_id, product_id, quantity, ...)'
         }
-        
+
         fix = mock_autofix_engine.generate_fix(violation)
-        
+
         # Validate parameter object fix
         assert fix['fix_type'] == 'parameter_object'
         assert fix['confidence'] > 0.7
         assert fix['safety_level'] == 'moderate'
-        
+
         # Validate required imports
         assert 'from dataclasses import dataclass' in fix['requires_imports']
         assert 'from typing import Any' in fix['requires_imports']
-        
+
         # Validate class creation
         change = fix['changes'][0]
         class_addition = change['additional_changes'][0]
         assert class_addition['action'] == 'add_class'
         assert '@dataclass' in class_addition['code']
         assert 'OrderParams' in class_addition['code']
-        
+
         autofix_coordinator.store_test_result('parameter_bomb_fix', {
             'violations_processed': 1,
             'fixes_generated': 1,
@@ -578,10 +574,10 @@ class TestAutofixEngineIntegration:
             'fix_type': fix['fix_type'],
             'requires_imports': len(fix['requires_imports'])
         })
-        
+
     def test_god_class_fix_generation(self, autofix_coordinator, mock_autofix_engine):
         """Test autofix for god class (CoA) violations"""
-        
+
         violation = {
             'id': 'CoA_001',
             'connascence_type': 'CoA',
@@ -591,24 +587,24 @@ class TestAutofixEngineIntegration:
             'line_number': 1,
             'context': 'class OrderManager:'
         }
-        
+
         fix = mock_autofix_engine.generate_fix(violation)
-        
+
         # Validate class extraction fix
         assert fix['fix_type'] == 'extract_class'
         assert fix['confidence'] > 0.6  # Lower confidence for complex fixes
         assert fix['safety_level'] == 'complex'
-        
+
         # Validate complexity warning
         assert 'complexity_warning' in fix
         assert 'multiple components' in fix['complexity_warning']
-        
+
         # Validate class split approach
         change = fix['changes'][0]
         assert 'OrderProcessor' in change['fixed_code']
         assert 'InventoryManager' in change['fixed_code']
         assert 'PaymentProcessor' in change['fixed_code']
-        
+
         autofix_coordinator.store_test_result('god_class_fix', {
             'violations_processed': 1,
             'fixes_generated': 1,
@@ -617,10 +613,10 @@ class TestAutofixEngineIntegration:
             'fix_type': fix['fix_type'],
             'complexity_warning': True
         })
-        
+
     def test_type_hint_fix_generation(self, autofix_coordinator, mock_autofix_engine):
         """Test autofix for missing type hints (CoT) violations"""
-        
+
         violation = {
             'id': 'CoT_001',
             'connascence_type': 'CoT',
@@ -630,24 +626,24 @@ class TestAutofixEngineIntegration:
             'line_number': 1,
             'context': 'def process_data(data, options, callback):'
         }
-        
+
         fix = mock_autofix_engine.generate_fix(violation)
-        
+
         # Validate type hint fix
         assert fix['fix_type'] == 'add_type_hints'
         assert fix['confidence'] > 0.8
         assert fix['safety_level'] == 'safe'
-        
+
         # Validate typing imports
         required_imports = fix['requires_imports']
         assert any('typing' in imp for imp in required_imports)
-        
+
         # Validate type annotation addition
         change = fix['changes'][0]
         fixed_code = change['fixed_code']
         assert 'List[Any]' in fixed_code or 'Dict[str, Any]' in fixed_code
         assert 'Callable' in fixed_code
-        
+
         autofix_coordinator.store_test_result('type_hint_fix', {
             'violations_processed': 1,
             'fixes_generated': 1,
@@ -656,10 +652,10 @@ class TestAutofixEngineIntegration:
             'fix_type': fix['fix_type'],
             'imports_added': len(required_imports)
         })
-        
+
     def test_batch_fix_generation(self, autofix_coordinator, mock_autofix_engine):
         """Test batch processing of multiple violations"""
-        
+
         violations = [
             {
                 'id': 'CoM_001',
@@ -670,7 +666,7 @@ class TestAutofixEngineIntegration:
                 'line_number': 1
             },
             {
-                'id': 'CoP_001', 
+                'id': 'CoP_001',
                 'connascence_type': 'CoP',
                 'severity': 'high',
                 'description': 'Parameter bomb violation',
@@ -686,25 +682,25 @@ class TestAutofixEngineIntegration:
                 'line_number': 10
             }
         ]
-        
+
         # Generate batch fixes
         fixes = mock_autofix_engine.batch_generate_fixes(violations)
-        
+
         # Validate batch processing
         assert len(fixes) == len(violations)
-        
+
         # Validate individual fixes
         fix_types = [fix['fix_type'] for fix in fixes]
         expected_types = ['extract_constant', 'parameter_object', 'add_type_hints']
-        
+
         for expected_type in expected_types:
             assert expected_type in fix_types
-            
+
         # Calculate batch metrics
         safe_fixes = sum(1 for fix in fixes if fix.get('safety_level') == 'safe')
         total_confidence = sum(fix.get('confidence', 0) for fix in fixes)
         avg_confidence = total_confidence / len(fixes)
-        
+
         autofix_coordinator.store_test_result('batch_processing', {
             'violations_processed': len(violations),
             'fixes_generated': len(fixes),
@@ -712,14 +708,14 @@ class TestAutofixEngineIntegration:
             'average_confidence': avg_confidence,
             'batch_processing_successful': True
         })
-        
+
     def test_fix_application_simulation(self, autofix_coordinator, mock_autofix_engine):
         """Test applying fixes to actual code (simulated)"""
-        
+
         # Create test workspace
         with tempfile.TemporaryDirectory() as tmpdir:
             test_file = Path(tmpdir) / "test_code.py"
-            
+
             # Write original code with violations
             original_code = '''
 def calculate_total(price):
@@ -727,7 +723,7 @@ def calculate_total(price):
     return price * (1 + tax)
 '''
             test_file.write_text(original_code)
-            
+
             # Generate fix for magic literal
             violation = {
                 'id': 'CoM_test',
@@ -738,18 +734,18 @@ def calculate_total(price):
                 'line_number': 3,
                 'context': 'tax = 0.08  # Magic literal'
             }
-            
+
             fix = mock_autofix_engine.generate_fix(violation)
-            
+
             # Apply fix (mock implementation)
             application_result = mock_autofix_engine.apply_fix(fix, test_file)
-            
+
             # Validate application result
-            assert application_result['applied'] == True
+            assert application_result["applied"] is True
             assert application_result['fix_id'] == fix['id']
-            assert application_result['backup_created'] == True
+            assert application_result["backup_created"] is True
             assert application_result['changes_made'] > 0
-            
+
             autofix_coordinator.store_test_result('fix_application', {
                 'violations_processed': 1,
                 'fixes_applied': 1,
@@ -757,10 +753,10 @@ def calculate_total(price):
                 'application_successful': application_result['applied'],
                 'validation_passed': application_result['validation_passed']
             })
-            
+
     def test_safety_validation_integration(self, autofix_coordinator, mock_autofix_engine):
         """Test safety validation for different fix types"""
-        
+
         # Test different violation types for safety validation
         test_violations = [
             ('CoM', 'extract_constant', 'safe'),
@@ -768,9 +764,9 @@ def calculate_total(price):
             ('CoP', 'parameter_object', 'moderate'),
             ('CoA', 'extract_class', 'complex')
         ]
-        
+
         safety_results = []
-        
+
         for conn_type, expected_fix_type, expected_safety in test_violations:
             violation = {
                 'id': f'{conn_type}_safety_test',
@@ -780,10 +776,10 @@ def calculate_total(price):
                 'file_path': 'test.py',
                 'line_number': 1
             }
-            
+
             fix = mock_autofix_engine.generate_fix(violation)
             validation_result = fix['validation_result']
-            
+
             safety_results.append({
                 'violation_type': conn_type,
                 'fix_type': fix['fix_type'],
@@ -791,15 +787,15 @@ def calculate_total(price):
                 'is_safe': validation_result.get('safe', False),
                 'risk_level': validation_result.get('risk_level', 'unknown')
             })
-            
+
             # Validate expected safety levels
             assert fix['fix_type'] == expected_fix_type
             assert fix['safety_level'] == expected_safety
-            
+
         # Calculate safety metrics
         safe_count = sum(1 for result in safety_results if result['is_safe'])
         safety_rate = (safe_count / len(safety_results)) * 100
-        
+
         autofix_coordinator.store_test_result('safety_validation', {
             'violations_processed': len(test_violations),
             'safety_validations_performed': len(safety_results),
@@ -807,10 +803,10 @@ def calculate_total(price):
             'safety_rate': safety_rate,
             'safety_results': safety_results
         })
-        
+
     def test_autofix_effectiveness_calculation(self, autofix_coordinator):
         """Test calculation of overall autofix effectiveness"""
-        
+
         # Simulate storing several test results
         test_results = [
             ('magic_literal_fix', {'violations_processed': 5, 'fixes_generated': 5, 'safe_fixes': 5, 'average_confidence': 0.92}),
@@ -818,20 +814,20 @@ def calculate_total(price):
             ('type_hint_fix', {'violations_processed': 8, 'fixes_generated': 8, 'safe_fixes': 8, 'average_confidence': 0.85}),
             ('god_class_fix', {'violations_processed': 2, 'fixes_generated': 2, 'safe_fixes': 0, 'average_confidence': 0.65})
         ]
-        
+
         for test_name, result in test_results:
             autofix_coordinator.store_test_result(test_name, result)
-            
+
         # Calculate effectiveness metrics
         effectiveness = autofix_coordinator.calculate_autofix_effectiveness()
-        
+
         # Validate calculations
         assert effectiveness['total_violations_processed'] == 18  # 5+3+8+2
         assert effectiveness['total_fixes_generated'] == 18
         assert effectiveness['fix_rate'] == 100.0  # All violations got fixes
         assert effectiveness['safety_rate'] > 80.0  # High safety rate
         assert 0.7 <= effectiveness['average_confidence'] <= 0.9
-        
+
         # Store effectiveness results
         autofix_coordinator.store_test_result('effectiveness_calculation', {
             'effectiveness_metrics': effectiveness,
@@ -842,10 +838,10 @@ def calculate_total(price):
                 'confidence_target': effectiveness['average_confidence'] >= 0.7
             }
         })
-        
+
     def test_sequential_thinking_coordination(self, autofix_coordinator):
         """Test sequential thinking pattern in autofix testing"""
-        
+
         # Simulate sequential test execution
         sequential_steps = [
             'initialization',
@@ -855,31 +851,31 @@ def calculate_total(price):
             'application_simulation',
             'effectiveness_measurement'
         ]
-        
+
         for step in sequential_steps:
             autofix_coordinator.store_test_result(step, {
                 'step_name': step,
                 'completed': True,
                 'sequence_order': len(autofix_coordinator.sequential_results)
             })
-            
+
         # Validate sequential execution
         recorded_sequence = autofix_coordinator.get_sequential_results()
         assert recorded_sequence == sequential_steps
-        
+
         # Validate memory coordination
         test_results = autofix_coordinator.get_test_results()
         assert len(test_results) == len(sequential_steps)
-        
+
         # Validate sequential ordering
         for i, step in enumerate(sequential_steps):
             result_key = f"{autofix_coordinator.test_session_id}_{step}"
             assert result_key in test_results
             assert test_results[result_key]['result']['sequence_order'] == i
-            
+
     def test_autofix_error_handling(self, autofix_coordinator, mock_autofix_engine):
         """Test autofix engine error handling with problematic violations"""
-        
+
         # Create problematic violations that should trigger error handling
         problematic_violations = [
             {
@@ -895,13 +891,13 @@ def calculate_total(price):
                 'severity': 'high'
             }
         ]
-        
+
         # Generate fixes for problematic violations
         fixes = mock_autofix_engine.batch_generate_fixes(problematic_violations)
-        
+
         # Validate error handling
         assert len(fixes) == len(problematic_violations)
-        
+
         error_handling_successful = True
         for fix in fixes:
             if fix.get('fix_type') == 'manual_review':
@@ -910,7 +906,7 @@ def calculate_total(price):
             elif fix.get('fix_type') == 'error':
                 assert 'error' in fix
                 error_handling_successful = True
-            
+
         autofix_coordinator.store_test_result('error_handling', {
             'problematic_violations': len(problematic_violations),
             'error_handling_successful': error_handling_successful,
@@ -921,12 +917,12 @@ def calculate_total(price):
 @pytest.mark.asyncio
 class TestAutofixWorkflowIntegration:
     """Test autofix integration with broader workflow"""
-    
+
     async def test_cli_to_autofix_workflow(self, mock_autofix_engine):
         """Test complete workflow: CLI scan -> autofix suggestions -> application"""
-        
+
         workflow_steps = []
-        
+
         # Step 1: CLI initiates scan (mock)
         scan_result = {
             'findings': [
@@ -942,16 +938,16 @@ class TestAutofixWorkflowIntegration:
             'summary': {'total_violations': 1}
         }
         workflow_steps.append('scan_completed')
-        
+
         # Step 2: Request autofix for violations
         violations = scan_result['findings']
         fixes = mock_autofix_engine.batch_generate_fixes(violations)
         workflow_steps.append('fixes_generated')
-        
+
         # Step 3: Filter safe fixes for automatic application
         safe_fixes = [fix for fix in fixes if fix.get('safety_level') == 'safe']
         workflow_steps.append('safe_fixes_filtered')
-        
+
         # Step 4: Apply safe fixes
         applied_fixes = []
         for fix in safe_fixes:
@@ -960,16 +956,16 @@ class TestAutofixWorkflowIntegration:
                 if result['applied']:
                     applied_fixes.append(fix)
         workflow_steps.append('fixes_applied')
-        
+
         # Validate complete workflow
         assert len(workflow_steps) == 4
         assert len(fixes) > 0
         assert len(applied_fixes) > 0
         assert all(fix['safety_level'] == 'safe' for fix in applied_fixes)
-        
+
     async def test_mcp_to_autofix_integration(self, mock_autofix_engine):
         """Test MCP server requesting autofix for violations"""
-        
+
         # Simulate MCP server calling autofix
         mcp_request = {
             'tool': 'propose_autofix',
@@ -986,11 +982,11 @@ class TestAutofixWorkflowIntegration:
                 'safety_preference': 'moderate'
             }
         }
-        
+
         # Process MCP request through autofix engine
         violation = mcp_request['args']['violation']
         fix = mock_autofix_engine.generate_fix(violation)
-        
+
         # Validate MCP-compatible response
         mcp_response = {
             'status': 'success',
@@ -1001,7 +997,7 @@ class TestAutofixWorkflowIntegration:
                 'requires_user_approval': fix['safety_level'] != 'safe'
             }
         }
-        
+
         assert mcp_response['status'] == 'success'
         assert mcp_response['autofix']['fix_type'] == 'parameter_object'
         assert mcp_response['metadata']['confidence'] > 0.7

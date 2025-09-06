@@ -11,12 +11,11 @@
 # The above copyright notice and this permission notice shall be included in
 # all copies or substantial portions of the Software.
 
-from mcp.server import ConnascenceViolation
 
 class GodObjectsFixer:
     """Fixer for god objects."""
     def __init__(self):
         pass
-        
+
     def fix(self, violation):
         return violation

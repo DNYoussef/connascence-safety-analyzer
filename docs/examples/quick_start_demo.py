@@ -10,7 +10,7 @@ class PaymentProcessor:
     def __init__(self):
         self.data = {}
         self.cnt = 0
-    
+
     # Magic numbers and parameter coupling
     def process_payment(self, amount, card_type, cvv, exp_month, exp_year):
         if amount > 10000:  # Magic limit
@@ -19,7 +19,7 @@ class PaymentProcessor:
             return False
         if len(str(cvv)) != 3 and card_type != 3:  # Amex has 4-digit CVV
             return False
-        
+
         # God object - doing validation, processing, and storage
         payment_id = self.cnt + 1
         self.data[payment_id] = {
@@ -31,16 +31,16 @@ class PaymentProcessor:
         }
         self.cnt += 1
         return payment_id
-    
+
     def _get_timestamp(self):
         import time
         return int(time.time())
-    
+
     def _calculate_fee(self, amount, card_type):
         # Duplicate fee calculation logic appears elsewhere too
         if card_type == 1:  # Visa
             return amount * 0.029
-        elif card_type == 2:  # MasterCard  
+        elif card_type == 2:  # MasterCard
             return amount * 0.031
         else:  # Amex
             return amount * 0.035
@@ -64,10 +64,10 @@ def generate_report(payments, include_fees, sort_by_date, format_currency):
     for payment in payments.values():
         if payment['status'] != 3:  # Magic number again
             results.append(payment)
-    
+
     if sort_by_date:
         results.sort(key=lambda x: x['processed_at'])
-    
+
     return results
 
 """

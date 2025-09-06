@@ -22,9 +22,8 @@ Phase 2 implementation features.
 """
 
 import asyncio
-import sys
-import json
 from pathlib import Path
+import sys
 
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -36,7 +35,7 @@ async def main():
     """Test enhanced tool coordinator."""
     print("Testing Enhanced Tool Coordinator - Phase 2")
     print("=" * 60)
-    
+
     # Initialize enhanced coordinator
     config = {
         'enhancements': {
@@ -47,22 +46,22 @@ async def main():
         'ruff': {'enabled': True},
         'mypy': {'enabled': True}
     }
-    
+
     coordinator = EnhancedToolCoordinator(config)
-    
+
     # Test on analyzer directory (contains connascence violations)
     test_path = Path(__file__).parent.parent / "analyzer"
-    
+
     print(f"Analyzing: {test_path}")
     print("Features enabled:")
     print("  + Enhanced correlation analysis")
-    print("  + Cross-tool severity classification") 
+    print("  + Cross-tool severity classification")
     print("  + AI-powered recommendations")
     print("  + Performance bottleneck detection")
     print("  + NASA rules correlation")
     print("  + MECE analysis integration")
     print()
-    
+
     try:
         # Run enhanced analysis
         result = await coordinator.enhanced_analyze_project(
@@ -72,15 +71,15 @@ async def main():
             enable_nasa_correlation=True,
             enable_mece_analysis=True
         )
-        
+
         print("ENHANCED ANALYSIS RESULTS")
         print("-" * 40)
-        print(f"Base analysis completed: [OK]")
+        print("Base analysis completed: [OK]")
         print(f"Enhanced correlations: {len(result.enhanced_correlations)}")
         print(f"Performance metrics: {len(result.performance_metrics)}")
         print(f"AI recommendations: {len(result.ai_recommendations)}")
         print()
-        
+
         # Show top correlations
         if result.enhanced_correlations:
             print("TOP CORRELATIONS")
@@ -91,7 +90,7 @@ async def main():
                 print(f"   Supporting tools: {len(correlation.supporting_tools)}")
                 print(f"   Priority: {correlation.recommendation_priority}")
                 print()
-        
+
         # Show AI recommendations
         if result.ai_recommendations:
             print("AI RECOMMENDATIONS")
@@ -101,7 +100,7 @@ async def main():
                 print(f"   Type: {rec['type']}")
                 print(f"   Effort: {rec.get('estimated_effort', 'unknown')}")
                 print()
-        
+
         # Show enhanced execution summary
         print("PERFORMANCE METRICS")
         print("-" * 40)
@@ -111,39 +110,39 @@ async def main():
         print(f"Base analysis time: {summary.get('total_execution_time', 0):.2f}s")
         print(f"Enhancement time: {summary.get('enhancement_time', 0):.2f}s")
         print()
-        
+
         # Generate enhanced report
         print("GENERATING ENHANCED REPORT")
         print("-" * 40)
-        
+
         report = coordinator.generate_enhanced_report(result, format_type="text")
         report_lines = report.split('\n')
-        
+
         # Show first 20 lines of report
         print("Preview (first 20 lines):")
         for line in report_lines[:20]:
             print(line)
         print("... (truncated)")
         print()
-        
+
         print("[OK] Phase 2 Enhanced Tool Coordinator Test PASSED")
         print(f"   - Enhanced correlations: {len(result.enhanced_correlations)} generated")
         print(f"   - AI recommendations: {len(result.ai_recommendations)} generated")
         print(f"   - Performance metrics: {len(result.performance_metrics)} identified")
-        print(f"   - Cross-tool consensus: Available")
-        
+        print("   - Cross-tool consensus: Available")
+
         # Save detailed report for inspection
         report_file = Path(__file__).parent.parent / "enhanced_analysis_report.txt"
         with open(report_file, 'w') as f:
             f.write(report)
         print(f"   - Detailed report saved: {report_file}")
-        
+
     except Exception as e:
         print(f"[ERROR] Enhanced analysis failed: {e}")
         import traceback
         traceback.print_exc()
         return 1
-    
+
     return 0
 
 

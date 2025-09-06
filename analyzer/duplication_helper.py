@@ -8,7 +8,7 @@ from typing import Any, Dict, List, Optional
 
 def format_duplication_analysis(duplication_result: Optional[Any]) -> Dict[str, Any]:
     """Format duplication analysis result for core analyzer integration."""
-    
+
     if not duplication_result or not duplication_result.success:
         return {
             'score': 1.0,  # Perfect score when no analysis or failed
@@ -22,10 +22,10 @@ def format_duplication_analysis(duplication_result: Optional[Any]) -> Dict[str, 
             'available': False,
             'error': getattr(duplication_result, 'error', None) if duplication_result else 'Duplication analyzer not available'
         }
-    
+
     # Extract violations from duplication result
     all_violations = []
-    
+
     # Add similarity violations
     for violation in duplication_result.similarity_violations:
         all_violations.append({
@@ -39,7 +39,7 @@ def format_duplication_analysis(duplication_result: Optional[Any]) -> Dict[str, 
             'recommendation': violation.recommendation,
             'analysis_method': 'mece_similarity'
         })
-    
+
     # Add algorithm violations
     for violation in duplication_result.algorithm_violations:
         all_violations.append({
@@ -53,7 +53,7 @@ def format_duplication_analysis(duplication_result: Optional[Any]) -> Dict[str, 
             'recommendation': violation.recommendation,
             'analysis_method': 'coa_algorithm'
         })
-    
+
     return {
         'score': duplication_result.overall_duplication_score,
         'violations': all_violations,
@@ -75,12 +75,12 @@ def format_duplication_analysis(duplication_result: Optional[Any]) -> Dict[str, 
 def get_duplication_severity_counts(violations: List[Dict[str, Any]]) -> Dict[str, int]:
     """Count duplication violations by severity."""
     counts = {'critical': 0, 'high': 0, 'medium': 0, 'low': 0}
-    
+
     for violation in violations:
         severity = violation.get('severity', 'medium')
         if severity in counts:
             counts[severity] += 1
-    
+
     return counts
 
 
@@ -88,21 +88,21 @@ def calculate_duplication_impact_score(violations: List[Dict[str, Any]]) -> floa
     """Calculate overall impact score for duplication violations."""
     if not violations:
         return 0.0
-    
+
     severity_weights = {'critical': 1.0, 'high': 0.7, 'medium': 0.4, 'low': 0.2}
-    
+
     total_impact = 0.0
     for violation in violations:
         severity = violation.get('severity', 'medium')
         similarity = violation.get('similarity_score', 0.5)
         files_count = len(violation.get('files_involved', []))
-        
+
         # Calculate impact: severity * similarity * file_spread
         base_weight = severity_weights.get(severity, 0.4)
         file_multiplier = min(files_count / 2.0, 2.0)  # Cap at 2x for file spread
-        
+
         violation_impact = base_weight * similarity * file_multiplier
         total_impact += violation_impact
-    
+
     # Normalize to 0-1 scale (roughly)
     return min(total_impact / len(violations), 1.0)

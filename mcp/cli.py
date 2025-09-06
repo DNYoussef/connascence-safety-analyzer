@@ -11,19 +11,18 @@ Provides clean integration point for Claude Code without
 tight coupling to Claude Flow.
 """
 
-import asyncio
 import argparse
+import asyncio
 import json
 import logging
-import sys
 from pathlib import Path
-from typing import Dict, Any, Optional
+import sys
+from typing import Any, Dict, Optional
 
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from mcp.enhanced_server import create_enhanced_mcp_server, get_server_info
-from config.central_constants import CONFIG
 
 logger = logging.getLogger(__name__)
 
@@ -44,23 +43,23 @@ async def analyze_file_command(args: argparse.Namespace) -> int:
     """Handle file analysis command."""
     try:
         server = create_enhanced_mcp_server(args.config)
-        
+
         result = await server.analyze_file(
             file_path=args.file_path,
             analysis_type=args.analysis_type,
             include_integrations=args.include_integrations,
             format=args.format
         )
-        
+
         if args.output:
             with open(args.output, 'w') as f:
                 json.dump(result, f, indent=2)
             print(f"Analysis results written to {args.output}")
         else:
             print(json.dumps(result, indent=2))
-        
+
         return 0 if result.get('success', False) else 1
-        
+
     except Exception as e:
         logger.error(f"Analysis failed: {e}")
         return 1
@@ -70,23 +69,23 @@ async def analyze_workspace_command(args: argparse.Namespace) -> int:
     """Handle workspace analysis command."""
     try:
         server = create_enhanced_mcp_server(args.config)
-        
+
         result = await server.analyze_workspace(
             workspace_path=args.workspace_path,
             analysis_type=args.analysis_type,
             file_patterns=args.file_patterns or ['*.py'],
             include_integrations=args.include_integrations
         )
-        
+
         if args.output:
             with open(args.output, 'w') as f:
                 json.dump(result, f, indent=2)
             print(f"Analysis results written to {args.output}")
         else:
             print(json.dumps(result, indent=2))
-        
+
         return 0 if result.get('success', False) else 1
-        
+
     except Exception as e:
         logger.error(f"Workspace analysis failed: {e}")
         return 1
@@ -97,10 +96,10 @@ async def health_check_command(args: argparse.Namespace) -> int:
     try:
         server = create_enhanced_mcp_server(args.config)
         result = await server.health_check()
-        
+
         print(json.dumps(result, indent=2))
         return 0 if result.get('success', False) else 1
-        
+
     except Exception as e:
         logger.error(f"Health check failed: {e}")
         return 1
@@ -121,14 +120,14 @@ def load_config(config_path: Optional[str]) -> Dict[str, Any]:
     """Load configuration from file."""
     if not config_path:
         return {}
-    
+
     config_file = Path(config_path)
     if not config_file.exists():
         logger.warning(f"Config file not found: {config_path}")
         return {}
-    
+
     try:
-        with open(config_file, 'r') as f:
+        with open(config_file) as f:
             return json.load(f)
     except Exception as e:
         logger.error(f"Failed to load config: {e}")
@@ -144,32 +143,32 @@ def create_parser() -> argparse.ArgumentParser:
 Examples:
   # Analyze a single file
   python -m mcp.cli analyze-file src/main.py
-  
+
   # Analyze a workspace
   python -m mcp.cli analyze-workspace . --file-patterns "*.py" "*.js"
-  
+
   # Check server health
   python -m mcp.cli health-check
-  
+
   # Get server info
   python -m mcp.cli info
         """
     )
-    
+
     parser.add_argument(
         '--verbose', '-v',
         action='store_true',
         help='Enable verbose logging'
     )
-    
+
     parser.add_argument(
         '--config', '-c',
         type=str,
         help='Path to configuration file'
     )
-    
+
     subparsers = parser.add_subparsers(dest='command', help='Available commands')
-    
+
     # Analyze file command
     analyze_file_parser = subparsers.add_parser(
         'analyze-file',
@@ -202,7 +201,7 @@ Examples:
         type=str,
         help='Output file path'
     )
-    
+
     # Analyze workspace command
     analyze_workspace_parser = subparsers.add_parser(
         'analyze-workspace',
@@ -234,19 +233,19 @@ Examples:
         type=str,
         help='Output file path'
     )
-    
+
     # Health check command
     subparsers.add_parser(
         'health-check',
         help='Check server health status'
     )
-    
+
     # Server info command
     subparsers.add_parser(
         'info',
         help='Get server information'
     )
-    
+
     return parser
 
 
@@ -254,13 +253,13 @@ async def main() -> int:
     """Main CLI entry point."""
     parser = create_parser()
     args = parser.parse_args()
-    
+
     # Setup logging
     setup_logging(args.verbose)
-    
+
     # Load configuration
     args.config = load_config(args.config)
-    
+
     # Handle commands
     if args.command == 'analyze-file':
         return await analyze_file_command(args)

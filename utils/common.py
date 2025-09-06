@@ -17,8 +17,8 @@ Common utility functions used across the Connascence Safety Analyzer.
 Small utility functions that were duplicated across multiple files.
 """
 
-from typing import List, Any, Dict, Optional
 import re
+from typing import Any, Dict, Optional
 
 
 def format_error_output(error_message: str, context: Optional[Dict[str, Any]] = None) -> str:
@@ -32,11 +32,11 @@ def validate_file_path(file_path: str) -> bool:
     """Validate if a file path is acceptable for processing."""
     if not file_path or not isinstance(file_path, str):
         return False
-    
+
     # Basic validation - no path traversal attempts
     if '..' in file_path or file_path.startswith('/'):
         return False
-        
+
     return True
 
 
@@ -52,7 +52,7 @@ def normalize_severity(severity: str) -> str:
     """Normalize severity strings to standard values."""
     severity_map = {
         'low': 'low',
-        'medium': 'medium', 
+        'medium': 'medium',
         'moderate': 'medium',
         'high': 'high',
         'critical': 'critical',
@@ -60,7 +60,7 @@ def normalize_severity(severity: str) -> str:
         'warning': 'medium',
         'info': 'low'
     }
-    
+
     return severity_map.get(severity.lower(), 'medium')
 
 
@@ -69,16 +69,16 @@ def parse_version_string(version_output: str) -> str:
     # Common version patterns
     patterns = [
         r'(\d+\.\d+\.\d+)',  # x.y.z
-        r'(\d+\.\d+)',       # x.y  
+        r'(\d+\.\d+)',       # x.y
         r'v(\d+\.\d+\.\d+)', # vx.y.z
         r'version (\d+\.\d+\.\d+)', # version x.y.z
     ]
-    
+
     for pattern in patterns:
         match = re.search(pattern, version_output)
         if match:
             return match.group(1)
-    
+
     return version_output.strip()
 
 
@@ -86,8 +86,8 @@ def create_unique_identifier(prefix: str = "", length: int = 8) -> str:
     """Create a unique identifier with optional prefix."""
     import random
     import string
-    
+
     chars = string.ascii_letters + string.digits
     unique_part = ''.join(random.choice(chars) for _ in range(length))
-    
+
     return f"{prefix}{unique_part}" if prefix else unique_part

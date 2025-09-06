@@ -17,7 +17,7 @@ Unified Reporting Coordinator
 
 Central coordinator for all reporting formats that leverages existing infrastructure:
 - JSON export (existing: reporting/json_export.py)
-- SARIF export (existing: reporting/sarif_export.py) 
+- SARIF export (existing: reporting/sarif_export.py)
 - Markdown summaries (existing: reporting/md_summary.py)
 - HTML dashboard (existing: dashboard/)
 - CLI outputs (existing: cli/)
@@ -27,20 +27,18 @@ This provides a single entry point for generating reports in any format
 while maintaining compatibility with all existing components.
 """
 
-import os
-import sys
-from pathlib import Path
-from typing import Dict, List, Any, Optional, Union
-import json
 import logging
+from pathlib import Path
+import sys
+from typing import Any, Dict, List, Optional, Union
 
 # Add parent directories to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 # Import existing reporting modules
 from analyzer.reporting.json import JSONReporter
-from analyzer.reporting.sarif import SARIFReporter  
 from analyzer.reporting.markdown import MarkdownReporter
+from analyzer.reporting.sarif import SARIFReporter
 
 # Import unified analyzer
 from analyzer.unified_analyzer import UnifiedAnalysisResult
@@ -51,56 +49,56 @@ logger = logging.getLogger(__name__)
 class UnifiedReportingCoordinator:
     """
     Central coordinator for all reporting formats.
-    
+
     Leverages existing reporting infrastructure while providing a unified
     interface for generating reports in any supported format.
     """
-    
+
     SUPPORTED_FORMATS = [
         'json',           # Machine-readable structured data
         'sarif',          # GitHub Code Scanning compatible
-        'markdown',       # PR summaries and documentation  
+        'markdown',       # PR summaries and documentation
         'html',           # Interactive dashboard
         'text',           # CLI-friendly output
         'csv',            # Spreadsheet-compatible
         'xml',            # Enterprise integration
         'summary'         # Executive summary
     ]
-    
+
     def __init__(self):
         """Initialize the reporting coordinator with all format handlers."""
-        
+
         # Initialize existing reporters
         self.json_reporter = JSONReporter()
         self.sarif_reporter = SARIFReporter()
         self.markdown_reporter = MarkdownReporter()
-        
+
         logger.info("Unified Reporting Coordinator initialized with all format handlers")
-    
-    def generate_report(self, 
+
+    def generate_report(self,
                        analysis_result: UnifiedAnalysisResult,
                        format_type: str,
                        output_path: Optional[Union[str, Path]] = None,
                        options: Optional[Dict[str, Any]] = None) -> str:
         """
         Generate a report in the specified format.
-        
+
         Args:
             analysis_result: Results from unified analysis
             format_type: Target format ('json', 'sarif', 'markdown', etc.)
             output_path: Optional file path to save report
             options: Additional formatting options
-            
+
         Returns:
             Report content as string
         """
-        
+
         if format_type not in self.SUPPORTED_FORMATS:
             raise ValueError(f"Unsupported format: {format_type}. Supported: {self.SUPPORTED_FORMATS}")
-        
+
         options = options or {}
         logger.info(f"Generating {format_type} report for {analysis_result.project_path}")
-        
+
         # Route to appropriate reporter
         if format_type == 'json':
             content = self._generate_json_report(analysis_result, options)
@@ -120,19 +118,19 @@ class UnifiedReportingCoordinator:
             content = self._generate_summary_report(analysis_result, options)
         else:
             raise ValueError(f"Format handler not implemented: {format_type}")
-        
+
         # Save to file if path provided
         if output_path:
             output_path = Path(output_path)
             output_path.parent.mkdir(parents=True, exist_ok=True)
-            
+
             with open(output_path, 'w', encoding='utf-8') as f:
                 f.write(content)
-            
+
             logger.info(f"Report saved to {output_path}")
-        
+
         return content
-    
+
     def generate_multi_format_report(self,
                                    analysis_result: UnifiedAnalysisResult,
                                    formats: List[str],
@@ -140,54 +138,54 @@ class UnifiedReportingCoordinator:
                                    base_filename: str = "connascence_report") -> Dict[str, str]:
         """
         Generate reports in multiple formats simultaneously.
-        
+
         Args:
             analysis_result: Results from unified analysis
             formats: List of format types to generate
             output_dir: Directory to save all reports
             base_filename: Base name for output files
-            
+
         Returns:
             Dictionary mapping format to output file path
         """
-        
+
         output_dir = Path(output_dir)
         output_dir.mkdir(parents=True, exist_ok=True)
-        
+
         generated_files = {}
-        
+
         for format_type in formats:
             if format_type not in self.SUPPORTED_FORMATS:
                 logger.warning(f"Skipping unsupported format: {format_type}")
                 continue
-            
+
             # Determine file extension
             extension_map = {
                 'json': 'json',
                 'sarif': 'sarif',
                 'markdown': 'md',
-                'html': 'html', 
+                'html': 'html',
                 'text': 'txt',
                 'csv': 'csv',
                 'xml': 'xml',
                 'summary': 'txt'
             }
-            
+
             extension = extension_map.get(format_type, format_type)
             output_file = output_dir / f"{base_filename}.{extension}"
-            
+
             try:
                 self.generate_report(analysis_result, format_type, output_file)
                 generated_files[format_type] = str(output_file)
                 logger.info(f"Generated {format_type} report: {output_file}")
             except Exception as e:
                 logger.error(f"Failed to generate {format_type} report: {e}")
-        
+
         return generated_files
-    
+
     def get_dashboard_report_data(self, analysis_result: UnifiedAnalysisResult) -> Dict[str, Any]:
         """Generate data optimized for dashboard display."""
-        
+
         return {
             'project_info': {
                 'name': Path(analysis_result.project_path).name,
@@ -228,23 +226,23 @@ class UnifiedReportingCoordinator:
                 'trend_data': self._create_trend_chart_data(analysis_result)
             }
         }
-    
+
     def get_cli_summary(self, analysis_result: UnifiedAnalysisResult, verbose: bool = False) -> str:
         """Generate CLI-friendly summary output."""
-        
+
         lines = []
         lines.append("=" * 60)
         lines.append("CONNASCENCE ANALYSIS SUMMARY")
         lines.append("=" * 60)
         lines.append("")
-        
+
         # Project info
         lines.append(f"Project: {Path(analysis_result.project_path).name}")
         lines.append(f"Policy: {analysis_result.policy_preset}")
         lines.append(f"Files analyzed: {analysis_result.files_analyzed}")
         lines.append(f"Analysis time: {analysis_result.analysis_duration_ms}ms")
         lines.append("")
-        
+
         # Quality scores
         lines.append("QUALITY METRICS:")
         lines.append(f"  Overall Quality Score: {analysis_result.overall_quality_score:.3f}")
@@ -252,7 +250,7 @@ class UnifiedReportingCoordinator:
         lines.append(f"  NASA Compliance: {analysis_result.nasa_compliance_score:.3f}")
         lines.append(f"  Duplication Score: {analysis_result.duplication_score:.3f}")
         lines.append("")
-        
+
         # Violation summary
         lines.append("VIOLATIONS FOUND:")
         lines.append(f"  Total: {analysis_result.total_violations}")
@@ -261,45 +259,45 @@ class UnifiedReportingCoordinator:
         lines.append(f"  Medium: {analysis_result.medium_count}")
         lines.append(f"  Low: {analysis_result.low_count}")
         lines.append("")
-        
+
         # Recommendations
         if analysis_result.priority_fixes:
             lines.append("PRIORITY FIXES:")
             for fix in analysis_result.priority_fixes[:5]:
                 lines.append(f"  - {fix}")
             lines.append("")
-        
+
         if verbose and analysis_result.improvement_actions:
             lines.append("IMPROVEMENT ACTIONS:")
             for action in analysis_result.improvement_actions[:5]:
                 lines.append(f"  - {action}")
             lines.append("")
-        
+
         lines.append("=" * 60)
         return "\n".join(lines)
-    
+
     # Format-specific generators
-    
+
     def _generate_json_report(self, analysis_result: UnifiedAnalysisResult, options: Dict) -> str:
         """Generate JSON report using existing JSONReporter."""
         # Convert UnifiedAnalysisResult to format expected by JSONReporter
         legacy_result = self._convert_to_legacy_format(analysis_result)
         return self.json_reporter.generate(legacy_result)
-    
+
     def _generate_sarif_report(self, analysis_result: UnifiedAnalysisResult, options: Dict) -> str:
-        """Generate SARIF report using existing SARIFReporter.""" 
+        """Generate SARIF report using existing SARIFReporter."""
         legacy_result = self._convert_to_legacy_format(analysis_result)
         return self.sarif_reporter.generate(legacy_result)
-    
+
     def _generate_markdown_report(self, analysis_result: UnifiedAnalysisResult, options: Dict) -> str:
         """Generate Markdown report using existing MarkdownReporter."""
         legacy_result = self._convert_to_legacy_format(analysis_result)
         return self.markdown_reporter.generate(legacy_result)
-    
+
     def _generate_html_report(self, analysis_result: UnifiedAnalysisResult, options: Dict) -> str:
         """Generate HTML report for dashboard."""
-        dashboard_data = self.get_dashboard_report_data(analysis_result)
-        
+        self.get_dashboard_report_data(analysis_result)
+
         html_template = """
 <!DOCTYPE html>
 <html>
@@ -324,7 +322,7 @@ class UnifiedReportingCoordinator:
         <p><strong>Project:</strong> {project_name}</p>
         <p><strong>Analysis Time:</strong> {timestamp}</p>
     </div>
-    
+
     <div class="metrics">
         <div class="metric">
             <h3>Overall Quality</h3>
@@ -339,7 +337,7 @@ class UnifiedReportingCoordinator:
             <div style="font-size: 24px; font-weight: bold;">{total_violations}</div>
         </div>
     </div>
-    
+
     <div class="violations">
         <h2>Priority Fixes</h2>
         {priority_fixes_html}
@@ -347,11 +345,11 @@ class UnifiedReportingCoordinator:
 </body>
 </html>
 """
-        
+
         priority_fixes_html = ""
         for fix in analysis_result.priority_fixes[:10]:
             priority_fixes_html += f'<div class="violation-item critical">• {fix}</div>\n'
-        
+
         return html_template.format(
             project_name=Path(analysis_result.project_path).name,
             timestamp=analysis_result.timestamp,
@@ -360,25 +358,25 @@ class UnifiedReportingCoordinator:
             total_violations=analysis_result.total_violations,
             priority_fixes_html=priority_fixes_html
         )
-    
+
     def _generate_text_report(self, analysis_result: UnifiedAnalysisResult, options: Dict) -> str:
         """Generate plain text report."""
         return self.get_cli_summary(analysis_result, verbose=options.get('verbose', False))
-    
+
     def _generate_csv_report(self, analysis_result: UnifiedAnalysisResult, options: Dict) -> str:
         """Generate CSV report."""
         import csv
         import io
-        
+
         output = io.StringIO()
         writer = csv.writer(output)
-        
+
         # Header
         writer.writerow([
-            'File Path', 'Line Number', 'Type', 'Severity', 
+            'File Path', 'Line Number', 'Type', 'Severity',
             'Description', 'Weight', 'Category'
         ])
-        
+
         # Connascence violations
         for violation in analysis_result.connascence_violations:
             writer.writerow([
@@ -390,7 +388,7 @@ class UnifiedReportingCoordinator:
                 violation.get('weight', 1),
                 'Connascence'
             ])
-        
+
         # NASA violations
         for violation in analysis_result.nasa_violations:
             writer.writerow([
@@ -402,9 +400,9 @@ class UnifiedReportingCoordinator:
                 1,   # weight
                 'NASA'
             ])
-        
+
         return output.getvalue()
-    
+
     def _generate_xml_report(self, analysis_result: UnifiedAnalysisResult, options: Dict) -> str:
         """Generate XML report for enterprise integration."""
         xml_content = f"""<?xml version="1.0" encoding="UTF-8"?>
@@ -416,14 +414,14 @@ class UnifiedReportingCoordinator:
         <files-analyzed>{analysis_result.files_analyzed}</files-analyzed>
         <analysis-duration-ms>{analysis_result.analysis_duration_ms}</analysis-duration-ms>
     </metadata>
-    
+
     <quality-metrics>
         <overall-score>{analysis_result.overall_quality_score}</overall-score>
         <connascence-index>{analysis_result.connascence_index}</connascence-index>
         <nasa-compliance>{analysis_result.nasa_compliance_score}</nasa-compliance>
         <duplication-score>{analysis_result.duplication_score}</duplication-score>
     </quality-metrics>
-    
+
     <violation-summary>
         <total>{analysis_result.total_violations}</total>
         <critical>{analysis_result.critical_count}</critical>
@@ -431,10 +429,10 @@ class UnifiedReportingCoordinator:
         <medium>{analysis_result.medium_count}</medium>
         <low>{analysis_result.low_count}</low>
     </violation-summary>
-    
+
     <violations>
 """
-        
+
         for violation in analysis_result.connascence_violations[:10]:  # Limit for brevity
             xml_content += f"""        <violation>
             <type>{violation.get('type', '')}</type>
@@ -444,15 +442,15 @@ class UnifiedReportingCoordinator:
             <description>{violation.get('description', '')}</description>
         </violation>
 """
-        
+
         xml_content += """    </violations>
 </connascence-report>"""
-        
+
         return xml_content
-    
+
     def _generate_summary_report(self, analysis_result: UnifiedAnalysisResult, options: Dict) -> str:
         """Generate executive summary report."""
-        
+
         # Calculate quality rating
         score = analysis_result.overall_quality_score
         if score >= 0.9:
@@ -463,7 +461,7 @@ class UnifiedReportingCoordinator:
             quality_rating = "FAIR"
         else:
             quality_rating = "NEEDS IMPROVEMENT"
-        
+
         summary = f"""EXECUTIVE SUMMARY - CONNASCENCE ANALYSIS
 =============================================
 
@@ -480,61 +478,61 @@ KEY METRICS:
 
 PRIORITY ACTIONS:
 """
-        
+
         for i, fix in enumerate(analysis_result.priority_fixes[:3], 1):
             summary += f"{i}. {fix}\n"
-        
-        summary += f"\nRECOMMENDATION: "
+
+        summary += "\nRECOMMENDATION: "
         if analysis_result.critical_count > 0:
             summary += "Address critical violations immediately before deployment."
         elif analysis_result.high_count > 5:
             summary += "Focus on reducing high-severity connascence violations."
         else:
             summary += "Continue maintaining good code quality practices."
-        
+
         return summary
-    
+
     # Helper methods for chart data and legacy conversion
-    
+
     def _create_severity_chart_data(self, analysis_result: UnifiedAnalysisResult) -> Dict:
-        """Create chart data for severity distribution.""" 
+        """Create chart data for severity distribution."""
         return {
             'labels': ['Critical', 'High', 'Medium', 'Low'],
             'data': [
                 analysis_result.critical_count,
-                analysis_result.high_count, 
+                analysis_result.high_count,
                 analysis_result.medium_count,
                 analysis_result.low_count
             ]
         }
-    
+
     def _create_file_chart_data(self, analysis_result: UnifiedAnalysisResult) -> Dict:
         """Create chart data for file distribution."""
         file_counts = {}
         for violation in analysis_result.connascence_violations:
             file_path = Path(violation.get('file_path', '')).name
             file_counts[file_path] = file_counts.get(file_path, 0) + 1
-        
+
         # Get top 10 files
         sorted_files = sorted(file_counts.items(), key=lambda x: x[1], reverse=True)[:10]
-        
+
         return {
             'labels': [item[0] for item in sorted_files],
             'data': [item[1] for item in sorted_files]
         }
-    
+
     def _create_type_chart_data(self, analysis_result: UnifiedAnalysisResult) -> Dict:
         """Create chart data for violation type distribution."""
         type_counts = {}
         for violation in analysis_result.connascence_violations:
             viol_type = violation.get('type', 'unknown')
             type_counts[viol_type] = type_counts.get(viol_type, 0) + 1
-        
+
         return {
             'labels': list(type_counts.keys()),
             'data': list(type_counts.values())
         }
-    
+
     def _create_trend_chart_data(self, analysis_result: UnifiedAnalysisResult) -> Dict:
         """Create placeholder trend data (would be populated by historical tracking)."""
         return {
@@ -547,22 +545,22 @@ PRIORITY ACTIONS:
                 analysis_result.total_violations
             ]
         }
-    
+
     def _convert_to_legacy_format(self, analysis_result: UnifiedAnalysisResult) -> Any:
         """Convert UnifiedAnalysisResult to legacy format for existing reporters."""
-        
+
         # This would create a mock AnalysisResult object that existing reporters expect
         # For now, return a simple dict that should work with most reporters
-        
+
         class MockAnalysisResult:
             def __init__(self, unified_result):
                 self.violations = []
-                
+
                 # Convert violations to legacy format
                 for violation in unified_result.connascence_violations:
                     mock_violation = MockViolation(violation)
                     self.violations.append(mock_violation)
-                
+
                 self.project_root = unified_result.project_path
                 self.timestamp = unified_result.timestamp
                 self.total_files_analyzed = unified_result.files_analyzed
@@ -575,7 +573,7 @@ PRIORITY ACTIONS:
                     'medium_count': unified_result.medium_count,
                     'low_count': unified_result.low_count
                 }
-        
+
         class MockViolation:
             def __init__(self, violation_dict):
                 self.id = violation_dict.get('id', '')
@@ -594,19 +592,19 @@ PRIORITY ACTIONS:
                 self.recommendation = ''
                 self.context = {}
                 self.code_snippet = None
-                
+
                 # Create mock type and severity objects
                 self.type = MockType(self.type_value)
                 self.severity = MockSeverity(self.severity_value)
-        
+
         class MockType:
             def __init__(self, value):
                 self.value = value
-        
+
         class MockSeverity:
             def __init__(self, value):
                 self.value = value
-        
+
         return MockAnalysisResult(analysis_result)
 
 

@@ -8,25 +8,20 @@ This script orchestrates the systematic elimination of 95,395 violations through
 phased consolidation of magic literals, algorithm duplication, and architectural patterns.
 """
 
-import json
-import os
-import re
-import sys
-from pathlib import Path
-from typing import Dict, List, Tuple, Set
-from dataclasses import dataclass, asdict
-from datetime import datetime
 import argparse
+from dataclasses import asdict, dataclass
+from datetime import datetime
+import json
+from pathlib import Path
+import re
 import subprocess
+import sys
+from typing import List
 
 # Add analyzer to path for constants access
 sys.path.insert(0, str(Path(__file__).parent.parent / "analyzer"))
-from constants import (
-    MAGIC_LITERAL_THRESHOLD,
-    GOD_OBJECT_METHOD_THRESHOLD, 
-    MECE_SIMILARITY_THRESHOLD,
-    OVERALL_QUALITY_THRESHOLD
-)
+from constants import OVERALL_QUALITY_THRESHOLD
+
 
 @dataclass
 class ConsolidationMetrics:
@@ -38,13 +33,13 @@ class ConsolidationMetrics:
     files_modified: int
     quality_score_before: float
     quality_score_after: float
-    
+
     @property
     def violation_reduction_percent(self) -> float:
         if self.violations_before == 0:
             return 0.0
         return ((self.violations_before - self.violations_after) / self.violations_before) * 100
-    
+
     @property
     def quality_improvement_percent(self) -> float:
         if self.quality_score_before == 0:
@@ -66,29 +61,29 @@ class DuplicationPattern:
 
 class ConsolidationRoadmap:
     """Main consolidation orchestrator."""
-    
+
     def __init__(self, project_root: Path):
         self.project_root = project_root
         self.analyzer_dir = project_root / "analyzer"
         self.shared_dir = project_root / "shared"
         self.scripts_dir = project_root / "scripts" / "consolidation"
         self.metrics_history: List[ConsolidationMetrics] = []
-        
+
         # Ensure directories exist
         self.shared_dir.mkdir(exist_ok=True)
         self.scripts_dir.mkdir(parents=True, exist_ok=True)
-    
+
     def analyze_baseline(self) -> ConsolidationMetrics:
         """Analyze current state to establish baseline metrics."""
         print("🔍 Analyzing baseline duplication patterns...")
-        
+
         # Run analysis to get current violation count
         try:
             result = subprocess.run([
-                sys.executable, "-m", "analyzer.check_connascence", 
+                sys.executable, "-m", "analyzer.check_connascence",
                 str(self.project_root), "--json"
             ], capture_output=True, text=True, cwd=self.project_root)
-            
+
             if result.returncode == 0:
                 analysis_data = json.loads(result.stdout)
                 total_violations = analysis_data.get("summary", {}).get("total_violations", 0)
@@ -97,12 +92,12 @@ class ConsolidationRoadmap:
                 print(f"⚠️  Analysis failed: {result.stderr}")
                 total_violations = 95395  # Known baseline from analysis
                 quality_score = 0.48
-                
+
         except Exception as e:
             print(f"⚠️  Using known baseline values due to error: {e}")
             total_violations = 95395
             quality_score = 0.48
-        
+
         baseline = ConsolidationMetrics(
             timestamp=datetime.now().isoformat(),
             phase="baseline",
@@ -112,17 +107,17 @@ class ConsolidationRoadmap:
             quality_score_before=quality_score,
             quality_score_after=quality_score
         )
-        
+
         self.metrics_history.append(baseline)
         print(f"📊 Baseline: {total_violations} violations, quality score: {quality_score:.2f}")
         return baseline
-    
+
     def identify_duplication_patterns(self) -> List[DuplicationPattern]:
         """Identify all duplication patterns using MECE framework."""
         print("🔍 Identifying duplication patterns...")
-        
+
         patterns = []
-        
+
         # P0: Magic Literals (Critical Impact, High Effort)
         magic_literal_files = self._find_files_with_magic_literals()
         patterns.append(DuplicationPattern(
@@ -132,10 +127,10 @@ class ConsolidationRoadmap:
             consolidation_target="shared/constants.py",
             priority="P0",
             effort_estimate="HIGH",
-            impact_estimate="CRITICAL", 
+            impact_estimate="CRITICAL",
             violation_count=92086
         ))
-        
+
         # P1: Algorithm Duplication (High Impact, Medium Effort)
         algorithm_files = self._find_algorithm_duplication()
         patterns.append(DuplicationPattern(
@@ -143,12 +138,12 @@ class ConsolidationRoadmap:
             pattern_id="detection_algorithms",
             locations=algorithm_files,
             consolidation_target="shared/detection_algorithms.py",
-            priority="P1", 
+            priority="P1",
             effort_estimate="MEDIUM",
             impact_estimate="HIGH",
             violation_count=2395
         ))
-        
+
         # P2: Policy Resolution (Medium Impact, Medium Effort)
         policy_files = self._find_policy_duplication()
         patterns.append(DuplicationPattern(
@@ -157,27 +152,27 @@ class ConsolidationRoadmap:
             locations=policy_files,
             consolidation_target="shared/policies.py",
             priority="P2",
-            effort_estimate="MEDIUM", 
+            effort_estimate="MEDIUM",
             impact_estimate="MEDIUM",
             violation_count=150  # Estimated
         ))
-        
+
         # P3: Configuration Logic (Medium Impact, Medium Effort)
         config_files = self._find_config_duplication()
         patterns.append(DuplicationPattern(
             pattern_type="config",
             pattern_id="config_management",
             locations=config_files,
-            consolidation_target="shared/config_management.py", 
+            consolidation_target="shared/config_management.py",
             priority="P3",
             effort_estimate="MEDIUM",
             impact_estimate="MEDIUM",
             violation_count=100  # Estimated
         ))
-        
+
         print(f"✅ Identified {len(patterns)} duplication patterns")
         return patterns
-    
+
     def _find_files_with_magic_literals(self) -> List[str]:
         """Find all files with magic literals."""
         files = []
@@ -185,7 +180,7 @@ class ConsolidationRoadmap:
             if self._file_has_magic_literals(py_file):
                 files.append(str(py_file.relative_to(self.project_root)))
         return files
-    
+
     def _file_has_magic_literals(self, file_path: Path) -> bool:
         """Check if file contains magic literals."""
         try:
@@ -193,7 +188,7 @@ class ConsolidationRoadmap:
             # Look for common magic literal patterns
             patterns = [
                 r'Magic literal.*should be a named constant',
-                r'"\w+".*appears.*duplicate', 
+                r'"\w+".*appears.*duplicate',
                 r'\d+\s*#.*threshold',
                 r'["\'][\w\-_\.]+["\'].*magic'
             ]
@@ -203,7 +198,7 @@ class ConsolidationRoadmap:
         except Exception:
             pass
         return False
-    
+
     def _find_algorithm_duplication(self) -> List[str]:
         """Find files with algorithm duplication."""
         return [
@@ -211,13 +206,13 @@ class ConsolidationRoadmap:
             "analyzer/language_strategies.py",
             "analyzer/core.py"
         ]
-    
+
     def _find_policy_duplication(self) -> List[str]:
         """Find files with policy resolution duplication."""
         files = []
         for py_file in self.project_root.rglob("*.py"):
             try:
-                content = py_file.read_text(encoding='utf-8', errors='ignore') 
+                content = py_file.read_text(encoding='utf-8', errors='ignore')
                 if any(policy in content for policy in [
                     "nasa_jpl_pot10", "strict-core", "service-defaults",
                     "safety_level_1", "general_safety_strict", "experimental"
@@ -226,7 +221,7 @@ class ConsolidationRoadmap:
             except Exception:
                 pass
         return files[:10]  # Limit to most relevant
-    
+
     def _find_config_duplication(self) -> List[str]:
         """Find files with configuration duplication."""
         config_patterns = ["config", "settings", "loader"]
@@ -235,21 +230,21 @@ class ConsolidationRoadmap:
             if any(pattern in str(py_file).lower() for pattern in config_patterns):
                 files.append(str(py_file.relative_to(self.project_root)))
         return files
-    
+
     def execute_phase_0_magic_literals(self) -> ConsolidationMetrics:
         """Execute Phase 0: Magic Literals Consolidation (P0)."""
         print("🚀 Phase 0: Consolidating Magic Literals...")
-        
+
         phase_start_metrics = self._get_current_metrics("phase_0_start")
-        
+
         # Create expanded constants file
         self._create_expanded_constants_file()
-        
+
         # Apply magic literal migrations (simulated for demo)
         files_modified = self._apply_magic_literal_migrations()
-        
-        phase_end_metrics = self._get_current_metrics("phase_0_end")
-        
+
+        self._get_current_metrics("phase_0_end")
+
         consolidation_metrics = ConsolidationMetrics(
             timestamp=datetime.now().isoformat(),
             phase="phase_0_magic_literals",
@@ -259,41 +254,41 @@ class ConsolidationRoadmap:
             quality_score_before=phase_start_metrics.quality_score_before,
             quality_score_after=0.85  # Target quality score after magic literal cleanup
         )
-        
+
         self.metrics_history.append(consolidation_metrics)
-        
+
         print(f"✅ Phase 0 Complete: {consolidation_metrics.violation_reduction_percent:.1f}% violation reduction")
         return consolidation_metrics
-    
+
     def execute_phase_1_algorithms(self) -> ConsolidationMetrics:
-        """Execute Phase 1: Algorithm Duplication Consolidation (P1).""" 
+        """Execute Phase 1: Algorithm Duplication Consolidation (P1)."""
         print("🚀 Phase 1: Consolidating Algorithm Duplication...")
-        
+
         phase_start_metrics = self._get_current_metrics("phase_1_start")
-        
+
         # Create unified detection algorithms
         self._create_detection_algorithms_module()
-        
+
         # Refactor duplicate detection functions
         files_modified = self._consolidate_detection_algorithms()
-        
-        phase_end_metrics = self._get_current_metrics("phase_1_end")
-        
+
+        self._get_current_metrics("phase_1_end")
+
         consolidation_metrics = ConsolidationMetrics(
             timestamp=datetime.now().isoformat(),
             phase="phase_1_algorithms",
             violations_before=phase_start_metrics.violations_before,
             violations_after=max(0, phase_start_metrics.violations_before - 2000),  # Simulate CoA reduction
             files_modified=files_modified,
-            quality_score_before=phase_start_metrics.quality_score_before, 
+            quality_score_before=phase_start_metrics.quality_score_before,
             quality_score_after=min(0.95, phase_start_metrics.quality_score_before + 0.05)
         )
-        
+
         self.metrics_history.append(consolidation_metrics)
-        
+
         print(f"✅ Phase 1 Complete: {consolidation_metrics.violation_reduction_percent:.1f}% violation reduction")
         return consolidation_metrics
-    
+
     def _create_expanded_constants_file(self):
         """Create expanded constants.py with all magic literals."""
         expanded_constants = '''# SPDX-License-Identifier: MIT
@@ -434,12 +429,12 @@ UTF8_ENCODING = "utf-8"
 print(f"✅ MECE Consolidation Phase 0: Loaded {len([k for k in globals() if k.isupper() and not k.startswith('_')])} constants")
 print(f"🎯 Target: Eliminate 92,086 magic literal violations")
 '''
-        
+
         # Write to shared directory
         constants_file = self.shared_dir / "constants.py"
         constants_file.write_text(expanded_constants)
         print(f"✅ Created expanded constants file: {constants_file}")
-    
+
     def _apply_magic_literal_migrations(self) -> int:
         """Apply magic literal migrations (simulated)."""
         # In real implementation, this would:
@@ -447,16 +442,16 @@ print(f"🎯 Target: Eliminate 92,086 magic literal violations")
         # 2. Replace magic literals with constant references
         # 3. Add import statements for new constants
         # 4. Update all 630 files systematically
-        
+
         print("🔄 Applying magic literal migrations...")
         print("   • Replacing 92,086 magic literal violations")
         print("   • Updating import statements")
         print("   • Validating syntax correctness")
-        
+
         return 630  # All files would be modified
-    
+
     def _create_detection_algorithms_module(self):
-        """Create unified detection algorithms module.""" 
+        """Create unified detection algorithms module."""
         detection_algorithms = '''# SPDX-License-Identifier: MIT
 # SPDX-FileCopyrightText: 2024 Connascence Safety Analyzer Contributors
 
@@ -485,49 +480,49 @@ from .constants import (
 
 class DetectionStrategy(ABC):
     """Unified base strategy for all connascence detection."""
-    
+
     def __init__(self, language: str):
         self.language = language
-    
+
     @abstractmethod
     def detect_magic_literals(self, file_path: Path, source_lines: List[str]) -> List[dict]:
         """Detect magic literals using language-specific patterns."""
         pass
-    
+
     @abstractmethod
     def detect_god_functions(self, file_path: Path, source_lines: List[str]) -> List[dict]:
         """Detect god functions using language-specific patterns."""
         pass
-    
-    @abstractmethod 
+
+    @abstractmethod
     def detect_parameter_coupling(self, file_path: Path, source_lines: List[str]) -> List[dict]:
         """Detect parameter coupling using language-specific patterns."""
         pass
 
 class UnifiedDetectionStrategy(DetectionStrategy):
     """Unified detection strategy eliminating algorithm duplication."""
-    
+
     def __init__(self, language: str, patterns: Dict[str, Pattern]):
         super().__init__(language)
         self.patterns = patterns
-    
+
     def detect_magic_literals(self, file_path: Path, source_lines: List[str]) -> List[dict]:
         """Unified magic literal detection for all languages."""
         violations = []
-        
+
         for line_num, line in enumerate(source_lines, 1):
             if self._is_comment_line(line):
                 continue
-                
+
             # Apply unified numeric pattern matching
             for match in self.patterns['numeric'].finditer(line):
                 violations.append(self._create_violation(
-                    'magic_literal', file_path, line_num, 
+                    'magic_literal', file_path, line_num,
                     MAGIC_LITERAL_MESSAGE_TEMPLATE.format(match.group()),
                     line.strip()
                 ))
-                
-            # Apply unified string pattern matching  
+
+            # Apply unified string pattern matching
             for match in self.patterns['string'].finditer(line):
                 if not self._is_excluded_string(match.group()):
                     violations.append(self._create_violation(
@@ -535,16 +530,16 @@ class UnifiedDetectionStrategy(DetectionStrategy):
                         MAGIC_LITERAL_MESSAGE_TEMPLATE.format(match.group()),
                         line.strip()
                     ))
-                    
+
         return violations
-    
+
     def detect_god_functions(self, file_path: Path, source_lines: List[str]) -> List[dict]:
         """Unified god function detection for all languages."""
         violations = []
         current_function = None
         function_start = 0
         brace_count = 0
-        
+
         for line_num, line in enumerate(source_lines, 1):
             # Detect function start using unified patterns
             func_match = self.patterns['function'].search(line)
@@ -554,7 +549,7 @@ class UnifiedDetectionStrategy(DetectionStrategy):
                 brace_count = self._count_braces(line)
             elif current_function:
                 brace_count += self._count_braces(line)
-                
+
                 # Function end detected
                 if brace_count <= 0:
                     function_length = line_num - function_start + 1
@@ -565,19 +560,19 @@ class UnifiedDetectionStrategy(DetectionStrategy):
                             f"Function spans {function_length} lines"
                         ))
                     current_function = None
-                    
+
         return violations
-    
+
     def detect_parameter_coupling(self, file_path: Path, source_lines: List[str]) -> List[dict]:
         """Unified parameter coupling detection for all languages."""
         violations = []
-        
+
         for line_num, line in enumerate(source_lines, 1):
             param_match = self.patterns['parameters'].search(line)
             if param_match:
                 params_str = param_match.group(1) if param_match.groups() else ""
                 param_count = self._count_parameters(params_str)
-                
+
                 if param_count > NASA_PARAMETER_THRESHOLD:
                     function_name = self._extract_function_name(line)
                     violations.append(self._create_violation(
@@ -585,10 +580,10 @@ class UnifiedDetectionStrategy(DetectionStrategy):
                         PARAMETER_COUPLING_MESSAGE_TEMPLATE.format(function_name, param_count),
                         line.strip()
                     ))
-                    
+
         return violations
-    
-    def _create_violation(self, violation_type: str, file_path: Path, line_num: int, 
+
+    def _create_violation(self, violation_type: str, file_path: Path, line_num: int,
                          description: str, code_snippet: str) -> dict:
         """Create standardized violation dictionary."""
         return {
@@ -599,7 +594,7 @@ class UnifiedDetectionStrategy(DetectionStrategy):
             'code_snippet': code_snippet,
             'language': self.language
         }
-    
+
     def _is_comment_line(self, line: str) -> bool:
         """Check if line is a comment using language-specific patterns."""
         comment_patterns = {
@@ -609,17 +604,17 @@ class UnifiedDetectionStrategy(DetectionStrategy):
         }
         pattern = comment_patterns.get(self.language, r'^\\s*#')
         return bool(re.match(pattern, line))
-    
+
     def _count_braces(self, line: str) -> int:
         """Count opening/closing braces for function detection."""
         return line.count('{') - line.count('}')
-    
+
     def _count_parameters(self, params_str: str) -> int:
         """Count parameters in function signature."""
         if not params_str.strip():
             return 0
         return len([p for p in params_str.split(',') if p.strip()])
-    
+
     def _extract_function_name(self, line: str) -> str:
         """Extract function name from function definition line."""
         patterns = {
@@ -630,7 +625,7 @@ class UnifiedDetectionStrategy(DetectionStrategy):
         pattern = patterns.get(self.language, r'([\\w_]+)')
         match = re.search(pattern, line)
         return match.group(1) if match else "unknown"
-    
+
     def _is_excluded_string(self, literal: str) -> bool:
         """Check if string literal should be excluded from detection."""
         excluded_patterns = ['""', "''", '"\\n"', "'\\n'", '"\\t"', "'\\t'"]
@@ -638,13 +633,13 @@ class UnifiedDetectionStrategy(DetectionStrategy):
 
 class DetectionStrategyFactory:
     """Factory for creating unified detection strategies."""
-    
+
     @staticmethod
     def create_strategy(language: str) -> DetectionStrategy:
         """Create appropriate detection strategy for language."""
         patterns = DetectionStrategyFactory._get_language_patterns(language)
         return UnifiedDetectionStrategy(language, patterns)
-    
+
     @staticmethod
     def _get_language_patterns(language: str) -> Dict[str, Pattern]:
         """Get compiled regex patterns for language."""
@@ -682,7 +677,7 @@ class DetectionStrategyFactory:
 def detect_violations(language: str, detection_type: str, file_path: Path, source_lines: List[str]) -> List[dict]:
     """Unified detection function replacing 18+ duplicate functions."""
     strategy = DetectionStrategyFactory.create_strategy(language)
-    
+
     if detection_type == 'magic_literals':
         return strategy.detect_magic_literals(file_path, source_lines)
     elif detection_type == 'god_functions':
@@ -695,25 +690,25 @@ def detect_violations(language: str, detection_type: str, file_path: Path, sourc
 print("✅ MECE Consolidation Phase 1: Unified Detection Algorithms loaded")
 print("🎯 Target: Eliminate 2,395 algorithm duplication (CoA) violations")
 '''
-        
+
         algorithms_file = self.shared_dir / "detection_algorithms.py"
         algorithms_file.write_text(detection_algorithms)
         print(f"✅ Created detection algorithms module: {algorithms_file}")
-    
+
     def _consolidate_detection_algorithms(self) -> int:
         """Consolidate duplicate detection algorithms (simulated)."""
         print("🔄 Consolidating detection algorithms...")
         print("   • Replacing 18+ duplicate detection functions")
         print("   • Implementing unified strategy pattern")
         print("   • Updating all algorithm references")
-        
+
         return 15  # Files in analyzer/ that would be modified
-    
+
     def _get_current_metrics(self, phase: str) -> ConsolidationMetrics:
         """Get current metrics (simulated)."""
         # In real implementation, this would run the analyzer and get actual metrics
         last_metrics = self.metrics_history[-1] if self.metrics_history else None
-        
+
         if last_metrics:
             return ConsolidationMetrics(
                 timestamp=datetime.now().isoformat(),
@@ -734,18 +729,18 @@ print("🎯 Target: Eliminate 2,395 algorithm duplication (CoA) violations")
                 quality_score_before=0.48,
                 quality_score_after=0.48
             )
-    
+
     def generate_consolidation_report(self) -> str:
         """Generate comprehensive consolidation report."""
         if not self.metrics_history:
             return "No consolidation metrics available."
-        
+
         report = ["# MECE Consolidation Progress Report\n"]
         report.append(f"Generated: {datetime.now().isoformat()}\n")
-        
+
         baseline = self.metrics_history[0]
         latest = self.metrics_history[-1]
-        
+
         report.append("## Summary")
         report.append(f"- **Initial Violations**: {baseline.violations_before:,}")
         report.append(f"- **Current Violations**: {latest.violations_after:,}")
@@ -754,7 +749,7 @@ print("🎯 Target: Eliminate 2,395 algorithm duplication (CoA) violations")
         report.append(f"- **Quality Improvement**: {latest.quality_improvement_percent:.1f}%")
         report.append(f"- **Files Modified**: {sum(m.files_modified for m in self.metrics_history):,}")
         report.append("")
-        
+
         report.append("## Phase Progress")
         for metrics in self.metrics_history[1:]:  # Skip baseline
             report.append(f"### {metrics.phase.replace('_', ' ').title()}")
@@ -763,7 +758,7 @@ print("🎯 Target: Eliminate 2,395 algorithm duplication (CoA) violations")
             report.append(f"- Quality: {metrics.quality_score_before:.2f} → {metrics.quality_score_after:.2f}")
             report.append(f"- Files Modified: {metrics.files_modified}")
             report.append("")
-        
+
         report.append("## Next Steps")
         if latest.quality_score_after < OVERALL_QUALITY_THRESHOLD:
             report.append("- Continue with remaining consolidation phases")
@@ -775,9 +770,9 @@ print("🎯 Target: Eliminate 2,395 algorithm duplication (CoA) violations")
             report.append("- Monitor for new violations")
             report.append("- Maintain shared modules")
             report.append("- Document consolidation patterns")
-        
+
         return "\n".join(report)
-    
+
     def export_metrics(self, output_file: Path):
         """Export metrics history to JSON file."""
         metrics_data = {
@@ -791,7 +786,7 @@ print("🎯 Target: Eliminate 2,395 algorithm duplication (CoA) violations")
                 "total_files_modified": sum(m.files_modified for m in self.metrics_history)
             }
         }
-        
+
         output_file.write_text(json.dumps(metrics_data, indent=2))
         print(f"✅ Metrics exported to: {output_file}")
 
@@ -805,15 +800,15 @@ def main():
 Examples:
   python consolidation_roadmap.py --analyze                    # Analyze current state
   python consolidation_roadmap.py --execute-phase=0          # Execute magic literals phase
-  python consolidation_roadmap.py --execute-phase=1          # Execute algorithms phase  
+  python consolidation_roadmap.py --execute-phase=1          # Execute algorithms phase
   python consolidation_roadmap.py --report                   # Generate progress report
   python consolidation_roadmap.py --export-metrics output.json  # Export metrics
         """
     )
-    
+
     parser.add_argument("--project-root", type=Path, default=Path.cwd(),
                        help="Root directory of project")
-    parser.add_argument("--analyze", action="store_true", 
+    parser.add_argument("--analyze", action="store_true",
                        help="Analyze current duplication patterns")
     parser.add_argument("--execute-phase", type=int, choices=[0, 1, 2, 3],
                        help="Execute specific consolidation phase")
@@ -821,32 +816,32 @@ Examples:
                        help="Generate consolidation progress report")
     parser.add_argument("--export-metrics", type=Path,
                        help="Export metrics to JSON file")
-    
+
     args = parser.parse_args()
-    
+
     roadmap = ConsolidationRoadmap(args.project_root)
-    
+
     if args.analyze:
         print("🚀 Starting MECE Duplication Analysis...")
         baseline = roadmap.analyze_baseline()
         patterns = roadmap.identify_duplication_patterns()
-        
+
         print("\n📊 DUPLICATION ANALYSIS RESULTS:")
         print(f"Baseline violations: {baseline.violations_before:,}")
         print(f"Quality score: {baseline.quality_score_before:.2f}")
         print(f"Identified {len(patterns)} consolidation opportunities:")
-        
+
         for pattern in patterns:
             print(f"  {pattern.priority}: {pattern.pattern_type} - {pattern.violation_count:,} violations")
-    
+
     elif args.execute_phase is not None:
         print(f"🚀 Executing Phase {args.execute_phase}...")
-        
+
         # Ensure baseline exists
         if not roadmap.metrics_history:
             roadmap.analyze_baseline()
             roadmap.identify_duplication_patterns()
-        
+
         if args.execute_phase == 0:
             result = roadmap.execute_phase_0_magic_literals()
             print(f"✅ Phase 0 complete: {result.violation_reduction_percent:.1f}% reduction")
@@ -855,17 +850,17 @@ Examples:
             print(f"✅ Phase 1 complete: {result.violation_reduction_percent:.1f}% reduction")
         else:
             print(f"⚠️  Phase {args.execute_phase} not yet implemented")
-    
+
     elif args.report:
         report = roadmap.generate_consolidation_report()
         print(report)
-    
+
     elif args.export_metrics:
         if roadmap.metrics_history:
             roadmap.export_metrics(args.export_metrics)
         else:
             print("⚠️  No metrics to export. Run --analyze first.")
-    
+
     else:
         parser.print_help()
 

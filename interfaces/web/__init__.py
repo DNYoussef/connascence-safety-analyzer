@@ -29,12 +29,12 @@ try:
 except ImportError:
     CIDashboard = None
 
-from .metrics import DashboardMetrics
 from .charts import ChartGenerator
+from .metrics import DashboardMetrics
 
 __all__ = [
     'LocalDashboard',
-    'CIDashboard', 
+    'CIDashboard',
     'DashboardMetrics',
     'ChartGenerator'
 ]

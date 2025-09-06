@@ -6,19 +6,19 @@ Provides the main entry point for connascence analysis.
 
 import argparse
 import json
+from pathlib import Path
 import sys
 import time
-from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 # Import using unified import strategy
 sys.path.insert(0, str(Path(__file__).parent.parent))
 try:
-    from core.unified_imports import IMPORT_MANAGER, ImportSpec
+    from core.unified_imports import IMPORT_MANAGER
 except ImportError:
     # Fallback for legacy execution
     sys.path.insert(0, str(Path(__file__).parent.parent / "core"))
-    from unified_imports import IMPORT_MANAGER, ImportSpec
+    from unified_imports import IMPORT_MANAGER
 
 # Import constants with unified strategy
 constants_result = IMPORT_MANAGER.import_constants()
@@ -46,14 +46,14 @@ else:
 
 # Import unified duplication analyzer
 try:
-    from .duplication_unified import UnifiedDuplicationAnalyzer
     from .duplication_helper import format_duplication_analysis
+    from .duplication_unified import UnifiedDuplicationAnalyzer
     DUPLICATION_ANALYZER_AVAILABLE = True
 except ImportError:
     print("[WARNING] Unified duplication analyzer not available")
     DUPLICATION_ANALYZER_AVAILABLE = False
     UnifiedDuplicationAnalyzer = None
-    
+
     def format_duplication_analysis(result):
         return {'score': 1.0, 'violations': [], 'available': False}
 
@@ -77,8 +77,8 @@ SARIFReporter = getattr(sarif_reporter_result.module, 'SARIFReporter', None) if 
 
 if not JSONReporter or not SARIFReporter:
     # Fallback for direct execution
-    from analyzer.reporting.sarif import SARIFReporter
     from analyzer.reporting.json import JSONReporter
+    from analyzer.reporting.sarif import SARIFReporter
 
 # Fallback imports for when unified analyzer is not available
 try:
@@ -94,16 +94,16 @@ except ImportError:
 
 class ConnascenceAnalyzer:
     """Main connascence analyzer with unified pipeline integration."""
-    
+
     def __init__(self):
         self.version = "2.0.0"
-        
+
         # Initialize duplication analyzer
         if DUPLICATION_ANALYZER_AVAILABLE:
             self.duplication_analyzer = UnifiedDuplicationAnalyzer(similarity_threshold=0.7)
         else:
             self.duplication_analyzer = None
-        
+
         # Initialize the appropriate analyzer
         if UNIFIED_ANALYZER_AVAILABLE:
             self.unified_analyzer = UnifiedConnascenceAnalyzer()
@@ -114,12 +114,12 @@ class ConnascenceAnalyzer:
         else:
             self.analysis_mode = "mock"
             print("[WARNING] Neither unified nor fallback analyzer available, using mock mode")
-    
+
     def analyze_path(self, path: str, policy: str = "default", **kwargs) -> Dict[str, Any]:
         """Analyze a file or directory for connascence violations using real analysis pipeline."""
         try:
             path_obj = Path(path)
-            
+
             if not path_obj.exists():
                 return {
                     'success': False,
@@ -142,12 +142,12 @@ class ConnascenceAnalyzer:
                 'duplication_analysis': {'score': 1.0, 'violations': []},
                 'god_objects': []
             }
-        
+
         # Run duplication analysis if requested
         duplication_result = None
         if kwargs.get('include_duplication', True) and self.duplication_analyzer:
             duplication_result = self.duplication_analyzer.analyze_path(path, comprehensive=True)
-        
+
         # Use real analysis based on available components
         if self.analysis_mode == "unified":
             return self._run_unified_analysis(path, policy, duplication_result, **kwargs)
@@ -155,22 +155,22 @@ class ConnascenceAnalyzer:
             return self._run_fallback_analysis(path, policy, duplication_result, **kwargs)
         else:
             return self._run_mock_analysis(path, policy, duplication_result, **kwargs)
-    
+
     def _run_unified_analysis(self, path: str, policy: str, duplication_result: Optional[Any] = None, **kwargs) -> Dict[str, Any]:
         """Run analysis using the unified analyzer pipeline."""
         try:
-            start_time = time.time()
-            
+            time.time()
+
             # Convert policy to unified analyzer format
             policy_preset = self._convert_policy_to_preset(policy)
-            
+
             # Run comprehensive analysis
             result = self.unified_analyzer.analyze_project(
                 project_path=path,
                 policy_preset=policy_preset,
                 options=kwargs
             )
-            
+
             # Convert unified result to expected format
             return {
                 'success': True,
@@ -206,7 +206,7 @@ class ConnascenceAnalyzer:
                     'mece_passing': result.duplication_score >= MECE_QUALITY_THRESHOLD
                 }
             }
-            
+
         except Exception as e:
             return {
                 'success': False,
@@ -217,7 +217,7 @@ class ConnascenceAnalyzer:
                 'mece_analysis': {'score': 0.0, 'duplications': []},
                 'god_objects': []
             }
-    
+
     def _run_fallback_analysis(self, path: str, policy: str, duplication_result: Optional[Any] = None, **kwargs) -> Dict[str, Any]:
         """Run analysis using fallback analyzer."""
         try:
@@ -226,17 +226,17 @@ class ConnascenceAnalyzer:
                 violations = self.fallback_analyzer.analyze_file(path_obj)
             else:
                 violations = self.fallback_analyzer.analyze_directory(path_obj)
-            
+
             # Convert violations to expected format
             violation_dicts = [self._violation_to_dict(v) for v in violations]
-            
+
             # Calculate basic metrics
             total_violations = len(violations)
             critical_count = len([v for v in violations if getattr(v, 'severity', 'medium') == 'critical'])
-            
+
             # Basic quality score calculation
             quality_score = max(0.0, 1.0 - (total_violations * 0.01))
-            
+
             return {
                 'success': True,
                 'path': str(path),
@@ -262,15 +262,15 @@ class ConnascenceAnalyzer:
                     'timestamp': time.time()
                 }
             }
-            
-        except Exception as e:
+
+        except Exception:
             return self._run_mock_analysis(path, policy, **kwargs)
-    
+
     def _run_mock_analysis(self, path: str, policy: str, **kwargs) -> Dict[str, Any]:
         """Fallback mock analysis when real analyzers are unavailable."""
         # Generate basic mock violations for testing
         violations = self._generate_mock_violations(path, policy)
-        
+
         return {
             'success': True,
             'path': str(path),
@@ -296,7 +296,7 @@ class ConnascenceAnalyzer:
                 'timestamp': time.time()
             }
         }
-    
+
     def _generate_mock_violations(self, path: str, policy: str) -> List[ConnascenceViolation]:
         """Generate mock violations only when real analysis is unavailable."""
         violations = [
@@ -311,12 +311,12 @@ class ConnascenceAnalyzer:
                 weight=2.0
             )
         ]
-        
+
         if policy == "nasa_jpl_pot10":
             violations.append(
                 ConnascenceViolation(
                     id="nasa_mock",
-                    rule_id="NASA_POT10_2", 
+                    rule_id="NASA_POT10_2",
                     connascence_type="CoA",
                     severity="critical",
                     description="Mock: NASA Power of Ten Rule violation (fallback mode)",
@@ -325,9 +325,9 @@ class ConnascenceAnalyzer:
                     weight=5.0
                 )
             )
-        
+
         return violations
-    
+
     def _convert_policy_to_preset(self, policy: str) -> str:
         """Convert policy string to unified analyzer preset."""
         policy_mapping = {
@@ -337,16 +337,16 @@ class ConnascenceAnalyzer:
             "lenient": "basic-analysis"
         }
         return policy_mapping.get(policy, "service-defaults")
-    
+
     def _extract_god_objects(self, violations: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Extract god object violations from violation list."""
         return [v for v in violations if v.get('type') == 'god_object' or 'god_object' in v.get('rule_id', '').lower()]
-    
+
     def _violation_to_dict(self, violation: ConnascenceViolation) -> Dict[str, Any]:
         """Convert violation object to dictionary with enhanced metadata."""
         if isinstance(violation, dict):
             return violation  # Already a dictionary
-            
+
         return {
             'id': getattr(violation, 'id', str(hash(str(violation)))),
             'rule_id': getattr(violation, 'rule_id', 'UNKNOWN'),
@@ -366,14 +366,14 @@ def create_parser() -> argparse.ArgumentParser:
         description="Connascence Safety Analyzer",
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
-    
+
     parser.add_argument(
         '--path', '-p',
         type=str,
         default='.',
         help='Path to analyze (default: current directory)'
     )
-    
+
     parser.add_argument(
         '--policy',
         type=str,
@@ -381,7 +381,7 @@ def create_parser() -> argparse.ArgumentParser:
         choices=['default', 'strict-core', 'nasa_jpl_pot10', 'lenient'],
         help='Analysis policy to use'
     )
-    
+
     parser.add_argument(
         '--format', '-f',
         type=str,
@@ -389,45 +389,45 @@ def create_parser() -> argparse.ArgumentParser:
         choices=['json', 'yaml', 'sarif'],
         help='Output format'
     )
-    
+
     parser.add_argument(
         '--output', '-o',
         type=str,
         help='Output file path'
     )
-    
+
     parser.add_argument(
         '--nasa-validation',
         action='store_true',
         help='Enable NASA Power of Ten validation'
     )
-    
+
     parser.add_argument(
         '--duplication-analysis',
         action='store_true',
         default=True,
         help='Enable unified duplication analysis (default: enabled)'
     )
-    
+
     parser.add_argument(
         '--no-duplication',
         action='store_true',
         help='Disable duplication analysis'
     )
-    
+
     parser.add_argument(
         '--duplication-threshold',
         type=float,
         default=0.7,
         help='Similarity threshold for duplication detection (0.0-1.0, default: 0.7)'
     )
-    
+
     parser.add_argument(
         '--strict-mode',
         action='store_true',
         help='Enable strict analysis mode'
     )
-    
+
     parser.add_argument(
         '--exclude',
         type=str,
@@ -435,38 +435,38 @@ def create_parser() -> argparse.ArgumentParser:
         default=[],
         help='Paths to exclude from analysis'
     )
-    
+
     parser.add_argument(
         '--include-nasa-rules',
         action='store_true',
         help='Include NASA-specific rules in SARIF output'
     )
-    
+
     parser.add_argument(
         '--include-god-objects',
         action='store_true',
         help='Include god object analysis in SARIF output'
     )
-    
+
     parser.add_argument(
         '--include-mece-analysis',
         action='store_true',
         help='Include MECE duplication analysis in SARIF output'
     )
-    
+
     parser.add_argument(
         '--enable-tool-correlation',
         action='store_true',
         help='Enable cross-tool analysis correlation'
     )
-    
+
     parser.add_argument(
         '--confidence-threshold',
         type=float,
         default=0.8,
         help='Confidence threshold for correlations'
     )
-    
+
     return parser
 
 
@@ -474,23 +474,20 @@ def main():
     """Main entry point for command-line execution."""
     parser = create_parser()
     args = parser.parse_args()
-    
+
     # Initialize analyzer
     analyzer = ConnascenceAnalyzer()
-    
+
     # Set policy based on flags
-    if args.nasa_validation:
-        policy = 'nasa_jpl_pot10'
-    else:
-        policy = args.policy
-    
+    policy = "nasa_jpl_pot10" if args.nasa_validation else args.policy
+
     # Handle duplication analysis options
     include_duplication = args.duplication_analysis and not args.no_duplication
     duplication_threshold = args.duplication_threshold
-    
+
     if include_duplication and DUPLICATION_ANALYZER_AVAILABLE:
         analyzer.duplication_analyzer.similarity_threshold = duplication_threshold
-    
+
     try:
         # Run analysis
         result = analyzer.analyze_path(
@@ -503,7 +500,7 @@ def main():
             enable_tool_correlation=args.enable_tool_correlation,
             confidence_threshold=args.confidence_threshold
         )
-        
+
         # Handle different output formats
         if args.format == 'sarif':
             # Use the proper SARIFReporter class
@@ -538,7 +535,7 @@ def main():
                     f.write(str(result))
             else:
                 print(result)
-        
+
         # Exit with appropriate code
         if result.get('success', False):
             violations = result.get('violations', [])
@@ -552,12 +549,12 @@ def main():
         else:
             print(f"Analysis failed: {result.get('error', 'Unknown error')}", file=sys.stderr)
             sys.exit(1)
-            
+
     except Exception as e:
         print(f"Analyzer error: {e}", file=sys.stderr)
         import traceback
         traceback.print_exc()
-        
+
         # Generate a minimal output file for CI compatibility
         if args.output and args.format in ['json', 'sarif']:
             try:
@@ -568,18 +565,18 @@ def main():
                     'summary': {'total_violations': 0},
                     'nasa_compliance': {'score': 0.0, 'violations': []}
                 }
-                
+
                 if args.format == 'sarif':
                     sarif_reporter = SARIFReporter()
                     sarif_reporter.export_results(minimal_result, args.output)
                 else:
                     json_reporter = JSONReporter()
                     json_reporter.export_results(minimal_result, args.output)
-                    
+
                 print(f"Minimal {args.format.upper()} report written for CI compatibility")
             except Exception as export_error:
                 print(f"Failed to write minimal report: {export_error}", file=sys.stderr)
-                
+
         sys.exit(1)
 
 

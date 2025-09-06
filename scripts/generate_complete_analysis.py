@@ -3,9 +3,9 @@
 Complete Analysis Generator - Generate all 4 analysis types for each codebase
 """
 
-import sys
 import json
 from pathlib import Path
+import sys
 
 # Add project to path
 project_root = Path(__file__).parent.parent
@@ -16,19 +16,19 @@ def run_complete_analysis(codebase_path: str, output_dir: str):
     codebase_name = Path(codebase_path).name
     output_path = Path(output_dir)
     output_path.mkdir(exist_ok=True)
-    
+
     print(f"Running complete analysis for {codebase_name}")
-    
+
     # 1. Connascence Analysis
     print("  1/4 Connascence analysis...")
     try:
         from analyzer.check_connascence import ConnascenceAnalyzer
         connascence_analyzer = ConnascenceAnalyzer()
-        
+
         # Analyze all files in codebase
         violations = []
         codebase_path_obj = Path(codebase_path)
-        
+
         # Find all Python, JavaScript, and C files
         file_patterns = ["**/*.py", "**/*.js", "**/*.c", "**/*.h", "**/*.cpp", "**/*.hpp"]
         for pattern in file_patterns:
@@ -36,9 +36,9 @@ def run_complete_analysis(codebase_path: str, output_dir: str):
                 try:
                     file_violations = connascence_analyzer.analyze_file(file_path)
                     violations.extend(file_violations)
-                except Exception as e:
+                except Exception:
                     continue
-        
+
         # Convert to JSON format
         connascence_data = {
             "analysis_type": "connascence",
@@ -56,49 +56,49 @@ def run_complete_analysis(codebase_path: str, output_dir: str):
                 for v in violations
             ]
         }
-        
+
         with open(output_path / f"{codebase_name}_connascence.json", 'w') as f:
             json.dump(connascence_data, f, indent=2)
         print(f"    ✓ {len(violations)} connascence violations found")
-        
+
     except Exception as e:
         print(f"    ✗ Connascence analysis failed: {e}")
-    
+
     # 2. NASA Safety Analysis
     print("  2/4 NASA safety analysis...")
     try:
         # Run NASA Power of Ten analysis
         nasa_violations = []
-        
+
         # Basic NASA compliance checks
         for file_path in codebase_path_obj.rglob("**/*.py"):
             try:
-                with open(file_path, 'r', encoding='utf-8') as f:
+                with open(file_path, encoding='utf-8') as f:
                     content = f.read()
                     lines = content.split('\n')
-                    
+
                     for i, line in enumerate(lines, 1):
                         # NASA Rule violations
                         if 'goto' in line.lower():
                             nasa_violations.append({
-                                "rule": "NASA-01", 
+                                "rule": "NASA-01",
                                 "description": "Avoid goto statements",
                                 "file_path": str(file_path),
                                 "line_number": i,
                                 "severity": "high"
                             })
-                        
+
                         if line.count('(') > 5:  # Complex expressions
                             nasa_violations.append({
                                 "rule": "NASA-08",
-                                "description": "Limit expression complexity", 
+                                "description": "Limit expression complexity",
                                 "file_path": str(file_path),
                                 "line_number": i,
                                 "severity": "medium"
                             })
             except:
                 continue
-        
+
         nasa_data = {
             "analysis_type": "nasa_safety",
             "codebase": codebase_name,
@@ -106,27 +106,27 @@ def run_complete_analysis(codebase_path: str, output_dir: str):
             "total_violations": len(nasa_violations),
             "violations": nasa_violations
         }
-        
+
         with open(output_path / f"{codebase_name}_nasa_safety.json", 'w') as f:
             json.dump(nasa_data, f, indent=2)
         print(f"    ✓ {len(nasa_violations)} NASA safety violations found")
-        
+
     except Exception as e:
         print(f"    ✗ NASA safety analysis failed: {e}")
-    
+
     # 3. Duplication Analysis
     print("  3/4 Duplication analysis...")
     try:
         duplications = []
-        
+
         # Simple duplication detection
         file_contents = {}
         for file_path in codebase_path_obj.rglob("**/*.py"):
             try:
-                with open(file_path, 'r', encoding='utf-8') as f:
+                with open(file_path, encoding='utf-8') as f:
                     content = f.read()
                     lines = [line.strip() for line in content.split('\n') if line.strip()]
-                    
+
                     # Look for duplicate function signatures
                     for i, line in enumerate(lines):
                         if line.startswith('def ') and len(line) > 20:
@@ -142,21 +142,21 @@ def run_complete_analysis(codebase_path: str, output_dir: str):
                                 file_contents[signature] = str(file_path)
             except:
                 continue
-        
+
         duplication_data = {
             "analysis_type": "duplication",
             "codebase": codebase_name,
             "total_duplications": len(duplications),
             "duplications": duplications
         }
-        
+
         with open(output_path / f"{codebase_name}_duplication.json", 'w') as f:
             json.dump(duplication_data, f, indent=2)
         print(f"    ✓ {len(duplications)} duplications found")
-        
+
     except Exception as e:
         print(f"    ✗ Duplication analysis failed: {e}")
-    
+
     # 4. MECE Duplication Analysis
     print("  4/4 MECE duplication analysis...")
     try:
@@ -168,13 +168,13 @@ def run_complete_analysis(codebase_path: str, output_dir: str):
             "configuration": [],
             "testing": []
         }
-        
+
         # Categorize files by MECE principles
         for file_path in codebase_path_obj.rglob("**/*.py"):
             try:
-                with open(file_path, 'r', encoding='utf-8') as f:
+                with open(file_path, encoding='utf-8') as f:
                     content = f.read().lower()
-                    
+
                     if 'database' in content or 'db' in content or 'sql' in content:
                         mece_categories["data_access"].append(str(file_path))
                     elif 'test' in str(file_path).lower():
@@ -187,17 +187,16 @@ def run_complete_analysis(codebase_path: str, output_dir: str):
                         mece_categories["business_logic"].append(str(file_path))
             except:
                 continue
-        
+
         # Calculate MECE compliance score
         total_files = sum(len(files) for files in mece_categories.values())
         mece_score = 1.0 if total_files > 0 else 0.0
-        
+
         # Look for overlapping responsibilities (MECE violations)
         overlaps = []
         for file_path in codebase_path_obj.rglob("**/*.py"):
-            categories_matched = []
             try:
-                with open(file_path, 'r', encoding='utf-8') as f:
+                with open(file_path, encoding='utf-8') as f:
                     content = f.read().lower()
                     if 'database' in content and 'render' in content:
                         overlaps.append({
@@ -207,7 +206,7 @@ def run_complete_analysis(codebase_path: str, output_dir: str):
                         })
             except:
                 continue
-        
+
         mece_data = {
             "analysis_type": "mece_duplication",
             "codebase": codebase_name,
@@ -216,22 +215,22 @@ def run_complete_analysis(codebase_path: str, output_dir: str):
             "overlaps": overlaps,
             "total_overlaps": len(overlaps)
         }
-        
+
         with open(output_path / f"{codebase_name}_mece_duplication.json", 'w') as f:
             json.dump(mece_data, f, indent=2)
         print(f"    ✓ {len(overlaps)} MECE violations found")
-        
+
     except Exception as e:
         print(f"    ✗ MECE analysis failed: {e}")
-    
+
     print(f"Complete analysis finished for {codebase_name}")
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
         print("Usage: python generate_complete_analysis.py <codebase_path> <output_dir>")
         sys.exit(1)
-    
+
     codebase_path = sys.argv[1]
     output_dir = sys.argv[2]
-    
+
     run_complete_analysis(codebase_path, output_dir)

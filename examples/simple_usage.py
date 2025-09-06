@@ -12,13 +12,13 @@ similar to how you'd use flake8.
 def calculate_circle_area(radius):
     return 3.14159 * radius * radius  # Magic number - should use math.pi
 
-# Connascence of Position (CoP) - Too many positional parameters  
+# Connascence of Position (CoP) - Too many positional parameters
 def create_user(first_name, last_name, email, phone, address, city, state, zip_code):
     """This function has too many positional parameters."""
     return {
         'first_name': first_name,
         'last_name': last_name,
-        'email': email, 
+        'email': email,
         'phone': phone,
         'address': address,
         'city': city,
@@ -31,7 +31,7 @@ def process_student_grade(grade):
     if grade >= 90:
         return "A"
     elif grade >= 80:
-        return "B" 
+        return "B"
     elif grade >= 70:
         return "C"
     elif grade >= 60:
@@ -55,7 +55,7 @@ def process_employee_rating(rating):
 # God class example (Connascence of Identity)
 class DataProcessor:
     """Example of a god class with too many responsibilities."""
-    
+
     def __init__(self):
         self.data = []
         self.results = []
@@ -64,7 +64,7 @@ class DataProcessor:
         self.validators = []
         self.transformers = []
         self.exporters = []
-    
+
     def load_data(self, source): pass
     def validate_data(self): pass
     def clean_data(self): pass
@@ -88,7 +88,7 @@ class DataProcessor:
 
 if __name__ == "__main__":
     # Usage examples - these would normally be in documentation
-    
+
     print("To analyze this file with connascence:")
     print("  connascence examples/simple_usage.py")
     print()

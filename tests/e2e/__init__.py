@@ -20,7 +20,7 @@ This module provides comprehensive end-to-end testing capabilities for the
 connascence analysis system, including:
 
 - CLI workflow testing
-- Repository analysis validation  
+- Repository analysis validation
 - Report generation verification
 - Enterprise-scale scenario testing
 - Error handling and recovery validation
@@ -87,7 +87,7 @@ patterns for quality assurance and performance monitoring.
 #     'E2EMemoryCoordinator',
 #     'SequentialWorkflowValidator',
 #     'RepositoryAnalysisCoordinator',
-#     'ReportGenerationCoordinator', 
+#     'ReportGenerationCoordinator',
 #     'EnterpriseScaleCoordinator',
 #     'ErrorHandlingCoordinator',
 #     'ExitCodeCoordinator',

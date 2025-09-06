@@ -18,22 +18,22 @@ Provides historical tracking, trend analysis, and performance
 metrics for the connascence analysis dashboard.
 """
 
-import json
-import sqlite3
 from datetime import datetime, timedelta
+import json
 from pathlib import Path
-from typing import Dict, List, Optional, Any
+import sqlite3
 import statistics
+from typing import Any, Dict, List, Optional
 
 
 class DashboardMetrics:
     """Dashboard metrics collection and storage."""
-    
+
     def __init__(self, db_path: Optional[Path] = None):
         self.db_path = db_path or Path.home() / '.connascence' / 'dashboard.db'
         self.db_path.parent.mkdir(exist_ok=True)
         self._init_database()
-    
+
     def _init_database(self):
         """Initialize SQLite database for metrics storage."""
         with sqlite3.connect(str(self.db_path)) as conn:
@@ -55,7 +55,7 @@ class DashboardMetrics:
                     file_count INTEGER DEFAULT 0
                 )
             ''')
-            
+
             conn.execute('''
                 CREATE TABLE IF NOT EXISTS performance_metrics (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -67,7 +67,7 @@ class DashboardMetrics:
                     memory_usage REAL
                 )
             ''')
-            
+
             conn.execute('''
                 CREATE TABLE IF NOT EXISTS violation_trends (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -78,14 +78,14 @@ class DashboardMetrics:
                     UNIQUE(date, connascence_type, severity)
                 )
             ''')
-            
+
             conn.commit()
-    
+
     def record_scan(self, scan_results: Dict[str, Any]) -> int:
         """Record scan results in database."""
         with sqlite3.connect(str(self.db_path)) as conn:
             summary = scan_results.get('summary', {})
-            
+
             cursor = conn.execute('''
                 INSERT INTO scan_results (
                     timestamp, project_path, policy_preset, total_violations,
@@ -108,15 +108,15 @@ class DashboardMetrics:
                 scan_results.get('analysis_time'),
                 summary.get('file_count', 0)
             ))
-            
+
             scan_id = cursor.lastrowid
-            
+
             # Record daily violation trends
             self._update_violation_trends(scan_results.get('violations', []))
-            
+
             conn.commit()
             return scan_id
-    
+
     def record_performance(self, operation_type: str, duration: float,
                           file_count: int = None, violation_count: int = None,
                           memory_usage: float = None):
@@ -136,11 +136,11 @@ class DashboardMetrics:
                 memory_usage
             ))
             conn.commit()
-    
+
     def get_trends(self, days: int = 30) -> Dict[str, Any]:
         """Get trend data for specified number of days."""
         start_date = (datetime.now() - timedelta(days=days)).isoformat()
-        
+
         with sqlite3.connect(str(self.db_path)) as conn:
             # Get main trends
             cursor = conn.execute('''
@@ -150,7 +150,7 @@ class DashboardMetrics:
                 WHERE timestamp >= ?
                 ORDER BY timestamp
             ''', (start_date,))
-            
+
             main_trends = []
             for row in cursor.fetchall():
                 main_trends.append({
@@ -162,7 +162,7 @@ class DashboardMetrics:
                     'medium_count': row[5],
                     'low_count': row[6]
                 })
-            
+
             # Get violation type trends
             cursor = conn.execute('''
                 SELECT date, connascence_type, SUM(count) as total_count
@@ -171,24 +171,24 @@ class DashboardMetrics:
                 GROUP BY date, connascence_type
                 ORDER BY date, connascence_type
             ''', (start_date,))
-            
+
             type_trends = {}
             for row in cursor.fetchall():
                 date, conn_type, count = row
                 if date not in type_trends:
                     type_trends[date] = {}
                 type_trends[date][conn_type] = count
-            
+
             return {
                 'trends': main_trends,
                 'type_trends': type_trends,
                 'period_days': days
             }
-    
+
     def get_summary_stats(self, days: int = 7) -> Dict[str, Any]:
         """Get summary statistics for recent period."""
         start_date = (datetime.now() - timedelta(days=days)).isoformat()
-        
+
         with sqlite3.connect(str(self.db_path)) as conn:
             # Get recent scan stats
             cursor = conn.execute('''
@@ -196,9 +196,9 @@ class DashboardMetrics:
                 FROM scan_results
                 WHERE timestamp >= ?
             ''', (start_date,))
-            
+
             scans = cursor.fetchall()
-            
+
             if not scans:
                 return {
                     'scans_count': 0,
@@ -207,22 +207,22 @@ class DashboardMetrics:
                     'avg_analysis_time': 0,
                     'trend_direction': 'stable'
                 }
-            
+
             violations = [s[0] for s in scans]
             indices = [s[1] for s in scans]
             times = [s[2] for s in scans if s[2] is not None]
-            
+
             # Calculate trend direction
             trend_direction = 'stable'
             if len(indices) >= 2:
                 recent_avg = statistics.mean(indices[-3:]) if len(indices) >= 3 else indices[-1]
                 older_avg = statistics.mean(indices[:-3]) if len(indices) >= 6 else indices[0]
-                
+
                 if recent_avg > older_avg * 1.1:
                     trend_direction = 'increasing'
                 elif recent_avg < older_avg * 0.9:
                     trend_direction = 'decreasing'
-            
+
             return {
                 'scans_count': len(scans),
                 'avg_violations': statistics.mean(violations),
@@ -232,17 +232,17 @@ class DashboardMetrics:
                 'max_violations': max(violations),
                 'min_violations': min(violations)
             }
-    
+
     def get_performance_stats(self, operation_type: str = None) -> Dict[str, Any]:
         """Get performance statistics."""
         with sqlite3.connect(str(self.db_path)) as conn:
             where_clause = ""
             params = []
-            
+
             if operation_type:
                 where_clause = "WHERE operation_type = ?"
                 params.append(operation_type)
-            
+
             cursor = conn.execute(f'''
                 SELECT operation_type, duration, file_count, violation_count
                 FROM performance_metrics
@@ -250,14 +250,14 @@ class DashboardMetrics:
                 ORDER BY timestamp DESC
                 LIMIT 100
             ''', params)
-            
+
             metrics = cursor.fetchall()
-            
+
             if not metrics:
                 return {'operations': 0}
-            
+
             durations = [m[1] for m in metrics]
-            
+
             stats = {
                 'operations': len(metrics),
                 'avg_duration': statistics.mean(durations),
@@ -265,23 +265,23 @@ class DashboardMetrics:
                 'max_duration': max(durations),
                 'p95_duration': self._percentile(durations, 95)
             }
-            
+
             # File processing rate
             file_metrics = [(m[1], m[2]) for m in metrics if m[2] is not None]
             if file_metrics:
                 file_rates = [fc / dur for dur, fc in file_metrics if dur > 0]
                 if file_rates:
                     stats['avg_files_per_second'] = statistics.mean(file_rates)
-            
+
             # Violation detection rate
             violation_metrics = [(m[1], m[3]) for m in metrics if m[3] is not None]
             if violation_metrics:
                 violation_rates = [vc / dur for dur, vc in violation_metrics if dur > 0]
                 if violation_rates:
                     stats['avg_violations_per_second'] = statistics.mean(violation_rates)
-            
+
             return stats
-    
+
     def get_top_violation_files(self, limit: int = 10) -> List[Dict[str, Any]]:
         """Get files with most violations."""
         with sqlite3.connect(str(self.db_path)) as conn:
@@ -291,28 +291,28 @@ class DashboardMetrics:
                 ORDER BY timestamp DESC
                 LIMIT 1
             ''')
-            
+
             result = cursor.fetchone()
             if not result or not result[0]:
                 return []
-            
+
             try:
                 violations_by_file = json.loads(result[0])
-                
+
                 # Sort by violation count
                 sorted_files = sorted(
                     violations_by_file.items(),
                     key=lambda x: x[1],
                     reverse=True
                 )
-                
+
                 return [
                     {'file_path': file_path, 'violation_count': count}
                     for file_path, count in sorted_files[:limit]
                 ]
             except (json.JSONDecodeError, TypeError):
                 return []
-    
+
     def get_connascence_type_distribution(self) -> Dict[str, int]:
         """Get distribution of connascence types from recent scans."""
         with sqlite3.connect(str(self.db_path)) as conn:
@@ -322,7 +322,7 @@ class DashboardMetrics:
                 ORDER BY timestamp DESC
                 LIMIT 5
             ''')
-            
+
             type_counts = {}
             for row in cursor.fetchall():
                 if row[0]:
@@ -332,16 +332,16 @@ class DashboardMetrics:
                             type_counts[conn_type] = type_counts.get(conn_type, 0) + count
                     except (json.JSONDecodeError, TypeError):
                         continue
-            
+
             return type_counts
-    
+
     def _update_violation_trends(self, violations: List[Dict]):
         """Update daily violation trends."""
         if not violations:
             return
-        
+
         date_str = datetime.now().date().isoformat()
-        
+
         # Count violations by type and severity
         type_severity_counts = {}
         for violation in violations:
@@ -349,7 +349,7 @@ class DashboardMetrics:
             severity = violation.get('severity', 'medium')
             key = (conn_type, severity)
             type_severity_counts[key] = type_severity_counts.get(key, 0) + 1
-        
+
         # Store in database
         with sqlite3.connect(str(self.db_path)) as conn:
             for (conn_type, severity), count in type_severity_counts.items():
@@ -359,26 +359,26 @@ class DashboardMetrics:
                     VALUES (?, ?, ?, ?)
                 ''', (date_str, conn_type, severity, count))
             conn.commit()
-    
+
     def _percentile(self, data: List[float], percentile: float) -> float:
         """Calculate percentile value."""
         if not data:
             return 0.0
-        
+
         sorted_data = sorted(data)
         k = (len(sorted_data) - 1) * (percentile / 100)
         f = int(k)
         c = k - f
-        
+
         if f == len(sorted_data) - 1:
             return sorted_data[f]
-        
+
         return sorted_data[f] * (1 - c) + sorted_data[f + 1] * c
-    
+
     def cleanup_old_data(self, days_to_keep: int = 90):
         """Clean up old metrics data."""
         cutoff_date = (datetime.now() - timedelta(days=days_to_keep)).isoformat()
-        
+
         with sqlite3.connect(str(self.db_path)) as conn:
             # Clean up scan results
             cursor = conn.execute(
@@ -386,14 +386,14 @@ class DashboardMetrics:
                 (cutoff_date,)
             )
             scan_rows_deleted = cursor.rowcount
-            
+
             # Clean up performance metrics
             cursor = conn.execute(
                 'DELETE FROM performance_metrics WHERE timestamp < ?',
                 (cutoff_date,)
             )
             perf_rows_deleted = cursor.rowcount
-            
+
             # Clean up violation trends (keep daily aggregates longer)
             trend_cutoff = (datetime.now() - timedelta(days=days_to_keep * 2)).isoformat()
             cursor = conn.execute(
@@ -401,15 +401,15 @@ class DashboardMetrics:
                 (trend_cutoff,)
             )
             trend_rows_deleted = cursor.rowcount
-            
+
             conn.commit()
-            
+
             return {
                 'scan_results_deleted': scan_rows_deleted,
                 'performance_metrics_deleted': perf_rows_deleted,
                 'violation_trends_deleted': trend_rows_deleted
             }
-    
+
     def export_metrics(self, format: str = 'json', days: int = 30) -> str:
         """Export metrics data in specified format."""
         data = {
@@ -421,22 +421,22 @@ class DashboardMetrics:
             'top_violation_files': self.get_top_violation_files(),
             'type_distribution': self.get_connascence_type_distribution()
         }
-        
+
         if format == 'json':
             return json.dumps(data, indent=2)
         elif format == 'csv':
             return self._export_csv(data)
         else:
             raise ValueError(f"Unsupported export format: {format}")
-    
+
     def _export_csv(self, data: Dict) -> str:
         """Export data as CSV format."""
         import csv
         import io
-        
+
         output = io.StringIO()
         writer = csv.writer(output)
-        
+
         # Write trends data
         writer.writerow(['Date', 'Total Violations', 'Connascence Index', 'Critical', 'High', 'Medium', 'Low'])
         for trend in data['trends']['trends']:
@@ -449,5 +449,5 @@ class DashboardMetrics:
                 trend['medium_count'],
                 trend['low_count']
             ])
-        
+
         return output.getvalue()

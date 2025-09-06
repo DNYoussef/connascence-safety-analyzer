@@ -13,6 +13,7 @@
 
 from enum import Enum
 
+
 class UserRole(Enum):
     VIEWER = 'viewer'
     ANALYST = 'analyst'
@@ -24,7 +25,7 @@ class UserRole(Enum):
 class SecurityManager:
     def __init__(self, air_gapped=False):
         self.air_gapped = air_gapped
-        
+
     def authenticate_user(self, username, password, ip):
         # Mock authentication
         from dataclasses import dataclass
@@ -36,9 +37,9 @@ class SecurityManager:
                 if self.roles is None:
                     self.roles = []
         return AuthContext(username)
-        
+
     def check_permission(self, context, resource, action):
         return resource == "analysis" and UserRole.ANALYST in context.roles
-        
+
     def _verify_credentials(self, username, password):
         return True

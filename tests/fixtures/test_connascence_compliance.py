@@ -22,9 +22,8 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
-import pytest
-
 from experimental.packages.agents.core.agent_interface import AgentInterface
+import pytest
 
 
 class ConnascenceAnalyzer:
@@ -202,9 +201,8 @@ class ConnascenceAnalyzer:
         """Count magic numbers in the tree."""
         count = 0
         for node in ast.walk(tree):
-            if isinstance(node, ast.Num) and isinstance(node.n, int | float):
-                if node.n not in [0, 1, -1, 0.0, 1.0]:
-                    count += 1
+            if isinstance(node, ast.Num) and isinstance(node.n, int | float) and node.n not in [0, 1, -1, 0.0, 1.0]:
+                count += 1
         return count
 
     def _count_positional_calls(self, tree: ast.AST) -> int:
@@ -505,7 +503,7 @@ class TestArchitecturalCompliance:
 
 class TestDocumentationCompliance:
     """Tests that validate documentation and self-documenting code."""
-    
+
     @pytest.fixture
     def test_files(self):
         """Provide test files for documentation compliance testing."""

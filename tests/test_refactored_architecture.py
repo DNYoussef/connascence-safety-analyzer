@@ -19,28 +19,27 @@ Validates that refactoring maintains functionality while reducing complexity.
 """
 
 import ast
-import pytest
 from pathlib import Path
-from typing import List
 
 # Import refactored components
 # Skip this test file until src modules are implemented
 import pytest
+
 pytest.skip("Test depends on unimplemented src modules", allow_module_level=True)
 
 # from src.analyzer.helpers.violation_reporter import ViolationReporter, ConnascenceViolation
+from src.analyzer.analyzers.complexity_analyzer import ComplexityAnalyzer
+from src.analyzer.analyzers.magic_literal_analyzer import MagicLiteralAnalyzer
+from src.analyzer.analyzers.parameter_analyzer import ParameterAnalyzer
+from src.analyzer.analyzers.refactored_ast_analyzer import AnalyzerConfig, RefactoredConnascenceASTAnalyzer
+from src.analyzer.detectors.refactored_connascence_detector import ConnascenceDetector
 from src.analyzer.helpers.ast_analysis_helper import ASTAnalysisHelper
 from src.analyzer.helpers.context_analyzer import ContextAnalyzer
-from src.analyzer.detectors.refactored_connascence_detector import ConnascenceDetector, ConnascenceAnalyzer
-from src.analyzer.analyzers.magic_literal_analyzer import MagicLiteralAnalyzer, MagicLiteralConfig
-from src.analyzer.analyzers.parameter_analyzer import ParameterAnalyzer, ParameterConfig
-from src.analyzer.analyzers.complexity_analyzer import ComplexityAnalyzer, ComplexityConfig
-from src.analyzer.analyzers.refactored_ast_analyzer import RefactoredConnascenceASTAnalyzer, AnalyzerConfig
 
 
 class TestViolationReporter:
     """Test the extracted ViolationReporter class."""
-    
+
     def setup_method(self):
         """Set up test fixtures."""
         self.file_path = "test.py"
@@ -51,44 +50,44 @@ class TestViolationReporter:
             "    return c + d + e"
         ]
         self.reporter = ViolationReporter(self.file_path, self.source_lines)
-    
+
     def test_create_position_violation(self):
         """Test creation of position violations."""
         # Create a mock function node
         code = "def test_function(a, b, c, d, e): pass"
         tree = ast.parse(code)
         func_node = tree.body[0]
-        
+
         violation = self.reporter.create_position_violation(func_node, 5)
-        
+
         assert violation.type == "connascence_of_position"
         assert violation.severity == "high"
         assert violation.file_path == self.file_path
         assert "5 positional parameters" in violation.description
         assert violation.context["parameter_count"] == 5
         assert violation.context["function_name"] == "test_function"
-    
+
     def test_create_meaning_violation(self):
         """Test creation of meaning violations."""
         code = "x = 42"
         tree = ast.parse(code)
         const_node = tree.body[0].value
-        
+
         violation = self.reporter.create_meaning_violation(const_node, 42, False)
-        
+
         assert violation.type == "connascence_of_meaning"
         assert violation.severity == "medium"  # Not in conditional
         assert "Magic literal '42'" in violation.description
         assert violation.context["literal_value"] == 42
-    
+
     def test_create_god_object_violation(self):
         """Test creation of god object violations."""
         code = "class TestClass: pass"
         tree = ast.parse(code)
         class_node = tree.body[0]
-        
+
         violation = self.reporter.create_god_object_violation(class_node, 25, 600)
-        
+
         assert violation.type == "god_object"
         assert violation.severity == "critical"
         assert "25 methods" in violation.description
@@ -99,7 +98,7 @@ class TestViolationReporter:
 
 class TestASTAnalysisHelper:
     """Test the extracted ASTAnalysisHelper class."""
-    
+
     def setup_method(self):
         """Set up test fixtures."""
         self.source_lines = [
@@ -111,7 +110,7 @@ class TestASTAnalysisHelper:
             "global y"
         ]
         self.helper = ASTAnalysisHelper(self.source_lines)
-    
+
     def test_normalize_function_body(self):
         """Test function body normalization."""
         code = """
@@ -124,14 +123,14 @@ def test_func():
 """
         tree = ast.parse(code)
         func_node = tree.body[0]
-        
+
         normalized = self.helper.normalize_function_body(func_node)
-        
+
         # Should contain normalized elements
         assert "if" in normalized
         assert "return" in normalized
         assert "assign" in normalized
-    
+
     def test_collect_function_definitions(self):
         """Test function definition collection."""
         code = """
@@ -147,13 +146,13 @@ class TestClass:
 """
         tree = ast.parse(code)
         functions = self.helper.collect_function_definitions(tree)
-        
+
         # Should find all functions including methods
         assert len(functions) == 3
         assert "func1" in functions
         assert "func2" in functions
         assert "method1" in functions
-    
+
     def test_collect_magic_literals(self):
         """Test magic literal collection."""
         code = """
@@ -164,7 +163,7 @@ valid = 0  # Should be excluded
 """
         tree = ast.parse(code)
         literals = self.helper.collect_magic_literals(tree)
-        
+
         # Should find magic literals but exclude common values
         literal_values = [value for _, value in literals]
         assert 42 in literal_values
@@ -175,7 +174,7 @@ valid = 0  # Should be excluded
 
 class TestContextAnalyzer:
     """Test the extracted ContextAnalyzer class."""
-    
+
     def setup_method(self):
         """Set up test fixtures."""
         self.file_path = "test.py"
@@ -186,7 +185,7 @@ class TestContextAnalyzer:
             "    return z"
         ]
         self.analyzer = ContextAnalyzer(self.file_path, self.source_lines)
-    
+
     def test_get_function_context(self):
         """Test function context analysis."""
         code = """
@@ -198,15 +197,15 @@ def test_function(a, b, c=None):
 """
         tree = ast.parse(code)
         func_node = tree.body[0]
-        
+
         context = self.analyzer.get_function_context(func_node)
-        
+
         assert context["name"] == "test_function"
         assert context["parameter_count"] == 3
         assert context["docstring"] == "Test docstring"
         assert context["body_length"] == 3
         assert len(context["parameters"]["parameter_names"]) == 3
-    
+
     def test_analyze_complexity_context(self):
         """Test complexity context analysis."""
         code = """
@@ -223,9 +222,9 @@ def complex_function(x):
 """
         tree = ast.parse(code)
         func_node = tree.body[0]
-        
+
         context = self.analyzer.analyze_complexity_context(func_node)
-        
+
         assert context["cyclomatic_complexity"] > 5
         assert context["nesting_depth"] > 2
         assert context["branch_count"] >= 2
@@ -235,7 +234,7 @@ def complex_function(x):
 
 class TestMagicLiteralAnalyzer:
     """Test the specialized MagicLiteralAnalyzer."""
-    
+
     def setup_method(self):
         """Set up test fixtures."""
         self.file_path = "test.py"
@@ -246,7 +245,7 @@ class TestMagicLiteralAnalyzer:
             "    return x"
         ]
         self.analyzer = MagicLiteralAnalyzer(self.file_path, self.source_lines)
-    
+
     def test_magic_number_detection(self):
         """Test magic number detection."""
         code = """
@@ -258,15 +257,15 @@ def calculate_price(base):
 """
         tree = ast.parse(code)
         violations = self.analyzer.analyze(tree)
-        
+
         # Should detect magic numbers 100 and 0.2
         magic_violations = [v for v in violations if "100" in v.description or "0.2" in v.description]
         assert len(magic_violations) >= 2
-        
+
         # Check severity assignment
         conditional_violations = [v for v in violations if v.severity == "high"]
         assert len(conditional_violations) >= 1  # 100 is in conditional
-    
+
     def test_security_related_detection(self):
         """Test security-related magic literal detection."""
         self.source_lines = [
@@ -274,14 +273,14 @@ def calculate_price(base):
             "api_key = 'abc-def-ghi'"
         ]
         self.analyzer = MagicLiteralAnalyzer(self.file_path, self.source_lines)
-        
+
         code = """
 password = 'secret123'
 api_key = 'abc-def-ghi'
 """
         tree = ast.parse(code)
         violations = self.analyzer.analyze(tree)
-        
+
         # Should detect security-related strings with critical severity
         critical_violations = [v for v in violations if v.severity == "critical"]
         assert len(critical_violations) >= 1
@@ -289,40 +288,40 @@ api_key = 'abc-def-ghi'
 
 class TestParameterAnalyzer:
     """Test the specialized ParameterAnalyzer."""
-    
+
     def setup_method(self):
         """Set up test fixtures."""
         self.file_path = "test.py"
         self.source_lines = ["def test_func(a, b, c, d, e): pass"]
         self.analyzer = ParameterAnalyzer(self.file_path, self.source_lines)
-    
+
     def test_parameter_count_violation(self):
         """Test parameter count violation detection."""
         code = "def excessive_params(a, b, c, d, e, f, g): pass"
         tree = ast.parse(code)
         violations = self.analyzer.analyze(tree)
-        
+
         # Should detect parameter count violation
         param_violations = [v for v in violations if "positional parameters" in v.description]
         assert len(param_violations) >= 1
         assert param_violations[0].severity in ["high", "critical"]
-    
+
     def test_boolean_parameter_detection(self):
         """Test boolean parameter detection."""
         code = "def func_with_flag(data, process_immediately=True): pass"
         tree = ast.parse(code)
         violations = self.analyzer.analyze(tree)
-        
+
         # Should detect boolean flag parameter
         flag_violations = [v for v in violations if "Boolean parameter" in v.description]
         assert len(flag_violations) >= 1
-    
+
     def test_function_call_analysis(self):
         """Test function call analysis."""
         code = "result = some_function(1, 2, 3, 4, 5, 6, 7)"
         tree = ast.parse(code)
         violations = self.analyzer.analyze(tree)
-        
+
         # Should detect excessive positional arguments in call
         call_violations = [v for v in violations if "Function call with" in v.description]
         assert len(call_violations) >= 1
@@ -330,13 +329,13 @@ class TestParameterAnalyzer:
 
 class TestComplexityAnalyzer:
     """Test the specialized ComplexityAnalyzer."""
-    
+
     def setup_method(self):
         """Set up test fixtures."""
         self.file_path = "test.py"
         self.source_lines = []
         self.analyzer = ComplexityAnalyzer(self.file_path, self.source_lines)
-    
+
     def test_cyclomatic_complexity_detection(self):
         """Test cyclomatic complexity detection."""
         code = """
@@ -358,12 +357,12 @@ def complex_function(x):
 """
         tree = ast.parse(code)
         violations = self.analyzer.analyze(tree)
-        
+
         # Should detect high complexity
         complexity_violations = [v for v in violations if "cyclomatic complexity" in v.description]
         assert len(complexity_violations) >= 1
         assert complexity_violations[0].severity in ["high", "critical"]
-    
+
     def test_god_class_detection(self):
         """Test God Object detection."""
         # Create a class with many methods
@@ -376,7 +375,7 @@ class GodClass:
 """
         tree = ast.parse(code)
         violations = self.analyzer.analyze(tree)
-        
+
         # Should detect God Object
         god_violations = [v for v in violations if "God Object" in v.description]
         assert len(god_violations) >= 1
@@ -385,7 +384,7 @@ class GodClass:
 
 class TestRefactoredConnascenceDetector:
     """Test the refactored ConnascenceDetector."""
-    
+
     def test_composition_works(self):
         """Test that the refactored detector works with composition."""
         source_lines = [
@@ -394,15 +393,15 @@ class TestRefactoredConnascenceDetector:
             "        return b * 0.2",
             "    return c"
         ]
-        
+
         detector = ConnascenceDetector("test.py", source_lines)
         tree = ast.parse("\n".join(source_lines))
         detector.visit(tree)
         detector.finalize_analysis()
-        
+
         # Should detect violations using helper classes
         assert len(detector.violations) > 0
-        
+
         # Should maintain the same interface
         violation_types = [v.type for v in detector.violations]
         assert "connascence_of_position" in violation_types or "connascence_of_meaning" in violation_types
@@ -410,12 +409,12 @@ class TestRefactoredConnascenceDetector:
 
 class TestRefactoredASTAnalyzer:
     """Test the refactored AST analyzer."""
-    
+
     def test_specialized_analyzers_integration(self):
         """Test that specialized analyzers work together."""
         config = AnalyzerConfig()
         analyzer = RefactoredConnascenceASTAnalyzer(config)
-        
+
         # Test with a sample Python file content
         code = """
 def complex_function(a, b, c, d, e, f):
@@ -430,21 +429,21 @@ def complex_function(a, b, c, d, e, f):
 class GodClass:
     def __init__(self): pass
 """ + "\n".join([f"    def method_{i}(self): pass" for i in range(25)])
-        
+
         # Create temporary file for testing
         import tempfile
         with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as f:
             f.write(code)
             temp_path = Path(f.name)
-        
+
         try:
             violations = analyzer.analyze_file(temp_path)
-            
+
             # Should find multiple types of violations
-            violation_types = set(v.type for v in violations)
+            violation_types = {v.type for v in violations}
             assert len(violation_types) > 1  # Multiple analyzers should contribute
             assert len(violations) > 3  # Should find several issues
-            
+
         finally:
             temp_path.unlink()  # Clean up
 
@@ -458,7 +457,7 @@ def problematic_function(a, b, c, d, e, f, g, h):
     secret = "hardcoded_password"
     magic_number = 42
     threshold = 100
-    
+
     if a > threshold:
         if b > magic_number:
             for i in range(1000):
@@ -478,7 +477,7 @@ def problematic_function(a, b, c, d, e, f, g, h):
 class MassiveClass:
     def __init__(self):
         self.data = []
-    
+
     def method_1(self): pass
     def method_2(self): pass
     def method_3(self): pass
@@ -506,39 +505,39 @@ class MassiveClass:
 
 class TestIntegrationRefactoredVsOriginal:
     """Integration tests comparing refactored vs original behavior."""
-    
+
     def test_violation_count_consistency(self, sample_code_with_issues):
         """Test that refactored version finds similar violations to original."""
         # This would compare against the original analyzer if imported
         # For now, we test that the refactored version finds expected violations
-        
+
         config = AnalyzerConfig()
         analyzer = RefactoredConnascenceASTAnalyzer(config)
-        
+
         # Create temporary file
         import tempfile
         with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as f:
             f.write(sample_code_with_issues)
             temp_path = Path(f.name)
-        
+
         try:
             violations = analyzer.analyze_file(temp_path)
-            
+
             # Should find various types of issues
             assert len(violations) >= 5  # Multiple issues should be detected
-            
+
             # Should find parameter issues
             param_issues = [v for v in violations if "parameter" in v.description.lower()]
             assert len(param_issues) >= 1
-            
+
             # Should find complexity issues
             complexity_issues = [v for v in violations if "complexity" in v.description.lower() or "god" in v.description.lower()]
             assert len(complexity_issues) >= 1
-            
+
             # Should find magic literal issues
             magic_issues = [v for v in violations if "magic" in v.description.lower() or "literal" in v.description.lower()]
             assert len(magic_issues) >= 1
-            
+
         finally:
             temp_path.unlink()
 

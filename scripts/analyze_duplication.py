@@ -5,11 +5,12 @@ Analyze duplication patterns from AIVillage MCP analysis results
 import json
 import os
 
+
 def analyze_duplication_patterns():
     """Extract and analyze duplication patterns from MCP results."""
-    
+
     # Load the comprehensive MCP analysis results
-    with open('reports/fixed_aivillage_mcp_analysis.json', 'r') as f:
+    with open('reports/fixed_aivillage_mcp_analysis.json') as f:
         mcp_data = json.load(f)
 
     # Extract duplication-related violations
@@ -17,7 +18,7 @@ def analyze_duplication_patterns():
     god_objects = []
     parameter_bombs = []
     magic_literals = []
-    
+
     total_files = mcp_data.get('summary', {}).get('total_files_analyzed', 0)
     total_violations = mcp_data.get('summary', {}).get('total_violations', 0)
 
@@ -32,13 +33,13 @@ def analyze_duplication_patterns():
     for file_result in file_results:
         violations = file_result.get('violations', [])
         file_path = file_result.get('file_path', '')
-        
+
         for violation in violations:
             v_type = violation.get('type', '')
             severity = violation.get('severity', '')
             description = violation.get('description', '')
             line_num = violation.get('line_number', 0)
-            
+
             violation_data = {
                 'file': os.path.basename(file_path),
                 'full_path': file_path,
@@ -46,7 +47,7 @@ def analyze_duplication_patterns():
                 'line': line_num,
                 'severity': severity
             }
-            
+
             if v_type == 'god_object':
                 god_objects.append(violation_data)
             elif v_type == 'CoP':  # Connascence of Position - Parameter bombs
@@ -68,9 +69,9 @@ def analyze_duplication_patterns():
         print(f'   {i+1}. {pb["description"]} (Line {pb["line"]})')
         print(f'      File: {pb["file"]}')
         print()
-    
+
     print(f'MAGIC LITERALS (CoM): {len(magic_literals)}')
-    print(f'   Found {len(magic_literals)} magic literal violations across {len(set(ml["file"] for ml in magic_literals))} files')
+    print(f'   Found {len(magic_literals)} magic literal violations across {len({ml["file"] for ml in magic_literals})} files')
     print()
 
     print(f'EXPLICIT DUPLICATION PATTERNS: {len(duplication_violations)}')
@@ -86,14 +87,14 @@ def analyze_duplication_patterns():
     print(f'   • Duplication Density: {total_dup_violations / max(total_files, 1):.2f} violations per file')
     print(f'   • God Object Rate: {len(god_objects) / max(total_files, 1) * 100:.1f}% of files')
     print(f'   • Magic Literal Rate: {len(magic_literals) / max(total_files, 1):.2f} per file')
-    
+
     # Create summary report
     summary = {
         'total_files_analyzed': total_files,
         'total_violations': total_violations,
         'duplication_analysis': {
             'god_objects': len(god_objects),
-            'parameter_bombs': len(parameter_bombs), 
+            'parameter_bombs': len(parameter_bombs),
             'magic_literals': len(magic_literals),
             'explicit_duplications': len(duplication_violations),
             'total_duplication_violations': total_dup_violations,
@@ -104,12 +105,12 @@ def analyze_duplication_patterns():
         'top_parameter_bombs': parameter_bombs[:10],
         'sample_magic_literals': magic_literals[:20]
     }
-    
+
     # Save detailed duplication analysis
     with open('reports/aivillage_duplication_summary.json', 'w') as f:
         json.dump(summary, f, indent=2)
-    
-    print(f'\nDetailed analysis saved to reports/aivillage_duplication_summary.json')
+
+    print('\nDetailed analysis saved to reports/aivillage_duplication_summary.json')
     return summary
 
 if __name__ == '__main__':

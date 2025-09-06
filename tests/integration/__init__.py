@@ -18,11 +18,11 @@ Integration Test Suite - Memory Coordination and Test Result Storage
 Provides memory coordination infrastructure for integration test results
 """
 
+from dataclasses import asdict, dataclass
 import json
-import time
 from pathlib import Path
-from typing import Dict, Any, List
-from dataclasses import dataclass, asdict
+import time
+from typing import Any, Dict, List
 
 # Global memory store for integration test coordination
 INTEGRATION_TEST_MEMORY = {}
@@ -37,52 +37,52 @@ class TestResult:
     component: str
     details: Dict[str, Any]
     dependencies: List[str] = None
-    
+
     def __post_init__(self):
         if self.dependencies is None:
             self.dependencies = []
 
 class IntegrationTestMemoryCoordinator:
     """Centralized memory coordination for all integration tests"""
-    
+
     def __init__(self):
         self.memory_store = INTEGRATION_TEST_MEMORY
         self.session_id = f"integration_session_{int(time.time())}"
         self.test_results = []
         self.component_coverage = set()
         self.integration_chains = {}
-        
+
     def store_test_result(self, test_result: TestResult):
         """Store test result with memory coordination"""
         result_key = f"{self.session_id}_{test_result.test_name}"
-        
+
         self.memory_store[result_key] = {
             'result': asdict(test_result),
             'stored_at': time.time(),
             'session_id': self.session_id
         }
-        
+
         self.test_results.append(test_result)
         self.component_coverage.add(test_result.component)
-        
+
     def get_test_results(self, component: str = None, status: str = None) -> List[TestResult]:
         """Retrieve test results with optional filtering"""
         results = self.test_results.copy()
-        
+
         if component:
             results = [r for r in results if r.component == component]
-            
+
         if status:
             results = [r for r in results if r.status == status]
-            
+
         return results
-        
+
     def calculate_coverage_metrics(self) -> Dict[str, Any]:
         """Calculate comprehensive coverage metrics"""
         total_tests = len(self.test_results)
         passed_tests = len([r for r in self.test_results if r.status == 'passed'])
         failed_tests = len([r for r in self.test_results if r.status == 'failed'])
-        
+
         component_results = {}
         for component in self.component_coverage:
             component_tests = [r for r in self.test_results if r.component == component]
@@ -91,7 +91,7 @@ class IntegrationTestMemoryCoordinator:
                 'passed': len([r for r in component_tests if r.status == 'passed']),
                 'pass_rate': len([r for r in component_tests if r.status == 'passed']) / len(component_tests) * 100 if component_tests else 0
             }
-            
+
         return {
             'total_tests': total_tests,
             'passed_tests': passed_tests,
@@ -102,11 +102,11 @@ class IntegrationTestMemoryCoordinator:
             'total_execution_time': sum(r.execution_time for r in self.test_results),
             'average_execution_time': sum(r.execution_time for r in self.test_results) / total_tests if total_tests > 0 else 0
         }
-        
+
     def export_results(self, output_path: Path):
         """Export test results to file for CI/CD integration"""
         metrics = self.calculate_coverage_metrics()
-        
+
         export_data = {
             'session_id': self.session_id,
             'timestamp': time.time(),
@@ -114,13 +114,13 @@ class IntegrationTestMemoryCoordinator:
             'test_results': [asdict(result) for result in self.test_results],
             'memory_store_keys': list(self.memory_store.keys())
         }
-        
+
         output_path.parent.mkdir(parents=True, exist_ok=True)
         with open(output_path, 'w') as f:
             json.dump(export_data, f, indent=2)
-            
+
         return export_data
-        
+
     def create_integration_chain(self, chain_name: str, components: List[str]):
         """Create integration test chain for dependency tracking"""
         self.integration_chains[chain_name] = {
@@ -129,12 +129,12 @@ class IntegrationTestMemoryCoordinator:
             'status': 'initialized',
             'created_at': time.time()
         }
-        
+
     def add_to_chain(self, chain_name: str, test_result: TestResult):
         """Add test result to integration chain"""
         if chain_name in self.integration_chains:
             self.integration_chains[chain_name]['tests'].append(test_result)
-            
+
             # Update chain status based on results
             chain_tests = self.integration_chains[chain_name]['tests']
             if all(t.status == 'passed' for t in chain_tests):
@@ -143,12 +143,12 @@ class IntegrationTestMemoryCoordinator:
                 self.integration_chains[chain_name]['status'] = 'failed'
             else:
                 self.integration_chains[chain_name]['status'] = 'in_progress'
-                
+
     def get_chain_status(self, chain_name: str) -> Dict[str, Any]:
         """Get status of integration chain"""
         if chain_name not in self.integration_chains:
             return {'status': 'not_found'}
-            
+
         chain = self.integration_chains[chain_name]
         return {
             'status': chain['status'],
@@ -161,8 +161,8 @@ class IntegrationTestMemoryCoordinator:
 # Global coordinator instance
 INTEGRATION_COORDINATOR = IntegrationTestMemoryCoordinator()
 
-def store_integration_result(test_name: str, status: str, execution_time: float, 
-                            component: str, details: Dict[str, Any], 
+def store_integration_result(test_name: str, status: str, execution_time: float,
+                            component: str, details: Dict[str, Any],
                             dependencies: List[str] = None):
     """Convenience function to store integration test results"""
     result = TestResult(
@@ -174,7 +174,7 @@ def store_integration_result(test_name: str, status: str, execution_time: float,
         details=details,
         dependencies=dependencies or []
     )
-    
+
     INTEGRATION_COORDINATOR.store_test_result(result)
     return result
 
@@ -186,7 +186,7 @@ def export_integration_results(output_dir: Path = None) -> Dict[str, Any]:
     """Export integration test results"""
     if output_dir is None:
         output_dir = Path(__file__).parent.parent.parent / 'test_results' / 'integration'
-        
+
     output_file = output_dir / 'integration_test_results.json'
     return INTEGRATION_COORDINATOR.export_results(output_file)
 
@@ -194,14 +194,14 @@ def export_integration_results(output_dir: Path = None) -> Dict[str, Any]:
 def create_test_workspace(workspace_name: str) -> Path:
     """Create standardized test workspace"""
     import tempfile
-    
+
     workspace = Path(tempfile.mkdtemp(prefix=f'connascence_test_{workspace_name}_'))
-    
+
     # Create standard directory structure
     (workspace / 'src').mkdir()
     (workspace / 'tests').mkdir()
     (workspace / 'docs').mkdir()
-    
+
     return workspace
 
 def create_sample_violations() -> List[Dict[str, Any]]:
@@ -277,10 +277,10 @@ def create_mock_autofix_results() -> List[Dict[str, Any]]:
 # Performance benchmarking utilities
 class IntegrationPerformanceBenchmark:
     """Performance benchmarking for integration tests"""
-    
+
     def __init__(self):
         self.benchmarks = {}
-        
+
     def start_benchmark(self, benchmark_name: str):
         """Start performance benchmark"""
         self.benchmarks[benchmark_name] = {
@@ -288,16 +288,16 @@ class IntegrationPerformanceBenchmark:
             'end_time': None,
             'duration': None
         }
-        
+
     def end_benchmark(self, benchmark_name: str):
         """End performance benchmark"""
         if benchmark_name in self.benchmarks:
             self.benchmarks[benchmark_name]['end_time'] = time.time()
             self.benchmarks[benchmark_name]['duration'] = (
-                self.benchmarks[benchmark_name]['end_time'] - 
+                self.benchmarks[benchmark_name]['end_time'] -
                 self.benchmarks[benchmark_name]['start_time']
             )
-            
+
     def get_benchmark_results(self) -> Dict[str, Any]:
         """Get all benchmark results"""
         return self.benchmarks.copy()
@@ -325,7 +325,7 @@ def cleanup_test_memory():
     """Clean up test memory after test run"""
     global INTEGRATION_TEST_MEMORY
     INTEGRATION_TEST_MEMORY.clear()
-    
+
     # Reset coordinator
     global INTEGRATION_COORDINATOR
     INTEGRATION_COORDINATOR = IntegrationTestMemoryCoordinator()

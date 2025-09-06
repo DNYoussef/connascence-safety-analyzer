@@ -12,9 +12,10 @@
 # all copies or substantial portions of the Software.
 
 from dataclasses import dataclass
-from typing import Dict, Any, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple
 
-@dataclass 
+
+@dataclass
 class PatchSuggestion:
     violation_id: str
     confidence: float
@@ -25,11 +26,10 @@ class PatchSuggestion:
     line_range: Tuple[int, int]
     safety_level: str = 'moderate'
     rollback_info: Optional[Dict[str, Any]] = None
-    
+
     def __post_init__(self):
         if self.rollback_info is None:
             self.rollback_info = {}
 
 
 # Import the real implementations from core module
-from .core import PatchGenerator, AutofixEngine, SafeAutofixer

@@ -20,21 +20,21 @@ Created to verify enterprise analyzer detects all patterns
 class DatabaseConnection:
     def __init__(self):
         self.connected = False
-    
+
     def connect(self):
         self.connected = True
-    
+
     def setup(self):
         # Setup requires connection first
         pass
-    
+
     def query(self, sql):
         # Requires setup and connection
         pass
-    
+
     def cleanup(self):
         pass
-    
+
     def disconnect(self):
         self.connected = False
 
@@ -42,15 +42,15 @@ class DatabaseConnection:
 class SharedCounter:
     shared_data = []  # Class-level mutable default
     config_dict = {"count": 0}
-    
+
     def increment(self):
         self.shared_data.append(1)
         self.config_dict["count"] += 1
-    
+
     def reset(self):
         self.shared_data.clear()
         self.config_dict["count"] = 0
-    
+
     def modify_shared(self):
         self.config_dict.update({"new": True})
 
@@ -72,14 +72,15 @@ def compare_objects(obj1, obj2):
     return False
 
 # CoTi - Timing: Sleep and timing dependencies
-import time
 import threading
+import time
+
 
 class TimingDependentProcessor:
     def process_with_sleep(self):
         time.sleep(0.1)  # Timing dependency
         return "processed"
-    
+
     def wait_for_condition(self):
         thread = threading.Thread(target=lambda: None)
         thread.start()
@@ -149,7 +150,7 @@ def process_data():
     status = "PROCESSING"  # Magic string
     max_retries = 42  # Magic number
     timeout = 3600  # Magic number
-    
+
     if status == "PROCESSING":
         return max_retries * timeout
 

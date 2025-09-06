@@ -15,7 +15,7 @@ NASA_GLOBAL_THRESHOLD = 5     # Rule #7: Limit global variable usage
 NASA_COMPLIANCE_THRESHOLD = 0.95  # Minimum NASA compliance score for passing
 
 # God Object Detection Thresholds
-GOD_OBJECT_METHOD_THRESHOLD = 20    # Classes with >20 methods are god objects  
+GOD_OBJECT_METHOD_THRESHOLD = 20    # Classes with >20 methods are god objects
 GOD_OBJECT_LOC_THRESHOLD = 500      # Classes with >500 LOC are god objects
 GOD_OBJECT_PARAMETER_THRESHOLD = 10  # Methods with >10 params are parameter bombs
 
@@ -135,7 +135,7 @@ CONNASCENCE_TYPES = [
 # Standard unified policy names (new canonical names)
 UNIFIED_POLICY_NAMES = [
     "nasa-compliance",  # Highest safety standards (NASA JPL Power of Ten)
-    "strict",          # Strict core analysis 
+    "strict",          # Strict core analysis
     "standard",        # Balanced service defaults
     "lenient"          # Relaxed experimental settings
 ]
@@ -145,28 +145,23 @@ UNIFIED_POLICY_NAMES = [
 UNIFIED_POLICY_MAPPING = {
     # New standard names (canonical) - map to themselves
     "nasa-compliance": "nasa-compliance",
-    "strict": "strict", 
+    "strict": "strict",
     "standard": "standard",
     "lenient": "lenient",
-    
+
     # CLI legacy names -> unified names
     "nasa_jpl_pot10": "nasa-compliance",
     "strict-core": "strict",
     "default": "standard",
     "service-defaults": "standard",
     "experimental": "lenient",
-    
-    # VSCode legacy names -> unified names  
+
+    # VSCode legacy names -> unified names
     "safety_level_1": "nasa-compliance",
     "general_safety_strict": "strict",
     "modern_general": "standard",
     "safety_level_3": "lenient",
-    
-    # MCP legacy names -> unified names
-    "nasa-compliance": "nasa-compliance",  # Already correct
-    "service-defaults": "standard",
-    "experimental": "lenient",
-    
+
     # Additional common variants
     "nasa": "nasa-compliance",
     "jpl": "nasa-compliance",
@@ -178,33 +173,33 @@ UNIFIED_POLICY_MAPPING = {
     "relaxed": "lenient"
 }
 
-# Reverse mapping for backwards compatibility 
+# Reverse mapping for backwards compatibility
 # Maps unified names back to expected legacy names per integration
 LEGACY_POLICY_MAPPING = {
     "cli": {
         "nasa-compliance": "nasa_jpl_pot10",
-        "strict": "strict-core", 
+        "strict": "strict-core",
         "standard": "default",
         "lenient": "lenient"
     },
     "vscode": {
         "nasa-compliance": "safety_level_1",
         "strict": "general_safety_strict",
-        "standard": "modern_general", 
+        "standard": "modern_general",
         "lenient": "safety_level_3"
     },
     "mcp": {
         "nasa-compliance": "nasa-compliance",
         "strict": "strict-core",
         "standard": "service-defaults",
-        "lenient": "experimental" 
+        "lenient": "experimental"
     }
 }
 
 # Policy deprecation warnings
 POLICY_DEPRECATION_WARNINGS = {
     "nasa_jpl_pot10": "Policy name 'nasa_jpl_pot10' is deprecated. Use 'nasa-compliance' instead.",
-    "strict-core": "Policy name 'strict-core' is deprecated. Use 'strict' instead.", 
+    "strict-core": "Policy name 'strict-core' is deprecated. Use 'strict' instead.",
     "default": "Policy name 'default' is deprecated. Use 'standard' instead.",
     "service-defaults": "Policy name 'service-defaults' is deprecated. Use 'standard' instead.",
     "experimental": "Policy name 'experimental' is deprecated. Use 'lenient' instead.",
@@ -217,14 +212,14 @@ POLICY_DEPRECATION_WARNINGS = {
 def resolve_policy_name(policy_name: str, warn_deprecated: bool = True) -> str:
     """
     Resolve any policy name to the unified standard name.
-    
+
     Args:
         policy_name: Any policy name (legacy or unified)
         warn_deprecated: Whether to emit deprecation warnings
-        
+
     Returns:
         Unified standard policy name
-        
+
     Examples:
         resolve_policy_name("nasa_jpl_pot10") -> "nasa-compliance"
         resolve_policy_name("strict-core") -> "strict"
@@ -233,11 +228,11 @@ def resolve_policy_name(policy_name: str, warn_deprecated: bool = True) -> str:
     """
     if not policy_name:
         return "standard"  # Default to standard policy
-        
+
     # Check if already a unified name
     if policy_name in UNIFIED_POLICY_NAMES:
         return policy_name
-        
+
     # Look up in mapping
     unified_name = UNIFIED_POLICY_MAPPING.get(policy_name)
     if unified_name:
@@ -250,7 +245,7 @@ def resolve_policy_name(policy_name: str, warn_deprecated: bool = True) -> str:
                 stacklevel=2
             )
         return unified_name
-        
+
     # If not found, default to standard policy with warning
     if warn_deprecated:
         import warnings
@@ -264,61 +259,61 @@ def resolve_policy_name(policy_name: str, warn_deprecated: bool = True) -> str:
 def get_legacy_policy_name(unified_name: str, integration: str = "cli") -> str:
     """
     Get the legacy policy name for a specific integration.
-    
+
     Args:
         unified_name: Unified standard policy name
         integration: Target integration ("cli", "vscode", "mcp")
-        
+
     Returns:
         Legacy policy name for the integration
-        
+
     Examples:
-        get_legacy_policy_name("nasa-compliance", "cli") -> "nasa_jpl_pot10" 
+        get_legacy_policy_name("nasa-compliance", "cli") -> "nasa_jpl_pot10"
         get_legacy_policy_name("strict", "vscode") -> "general_safety_strict"
         get_legacy_policy_name("standard", "mcp") -> "service-defaults"
     """
     # Ensure we have a valid unified name
     resolved_name = resolve_policy_name(unified_name, warn_deprecated=False)
-    
+
     # Get legacy mapping for integration
     integration_mapping = LEGACY_POLICY_MAPPING.get(integration, LEGACY_POLICY_MAPPING["cli"])
-    
+
     return integration_mapping.get(resolved_name, resolved_name)
 
 def validate_policy_name(policy_name: str) -> bool:
     """
     Validate if a policy name is recognized (unified or legacy).
-    
+
     Args:
         policy_name: Policy name to validate
-        
+
     Returns:
         True if policy name is valid/recognized
     """
     if not policy_name:
         return False
-        
-    return (policy_name in UNIFIED_POLICY_NAMES or 
+
+    return (policy_name in UNIFIED_POLICY_NAMES or
             policy_name in UNIFIED_POLICY_MAPPING)
 
 def list_available_policies(include_legacy: bool = False) -> list:
     """
     List all available policy names.
-    
+
     Args:
         include_legacy: Whether to include legacy names
-        
+
     Returns:
         List of available policy names
     """
     policies = UNIFIED_POLICY_NAMES.copy()
-    
+
     if include_legacy:
         # Add all legacy names
-        legacy_names = [name for name in UNIFIED_POLICY_MAPPING.keys() 
+        legacy_names = [name for name in UNIFIED_POLICY_MAPPING
                        if name not in UNIFIED_POLICY_NAMES]
         policies.extend(sorted(legacy_names))
-    
+
     return policies
 
 # Standard Error Response Schema
@@ -332,27 +327,27 @@ ERROR_CODE_MAPPING = {
     'UNSUPPORTED_FILE_TYPE': 1006,
     'TIMEOUT_ERROR': 1007,
     'MEMORY_ERROR': 1008,
-    
+
     # Configuration Errors (2000-2999)
     'CONFIG_INVALID': 2001,
     'CONFIG_NOT_FOUND': 2002,
     'POLICY_INVALID': 2003,
     'THRESHOLD_INVALID': 2004,
     'PRESET_NOT_FOUND': 2005,
-    
+
     # Integration Errors (3000-3999)
     'MCP_CONNECTION_FAILED': 3001,
     'MCP_RATE_LIMIT_EXCEEDED': 3002,
     'MCP_VALIDATION_FAILED': 3003,
     'CLI_ARGUMENT_INVALID': 3004,
     'VSCODE_EXTENSION_ERROR': 3005,
-    
+
     # Security Errors (4000-4999)
     'PATH_TRAVERSAL_DETECTED': 4001,
     'PERMISSION_DENIED': 4002,
     'RESOURCE_EXHAUSTED': 4003,
     'AUDIT_LOG_FAILURE': 4004,
-    
+
     # System Errors (5000-5999)
     'INTERNAL_ERROR': 5001,
     'INITIALIZATION_FAILED': 5002,
@@ -423,18 +418,18 @@ ERROR_CORRELATION_CONTEXT = {
 SAFE_NUMBERS = frozenset([
     # Basic mathematical constants
     0, 1, -1, 2, 3, 5, 8,
-    
+
     # Common programming numbers
     10, 12, 16, 24, 32, 60, 100, 128, 256, 512, 1000, 1024,
-    
+
     # Time-related constants (common patterns)
     7, 30, 31, 365,  # days
     3600, 86400,     # seconds
-    
+
     # Common technical constants
     64, 255, 4096,   # byte/memory related
     8080, 3000,      # common dev ports (but still contextual)
-    
+
     # HTTP status codes (common ones)
     200, 201, 204, 301, 302, 400, 401, 403, 404, 409, 422, 500, 501, 502, 503
 ])
@@ -443,14 +438,14 @@ SAFE_NUMBERS = frozenset([
 CONTEXTUAL_NUMBERS = {
     # Network/Port numbers - flag if not in obvious network context
     8080: 'network_port',
-    3000: 'network_port', 
+    3000: 'network_port',
     443: 'network_port',
     80: 'network_port',
-    
+
     # Large buffer sizes - flag if not in buffer/size context
     4096: 'buffer_size',
     8192: 'buffer_size',
-    
+
     # Specific HTTP codes - less common ones
     418: 'http_status',  # I'm a teapot
     429: 'http_status',  # Rate limited
@@ -462,25 +457,25 @@ SAFE_STRING_PATTERNS = frozenset([
     '__main__', '__name__', '__file__', '__path__', '__version__',
     '__init__', '__str__', '__repr__', '__len__', '__iter__',
     '__enter__', '__exit__', '__call__', '__getitem__', '__setitem__',
-    
+
     # Common encoding/format strings
     'utf-8', 'utf8', 'ascii', 'latin-1', 'iso-8859-1',
     'json', 'xml', 'yaml', 'csv', 'txt', 'html', 'css', 'js',
-    
+
     # HTTP methods and headers
     'GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS',
     'Content-Type', 'Authorization', 'Accept', 'User-Agent',
-    
+
     # Common log levels
     'DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL',
     'debug', 'info', 'warning', 'error', 'critical',
-    
+
     # Single characters and whitespace
     '', ' ', '\n', '\t', '\r', '\r\n',
-    
+
     # Common separators
     ',', ';', ':', '|', '-', '_', '/', '\\',
-    
+
     # Boolean-like strings
     'true', 'false', 'True', 'False', 'yes', 'no', 'on', 'off'
 ])
@@ -562,13 +557,13 @@ REGEX_PATTERNS = {
     'file_extension': r'\\.([a-zA-Z0-9]+)$'
 }
 
-# Analysis Configuration Strings  
+# Analysis Configuration Strings
 CONFIG_KEYS = {
     'analysis_type': 'analysis_type',
     'policy_name': 'policy',
     'output_format': 'format',
     'include_nasa': 'include_nasa_rules',
-    'include_god': 'include_god_objects', 
+    'include_god': 'include_god_objects',
     'include_mece': 'include_mece_analysis',
     'tool_correlation': 'enable_tool_correlation',
     'strict_mode': 'strict_mode',
@@ -608,7 +603,7 @@ LANGUAGE_KEYWORDS = {
 COMMON_DIRECTORIES = {
     'python_cache': '__pycache__',
     'git_dir': '.git',
-    'pytest_cache': '.pytest_cache', 
+    'pytest_cache': '.pytest_cache',
     'node_modules': 'node_modules',
     'virtual_env': '.venv',
     'build_dir': 'build',

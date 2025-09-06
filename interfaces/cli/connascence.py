@@ -19,32 +19,26 @@ after the core analyzer components were removed.
 """
 
 import argparse
-import sys
-import warnings
-from typing import List, Optional
 from pathlib import Path
+import sys
+from typing import List, Optional
 
 # Import unified policy system
 sys.path.append(str(Path(__file__).parent.parent.parent))
 from analyzer.constants import (
-    resolve_policy_name, 
-    validate_policy_name,
-    list_available_policies,
-    UNIFIED_POLICY_NAMES,
-    POLICY_DEPRECATION_WARNINGS,
-    ERROR_CODE_MAPPING,
     ERROR_SEVERITY,
-    INTEGRATION_ERROR_MAPPING,
-    EXIT_SUCCESS,
-    EXIT_VIOLATIONS_FOUND,
-    EXIT_ERROR,
-    EXIT_INVALID_ARGUMENTS,
     EXIT_CONFIGURATION_ERROR,
-    EXIT_INTERRUPTED
+    EXIT_ERROR,
+    EXIT_INTERRUPTED,
+    EXIT_INVALID_ARGUMENTS,
+    UNIFIED_POLICY_NAMES,
+    list_available_policies,
+    resolve_policy_name,
+    validate_policy_name,
 )
 
 try:
-    from analyzer.unified_analyzer import StandardError, ErrorHandler
+    from analyzer.unified_analyzer import ErrorHandler, StandardError
 except ImportError:
     # Fallback for environments where unified analyzer isn't available
     class StandardError:
@@ -52,8 +46,8 @@ except ImportError:
             for k, v in kwargs.items():
                 setattr(self, k, v)
         def to_dict(self):
-            return {k: v for k, v in self.__dict__.items()}
-    
+            return dict(self.__dict__.items())
+
     class ErrorHandler:
         def __init__(self, integration):
             self.integration = integration
@@ -65,100 +59,100 @@ except ImportError:
 
 class ConnascenceCLI:
     """Basic CLI interface for connascence analysis."""
-    
+
     def __init__(self):
         self.parser = self._create_parser()
         self.error_handler = ErrorHandler('cli')
         self.errors = []
         self.warnings = []
-    
+
     def _create_parser(self) -> argparse.ArgumentParser:
         """Create argument parser for CLI."""
         parser = argparse.ArgumentParser(
             description="Connascence Safety Analyzer CLI",
             prog="connascence"
         )
-        
+
         parser.add_argument(
             "paths",
             nargs="*",
             help="Paths to analyze"
         )
-        
+
         parser.add_argument(
             "--config",
             type=str,
             help="Configuration file path"
         )
-        
+
         parser.add_argument(
             "--output",
             "-o",
             type=str,
             help="Output file path"
         )
-        
+
         parser.add_argument(
             "--policy",
-            "--policy-preset", 
+            "--policy-preset",
             dest="policy",
             type=str,
             default="standard",
             help=f"Policy preset to use. Unified names: {', '.join(UNIFIED_POLICY_NAMES)}. "
                  f"Legacy names supported with deprecation warnings."
         )
-        
+
         parser.add_argument(
             "--format",
             choices=["json", "markdown", "sarif"],
             default="json",
             help="Output format"
         )
-        
+
         parser.add_argument(
             "--verbose",
             "-v",
             action="store_true",
             help="Verbose output"
         )
-        
+
         parser.add_argument(
             "--dry-run",
             action="store_true",
             help="Dry run mode"
         )
-        
+
         parser.add_argument(
             "--list-policies",
             action="store_true",
             help="List all available policy names (unified and legacy)"
         )
-        
+
         return parser
-    
+
     def parse_args(self, args: Optional[List[str]] = None) -> argparse.Namespace:
         """Parse command line arguments."""
         return self.parser.parse_args(args)
-    
+
     def run(self, args: Optional[List[str]] = None) -> int:
         """Run the CLI with given arguments."""
         parsed_args = self.parse_args(args)
-        
+
         # Handle policy listing
         if parsed_args.list_policies:
             print("Available policy names:")
             print("\nUnified standard names (recommended):")
             for policy in UNIFIED_POLICY_NAMES:
                 print(f"  {policy}")
-            
+
             print("\nLegacy names (deprecated, but supported):")
             legacy_policies = list_available_policies(include_legacy=True)
             for policy in sorted(legacy_policies):
                 if policy not in UNIFIED_POLICY_NAMES:
                     print(f"  {policy} (deprecated)")
-            
+
             return 0
-        
+
         # Validate and resolve policy name with error handling
         if hasattr(parsed_args, 'policy'):
             if not validate_policy_name(parsed_args.policy):
@@ -174,28 +168,28 @@ class ConnascenceCLI:
                 self._handle_cli_error(error)
                 print(f"Available policies: {', '.join(list_available_policies(include_legacy=True))}")
                 return EXIT_CONFIGURATION_ERROR
-                
+
             # Resolve to unified name and show deprecation warning if needed
             unified_policy = resolve_policy_name(parsed_args.policy, warn_deprecated=True)
             if unified_policy != parsed_args.policy:
                 print(f"Note: Using unified policy name '{unified_policy}' for '{parsed_args.policy}'")
             parsed_args.policy = unified_policy
-        
+
         if parsed_args.verbose:
             print("Running connascence analysis...")
             if hasattr(parsed_args, 'policy'):
                 print(f"Using policy: {parsed_args.policy}")
-            
+
         # Validate paths with standardized error handling
         if not self._validate_paths(parsed_args.paths):
             return EXIT_INVALID_ARGUMENTS
-        
+
         if parsed_args.dry_run:
             print("Dry run mode - would analyze:", parsed_args.paths)
             if hasattr(parsed_args, 'policy'):
                 print(f"Would use policy: {parsed_args.policy}")
             return 0
-        
+
         # Placeholder analysis result
         result = {
             "analysis_complete": True,
@@ -205,7 +199,7 @@ class ConnascenceCLI:
             "policy_used": getattr(parsed_args, 'policy', 'standard'),
             "policy_system": "unified_v2.0"
         }
-        
+
         if parsed_args.output:
             import json
             with open(parsed_args.output, 'w') as f:
@@ -213,31 +207,31 @@ class ConnascenceCLI:
             print(f"Results written to {parsed_args.output}")
         else:
             print("Analysis completed successfully")
-            
+
         return 0
-    
+
     def _handle_cli_error(self, error: StandardError):
         """Handle CLI-specific error display with standardized format."""
         self.errors.append(error)
-        
+
         # Map severity to CLI-friendly display
         severity_prefix = {
             ERROR_SEVERITY['CRITICAL']: '💥 CRITICAL',
             ERROR_SEVERITY['HIGH']: '❌ ERROR',
             ERROR_SEVERITY['MEDIUM']: '⚠️  WARNING',
-            ERROR_SEVERITY['LOW']: 'ℹ️  INFO'
+            ERROR_SEVERITY['LOW']: 'i️  INFO'
         }
-        
+
         prefix = severity_prefix.get(error.severity, '❌ ERROR')
         print(f"{prefix}: {error.message}", file=sys.stderr)
-        
+
         # Show relevant context
         if hasattr(error, 'context') and error.context:
-            relevant_context = {k: v for k, v in error.context.items() 
+            relevant_context = {k: v for k, v in error.context.items()
                               if k in ['path', 'file_path', 'required_argument', 'config_path']}
             if relevant_context:
                 print(f"  Context: {relevant_context}", file=sys.stderr)
-    
+
     def _validate_paths(self, paths: List[str]) -> bool:
         """Validate input paths with error handling."""
         if not paths:
@@ -249,7 +243,7 @@ class ConnascenceCLI:
             )
             self._handle_cli_error(error)
             return False
-        
+
         # Check each path
         for path in paths:
             if not Path(path).exists():
@@ -261,7 +255,7 @@ class ConnascenceCLI:
                 )
                 self._handle_cli_error(error)
                 return False
-        
+
         return True
 
 

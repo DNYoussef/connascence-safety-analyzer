@@ -6,12 +6,12 @@ Shared functionality across all interface types (CLI, Web, VSCode).
 Eliminates duplication and provides consistent behavior.
 """
 
-from .shared_components import SharedAnalysisEngine, SharedFormatter, SharedValidation
 from .interface_base import InterfaceBase
+from .shared_components import SharedAnalysisEngine, SharedFormatter, SharedValidation
 
 __all__ = [
     "SharedAnalysisEngine",
-    "SharedFormatter", 
+    "SharedFormatter",
     "SharedValidation",
     "InterfaceBase"
 ]

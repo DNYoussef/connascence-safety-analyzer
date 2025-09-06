@@ -5,41 +5,39 @@ Unicode Removal Script for Code Safety
 
 Removes Unicode characters from Python code while preserving them in:
 - Comments for user/admin display
-- Docstrings for documentation  
+- Docstrings for documentation
 - String literals for user messages
 - Print statements for console output
 
 This ensures code compatibility across all systems and terminals.
 """
 
-import os
+from pathlib import Path
 import re
 import sys
-import ast
-from pathlib import Path
-from typing import List, Tuple, Dict
+from typing import Tuple
 
 
 class UnicodeRemover:
     """Removes Unicode characters from Python code safely."""
-    
+
     def __init__(self):
         self.stats = {
             'files_processed': 0,
             'unicode_removed': 0,
             'files_modified': 0
         }
-        
+
         # Unicode patterns that are safe in user-facing text
         self.safe_contexts = [
             r'#.*',  # Comments
             r'""".*?"""',  # Triple-quoted docstrings
-            r"'''.*?'''",  # Single-quote docstrings  
+            r"'''.*?'''",  # Single-quote docstrings
             r'print\s*\([^)]*\)',  # Print statements
             r'f"[^"]*"',  # F-strings for user output
             r"f'[^']*'",  # F-strings single quotes
         ]
-        
+
         # Common Unicode characters to replace with ASCII equivalents
         self.unicode_replacements = {
             # Arrows and symbols
@@ -50,16 +48,16 @@ class UnicodeRemover:
             '⇒': '=>',
             '⇐': '<=',
             '∞': 'inf',
-            
+
             # Math symbols
             '≤': '<=',
             '≥': '>=',
             '≠': '!=',
             '±': '+/-',
-            '×': '*',
+            'x': '*',
             '÷': '/',
             '√': 'sqrt',
-            
+
             # Bullets and markers
             '•': '*',
             '◦': '-',
@@ -82,16 +80,15 @@ class UnicodeRemover:
             '🏗': 'BUILD',
             '🛡': 'SECURITY',
             '🏛': 'ARCH',
-            
+
             # Quotes and dashes
-            '"': '"',  # Smart quotes
             '"': '"',
             ''': "'",
             ''': "'",
-            '–': '-',  # En dash
+            '-': '-',  # En dash
             '—': '--', # Em dash
             '…': '...',
-            
+
             # Currency and misc
             '©': '(c)',
             '®': '(R)',
@@ -106,29 +103,24 @@ class UnicodeRemover:
         comment_pos = line.find('#')
         if comment_pos != -1 and position >= comment_pos:
             return True
-            
+
         # Check if in string literal (simplified check)
         before_pos = line[:position]
         quote_count_double = before_pos.count('"') - before_pos.count('\\"')
         quote_count_single = before_pos.count("'") - before_pos.count("\\'")
-        
+
         # If odd number of quotes, we're inside a string
         if quote_count_double % 2 == 1 or quote_count_single % 2 == 1:
             return True
-            
+
         # Check for print statements and f-strings
-        for pattern in self.safe_contexts:
-            if re.search(pattern, line):
-                return True
-                
-        return False
+        return any(re.search(pattern, line) for pattern in self.safe_contexts)
 
     def remove_unicode_from_line(self, line: str, line_num: int, file_path: str) -> Tuple[str, int]:
         """Remove Unicode characters from a single line of code."""
-        original_line = line
         removed_count = 0
         result = []
-        
+
         for i, char in enumerate(line):
             if ord(char) > 127:  # Non-ASCII character
                 if self.is_safe_context(line, i):
@@ -153,13 +145,13 @@ class UnicodeRemover:
                     # Don't append anything (remove the character)
             else:
                 result.append(char)
-        
+
         return ''.join(result), removed_count
 
     def process_file(self, file_path: Path) -> bool:
         """Process a single Python file to remove Unicode."""
         try:
-            with open(file_path, 'r', encoding='utf-8') as f:
+            with open(file_path, encoding='utf-8') as f:
                 lines = f.readlines()
         except UnicodeDecodeError:
             print(f"Warning: Could not decode {file_path} as UTF-8")
@@ -167,19 +159,19 @@ class UnicodeRemover:
         except Exception as e:
             print(f"Error reading {file_path}: {e}")
             return False
-        
+
         modified = False
         new_lines = []
         file_unicode_count = 0
-        
+
         for line_num, line in enumerate(lines, 1):
             new_line, removed = self.remove_unicode_from_line(line, line_num, str(file_path))
             new_lines.append(new_line)
-            
+
             if removed > 0:
                 modified = True
                 file_unicode_count += removed
-        
+
         # Only write back if modified
         if modified:
             try:
@@ -190,7 +182,7 @@ class UnicodeRemover:
             except Exception as e:
                 print(f"Error writing {file_path}: {e}")
                 return False
-        
+
         self.stats['files_processed'] += 1
         self.stats['unicode_removed'] += file_unicode_count
         return True
@@ -200,12 +192,12 @@ class UnicodeRemover:
         # Only process Python files
         if file_path.suffix != '.py':
             return False
-            
+
         # Skip certain directories
         skip_dirs = {'.git', '__pycache__', '.pytest_cache', 'node_modules', '.venv', 'venv'}
         if any(skip_dir in str(file_path) for skip_dir in skip_dirs):
             return False
-            
+
         # Skip if file is too large (>1MB)
         try:
             if file_path.stat().st_size > 1024 * 1024:
@@ -213,23 +205,23 @@ class UnicodeRemover:
                 return False
         except:
             return False
-            
+
         return True
 
     def process_directory(self, directory: Path) -> None:
         """Process all Python files in directory recursively."""
         print(f"Processing directory: {directory}")
-        
+
         python_files = []
         for file_path in directory.rglob('*.py'):
             if self.should_process_file(file_path):
                 python_files.append(file_path)
-        
+
         print(f"Found {len(python_files)} Python files to process")
-        
+
         for file_path in python_files:
             self.process_file(file_path)
-    
+
     def print_stats(self) -> None:
         """Print processing statistics."""
         print("\n" + "="*50)
@@ -247,12 +239,12 @@ def main():
         print("Usage: python remove_unicode.py <directory>")
         print("Example: python remove_unicode.py .")
         sys.exit(1)
-    
+
     directory = Path(sys.argv[1])
     if not directory.exists():
         print(f"Error: Directory {directory} does not exist")
         sys.exit(1)
-    
+
     remover = UnicodeRemover()
     remover.process_directory(directory)
     remover.print_stats()

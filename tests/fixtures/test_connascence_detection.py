@@ -70,38 +70,23 @@ def complex_pricing_logic(item_type, user_level, season, promo_code, quantity):
                         else:
                             discount = 0.1
                     elif promo_code.startswith("GOLD"):
-                        if quantity > 15:
-                            discount = 0.25
-                        else:
-                            discount = 0.15
+                        discount = 0.25 if quantity > 15 else 0.15
                     else:
                         discount = 0.05
                 else:
                     discount = 0.02
             elif season == "summer":
-                if promo_code:
-                    if promo_code.startswith("SUMMER"):
-                        discount = 0.15
-                    else:
-                        discount = 0.08
-                else:
-                    discount = 0.03
+                discount = (0.15 if promo_code.startswith("SUMMER") else 0.08) if promo_code else 0.03
             else:
                 discount = 0.01
         elif user_level == "silver":
             # More nested logic...
-            if season == "winter":
-                discount = 0.05
-            else:
-                discount = 0.02
+            discount = 0.05 if season == "winter" else 0.02
         else:
             discount = 0.01
     elif item_type == "standard":
         # Even more logic...
-        if user_level == "gold":
-            discount = 0.1
-        else:
-            discount = 0.05
+        discount = 0.1 if user_level == "gold" else 0.05
     else:
         discount = 0
 

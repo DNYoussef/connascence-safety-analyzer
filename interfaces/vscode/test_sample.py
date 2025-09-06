@@ -6,7 +6,7 @@ def calculate_area(length, width, height=1):
     else:
         return 0
 
-# Long parameter list example  
+# Long parameter list example
 def process_user_data(name, email, phone, address, city, state, zip_code, country, age, gender):
     return f"{name} from {city}, {state}"
 
@@ -14,13 +14,13 @@ def process_user_data(name, email, phone, address, city, state, zip_code, countr
 def calculate_rectangle_area(l, w):
     return l * w
 
-def calculate_box_area(length, width):  
+def calculate_box_area(length, width):
     return length * width
 
 class DataProcessor:
     def __init__(self):
         pass
-    
+
     def process(self, data):
         # Simple processing logic
         return data.upper() if isinstance(data, str) else str(data)

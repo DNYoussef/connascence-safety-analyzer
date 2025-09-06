@@ -25,61 +25,60 @@ and showing the key capabilities:
 - Comprehensive reporting
 """
 
-import sys
-import os
 from pathlib import Path
+import sys
 
 # Add scripts directory to path to import the verification module
 sys.path.append(str(Path(__file__).parent / "scripts"))
 
 try:
     from verify_counts import SequentialThinkingValidator
-    
+
     def main():
         print("=" * 60)
         print("CONNASCENCE SAFETY ANALYZER - VERIFICATION DEMO")
         print("=" * 60)
-        
+
         # Initialize validator
         validator = SequentialThinkingValidator(
             base_path=Path.cwd(),
             verbose=True
         )
-        
+
         print("\n🎯 KEY VALIDATION REQUIREMENTS:")
         print("   README total: 5,743 violations")
         print("   Individual counts: Celery=4,630, curl=1,061, Express=52")
         print("   File existence: all referenced artifacts present")
         print("   JSON validity: all artifact files parse correctly")
         print("\n" + "=" * 60)
-        
+
         # Run validation
         success, report = validator.run_validation()
-        
+
         print("\n" + "=" * 60)
         print("🏁 DEMO COMPLETE")
         print("=" * 60)
-        
+
         summary = validator.memory.get_summary()
-        print(f"📊 Final Results:")
+        print("📊 Final Results:")
         print(f"   ✓ Tests Passed: {summary['PASS']}")
         print(f"   ✗ Tests Failed: {summary['FAIL']}")
         print(f"   ⚠ Tests with Errors: {summary['ERROR']}")
         print(f"   📈 Success Rate: {report.get('summary', {}).get('success_rate', 0):.1f}%")
-        
-        print(f"\n📁 Files Generated:")
-        print(f"   📄 Validation Report: DEMO_ARTIFACTS/validation_report.json")
-        print(f"   💾 Memory Coordination: DEMO_ARTIFACTS/memory_coordination.json")
-        print(f"   📋 Artifact Index: DEMO_ARTIFACTS/index.json")
-        
+
+        print("\n📁 Files Generated:")
+        print("   📄 Validation Report: DEMO_ARTIFACTS/validation_report.json")
+        print("   💾 Memory Coordination: DEMO_ARTIFACTS/memory_coordination.json")
+        print("   📋 Artifact Index: DEMO_ARTIFACTS/index.json")
+
         if success:
-            print(f"\n🎉 ALL VALIDATIONS PASSED! System is working correctly.")
+            print("\n🎉 ALL VALIDATIONS PASSED! System is working correctly.")
             return 0
         else:
-            print(f"\n⚠️  Some validations failed, but core counts are correct.")
-            print(f"   This is expected for the demo setup.")
+            print("\n⚠️  Some validations failed, but core counts are correct.")
+            print("   This is expected for the demo setup.")
             return 0
-            
+
 except ImportError as e:
     print(f"❌ Failed to import verification module: {e}")
     print("Make sure you're running from the project root directory.")

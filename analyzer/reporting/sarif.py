@@ -20,11 +20,11 @@ compatible with GitHub Code Scanning, Azure DevOps, and other platforms.
 SARIF 2.1.0 Specification: https://docs.oasis-open.org/sarif/sarif/v2.1.0/
 """
 
-import json
-import uuid
 from datetime import datetime
+import json
 from pathlib import Path
 from typing import Any, Dict, List
+import uuid
 
 from analyzer.ast_engine.core_analyzer import AnalysisResult, Violation
 from analyzer.thresholds import ConnascenceType
@@ -32,13 +32,13 @@ from analyzer.thresholds import ConnascenceType
 
 class SARIFReporter:
     """SARIF 2.1.0 report generator."""
-    
+
     def __init__(self):
         self.tool_name = "connascence"
         self.tool_version = "1.0.0"
         self.tool_uri = "https://github.com/connascence/connascence-analyzer"
         self.organization = "Connascence Analytics"
-    
+
     def generate(self, result: AnalysisResult) -> str:
         """Generate SARIF report from analysis result."""
         sarif_report = {
@@ -46,9 +46,9 @@ class SARIFReporter:
             "version": "2.1.0",
             "runs": [self._create_run(result)]
         }
-        
+
         return json.dumps(sarif_report, indent=2, ensure_ascii=False)
-    
+
     def _create_run(self, result: AnalysisResult) -> Dict[str, Any]:
         """Create the main SARIF run object."""
         return {
@@ -91,7 +91,7 @@ class SARIFReporter:
                 "policyPreset": result.policy_preset
             }
         }
-    
+
     def _create_tool(self) -> Dict[str, Any]:
         """Create the tool descriptor."""
         return {
@@ -127,11 +127,11 @@ class SARIFReporter:
                 ]
             }
         }
-    
+
     def _create_rules(self) -> List[Dict[str, Any]]:
         """Create SARIF rule definitions for all connascence types."""
         rules = []
-        
+
         # Define rules for each connascence type
         rule_definitions = {
             ConnascenceType.NAME: {
@@ -146,7 +146,7 @@ class SARIFReporter:
                 "tags": ["coupling", "maintenance", "static"]
             },
             ConnascenceType.TYPE: {
-                "name": "Connascence of Type", 
+                "name": "Connascence of Type",
                 "shortDescription": "Dependencies on data types",
                 "fullDescription": (
                     "Connascence of Type occurs when multiple components must agree "
@@ -164,7 +164,7 @@ class SARIFReporter:
                     "on the meaning of particular values. Magic numbers and strings "
                     "create this coupling. Use named constants instead."
                 ),
-                "defaultSeverity": "warning", 
+                "defaultSeverity": "warning",
                 "tags": ["coupling", "magic-literals", "static", "maintenance"]
             },
             ConnascenceType.POSITION: {
@@ -179,7 +179,7 @@ class SARIFReporter:
                 "tags": ["coupling", "parameters", "static", "api-design"]
             },
             ConnascenceType.ALGORITHM: {
-                "name": "Connascence of Algorithm", 
+                "name": "Connascence of Algorithm",
                 "shortDescription": "Dependencies on specific algorithms or implementations",
                 "fullDescription": (
                     "Connascence of Algorithm occurs when multiple components must agree "
@@ -202,7 +202,7 @@ class SARIFReporter:
             },
             ConnascenceType.TIMING: {
                 "name": "Connascence of Timing",
-                "shortDescription": "Dependencies on timing or delays", 
+                "shortDescription": "Dependencies on timing or delays",
                 "fullDescription": (
                     "Connascence of Timing occurs when components depend on timing. "
                     "This is a strong form of dynamic coupling that makes systems "
@@ -219,7 +219,7 @@ class SARIFReporter:
                     "the same shared value. This dynamic coupling can lead to "
                     "unexpected side effects and race conditions."
                 ),
-                "defaultSeverity": "warning", 
+                "defaultSeverity": "warning",
                 "tags": ["coupling", "shared-state", "dynamic", "concurrency"]
             },
             ConnascenceType.IDENTITY: {
@@ -234,10 +234,10 @@ class SARIFReporter:
                 "tags": ["coupling", "identity", "dynamic", "reliability"]
             }
         }
-        
+
         for connascence_type, definition in rule_definitions.items():
             rule_id = f"CON_{connascence_type.value}"
-            
+
             rule = {
                 "id": rule_id,
                 "name": definition["name"],
@@ -262,18 +262,18 @@ class SARIFReporter:
                 },
                 "helpUri": f"{self.tool_uri}/docs/rules/{rule_id.lower()}"
             }
-            
+
             rules.append(rule)
-        
+
         return rules
-    
+
     def _create_result(self, violation: Violation) -> Dict[str, Any]:
         """Create SARIF result from violation."""
         rule_id = f"CON_{violation.type.value}"
-        
+
         # Convert severity to SARIF level
         sarif_level = self._severity_to_sarif_level(violation.severity.value)
-        
+
         result = {
             "ruleId": rule_id,
             "ruleIndex": self._get_rule_index(violation.type),
@@ -313,7 +313,7 @@ class SARIFReporter:
                 "context": violation.context
             }
         }
-        
+
         # Add code snippet if available
         if violation.code_snippet:
             result["locations"][0]["physicalLocation"]["contextRegion"] = {
@@ -321,25 +321,25 @@ class SARIFReporter:
                     "text": violation.code_snippet
                 }
             }
-        
+
         # Add related locations for cross-module violations
         if violation.locality == "cross_module" and violation.context:
             related_locations = self._extract_related_locations(violation)
             if related_locations:
                 result["relatedLocations"] = related_locations
-        
+
         return result
-    
+
     def _severity_to_sarif_level(self, severity: str) -> str:
         """Convert connascence severity to SARIF level."""
         mapping = {
             "low": "note",
-            "medium": "warning", 
+            "medium": "warning",
             "high": "error",
             "critical": "error"
         }
         return mapping.get(severity, "warning")
-    
+
     def _get_rule_index(self, connascence_type: ConnascenceType) -> int:
         """Get the index of a rule in the rules array."""
         # This would map to actual rule positions
@@ -355,17 +355,17 @@ class SARIFReporter:
             ConnascenceType.IDENTITY
         ]
         return type_order.index(connascence_type)
-    
+
     def _normalize_path(self, file_path: str) -> str:
         """Normalize file path for SARIF."""
         # Convert Windows paths to URI format
         path = Path(file_path)
         return path.as_posix()
-    
+
     def _extract_related_locations(self, violation: Violation) -> List[Dict[str, Any]]:
         """Extract related locations from violation context."""
         related_locations = []
-        
+
         # Example: if violation has related function or duplicate
         if "similar_function" in violation.context:
             related_locations.append({
@@ -384,16 +384,16 @@ class SARIFReporter:
                     "text": f"Related to {violation.context['similar_function']}"
                 }
             })
-        
+
         return related_locations
-    
+
     def export_results(self, result, output_file=None):
         """Export results to SARIF format.
-        
+
         Args:
             result: Analysis result (dict or AnalysisResult object)
             output_file: Optional file path to write to. If None, returns SARIF string.
-            
+
         Returns:
             SARIF JSON string if output_file is None, otherwise writes to file.
         """
@@ -404,7 +404,7 @@ class SARIFReporter:
         else:
             # Use the generate method for AnalysisResult objects
             sarif_output = self.generate(result)
-        
+
         if output_file:
             # Write to file
             with open(output_file, 'w', encoding='utf-8') as f:
@@ -412,12 +412,12 @@ class SARIFReporter:
         else:
             # Return SARIF string
             return sarif_output
-    
+
     def _convert_dict_to_sarif(self, result_dict):
         """Convert dict-based analysis result to SARIF format."""
         # Create a minimal SARIF report from dict results
         violations = result_dict.get('violations', [])
-        
+
         sarif_report = {
             "$schema": "https://schemastore.azurewebsites.net/schemas/json/sarif-2.1.0.json",
             "version": "2.1.0",
@@ -444,15 +444,15 @@ class SARIFReporter:
                 }
             }]
         }
-        
+
         return json.dumps(sarif_report, indent=2, ensure_ascii=False)
-    
+
     def _create_result_from_dict(self, violation_dict):
         """Create SARIF result from violation dictionary."""
         rule_id = violation_dict.get('rule_id', 'CON_UNKNOWN')
         severity = violation_dict.get('severity', 'medium')
         sarif_level = self._severity_to_sarif_level(severity)
-        
+
         result = {
             "ruleId": rule_id,
             "level": sarif_level,
@@ -482,5 +482,5 @@ class SARIFReporter:
                 "weight": violation_dict.get('weight', 1.0)
             }
         }
-        
+
         return result

@@ -17,14 +17,14 @@ Shared configuration utilities for the Connascence Safety Analyzer.
 Provides common configuration loading and mock classes used across components.
 """
 
-from typing import Dict, Any, Optional
+from typing import Any, Dict, Optional
 
 
 class ConnascenceViolation:
     """Mock ConnascenceViolation class for removed analyzer dependency."""
-    
-    def __init__(self, id=None, rule_id=None, connascence_type=None, severity=None, 
-                 description=None, file_path=None, line_number=None, weight=None, 
+
+    def __init__(self, id=None, rule_id=None, connascence_type=None, severity=None,
+                 description=None, file_path=None, line_number=None, weight=None,
                  type=None, **kwargs):
         self.id = id
         self.rule_id = rule_id
@@ -36,7 +36,7 @@ class ConnascenceViolation:
         self.line_number = line_number
         self.weight = weight
         self.context = kwargs.get('context', {})
-        
+
         # Set additional attributes from kwargs
         for k, v in kwargs.items():
             if not hasattr(self, k):
@@ -45,7 +45,7 @@ class ConnascenceViolation:
 
 class ThresholdConfig:
     """Mock ThresholdConfig class for removed analyzer dependency."""
-    
+
     def __init__(self, max_positional_params=3, god_class_methods=20, max_cyclomatic_complexity=10):
         self.max_positional_params = max_positional_params
         self.god_class_methods = god_class_methods
@@ -54,26 +54,26 @@ class ThresholdConfig:
 
 class RateLimiter:
     """Rate limiter utility class."""
-    
+
     def __init__(self, max_requests: int = 100, window_seconds: int = 60):
         self.max_requests = max_requests
         self.window_seconds = window_seconds
         self.requests = []
-    
+
     def is_allowed(self) -> bool:
         """Check if a request is allowed."""
         import time
         now = time.time()
-        
+
         # Remove old requests outside the window
         self.requests = [req_time for req_time in self.requests if now - req_time < self.window_seconds]
-        
+
         # Check if we're under the limit
         if len(self.requests) < self.max_requests:
             self.requests.append(now)
             return True
         return False
-    
+
     def check_rate_limit(self, client_id: str = 'default') -> bool:
         """Check rate limit for a client (alias for is_allowed)."""
         return self.is_allowed()
@@ -81,7 +81,7 @@ class RateLimiter:
 
 def load_config_defaults(component_name: str) -> Dict[str, Any]:
     """Load default configuration values for a component."""
-    
+
     # Common configuration defaults across components
     base_defaults = {
         'rate_limit_requests': 100,
@@ -91,7 +91,7 @@ def load_config_defaults(component_name: str) -> Dict[str, Any]:
         'god_class_methods': 25,
         'max_cyclomatic_complexity': 12
     }
-    
+
     # Component-specific defaults
     component_defaults = {
         'mcp_server': {
@@ -113,11 +113,11 @@ def load_config_defaults(component_name: str) -> Dict[str, Any]:
             'max_cyclomatic_complexity': 12,
         }
     }
-    
+
     config = base_defaults.copy()
     if component_name in component_defaults:
         config.update(component_defaults[component_name])
-    
+
     return config
 
 
@@ -125,8 +125,8 @@ def create_rate_limiter(config: Optional[Dict[str, Any]] = None) -> RateLimiter:
     """Create a rate limiter with default or custom configuration."""
     if config is None:
         config = {}
-    
+
     max_requests = config.get('rate_limit_requests', 100)
     window_seconds = config.get('rate_limit_window_seconds', 60)
-    
+
     return RateLimiter(max_requests, window_seconds)

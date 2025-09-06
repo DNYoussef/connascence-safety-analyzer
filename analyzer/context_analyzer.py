@@ -9,11 +9,11 @@ understanding the purpose and domain of code structures.
 """
 
 import ast
-import re
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Set, Tuple, Any
 from enum import Enum
-from pathlib import Path
+import re
+from typing import Dict, List, Optional, Set
+
 
 class ClassContext(Enum):
     """Classification of class contexts for domain-specific analysis."""
@@ -30,7 +30,7 @@ class ClassContext(Enum):
 class ResponsibilityType(Enum):
     """Types of responsibilities for cohesion analysis."""
     DATA_MANAGEMENT = "data_management"
-    BUSINESS_RULE = "business_rule" 
+    BUSINESS_RULE = "business_rule"
     COORDINATION = "coordination"
     TRANSFORMATION = "transformation"
     VALIDATION = "validation"
@@ -67,7 +67,7 @@ class MethodAnalysis:
 
 class ContextAnalyzer:
     """Analyzes code context to provide domain-specific thresholds and rules."""
-    
+
     def __init__(self):
         # Context classification patterns
         self.config_indicators = {
@@ -76,21 +76,21 @@ class ContextAnalyzer:
             'base_classes': ['Config', 'Settings', 'BaseConfig', 'ConfigParser'],
             'imports': ['configparser', 'settings', 'config', 'dynaconf']
         }
-        
+
         self.data_model_indicators = {
             'name_patterns': [r'.*[Mm]odel.*', r'.*[Dd][Tt][Oo].*', r'.*[Ee]ntity.*', r'.*[Dd]ata.*'],
             'method_patterns': [r'to_dict', r'from_dict', r'to_json', r'from_json', r'serialize', r'deserialize'],
             'base_classes': ['BaseModel', 'Model', 'Entity', 'DTO', 'DataClass'],
             'imports': ['pydantic', 'dataclasses', 'marshmallow', 'sqlalchemy']
         }
-        
+
         self.api_controller_indicators = {
             'name_patterns': [r'.*[Cc]ontroller.*', r'.*[Hh]andler.*', r'.*[Vv]iew.*', r'.*[Aa][Pp][Ii].*'],
             'method_patterns': [r'get', r'post', r'put', r'delete', r'patch', r'handle_.*'],
             'base_classes': ['APIView', 'Controller', 'Handler', 'Resource'],
             'imports': ['flask', 'django', 'fastapi', 'tornado', 'aiohttp']
         }
-        
+
         self.utility_indicators = {
             'name_patterns': [r'.*[Uu]til.*', r'.*[Hh]elper.*', r'.*[Tt]ool.*', r'.*[Uu]tility.*'],
             'method_patterns': [r'format_.*', r'parse_.*', r'convert_.*', r'transform_.*'],
@@ -149,31 +149,31 @@ class ContextAnalyzer:
 
     def analyze_class_context(self, class_node: ast.ClassDef, source_lines: List[str], file_path: str) -> ClassAnalysis:
         """Perform comprehensive context analysis of a class."""
-        
+
         # Basic metrics
         method_count = self._count_methods(class_node)
         loc = self._calculate_lines_of_code(class_node, source_lines)
-        
+
         # Classify context
         context = self._classify_class_context(class_node, source_lines, file_path)
-        
+
         # Analyze responsibilities and cohesion
         methods = self._analyze_methods(class_node, source_lines)
         responsibilities = self._identify_responsibilities(class_node, methods)
         cohesion_score = self._calculate_cohesion(methods, responsibilities)
-        
+
         # Get context-specific threshold
         thresholds = self.context_thresholds[context]
         god_object_threshold = thresholds['method_threshold']
-        
+
         # Determine if this is a god object with context-aware reasoning
         god_object_reason = self._assess_god_object_with_context(
             class_node.name, context, method_count, loc, cohesion_score, thresholds
         )
-        
+
         # Generate context-specific recommendations
         recommendations = self._generate_recommendations(context, method_count, loc, cohesion_score, responsibilities)
-        
+
         return ClassAnalysis(
             name=class_node.name,
             context=context,
@@ -188,9 +188,9 @@ class ContextAnalyzer:
 
     def _classify_class_context(self, class_node: ast.ClassDef, source_lines: List[str], file_path: str) -> ClassContext:
         """Classify the context/domain of a class using multiple indicators."""
-        
+
         scores = {context: 0 for context in ClassContext}
-        
+
         # File path indicators
         path_lower = file_path.lower()
         if any(term in path_lower for term in ['test', 'spec']):
@@ -205,7 +205,7 @@ class ContextAnalyzer:
             scores[ClassContext.UTILITY] += 2
         elif any(term in path_lower for term in ['db', 'database', 'persistence', 'repository']):
             scores[ClassContext.INFRASTRUCTURE] += 2
-        
+
         # Class name analysis
         class_name = class_node.name.lower()
         for context, indicators in [
@@ -218,7 +218,7 @@ class ContextAnalyzer:
                 if re.match(pattern, class_name):
                     scores[context] += 2
                     break
-        
+
         # Base class analysis
         for base in class_node.bases:
             base_name = ast.unparse(base) if hasattr(ast, 'unparse') else str(base)
@@ -230,7 +230,7 @@ class ContextAnalyzer:
             ]:
                 if base_name in indicators['base_classes']:
                     scores[context] += 3
-        
+
         # Method pattern analysis
         methods = [node for node in class_node.body if isinstance(node, ast.FunctionDef)]
         for method in methods:
@@ -245,21 +245,21 @@ class ContextAnalyzer:
                     if re.match(pattern, method_name):
                         scores[context] += 1
                         break
-        
+
         # Static method ratio for utilities
         if methods:
             static_methods = len([m for m in methods if any(
-                isinstance(d, ast.Name) and d.id == 'staticmethod' 
+                isinstance(d, ast.Name) and d.id == 'staticmethod'
                 for d in m.decorator_list
             )])
             static_ratio = static_methods / len(methods)
             if static_ratio >= self.utility_indicators['static_methods_ratio']:
                 scores[ClassContext.UTILITY] += 2
-        
+
         # Business logic is default for substantial classes with mixed responsibilities
         if max(scores.values()) == 0 and len(methods) > 5:
             scores[ClassContext.BUSINESS_LOGIC] += 1
-        
+
         # Return the highest scoring context
         best_context = max(scores.items(), key=lambda x: x[1])
         return best_context[0] if best_context[1] > 0 else ClassContext.UNKNOWN
@@ -276,7 +276,7 @@ class ContextAnalyzer:
         if hasattr(class_node, 'end_lineno') and class_node.end_lineno:
             start_line = class_node.lineno - 1  # Convert to 0-based indexing
             end_line = class_node.end_lineno
-            
+
             loc = 0
             for i in range(start_line, min(end_line, len(source_lines))):
                 line = source_lines[i].strip()
@@ -291,7 +291,7 @@ class ContextAnalyzer:
     def _analyze_methods(self, class_node: ast.ClassDef, source_lines: List[str]) -> List[MethodAnalysis]:
         """Analyze individual methods for responsibility and complexity."""
         methods = []
-        
+
         for node in class_node.body:
             if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
                 # Calculate method LOC
@@ -299,19 +299,19 @@ class ContextAnalyzer:
                     method_loc = node.end_lineno - node.lineno
                 else:
                     method_loc = len(node.body)
-                
+
                 # Calculate complexity (simplified)
                 complexity = self._calculate_method_complexity(node)
-                
+
                 # Identify responsibilities
                 responsibilities = self._identify_method_responsibilities(node)
-                
+
                 # Count parameters
                 param_count = len(node.args.args)
-                
+
                 # Calculate return complexity
                 return_complexity = self._analyze_return_complexity(node)
-                
+
                 methods.append(MethodAnalysis(
                     name=node.name,
                     lines_of_code=method_loc,
@@ -320,13 +320,13 @@ class ContextAnalyzer:
                     parameter_count=param_count,
                     return_complexity=return_complexity
                 ))
-        
+
         return methods
 
     def _calculate_method_complexity(self, method_node: ast.FunctionDef) -> float:
         """Calculate cyclomatic complexity of a method."""
         complexity = 1  # Base complexity
-        
+
         for node in ast.walk(method_node):
             if isinstance(node, (ast.If, ast.While, ast.For, ast.AsyncFor)):
                 complexity += 1
@@ -334,15 +334,15 @@ class ContextAnalyzer:
                 complexity += 1
             elif isinstance(node, (ast.BoolOp, ast.Compare)):
                 complexity += 1
-        
+
         return float(complexity)
 
     def _identify_method_responsibilities(self, method_node: ast.FunctionDef) -> Set[ResponsibilityType]:
         """Identify the responsibilities of a method based on its operations."""
         responsibilities = set()
-        
+
         method_name = method_node.name.lower()
-        
+
         # Name-based responsibility identification
         if any(prefix in method_name for prefix in ['get_', 'fetch_', 'load_', 'read_']):
             responsibilities.add(ResponsibilityType.DATA_MANAGEMENT)
@@ -358,7 +358,7 @@ class ContextAnalyzer:
             responsibilities.add(ResponsibilityType.CONFIGURATION)
         elif any(prefix in method_name for prefix in ['process_', 'handle_', 'execute_']):
             responsibilities.add(ResponsibilityType.COORDINATION)
-        
+
         # AST-based responsibility identification
         for node in ast.walk(method_node):
             if isinstance(node, ast.Call):
@@ -367,62 +367,61 @@ class ContextAnalyzer:
                     func_name = node.func.id
                 elif isinstance(node.func, ast.Attribute):
                     func_name = node.func.attr
-                
+
                 if func_name.lower() in ['open', 'read', 'write', 'save', 'load']:
                     responsibilities.add(ResponsibilityType.PERSISTENCE)
                 elif func_name.lower() in ['validate', 'check', 'assert']:
                     responsibilities.add(ResponsibilityType.VALIDATION)
                 elif func_name.lower() in ['send', 'post', 'get', 'request']:
                     responsibilities.add(ResponsibilityType.COMMUNICATION)
-        
+
         # If no specific responsibility identified, assume business logic
         if not responsibilities:
             responsibilities.add(ResponsibilityType.BUSINESS_RULE)
-        
+
         return responsibilities
 
     def _analyze_return_complexity(self, method_node: ast.FunctionDef) -> int:
         """Analyze the complexity of return statements."""
         return_complexity = 0
-        
+
         for node in ast.walk(method_node):
-            if isinstance(node, ast.Return):
-                if node.value:
-                    if isinstance(node.value, (ast.Dict, ast.List, ast.Tuple)):
-                        return_complexity += 2
-                    elif isinstance(node.value, ast.Call):
-                        return_complexity += 1
-                    else:
-                        return_complexity += 0.5
-        
+            if isinstance(node, ast.Return) and node.value:
+                if isinstance(node.value, (ast.Dict, ast.List, ast.Tuple)):
+                    return_complexity += 2
+                elif isinstance(node.value, ast.Call):
+                    return_complexity += 1
+                else:
+                    return_complexity += 0.5
+
         return int(return_complexity)
 
     def _identify_responsibilities(self, class_node: ast.ClassDef, methods: List[MethodAnalysis]) -> Set[ResponsibilityType]:
         """Identify all responsibilities handled by a class."""
         all_responsibilities = set()
-        
+
         for method in methods:
             all_responsibilities.update(method.responsibilities)
-        
+
         return all_responsibilities
 
     def _calculate_cohesion(self, methods: List[MethodAnalysis], responsibilities: Set[ResponsibilityType]) -> float:
         """Calculate cohesion score based on responsibility distribution."""
         if not methods:
             return 1.0  # Empty class has perfect cohesion
-        
+
         if not responsibilities:
             return 0.5  # Default moderate score if no responsibilities detected
-        
+
         # Measure how focused the class is on its responsibilities
         total_methods = len(methods)
         responsibility_count = len(responsibilities)
-        
+
         # Context-aware responsibility scoring
         # Config classes can have more responsibilities and still be cohesive
         max_acceptable_responsibilities = 5.0  # Allow up to 5 different types of responsibilities
         responsibility_penalty = min(responsibility_count / max_acceptable_responsibilities, 1.0)
-        
+
         # Measure consistency of method sizes
         if total_methods > 1:
             method_sizes = [max(1, method.lines_of_code) for method in methods]  # Avoid zero
@@ -434,36 +433,36 @@ class ContextAnalyzer:
                 consistency_score = 0.5
         else:
             consistency_score = 1.0
-        
+
         # Base cohesion calculation
         base_cohesion = (1.0 - responsibility_penalty * 0.6) * consistency_score
-        
+
         # Boost cohesion for patterns that indicate good organization
         if responsibility_count <= 3:  # Very focused classes get bonus
             base_cohesion *= 1.2
         elif responsibility_count <= 5:  # Moderately focused classes get small bonus
             base_cohesion *= 1.1
-        
+
         # Method naming consistency bonus
         if self._has_consistent_naming_pattern(methods):
             base_cohesion *= 1.1
-        
+
         return max(0.1, min(1.0, base_cohesion))  # Ensure reasonable bounds
 
     def _has_consistent_naming_pattern(self, methods: List[MethodAnalysis]) -> bool:
         """Check if methods follow consistent naming patterns."""
         if len(methods) < 3:
             return True  # Small classes are considered consistent
-        
+
         # Check for getter/setter patterns
         getters = sum(1 for m in methods if m.name.startswith('get_'))
         setters = sum(1 for m in methods if m.name.startswith('set_'))
         total = len(methods)
-        
+
         # If majority are getters/setters, consider it consistent
         if (getters + setters) / total > 0.6:
             return True
-        
+
         # Check for other consistent prefixes
         prefixes = {}
         for method in methods:
@@ -471,34 +470,30 @@ class ContextAnalyzer:
             if len(parts) > 1:
                 prefix = parts[0]
                 prefixes[prefix] = prefixes.get(prefix, 0) + 1
-        
-        # If any prefix accounts for >40% of methods, consider it consistent
-        for count in prefixes.values():
-            if count / total > 0.4:
-                return True
-        
-        return False
 
-    def _assess_god_object_with_context(self, class_name: str, context: ClassContext, method_count: int, 
+        # If any prefix accounts for >40% of methods, consider it consistent
+        return any(count / total > 0.4 for count in prefixes.values())
+
+    def _assess_god_object_with_context(self, class_name: str, context: ClassContext, method_count: int,
                                       loc: int, cohesion_score: float, thresholds: Dict[str, int]) -> Optional[str]:
         """Assess if a class is a god object considering its context."""
-        
+
         issues = []
-        
+
         # Check method count against context-specific threshold
         if method_count > thresholds['method_threshold']:
             issues.append(f"Method count ({method_count}) exceeds {context.value} threshold ({thresholds['method_threshold']})")
-        
+
         # Check lines of code against context-specific threshold
         if loc > thresholds['loc_threshold']:
             issues.append(f"Lines of code ({loc}) exceeds {context.value} threshold ({thresholds['loc_threshold']})")
-        
+
         # Check cohesion for business logic classes (stricter)
         if context == ClassContext.BUSINESS_LOGIC and cohesion_score < 0.6:
             issues.append(f"Low cohesion ({cohesion_score:.2f}) in business logic class")
         elif context not in [ClassContext.FRAMEWORK, ClassContext.UTILITY] and cohesion_score < 0.4:
             issues.append(f"Very low cohesion ({cohesion_score:.2f})")
-        
+
         # Context-specific god object assessment
         if context == ClassContext.CONFIG:
             # Config classes can be large, focus on cohesion and responsibility
@@ -523,14 +518,14 @@ class ContextAnalyzer:
             # Business logic should be strictly controlled
             if method_count > 15 or loc > 300:
                 issues.append("Business logic class violates Single Responsibility Principle")
-        
+
         return "; ".join(issues) if issues else None
 
-    def _generate_recommendations(self, context: ClassContext, method_count: int, loc: int, 
+    def _generate_recommendations(self, context: ClassContext, method_count: int, loc: int,
                                 cohesion_score: float, responsibilities: Set[ResponsibilityType]) -> List[str]:
         """Generate context-specific recommendations for improvement."""
         recommendations = []
-        
+
         if context == ClassContext.CONFIG:
             if method_count > 30:
                 recommendations.append("Consider splitting configuration into domain-specific config classes")
@@ -556,13 +551,13 @@ class ContextAnalyzer:
         elif context == ClassContext.INFRASTRUCTURE:
             recommendations.append("Consider using composition over inheritance")
             recommendations.append("Extract different infrastructure concerns into separate classes")
-        
+
         # General recommendations based on metrics
         if cohesion_score < 0.3:
             recommendations.append("Improve cohesion by grouping related methods and extracting unrelated ones")
         if loc > 1000:
             recommendations.append("Consider breaking into smaller, more focused classes")
-        
+
         return recommendations
 
     def get_context_specific_thresholds(self, context: ClassContext) -> Dict[str, int]:

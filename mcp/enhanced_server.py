@@ -15,21 +15,20 @@ This provides a clean API for code analysis while maintaining separation
 of concerns and avoiding tight coupling.
 """
 
-import asyncio
-import json
+from dataclasses import asdict, dataclass
 import logging
-import time
 from pathlib import Path
-from typing import Dict, List, Any, Optional, Union
-from dataclasses import dataclass, asdict
-import traceback
 
 # Import using our unified import strategy
 import sys
+import time
+import traceback
+from typing import Any, Dict, List, Optional
+
 sys.path.append(str(Path(__file__).parent.parent))
 
-from core.unified_imports import IMPORT_MANAGER, safe_import
-from config.central_constants import CONFIG, MCPConstants, PerformanceLimits, ExitCode
+from config.central_constants import MCPConstants, PerformanceLimits
+from core.unified_imports import IMPORT_MANAGER
 
 logger = logging.getLogger(__name__)
 
@@ -55,7 +54,7 @@ class AnalysisResponse:
     metadata: Dict[str, Any]
     error_message: Optional[str] = None
     execution_time: float = 0.0
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for JSON serialization."""
         return asdict(self)
@@ -64,7 +63,7 @@ class AnalysisResponse:
 class EnhancedConnascenceMCPServer:
     """
     Enhanced MCP server for connascence analysis.
-    
+
     Provides clean API for Claude Code access with:
     - Centralized configuration
     - Consolidated integrations
@@ -72,30 +71,30 @@ class EnhancedConnascenceMCPServer:
     - Rate limiting and security
     - Comprehensive logging
     """
-    
+
     def __init__(self, config: Optional[Dict] = None):
         self.config = config or {}
         self.name = MCPConstants.SERVER_NAME
         self.version = MCPConstants.SERVER_VERSION
         self.description = MCPConstants.SERVER_DESCRIPTION
-        
+
         # Initialize components with central constants
         self.rate_limiter = self._create_rate_limiter()
         self.audit_logger = self._create_audit_logger()
-        
+
         # Security settings
         self.allowed_paths = self.config.get('allowed_paths', [])
         self.max_file_size = self.config.get('max_file_size', MCPConstants.DEFAULT_MAX_FILE_SIZE)
-        
+
         # Load analyzer and integrations
         self.analyzer = self._load_analyzer()
         self.integrations = self._load_integrations()
-        
+
         # Register tools
         self._tools = self._register_tools()
-        
+
         logger.info(f"Enhanced MCP Server initialized: {self.name} v{self.version}")
-    
+
     def _create_rate_limiter(self):
         """Create rate limiter with central config."""
         try:
@@ -105,29 +104,29 @@ class EnhancedConnascenceMCPServer:
         except ImportError:
             logger.warning("RateLimiter not available, using mock")
             return self._create_mock_rate_limiter()
-    
+
     def _create_mock_rate_limiter(self):
         """Create mock rate limiter for fallback."""
         class MockRateLimiter:
             def __init__(self, max_requests=60):
                 self.max_requests = max_requests
                 self.requests = {}
-            
+
             def is_allowed(self, client_id="default"):
                 return True
-            
+
             def record_request(self, client_id="default"):
                 pass
-        
+
         return MockRateLimiter()
-    
+
     def _create_audit_logger(self):
         """Create audit logger with central config."""
         class AuditLogger:
             def __init__(self, enabled=True):
                 self.logs = []
                 self.enabled = enabled
-            
+
             def log(self, event: str, details: Dict[str, Any] = None):
                 if self.enabled:
                     self.logs.append({
@@ -135,21 +134,21 @@ class EnhancedConnascenceMCPServer:
                         'event': event,
                         'details': details or {}
                     })
-            
+
             def get_logs(self, limit: Optional[int] = None) -> List[Dict]:
                 """Get audit logs."""
                 logs = self.logs
                 if limit:
                     logs = logs[-limit:]
                 return logs
-        
+
         audit_enabled = self.config.get('audit_enabled', MCPConstants.DEFAULT_AUDIT_ENABLED)
         return AuditLogger(enabled=audit_enabled)
-    
+
     def _load_analyzer(self):
         """Load analyzer using unified import strategy."""
         from core.unified_imports import ImportSpec
-        
+
         # Try SmartIntegrationEngine first (the real analyzer)
         spec = ImportSpec(
             module_name="analyzer.smart_integration_engine",
@@ -158,11 +157,11 @@ class EnhancedConnascenceMCPServer:
             required=False
         )
         analyzer_result = IMPORT_MANAGER.import_module(spec)
-        
+
         if analyzer_result.has_module:
             # Create instance and add analyze_file method to match interface
             engine_instance = analyzer_result.module()
-            
+
             def analyze_file_wrapper(file_path, **kwargs):
                 result = engine_instance.comprehensive_analysis(file_path)
                 return {
@@ -170,10 +169,10 @@ class EnhancedConnascenceMCPServer:
                     'summary': result.get('summary', {'total_violations': 0}),
                     'success': True
                 }
-            
+
             engine_instance.analyze_file = analyze_file_wrapper
             return engine_instance
-        
+
         # Create mock analyzer for fallback
         class MockAnalyzer:
             def analyze_file(self, file_path, **kwargs):
@@ -182,10 +181,10 @@ class EnhancedConnascenceMCPServer:
                     'summary': {'total_violations': 0},
                     'success': True
                 }
-        
+
         logger.warning("Using mock analyzer - full analysis not available")
         return MockAnalyzer()
-    
+
     def _load_integrations(self):
         """Load consolidated integrations."""
         from core.unified_imports import ImportSpec
@@ -194,7 +193,7 @@ class EnhancedConnascenceMCPServer:
             required=False
         )
         integrations_result = IMPORT_MANAGER.import_module(spec)
-        
+
         if integrations_result.has_module:
             try:
                 # Get available integrations from consolidated module
@@ -206,13 +205,13 @@ class EnhancedConnascenceMCPServer:
                     return self._create_fallback_integrations(integrations_result.module)
             except Exception as e:
                 logger.error(f"Failed to load integrations: {e}")
-        
+
         return {}
-    
+
     def _create_fallback_integrations(self, integrations_module):
         """Create fallback integrations from module."""
         integrations = {}
-        
+
         for name in ['BlackIntegration', 'MyPyIntegration', 'RuffIntegration']:
             integration_class = getattr(integrations_module, name, None)
             if integration_class:
@@ -222,9 +221,9 @@ class EnhancedConnascenceMCPServer:
                         integrations[name.lower().replace('integration', '')] = integration
                 except Exception as e:
                     logger.debug(f"Failed to create {name}: {e}")
-        
+
         return integrations
-    
+
     def _register_tools(self) -> Dict[str, Dict[str, Any]]:
         """Register MCP tools with metadata."""
         tools = {
@@ -260,17 +259,17 @@ class EnhancedConnascenceMCPServer:
                 'parameters': {}
             }
         }
-        
+
         return tools
-    
+
     # =================================================================
     # MCP TOOL IMPLEMENTATIONS
     # =================================================================
-    
+
     async def analyze_file(self, file_path: str, **kwargs) -> Dict[str, Any]:
         """Analyze a single file for connascence violations."""
         start_time = time.time()
-        
+
         try:
             # Create analysis request
             request = AnalysisRequest(
@@ -279,26 +278,26 @@ class EnhancedConnascenceMCPServer:
                 include_integrations=kwargs.get('include_integrations', True),
                 format=kwargs.get('format', 'json')
             )
-            
+
             # Log the request
             self.audit_logger.log('analyze_file_request', {
                 'file_path': file_path,
                 'analysis_type': request.analysis_type
             })
-            
+
             # Validate request
             validation_result = self._validate_analysis_request(request)
             if not validation_result['valid']:
                 return self._create_error_response(
                     request, validation_result['error'], start_time
                 )
-            
+
             # Perform analysis
             analysis_result = await self._perform_analysis(request)
-            
+
             # Add execution time
             analysis_result.execution_time = time.time() - start_time
-            
+
             # Log completion
             self.audit_logger.log('analyze_file_complete', {
                 'file_path': file_path,
@@ -306,21 +305,21 @@ class EnhancedConnascenceMCPServer:
                 'violation_count': len(analysis_result.violations),
                 'execution_time': analysis_result.execution_time
             })
-            
+
             return analysis_result.to_dict()
-            
+
         except Exception as e:
             error_msg = f"Analysis failed: {str(e)}"
             logger.error(f"{error_msg}\n{traceback.format_exc()}")
-            
+
             return self._create_error_response(
                 AnalysisRequest(file_path=file_path), error_msg, start_time
             ).to_dict()
-    
+
     async def analyze_workspace(self, workspace_path: str, **kwargs) -> Dict[str, Any]:
         """Analyze entire workspace for connascence violations."""
         start_time = time.time()
-        
+
         try:
             workspace_path = Path(workspace_path)
             if not workspace_path.exists():
@@ -329,28 +328,28 @@ class EnhancedConnascenceMCPServer:
                     'error': f"Workspace path does not exist: {workspace_path}",
                     'execution_time': time.time() - start_time
                 }
-            
+
             file_patterns = kwargs.get('file_patterns', ['*.py'])
             files_to_analyze = []
-            
+
             # Find files matching patterns
             for pattern in file_patterns:
                 files_to_analyze.extend(workspace_path.rglob(pattern))
-            
+
             # Limit number of files for performance
             max_files = PerformanceLimits.MAX_FILES_PER_BATCH
             if len(files_to_analyze) > max_files:
                 files_to_analyze = files_to_analyze[:max_files]
                 logger.warning(f"Limited analysis to {max_files} files")
-            
+
             # Analyze each file
             results = []
             total_violations = 0
-            
+
             for file_path in files_to_analyze:
                 try:
                     file_result = await self.analyze_file(
-                        str(file_path), 
+                        str(file_path),
                         **kwargs
                     )
                     results.append(file_result)
@@ -364,7 +363,7 @@ class EnhancedConnascenceMCPServer:
                         'error': str(e),
                         'violations': []
                     })
-            
+
             # Create workspace summary
             summary = {
                 'total_files_analyzed': len(files_to_analyze),
@@ -372,51 +371,51 @@ class EnhancedConnascenceMCPServer:
                 'files_with_violations': sum(1 for r in results if r.get('success', False) and r.get('violations')),
                 'execution_time': time.time() - start_time
             }
-            
+
             return {
                 'success': True,
                 'workspace_path': str(workspace_path),
                 'summary': summary,
                 'file_results': results
             }
-            
+
         except Exception as e:
             error_msg = f"Workspace analysis failed: {str(e)}"
             logger.error(f"{error_msg}\n{traceback.format_exc()}")
-            
+
             return {
                 'success': False,
                 'workspace_path': workspace_path,
                 'error': error_msg,
                 'execution_time': time.time() - start_time
             }
-    
+
     async def get_violations(self, file_path: str, **kwargs) -> Dict[str, Any]:
         """Get violations by type or severity."""
         try:
             # First analyze the file
             analysis_result = await self.analyze_file(file_path, format='json')
-            
+
             if not analysis_result.get('success', False):
                 return analysis_result
-            
+
             violations = analysis_result.get('violations', [])
-            
+
             # Apply filters
             violation_type = kwargs.get('violation_type')
             severity = kwargs.get('severity')
             limit = kwargs.get('limit', 100)
-            
+
             if violation_type:
                 violations = [v for v in violations if v.get('type') == violation_type]
-            
+
             if severity:
                 violations = [v for v in violations if v.get('severity') == severity]
-            
+
             # Apply limit
             if limit and len(violations) > limit:
                 violations = violations[:limit]
-            
+
             return {
                 'success': True,
                 'file_path': file_path,
@@ -428,7 +427,7 @@ class EnhancedConnascenceMCPServer:
                     'limit': limit
                 }
             }
-            
+
         except Exception as e:
             error_msg = f"Failed to get violations: {str(e)}"
             logger.error(error_msg)
@@ -436,7 +435,7 @@ class EnhancedConnascenceMCPServer:
                 'success': False,
                 'error': error_msg
             }
-    
+
     async def health_check(self) -> Dict[str, Any]:
         """Check health status of analyzer and integrations."""
         try:
@@ -459,13 +458,13 @@ class EnhancedConnascenceMCPServer:
                 },
                 'import_status': IMPORT_MANAGER.get_import_status()
             }
-            
+
             # Check integration health
             for name, integration in self.integrations.items():
                 try:
                     is_available = integration.is_available() if hasattr(integration, 'is_available') else True
                     version = integration.get_version() if hasattr(integration, 'get_version') else 'unknown'
-                    
+
                     health_status['integrations'][name] = {
                         'available': is_available,
                         'version': version,
@@ -476,13 +475,13 @@ class EnhancedConnascenceMCPServer:
                         'available': False,
                         'error': str(e)
                     }
-            
+
             return {
                 'success': True,
                 'timestamp': time.time(),
                 'health': health_status
             }
-            
+
         except Exception as e:
             error_msg = f"Health check failed: {str(e)}"
             logger.error(error_msg)
@@ -491,29 +490,29 @@ class EnhancedConnascenceMCPServer:
                 'error': error_msg,
                 'timestamp': time.time()
             }
-    
+
     # =================================================================
     # HELPER METHODS
     # =================================================================
-    
+
     def _validate_analysis_request(self, request: AnalysisRequest) -> Dict[str, Any]:
         """Validate analysis request."""
         file_path = Path(request.file_path)
-        
+
         # Check if file exists
         if not file_path.exists():
             return {
                 'valid': False,
                 'error': f"File does not exist: {request.file_path}"
             }
-        
+
         # Check file size
         if file_path.stat().st_size > self.max_file_size * 1024:
             return {
                 'valid': False,
                 'error': f"File too large (max {self.max_file_size}KB): {request.file_path}"
             }
-        
+
         # Check allowed paths (if configured)
         if self.allowed_paths:
             allowed = any(
@@ -525,21 +524,21 @@ class EnhancedConnascenceMCPServer:
                     'valid': False,
                     'error': f"File path not allowed: {request.file_path}"
                 }
-        
+
         return {'valid': True}
-    
+
     async def _perform_analysis(self, request: AnalysisRequest) -> AnalysisResponse:
         """Perform the actual analysis."""
         violations = []
         integrations_results = {}
-        
+
         try:
             # Core connascence analysis
             if hasattr(self.analyzer, 'analyze_file'):
                 core_result = self.analyzer.analyze_file(request.file_path)
                 if isinstance(core_result, dict):
                     violations.extend(core_result.get('violations', []))
-            
+
             # Run integrations if requested
             if request.include_integrations:
                 for name, integration in self.integrations.items():
@@ -556,14 +555,14 @@ class EnhancedConnascenceMCPServer:
                             'success': False,
                             'error': str(e)
                         }
-            
+
             # Create summary
             summary = {
                 'total_violations': len(violations),
                 'by_severity': self._count_by_severity(violations),
                 'by_type': self._count_by_type(violations)
             }
-            
+
             # Create metadata
             metadata = {
                 'analysis_type': request.analysis_type,
@@ -571,7 +570,7 @@ class EnhancedConnascenceMCPServer:
                 'timestamp': time.time(),
                 'server_version': self.version
             }
-            
+
             return AnalysisResponse(
                 success=True,
                 file_path=request.file_path,
@@ -580,7 +579,7 @@ class EnhancedConnascenceMCPServer:
                 integrations=integrations_results,
                 metadata=metadata
             )
-            
+
         except Exception as e:
             return AnalysisResponse(
                 success=False,
@@ -591,7 +590,7 @@ class EnhancedConnascenceMCPServer:
                 metadata={'error': str(e)},
                 error_message=str(e)
             )
-    
+
     def _count_by_severity(self, violations: List[Dict]) -> Dict[str, int]:
         """Count violations by severity."""
         counts = {'critical': 0, 'high': 0, 'medium': 0, 'low': 0}
@@ -600,7 +599,7 @@ class EnhancedConnascenceMCPServer:
             if severity in counts:
                 counts[severity] += 1
         return counts
-    
+
     def _count_by_type(self, violations: List[Dict]) -> Dict[str, int]:
         """Count violations by type."""
         counts = {}
@@ -608,7 +607,7 @@ class EnhancedConnascenceMCPServer:
             violation_type = violation.get('type', 'unknown')
             counts[violation_type] = counts.get(violation_type, 0) + 1
         return counts
-    
+
     def _create_error_response(self, request: AnalysisRequest, error_message: str, start_time: float) -> AnalysisResponse:
         """Create error response."""
         return AnalysisResponse(
@@ -621,11 +620,11 @@ class EnhancedConnascenceMCPServer:
             error_message=error_message,
             execution_time=time.time() - start_time
         )
-    
+
     # =================================================================
     # MCP PROTOCOL METHODS
     # =================================================================
-    
+
     def list_tools(self) -> List[Dict[str, Any]]:
         """List available MCP tools."""
         return [
@@ -635,7 +634,7 @@ class EnhancedConnascenceMCPServer:
             }
             for tool_name, tool_info in self._tools.items()
         ]
-    
+
     async def call_tool(self, name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
         """Call an MCP tool."""
         if name not in self._tools:
@@ -643,7 +642,7 @@ class EnhancedConnascenceMCPServer:
                 'success': False,
                 'error': f"Tool '{name}' not found"
             }
-        
+
         try:
             # Rate limiting check
             if not self.rate_limiter.is_allowed():
@@ -651,9 +650,9 @@ class EnhancedConnascenceMCPServer:
                     'success': False,
                     'error': "Rate limit exceeded"
                 }
-            
+
             self.rate_limiter.record_request()
-            
+
             # Route to appropriate method
             if name == MCPConstants.TOOL_ANALYZE_FILE:
                 return await self.analyze_file(**arguments)
@@ -668,7 +667,7 @@ class EnhancedConnascenceMCPServer:
                     'success': False,
                     'error': f"Tool '{name}' not implemented"
                 }
-                
+
         except Exception as e:
             error_msg = f"Tool execution failed: {str(e)}"
             logger.error(f"{error_msg}\n{traceback.format_exc()}")

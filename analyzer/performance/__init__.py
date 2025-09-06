@@ -15,6 +15,6 @@
 Performance enhancement module.
 """
 
-from .parallel_analyzer import ParallelConnascenceAnalyzer, ParallelAnalysisConfig, ParallelAnalysisResult
+from .parallel_analyzer import ParallelAnalysisConfig, ParallelAnalysisResult, ParallelConnascenceAnalyzer
 
 __all__ = ['ParallelConnascenceAnalyzer', 'ParallelAnalysisConfig', 'ParallelAnalysisResult']

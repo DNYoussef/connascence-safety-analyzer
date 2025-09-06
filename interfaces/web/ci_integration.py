@@ -18,24 +18,25 @@ Provides dashboard components specifically designed for CI/CD environments,
 including GitHub Actions integration, pull request comments, and build status.
 """
 
+from datetime import datetime
 import json
 import os
-import tempfile
-from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Any
 import subprocess
+import sys
+from typing import Any, Dict, List, Optional
 
 from analyzer.ast_engine.core_analyzer import ConnascenceASTAnalyzer
-from policy.budgets import BudgetTracker
-from policy.baselines import BaselineManager
 from analyzer.reporting.sarif import SARIFReporter
+from policy.baselines import BaselineManager
+from policy.budgets import BudgetTracker
+
 from .metrics import DashboardMetrics
 
 
 class CIDashboard:
     """CI/CD integration dashboard for connascence analysis."""
-    
+
     def __init__(self, config: Optional[Dict] = None):
         self.config = config or {}
         self.analyzer = ConnascenceASTAnalyzer()
@@ -43,13 +44,13 @@ class CIDashboard:
         self.baseline_manager = BaselineManager()
         self.metrics = DashboardMetrics()
         self.sarif_reporter = SARIFReporter()
-        
+
         # CI environment detection
         self.is_github_actions = os.getenv('GITHUB_ACTIONS') == 'true'
         self.is_gitlab_ci = os.getenv('GITLAB_CI') == 'true'
         self.is_jenkins = os.getenv('JENKINS_URL') is not None
         self.is_ci = any([self.is_github_actions, self.is_gitlab_ci, self.is_jenkins])
-    
+
     def analyze_pull_request(self, base_ref: str, head_ref: str = 'HEAD',
                            policy_preset: str = 'service-defaults') -> Dict[str, Any]:
         """Analyze pull request changes for connascence violations."""
@@ -58,14 +59,14 @@ class CIDashboard:
             changed_files = self._get_changed_files(base_ref, head_ref)
             if not changed_files:
                 return self._create_pr_report([], [], 'No Python files changed')
-            
+
             # Analyze only changed files
             violations = []
             for file_path in changed_files:
                 if file_path.suffix == '.py' and file_path.exists():
                     file_violations = self.analyzer.analyze_file(file_path)
                     violations.extend(file_violations)
-            
+
             # Compare against baseline if available
             baseline_comparison = None
             try:
@@ -78,105 +79,105 @@ class CIDashboard:
                     violations = baseline_comparison['new_violations']
             except Exception:
                 pass  # Continue without baseline if not available
-            
+
             # Check budget compliance
             budget_status = self._check_pr_budget(violations, policy_preset)
-            
-            return self._create_pr_report(violations, changed_files, 
+
+            return self._create_pr_report(violations, changed_files,
                                         baseline_comparison=baseline_comparison,
                                         budget_status=budget_status)
-        
+
         except Exception as e:
             return self._create_error_report(str(e))
-    
-    def generate_ci_artifacts(self, scan_results: Dict[str, Any], 
+
+    def generate_ci_artifacts(self, scan_results: Dict[str, Any],
                             output_dir: Path) -> Dict[str, str]:
         """Generate CI artifacts from scan results."""
         artifacts = {}
         output_dir.mkdir(exist_ok=True)
-        
+
         # SARIF report for GitHub Code Scanning
         if scan_results.get('violations'):
             sarif_path = output_dir / 'connascence.sarif'
             sarif_content = self.sarif_reporter.generate_report(scan_results['violations'])
             sarif_path.write_text(sarif_content)
             artifacts['sarif'] = str(sarif_path)
-        
+
         # HTML dashboard report
         html_path = output_dir / 'dashboard.html'
         html_content = self._generate_html_report(scan_results)
         html_path.write_text(html_content)
         artifacts['html'] = str(html_path)
-        
+
         # JSON summary
         json_path = output_dir / 'summary.json'
         summary = self._create_ci_summary(scan_results)
         json_path.write_text(json.dumps(summary, indent=2))
         artifacts['json'] = str(json_path)
-        
+
         # Badge data for README
         badge_path = output_dir / 'badge.json'
         badge_data = self._generate_badge_data(scan_results)
         badge_path.write_text(json.dumps(badge_data))
         artifacts['badge'] = str(badge_path)
-        
+
         return artifacts
-    
+
     def post_github_comment(self, pr_number: int, scan_results: Dict[str, Any]) -> bool:
         """Post scan results as GitHub PR comment."""
         if not self.is_github_actions:
             return False
-        
+
         try:
             comment_body = self._generate_pr_comment(scan_results)
-            
+
             # Use GitHub CLI if available
             result = subprocess.run([
                 'gh', 'pr', 'comment', str(pr_number),
                 '--body', comment_body
             ], capture_output=True, text=True)
-            
+
             return result.returncode == 0
         except Exception:
             return False
-    
+
     def set_build_status(self, scan_results: Dict[str, Any]) -> bool:
         """Set build status based on scan results."""
         violations = scan_results.get('violations', [])
         critical_violations = [v for v in violations if v.get('severity') == 'critical']
-        
+
         # Fail build if critical violations or budget exceeded
         budget_exceeded = scan_results.get('budget_status', {}).get('budget_exceeded', False)
-        
+
         if critical_violations or budget_exceeded:
             if self.is_github_actions:
                 print("::error::Critical connascence violations detected")
                 return False
             return False
-        
+
         return True
-    
+
     def _get_changed_files(self, base_ref: str, head_ref: str) -> List[Path]:
         """Get list of changed Python files between refs."""
         try:
             result = subprocess.run([
                 'git', 'diff', '--name-only', f'{base_ref}...{head_ref}'
             ], capture_output=True, text=True)
-            
+
             if result.returncode != 0:
                 return []
-            
+
             files = []
             for line in result.stdout.strip().split('\n'):
                 if line and line.endswith('.py'):
                     file_path = Path(line)
                     if file_path.exists():
                         files.append(file_path)
-            
+
             return files
         except Exception:
             return []
-    
+
     def _check_pr_budget(self, violations: List, policy_preset: str) -> Dict[str, Any]:
         """Check PR violations against budget limits."""
         try:
@@ -189,14 +190,14 @@ class CIDashboard:
                 'CoM': 5,  # Magic literals
                 'CoP': 2,  # Parameter bombs
             })
-            
+
             self.budget_tracker.set_budget_limits(budget_limits)
             self.budget_tracker.track_violations(violations)
-            
+
             return self.budget_tracker.check_compliance()
         except Exception as e:
             return {'compliant': True, 'error': str(e)}
-    
+
     def _create_pr_report(self, violations: List, changed_files: List[Path],
                          message: str = None, baseline_comparison: Dict = None,
                          budget_status: Dict = None) -> Dict[str, Any]:
@@ -213,20 +214,20 @@ class CIDashboard:
                 'violations_by_type': self._group_violations_by_type(violations)
             }
         }
-        
+
         if message:
             report['message'] = message
-        
+
         if baseline_comparison:
             report['baseline_comparison'] = baseline_comparison
-        
+
         if budget_status:
             report['budget_status'] = budget_status
-        
+
         # Determine PR status
         critical_violations = report['summary']['critical_count']
         budget_exceeded = budget_status and budget_status.get('budget_exceeded', False)
-        
+
         if critical_violations > 0:
             report['status'] = 'critical'
             report['status_message'] = f'{critical_violations} critical violations detected'
@@ -239,9 +240,9 @@ class CIDashboard:
         else:
             report['status'] = 'clean'
             report['status_message'] = 'No connascence violations detected'
-        
+
         return report
-    
+
     def _create_error_report(self, error_message: str) -> Dict[str, Any]:
         """Create error report."""
         return {
@@ -251,7 +252,7 @@ class CIDashboard:
             'violations': [],
             'summary': {'total_violations': 0}
         }
-    
+
     def _violation_to_dict(self, violation) -> Dict:
         """Convert violation object to dictionary."""
         if hasattr(violation, '__dict__'):
@@ -266,7 +267,7 @@ class CIDashboard:
                 'weight': getattr(violation, 'weight', 1.0)
             }
         return violation
-    
+
     def _group_violations_by_type(self, violations: List) -> Dict[str, int]:
         """Group violations by connascence type."""
         groups = {}
@@ -274,12 +275,12 @@ class CIDashboard:
             conn_type = getattr(violation, 'connascence_type', 'Unknown')
             groups[conn_type] = groups.get(conn_type, 0) + 1
         return groups
-    
+
     def _create_ci_summary(self, scan_results: Dict[str, Any]) -> Dict[str, Any]:
         """Create CI summary report."""
-        violations = scan_results.get('violations', [])
+        scan_results.get('violations', [])
         summary = scan_results.get('summary', {})
-        
+
         return {
             'connascence_analysis': {
                 'timestamp': scan_results.get('timestamp', datetime.now().isoformat()),
@@ -297,13 +298,13 @@ class CIDashboard:
                 'build_status': 'pass' if summary.get('critical_count', 0) == 0 else 'fail'
             }
         }
-    
+
     def _generate_badge_data(self, scan_results: Dict[str, Any]) -> Dict[str, Any]:
         """Generate badge data for shields.io."""
         summary = scan_results.get('summary', {})
         total_violations = summary.get('total_violations', 0)
         critical_count = summary.get('critical_count', 0)
-        
+
         if critical_count > 0:
             color = 'red'
             message = f'{total_violations} violations ({critical_count} critical)'
@@ -316,19 +317,19 @@ class CIDashboard:
         else:
             color = 'green'
             message = 'clean'
-        
+
         return {
             'schemaVersion': 1,
             'label': 'connascence',
             'message': message,
             'color': color
         }
-    
+
     def _generate_html_report(self, scan_results: Dict[str, Any]) -> str:
         """Generate HTML dashboard report."""
         violations = scan_results.get('violations', [])
         summary = scan_results.get('summary', {})
-        
+
         # Simple HTML template
         html = f"""
 <!DOCTYPE html>
@@ -360,7 +361,7 @@ class CIDashboard:
         <p><strong>Policy:</strong> {scan_results.get('policy_preset', 'Unknown')}</p>
         <p><strong>Generated:</strong> {scan_results.get('timestamp', 'Unknown')}</p>
     </div>
-    
+
     <div class="summary">
         <div class="metric">
             <div class="metric-value">{summary.get('total_violations', 0)}</div>
@@ -388,7 +389,7 @@ class CIDashboard:
         </div>
     </div>
 """
-        
+
         if violations:
             html += '<div class="violations"><h2>Violations</h2>'
             for violation in violations[:50]:  # Limit display
@@ -400,21 +401,21 @@ class CIDashboard:
                     <small>{violation.get('file_path', '')}:{violation.get('line_number', 0)}</small>
                 </div>
                 '''
-            
+
             if len(violations) > 50:
                 html += f'<p><em>... and {len(violations) - 50} more violations</em></p>'
-            
+
             html += '</div>'
-        
+
         html += '</body></html>'
         return html
-    
+
     def _generate_pr_comment(self, scan_results: Dict[str, Any]) -> str:
         """Generate GitHub PR comment."""
         violations = scan_results.get('violations', [])
         summary = scan_results.get('summary', {})
         status = scan_results.get('status', 'unknown')
-        
+
         # Status emoji
         status_emoji = {
             'clean': '[DONE]',
@@ -423,7 +424,7 @@ class CIDashboard:
             'critical': '',
             'error': ''
         }.get(status, '[METRICS]')
-        
+
         comment = f"""## {status_emoji} Connascence Analysis Report
 
 **Status:** {scan_results.get('status_message', 'Analysis complete')}
@@ -437,11 +438,11 @@ class CIDashboard:
 
 ### Violations by Type
 """
-        
+
         violations_by_type = summary.get('violations_by_type', {})
         for conn_type, count in violations_by_type.items():
             comment += f"- **{conn_type}:** {count}\n"
-        
+
         # Show critical violations
         critical_violations = [v for v in violations if v.get('severity') == 'critical']
         if critical_violations:
@@ -451,25 +452,25 @@ class CIDashboard:
                 line_number = violation.get('line_number', 0)
                 description = violation.get('description', '')
                 comment += f"- `{file_path}:{line_number}` - {description}\n"
-        
+
         # Budget status
         budget_status = scan_results.get('budget_status')
         if budget_status and budget_status.get('budget_exceeded'):
             comment += "\n###  Budget Exceeded\n"
             for violation_type, details in budget_status.get('violations', {}).items():
                 comment += f"- **{violation_type}:** Over budget\n"
-        
-        comment += f"\n---\n*Analysis powered by [Connascence Analyzer](https://github.com/DNYoussef/connascence)*"
-        
+
+        comment += "\n---\n*Analysis powered by [Connascence Analyzer](https://github.com/DNYoussef/connascence)*"
+
         return comment
 
 
 def main():
     """CLI entry point for CI dashboard."""
     import argparse
-    
+
     parser = argparse.ArgumentParser(description='Connascence CI Dashboard')
-    parser.add_argument('--pr-analysis', action='store_true', 
+    parser.add_argument('--pr-analysis', action='store_true',
                        help='Run PR analysis mode')
     parser.add_argument('--base-ref', default='origin/main',
                        help='Base reference for PR analysis')
@@ -479,26 +480,26 @@ def main():
                        help='Output directory for CI artifacts')
     parser.add_argument('--policy', default='service-defaults',
                        help='Policy preset to use')
-    
+
     args = parser.parse_args()
-    
+
     dashboard = CIDashboard()
-    
+
     if args.pr_analysis:
         # Run PR analysis
         results = dashboard.analyze_pull_request(
             args.base_ref, args.head_ref, args.policy
         )
-        
+
         # Generate artifacts
-        artifacts = dashboard.generate_ci_artifacts(results, args.output_dir)
-        
+        dashboard.generate_ci_artifacts(results, args.output_dir)
+
         # Print results
         print(json.dumps(results, indent=2))
-        
+
         # Exit with appropriate code
         if results['status'] in ['critical', 'budget_exceeded']:
-            exit(1)
+            sys.exit(1)
     else:
         print("CI Dashboard - use --pr-analysis for PR analysis mode")
 

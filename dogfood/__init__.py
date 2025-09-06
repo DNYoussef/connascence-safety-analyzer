@@ -18,14 +18,14 @@ This package implements the complete dogfood self-improvement system
 for the Connascence Safety Analyzer.
 """
 
-from .controller import DogfoodController
-from .safety_validator import SafetyValidator
 from .branch_manager import BranchManager
+from .controller import DogfoodController
 from .metrics_tracker import MetricsTracker
+from .safety_validator import SafetyValidator
 
 __all__ = [
     'DogfoodController',
-    'SafetyValidator', 
+    'SafetyValidator',
     'BranchManager',
     'MetricsTracker'
 ]

@@ -15,9 +15,9 @@
 Mock licensing module for import compatibility.
 """
 from dataclasses import dataclass
-from typing import Optional, Dict, Any
-import sys
 from pathlib import Path
+import sys
+from typing import Any, Dict, Optional
 
 # Import central constants
 sys.path.append(str(Path(__file__).parent.parent))
@@ -32,7 +32,7 @@ class LicenseValidationResult:
     expires_at: Optional[str] = None
     features_enabled: Dict[str, bool] = None
     message: str = LicenseConstants.MOCK_VALIDATION_MESSAGE
-    
+
     def __post_init__(self):
         if self.features_enabled is None:
             self.features_enabled = LicenseConstants.DEFAULT_FEATURES.copy()
@@ -40,10 +40,10 @@ class LicenseValidationResult:
 
 class LicenseValidator:
     """Mock license validator."""
-    
+
     def __init__(self):
         self.is_valid = True
-    
+
     def validate(self, license_key: Optional[str] = None) -> LicenseValidationResult:
         """Mock validation - always returns valid."""
         return LicenseValidationResult(
@@ -51,11 +51,11 @@ class LicenseValidator:
             license_type=LicenseConstants.MIT,
             message=LicenseConstants.MOCK_ALL_FEATURES_MESSAGE
         )
-    
+
     def check_feature(self, feature_name: str) -> bool:
         """Mock feature check - always returns True."""
         return True
-    
+
     def get_license_info(self) -> Dict[str, Any]:
         """Get mock license information."""
         return {
