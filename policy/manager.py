@@ -28,7 +28,8 @@ from analyzer.constants import (
     resolve_policy_name,
     validate_policy_name,
 )
-from utils.config_loader import ConnascenceViolation, ThresholdConfig, load_config_defaults
+from utils.types import ConnascenceViolation
+from utils.config_loader import ThresholdConfig, load_config_defaults
 
 # Load configuration defaults
 POLICY_DEFAULTS = load_config_defaults('policy_manager')

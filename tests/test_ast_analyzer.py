@@ -28,7 +28,7 @@ import pytest
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from analyzer.ast_engine import AnalysisResult, ConnascenceASTAnalyzer
-from analyzer.core import ConnascenceViolation
+from utils.types import ConnascenceViolation
 
 
 class TestConnascenceASTAnalyzer:

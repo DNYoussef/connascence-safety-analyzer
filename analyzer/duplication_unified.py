@@ -36,6 +36,7 @@ except ImportError:
 @dataclass
 class DuplicationViolation:
     """Unified duplication violation combining both analysis approaches."""
+
     violation_id: str
     type: str  # 'function_similarity', 'algorithm_duplication', 'structural_clone'
     severity: str  # 'critical', 'high', 'medium', 'low'
@@ -50,6 +51,7 @@ class DuplicationViolation:
 @dataclass
 class UnifiedDuplicationResult:
     """Complete duplication analysis result."""
+
     success: bool
     path: str
     analysis_type: str = "unified_duplication"
@@ -89,11 +91,7 @@ class UnifiedDuplicationAnalyzer:
         path_obj = Path(path)
 
         if not path_obj.exists():
-            return UnifiedDuplicationResult(
-                success=False,
-                path=str(path),
-                error=f"Path does not exist: {path}"
-            )
+            return UnifiedDuplicationResult(success=False, path=str(path), error=f"Path does not exist: {path}")
 
         try:
             # Phase 1: MECE similarity analysis
@@ -103,9 +101,7 @@ class UnifiedDuplicationAnalyzer:
             algorithm_violations = self._run_algorithm_analysis(path_obj)
 
             # Phase 3: Calculate unified duplication score
-            overall_score = self._calculate_unified_score(
-                similarity_violations, algorithm_violations, path_obj
-            )
+            overall_score = self._calculate_unified_score(similarity_violations, algorithm_violations, path_obj)
 
             # Phase 4: Generate summary
             summary = self._generate_summary(similarity_violations, algorithm_violations)
@@ -117,15 +113,11 @@ class UnifiedDuplicationAnalyzer:
                 similarity_violations=similarity_violations,
                 algorithm_violations=algorithm_violations,
                 overall_duplication_score=overall_score,
-                summary=summary
+                summary=summary,
             )
 
         except Exception as e:
-            return UnifiedDuplicationResult(
-                success=False,
-                path=str(path),
-                error=f"Analysis error: {str(e)}"
-            )
+            return UnifiedDuplicationResult(success=False, path=str(path), error=f"Analysis error: {str(e)}")
 
     def _run_similarity_analysis(self, path_obj: Path) -> List[DuplicationViolation]:
         """Run MECE similarity-based analysis."""
@@ -134,50 +126,52 @@ class UnifiedDuplicationAnalyzer:
         # Use MECE analyzer for similarity clustering
         mece_result = self.mece_analyzer.analyze_path(str(path_obj), comprehensive=True)
 
-        if not mece_result.get('success', False):
+        if not mece_result.get("success", False):
             return violations
 
         # Convert MECE clusters to unified violations
-        for i, cluster_data in enumerate(mece_result.get('duplications', []), 1):
+        for i, cluster_data in enumerate(mece_result.get("duplications", []), 1):
             violation_id = f"SIM-{i:03d}"
 
             # Determine severity based on similarity score and block count
-            similarity = cluster_data.get('similarity_score', 0.0)
-            block_count = cluster_data.get('block_count', 0)
+            similarity = cluster_data.get("similarity_score", 0.0)
+            block_count = cluster_data.get("block_count", 0)
 
             if similarity > 0.9 and block_count >= 3:
-                severity = 'critical'
+                severity = "critical"
             elif similarity > 0.8 and block_count >= 2:
-                severity = 'high'
+                severity = "high"
             elif similarity > 0.7:
-                severity = 'medium'
+                severity = "medium"
             else:
-                severity = 'low'
+                severity = "low"
 
             # Extract line ranges
             line_ranges = []
-            for block in cluster_data.get('blocks', []):
-                line_ranges.append({
-                    'file': block['file_path'],
-                    'start': block['start_line'],
-                    'end': block['end_line'],
-                    'lines': block.get('lines', [])
-                })
+            for block in cluster_data.get("blocks", []):
+                line_ranges.append(
+                    {
+                        "file": block["file_path"],
+                        "start": block["start_line"],
+                        "end": block["end_line"],
+                        "lines": block.get("lines", []),
+                    }
+                )
 
             violation = DuplicationViolation(
                 violation_id=violation_id,
-                type='function_similarity',
+                type="function_similarity",
                 severity=severity,
                 description=f"Found {block_count} similar functions with {similarity:.1%} similarity",
-                files_involved=cluster_data.get('files_involved', []),
+                files_involved=cluster_data.get("files_involved", []),
                 similarity_score=similarity,
                 line_ranges=line_ranges,
                 recommendation=self._get_similarity_recommendation(similarity, block_count),
                 context={
-                    'cluster_id': cluster_data.get('id', ''),
-                    'analysis_method': 'mece_similarity',
-                    'block_count': block_count
-                }
+                    "cluster_id": cluster_data.get("id", ""),
+                    "analysis_method": "mece_similarity",
+                    "block_count": block_count,
+                },
             )
 
             violations.append(violation)
@@ -191,16 +185,15 @@ class UnifiedDuplicationAnalyzer:
 
         # Collect all Python files
         python_files = []
-        if path_obj.is_file() and path_obj.suffix == '.py':
+        if path_obj.is_file() and path_obj.suffix == ".py":
             python_files = [path_obj]
         elif path_obj.is_dir():
-            python_files = [f for f in path_obj.rglob('*.py')
-                          if self._should_analyze_file(f)]
+            python_files = [f for f in path_obj.rglob("*.py") if self._should_analyze_file(f)]
 
         # Process each file for algorithm patterns
         for file_path in python_files:
             try:
-                with open(file_path, encoding='utf-8') as f:
+                with open(file_path, encoding="utf-8") as f:
                     content = f.read()
                     source_lines = content.splitlines()
 
@@ -221,27 +214,29 @@ class UnifiedDuplicationAnalyzer:
 
                 # Determine severity
                 if len(functions) >= 4:
-                    severity = 'critical'
+                    severity = "critical"
                 elif len(functions) >= 3:
-                    severity = 'high'
+                    severity = "high"
                 else:
-                    severity = 'medium'
+                    severity = "medium"
 
                 # Build violation
                 files_involved = list({f[0] for f in functions})
                 line_ranges = []
 
                 for file_path, func_node, _ in functions:
-                    line_ranges.append({
-                        'file': file_path,
-                        'start': func_node.lineno,
-                        'end': getattr(func_node, 'end_lineno', func_node.lineno + 10),
-                        'function_name': func_node.name
-                    })
+                    line_ranges.append(
+                        {
+                            "file": file_path,
+                            "start": func_node.lineno,
+                            "end": getattr(func_node, "end_lineno", func_node.lineno + 10),
+                            "function_name": func_node.name,
+                        }
+                    )
 
                 violation = DuplicationViolation(
                     violation_id=f"COA-{violation_id:03d}",
-                    type='algorithm_duplication',
+                    type="algorithm_duplication",
                     severity=severity,
                     description=f"Found {len(functions)} functions with identical algorithm patterns",
                     files_involved=files_involved,
@@ -249,11 +244,11 @@ class UnifiedDuplicationAnalyzer:
                     line_ranges=line_ranges,
                     recommendation=self._get_algorithm_recommendation(len(functions)),
                     context={
-                        'pattern_hash': pattern_hash[:16],
-                        'function_count': len(functions),
-                        'analysis_method': 'coa_algorithm',
-                        'functions': [f[1].name for f in functions]
-                    }
+                        "pattern_hash": pattern_hash[:16],
+                        "function_count": len(functions),
+                        "analysis_method": "coa_algorithm",
+                        "functions": [f[1].name for f in functions],
+                    },
                 )
 
                 violations.append(violation)
@@ -318,9 +313,12 @@ class UnifiedDuplicationAnalyzer:
 
         return min(1.0, base_similarity)
 
-    def _calculate_unified_score(self, similarity_violations: List[DuplicationViolation],
-                               algorithm_violations: List[DuplicationViolation],
-                               path_obj: Path) -> float:
+    def _calculate_unified_score(
+        self,
+        similarity_violations: List[DuplicationViolation],
+        algorithm_violations: List[DuplicationViolation],
+        path_obj: Path,
+    ) -> float:
         """Calculate unified duplication score (higher is better)."""
 
         # Count total Python files for baseline
@@ -328,7 +326,7 @@ class UnifiedDuplicationAnalyzer:
         if path_obj.is_file():
             python_files = [path_obj]
         else:
-            python_files = [f for f in path_obj.rglob('*.py') if self._should_analyze_file(f)]
+            python_files = [f for f in path_obj.rglob("*.py") if self._should_analyze_file(f)]
 
         total_files = len(python_files)
         if total_files == 0:
@@ -345,13 +343,14 @@ class UnifiedDuplicationAnalyzer:
         final_score = max(0.0, base_score - total_penalty)
         return round(final_score, 3)
 
-    def _generate_summary(self, similarity_violations: List[DuplicationViolation],
-                         algorithm_violations: List[DuplicationViolation]) -> Dict[str, Any]:
+    def _generate_summary(
+        self, similarity_violations: List[DuplicationViolation], algorithm_violations: List[DuplicationViolation]
+    ) -> Dict[str, Any]:
         """Generate comprehensive summary of duplication analysis."""
 
         # Count by severity
         all_violations = similarity_violations + algorithm_violations
-        severity_counts = {'critical': 0, 'high': 0, 'medium': 0, 'low': 0}
+        severity_counts = {"critical": 0, "high": 0, "medium": 0, "low": 0}
 
         for violation in all_violations:
             severity_counts[violation.severity] += 1
@@ -363,16 +362,13 @@ class UnifiedDuplicationAnalyzer:
             avg_similarity = 0.0
 
         return {
-            'total_violations': len(all_violations),
-            'similarity_duplications': len(similarity_violations),
-            'algorithm_duplications': len(algorithm_violations),
-            'severity_breakdown': severity_counts,
-            'average_similarity_score': round(avg_similarity, 3),
-            'files_with_duplications': len({
-                file for violation in all_violations
-                for file in violation.files_involved
-            }),
-            'recommendation_priority': self._get_priority_recommendation(all_violations)
+            "total_violations": len(all_violations),
+            "similarity_duplications": len(similarity_violations),
+            "algorithm_duplications": len(algorithm_violations),
+            "severity_breakdown": severity_counts,
+            "average_similarity_score": round(avg_similarity, 3),
+            "files_with_duplications": len({file for violation in all_violations for file in violation.files_involved}),
+            "recommendation_priority": self._get_priority_recommendation(all_violations),
         }
 
     def _get_similarity_recommendation(self, similarity: float, block_count: int) -> str:
@@ -397,8 +393,8 @@ class UnifiedDuplicationAnalyzer:
 
     def _get_priority_recommendation(self, violations: List[DuplicationViolation]) -> str:
         """Get overall priority recommendation."""
-        critical_count = sum(1 for v in violations if v.severity == 'critical')
-        high_count = sum(1 for v in violations if v.severity == 'high')
+        critical_count = sum(1 for v in violations if v.severity == "critical")
+        high_count = sum(1 for v in violations if v.severity == "high")
 
         if critical_count > 0:
             return f"Address {critical_count} critical duplication(s) immediately"
@@ -411,8 +407,17 @@ class UnifiedDuplicationAnalyzer:
 
     def _should_analyze_file(self, file_path: Path) -> bool:
         """Check if file should be analyzed."""
-        skip_patterns = ['__pycache__', '.git', '.pytest_cache', 'test_', '_test.py',
-                        'conftest.py', '.pyc', 'migrations', 'node_modules']
+        skip_patterns = [
+            "__pycache__",
+            ".git",
+            ".pytest_cache",
+            "test_",
+            "_test.py",
+            "conftest.py",
+            ".pyc",
+            "migrations",
+            "node_modules",
+        ]
 
         path_str = str(file_path)
         return not any(pattern in path_str for pattern in skip_patterns)
@@ -421,25 +426,25 @@ class UnifiedDuplicationAnalyzer:
         """Export results to JSON format."""
         # Convert dataclasses to dictionaries
         export_data = {
-            'analysis_type': 'unified_duplication',
-            'success': result.success,
-            'path': result.path,
-            'total_violations': result.total_violations,
-            'overall_duplication_score': result.overall_duplication_score,
-            'summary': result.summary,
-            'violations': {
-                'similarity_violations': [asdict(v) for v in result.similarity_violations],
-                'algorithm_violations': [asdict(v) for v in result.algorithm_violations]
-            }
+            "analysis_type": "unified_duplication",
+            "success": result.success,
+            "path": result.path,
+            "total_violations": result.total_violations,
+            "overall_duplication_score": result.overall_duplication_score,
+            "summary": result.summary,
+            "violations": {
+                "similarity_violations": [asdict(v) for v in result.similarity_violations],
+                "algorithm_violations": [asdict(v) for v in result.algorithm_violations],
+            },
         }
 
         if result.error:
-            export_data['error'] = result.error
+            export_data["error"] = result.error
 
         json_output = json.dumps(export_data, indent=2, ensure_ascii=True)
 
         if output_file:
-            with open(output_file, 'w', encoding='utf-8') as f:
+            with open(output_file, "w", encoding="utf-8") as f:
                 f.write(json_output)
             return f"Results exported to {output_file}"
 
@@ -451,11 +456,12 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(description="Unified duplication analyzer")
-    parser.add_argument('--path', required=True, help='Path to analyze')
-    parser.add_argument('--threshold', type=float, default=MECE_SIMILARITY_THRESHOLD,
-                       help='Similarity threshold (0.0-1.0)')
-    parser.add_argument('--output', help='Output JSON file')
-    parser.add_argument('--comprehensive', action='store_true', help='Run comprehensive analysis')
+    parser.add_argument("--path", required=True, help="Path to analyze")
+    parser.add_argument(
+        "--threshold", type=float, default=MECE_SIMILARITY_THRESHOLD, help="Similarity threshold (0.0-1.0)"
+    )
+    parser.add_argument("--output", help="Output JSON file")
+    parser.add_argument("--comprehensive", action="store_true", help="Run comprehensive analysis")
 
     args = parser.parse_args()
 
@@ -475,5 +481,5 @@ def main():
         return 1
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

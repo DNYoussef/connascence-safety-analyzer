@@ -22,7 +22,7 @@ import ast
 from pathlib import Path
 import tempfile
 
-from autofix.core import ConnascenceViolation
+from utils.types import ConnascenceViolation
 from autofix.magic_literals import MagicLiteralFixer
 from autofix.param_bombs import ParameterBombFixer
 from autofix.patch_api import AutofixEngine, PatchGenerator, PatchSuggestion, SafeAutofixer

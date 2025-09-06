@@ -27,8 +27,33 @@ from typing import Any, Dict, List, Optional
 
 sys.path.append(str(Path(__file__).parent.parent))
 
-from config.central_constants import MCPConstants, PerformanceLimits
-from core.unified_imports import IMPORT_MANAGER
+try:
+    from config.central_constants import MCPConstants, PerformanceLimits
+except ImportError:
+    # Fallback constants for MCP CLI
+    class MCPConstants:
+        MAX_PARALLEL_TASKS = 10
+        TASK_TIMEOUT = 300
+        SERVER_NAME = "connascence-mcp-enhanced"
+        SERVER_VERSION = "2.0.0"
+        SERVER_DESCRIPTION = "Enhanced MCP Server for Connascence Analysis"
+        TOOL_ANALYZE_FILE = "analyze_file"
+        TOOL_ANALYZE_WORKSPACE = "analyze_workspace"
+        TOOL_GET_VIOLATIONS = "get_violations"
+        TOOL_HEALTH_CHECK = "health_check"
+        DEFAULT_MAX_FILE_SIZE = 1024  # KB
+        DEFAULT_RATE_LIMIT = 60
+        DEFAULT_AUDIT_ENABLED = True
+        
+    class PerformanceLimits:
+        MAX_MEMORY_MB = 512
+        MAX_FILES_PER_BATCH = 100
+
+try:
+    from core.unified_imports import IMPORT_MANAGER
+except ImportError:
+    # Fallback for when unified imports not available
+    IMPORT_MANAGER = None
 
 logger = logging.getLogger(__name__)
 
@@ -146,22 +171,41 @@ class EnhancedConnascenceMCPServer:
         return AuditLogger(enabled=audit_enabled)
 
     def _load_analyzer(self):
-        """Load analyzer using unified import strategy."""
-        from core.unified_imports import ImportSpec
+        """Load analyzer using fallback import strategy."""
+        if IMPORT_MANAGER is not None:
+            try:
+                from core.unified_imports import ImportSpec
+                # Try SmartIntegrationEngine first (the real analyzer)
+                spec = ImportSpec(
+                    module_name="analyzer.smart_integration_engine",
+                    attribute_name="SmartIntegrationEngine",
+                    fallback_modules=["analyzer.unified_analyzer"],
+                    required=False
+                )
+                analyzer_result = IMPORT_MANAGER.import_module(spec)
 
-        # Try SmartIntegrationEngine first (the real analyzer)
-        spec = ImportSpec(
-            module_name="analyzer.smart_integration_engine",
-            attribute_name="SmartIntegrationEngine",
-            fallback_modules=["analyzer.unified_analyzer"],
-            required=False
-        )
-        analyzer_result = IMPORT_MANAGER.import_module(spec)
+                if analyzer_result.has_module:
+                    # Create instance and add analyze_file method to match interface
+                    engine_instance = analyzer_result.module()
 
-        if analyzer_result.has_module:
-            # Create instance and add analyze_file method to match interface
-            engine_instance = analyzer_result.module()
+                    def analyze_file_wrapper(file_path, **kwargs):
+                        result = engine_instance.comprehensive_analysis(file_path)
+                        return {
+                            'violations': result.get('violations', []),
+                            'summary': result.get('summary', {'total_violations': 0}),
+                            'success': True
+                        }
 
+                    engine_instance.analyze_file = analyze_file_wrapper
+                    return engine_instance
+            except Exception as e:
+                logger.warning(f"Failed to load analyzer via unified imports: {e}")
+
+        # Try direct imports as fallback
+        try:
+            from analyzer.smart_integration_engine import SmartIntegrationEngine
+            engine_instance = SmartIntegrationEngine()
+            
             def analyze_file_wrapper(file_path, **kwargs):
                 result = engine_instance.comprehensive_analysis(file_path)
                 return {
@@ -169,9 +213,18 @@ class EnhancedConnascenceMCPServer:
                     'summary': result.get('summary', {'total_violations': 0}),
                     'success': True
                 }
-
+            
             engine_instance.analyze_file = analyze_file_wrapper
             return engine_instance
+        except ImportError:
+            pass
+            
+        try:
+            from analyzer.unified_analyzer import UnifiedAnalyzer
+            analyzer_instance = UnifiedAnalyzer()
+            return analyzer_instance
+        except ImportError:
+            pass
 
         # Create mock analyzer for fallback
         class MockAnalyzer:
@@ -187,24 +240,39 @@ class EnhancedConnascenceMCPServer:
 
     def _load_integrations(self):
         """Load consolidated integrations."""
-        from core.unified_imports import ImportSpec
-        spec = ImportSpec(
-            module_name="integrations",
-            required=False
-        )
-        integrations_result = IMPORT_MANAGER.import_module(spec)
-
-        if integrations_result.has_module:
+        if IMPORT_MANAGER is not None:
             try:
-                # Get available integrations from consolidated module
-                get_available = getattr(integrations_result.module, 'get_available_integrations', None)
-                if get_available:
-                    return get_available(self.config)
-                else:
-                    # Fallback: create integrations manually
-                    return self._create_fallback_integrations(integrations_result.module)
-            except Exception as e:
-                logger.error(f"Failed to load integrations: {e}")
+                from core.unified_imports import ImportSpec
+                spec = ImportSpec(
+                    module_name="integrations",
+                    required=False
+                )
+                integrations_result = IMPORT_MANAGER.import_module(spec)
+
+                if integrations_result.has_module:
+                    try:
+                        # Get available integrations from consolidated module
+                        get_available = getattr(integrations_result.module, 'get_available_integrations', None)
+                        if get_available:
+                            return get_available(self.config)
+                        else:
+                            # Fallback: create integrations manually
+                            return self._create_fallback_integrations(integrations_result.module)
+                    except Exception as e:
+                        logger.error(f"Failed to load integrations: {e}")
+            except ImportError:
+                logger.debug("Unified imports not available for integrations")
+        
+        # Try direct import fallback
+        try:
+            import integrations
+            get_available = getattr(integrations, 'get_available_integrations', None)
+            if get_available:
+                return get_available(self.config)
+            else:
+                return self._create_fallback_integrations(integrations)
+        except ImportError:
+            logger.debug("Direct integrations import failed")
 
         return {}
 
@@ -456,7 +524,7 @@ class EnhancedConnascenceMCPServer:
                     'audit_enabled': MCPConstants.DEFAULT_AUDIT_ENABLED,
                     'max_file_size': self.max_file_size
                 },
-                'import_status': IMPORT_MANAGER.get_import_status()
+                'import_status': IMPORT_MANAGER.get_import_status() if IMPORT_MANAGER else 'fallback_mode'
             }
 
             # Check integration health

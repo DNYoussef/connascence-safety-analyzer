@@ -23,7 +23,7 @@ from dataclasses import dataclass
 import re
 from typing import Any, List, Optional
 
-from .core import ConnascenceViolation
+from utils.types import ConnascenceViolation
 from .patch_api import PatchSuggestion
 
 

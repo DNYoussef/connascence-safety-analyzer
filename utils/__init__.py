@@ -9,10 +9,14 @@ from .common import (
     safe_get_attribute,
     validate_file_path,
 )
-from .config_loader import ConnascenceViolation, RateLimiter, ThresholdConfig, create_rate_limiter, load_config_defaults
+from .types import ConnascenceViolation, Violation, ViolationDict, create_violation
+from .config_loader import RateLimiter, ThresholdConfig, create_rate_limiter, load_config_defaults
 
 __all__ = [
     'ConnascenceViolation',
+    'Violation',
+    'ViolationDict', 
+    'create_violation',
     'ThresholdConfig',
     'RateLimiter',
     'load_config_defaults',

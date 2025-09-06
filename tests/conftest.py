@@ -31,7 +31,7 @@ import pytest
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 # Import from our mock implementations instead of removed analyzer module
-from mcp.server import ConnascenceViolation
+from utils.types import ConnascenceViolation
 
 
 # Mock ThresholdConfig class for tests

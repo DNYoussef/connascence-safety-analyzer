@@ -35,20 +35,8 @@ from typing import Any, Dict, List, Optional
 
 
 # Mock ConnascenceViolation for removed analyzer dependency
-class ConnascenceViolation:
-    def __init__(self, id=None, rule_id=None, connascence_type=None, severity=None,
-                 description=None, file_path=None, line_number=None, weight=None, type=None, **kwargs):
-        self.id = id
-        self.rule_id = rule_id
-        self.connascence_type = connascence_type or type
-        self.type = type or connascence_type
-        self.severity = severity
-        self.description = description
-        self.file_path = file_path
-        self.line_number = line_number
-        self.weight = weight
-        for k, v in kwargs.items():
-            setattr(self, k, v)
+# ConnascenceViolation now available from utils.types
+# This duplicate class has been removed
 
 # BudgetTracker Configuration Constants (CoM Improvement - Pass 2)
 DEFAULT_USAGE_HISTORY_LIMIT = 10  # Last N entries to keep in usage history

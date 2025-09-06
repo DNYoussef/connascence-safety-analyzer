@@ -27,7 +27,8 @@ import pytest
 
 pytest.skip("Test depends on unimplemented src modules", allow_module_level=True)
 
-# from src.analyzer.helpers.violation_reporter import ViolationReporter, ConnascenceViolation
+# from src.analyzer.helpers.violation_reporter import ViolationReporter
+# from utils.types import ConnascenceViolation
 from src.analyzer.analyzers.complexity_analyzer import ComplexityAnalyzer
 from src.analyzer.analyzers.magic_literal_analyzer import MagicLiteralAnalyzer
 from src.analyzer.analyzers.parameter_analyzer import ParameterAnalyzer

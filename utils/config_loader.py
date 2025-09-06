@@ -20,27 +20,8 @@ Provides common configuration loading and mock classes used across components.
 from typing import Any, Dict, Optional
 
 
-class ConnascenceViolation:
-    """Mock ConnascenceViolation class for removed analyzer dependency."""
-
-    def __init__(self, id=None, rule_id=None, connascence_type=None, severity=None,
-                 description=None, file_path=None, line_number=None, weight=None,
-                 type=None, **kwargs):
-        self.id = id
-        self.rule_id = rule_id
-        self.connascence_type = connascence_type or type
-        self.type = type or connascence_type
-        self.severity = severity
-        self.description = description
-        self.file_path = file_path
-        self.line_number = line_number
-        self.weight = weight
-        self.context = kwargs.get('context', {})
-
-        # Set additional attributes from kwargs
-        for k, v in kwargs.items():
-            if not hasattr(self, k):
-                setattr(self, k, v)
+# ConnascenceViolation now available from utils.types
+# This class has been removed to eliminate duplication
 
 
 class ThresholdConfig:

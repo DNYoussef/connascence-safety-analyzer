@@ -19,6 +19,7 @@ from typing import Any, Dict, List, Optional
 
 class PatternType(Enum):
     """Types of code patterns for formal grammar analysis."""
+
     FUNCTION_DEFINITION = "function_definition"
     CLASS_DEFINITION = "class_definition"
     MAGIC_LITERAL = "magic_literal"
@@ -30,9 +31,11 @@ class PatternType(Enum):
     DOCSTRING = "docstring"
     COMMENT = "comment"
 
+
 @dataclass
 class GrammarMatch:
     """Represents a match found by formal grammar analysis."""
+
     pattern_type: PatternType
     node: ast.AST
     file_path: str
@@ -42,9 +45,11 @@ class GrammarMatch:
     metadata: Dict[str, Any]
     confidence: float = 1.0
 
+
 @dataclass
 class MagicLiteralContext:
     """Context information for magic literal detection."""
+
     literal_value: Any
     literal_type: type
     in_conditional: bool
@@ -56,6 +61,7 @@ class MagicLiteralContext:
     class_name: Optional[str] = None
     is_constant: bool = False
     is_configuration: bool = False
+
 
 class FormalGrammarAnalyzer(ABC):
     """Abstract base class for language-specific formal grammar analyzers."""
@@ -75,13 +81,14 @@ class FormalGrammarAnalyzer(ABC):
         """Detect function signatures and parameter patterns."""
         pass
 
+
 class PythonGrammarAnalyzer(FormalGrammarAnalyzer):
     """Python-specific formal grammar analyzer using AST."""
 
     def __init__(self):
         self.magic_number_whitelist = {0, 1, -1, 2, 10, 100, 1000}
-        self.magic_string_whitelist = {'', ' ', '\n', '\t', 'utf-8', 'ascii', 'None', 'True', 'False'}
-        self.config_indicators = ['config', 'setting', 'const', 'default', 'option']
+        self.magic_string_whitelist = {"", " ", "\n", "\t", "utf-8", "ascii", "None", "True", "False"}
+        self.config_indicators = ["config", "setting", "const", "default", "option"]
 
     def analyze_file(self, file_path: str, source_code: str) -> List[GrammarMatch]:
         """Comprehensive analysis using Python AST."""
@@ -89,21 +96,23 @@ class PythonGrammarAnalyzer(FormalGrammarAnalyzer):
 
         try:
             tree = ast.parse(source_code, filename=file_path)
-            visitor = PythonASTVisitor(file_path, source_code.split('\n'))
+            visitor = PythonASTVisitor(file_path, source_code.split("\n"))
             visitor.visit(tree)
             matches.extend(visitor.matches)
         except SyntaxError as e:
             # Handle syntax errors gracefully
-            matches.append(GrammarMatch(
-                pattern_type=PatternType.COMMENT,
-                node=None,
-                file_path=file_path,
-                line_number=e.lineno or 1,
-                column=e.offset or 0,
-                text=f"Syntax error: {e.msg}",
-                metadata={'error': str(e)},
-                confidence=0.5
-            ))
+            matches.append(
+                GrammarMatch(
+                    pattern_type=PatternType.COMMENT,
+                    node=None,
+                    file_path=file_path,
+                    line_number=e.lineno or 1,
+                    column=e.offset or 0,
+                    text=f"Syntax error: {e.msg}",
+                    metadata={"error": str(e)},
+                    confidence=0.5,
+                )
+            )
 
         return matches
 
@@ -113,7 +122,7 @@ class PythonGrammarAnalyzer(FormalGrammarAnalyzer):
 
         try:
             tree = ast.parse(source_code)
-            detector = MagicLiteralDetector(source_code.split('\n'))
+            detector = MagicLiteralDetector(source_code.split("\n"))
             detector.visit(tree)
             matches.extend(detector.get_violations())
         except SyntaxError:
@@ -128,7 +137,7 @@ class PythonGrammarAnalyzer(FormalGrammarAnalyzer):
 
         try:
             tree = ast.parse(source_code)
-            detector = FunctionSignatureDetector(source_code.split('\n'))
+            detector = FunctionSignatureDetector(source_code.split("\n"))
             detector.visit(tree)
             matches.extend(detector.get_violations())
         except SyntaxError:
@@ -139,32 +148,34 @@ class PythonGrammarAnalyzer(FormalGrammarAnalyzer):
     def _regex_fallback_magic_literals(self, source_code: str) -> List[GrammarMatch]:
         """Fallback regex-based magic literal detection for malformed code."""
         matches = []
-        lines = source_code.split('\n')
+        lines = source_code.split("\n")
 
         # Simple regex patterns as fallback
-        number_pattern = re.compile(r'\b(?!0\b|1\b|-1\b)\d+\.?\d*\b')
-        string_pattern = re.compile(r'''["'][^"']{3,}["']''')
+        number_pattern = re.compile(r"\b(?!0\b|1\b|-1\b)\d+\.?\d*\b")
+        string_pattern = re.compile(r"""["'][^"']{3,}["']""")
 
         for line_num, line in enumerate(lines, 1):
             # Skip comments
-            if line.strip().startswith('#'):
+            if line.strip().startswith("#"):
                 continue
 
             # Find numeric literals
             for match in number_pattern.finditer(line):
                 try:
-                    value = float(match.group()) if '.' in match.group() else int(match.group())
+                    value = float(match.group()) if "." in match.group() else int(match.group())
                     if value not in self.magic_number_whitelist:
-                        matches.append(GrammarMatch(
-                            pattern_type=PatternType.MAGIC_LITERAL,
-                            node=None,
-                            file_path="<fallback>",
-                            line_number=line_num,
-                            column=match.start(),
-                            text=match.group(),
-                            metadata={'value': value, 'type': 'number', 'fallback': True},
-                            confidence=0.7
-                        ))
+                        matches.append(
+                            GrammarMatch(
+                                pattern_type=PatternType.MAGIC_LITERAL,
+                                node=None,
+                                file_path="<fallback>",
+                                line_number=line_num,
+                                column=match.start(),
+                                text=match.group(),
+                                metadata={"value": value, "type": "number", "fallback": True},
+                                confidence=0.7,
+                            )
+                        )
                 except ValueError:
                     continue
 
@@ -172,18 +183,21 @@ class PythonGrammarAnalyzer(FormalGrammarAnalyzer):
             for match in string_pattern.finditer(line):
                 value = match.group()[1:-1]  # Remove quotes
                 if value not in self.magic_string_whitelist:
-                    matches.append(GrammarMatch(
-                        pattern_type=PatternType.MAGIC_LITERAL,
-                        node=None,
-                        file_path="<fallback>",
-                        line_number=line_num,
-                        column=match.start(),
-                        text=match.group(),
-                        metadata={'value': value, 'type': 'string', 'fallback': True},
-                        confidence=0.7
-                    ))
+                    matches.append(
+                        GrammarMatch(
+                            pattern_type=PatternType.MAGIC_LITERAL,
+                            node=None,
+                            file_path="<fallback>",
+                            line_number=line_num,
+                            column=match.start(),
+                            text=match.group(),
+                            metadata={"value": value, "type": "string", "fallback": True},
+                            confidence=0.7,
+                        )
+                    )
 
         return matches
+
 
 class PythonASTVisitor(ast.NodeVisitor):
     """AST visitor for comprehensive Python code analysis."""
@@ -199,22 +213,26 @@ class PythonASTVisitor(ast.NodeVisitor):
     def visit_ClassDef(self, node: ast.ClassDef):
         """Visit class definitions."""
         self.current_class = node.name
-        self.scope_stack.append(('class', node.name))
+        self.scope_stack.append(("class", node.name))
 
-        self.matches.append(GrammarMatch(
-            pattern_type=PatternType.CLASS_DEFINITION,
-            node=node,
-            file_path=self.file_path,
-            line_number=node.lineno,
-            column=node.col_offset,
-            text=f"class {node.name}",
-            metadata={
-                'class_name': node.name,
-                'base_classes': [ast.unparse(base) if hasattr(ast, 'unparse') else str(base) for base in node.bases],
-                'method_count': len([n for n in node.body if isinstance(n, ast.FunctionDef)]),
-                'decorator_count': len(node.decorator_list)
-            }
-        ))
+        self.matches.append(
+            GrammarMatch(
+                pattern_type=PatternType.CLASS_DEFINITION,
+                node=node,
+                file_path=self.file_path,
+                line_number=node.lineno,
+                column=node.col_offset,
+                text=f"class {node.name}",
+                metadata={
+                    "class_name": node.name,
+                    "base_classes": [
+                        ast.unparse(base) if hasattr(ast, "unparse") else str(base) for base in node.bases
+                    ],
+                    "method_count": len([n for n in node.body if isinstance(n, ast.FunctionDef)]),
+                    "decorator_count": len(node.decorator_list),
+                },
+            )
+        )
 
         self.generic_visit(node)
         self.scope_stack.pop()
@@ -223,7 +241,7 @@ class PythonASTVisitor(ast.NodeVisitor):
     def visit_FunctionDef(self, node: ast.FunctionDef):
         """Visit function definitions."""
         self.current_function = node.name
-        self.scope_stack.append(('function', node.name))
+        self.scope_stack.append(("function", node.name))
 
         # Analyze parameters
         param_count = len(node.args.args)
@@ -231,24 +249,26 @@ class PythonASTVisitor(ast.NodeVisitor):
         has_kwargs = node.args.kwarg is not None
         default_count = len(node.args.defaults)
 
-        self.matches.append(GrammarMatch(
-            pattern_type=PatternType.FUNCTION_DEFINITION,
-            node=node,
-            file_path=self.file_path,
-            line_number=node.lineno,
-            column=node.col_offset,
-            text=f"def {node.name}",
-            metadata={
-                'function_name': node.name,
-                'parameter_count': param_count,
-                'has_varargs': has_varargs,
-                'has_kwargs': has_kwargs,
-                'default_count': default_count,
-                'is_async': isinstance(node, ast.AsyncFunctionDef),
-                'decorator_count': len(node.decorator_list),
-                'in_class': self.current_class
-            }
-        ))
+        self.matches.append(
+            GrammarMatch(
+                pattern_type=PatternType.FUNCTION_DEFINITION,
+                node=node,
+                file_path=self.file_path,
+                line_number=node.lineno,
+                column=node.col_offset,
+                text=f"def {node.name}",
+                metadata={
+                    "function_name": node.name,
+                    "parameter_count": param_count,
+                    "has_varargs": has_varargs,
+                    "has_kwargs": has_kwargs,
+                    "default_count": default_count,
+                    "is_async": isinstance(node, ast.AsyncFunctionDef),
+                    "decorator_count": len(node.decorator_list),
+                    "in_class": self.current_class,
+                },
+            )
+        )
 
         self.generic_visit(node)
         self.scope_stack.pop()
@@ -257,40 +277,41 @@ class PythonASTVisitor(ast.NodeVisitor):
     def visit_Import(self, node: ast.Import):
         """Visit import statements."""
         for alias in node.names:
-            self.matches.append(GrammarMatch(
-                pattern_type=PatternType.IMPORT_STATEMENT,
-                node=node,
-                file_path=self.file_path,
-                line_number=node.lineno,
-                column=node.col_offset,
-                text=f"import {alias.name}",
-                metadata={
-                    'module': alias.name,
-                    'alias': alias.asname,
-                    'import_type': 'direct'
-                }
-            ))
+            self.matches.append(
+                GrammarMatch(
+                    pattern_type=PatternType.IMPORT_STATEMENT,
+                    node=node,
+                    file_path=self.file_path,
+                    line_number=node.lineno,
+                    column=node.col_offset,
+                    text=f"import {alias.name}",
+                    metadata={"module": alias.name, "alias": alias.asname, "import_type": "direct"},
+                )
+            )
         self.generic_visit(node)
 
     def visit_ImportFrom(self, node: ast.ImportFrom):
         """Visit from...import statements."""
         for alias in node.names:
-            self.matches.append(GrammarMatch(
-                pattern_type=PatternType.IMPORT_STATEMENT,
-                node=node,
-                file_path=self.file_path,
-                line_number=node.lineno,
-                column=node.col_offset,
-                text=f"from {node.module} import {alias.name}",
-                metadata={
-                    'module': node.module,
-                    'name': alias.name,
-                    'alias': alias.asname,
-                    'import_type': 'from',
-                    'level': node.level
-                }
-            ))
+            self.matches.append(
+                GrammarMatch(
+                    pattern_type=PatternType.IMPORT_STATEMENT,
+                    node=node,
+                    file_path=self.file_path,
+                    line_number=node.lineno,
+                    column=node.col_offset,
+                    text=f"from {node.module} import {alias.name}",
+                    metadata={
+                        "module": node.module,
+                        "name": alias.name,
+                        "alias": alias.asname,
+                        "import_type": "from",
+                        "level": node.level,
+                    },
+                )
+            )
         self.generic_visit(node)
+
 
 class MagicLiteralDetector(ast.NodeVisitor):
     """Specialized detector for magic literals with context analysis."""
@@ -312,8 +333,8 @@ class MagicLiteralDetector(ast.NodeVisitor):
 
         # Whitelists
         self.safe_numbers = {0, 1, -1, 2, 10, 100, 1000, 24, 60, 365, 1024}
-        self.safe_strings = {'', ' ', '\n', '\t', 'utf-8', 'ascii', 'None', 'True', 'False'}
-        self.config_patterns = [r'.*[Cc]onfig.*', r'.*[Ss]etting.*', r'.*[Cc]onst.*', r'.*[Dd]efault.*']
+        self.safe_strings = {"", " ", "\n", "\t", "utf-8", "ascii", "None", "True", "False"}
+        self.config_patterns = [r".*[Cc]onfig.*", r".*[Ss]etting.*", r".*[Cc]onst.*", r".*[Dd]efault.*"]
 
     def visit_ClassDef(self, node: ast.ClassDef):
         """Track class context."""
@@ -396,21 +417,23 @@ class MagicLiteralDetector(ast.NodeVisitor):
         severity = self._calculate_severity(context)
 
         if severity > 0:
-            self.violations.append(GrammarMatch(
-                pattern_type=PatternType.MAGIC_LITERAL,
-                node=node,
-                file_path="<current>",
-                line_number=node.lineno,
-                column=node.col_offset,
-                text=repr(node.value),
-                metadata={
-                    'context': context,
-                    'severity_score': severity,
-                    'literal_type': type(node.value).__name__,
-                    'recommendations': self._generate_recommendations(context)
-                },
-                confidence=min(1.0, severity / 10.0)
-            ))
+            self.violations.append(
+                GrammarMatch(
+                    pattern_type=PatternType.MAGIC_LITERAL,
+                    node=node,
+                    file_path="<current>",
+                    line_number=node.lineno,
+                    column=node.col_offset,
+                    text=repr(node.value),
+                    metadata={
+                        "context": context,
+                        "severity_score": severity,
+                        "literal_type": type(node.value).__name__,
+                        "recommendations": self._generate_recommendations(context),
+                    },
+                    confidence=min(1.0, severity / 10.0),
+                )
+            )
 
         self.generic_visit(node)
 
@@ -449,7 +472,7 @@ class MagicLiteralDetector(ast.NodeVisitor):
             function_name=self.current_function,
             class_name=self.current_class,
             is_constant=self.current_assignment_target in self.constants if self.current_assignment_target else False,
-            is_configuration=self._is_configuration_context()
+            is_configuration=self._is_configuration_context(),
         )
 
     def _is_configuration_context(self) -> bool:
@@ -462,13 +485,13 @@ class MagicLiteralDetector(ast.NodeVisitor):
 
         # Check function name
         if self.current_function:
-            config_functions = ['configure', 'setup', 'initialize', 'load_config', 'get_setting']
+            config_functions = ["configure", "setup", "initialize", "load_config", "get_setting"]
             if any(func in self.current_function.lower() for func in config_functions):
                 return True
 
         # Check variable name
         if self.current_assignment_target:
-            config_vars = ['config', 'setting', 'option', 'default', 'param']
+            config_vars = ["config", "setting", "option", "default", "param"]
             if any(var in self.current_assignment_target.lower() for var in config_vars):
                 return True
 
@@ -491,7 +514,7 @@ class MagicLiteralDetector(ast.NodeVisitor):
             base_severity *= 1.5
 
         # Increase severity for business logic functions
-        if context.function_name and 'process' in context.function_name.lower():
+        if context.function_name and "process" in context.function_name.lower():
             base_severity *= 1.3
 
         # Reduce severity for small numbers in loops
@@ -504,7 +527,7 @@ class MagicLiteralDetector(ast.NodeVisitor):
             if len(context.literal_value) < 5:
                 base_severity *= 0.6
             # URLs and file paths are often legitimate
-            if any(pattern in context.literal_value for pattern in ['http', '/', '.', '@']):
+            if any(pattern in context.literal_value for pattern in ["http", "/", ".", "@"]):
                 base_severity *= 0.4
 
         return base_severity
@@ -534,6 +557,7 @@ class MagicLiteralDetector(ast.NodeVisitor):
         """Get all detected magic literal violations."""
         return self.violations
 
+
 class FunctionSignatureDetector(ast.NodeVisitor):
     """Detector for function signature issues using formal grammar analysis."""
 
@@ -547,30 +571,32 @@ class FunctionSignatureDetector(ast.NodeVisitor):
         param_count = len(node.args.args)
 
         # Exclude 'self' parameter for methods
-        if param_count > 0 and node.args.args[0].arg in ['self', 'cls']:
+        if param_count > 0 and node.args.args[0].arg in ["self", "cls"]:
             effective_param_count = param_count - 1
         else:
             effective_param_count = param_count
 
         if effective_param_count > self.nasa_param_threshold:
-            self.violations.append(GrammarMatch(
-                pattern_type=PatternType.PARAMETER_LIST,
-                node=node,
-                file_path="<current>",
-                line_number=node.lineno,
-                column=node.col_offset,
-                text=f"def {node.name}(...)",
-                metadata={
-                    'function_name': node.name,
-                    'parameter_count': effective_param_count,
-                    'threshold': self.nasa_param_threshold,
-                    'has_defaults': len(node.args.defaults) > 0,
-                    'has_varargs': node.args.vararg is not None,
-                    'has_kwargs': node.args.kwarg is not None,
-                    'recommendations': self._get_parameter_recommendations(effective_param_count, node)
-                },
-                confidence=1.0
-            ))
+            self.violations.append(
+                GrammarMatch(
+                    pattern_type=PatternType.PARAMETER_LIST,
+                    node=node,
+                    file_path="<current>",
+                    line_number=node.lineno,
+                    column=node.col_offset,
+                    text=f"def {node.name}(...)",
+                    metadata={
+                        "function_name": node.name,
+                        "parameter_count": effective_param_count,
+                        "threshold": self.nasa_param_threshold,
+                        "has_defaults": len(node.args.defaults) > 0,
+                        "has_varargs": node.args.vararg is not None,
+                        "has_kwargs": node.args.kwarg is not None,
+                        "recommendations": self._get_parameter_recommendations(effective_param_count, node),
+                    },
+                    confidence=1.0,
+                )
+            )
 
         self.generic_visit(node)
 
@@ -597,6 +623,7 @@ class FunctionSignatureDetector(ast.NodeVisitor):
         """Get all detected function signature violations."""
         return self.violations
 
+
 class JavaScriptGrammarAnalyzer(FormalGrammarAnalyzer):
     """JavaScript-specific formal grammar analyzer."""
 
@@ -609,42 +636,44 @@ class JavaScriptGrammarAnalyzer(FormalGrammarAnalyzer):
     def detect_magic_literals(self, source_code: str) -> List[GrammarMatch]:
         """Detect JavaScript magic literals using enhanced regex."""
         matches = []
-        lines = source_code.split('\n')
+        lines = source_code.split("\n")
 
         # Enhanced patterns for JavaScript
-        number_pattern = re.compile(r'\b(?!0\b|1\b|-1\b)\d+\.?\d*\b')
-        re.compile(r'''(?:["'](?:[^"'\\]|\\.){3,}["'])''')
+        number_pattern = re.compile(r"\b(?!0\b|1\b|-1\b)\d+\.?\d*\b")
+        re.compile(r"""(?:["'](?:[^"'\\]|\\.){3,}["'])""")
 
         for line_num, line in enumerate(lines, 1):
             # Skip comments
-            if '//' in line:
-                line = line[:line.index('//')]
+            if "//" in line:
+                line = line[: line.index("//")]
 
             for match in number_pattern.finditer(line):
-                matches.append(GrammarMatch(
-                    pattern_type=PatternType.MAGIC_LITERAL,
-                    node=None,
-                    file_path=file_path,
-                    line_number=line_num,
-                    column=match.start(),
-                    text=match.group(),
-                    metadata={'value': match.group(), 'type': 'number'},
-                    confidence=0.8
-                ))
+                matches.append(
+                    GrammarMatch(
+                        pattern_type=PatternType.MAGIC_LITERAL,
+                        node=None,
+                        file_path=file_path,
+                        line_number=line_num,
+                        column=match.start(),
+                        text=match.group(),
+                        metadata={"value": match.group(), "type": "number"},
+                        confidence=0.8,
+                    )
+                )
 
         return matches
 
     def detect_function_signatures(self, source_code: str) -> List[GrammarMatch]:
         """Detect JavaScript function signatures."""
         matches = []
-        lines = source_code.split('\n')
+        lines = source_code.split("\n")
 
         # Enhanced JavaScript function patterns
         function_patterns = [
-            re.compile(r'function\s+(\w+)\s*\(([^)]*)\)'),
-            re.compile(r'(?:const|let|var)\s+(\w+)\s*=\s*function\s*\(([^)]*)\)'),
-            re.compile(r'(?:const|let|var)\s+(\w+)\s*=\s*\(([^)]*)\)\s*=>'),
-            re.compile(r'(\w+)\s*:\s*function\s*\(([^)]*)\)')
+            re.compile(r"function\s+(\w+)\s*\(([^)]*)\)"),
+            re.compile(r"(?:const|let|var)\s+(\w+)\s*=\s*function\s*\(([^)]*)\)"),
+            re.compile(r"(?:const|let|var)\s+(\w+)\s*=\s*\(([^)]*)\)\s*=>"),
+            re.compile(r"(\w+)\s*:\s*function\s*\(([^)]*)\)"),
         ]
 
         for line_num, line in enumerate(lines, 1):
@@ -653,23 +682,25 @@ class JavaScriptGrammarAnalyzer(FormalGrammarAnalyzer):
                 if match:
                     func_name = match.group(1)
                     params = match.group(2).strip()
-                    param_count = len([p.strip() for p in params.split(',') if p.strip()]) if params else 0
+                    param_count = len([p.strip() for p in params.split(",") if p.strip()]) if params else 0
 
                     if param_count > 6:  # NASA threshold
-                        matches.append(GrammarMatch(
-                            pattern_type=PatternType.FUNCTION_DEFINITION,
-                            node=None,
-                            file_path="<current>",
-                            line_number=line_num,
-                            column=match.start(),
-                            text=match.group(),
-                            metadata={
-                                'function_name': func_name,
-                                'parameter_count': param_count,
-                                'language': 'javascript'
-                            },
-                            confidence=0.9
-                        ))
+                        matches.append(
+                            GrammarMatch(
+                                pattern_type=PatternType.FUNCTION_DEFINITION,
+                                node=None,
+                                file_path="<current>",
+                                line_number=line_num,
+                                column=match.start(),
+                                text=match.group(),
+                                metadata={
+                                    "function_name": func_name,
+                                    "parameter_count": param_count,
+                                    "language": "javascript",
+                                },
+                                confidence=0.9,
+                            )
+                        )
 
         return matches
 
@@ -680,14 +711,15 @@ class JavaScriptGrammarAnalyzer(FormalGrammarAnalyzer):
         matches.extend(self.detect_function_signatures(source_code))
         return matches
 
+
 class FormalGrammarEngine:
     """Main engine that coordinates formal grammar analysis across languages."""
 
     def __init__(self):
         self.analyzers = {
-            'python': PythonGrammarAnalyzer(),
-            'javascript': JavaScriptGrammarAnalyzer(),
-            'typescript': JavaScriptGrammarAnalyzer(),  # Use JS analyzer for TS
+            "python": PythonGrammarAnalyzer(),
+            "javascript": JavaScriptGrammarAnalyzer(),
+            "typescript": JavaScriptGrammarAnalyzer(),  # Use JS analyzer for TS
         }
 
     def analyze_file(self, file_path: str, source_code: str, language: Optional[str] = None) -> List[GrammarMatch]:
@@ -706,11 +738,11 @@ class FormalGrammarEngine:
         extension = Path(file_path).suffix.lower()
 
         extension_map = {
-            '.py': 'python',
-            '.js': 'javascript',
-            '.jsx': 'javascript',
-            '.ts': 'typescript',
-            '.tsx': 'typescript'
+            ".py": "python",
+            ".js": "javascript",
+            ".jsx": "javascript",
+            ".ts": "typescript",
+            ".tsx": "typescript",
         }
 
         return extension_map.get(extension)

@@ -160,7 +160,7 @@ class TestCLIScanCommand:
     @patch('cli.connascence.ConnascenceASTAnalyzer')
     def test_scan_with_violations(self, mock_analyzer_class):
         """Test scan command with violations found."""
-        from analyzer.core import ConnascenceViolation
+        from utils.types import ConnascenceViolation
 
         # Mock violations
         violations = [

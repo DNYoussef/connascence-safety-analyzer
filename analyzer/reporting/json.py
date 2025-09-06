@@ -38,7 +38,7 @@ class JSONReporter:
             "summary": self._create_summary(result),
             "violations": [self._serialize_violation(v) for v in result.violations],
             "file_stats": result.file_stats,
-            "policy_compliance": self._create_policy_compliance(result)
+            "policy_compliance": self._create_policy_compliance(result),
         }
 
         # Ensure deterministic ordering
@@ -50,19 +50,16 @@ class JSONReporter:
             "tool": {
                 "name": "connascence",
                 "version": "1.0.0",
-                "url": "https://github.com/connascence/connascence-analyzer"
+                "url": "https://github.com/connascence/connascence-analyzer",
             },
             "analysis": {
                 "timestamp": result.timestamp,
                 "project_root": result.project_root,
                 "total_files_analyzed": result.total_files_analyzed,
                 "analysis_duration_ms": result.analysis_duration_ms,
-                "policy_preset": result.policy_preset
+                "policy_preset": result.policy_preset,
             },
-            "environment": {
-                "python_version": "3.11+",
-                "platform": "multi-platform"
-            }
+            "environment": {"python_version": "3.11+", "platform": "multi-platform"},
         }
 
     def _create_summary(self, result: AnalysisResult) -> Dict[str, Any]:
@@ -107,8 +104,8 @@ class JSONReporter:
                 "connascence_index": round(total_weight, 2),
                 "violations_per_file": round(len(violations) / max(1, result.total_files_analyzed), 2),
                 "critical_violations": by_severity.get("critical", 0),
-                "high_violations": by_severity.get("high", 0)
-            }
+                "high_violations": by_severity.get("high", 0),
+            },
         }
 
     def _serialize_violation(self, violation: Violation) -> Dict[str, Any]:
@@ -120,25 +117,21 @@ class JSONReporter:
             "severity": violation.severity.value,
             "weight": round(violation.weight, 2),
             "locality": violation.locality,
-
             # Location information
             "file_path": violation.file_path,
             "line_number": violation.line_number,
             "column": violation.column,
             "end_line": violation.end_line,
             "end_column": violation.end_column,
-
             # Description and recommendations
             "description": violation.description,
             "recommendation": violation.recommendation,
-
             # Context information (optional)
             "function_name": violation.function_name,
             "class_name": violation.class_name,
             "code_snippet": violation.code_snippet,
-
             # Additional context
-            "context": violation.context or {}
+            "context": violation.context or {},
         }
 
     def _create_policy_compliance(self, result: AnalysisResult) -> Dict[str, Any]:
@@ -147,7 +140,7 @@ class JSONReporter:
             "policy_preset": result.policy_preset,
             "budget_status": result.budget_status,
             "baseline_comparison": result.baseline_comparison,
-            "quality_gates": {}
+            "quality_gates": {},
         }
 
         # Calculate quality gate status
@@ -159,7 +152,7 @@ class JSONReporter:
         compliance["quality_gates"] = {
             "no_critical_violations": critical_violations == 0,
             "max_high_violations": high_violations <= 10,  # Configurable
-            "total_violations_acceptable": len(violations) <= 100  # Configurable
+            "total_violations_acceptable": len(violations) <= 100,  # Configurable
         }
 
         return compliance
@@ -184,7 +177,7 @@ class JSONReporter:
 
         if output_file:
             # Write to file
-            with open(output_file, 'w', encoding='utf-8') as f:
+            with open(output_file, "w", encoding="utf-8") as f:
                 f.write(json_output)
         else:
             # Return JSON string
@@ -201,7 +194,7 @@ class JSONReporter:
                     "file_path": file_path,
                     "violation_count": 0,
                     "total_weight": 0.0,
-                    "severity_breakdown": {}
+                    "severity_breakdown": {},
                 }
 
             stats = file_stats[file_path]
@@ -213,9 +206,7 @@ class JSONReporter:
 
         # Sort by total weight, then by violation count
         sorted_files = sorted(
-            file_stats.values(),
-            key=lambda x: (x["total_weight"], x["violation_count"]),
-            reverse=True
+            file_stats.values(), key=lambda x: (x["total_weight"], x["violation_count"]), reverse=True
         )
 
         # Round weights for cleaner output

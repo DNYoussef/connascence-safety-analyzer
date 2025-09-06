@@ -3,7 +3,7 @@ Language-specific strategy implementations for connascence detection.
 Consolidates duplicate algorithms across JavaScript and C language detection.
 """
 
-from dataclasses import dataclass
+from utils.types import ConnascenceViolation
 from pathlib import Path
 import re
 from typing import Dict, List
@@ -25,18 +25,7 @@ except ImportError:
     )
 
 
-@dataclass
-class ConnascenceViolation:
-    """Represents a detected connascence violation."""
-    type: str
-    severity: str
-    file_path: str
-    line_number: int
-    column: int
-    description: str
-    recommendation: str
-    code_snippet: str
-    context: dict
+# ConnascenceViolation now imported from utils.types
 
 
 class LanguageStrategy:
@@ -52,16 +41,15 @@ class LanguageStrategy:
         # Try to use formal grammar analyzer first
         try:
             from .formal_grammar import FormalGrammarEngine
+
             engine = FormalGrammarEngine()
-            source_code = '\n'.join(source_lines)
+            source_code = "\n".join(source_lines)
             matches = engine.analyze_file(str(file_path), source_code, self.language_name)
 
             # Convert grammar matches to violations
             for match in matches:
                 if match.pattern_type.value == "magic_literal":
-                    violations.append(self._create_formal_magic_literal_violation(
-                        file_path, match, source_lines
-                    ))
+                    violations.append(self._create_formal_magic_literal_violation(file_path, match, source_lines))
             return violations
         except ImportError:
             # Fallback to regex-based detection
@@ -76,18 +64,18 @@ class LanguageStrategy:
                 continue
 
             # Apply numeric patterns
-            for match in patterns['numeric'].finditer(line):
-                violations.append(self._create_magic_literal_violation(
-                    file_path, line_num, match, "number", line.strip()
-                ))
+            for match in patterns["numeric"].finditer(line):
+                violations.append(
+                    self._create_magic_literal_violation(file_path, line_num, match, "number", line.strip())
+                )
 
             # Apply string patterns
-            for match in patterns['string'].finditer(line):
+            for match in patterns["string"].finditer(line):
                 literal = match.group()
                 if not self.is_excluded_string_literal(literal):
-                    violations.append(self._create_magic_literal_violation(
-                        file_path, line_num, match, "string", line.strip()
-                    ))
+                    violations.append(
+                        self._create_magic_literal_violation(file_path, line_num, match, "string", line.strip())
+                    )
 
         return violations
 
@@ -115,9 +103,11 @@ class LanguageStrategy:
                     # Function ended
                     function_length = line_num - function_start + 1
                     if function_length > GOD_OBJECT_LOC_THRESHOLD // 10:  # 50 lines threshold
-                        violations.append(self._create_god_function_violation(
-                            file_path, function_start, function_name, function_length
-                        ))
+                        violations.append(
+                            self._create_god_function_violation(
+                                file_path, function_start, function_name, function_length
+                            )
+                        )
                     in_function = False
 
         return violations
@@ -134,9 +124,9 @@ class LanguageStrategy:
                 param_count = self.count_parameters(params)
 
                 if param_count > NASA_PARAMETER_THRESHOLD:
-                    violations.append(self._create_parameter_violation(
-                        file_path, line_num, match.start(), param_count, line.strip()
-                    ))
+                    violations.append(
+                        self._create_parameter_violation(file_path, line_num, match.start(), param_count, line.strip())
+                    )
 
         return violations
 
@@ -163,15 +153,15 @@ class LanguageStrategy:
 
     def count_braces(self, line: str) -> int:
         """Count brace difference for function boundary detection."""
-        return line.count('{') - line.count('}')
+        return line.count("{") - line.count("}")
 
     def count_parameters(self, params: str) -> int:
         """Count parameters in parameter string."""
-        return len([p.strip() for p in params.split(',') if p.strip()]) if params.strip() else 0
+        return len([p.strip() for p in params.split(",") if p.strip()]) if params.strip() else 0
 
     def is_excluded_string_literal(self, literal: str) -> bool:
         """Check if string literal should be excluded."""
-        return any(skip in literal.lower() for skip in ['test', 'error', 'warning', 'debug'])
+        return any(skip in literal.lower() for skip in ["test", "error", "warning", "debug"])
 
     # Helper methods for creating violations
     def _create_formal_magic_literal_violation(
@@ -180,7 +170,7 @@ class LanguageStrategy:
         """Create a violation from formal grammar match."""
         # Extract context information from the match
         context = match.metadata
-        severity_score = context.get('severity_score', 5.0)
+        severity_score = context.get("severity_score", 5.0)
 
         # Map severity score to severity level
         if severity_score > 8.0:
@@ -193,15 +183,17 @@ class LanguageStrategy:
             severity = "informational"
 
         # Create enhanced description
-        formal_context = context.get('context')
+        formal_context = context.get("context")
         if formal_context:
             description = f"Context-aware magic literal '{match.text}' in {formal_context.__class__.__name__.lower()}"
         else:
             description = f"Magic literal '{match.text}' detected"
 
         # Get recommendations from context
-        recommendations = context.get('recommendations', [])
-        recommendation = "; ".join(recommendations) if recommendations else f"Extract to a {self.get_constant_recommendation()}"
+        recommendations = context.get("recommendations", [])
+        recommendation = (
+            "; ".join(recommendations) if recommendations else f"Extract to a {self.get_constant_recommendation()}"
+        )
 
         return ConnascenceViolation(
             type="connascence_of_meaning",
@@ -213,16 +205,15 @@ class LanguageStrategy:
             recommendation=recommendation,
             code_snippet=match.text,
             context={
-                "literal_value": context.get('value', match.text),
+                "literal_value": context.get("value", match.text),
                 "formal_analysis": True,
                 "confidence": match.confidence,
-                "analysis_metadata": context
+                "analysis_metadata": context,
             },
         )
 
     def _create_magic_literal_violation(
-        self, file_path: Path, line_num: int, match: re.Match,
-        literal_type: str, code_snippet: str
+        self, file_path: Path, line_num: int, match: re.Match, literal_type: str, code_snippet: str
     ) -> ConnascenceViolation:
         """Create a magic literal violation."""
         return ConnascenceViolation(
@@ -231,7 +222,7 @@ class LanguageStrategy:
             file_path=str(file_path),
             line_number=line_num,
             column=match.start(),
-            description=DETECTION_MESSAGES['magic_literal'].format(value=match.group()),
+            description=DETECTION_MESSAGES["magic_literal"].format(value=match.group()),
             recommendation=f"Extract to a {self.get_constant_recommendation()}",
             code_snippet=code_snippet,
             context={"literal_type": literal_type, "value": match.group()},
@@ -254,8 +245,7 @@ class LanguageStrategy:
         )
 
     def _create_parameter_violation(
-        self, file_path: Path, line_num: int, column: int,
-        param_count: int, code_snippet: str
+        self, file_path: Path, line_num: int, column: int, param_count: int, code_snippet: str
     ) -> ConnascenceViolation:
         """Create a parameter coupling violation."""
         return ConnascenceViolation(
@@ -282,21 +272,17 @@ class JavaScriptStrategy(LanguageStrategy):
         super().__init__("javascript")
 
     def get_magic_literal_patterns(self) -> Dict[str, re.Pattern]:
-        return {
-            'numeric': re.compile(r'\b(?!0\b|1\b|-1\b)\d+\.?\d*\b'),
-            'string': re.compile(r'''["'][^"']{3,}["']''')
-        }
+        return {"numeric": re.compile(r"\b(?!0\b|1\b|-1\b)\d+\.?\d*\b"), "string": re.compile(r"""["'][^"']{3,}["']""")}
 
     def get_function_detector(self) -> re.Pattern:
-        return re.compile(REGEX_PATTERNS['function_def'].replace('def', 'function'))
+        return re.compile(REGEX_PATTERNS["function_def"].replace("def", "function"))
 
     def get_parameter_detector(self) -> re.Pattern:
-        return re.compile(r'(?:function\s+\w+|(?:const|let|var)\s+\w+\s*=\s*(?:function|\(.*?\)\s*=>))\s*\(([^)]+)\)')
+        return re.compile(r"(?:function\s+\w+|(?:const|let|var)\s+\w+\s*=\s*(?:function|\(.*?\)\s*=>))\s*\(([^)]+)\)")
 
     def is_comment_line(self, line: str) -> bool:
         stripped = line.strip()
-        return (stripped.startswith('//') or
-                ('/*' in line and '*/' in line))
+        return stripped.startswith("//") or ("/*" in line and "*/" in line)
 
     def extract_function_name(self, line: str) -> str:
         clean_line = line.strip()
@@ -313,27 +299,22 @@ class CStrategy(LanguageStrategy):
         super().__init__("c")
 
     def get_magic_literal_patterns(self) -> Dict[str, re.Pattern]:
-        return {
-            'numeric': re.compile(r'\b(?!0\b|1\b|-1\b)\d+[UuLl]*\b'),
-            'string': re.compile(r'"[^"]{3,}"')
-        }
+        return {"numeric": re.compile(r"\b(?!0\b|1\b|-1\b)\d+[UuLl]*\b"), "string": re.compile(r'"[^"]{3,}"')}
 
     def get_function_detector(self) -> re.Pattern:
-        return re.compile(r'^\s*(?:static\s+)?(?:inline\s+)?[\w\s\*]+\s+\w+\s*\([^)]*\)\s*\{?')
+        return re.compile(r"^\s*(?:static\s+)?(?:inline\s+)?[\w\s\*]+\s+\w+\s*\([^)]*\)\s*\{?")
 
     def get_parameter_detector(self) -> re.Pattern:
-        return re.compile(r'[\w\s\*]+\s+\w+\s*\(([^)]+)\)')
+        return re.compile(r"[\w\s\*]+\s+\w+\s*\(([^)]+)\)")
 
     def is_comment_line(self, line: str) -> bool:
         stripped = line.strip()
-        return (stripped.startswith('//') or
-                stripped.startswith('#') or
-                stripped.startswith('/*'))
+        return stripped.startswith("//") or stripped.startswith("#") or stripped.startswith("/*")
 
     def extract_function_name(self, line: str) -> str:
         # Extract function name from C function definition
-        match = re.search(r'\w+\s*\(', line)
-        return match.group().replace('(', '') if match else "unknown_function"
+        match = re.search(r"\w+\s*\(", line)
+        return match.group().replace("(", "") if match else "unknown_function"
 
     def get_constant_recommendation(self) -> str:
         return "#define or const"
@@ -346,22 +327,19 @@ class PythonStrategy(LanguageStrategy):
         super().__init__("python")
 
     def get_magic_literal_patterns(self) -> Dict[str, re.Pattern]:
-        return {
-            'numeric': re.compile(r'\b(?!0\b|1\b|-1\b)\d+\.?\d*\b'),
-            'string': re.compile(r'''["'][^"']{3,}["']''')
-        }
+        return {"numeric": re.compile(r"\b(?!0\b|1\b|-1\b)\d+\.?\d*\b"), "string": re.compile(r"""["'][^"']{3,}["']""")}
 
     def get_function_detector(self) -> re.Pattern:
-        return re.compile(r'^\s*def\s+\w+\s*\(')
+        return re.compile(r"^\s*def\s+\w+\s*\(")
 
     def get_parameter_detector(self) -> re.Pattern:
-        return re.compile(r'def\s+\w+\s*\(([^)]+)\)')
+        return re.compile(r"def\s+\w+\s*\(([^)]+)\)")
 
     def is_comment_line(self, line: str) -> bool:
-        return line.strip().startswith('#')
+        return line.strip().startswith("#")
 
     def extract_function_name(self, line: str) -> str:
-        match = re.search(r'def\s+(\w+)', line)
+        match = re.search(r"def\s+(\w+)", line)
         return match.group(1) if match else "unknown_function"
 
     def get_constant_recommendation(self) -> str:

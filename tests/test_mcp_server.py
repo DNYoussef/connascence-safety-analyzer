@@ -23,7 +23,8 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from mcp.server import ConnascenceMCPServer, ConnascenceViolation, MCPConnascenceTool
+from mcp.server import ConnascenceMCPServer, MCPConnascenceTool
+from utils.types import ConnascenceViolation
 
 
 class TestConnascenceMCPServer:

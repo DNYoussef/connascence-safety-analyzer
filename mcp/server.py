@@ -25,13 +25,58 @@ from typing import Any, Dict
 
 sys.path.append(str(Path(__file__).parent.parent))
 
-from analyzer.constants import (
-    get_legacy_policy_name,
-    list_available_policies,
-    resolve_policy_name,
-    validate_policy_name,
-)
-from utils.config_loader import ConnascenceViolation, RateLimiter, load_config_defaults
+# Import canonical types and utilities
+from utils.types import ConnascenceViolation
+from utils.config_loader import RateLimiter, load_config_defaults
+
+try:
+    from analyzer.constants import (
+        get_legacy_policy_name,
+        list_available_policies,
+        resolve_policy_name,
+        validate_policy_name,
+    )
+except ImportError:
+    # Fallback policy functions to avoid circular imports
+    def resolve_policy_name(policy_name: str, warn_deprecated: bool = True) -> str:
+        """Fallback policy name resolver."""
+        policy_mapping = {
+            "nasa_jpl_pot10": "nasa-compliance",
+            "strict-core": "strict", 
+            "default": "standard",
+            "service-defaults": "standard",
+            "experimental": "lenient",
+            "nasa-compliance": "nasa-compliance",
+            "strict": "strict",
+            "standard": "standard", 
+            "lenient": "lenient"
+        }
+        return policy_mapping.get(policy_name, "standard")
+    
+    def get_legacy_policy_name(unified_name: str, integration: str = "cli") -> str:
+        """Fallback legacy policy name getter."""
+        legacy_mapping = {
+            "nasa-compliance": "nasa_jpl_pot10" if integration == "cli" else "nasa-compliance",
+            "strict": "strict-core" if integration == "cli" else "strict",
+            "standard": "default" if integration == "cli" else "service-defaults",
+            "lenient": "experimental" if integration == "cli" else "lenient"
+        }
+        return legacy_mapping.get(unified_name, unified_name)
+    
+    def validate_policy_name(policy_name: str) -> bool:
+        """Fallback policy name validator."""
+        valid_policies = [
+            "nasa-compliance", "strict", "standard", "lenient",
+            "nasa_jpl_pot10", "strict-core", "default", "service-defaults", "experimental"
+        ]
+        return policy_name in valid_policies
+    
+    def list_available_policies(include_legacy: bool = False) -> list:
+        """Fallback policy list."""
+        policies = ["nasa-compliance", "strict", "standard", "lenient"]
+        if include_legacy:
+            policies.extend(["nasa_jpl_pot10", "strict-core", "default", "service-defaults", "experimental"])
+        return policies
 
 try:
     from analyzer.unified_analyzer import ErrorHandler, StandardError

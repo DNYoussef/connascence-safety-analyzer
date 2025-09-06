@@ -43,11 +43,13 @@ class OptimizedASTVisitor(ast.NodeVisitor):
     - Pattern-based pruning
     """
 
-    def __init__(self,
-                 target_patterns: Optional[Set[str]] = None,
-                 skip_patterns: Optional[Set[str]] = None,
-                 enable_caching: bool = True,
-                 max_depth: int = 100):
+    def __init__(
+        self,
+        target_patterns: Optional[Set[str]] = None,
+        skip_patterns: Optional[Set[str]] = None,
+        enable_caching: bool = True,
+        max_depth: int = 100,
+    ):
         """Initialize optimized visitor."""
 
         self.target_patterns = target_patterns or set()
@@ -124,7 +126,9 @@ class OptimizedASTVisitor(ast.NodeVisitor):
             for child in ast.iter_child_nodes(node):
                 yield from self.visit_optimized(child, target_types)
 
-    def find_patterns_fast(self, node: ast.AST, patterns: Dict[str, Callable[[ast.AST], bool]]) -> Dict[str, List[ast.AST]]:
+    def find_patterns_fast(
+        self, node: ast.AST, patterns: Dict[str, Callable[[ast.AST], bool]]
+    ) -> Dict[str, List[ast.AST]]:
         """
         Fast pattern matching using optimized traversal.
         Returns all nodes matching each pattern.
@@ -186,28 +190,45 @@ class OptimizedASTVisitor(ast.NodeVisitor):
 
         # These node types commonly contain other statement/expression types
         container_types = {
-            'Module', 'FunctionDef', 'AsyncFunctionDef', 'ClassDef',
-            'If', 'For', 'AsyncFor', 'While', 'With', 'AsyncWith',
-            'Try', 'ExceptHandler', 'Block'
+            "Module",
+            "FunctionDef",
+            "AsyncFunctionDef",
+            "ClassDef",
+            "If",
+            "For",
+            "AsyncFor",
+            "While",
+            "With",
+            "AsyncWith",
+            "Try",
+            "ExceptHandler",
+            "Block",
         }
 
         # Expression containers
         expr_containers = {
-            'Call', 'Attribute', 'BinOp', 'UnaryOp', 'Compare',
-            'ListComp', 'SetComp', 'DictComp', 'GeneratorExp'
+            "Call",
+            "Attribute",
+            "BinOp",
+            "UnaryOp",
+            "Compare",
+            "ListComp",
+            "SetComp",
+            "DictComp",
+            "GeneratorExp",
         }
 
         if node_type in container_types:
             return True  # Always traverse structural containers
 
-        if node_type in expr_containers and any(t in target_names for t in ['Call', 'Name', 'Attribute', 'Constant']):
+        if node_type in expr_containers and any(t in target_names for t in ["Call", "Name", "Attribute", "Constant"]):
             return True  # Expression containers might have target expressions
 
         # If looking for specific types, check if this node could contain them
-        if 'FunctionDef' in target_names and node_type in {'Module', 'ClassDef'}:
+        if "FunctionDef" in target_names and node_type in {"Module", "ClassDef"}:
             return True
 
-        if 'Name' in target_names:  # Names can be anywhere
+        if "Name" in target_names:  # Names can be anywhere
             return True
 
         return False
@@ -220,9 +241,9 @@ class OptimizedASTVisitor(ast.NodeVisitor):
             key_parts = [type(node).__name__]
 
             # Add location if available
-            if hasattr(node, 'lineno'):
+            if hasattr(node, "lineno"):
                 key_parts.append(f"L{node.lineno}")
-            if hasattr(node, 'col_offset'):
+            if hasattr(node, "col_offset"):
                 key_parts.append(f"C{node.col_offset}")
 
             # Add key attributes based on node type
@@ -240,7 +261,9 @@ class OptimizedASTVisitor(ast.NodeVisitor):
         except Exception:
             return None
 
-    def _group_patterns_by_type(self, patterns: Dict[str, Callable[[ast.AST], bool]]) -> Dict[type, Dict[str, Callable]]:
+    def _group_patterns_by_type(
+        self, patterns: Dict[str, Callable[[ast.AST], bool]]
+    ) -> Dict[type, Dict[str, Callable]]:
         """Group patterns by the AST node types they target."""
 
         # This is a simplified grouping - in practice, you'd analyze the patterns
@@ -250,13 +273,13 @@ class OptimizedASTVisitor(ast.NodeVisitor):
 
         for pattern_name, pattern_func in patterns.items():
             # Heuristic: inspect pattern name to guess target types
-            if 'function' in pattern_name.lower():
+            if "function" in pattern_name.lower():
                 type_groups[ast.FunctionDef][pattern_name] = pattern_func
-            elif 'class' in pattern_name.lower():
+            elif "class" in pattern_name.lower():
                 type_groups[ast.ClassDef][pattern_name] = pattern_func
-            elif 'call' in pattern_name.lower():
+            elif "call" in pattern_name.lower():
                 type_groups[ast.Call][pattern_name] = pattern_func
-            elif 'name' in pattern_name.lower() or 'variable' in pattern_name.lower():
+            elif "name" in pattern_name.lower() or "variable" in pattern_name.lower():
                 type_groups[ast.Name][pattern_name] = pattern_func
             else:
                 # Default: could be any expression or statement
@@ -303,16 +326,15 @@ class ConnascencePatternOptimizer:
         # Convert matches to violation format
         violations = {}
         for connascence_type, matches in pattern_matches.items():
-            violations[connascence_type] = [
-                self._create_violation(match, connascence_type)
-                for match in matches
-            ]
+            violations[connascence_type] = [self._create_violation(match, connascence_type) for match in matches]
 
         analysis_time = time.time() - start_time
         stats = self.visitor.get_statistics()
 
-        logger.debug(f"Fast connascence analysis: {analysis_time*1000:.2f}ms, "
-                    f"{stats.nodes_visited} nodes visited, {stats.nodes_skipped} skipped")
+        logger.debug(
+            f"Fast connascence analysis: {analysis_time*1000:.2f}ms, "
+            f"{stats.nodes_visited} nodes visited, {stats.nodes_skipped} skipped"
+        )
 
         return violations
 
@@ -331,13 +353,15 @@ class ConnascencePatternOptimizer:
                     method_count += 1
 
             if method_count >= method_threshold:
-                god_objects.append({
-                    'type': 'god_object',
-                    'class_name': class_node.name,
-                    'method_count': method_count,
-                    'line_number': getattr(class_node, 'lineno', 0),
-                    'severity': 'high' if method_count > 30 else 'medium'
-                })
+                god_objects.append(
+                    {
+                        "type": "god_object",
+                        "class_name": class_node.name,
+                        "method_count": method_count,
+                        "line_number": getattr(class_node, "lineno", 0),
+                        "severity": "high" if method_count > 30 else "medium",
+                    }
+                )
 
         return god_objects
 
@@ -351,13 +375,15 @@ class ConnascencePatternOptimizer:
             param_count = len(func_node.args.args)
 
             if param_count >= param_threshold:
-                violations.append({
-                    'type': 'parameter_coupling',
-                    'function_name': func_node.name,
-                    'parameter_count': param_count,
-                    'line_number': getattr(func_node, 'lineno', 0),
-                    'severity': 'high' if param_count > 8 else 'medium'
-                })
+                violations.append(
+                    {
+                        "type": "parameter_coupling",
+                        "function_name": func_node.name,
+                        "parameter_count": param_count,
+                        "line_number": getattr(func_node, "lineno", 0),
+                        "severity": "high" if param_count > 8 else "medium",
+                    }
+                )
 
         return violations
 
@@ -377,18 +403,16 @@ class ConnascencePatternOptimizer:
                     return len(value) > 3 and not value.isspace()
             return False
 
-        patterns['connascence_of_literal'] = detect_magic_literals
+        patterns["connascence_of_literal"] = detect_magic_literals
 
         # Connascence of Name (CoN) - Variable naming dependencies
         def detect_name_coupling(node: ast.AST) -> bool:
             if isinstance(node, ast.Name):
                 # Look for variables that might be tightly coupled by name
-                return ('temp' in node.id.lower() or
-                       'tmp' in node.id.lower() or
-                       node.id.lower().startswith('var'))
+                return "temp" in node.id.lower() or "tmp" in node.id.lower() or node.id.lower().startswith("var")
             return False
 
-        patterns['connascence_of_name'] = detect_name_coupling
+        patterns["connascence_of_name"] = detect_name_coupling
 
         # Connascence of Position (CoP) - Parameter order dependencies
         def detect_position_coupling(node: ast.AST) -> bool:
@@ -398,7 +422,7 @@ class ConnascencePatternOptimizer:
                 return positional_args >= 4
             return False
 
-        patterns['connascence_of_position'] = detect_position_coupling
+        patterns["connascence_of_position"] = detect_position_coupling
 
         # Connascence of Algorithm (CoA) - Algorithmic dependencies
         def detect_algorithm_coupling(node: ast.AST) -> bool:
@@ -409,7 +433,7 @@ class ConnascencePatternOptimizer:
                 return body_lines > 50  # Long functions often have algorithmic coupling
             return False
 
-        patterns['connascence_of_algorithm'] = detect_algorithm_coupling
+        patterns["connascence_of_algorithm"] = detect_algorithm_coupling
 
         return patterns
 
@@ -417,12 +441,12 @@ class ConnascencePatternOptimizer:
         """Create violation dictionary from AST node."""
 
         return {
-            'type': connascence_type,
-            'line_number': getattr(node, 'lineno', 0),
-            'column_number': getattr(node, 'col_offset', 0),
-            'severity': self._determine_severity(node, connascence_type),
-            'description': self._generate_description(node, connascence_type),
-            'node_type': type(node).__name__
+            "type": connascence_type,
+            "line_number": getattr(node, "lineno", 0),
+            "column_number": getattr(node, "col_offset", 0),
+            "severity": self._determine_severity(node, connascence_type),
+            "description": self._generate_description(node, connascence_type),
+            "node_type": type(node).__name__,
         }
 
     def _determine_severity(self, node: ast.AST, connascence_type: str) -> str:
@@ -430,22 +454,22 @@ class ConnascencePatternOptimizer:
 
         # Simplified severity mapping
         severity_map = {
-            'connascence_of_literal': 'medium',
-            'connascence_of_name': 'low',
-            'connascence_of_position': 'high',
-            'connascence_of_algorithm': 'high'
+            "connascence_of_literal": "medium",
+            "connascence_of_name": "low",
+            "connascence_of_position": "high",
+            "connascence_of_algorithm": "high",
         }
 
-        return severity_map.get(connascence_type, 'medium')
+        return severity_map.get(connascence_type, "medium")
 
     def _generate_description(self, node: ast.AST, connascence_type: str) -> str:
         """Generate human-readable description of violation."""
 
         descriptions = {
-            'connascence_of_literal': f"Magic literal detected: {getattr(node, 'value', 'unknown')}",
-            'connascence_of_name': f"Name coupling detected: {getattr(node, 'id', 'unknown')}",
-            'connascence_of_position': "Position coupling detected in function call",
-            'connascence_of_algorithm': f"Algorithm coupling detected in function: {getattr(node, 'name', 'unknown')}"
+            "connascence_of_literal": f"Magic literal detected: {getattr(node, 'value', 'unknown')}",
+            "connascence_of_name": f"Name coupling detected: {getattr(node, 'id', 'unknown')}",
+            "connascence_of_position": "Position coupling detected in function call",
+            "connascence_of_algorithm": f"Algorithm coupling detected in function: {getattr(node, 'name', 'unknown')}",
         }
 
         return descriptions.get(connascence_type, f"Connascence violation: {connascence_type}")
@@ -462,10 +486,10 @@ class PerformanceProfiler:
     def start_profile(self, profile_name: str):
         """Start profiling a traversal operation."""
         self.active_profiles[profile_name] = {
-            'start_time': time.time(),
-            'start_memory': self._get_memory_usage(),
-            'nodes_visited': 0,
-            'cache_operations': 0
+            "start_time": time.time(),
+            "start_memory": self._get_memory_usage(),
+            "nodes_visited": 0,
+            "cache_operations": 0,
         }
 
     def end_profile(self, profile_name: str) -> Dict[str, Any]:
@@ -480,11 +504,11 @@ class PerformanceProfiler:
         end_memory = self._get_memory_usage()
 
         result = {
-            'duration_ms': (end_time - profile['start_time']) * 1000,
-            'memory_delta_mb': (end_memory - profile['start_memory']) / (1024 * 1024),
-            'nodes_visited': profile['nodes_visited'],
-            'cache_operations': profile['cache_operations'],
-            'nodes_per_second': profile['nodes_visited'] / max((end_time - profile['start_time']), 0.001)
+            "duration_ms": (end_time - profile["start_time"]) * 1000,
+            "memory_delta_mb": (end_memory - profile["start_memory"]) / (1024 * 1024),
+            "nodes_visited": profile["nodes_visited"],
+            "cache_operations": profile["cache_operations"],
+            "nodes_per_second": profile["nodes_visited"] / max((end_time - profile["start_time"]), 0.001),
         }
 
         self.profiles[profile_name] = result
@@ -496,16 +520,16 @@ class PerformanceProfiler:
         if not self.profiles:
             return {}
 
-        durations = [p['duration_ms'] for p in self.profiles.values()]
-        memory_deltas = [p['memory_delta_mb'] for p in self.profiles.values()]
+        durations = [p["duration_ms"] for p in self.profiles.values()]
+        memory_deltas = [p["memory_delta_mb"] for p in self.profiles.values()]
 
         return {
-            'total_profiles': len(self.profiles),
-            'avg_duration_ms': sum(durations) / len(durations),
-            'max_duration_ms': max(durations),
-            'avg_memory_delta_mb': sum(memory_deltas) / len(memory_deltas),
-            'max_memory_delta_mb': max(memory_deltas),
-            'detailed_profiles': self.profiles
+            "total_profiles": len(self.profiles),
+            "avg_duration_ms": sum(durations) / len(durations),
+            "max_duration_ms": max(durations),
+            "avg_memory_delta_mb": sum(memory_deltas) / len(memory_deltas),
+            "max_memory_delta_mb": max(memory_deltas),
+            "detailed_profiles": self.profiles,
         }
 
     def _get_memory_usage(self) -> int:
@@ -513,10 +537,12 @@ class PerformanceProfiler:
 
         try:
             import psutil
+
             process = psutil.Process()
             return process.memory_info().rss
         except ImportError:
             import resource
+
             return resource.getrusage(resource.RUSAGE_SELF).ru_maxrss * 1024
         except Exception:
             return 0
@@ -539,7 +565,7 @@ def optimize_ast_analysis(ast_tree: ast.AST, target_patterns: Optional[Set[str]]
         Analysis results with performance metrics
     """
 
-    performance_profiler.start_profile('ast_analysis')
+    performance_profiler.start_profile("ast_analysis")
 
     try:
         # Use optimized connascence analysis
@@ -547,20 +573,20 @@ def optimize_ast_analysis(ast_tree: ast.AST, target_patterns: Optional[Set[str]]
 
         # Add god object detection
         god_objects = ast_optimizer.find_god_objects_fast(ast_tree)
-        violations['god_objects'] = god_objects
+        violations["god_objects"] = god_objects
 
         # Add parameter coupling detection
         param_coupling = ast_optimizer.detect_parameter_coupling_fast(ast_tree)
-        violations['parameter_coupling'] = param_coupling
+        violations["parameter_coupling"] = param_coupling
 
         return {
-            'violations': violations,
-            'total_violations': sum(len(v) for v in violations.values()),
-            'performance_optimized': True
+            "violations": violations,
+            "total_violations": sum(len(v) for v in violations.values()),
+            "performance_optimized": True,
         }
 
     finally:
-        performance_stats = performance_profiler.end_profile('ast_analysis')
+        performance_stats = performance_profiler.end_profile("ast_analysis")
         logger.debug(f"AST analysis performance: {performance_stats}")
 
 
@@ -571,13 +597,14 @@ def get_optimization_statistics() -> Dict[str, Any]:
     profiler_summary = performance_profiler.get_profile_summary()
 
     return {
-        'traversal_stats': {
-            'nodes_visited': visitor_stats.nodes_visited,
-            'nodes_skipped': visitor_stats.nodes_skipped,
-            'traversal_time_ms': visitor_stats.traversal_time_ms,
-            'cache_hits': visitor_stats.cache_hits,
-            'cache_misses': visitor_stats.cache_misses,
-            'cache_hit_rate': (visitor_stats.cache_hits / max(visitor_stats.cache_hits + visitor_stats.cache_misses, 1)) * 100
+        "traversal_stats": {
+            "nodes_visited": visitor_stats.nodes_visited,
+            "nodes_skipped": visitor_stats.nodes_skipped,
+            "traversal_time_ms": visitor_stats.traversal_time_ms,
+            "cache_hits": visitor_stats.cache_hits,
+            "cache_misses": visitor_stats.cache_misses,
+            "cache_hit_rate": (visitor_stats.cache_hits / max(visitor_stats.cache_hits + visitor_stats.cache_misses, 1))
+            * 100,
         },
-        'profiler_summary': profiler_summary
+        "profiler_summary": profiler_summary,
     }

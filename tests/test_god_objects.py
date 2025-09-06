@@ -14,7 +14,8 @@ from typing import List
 
 import pytest
 
-from analyzer.check_connascence import ConnascenceAnalyzer, ConnascenceDetector, ConnascenceViolation
+from analyzer.check_connascence import ConnascenceAnalyzer, ConnascenceDetector
+from utils.types import ConnascenceViolation
 from analyzer.constants import GOD_OBJECT_METHOD_THRESHOLD_CI
 
 

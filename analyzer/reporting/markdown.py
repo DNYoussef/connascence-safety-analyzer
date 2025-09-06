@@ -100,12 +100,7 @@ class MarkdownReporter:
         summary_lines = ["## [METRICS] Summary"]
 
         # Severity breakdown with emojis
-        severity_emojis = {
-            "critical": "",
-            "high": "",
-            "medium": "",
-            "low": ""
-        }
+        severity_emojis = {"critical": "", "high": "", "medium": "", "low": ""}
 
         severity_items = []
         for severity in ["critical", "high", "medium", "low"]:
@@ -138,9 +133,7 @@ class MarkdownReporter:
         severity_order = {"critical": 4, "high": 3, "medium": 2, "low": 1}
 
         sorted_violations = sorted(
-            violations,
-            key=lambda v: (severity_order.get(v.severity.value, 0), v.weight),
-            reverse=True
+            violations, key=lambda v: (severity_order.get(v.severity.value, 0), v.weight), reverse=True
         )
 
         lines = ["## [SEARCH] Top Issues"]
@@ -151,19 +144,12 @@ class MarkdownReporter:
                 break
 
             # Format violation
-            severity_emoji = {
-                "critical": "",
-                "high": "",
-                "medium": "",
-                "low": ""
-            }.get(violation.severity.value, "")
+            severity_emoji = {"critical": "", "high": "", "medium": "", "low": ""}.get(violation.severity.value, "")
 
             file_name = Path(violation.file_path).name
             line_ref = f"{file_name}:{violation.line_number}"
 
-            lines.append(
-                f"- {severity_emoji} **{violation.type.value}** in `{line_ref}` - {violation.description}"
-            )
+            lines.append(f"- {severity_emoji} **{violation.type.value}** in `{line_ref}` - {violation.description}")
 
             # Add recommendation if available
             if violation.recommendation:
@@ -192,11 +178,7 @@ class MarkdownReporter:
             by_file[file_path].append(violation)
 
         # Sort files by violation count and weight
-        sorted_files = sorted(
-            by_file.items(),
-            key=lambda x: (len(x[1]), sum(v.weight for v in x[1])),
-            reverse=True
-        )
+        sorted_files = sorted(by_file.items(), key=lambda x: (len(x[1]), sum(v.weight for v in x[1])), reverse=True)
 
         lines = ["## [FOLDER] Files Needing Attention"]
 
@@ -301,7 +283,7 @@ class MarkdownReporter:
             "leads to more maintainable code.",
             "",
             " [Learn More](https://connascence.io) | "
-            "[TECH] [Connascence Analyzer](https://github.com/connascence/connascence-analyzer)"
+            "[TECH] [Connascence Analyzer](https://github.com/connascence/connascence-analyzer)",
         ]
 
         return "\n".join(footer_parts)

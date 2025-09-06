@@ -22,19 +22,8 @@ from typing import Any, Dict, List, Optional
 
 
 # Need to create a mock ConnascenceViolation since analyzer.core was removed
-class ConnascenceViolation:
-    def __init__(self, id=None, rule_id=None, connascence_type=None, severity=None,
-                 description=None, file_path=None, line_number=None, weight=None, type=None, **kwargs):
-        self.id = id
-        self.rule_id = rule_id
-        self.connascence_type = connascence_type or type
-        self.type = type or connascence_type
-        self.severity = severity
-        self.description = description
-        self.file_path = file_path
-        self.line_number = line_number
-        self.weight = weight
-        self.context = kwargs.get('context', {})
+# ConnascenceViolation now available from utils.types
+# This duplicate class has been removed
 
 # Baseline Manager Configuration Constants (CoM Improvement - Pass 2)
 DEFAULT_BASELINE_VERSION = "1.0.0"

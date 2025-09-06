@@ -22,7 +22,7 @@ import ast
 from dataclasses import dataclass
 from typing import List, Optional, Tuple
 
-from .core import ConnascenceViolation
+from utils.types import ConnascenceViolation
 from .patch_api import PatchSuggestion
 
 

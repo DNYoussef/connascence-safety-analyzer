@@ -16,7 +16,8 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from mcp.server import ConnascenceMCPServer, ConnascenceViolation
+from mcp.server import ConnascenceMCPServer
+from utils.types import ConnascenceViolation
 
 
 class TestMCPServerBasic:

@@ -12,13 +12,16 @@ Based on Meilir Page-Jones' connascence theory for reducing coupling.
 import argparse
 import ast
 import collections
-from dataclasses import asdict, dataclass
+from dataclasses import asdict
 import json
 import os
 from pathlib import Path
 import sys
 import time
 from typing import Any
+
+# Import canonical ConnascenceViolation
+from utils.types import ConnascenceViolation
 
 # Import optimization modules for enhanced performance
 try:
@@ -27,20 +30,7 @@ except ImportError:
     OPTIMIZATION_AVAILABLE = False
 
 
-@dataclass
-class ConnascenceViolation:
-    """Represents a detected connascence violation."""
-
-    type: str
-    severity: str  # 'critical', 'high', 'medium', 'low'
-    file_path: str
-    line_number: int
-    column: int
-    description: str
-    recommendation: str
-    code_snippet: str
-    context: dict[str, Any]
-
+# ConnascenceViolation now imported from utils.types
 
 class ConnascenceDetector(ast.NodeVisitor):
     """AST visitor that detects connascence violations."""
@@ -139,6 +129,7 @@ class ConnascenceDetector(ast.NodeVisitor):
         # Use context-aware analysis for more accurate god object detection
         try:
             from .context_analyzer import ContextAnalyzer
+
             context_analyzer = ContextAnalyzer()
             class_analysis = context_analyzer.analyze_class_context(node, self.source_lines, self.file_path)
 
@@ -152,7 +143,11 @@ class ConnascenceDetector(ast.NodeVisitor):
                         line_number=node.lineno,
                         column=node.col_offset,
                         description=f"Class '{node.name}' is a God Object ({class_analysis.context.value} context): {class_analysis.god_object_reason}",
-                        recommendation="; ".join(class_analysis.recommendations) if class_analysis.recommendations else "Apply Single Responsibility Principle",
+                        recommendation=(
+                            "; ".join(class_analysis.recommendations)
+                            if class_analysis.recommendations
+                            else "Apply Single Responsibility Principle"
+                        ),
                         code_snippet=self.get_code_snippet(node),
                         context={
                             "method_count": class_analysis.method_count,
@@ -161,7 +156,7 @@ class ConnascenceDetector(ast.NodeVisitor):
                             "context_type": class_analysis.context.value,
                             "cohesion_score": class_analysis.cohesion_score,
                             "responsibilities": [r.value for r in class_analysis.responsibilities],
-                            "threshold_used": class_analysis.god_object_threshold
+                            "threshold_used": class_analysis.god_object_threshold,
                         },
                     )
                 )
@@ -218,8 +213,8 @@ class ConnascenceDetector(ast.NodeVisitor):
 
             # Create a specialized detector just for this node's context
             detector = MagicLiteralDetector(self.source_lines)
-            detector.current_class = getattr(self, '_current_class', None)
-            detector.current_function = getattr(self, '_current_function', None)
+            detector.current_class = getattr(self, "_current_class", None)
+            detector.current_function = getattr(self, "_current_function", None)
 
             # Check if this constant should be flagged
             if detector._should_ignore_literal(node):
@@ -231,11 +226,9 @@ class ConnascenceDetector(ast.NodeVisitor):
             severity = detector._calculate_severity(context)
 
             if severity > 2.0:  # Only flag if severity is above threshold
-                self.magic_literals.append((node, node.value, {
-                    'context': context,
-                    'severity_score': severity,
-                    'formal_analysis': True
-                }))
+                self.magic_literals.append(
+                    (node, node.value, {"context": context, "severity_score": severity, "formal_analysis": True})
+                )
         except ImportError:
             # Fallback to original simpler detection
             if isinstance(node.value, (int, float)):
@@ -244,7 +237,7 @@ class ConnascenceDetector(ast.NodeVisitor):
                     self.magic_literals.append((node, node.value))
             elif isinstance(node.value, str) and len(node.value) > 1:
                 # Skip obvious safe strings
-                if node.value not in ['', ' ', '\n', '\t', 'utf-8', 'ascii']:
+                if node.value not in ["", " ", "\n", "\t", "utf-8", "ascii"]:
                     self.magic_literals.append((node, node.value))
 
         self.generic_visit(node)
@@ -275,15 +268,15 @@ class ConnascenceDetector(ast.NodeVisitor):
 
         # Additional heuristics for non-magic strings
         # File extensions (common ones)
-        if len(value) <= 5 and value.startswith('.') and value[1:].isalnum():
+        if len(value) <= 5 and value.startswith(".") and value[1:].isalnum():
             return False
 
         # Simple separators or repeated characters
-        if len(set(value)) == 1 and value[0] in ' -_=*#':
+        if len(set(value)) == 1 and value[0] in " -_=*#":
             return False
 
         # URLs and paths (basic check)
-        if any(pattern in value for pattern in ['http://', 'https://', 'file://', '/', '\\']):
+        if any(pattern in value for pattern in ["http://", "https://", "file://", "/", "\\"]):
             # Might be a path or URL - could still be magic, but lower priority
             return True  # But will get lower severity
 
@@ -298,38 +291,38 @@ class ConnascenceDetector(ast.NodeVisitor):
         - Detected context type (time, size, network, etc.)
         - Confidence level
         """
-        context = {'in_conditional': self._is_in_conditional(node)}
+        context = {"in_conditional": self._is_in_conditional(node)}
 
         # Get surrounding code context for analysis
         line_content = self._get_line_content(node)
         variable_context = self._get_variable_context(node)
 
         # Analyze context keywords in surrounding code
-        context_type = self._detect_context_type(line_content + ' ' + variable_context)
+        context_type = self._detect_context_type(line_content + " " + variable_context)
         if context_type:
-            context['detected_context'] = context_type
-            context['confidence'] = 'medium'
+            context["detected_context"] = context_type
+            context["confidence"] = "medium"
 
         # Check for common patterns that suggest non-magic usage
         if self._is_likely_array_index(node):
-            context['likely_array_index'] = True
-            context['severity_modifier'] = 'lower'
+            context["likely_array_index"] = True
+            context["severity_modifier"] = "lower"
 
         if self._is_likely_loop_counter(node):
-            context['likely_loop_counter'] = True
-            context['severity_modifier'] = 'lower'
+            context["likely_loop_counter"] = True
+            context["severity_modifier"] = "lower"
 
         return context
 
     def _analyze_string_context(self, node: ast.AST) -> dict:
         """Analyze context for string literals."""
-        context = {'in_conditional': self._is_in_conditional(node)}
+        context = {"in_conditional": self._is_in_conditional(node)}
 
         # Check if it's a format string, path, or other structured string
         line_content = self._get_line_content(node)
-        if any(pattern in line_content.lower() for pattern in ['format', 'template', 'path', 'url', 'pattern']):
-            context['likely_structured'] = True
-            context['severity_modifier'] = 'lower'
+        if any(pattern in line_content.lower() for pattern in ["format", "template", "path", "url", "pattern"]):
+            context["likely_structured"] = True
+            context["severity_modifier"] = "lower"
 
         return context
 
@@ -352,7 +345,7 @@ class ConnascenceDetector(ast.NodeVisitor):
         variable_context = self._get_variable_context(node).lower()
 
         # Check if any context keywords appear nearby
-        full_context = line_content + ' ' + variable_context
+        full_context = line_content + " " + variable_context
         return any(keyword in full_context for keyword in keywords)
 
     def _detect_context_type(self, text: str) -> str:
@@ -370,7 +363,7 @@ class ConnascenceDetector(ast.NodeVisitor):
 
     def _get_line_content(self, node: ast.AST) -> str:
         """Get the full line content containing the node."""
-        if not hasattr(node, 'lineno') or node.lineno > len(self.source_lines):
+        if not hasattr(node, "lineno") or node.lineno > len(self.source_lines):
             return ""
         return self.source_lines[node.lineno - 1]
 
@@ -382,14 +375,14 @@ class ConnascenceDetector(ast.NodeVisitor):
         line_content = self._get_line_content(node)
 
         # Look for assignment patterns
-        if '=' in line_content and not any(op in line_content for op in ['==', '!=', '<=', '>=']):
+        if "=" in line_content and not any(op in line_content for op in ["==", "!=", "<=", ">="]):
             # Extract variable name before assignment
-            parts = line_content.split('=')[0].strip()
+            parts = line_content.split("=")[0].strip()
             return parts
 
         # Look for function parameter names
         parent_line_start = max(0, node.lineno - 2)
-        parent_lines = ' '.join(self.source_lines[parent_line_start:node.lineno])
+        parent_lines = " ".join(self.source_lines[parent_line_start : node.lineno])
 
         return parent_lines
 
@@ -398,15 +391,14 @@ class ConnascenceDetector(ast.NodeVisitor):
         line_content = self._get_line_content(node)
 
         # Look for bracket patterns suggesting indexing
-        return '[' in line_content and ']' in line_content
+        return "[" in line_content and "]" in line_content
 
     def _is_likely_loop_counter(self, node: ast.AST) -> bool:
         """Check if the number is likely a loop counter or range parameter."""
         line_content = self._get_line_content(node)
 
         # Look for loop-related keywords
-        return any(pattern in line_content for pattern in ['for ', 'range(', 'range ', 'while ', 'enumerate('])
-
+        return any(pattern in line_content for pattern in ["for ", "range(", "range ", "while ", "enumerate("])
 
     def visit_Call(self, node: ast.Call):
         """Detect timing-related calls and other patterns."""
@@ -460,14 +452,14 @@ class ConnascenceDetector(ast.NodeVisitor):
             # Handle different formats: old (node, value), enhanced (node, value, context)
             if len(item) == 2:
                 node, value = item
-                context_info = {'in_conditional': self._is_in_conditional(node)}
+                context_info = {"in_conditional": self._is_in_conditional(node)}
                 severity_score = 3.0  # Default fallback severity
             else:
                 node, value, context_info = item
                 # Check if we have formal grammar analysis context
-                if context_info.get('formal_analysis') and 'context' in context_info:
-                    formal_context = context_info['context']
-                    severity_score = context_info.get('severity_score', 3.0)
+                if context_info.get("formal_analysis") and "context" in context_info:
+                    formal_context = context_info["context"]
+                    severity_score = context_info.get("severity_score", 3.0)
 
                     # Use formal grammar analyzer's severity calculation
                     if severity_score < 2.0:
@@ -502,10 +494,10 @@ class ConnascenceDetector(ast.NodeVisitor):
                                     "is_configuration": formal_context.is_configuration,
                                     "variable_name": formal_context.variable_name,
                                     "function_name": formal_context.function_name,
-                                    "class_name": formal_context.class_name
+                                    "class_name": formal_context.class_name,
                                 },
                                 "severity_score": severity_score,
-                                "analysis_type": "formal_grammar"
+                                "analysis_type": "formal_grammar",
                             },
                         )
                     )
@@ -515,7 +507,7 @@ class ConnascenceDetector(ast.NodeVisitor):
             severity = self._determine_magic_literal_severity(value, context_info)
 
             # Skip very low priority items if they have contextual justification
-            if severity == "informational" and context_info.get('severity_modifier') == 'lower':
+            if severity == "informational" and context_info.get("severity_modifier") == "lower":
                 continue
 
             # Create appropriate description based on context
@@ -534,8 +526,8 @@ class ConnascenceDetector(ast.NodeVisitor):
                     context={
                         "literal_value": value,
                         "analysis_context": context_info,
-                        "in_conditional": context_info.get('in_conditional', False),
-                        "analysis_type": "legacy"
+                        "in_conditional": context_info.get("in_conditional", False),
+                        "analysis_type": "legacy",
                     },
                 )
             )
@@ -578,13 +570,13 @@ class ConnascenceDetector(ast.NodeVisitor):
         - informational: Very low impact cases
         """
         # Start with base severity
-        if context_info.get('in_conditional', False):
+        if context_info.get("in_conditional", False):
             base_severity = "high"  # Conditionals are more critical
         else:
             base_severity = "medium"  # Default for most magic literals
 
         # Apply context-based modifications
-        if context_info.get('severity_modifier') == 'lower':
+        if context_info.get("severity_modifier") == "lower":
             # Lower severity for array indices, loop counters, etc.
             if base_severity == "high":
                 return "medium"
@@ -594,13 +586,13 @@ class ConnascenceDetector(ast.NodeVisitor):
                 return "informational"
 
         # Special handling for contextual numbers
-        if context_info.get('context_type'):
+        if context_info.get("context_type"):
             # Contextual numbers in wrong context get medium severity
             return "medium"
 
         # String-specific severity adjustment
         if isinstance(value, str):
-            if context_info.get('likely_structured', False):
+            if context_info.get("likely_structured", False):
                 return "low" if base_severity != "high" else "medium"
 
             # Very long strings are more likely to be legitimate magic
@@ -617,7 +609,7 @@ class ConnascenceDetector(ast.NodeVisitor):
                 return base_severity
             else:
                 # Small numbers in good context get lower severity
-                if context_info.get('detected_context'):
+                if context_info.get("detected_context"):
                     return "low" if base_severity != "high" else "medium"
 
         return base_severity
@@ -630,37 +622,35 @@ class ConnascenceDetector(ast.NodeVisitor):
             from constants import DETECTION_MESSAGES
 
         # Use contextual message if we have context information
-        if context_info.get('context_type'):
-            return DETECTION_MESSAGES['magic_literal_contextual'].format(
-                value=value,
-                context=context_info['context_type']
+        if context_info.get("context_type"):
+            return DETECTION_MESSAGES["magic_literal_contextual"].format(
+                value=value, context=context_info["context_type"]
             )
-        elif context_info.get('detected_context'):
-            return DETECTION_MESSAGES['magic_literal_contextual'].format(
-                value=value,
-                context=context_info['detected_context'] + " context"
+        elif context_info.get("detected_context"):
+            return DETECTION_MESSAGES["magic_literal_contextual"].format(
+                value=value, context=context_info["detected_context"] + " context"
             )
-        elif context_info.get('severity_modifier') == 'lower':
-            return DETECTION_MESSAGES['magic_literal_safe'].format(value=value)
+        elif context_info.get("severity_modifier") == "lower":
+            return DETECTION_MESSAGES["magic_literal_safe"].format(value=value)
         else:
-            return DETECTION_MESSAGES['magic_literal'].format(value=value)
+            return DETECTION_MESSAGES["magic_literal"].format(value=value)
 
     def _get_magic_literal_recommendation(self, value, context_info: dict) -> str:
         """Get context-appropriate recommendation for magic literal."""
         base_recommendation = "Replace with a well-named constant or configuration value"
 
         # Provide specific recommendations based on context
-        if context_info.get('context_type') == 'network_port':
+        if context_info.get("context_type") == "network_port":
             return "Define as a named constant like 'DEFAULT_PORT' or use configuration"
-        elif context_info.get('context_type') == 'buffer_size':
+        elif context_info.get("context_type") == "buffer_size":
             return "Define as a named constant like 'BUFFER_SIZE' or 'CHUNK_SIZE'"
-        elif context_info.get('detected_context') == 'time':
+        elif context_info.get("detected_context") == "time":
             return "Define as a named constant like 'TIMEOUT_SECONDS' or 'DEFAULT_DELAY'"
-        elif context_info.get('likely_array_index'):
+        elif context_info.get("likely_array_index"):
             return "Consider using meaningful names for array indices or constants for offsets"
-        elif context_info.get('likely_loop_counter'):
+        elif context_info.get("likely_loop_counter"):
             return "Consider using named constants for loop limits or range bounds"
-        elif isinstance(value, str) and context_info.get('likely_structured'):
+        elif isinstance(value, str) and context_info.get("likely_structured"):
             return "Consider using constants for format strings, templates, or structured data"
         else:
             return base_recommendation
@@ -687,7 +677,9 @@ class ConnascenceDetector(ast.NodeVisitor):
         location_str = " in " + ", ".join(location_parts) if location_parts else ""
         context_str = " (" + ", ".join(context_parts) + ")" if context_parts else ""
 
-        severity_desc = "high-priority" if severity_score > 7.0 else "medium-priority" if severity_score > 4.0 else "low-priority"
+        severity_desc = (
+            "high-priority" if severity_score > 7.0 else "medium-priority" if severity_score > 4.0 else "low-priority"
+        )
 
         return f"{severity_desc.title()} magic literal '{value}'{context_str}{location_str}"
 
@@ -706,7 +698,9 @@ class ConnascenceDetector(ast.NodeVisitor):
             recommendations.append("Magic literals in conditionals are error-prone - use named constants")
 
         if formal_context.variable_name:
-            recommendations.append(f"Consider improving variable name '{formal_context.variable_name}' to be more descriptive")
+            recommendations.append(
+                f"Consider improving variable name '{formal_context.variable_name}' to be more descriptive"
+            )
 
         if isinstance(formal_context.literal_value, str):
             recommendations.append("Consider using enums or string constants for better maintainability")
@@ -747,7 +741,7 @@ class ConnascenceAnalyzer:
         path_str = str(file_path)
 
         # Check file extension support
-        supported_extensions = ['.py', '.js', '.mjs', '.c', '.h', '.cpp', '.cxx', '.cc', '.hpp', '.hxx']
+        supported_extensions = [".py", ".js", ".mjs", ".c", ".h", ".cpp", ".cxx", ".cc", ".hpp", ".hxx"]
         if not any(path_str.endswith(ext) for ext in supported_extensions):
             return False
 
@@ -777,6 +771,7 @@ class ConnascenceAnalyzer:
                     return False
             elif "*" in exclusion:
                 import fnmatch
+
                 # Skip test_* pattern for our test_packages directory
                 if exclusion == "test_*" and "test_packages" in path_str.lower():
                     continue
@@ -790,11 +785,11 @@ class ConnascenceAnalyzer:
         """Analyze a single file for connascence violations."""
 
         # Determine file type
-        if str(file_path).endswith('.py'):
+        if str(file_path).endswith(".py"):
             return self._analyze_python_file(file_path)
-        elif str(file_path).endswith(('.js', '.mjs')):
+        elif str(file_path).endswith((".js", ".mjs")):
             return self._analyze_javascript_file(file_path)
-        elif str(file_path).endswith(('.c', '.h', '.cpp', '.cxx', '.cc', '.hpp', '.hxx')):
+        elif str(file_path).endswith((".c", ".h", ".cpp", ".cxx", ".cc", ".hpp", ".hxx")):
             return self._analyze_c_file(file_path)
         else:
             return []  # Unsupported file type
@@ -855,7 +850,7 @@ class ConnascenceAnalyzer:
                         self.violations.extend(file_violations)
                     except Exception as e:
                         # For non-Python files, create a basic violation if parsing fails
-                        if not str(source_file).endswith('.py'):
+                        if not str(source_file).endswith(".py"):
                             print(f"Note: Could not analyze {source_file} - Tree-sitter not fully integrated yet")
                         else:
                             # Re-raise for Python files
@@ -1007,36 +1002,42 @@ class ConnascenceAnalyzer:
     def _detect_js_magic_literals(self, file_path: Path, source_lines: list[str]) -> list[ConnascenceViolation]:
         """Detect magic literals in JavaScript code using consolidated strategy."""
         from .language_strategies import JavaScriptStrategy
+
         strategy = JavaScriptStrategy()
         return strategy.detect_magic_literals(file_path, source_lines)
 
     def _detect_js_god_functions(self, file_path: Path, source_lines: list[str]) -> list[ConnascenceViolation]:
         """Detect god functions in JavaScript using consolidated strategy."""
         from .language_strategies import JavaScriptStrategy
+
         strategy = JavaScriptStrategy()
         return strategy.detect_god_functions(file_path, source_lines)
 
     def _detect_js_parameter_coupling(self, file_path: Path, source_lines: list[str]) -> list[ConnascenceViolation]:
         """Detect parameter coupling in JavaScript using consolidated strategy."""
         from .language_strategies import JavaScriptStrategy
+
         strategy = JavaScriptStrategy()
         return strategy.detect_parameter_coupling(file_path, source_lines)
 
     def _detect_c_magic_literals(self, file_path: Path, source_lines: list[str]) -> list[ConnascenceViolation]:
         """Detect magic literals in C/C++ code using consolidated strategy."""
         from .language_strategies import CStrategy
+
         strategy = CStrategy()
         return strategy.detect_magic_literals(file_path, source_lines)
 
     def _detect_c_god_functions(self, file_path: Path, source_lines: list[str]) -> list[ConnascenceViolation]:
         """Detect god functions in C/C++ using consolidated strategy."""
         from .language_strategies import CStrategy
+
         strategy = CStrategy()
         return strategy.detect_god_functions(file_path, source_lines)
 
     def _detect_c_parameter_coupling(self, file_path: Path, source_lines: list[str]) -> list[ConnascenceViolation]:
         """Detect parameter coupling in C functions using consolidated strategy."""
         from .language_strategies import CStrategy
+
         strategy = CStrategy()
         return strategy.detect_parameter_coupling(file_path, source_lines)
 
@@ -1125,6 +1126,7 @@ Examples:
     # Check for license validation (exit code 4)
     try:
         from licensing import LicenseValidationResult, LicenseValidator
+
         license_validator = LicenseValidator()
         project_root = target_path if target_path.is_dir() else target_path.parent
 

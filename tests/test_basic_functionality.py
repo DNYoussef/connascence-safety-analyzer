@@ -122,7 +122,7 @@ def simple_function():
 
 def test_violation_dataclass():
     """Test ConnascenceViolation dataclass."""
-    from analyzer.check_connascence import ConnascenceViolation
+    from utils.types import ConnascenceViolation
 
     violation = ConnascenceViolation(
         type="test",

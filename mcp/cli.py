@@ -22,7 +22,12 @@ from typing import Any, Dict, Optional
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from mcp.enhanced_server import create_enhanced_mcp_server, get_server_info
+try:
+    from mcp.enhanced_server import create_enhanced_mcp_server, get_server_info
+except ImportError as e:
+    print(f"Error: Failed to import MCP server components: {e}", file=sys.stderr)
+    print("This usually indicates missing dependencies or circular import issues.", file=sys.stderr)
+    sys.exit(1)
 
 logger = logging.getLogger(__name__)
 

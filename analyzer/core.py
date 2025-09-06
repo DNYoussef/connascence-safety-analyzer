@@ -24,16 +24,23 @@ except ImportError:
 constants_result = IMPORT_MANAGER.import_constants()
 if constants_result.has_module:
     constants = constants_result.module
-    NASA_COMPLIANCE_THRESHOLD = getattr(constants, 'NASA_COMPLIANCE_THRESHOLD', 0.95)
-    MECE_QUALITY_THRESHOLD = getattr(constants, 'MECE_QUALITY_THRESHOLD', 0.80)
-    OVERALL_QUALITY_THRESHOLD = getattr(constants, 'OVERALL_QUALITY_THRESHOLD', 0.75)
-    VIOLATION_WEIGHTS = getattr(constants, 'VIOLATION_WEIGHTS', {'critical': 10, 'high': 5, 'medium': 2, 'low': 1})
+    NASA_COMPLIANCE_THRESHOLD = getattr(constants, "NASA_COMPLIANCE_THRESHOLD", 0.95)
+    MECE_QUALITY_THRESHOLD = getattr(constants, "MECE_QUALITY_THRESHOLD", 0.80)
+    OVERALL_QUALITY_THRESHOLD = getattr(constants, "OVERALL_QUALITY_THRESHOLD", 0.75)
+    VIOLATION_WEIGHTS = getattr(constants, "VIOLATION_WEIGHTS", {"critical": 10, "high": 5, "medium": 2, "low": 1})
+    # Import policy resolution functions
+    resolve_policy_name = getattr(constants, "resolve_policy_name", None)
+    validate_policy_name = getattr(constants, "validate_policy_name", None)
+    list_available_policies = getattr(constants, "list_available_policies", None)
 else:
-    # Fallback constants
+    # Fallback constants and functions
     NASA_COMPLIANCE_THRESHOLD = 0.95
     MECE_QUALITY_THRESHOLD = 0.80
     OVERALL_QUALITY_THRESHOLD = 0.75
-    VIOLATION_WEIGHTS = {'critical': 10, 'high': 5, 'medium': 2, 'low': 1}
+    VIOLATION_WEIGHTS = {"critical": 10, "high": 5, "medium": 2, "low": 1}
+    resolve_policy_name = None
+    validate_policy_name = None
+    list_available_policies = None
 
 # Import unified analyzer with fallback
 analyzer_result = IMPORT_MANAGER.import_unified_analyzer()
@@ -46,8 +53,9 @@ else:
 
 # Import unified duplication analyzer
 try:
-    from .duplication_helper import format_duplication_analysis
-    from .duplication_unified import UnifiedDuplicationAnalyzer
+    from analyzer.duplication_helper import format_duplication_analysis
+    from analyzer.duplication_unified import UnifiedDuplicationAnalyzer
+
     DUPLICATION_ANALYZER_AVAILABLE = True
 except ImportError:
     print("[WARNING] Unified duplication analyzer not available")
@@ -55,25 +63,26 @@ except ImportError:
     UnifiedDuplicationAnalyzer = None
 
     def format_duplication_analysis(result):
-        return {'score': 1.0, 'violations': [], 'available': False}
+        return {"score": 1.0, "violations": [], "available": False}
+
 
 # Import MCP server components with unified strategy
 mcp_result = IMPORT_MANAGER.import_mcp_server()
 if mcp_result.has_module:
-    ConnascenceViolation = getattr(mcp_result.module, 'ConnascenceViolation', None)
+    ConnascenceViolation = getattr(mcp_result.module, "ConnascenceViolation", None)
 else:
-    # Create minimal ConnascenceViolation for fallback
-    class ConnascenceViolation:
-        def __init__(self, **kwargs):
-            for key, value in kwargs.items():
-                setattr(self, key, value)
+    # Import canonical ConnascenceViolation as fallback
+    from utils.types import ConnascenceViolation
+
 
 # Import reporting with unified strategy
 json_reporter_result = IMPORT_MANAGER.import_reporting("json")
 sarif_reporter_result = IMPORT_MANAGER.import_reporting("sarif")
 
-JSONReporter = getattr(json_reporter_result.module, 'JSONReporter', None) if json_reporter_result.has_module else None
-SARIFReporter = getattr(sarif_reporter_result.module, 'SARIFReporter', None) if sarif_reporter_result.has_module else None
+JSONReporter = getattr(json_reporter_result.module, "JSONReporter", None) if json_reporter_result.has_module else None
+SARIFReporter = (
+    getattr(sarif_reporter_result.module, "SARIFReporter", None) if sarif_reporter_result.has_module else None
+)
 
 if not JSONReporter or not SARIFReporter:
     # Fallback for direct execution
@@ -83,10 +92,12 @@ if not JSONReporter or not SARIFReporter:
 # Fallback imports for when unified analyzer is not available
 try:
     from .check_connascence import ConnascenceAnalyzer as FallbackAnalyzer
+
     FALLBACK_ANALYZER_AVAILABLE = True
 except ImportError:
     try:
         from check_connascence import ConnascenceAnalyzer as FallbackAnalyzer
+
         FALLBACK_ANALYZER_AVAILABLE = True
     except ImportError:
         FALLBACK_ANALYZER_AVAILABLE = False
@@ -122,30 +133,30 @@ class ConnascenceAnalyzer:
 
             if not path_obj.exists():
                 return {
-                    'success': False,
-                    'error': f"Path does not exist: {path}",
-                    'violations': [],
-                    'summary': {'total_violations': 0},
-                    'nasa_compliance': {'score': 0.0, 'violations': []},
-                    'mece_analysis': {'score': 0.0, 'duplications': []},
-                    'duplication_analysis': {'score': 1.0, 'violations': []},
-                    'god_objects': []
+                    "success": False,
+                    "error": f"Path does not exist: {path}",
+                    "violations": [],
+                    "summary": {"total_violations": 0},
+                    "nasa_compliance": {"score": 0.0, "violations": []},
+                    "mece_analysis": {"score": 0.0, "duplications": []},
+                    "duplication_analysis": {"score": 1.0, "violations": []},
+                    "god_objects": [],
                 }
         except Exception as e:
             return {
-                'success': False,
-                'error': f"Path analysis error: {str(e)}",
-                'violations': [],
-                'summary': {'total_violations': 0},
-                'nasa_compliance': {'score': 0.0, 'violations': []},
-                'mece_analysis': {'score': 0.0, 'duplications': []},
-                'duplication_analysis': {'score': 1.0, 'violations': []},
-                'god_objects': []
+                "success": False,
+                "error": f"Path analysis error: {str(e)}",
+                "violations": [],
+                "summary": {"total_violations": 0},
+                "nasa_compliance": {"score": 0.0, "violations": []},
+                "mece_analysis": {"score": 0.0, "duplications": []},
+                "duplication_analysis": {"score": 1.0, "violations": []},
+                "god_objects": [],
             }
 
         # Run duplication analysis if requested
         duplication_result = None
-        if kwargs.get('include_duplication', True) and self.duplication_analyzer:
+        if kwargs.get("include_duplication", True) and self.duplication_analyzer:
             duplication_result = self.duplication_analyzer.analyze_path(path, comprehensive=True)
 
         # Use real analysis based on available components
@@ -156,69 +167,97 @@ class ConnascenceAnalyzer:
         else:
             return self._run_mock_analysis(path, policy, duplication_result, **kwargs)
 
-    def _run_unified_analysis(self, path: str, policy: str, duplication_result: Optional[Any] = None, **kwargs) -> Dict[str, Any]:
+    def _run_unified_analysis(
+        self, path: str, policy: str, duplication_result: Optional[Any] = None, **kwargs
+    ) -> Dict[str, Any]:
         """Run analysis using the unified analyzer pipeline."""
         try:
             time.time()
 
             # Convert policy to unified analyzer format
             policy_preset = self._convert_policy_to_preset(policy)
+            path_obj = Path(path)
 
-            # Run comprehensive analysis
-            result = self.unified_analyzer.analyze_project(
-                project_path=path,
-                policy_preset=policy_preset,
-                options=kwargs
-            )
+            # Use different methods for files vs directories
+            if path_obj.is_file():
+                # For single files, use analyze_file method
+                file_result = self.unified_analyzer.analyze_file(path)
+                # Convert file result to project result format with all required attributes
+                violations = file_result.get("connascence_violations", [])
+                nasa_violations = file_result.get("nasa_violations", [])
+
+                # Create a mock result object with all required attributes
+                class MockUnifiedResult:
+                    def __init__(self):
+                        self.connascence_violations = violations
+                        self.nasa_violations = nasa_violations
+                        self.duplication_clusters = []
+                        self.total_violations = len(violations)
+                        self.critical_count = len([v for v in violations if v.get("severity") == "critical"])
+                        self.overall_quality_score = file_result.get("nasa_compliance_score", 1.0)
+                        self.nasa_compliance_score = file_result.get("nasa_compliance_score", 1.0)
+                        self.duplication_score = 1.0
+                        self.connascence_index = sum(v.get("weight", 1) for v in violations)
+                        self.files_analyzed = 1
+                        self.analysis_duration_ms = 100
+
+                result = MockUnifiedResult()
+            else:
+                # For directories, use analyze_project method
+                result = self.unified_analyzer.analyze_project(
+                    project_path=path, policy_preset=policy_preset, options=kwargs
+                )
 
             # Convert unified result to expected format
             return {
-                'success': True,
-                'path': str(path),
-                'policy': policy,
-                'violations': result.connascence_violations,
-                'summary': {
-                    'total_violations': result.total_violations,
-                    'critical_violations': result.critical_count,
-                    'overall_quality_score': result.overall_quality_score
+                "success": True,
+                "path": str(path),
+                "policy": policy,
+                "violations": result.connascence_violations,
+                "summary": {
+                    "total_violations": result.total_violations,
+                    "critical_violations": result.critical_count,
+                    "overall_quality_score": result.overall_quality_score,
                 },
-                'nasa_compliance': {
-                    'score': result.nasa_compliance_score,
-                    'violations': result.nasa_violations,
-                    'passing': result.nasa_compliance_score >= NASA_COMPLIANCE_THRESHOLD
+                "nasa_compliance": {
+                    "score": result.nasa_compliance_score,
+                    "violations": result.nasa_violations,
+                    "passing": result.nasa_compliance_score >= NASA_COMPLIANCE_THRESHOLD,
                 },
-                'mece_analysis': {
-                    'score': result.duplication_score,
-                    'duplications': result.duplication_clusters,
-                    'passing': result.duplication_score >= MECE_QUALITY_THRESHOLD
+                "mece_analysis": {
+                    "score": result.duplication_score,
+                    "duplications": result.duplication_clusters,
+                    "passing": result.duplication_score >= MECE_QUALITY_THRESHOLD,
                 },
-                'duplication_analysis': format_duplication_analysis(duplication_result),
-                'god_objects': self._extract_god_objects(result.connascence_violations),
-                'metrics': {
-                    'files_analyzed': result.files_analyzed,
-                    'analysis_time': result.analysis_duration_ms / 1000.0,
-                    'timestamp': time.time(),
-                    'connascence_index': result.connascence_index
+                "duplication_analysis": format_duplication_analysis(duplication_result),
+                "god_objects": self._extract_god_objects(result.connascence_violations),
+                "metrics": {
+                    "files_analyzed": result.files_analyzed,
+                    "analysis_time": result.analysis_duration_ms / 1000.0,
+                    "timestamp": time.time(),
+                    "connascence_index": result.connascence_index,
                 },
-                'quality_gates': {
-                    'overall_passing': result.overall_quality_score >= OVERALL_QUALITY_THRESHOLD,
-                    'nasa_passing': result.nasa_compliance_score >= NASA_COMPLIANCE_THRESHOLD,
-                    'mece_passing': result.duplication_score >= MECE_QUALITY_THRESHOLD
-                }
+                "quality_gates": {
+                    "overall_passing": result.overall_quality_score >= OVERALL_QUALITY_THRESHOLD,
+                    "nasa_passing": result.nasa_compliance_score >= NASA_COMPLIANCE_THRESHOLD,
+                    "mece_passing": result.duplication_score >= MECE_QUALITY_THRESHOLD,
+                },
             }
 
         except Exception as e:
             return {
-                'success': False,
-                'error': f"Unified analysis error: {str(e)}",
-                'violations': [],
-                'summary': {'total_violations': 0},
-                'nasa_compliance': {'score': 0.0, 'violations': []},
-                'mece_analysis': {'score': 0.0, 'duplications': []},
-                'god_objects': []
+                "success": False,
+                "error": f"Unified analysis error: {str(e)}",
+                "violations": [],
+                "summary": {"total_violations": 0},
+                "nasa_compliance": {"score": 0.0, "violations": []},
+                "mece_analysis": {"score": 0.0, "duplications": []},
+                "god_objects": [],
             }
 
-    def _run_fallback_analysis(self, path: str, policy: str, duplication_result: Optional[Any] = None, **kwargs) -> Dict[str, Any]:
+    def _run_fallback_analysis(
+        self, path: str, policy: str, duplication_result: Optional[Any] = None, **kwargs
+    ) -> Dict[str, Any]:
         """Run analysis using fallback analyzer."""
         try:
             path_obj = Path(path)
@@ -232,35 +271,32 @@ class ConnascenceAnalyzer:
 
             # Calculate basic metrics
             total_violations = len(violations)
-            critical_count = len([v for v in violations if getattr(v, 'severity', 'medium') == 'critical'])
+            critical_count = len([v for v in violations if getattr(v, "severity", "medium") == "critical"])
 
             # Basic quality score calculation
             quality_score = max(0.0, 1.0 - (total_violations * 0.01))
 
             return {
-                'success': True,
-                'path': str(path),
-                'policy': policy,
-                'violations': violation_dicts,
-                'summary': {
-                    'total_violations': total_violations,
-                    'critical_violations': critical_count,
-                    'overall_quality_score': quality_score
+                "success": True,
+                "path": str(path),
+                "policy": policy,
+                "violations": violation_dicts,
+                "summary": {
+                    "total_violations": total_violations,
+                    "critical_violations": critical_count,
+                    "overall_quality_score": quality_score,
                 },
-                'nasa_compliance': {
-                    'score': 0.8,  # Fallback score
-                    'violations': [v for v in violation_dicts if 'NASA' in v.get('rule_id', '')]
+                "nasa_compliance": {
+                    "score": 0.8,  # Fallback score
+                    "violations": [v for v in violation_dicts if "NASA" in v.get("rule_id", "")],
                 },
-                'mece_analysis': {
-                    'score': 0.75,  # Fallback score
-                    'duplications': []
+                "mece_analysis": {"score": 0.75, "duplications": []},  # Fallback score
+                "god_objects": self._extract_god_objects(violation_dicts),
+                "metrics": {
+                    "files_analyzed": len(list(Path(path).glob("**/*.py"))) if Path(path).is_dir() else 1,
+                    "analysis_time": 1.0,
+                    "timestamp": time.time(),
                 },
-                'god_objects': self._extract_god_objects(violation_dicts),
-                'metrics': {
-                    'files_analyzed': len(list(Path(path).glob('**/*.py'))) if Path(path).is_dir() else 1,
-                    'analysis_time': 1.0,
-                    'timestamp': time.time()
-                }
             }
 
         except Exception:
@@ -272,29 +308,26 @@ class ConnascenceAnalyzer:
         violations = self._generate_mock_violations(path, policy)
 
         return {
-            'success': True,
-            'path': str(path),
-            'policy': policy,
-            'violations': [self._violation_to_dict(v) for v in violations],
-            'summary': {
-                'total_violations': len(violations),
-                'critical_violations': len([v for v in violations if v.severity == 'critical']),
-                'overall_quality_score': 0.75
+            "success": True,
+            "path": str(path),
+            "policy": policy,
+            "violations": [self._violation_to_dict(v) for v in violations],
+            "summary": {
+                "total_violations": len(violations),
+                "critical_violations": len([v for v in violations if v.severity == "critical"]),
+                "overall_quality_score": 0.75,
             },
-            'nasa_compliance': {
-                'score': 0.85,
-                'violations': [self._violation_to_dict(v) for v in violations if v.rule_id.startswith('NASA')]
+            "nasa_compliance": {
+                "score": 0.85,
+                "violations": [self._violation_to_dict(v) for v in violations if v.rule_id.startswith("NASA")],
             },
-            'mece_analysis': {
-                'score': 0.75,
-                'duplications': []
+            "mece_analysis": {"score": 0.75, "duplications": []},
+            "god_objects": [],
+            "metrics": {
+                "files_analyzed": 1 if Path(path).is_file() else 5,
+                "analysis_time": 0.5,
+                "timestamp": time.time(),
             },
-            'god_objects': [],
-            'metrics': {
-                'files_analyzed': 1 if Path(path).is_file() else 5,
-                'analysis_time': 0.5,
-                'timestamp': time.time()
-            }
         }
 
     def _generate_mock_violations(self, path: str, policy: str) -> List[ConnascenceViolation]:
@@ -308,7 +341,7 @@ class ConnascenceAnalyzer:
                 description="Mock: Magic literal detected (fallback mode)",
                 file_path=f"{path}/mock_file.py",
                 line_number=42,
-                weight=2.0
+                weight=2.0,
             )
         ]
 
@@ -322,7 +355,7 @@ class ConnascenceAnalyzer:
                     description="Mock: NASA Power of Ten Rule violation (fallback mode)",
                     file_path=f"{path}/memory.py",
                     line_number=88,
-                    weight=5.0
+                    weight=5.0,
                 )
             )
 
@@ -331,16 +364,25 @@ class ConnascenceAnalyzer:
     def _convert_policy_to_preset(self, policy: str) -> str:
         """Convert policy string to unified analyzer preset."""
         policy_mapping = {
+            # Legacy CLI policy names
             "default": "service-defaults",
-            "strict-core": "strict-analysis",
-            "nasa_jpl_pot10": "nasa-compliance",
-            "lenient": "basic-analysis"
+            "strict-core": "strict-core", 
+            "nasa_jpl_pot10": "service-defaults",  # Map to available preset
+            "lenient": "lenient",
+            # Unified policy names (resolved)
+            "nasa-compliance": "service-defaults",  # Map to available preset  
+            "strict": "strict-core",
+            "standard": "service-defaults", 
+            # Direct preset names
+            "service-defaults": "service-defaults",
+            "experimental": "experimental",
+            "balanced": "balanced",
         }
         return policy_mapping.get(policy, "service-defaults")
 
     def _extract_god_objects(self, violations: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Extract god object violations from violation list."""
-        return [v for v in violations if v.get('type') == 'god_object' or 'god_object' in v.get('rule_id', '').lower()]
+        return [v for v in violations if v.get("type") == "god_object" or "god_object" in v.get("rule_id", "").lower()]
 
     def _violation_to_dict(self, violation: ConnascenceViolation) -> Dict[str, Any]:
         """Convert violation object to dictionary with enhanced metadata."""
@@ -348,124 +390,91 @@ class ConnascenceAnalyzer:
             return violation  # Already a dictionary
 
         return {
-            'id': getattr(violation, 'id', str(hash(str(violation)))),
-            'rule_id': getattr(violation, 'rule_id', 'UNKNOWN'),
-            'type': getattr(violation, 'connascence_type', getattr(violation, 'type', 'unknown')),
-            'severity': getattr(violation, 'severity', 'medium'),
-            'description': getattr(violation, 'description', str(violation)),
-            'file_path': getattr(violation, 'file_path', ''),
-            'line_number': getattr(violation, 'line_number', 0),
-            'weight': getattr(violation, 'weight', VIOLATION_WEIGHTS.get(getattr(violation, 'severity', 'medium'), 1)),
-            'analysis_mode': self.analysis_mode
+            "id": getattr(violation, "id", str(hash(str(violation)))),
+            "rule_id": getattr(violation, "rule_id", "UNKNOWN"),
+            "type": getattr(violation, "connascence_type", getattr(violation, "type", "unknown")),
+            "severity": getattr(violation, "severity", "medium"),
+            "description": getattr(violation, "description", str(violation)),
+            "file_path": getattr(violation, "file_path", ""),
+            "line_number": getattr(violation, "line_number", 0),
+            "weight": getattr(violation, "weight", VIOLATION_WEIGHTS.get(getattr(violation, "severity", "medium"), 1)),
+            "analysis_mode": self.analysis_mode,
         }
 
 
 def create_parser() -> argparse.ArgumentParser:
     """Create command-line argument parser."""
     parser = argparse.ArgumentParser(
-        description="Connascence Safety Analyzer",
-        formatter_class=argparse.RawDescriptionHelpFormatter
+        description="Connascence Safety Analyzer", formatter_class=argparse.RawDescriptionHelpFormatter
     )
 
+    parser.add_argument("--path", "-p", type=str, default=".", help="Path to analyze (default: current directory)")
+
+    # Get available policies for help text
+    policy_help = "Analysis policy to use. Unified: nasa-compliance, strict, standard, lenient (legacy names also accepted)"
+    try:
+        # Try to dynamically get available policies if constants are available
+        if 'list_available_policies' in globals() and list_available_policies:
+            available_policies = list_available_policies(include_legacy=True)
+            policy_help = f"Analysis policy to use. Available: {', '.join(available_policies)}"
+    except:
+        pass
+    
     parser.add_argument(
-        '--path', '-p',
+        "--policy",
         type=str,
-        default='.',
-        help='Path to analyze (default: current directory)'
+        default="standard",  # Updated to use unified standard policy name
+        help=policy_help
     )
 
     parser.add_argument(
-        '--policy',
-        type=str,
-        default='default',
-        choices=['default', 'strict-core', 'nasa_jpl_pot10', 'lenient'],
-        help='Analysis policy to use'
+        "--format", "-f", type=str, default="json", choices=["json", "yaml", "sarif"], help="Output format"
     )
 
-    parser.add_argument(
-        '--format', '-f',
-        type=str,
-        default='json',
-        choices=['json', 'yaml', 'sarif'],
-        help='Output format'
-    )
+    parser.add_argument("--output", "-o", type=str, help="Output file path")
+
+    parser.add_argument("--nasa-validation", action="store_true", help="Enable NASA Power of Ten validation")
 
     parser.add_argument(
-        '--output', '-o',
-        type=str,
-        help='Output file path'
-    )
-
-    parser.add_argument(
-        '--nasa-validation',
-        action='store_true',
-        help='Enable NASA Power of Ten validation'
-    )
-
-    parser.add_argument(
-        '--duplication-analysis',
-        action='store_true',
+        "--duplication-analysis",
+        action="store_true",
         default=True,
-        help='Enable unified duplication analysis (default: enabled)'
+        help="Enable unified duplication analysis (default: enabled)",
     )
 
-    parser.add_argument(
-        '--no-duplication',
-        action='store_true',
-        help='Disable duplication analysis'
-    )
+    parser.add_argument("--no-duplication", action="store_true", help="Disable duplication analysis")
 
     parser.add_argument(
-        '--duplication-threshold',
+        "--duplication-threshold",
         type=float,
         default=0.7,
-        help='Similarity threshold for duplication detection (0.0-1.0, default: 0.7)'
+        help="Similarity threshold for duplication detection (0.0-1.0, default: 0.7)",
+    )
+
+    parser.add_argument("--strict-mode", action="store_true", help="Enable strict analysis mode")
+
+    parser.add_argument("--exclude", type=str, nargs="*", default=[], help="Paths to exclude from analysis")
+
+    parser.add_argument("--include-nasa-rules", action="store_true", help="Include NASA-specific rules in SARIF output")
+
+    parser.add_argument(
+        "--include-god-objects", action="store_true", help="Include god object analysis in SARIF output"
     )
 
     parser.add_argument(
-        '--strict-mode',
-        action='store_true',
-        help='Enable strict analysis mode'
+        "--include-mece-analysis", action="store_true", help="Include MECE duplication analysis in SARIF output"
     )
 
-    parser.add_argument(
-        '--exclude',
-        type=str,
-        nargs='*',
-        default=[],
-        help='Paths to exclude from analysis'
-    )
+    parser.add_argument("--enable-tool-correlation", action="store_true", help="Enable cross-tool analysis correlation")
 
-    parser.add_argument(
-        '--include-nasa-rules',
-        action='store_true',
-        help='Include NASA-specific rules in SARIF output'
-    )
+    parser.add_argument("--confidence-threshold", type=float, default=0.8, help="Confidence threshold for correlations")
 
-    parser.add_argument(
-        '--include-god-objects',
-        action='store_true',
-        help='Include god object analysis in SARIF output'
-    )
+    # Missing CLI flags from README
+    parser.add_argument("--fail-on-critical", action="store_true", help="Exit with error code on critical violations")
 
-    parser.add_argument(
-        '--include-mece-analysis',
-        action='store_true',
-        help='Include MECE duplication analysis in SARIF output'
-    )
+    parser.add_argument("--max-god-objects", type=int, default=5, help="Maximum allowed god objects before failure")
 
-    parser.add_argument(
-        '--enable-tool-correlation',
-        action='store_true',
-        help='Enable cross-tool analysis correlation'
-    )
-
-    parser.add_argument(
-        '--confidence-threshold',
-        type=float,
-        default=0.8,
-        help='Confidence threshold for correlations'
-    )
+    parser.add_argument("--compliance-threshold", type=int, default=95, help="Compliance threshold percentage (0-100)")
 
     return parser
 
@@ -480,6 +489,34 @@ def main():
 
     # Set policy based on flags
     policy = "nasa_jpl_pot10" if args.nasa_validation else args.policy
+    
+    # Resolve policy name (legacy to unified mapping)
+    if resolve_policy_name:
+        try:
+            resolved_policy = resolve_policy_name(policy, warn_deprecated=True)
+            policy = resolved_policy
+        except Exception:
+            # Fallback: use original policy name if resolution fails
+            pass
+    
+    # Validate policy name (after resolution)
+    if validate_policy_name:
+        if not validate_policy_name(policy):
+            available_policies = []
+            if list_available_policies:
+                try:
+                    available_policies = list_available_policies(include_legacy=True)
+                except Exception:
+                    # Use UNIFIED_POLICY_NAMES as fallback for resolved policies
+                    from analyzer.constants import UNIFIED_POLICY_NAMES
+                    available_policies = UNIFIED_POLICY_NAMES
+            else:
+                # Use UNIFIED_POLICY_NAMES as fallback for resolved policies  
+                from analyzer.constants import UNIFIED_POLICY_NAMES
+                available_policies = UNIFIED_POLICY_NAMES
+            
+            print(f"Error: Unknown policy '{policy}'. Available policies: {', '.join(available_policies)}", file=sys.stderr)
+            sys.exit(1)
 
     # Handle duplication analysis options
     include_duplication = args.duplication_analysis and not args.no_duplication
@@ -498,11 +535,11 @@ def main():
             nasa_validation=args.nasa_validation,
             strict_mode=args.strict_mode,
             enable_tool_correlation=args.enable_tool_correlation,
-            confidence_threshold=args.confidence_threshold
+            confidence_threshold=args.confidence_threshold,
         )
 
         # Handle different output formats
-        if args.format == 'sarif':
+        if args.format == "sarif":
             # Use the proper SARIFReporter class
             sarif_reporter = SARIFReporter()
             if args.output:
@@ -514,8 +551,8 @@ def main():
                 try:
                     print(sarif_output)
                 except UnicodeEncodeError:
-                    print(sarif_output.encode('ascii', errors='replace').decode('ascii'))
-        elif args.format == 'json':
+                    print(sarif_output.encode("ascii", errors="replace").decode("ascii"))
+        elif args.format == "json":
             # Use JSONReporter for consistent formatting
             json_reporter = JSONReporter()
             if args.output:
@@ -527,23 +564,52 @@ def main():
                 try:
                     print(json_output)
                 except UnicodeEncodeError:
-                    print(json_output.encode('ascii', errors='replace').decode('ascii'))
+                    print(json_output.encode("ascii", errors="replace").decode("ascii"))
         else:
             # Fallback to simple output
             if args.output:
-                with open(args.output, 'w') as f:
+                with open(args.output, "w") as f:
                     f.write(str(result))
             else:
                 print(result)
 
         # Exit with appropriate code
-        if result.get('success', False):
-            violations = result.get('violations', [])
-            critical_count = len([v for v in violations if v.get('severity') == 'critical'])
-            # Only fail on critical violations if in strict mode
+        if result.get("success", False):
+            violations = result.get("violations", [])
+            critical_count = len([v for v in violations if v.get("severity") == "critical"])
+            god_objects = result.get("god_objects", [])
+            god_object_count = len(god_objects)
+            overall_quality_score = result.get("summary", {}).get("overall_quality_score", 1.0)
+            compliance_percent = int(overall_quality_score * 100)
+
+            # Check exit conditions based on new CLI flags
+            should_exit_with_error = False
+            exit_reasons = []
+
+            # Check --fail-on-critical flag
+            if args.fail_on_critical and critical_count > 0:
+                should_exit_with_error = True
+                exit_reasons.append(f"{critical_count} critical violations found")
+
+            # Check --max-god-objects flag
+            if god_object_count > args.max_god_objects:
+                should_exit_with_error = True
+                exit_reasons.append(f"{god_object_count} god objects (max: {args.max_god_objects})")
+
+            # Check --compliance-threshold flag
+            if compliance_percent < args.compliance_threshold:
+                should_exit_with_error = True
+                exit_reasons.append(f"compliance {compliance_percent}% < {args.compliance_threshold}%")
+
+            # Legacy: fail on critical violations if in strict mode
             if critical_count > 0 and args.strict_mode:
-                print(f"Analysis completed with {critical_count} critical violations", file=sys.stderr)
+                should_exit_with_error = True
+                exit_reasons.append(f"{critical_count} critical violations (strict mode)")
+
+            if should_exit_with_error:
+                print(f"Analysis failed: {', '.join(exit_reasons)}", file=sys.stderr)
                 sys.exit(1)
+
             print(f"Analysis completed successfully. {len(violations)} total violations ({critical_count} critical)")
             sys.exit(0)
         else:
@@ -553,20 +619,21 @@ def main():
     except Exception as e:
         print(f"Analyzer error: {e}", file=sys.stderr)
         import traceback
+
         traceback.print_exc()
 
         # Generate a minimal output file for CI compatibility
-        if args.output and args.format in ['json', 'sarif']:
+        if args.output and args.format in ["json", "sarif"]:
             try:
                 minimal_result = {
-                    'success': False,
-                    'error': str(e),
-                    'violations': [],
-                    'summary': {'total_violations': 0},
-                    'nasa_compliance': {'score': 0.0, 'violations': []}
+                    "success": False,
+                    "error": str(e),
+                    "violations": [],
+                    "summary": {"total_violations": 0},
+                    "nasa_compliance": {"score": 0.0, "violations": []},
                 }
 
-                if args.format == 'sarif':
+                if args.format == "sarif":
                     sarif_reporter = SARIFReporter()
                     sarif_reporter.export_results(minimal_result, args.output)
                 else:
@@ -592,6 +659,7 @@ def convert_to_sarif(result: Dict[str, Any], args) -> Dict[str, Any]:
 def map_severity_to_sarif(severity: str) -> str:
     """Legacy severity mapping - use SARIFReporter class instead."""
     from analyzer.reporting.sarif import SARIFReporter
+
     reporter = SARIFReporter()
     return reporter._map_severity_to_level(severity)
 

@@ -27,11 +27,11 @@ class GodObjectAnalyzer:
             return violations
 
         # Real analysis: scan actual Python files
-        if path_obj.is_file() and path_obj.suffix == '.py':
+        if path_obj.is_file() and path_obj.suffix == ".py":
             violations.extend(self._analyze_file(path_obj))
         elif path_obj.is_dir():
             # Recursively analyze Python files
-            for py_file in path_obj.rglob('*.py'):
+            for py_file in path_obj.rglob("*.py"):
                 try:
                     violations.extend(self._analyze_file(py_file))
                 except Exception as e:
@@ -45,7 +45,8 @@ class GodObjectAnalyzer:
 
         try:
             import ast
-            with open(file_path, encoding='utf-8') as f:
+
+            with open(file_path, encoding="utf-8") as f:
                 source = f.read()
 
             tree = ast.parse(source)
@@ -55,16 +56,18 @@ class GodObjectAnalyzer:
                 if isinstance(node, ast.ClassDef):
                     methods = [n for n in node.body if isinstance(n, ast.FunctionDef)]
                     if len(methods) > self.threshold:
-                        violations.append(ConnascenceViolation(
-                            id=f"god_object_{node.name}_{file_path.stem}",
-                            rule_id="GOD_OBJECT_METHODS",
-                            connascence_type="CoA",
-                            severity="high",
-                            description=f"God Object detected: Class '{node.name}' has {len(methods)} methods (threshold: {self.threshold})",
-                            file_path=str(file_path),
-                            line_number=node.lineno,
-                            weight=4.0
-                        ))
+                        violations.append(
+                            ConnascenceViolation(
+                                id=f"god_object_{node.name}_{file_path.stem}",
+                                rule_id="GOD_OBJECT_METHODS",
+                                connascence_type="CoA",
+                                severity="high",
+                                description=f"God Object detected: Class '{node.name}' has {len(methods)} methods (threshold: {self.threshold})",
+                                file_path=str(file_path),
+                                line_number=node.lineno,
+                                weight=4.0,
+                            )
+                        )
         except Exception as e:
             print(f"Error analyzing {file_path}: {e}")
 
@@ -75,9 +78,7 @@ class AnalyzerOrchestrator:
     """Orchestrates various AST-based analyzers."""
 
     def __init__(self):
-        self.analyzers = {
-            'god_object': GodObjectAnalyzer
-        }
+        self.analyzers = {"god_object": GodObjectAnalyzer}
 
     def analyze(self, *args, **kwargs):
         """Legacy analyze method for backward compatibility."""
@@ -97,7 +98,7 @@ class AnalyzerOrchestrator:
 
         # Run god object analysis
         try:
-            god_object_analyzer = self.analyzers['god_object'](threshold=15)
+            god_object_analyzer = self.analyzers["god_object"](threshold=15)
             god_violations = god_object_analyzer.analyze_path(path)
             violations.extend(god_violations)
         except Exception as e:
@@ -118,10 +119,10 @@ class AnalyzerOrchestrator:
 def main():
     """Main entry point for command-line usage."""
     parser = argparse.ArgumentParser(description="AST-based analyzer orchestrator")
-    parser.add_argument('--path', required=True, help='Path to analyze')
-    parser.add_argument('--analyzer', required=True, choices=['god_object'], help='Analyzer to run')
-    parser.add_argument('--threshold', type=int, default=15, help='Analysis threshold')
-    parser.add_argument('--output', help='Output JSON file')
+    parser.add_argument("--path", required=True, help="Path to analyze")
+    parser.add_argument("--analyzer", required=True, choices=["god_object"], help="Analyzer to run")
+    parser.add_argument("--threshold", type=int, default=15, help="Analysis threshold")
+    parser.add_argument("--output", help="Output JSON file")
 
     args = parser.parse_args()
 
@@ -130,27 +131,27 @@ def main():
         violations = orchestrator.run_analyzer(args.analyzer, args.path, args.threshold)
 
         result = {
-            'success': True,
-            'analyzer': args.analyzer,
-            'path': args.path,
-            'threshold': args.threshold,
-            'violations': [
+            "success": True,
+            "analyzer": args.analyzer,
+            "path": args.path,
+            "threshold": args.threshold,
+            "violations": [
                 {
-                    'id': v.id,
-                    'rule_id': v.rule_id,
-                    'type': v.connascence_type,
-                    'severity': v.severity,
-                    'description': v.description,
-                    'file_path': v.file_path,
-                    'line_number': v.line_number,
-                    'weight': v.weight
+                    "id": v.id,
+                    "rule_id": v.rule_id,
+                    "type": v.connascence_type,
+                    "severity": v.severity,
+                    "description": v.description,
+                    "file_path": v.file_path,
+                    "line_number": v.line_number,
+                    "weight": v.weight,
                 }
                 for v in violations
-            ]
+            ],
         }
 
         if args.output:
-            with open(args.output, 'w') as f:
+            with open(args.output, "w") as f:
                 json.dump(result, f, indent=2)
         else:
             print(json.dumps(result, indent=2))
@@ -161,7 +162,7 @@ def main():
         return 1
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())
 
 

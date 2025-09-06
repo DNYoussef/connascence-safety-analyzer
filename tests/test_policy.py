@@ -26,7 +26,8 @@ import yaml
 
 from policy.baselines import BaselineManager
 from policy.budgets import BudgetTracker
-from policy.manager import ConnascenceViolation, PolicyManager, ThresholdConfig
+from policy.manager import PolicyManager, ThresholdConfig
+from utils.types import ConnascenceViolation
 
 
 class TestPolicyManager:

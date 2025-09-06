@@ -21,19 +21,8 @@ from .patch_api import PatchSuggestion
 
 
 # Create a mock ConnascenceViolation for testing since analyzer.core was removed
-class ConnascenceViolation:
-    def __init__(self, id=None, rule_id=None, connascence_type=None, severity=None,
-                 description=None, file_path=None, line_number=None, weight=None, type=None, **kwargs):
-        self.id = id
-        self.rule_id = rule_id
-        self.connascence_type = connascence_type or type
-        self.type = type or connascence_type
-        self.severity = severity
-        self.description = description
-        self.file_path = file_path
-        self.line_number = line_number
-        self.weight = weight
-        self.context = kwargs.get('context', {})
+# ConnascenceViolation now imported from utils.types
+from utils.types import ConnascenceViolation
 
 
 @dataclass

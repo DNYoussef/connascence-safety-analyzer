@@ -27,37 +27,41 @@ class CorrelationAnalyzer:
 
         for cluster in duplication_clusters:
             related_violations = []
-            cluster_files = cluster.get('files_involved', [])
+            cluster_files = cluster.get("files_involved", [])
 
             for violation in findings:
-                if violation.get('file_path') in cluster_files:
+                if violation.get("file_path") in cluster_files:
                     related_violations.append(violation)
 
             if related_violations:
-                correlations.append({
-                    'analyzer1': 'connascence',
-                    'analyzer2': 'duplication',
-                    'correlation_score': 0.8,
-                    'common_findings': related_violations,
-                    'description': f"Duplication cluster correlates with {len(related_violations)} connascence violations"
-                })
+                correlations.append(
+                    {
+                        "analyzer1": "connascence",
+                        "analyzer2": "duplication",
+                        "correlation_score": 0.8,
+                        "common_findings": related_violations,
+                        "description": f"Duplication cluster correlates with {len(related_violations)} connascence violations",
+                    }
+                )
 
         return correlations
 
     def _find_nasa_correlations(self, findings, nasa_violations):
         """Find correlations between NASA violations and connascence violations."""
-        nasa_files = {v.get('file_path', '') for v in nasa_violations}
-        connascence_files = {v.get('file_path', '') for v in findings}
+        nasa_files = {v.get("file_path", "") for v in nasa_violations}
+        connascence_files = {v.get("file_path", "") for v in findings}
         common_files = nasa_files.intersection(connascence_files)
 
         if common_files:
-            return [{
-                'analyzer1': 'nasa_compliance',
-                'analyzer2': 'connascence',
-                'correlation_score': len(common_files) / max(len(nasa_files), 1),
-                'common_findings': list(common_files),
-                'description': f"NASA violations and connascence violations overlap in {len(common_files)} files"
-            }]
+            return [
+                {
+                    "analyzer1": "nasa_compliance",
+                    "analyzer2": "connascence",
+                    "correlation_score": len(common_files) / max(len(nasa_files), 1),
+                    "common_findings": list(common_files),
+                    "description": f"NASA violations and connascence violations overlap in {len(common_files)} files",
+                }
+            ]
 
         return []
 
@@ -81,78 +85,86 @@ class RecommendationEngine:
 
     def _generate_critical_recommendations(self, findings):
         """Generate recommendations for critical violations."""
-        critical_violations = [f for f in findings if f.get('severity') == 'critical']
+        critical_violations = [f for f in findings if f.get("severity") == "critical"]
         if not critical_violations:
             return []
 
-        return [{
-            'priority': 'high',
-            'category': 'critical_violations',
-            'description': f'Address {len(critical_violations)} critical connascence violations immediately',
-            'impact': 'High - critical violations can lead to system instability and maintenance issues',
-            'effort': 'high',
-            'suggested_actions': [
-                f"Review and refactor {v.get('file_path', 'unknown')} line {v.get('line_number', 0)}"
-                for v in critical_violations[:3]
-            ]
-        }]
+        return [
+            {
+                "priority": "high",
+                "category": "critical_violations",
+                "description": f"Address {len(critical_violations)} critical connascence violations immediately",
+                "impact": "High - critical violations can lead to system instability and maintenance issues",
+                "effort": "high",
+                "suggested_actions": [
+                    f"Review and refactor {v.get('file_path', 'unknown')} line {v.get('line_number', 0)}"
+                    for v in critical_violations[:3]
+                ],
+            }
+        ]
 
     def _generate_duplication_recommendations(self, duplication_clusters):
         """Generate recommendations for code duplication."""
-        high_similarity_clusters = [c for c in duplication_clusters if c.get('similarity_score', 0) >= 0.9]
+        high_similarity_clusters = [c for c in duplication_clusters if c.get("similarity_score", 0) >= 0.9]
         if not high_similarity_clusters:
             return []
 
-        return [{
-            'priority': 'high',
-            'category': 'code_duplication',
-            'description': f'Eliminate {len(high_similarity_clusters)} high-similarity duplication clusters',
-            'impact': 'High - code duplication increases maintenance burden and bug risk',
-            'effort': 'medium',
-            'suggested_actions': [
-                'Extract common functionality into shared modules',
-                'Use inheritance or composition patterns',
-                'Create utility functions for repeated code blocks'
-            ]
-        }]
+        return [
+            {
+                "priority": "high",
+                "category": "code_duplication",
+                "description": f"Eliminate {len(high_similarity_clusters)} high-similarity duplication clusters",
+                "impact": "High - code duplication increases maintenance burden and bug risk",
+                "effort": "medium",
+                "suggested_actions": [
+                    "Extract common functionality into shared modules",
+                    "Use inheritance or composition patterns",
+                    "Create utility functions for repeated code blocks",
+                ],
+            }
+        ]
 
     def _generate_nasa_recommendations(self, nasa_violations):
         """Generate recommendations for NASA compliance."""
         if not nasa_violations:
             return []
 
-        return [{
-            'priority': 'medium',
-            'category': 'nasa_compliance',
-            'description': f'Improve NASA Power of Ten compliance ({len(nasa_violations)} violations)',
-            'impact': 'Medium - improves code safety and reliability',
-            'effort': 'medium',
-            'suggested_actions': [
-                'Limit function parameters to 6 or fewer',
-                'Reduce cyclomatic complexity',
-                'Limit nesting depth to 4 levels maximum',
-                'Replace goto statements with structured control flow'
-            ]
-        }]
+        return [
+            {
+                "priority": "medium",
+                "category": "nasa_compliance",
+                "description": f"Improve NASA Power of Ten compliance ({len(nasa_violations)} violations)",
+                "impact": "Medium - improves code safety and reliability",
+                "effort": "medium",
+                "suggested_actions": [
+                    "Limit function parameters to 6 or fewer",
+                    "Reduce cyclomatic complexity",
+                    "Limit nesting depth to 4 levels maximum",
+                    "Replace goto statements with structured control flow",
+                ],
+            }
+        ]
 
     def _generate_general_recommendations(self, findings):
         """Generate general quality improvement recommendations."""
         if len(findings) <= 10:
             return []
 
-        return [{
-            'priority': 'medium',
-            'category': 'general_quality',
-            'description': 'Implement systematic code quality improvements',
-            'impact': 'Medium - gradual improvement in overall codebase quality',
-            'effort': 'low',
-            'suggested_actions': [
-                'Establish coding standards and review processes',
-                'Integrate automated quality checks in CI/CD',
-                'Schedule regular refactoring sessions',
-                'Set up code quality metrics tracking'
-            ]
-        }]
+        return [
+            {
+                "priority": "medium",
+                "category": "general_quality",
+                "description": "Implement systematic code quality improvements",
+                "impact": "Medium - gradual improvement in overall codebase quality",
+                "effort": "low",
+                "suggested_actions": [
+                    "Establish coding standards and review processes",
+                    "Integrate automated quality checks in CI/CD",
+                    "Schedule regular refactoring sessions",
+                    "Set up code quality metrics tracking",
+                ],
+            }
+        ]
 
 
 class PythonASTAnalyzer:
@@ -163,7 +175,7 @@ class PythonASTAnalyzer:
         violations = []
 
         try:
-            with open(file_path, encoding='utf-8') as f:
+            with open(file_path, encoding="utf-8") as f:
                 source = f.read()
 
             tree = ast.parse(source)
@@ -195,16 +207,18 @@ class PythonASTAnalyzer:
         methods = [n for n in node.body if isinstance(n, ast.FunctionDef)]
 
         if len(methods) > 18:  # Temporary adjusted God Object threshold for CI/CD
-            violations.append({
-                'id': f'god_object_{node.name}',
-                'rule_id': 'god_object',
-                'type': 'god_object',
-                'severity': 'high',
-                'description': f'God Object detected: Class "{node.name}" has {len(methods)} methods (threshold: 15)',
-                'file_path': str(file_path),
-                'line_number': node.lineno,
-                'weight': 4.0
-            })
+            violations.append(
+                {
+                    "id": f"god_object_{node.name}",
+                    "rule_id": "god_object",
+                    "type": "god_object",
+                    "severity": "high",
+                    "description": f'God Object detected: Class "{node.name}" has {len(methods)} methods (threshold: 15)',
+                    "file_path": str(file_path),
+                    "line_number": node.lineno,
+                    "weight": 4.0,
+                }
+            )
 
         violations.extend(self._analyze_data_class(node, methods, file_path))
         return violations
@@ -215,26 +229,30 @@ class PythonASTAnalyzer:
         instance_vars = set()
 
         for method in methods:
-            if method.name == '__init__':
+            if method.name == "__init__":
                 for stmt in ast.walk(method):
-                    if (isinstance(stmt, ast.Assign) and
-                        stmt.targets and
-                        isinstance(stmt.targets[0], ast.Attribute) and
-                        isinstance(stmt.targets[0].value, ast.Name) and
-                        stmt.targets[0].value.id == 'self'):
+                    if (
+                        isinstance(stmt, ast.Assign)
+                        and stmt.targets
+                        and isinstance(stmt.targets[0], ast.Attribute)
+                        and isinstance(stmt.targets[0].value, ast.Name)
+                        and stmt.targets[0].value.id == "self"
+                    ):
                         instance_vars.add(stmt.targets[0].attr)
 
         if len(instance_vars) > 10:  # Too many instance variables
-            violations.append({
-                'id': f'data_class_{node.name}',
-                'rule_id': 'data_class',
-                'type': 'data_class',
-                'severity': 'medium',
-                'description': f'Data Class smell: Class "{node.name}" has {len(instance_vars)} instance variables (threshold: 10)',
-                'file_path': str(file_path),
-                'line_number': node.lineno,
-                'weight': 2.5
-            })
+            violations.append(
+                {
+                    "id": f"data_class_{node.name}",
+                    "rule_id": "data_class",
+                    "type": "data_class",
+                    "severity": "medium",
+                    "description": f'Data Class smell: Class "{node.name}" has {len(instance_vars)} instance variables (threshold: 10)',
+                    "file_path": str(file_path),
+                    "line_number": node.lineno,
+                    "weight": 2.5,
+                }
+            )
 
         return violations
 
@@ -244,16 +262,18 @@ class PythonASTAnalyzer:
         param_count = len(node.args.args)
 
         if param_count > 6:  # NASA Rule: max 6 parameters
-            violations.append({
-                'id': f'parameter_bomb_{node.name}',
-                'rule_id': 'connascence_of_position',
-                'type': 'CoP',
-                'severity': 'medium',
-                'description': f'Function "{node.name}" has {param_count} parameters (NASA limit: 6)',
-                'file_path': str(file_path),
-                'line_number': node.lineno,
-                'weight': 2.0
-            })
+            violations.append(
+                {
+                    "id": f"parameter_bomb_{node.name}",
+                    "rule_id": "connascence_of_position",
+                    "type": "CoP",
+                    "severity": "medium",
+                    "description": f'Function "{node.name}" has {param_count} parameters (NASA limit: 6)',
+                    "file_path": str(file_path),
+                    "line_number": node.lineno,
+                    "weight": 2.0,
+                }
+            )
 
         violations.extend(self._analyze_function_length(node, file_path))
         violations.extend(self._analyze_function_complexity(node, file_path))
@@ -263,19 +283,21 @@ class PythonASTAnalyzer:
 
     def _analyze_function_length(self, node: ast.FunctionDef, file_path: Path) -> List[Dict[str, Any]]:
         """Check function length."""
-        func_length = getattr(node, 'end_lineno', node.lineno + 10) - node.lineno
+        func_length = getattr(node, "end_lineno", node.lineno + 10) - node.lineno
 
         if func_length > 50:  # Function too long
-            return [{
-                'id': f'long_function_{node.name}',
-                'rule_id': 'long_function',
-                'type': 'long_function',
-                'severity': 'medium',
-                'description': f'Function "{node.name}" is {func_length} lines long (threshold: 50)',
-                'file_path': str(file_path),
-                'line_number': node.lineno,
-                'weight': 2.0
-            }]
+            return [
+                {
+                    "id": f"long_function_{node.name}",
+                    "rule_id": "long_function",
+                    "type": "long_function",
+                    "severity": "medium",
+                    "description": f'Function "{node.name}" is {func_length} lines long (threshold: 50)',
+                    "file_path": str(file_path),
+                    "line_number": node.lineno,
+                    "weight": 2.0,
+                }
+            ]
 
         return []
 
@@ -284,16 +306,18 @@ class PythonASTAnalyzer:
         complexity = self._calculate_complexity(node)
 
         if complexity > 10:  # McCabe complexity threshold
-            return [{
-                'id': f'high_complexity_{node.name}',
-                'rule_id': 'cyclomatic_complexity',
-                'type': 'complexity',
-                'severity': 'high',
-                'description': f'Function "{node.name}" has cyclomatic complexity {complexity} (threshold: 10)',
-                'file_path': str(file_path),
-                'line_number': node.lineno,
-                'weight': 3.0
-            }]
+            return [
+                {
+                    "id": f"high_complexity_{node.name}",
+                    "rule_id": "cyclomatic_complexity",
+                    "type": "complexity",
+                    "severity": "high",
+                    "description": f'Function "{node.name}" has cyclomatic complexity {complexity} (threshold: 10)',
+                    "file_path": str(file_path),
+                    "line_number": node.lineno,
+                    "weight": 3.0,
+                }
+            ]
 
         return []
 
@@ -302,16 +326,18 @@ class PythonASTAnalyzer:
         max_depth = self._calculate_nesting_depth(node)
 
         if max_depth > 4:  # NASA Rule: max 4 levels of nesting
-            return [{
-                'id': f'deep_nesting_{node.name}',
-                'rule_id': 'deep_nesting',
-                'type': 'nesting',
-                'severity': 'high',
-                'description': f'Function "{node.name}" has {max_depth} levels of nesting (NASA limit: 4)',
-                'file_path': str(file_path),
-                'line_number': node.lineno,
-                'weight': 3.0
-            }]
+            return [
+                {
+                    "id": f"deep_nesting_{node.name}",
+                    "rule_id": "deep_nesting",
+                    "type": "nesting",
+                    "severity": "high",
+                    "description": f'Function "{node.name}" has {max_depth} levels of nesting (NASA limit: 4)',
+                    "file_path": str(file_path),
+                    "line_number": node.lineno,
+                    "weight": 3.0,
+                }
+            ]
 
         return []
 
@@ -324,17 +350,21 @@ class PythonASTAnalyzer:
             return []
 
         # Check for configuration values
-        if isinstance(node.value, int) and (node.value > 1000 or node.value in {80, 443, 8080, 3000, 5432, 6379, 27017}):
-            return [{
-                'id': f'config_magic_literal_{node.lineno}',
-                'rule_id': 'connascence_of_meaning',
-                'type': 'CoM',
-                'severity': 'medium',
-                'description': f'Configuration value "{node.value}" should be a named constant (likely port/timeout/limit)',
-                'file_path': str(file_path),
-                'line_number': node.lineno,
-                'weight': 2.0
-            }]
+        if isinstance(node.value, int) and (
+            node.value > 1000 or node.value in {80, 443, 8080, 3000, 5432, 6379, 27017}
+        ):
+            return [
+                {
+                    "id": f"config_magic_literal_{node.lineno}",
+                    "rule_id": "connascence_of_meaning",
+                    "type": "CoM",
+                    "severity": "medium",
+                    "description": f'Configuration value "{node.value}" should be a named constant (likely port/timeout/limit)',
+                    "file_path": str(file_path),
+                    "line_number": node.lineno,
+                    "weight": 2.0,
+                }
+            ]
 
         return []
 
@@ -356,6 +386,7 @@ class PythonASTAnalyzer:
 
     def _calculate_nesting_depth(self, node: ast.FunctionDef) -> int:
         """Calculate maximum nesting depth in a function."""
+
         def depth_visitor(current_node, current_depth=0):
             max_depth = current_depth
 
@@ -393,7 +424,9 @@ class SmartIntegrationEngine:
 
     def generate_intelligent_recommendations(self, findings, duplication_clusters, nasa_violations):
         """Generate intelligent recommendations based on analysis results."""
-        return self.recommendation_engine.generate_intelligent_recommendations(findings, duplication_clusters, nasa_violations)
+        return self.recommendation_engine.generate_intelligent_recommendations(
+            findings, duplication_clusters, nasa_violations
+        )
 
     def comprehensive_analysis(self, path: str, policy: str = "default") -> Dict[str, Any]:
         """Perform comprehensive analysis on real files."""
@@ -408,16 +441,16 @@ class SmartIntegrationEngine:
     def _empty_analysis_result(self) -> Dict[str, Any]:
         """Return empty analysis result for non-existent paths."""
         return {
-            'violations': [],
-            'summary': {'total_violations': 0, 'critical_violations': 0},
-            'nasa_compliance': {'score': 1.0, 'violations': [], 'passing': True}
+            "violations": [],
+            "summary": {"total_violations": 0, "critical_violations": 0},
+            "nasa_compliance": {"score": 1.0, "violations": [], "passing": True},
         }
 
     def _collect_violations(self, path_obj: Path) -> List[Dict[str, Any]]:
         """Collect violations from the given path."""
         violations = []
 
-        if path_obj.is_file() and path_obj.suffix == '.py':
+        if path_obj.is_file() and path_obj.suffix == ".py":
             violations.extend(self.python_analyzer.analyze_file(path_obj))
         elif path_obj.is_dir():
             violations.extend(self._analyze_directory(path_obj))
@@ -428,7 +461,7 @@ class SmartIntegrationEngine:
         """Analyze all Python files in a directory."""
         violations = []
 
-        for py_file in path_obj.rglob('*.py'):
+        for py_file in path_obj.rglob("*.py"):
             try:
                 violations.extend(self.python_analyzer.analyze_file(py_file))
             except Exception as e:
@@ -438,63 +471,60 @@ class SmartIntegrationEngine:
 
     def _build_analysis_result(self, violations: List[Dict[str, Any]]) -> Dict[str, Any]:
         """Build comprehensive analysis result from violations."""
-        critical_violations = len([v for v in violations if v.get('severity') == 'critical'])
+        critical_violations = len([v for v in violations if v.get("severity") == "critical"])
 
         # Generate intelligent analysis
         duplication_clusters = []  # Placeholder for duplication detection
-        nasa_violations = [v for v in violations if 'nasa' in v.get('rule_id', '').lower()]
+        nasa_violations = [v for v in violations if "nasa" in v.get("rule_id", "").lower()]
 
         correlations = self.analyze_correlations(violations, duplication_clusters, nasa_violations)
         recommendations = self.generate_intelligent_recommendations(violations, duplication_clusters, nasa_violations)
 
         return {
-            'violations': violations,
-            'summary': {
-                'total_violations': len(violations),
-                'critical_violations': critical_violations
-            },
-            'nasa_compliance': self._build_nasa_compliance(nasa_violations, critical_violations),
-            'correlations': correlations,
-            'recommendations': recommendations,
-            'quality_trends': self._build_quality_trends(critical_violations),
-            'risk_assessment': self._build_risk_assessment(critical_violations)
+            "violations": violations,
+            "summary": {"total_violations": len(violations), "critical_violations": critical_violations},
+            "nasa_compliance": self._build_nasa_compliance(nasa_violations, critical_violations),
+            "correlations": correlations,
+            "recommendations": recommendations,
+            "quality_trends": self._build_quality_trends(critical_violations),
+            "risk_assessment": self._build_risk_assessment(critical_violations),
         }
 
     def _build_nasa_compliance(self, nasa_violations: List, critical_violations: int) -> Dict[str, Any]:
         """Build NASA compliance section."""
         return {
-            'score': 1.0 if critical_violations == 0 else 0.5,
-            'violations': nasa_violations,
-            'passing': critical_violations == 0
+            "score": 1.0 if critical_violations == 0 else 0.5,
+            "violations": nasa_violations,
+            "passing": critical_violations == 0,
         }
 
     def _build_quality_trends(self, critical_violations: int) -> List[Dict[str, Any]]:
         """Build quality trends section."""
-        return [{
-            'metric': 'overall_quality',
-            'current': 0.8 if critical_violations == 0 else 0.5,
-            'trend': 'stable',
-            'projection': 0.8 if critical_violations == 0 else 0.5
-        }]
+        return [
+            {
+                "metric": "overall_quality",
+                "current": 0.8 if critical_violations == 0 else 0.5,
+                "trend": "stable",
+                "projection": 0.8 if critical_violations == 0 else 0.5,
+            }
+        ]
 
     def _build_risk_assessment(self, critical_violations: int) -> Dict[str, Any]:
         """Build risk assessment section."""
         if critical_violations == 0:
-            return {
-                'overall_risk': 'low',
-                'risk_factors': [],
-                'mitigation': []
-            }
+            return {"overall_risk": "low", "risk_factors": [], "mitigation": []}
 
         return {
-            'overall_risk': 'high' if critical_violations > 5 else 'medium',
-            'risk_factors': [{
-                'factor': 'critical_violations',
-                'impact': critical_violations * 2,
-                'likelihood': 8,
-                'description': f'{critical_violations} critical violations found'
-            }],
-            'mitigation': ['Address critical violations immediately', 'Implement code review process']
+            "overall_risk": "high" if critical_violations > 5 else "medium",
+            "risk_factors": [
+                {
+                    "factor": "critical_violations",
+                    "impact": critical_violations * 2,
+                    "likelihood": 8,
+                    "description": f"{critical_violations} critical violations found",
+                }
+            ],
+            "mitigation": ["Address critical violations immediately", "Implement code review process"],
         }
 
 
