@@ -29,7 +29,7 @@ import subprocess
 from analyzer.ast_engine.core_analyzer import ConnascenceASTAnalyzer
 from policy.budgets import BudgetTracker
 from policy.baselines import BaselineManager
-from reporting.sarif_export import SARIFReporter
+from analyzer.reporting.sarif import SARIFReporter
 from .metrics import DashboardMetrics
 
 

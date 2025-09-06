@@ -38,9 +38,9 @@ import logging
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 # Import existing reporting modules
-from reporting.json_export import JSONReporter
-from reporting.sarif_export import SARIFReporter  
-from reporting.md_summary import MarkdownReporter
+from analyzer.reporting.json import JSONReporter
+from analyzer.reporting.sarif import SARIFReporter  
+from analyzer.reporting.markdown import MarkdownReporter
 
 # Import unified analyzer
 from analyzer.unified_analyzer import UnifiedAnalysisResult

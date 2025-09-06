@@ -154,14 +154,15 @@ python -m analyzer.core --path . --fail-on-critical --max-god-objects 5
 python -m analyzer.core --path . --policy nasa_jpl_pot10 --compliance-threshold 95
 ```
 
-## Enterprise Package
+## Business Package
 
-### Business Documentation
-Complete enterprise sales package with ROI calculations, compliance documentation, and Fortune 500 validation:
+### Complete Sales & Technical Package
+All business materials, pricing tiers, and technical documentation consolidated in one location:
 
 ```bash
-# Access enterprise materials
+# Access all business materials
 ls enterprise-package/
+# ├── tiers/              # All pricing tiers (Startup, Professional, Enterprise)
 # ├── executive/          # Executive summaries and ROI analysis
 # ├── technical/          # Architecture and implementation guides  
 # ├── legal/              # IP ownership and compliance documentation
@@ -169,10 +170,10 @@ ls enterprise-package/
 # └── artifacts/          # Generated reports and metrics
 ```
 
-### Support Tiers
-- **Community**: GitHub issues and documentation
-- **Professional**: Email support + enterprise deployment guides ($50K annually)
-- **Enterprise**: Dedicated technical support + custom features ($150K+ annually)
+### Pricing Tiers
+- **[Startup](enterprise-package/tiers/STARTUP_TIER.md)**: 2-10 developers, $15K-25K (perpetual license)
+- **[Professional](enterprise-package/tiers/PROFESSIONAL_TIER.md)**: 10-50 developers, $50K-75K (team features)
+- **[Enterprise](enterprise-package/tiers/ENTERPRISE_TIER.md)**: 50+ developers, custom pricing (unlimited scale)
 
 ## Documentation & Support
 
@@ -185,13 +186,13 @@ ls enterprise-package/
 ### Community & Support
 - **Issues**: [GitHub Issues](https://github.com/DNYoussef/connascence-safety-analyzer/issues)
 - **Discussions**: Technical questions and feature requests
-- **Enterprise Contact**: See `enterprise-package/executive/` for business inquiries
+- **Business Inquiries**: See `enterprise-package/` for complete sales package and pricing tiers
 
 ## License
 
 **MIT License** - Full commercial use rights included. See [LICENSE](LICENSE) for complete terms.
 
-Enterprise licensing and IP ownership documentation available in `enterprise-package/legal/`.
+Complete business package with all pricing tiers and enterprise licensing available in `enterprise-package/`.
 
 ---
 

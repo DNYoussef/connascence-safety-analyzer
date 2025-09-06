@@ -64,8 +64,8 @@ SARIFReporter = getattr(sarif_reporter_result.module, 'SARIFReporter', None) if 
 
 if not JSONReporter or not SARIFReporter:
     # Fallback for direct execution
-    from reporting.sarif_export import SARIFReporter
-    from reporting.json_export import JSONReporter
+    from analyzer.reporting.sarif import SARIFReporter
+    from analyzer.reporting.json import JSONReporter
 
 # Fallback imports for when unified analyzer is not available
 try:
@@ -538,7 +538,7 @@ def convert_to_sarif(result: Dict[str, Any], args) -> Dict[str, Any]:
 # Deprecated: Use SARIFReporter._map_severity_to_level instead
 def map_severity_to_sarif(severity: str) -> str:
     """Legacy severity mapping - use SARIFReporter class instead."""
-    from reporting.sarif_export import SARIFReporter
+    from analyzer.reporting.sarif import SARIFReporter
     reporter = SARIFReporter()
     return reporter._map_severity_to_level(severity)
 
