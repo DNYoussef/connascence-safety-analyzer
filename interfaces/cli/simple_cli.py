@@ -135,6 +135,34 @@ Examples:
             help="Enable strict analysis mode"
         )
 
+        # Quality control flags (matching full analyzer)
+        parser.add_argument(
+            "--fail-on-critical",
+            action="store_true",
+            help="Exit with error code on critical violations"
+        )
+
+        parser.add_argument(
+            "--max-god-objects",
+            type=int,
+            default=5,
+            help="Maximum allowed god objects before failure"
+        )
+
+        parser.add_argument(
+            "--compliance-threshold",
+            type=int,
+            default=95,
+            help="Compliance threshold percentage (0-100)"
+        )
+
+        parser.add_argument(
+            "--duplication-analysis",
+            action="store_true",
+            default=True,
+            help="Enable duplication analysis (enabled by default)"
+        )
+
         # Compatibility with old interface
         parser.add_argument(
             "--legacy-cli",
@@ -300,7 +328,7 @@ Examples:
         # Detect best policy
         policy = self.detect_policy(args.paths, args.policy)
 
-        # Run analysis
+        # Run analysis using the ConnascenceAnalyzer (which already includes all features)
         if not ANALYZER_AVAILABLE:
             print("Error: Analyzer not available. Run with --legacy-cli", file=sys.stderr)
             return 1
@@ -308,19 +336,18 @@ Examples:
         try:
             analyzer = ConnascenceAnalyzer()
 
-            results = []
-            for path in args.paths:
-                result = analyzer.analyze_path(
-                    path=path,
-                    policy=policy,
-                    strict_mode=args.strict_mode,
-                    exclude=args.exclude.split(",") if args.exclude else [],
-                    nasa_validation=args.nasa_validation
-                )
-                results.append(result)
-
-            # Combine results
-            combined_result = self._combine_results(results)
+            # Use first path for analysis (simple CLI focuses on single path)
+            path = args.paths[0] if args.paths else "."
+            
+            # Run comprehensive analysis with all features included
+            combined_result = analyzer.analyze_path(
+                path=path,
+                policy=policy,
+                strict_mode=args.strict_mode,
+                nasa_validation=args.nasa_validation,
+                include_duplication=True,  # Enable duplication analysis
+                duplication_threshold=0.7,  # Default threshold
+            )
 
             # Apply filtering
             if args.severity:
@@ -332,23 +359,57 @@ Examples:
             # Format output
             output = self.format_output(combined_result, args.format, args.show_source)
 
-            # Write output
+            # Write output with Unicode handling (same as full analyzer)
             if args.output:
                 Path(args.output).write_text(output, encoding="utf-8")
                 print(f"Results written to {args.output}")
             else:
-                print(output)
+                # Handle Unicode characters for Windows terminal (same fix as core analyzer)
+                try:
+                    print(output)
+                except UnicodeEncodeError:
+                    print(output.encode("ascii", errors="replace").decode("ascii"))
 
-            # Determine exit code
+            # Determine exit code using same logic as full analyzer
             violations = combined_result.get("violations", [])
             critical_violations = [v for v in violations if v.get("severity") == "critical"]
-
+            god_objects = combined_result.get("god_objects", [])
+            overall_quality_score = combined_result.get("summary", {}).get("overall_quality_score", 1.0)
+            
+            # Apply exit-zero override first
             if args.exit_zero:
                 return 0
-            elif critical_violations:
+                
+            # Check exit conditions based on CLI flags (same as full analyzer)
+            should_exit_with_error = False
+            exit_reasons = []
+
+            # Check --fail-on-critical flag
+            if args.fail_on_critical and len(critical_violations) > 0:
+                should_exit_with_error = True
+                exit_reasons.append(f"{len(critical_violations)} critical violations found")
+
+            # Check --max-god-objects flag  
+            if len(god_objects) > args.max_god_objects:
+                should_exit_with_error = True
+                exit_reasons.append(f"{len(god_objects)} god objects (max: {args.max_god_objects})")
+
+            # Check --compliance-threshold flag
+            compliance_percent = int(overall_quality_score * 100)
+            if compliance_percent < args.compliance_threshold:
+                should_exit_with_error = True
+                exit_reasons.append(f"compliance {compliance_percent}% < {args.compliance_threshold}%")
+
+            # Legacy: fail on critical violations if in strict mode
+            if len(critical_violations) > 0 and args.strict_mode:
+                should_exit_with_error = True
+                exit_reasons.append(f"{len(critical_violations)} critical violations (strict mode)")
+
+            if should_exit_with_error:
+                print(f"Analysis failed: {', '.join(exit_reasons)}", file=sys.stderr)
                 return 1
-            else:
-                return 0
+
+            return 0
 
         except Exception as e:
             print(f"Analysis failed: {e}", file=sys.stderr)
