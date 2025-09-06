@@ -42,8 +42,28 @@ class LanguageStrategy:
         self.language_name = language_name
     
     def detect_magic_literals(self, file_path: Path, source_lines: List[str]) -> List[ConnascenceViolation]:
-        """Detect magic literals using language-specific patterns."""
+        """Detect magic literals using formal grammar analysis when possible."""
         violations = []
+        
+        # Try to use formal grammar analyzer first
+        try:
+            from .formal_grammar import FormalGrammarEngine
+            engine = FormalGrammarEngine()
+            source_code = '\n'.join(source_lines)
+            matches = engine.analyze_file(str(file_path), source_code, self.language_name)
+            
+            # Convert grammar matches to violations
+            for match in matches:
+                if match.pattern_type.value == "magic_literal":
+                    violations.append(self._create_formal_magic_literal_violation(
+                        file_path, match, source_lines
+                    ))
+            return violations
+        except ImportError:
+            # Fallback to regex-based detection
+            pass
+        
+        # Original regex-based detection as fallback
         patterns = self.get_magic_literal_patterns()
         
         for line_num, line in enumerate(source_lines, 1):
@@ -150,6 +170,52 @@ class LanguageStrategy:
         return any(skip in literal.lower() for skip in ['test', 'error', 'warning', 'debug'])
     
     # Helper methods for creating violations
+    def _create_formal_magic_literal_violation(
+        self, file_path: Path, match, source_lines: List[str]
+    ) -> ConnascenceViolation:
+        """Create a violation from formal grammar match."""
+        # Extract context information from the match
+        context = match.metadata
+        severity_score = context.get('severity_score', 5.0)
+        
+        # Map severity score to severity level
+        if severity_score > 8.0:
+            severity = "high"
+        elif severity_score > 5.0:
+            severity = "medium"
+        elif severity_score > 2.0:
+            severity = "low"
+        else:
+            severity = "informational"
+        
+        # Create enhanced description
+        formal_context = context.get('context')
+        if formal_context:
+            description = f"Context-aware magic literal '{match.text}' in {formal_context.__class__.__name__.lower()}"
+        else:
+            description = f"Magic literal '{match.text}' detected"
+        
+        # Get recommendations from context
+        recommendations = context.get('recommendations', [])
+        recommendation = "; ".join(recommendations) if recommendations else f"Extract to a {self.get_constant_recommendation()}"
+        
+        return ConnascenceViolation(
+            type="connascence_of_meaning",
+            severity=severity,
+            file_path=str(file_path),
+            line_number=match.line_number,
+            column=match.column,
+            description=description,
+            recommendation=recommendation,
+            code_snippet=match.text,
+            context={
+                "literal_value": context.get('value', match.text),
+                "formal_analysis": True,
+                "confidence": match.confidence,
+                "analysis_metadata": context
+            },
+        )
+
     def _create_magic_literal_violation(
         self, file_path: Path, line_num: int, match: re.Match, 
         literal_type: str, code_snippet: str

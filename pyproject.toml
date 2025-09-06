@@ -7,7 +7,7 @@ name = "connascence-analyzer"
 version = "1.0.0"
 description = "Professional connascence analysis for Python codebases"
 authors = [{name = "Connascence Analytics", email = "hello@connascence.io"}]
-license = {text = "MIT"}
+license = {file = "LICENSE"}
 readme = "README.md"
 keywords = ["code-quality", "coupling", "connascence", "static-analysis", "refactoring"]
 classifiers = [
@@ -70,8 +70,8 @@ Changelog = "https://github.com/connascence/connascence-analyzer/blob/main/CHANG
 "Commercial License" = "https://connascence.io/pricing"
 
 [project.scripts]
-connascence = "cli.connascence:main"
-connascence-cli = "cli.connascence:main"
+connascence = "analyzer.core:main"
+connascence-analyzer = "analyzer.core:main"
 
 [project.entry-points."mcp.servers"]
 connascence = "mcp.server:main"
@@ -79,21 +79,7 @@ connascence = "mcp.server:main"
 # Tool Configuration
 
 [tool.setuptools]
-# Complete package list including all migrated components
-packages = [
-    "autofix",
-    "policy", 
-    "grammar",
-    "integrations",
-    "mcp",
-    "cli",
-    "analyzer",
-    "reporting", 
-    "dashboard",
-    "utils",
-    "security",
-    "dogfood"
-]
+packages = ["analyzer", "cli", "autofix", "policy", "mcp", "utils", "security"]
 
 [tool.setuptools.package-data]
 # Include runtime files for all packages
@@ -293,8 +279,45 @@ directory = "htmlcov"
 
 # Connascence-specific configuration
 [tool.connascence]
-# Default policy for self-analysis
-policy_preset = "strict-core"  
+# Analysis policy (default, strict-core, nasa_jpl_pot10, lenient)
+policy = "strict-core"  
+
+# Output format (json, text, sarif)
+format = "json"
+
+# Files and directories to exclude from analysis
+exclude = [
+    "deprecated/*",
+    "experimental/*", 
+    "examples/*",
+    "fixtures/*",
+    "vscode-extension/out/*",
+    "vscode-extension/node_modules/*",
+    "*/node_modules/*",
+    "*/__pycache__/*",
+    "*.pyc"
+]
+
+# Files and directories to include (overrides exclude)
+include = [
+    "src/**/*.py",
+    "connascence/**/*.py"
+]
+
+# Minimum severity level to report (low, medium, high, critical)
+severity = "medium"
+
+# Show source code excerpts for violations
+show-source = true
+
+# Exit with code 0 even if violations found
+exit-zero = false
+
+# Enable strict analysis mode
+strict-mode = false
+
+# Enable NASA Power of Ten validation
+nasa-validation = false
 
 # Custom thresholds for this codebase
 thresholds.max_positional_params = 4  # Slightly relaxed for internal APIs
@@ -307,16 +330,6 @@ budgets.CoP = 5      # Position violations
 budgets.CoA = 3      # Algorithm duplication
 budgets.critical = 0 # No critical issues
 budgets.high = 5     # Max 5 high severity
-
-# Exclusions specific to our project structure
-exclusions = [
-    "deprecated/*",
-    "experimental/*", 
-    "examples/*",
-    "fixtures/*",
-    "vscode-extension/out/*",
-    "vscode-extension/node_modules/*",
-]
 
 # Framework profiles
 frameworks = [

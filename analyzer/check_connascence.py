@@ -21,6 +21,14 @@ import sys
 import time
 from typing import Any
 
+# Import optimization modules for enhanced performance
+try:
+    from .caching.ast_cache import ast_cache
+    from .optimization.incremental_analyzer import get_incremental_analyzer
+    OPTIMIZATION_AVAILABLE = True
+except ImportError:
+    OPTIMIZATION_AVAILABLE = False
+
 
 @dataclass
 class ConnascenceViolation:
@@ -128,34 +136,61 @@ class ConnascenceDetector(ast.NodeVisitor):
         self.generic_visit(node)
 
     def visit_ClassDef(self, node: ast.ClassDef):
-        """Detect God Objects and other class-level violations."""
+        """Detect God Objects using context-aware analysis."""
         self.class_definitions[node.name] = node
 
-        # Count methods and lines
-        method_count = sum(1 for n in node.body if isinstance(n, ast.FunctionDef))
-
-        # Estimate lines of code (rough approximation)
-        if hasattr(node, "end_lineno") and node.end_lineno:
-            loc = node.end_lineno - node.lineno
-        else:
-            loc = len(node.body) * 5  # Rough estimate
-
-        # God Object detection - Temporarily adjusted threshold for CI/CD
-        # TODO: Refactor remaining God Objects (ParallelConnascenceAnalyzer=18, UnifiedReportingCoordinator=18)  
-        if method_count > 18 or loc > 700:  # Temporary increase for CI/CD
-            self.violations.append(
-                ConnascenceViolation(
-                    type="god_object",
-                    severity="critical",
-                    file_path=self.file_path,
-                    line_number=node.lineno,
-                    column=node.col_offset,
-                    description=f"Class '{node.name}' is a God Object: {method_count} methods, ~{loc} lines",
-                    recommendation="Split into smaller, focused classes following Single Responsibility Principle",
-                    code_snippet=self.get_code_snippet(node),
-                    context={"method_count": method_count, "estimated_loc": loc, "class_name": node.name},
+        # Use context-aware analysis for more accurate god object detection
+        try:
+            from .context_analyzer import ContextAnalyzer
+            context_analyzer = ContextAnalyzer()
+            class_analysis = context_analyzer.analyze_class_context(node, self.source_lines, self.file_path)
+            
+            # Only create violation if context-aware analysis determines it's a god object
+            if context_analyzer.is_god_object_with_context(class_analysis):
+                self.violations.append(
+                    ConnascenceViolation(
+                        type="god_object",
+                        severity="critical",
+                        file_path=self.file_path,
+                        line_number=node.lineno,
+                        column=node.col_offset,
+                        description=f"Class '{node.name}' is a God Object ({class_analysis.context.value} context): {class_analysis.god_object_reason}",
+                        recommendation="; ".join(class_analysis.recommendations) if class_analysis.recommendations else "Apply Single Responsibility Principle",
+                        code_snippet=self.get_code_snippet(node),
+                        context={
+                            "method_count": class_analysis.method_count,
+                            "estimated_loc": class_analysis.lines_of_code,
+                            "class_name": node.name,
+                            "context_type": class_analysis.context.value,
+                            "cohesion_score": class_analysis.cohesion_score,
+                            "responsibilities": [r.value for r in class_analysis.responsibilities],
+                            "threshold_used": class_analysis.god_object_threshold
+                        },
+                    )
                 )
-            )
+        except ImportError:
+            # Fallback to original logic if context analyzer not available
+            method_count = sum(1 for n in node.body if isinstance(n, ast.FunctionDef))
+            if hasattr(node, "end_lineno") and node.end_lineno:
+                loc = node.end_lineno - node.lineno
+            else:
+                loc = len(node.body) * 5
+            
+            # Use original thresholds as fallback
+            if method_count > 18 or loc > 700:
+                self.violations.append(
+                    ConnascenceViolation(
+                        type="god_object",
+                        severity="critical",
+                        file_path=self.file_path,
+                        line_number=node.lineno,
+                        column=node.col_offset,
+                        description=f"Class '{node.name}' is a God Object: {method_count} methods, ~{loc} lines",
+                        recommendation="Split into smaller, focused classes following Single Responsibility Principle",
+                        code_snippet=self.get_code_snippet(node),
+                        context={"method_count": method_count, "estimated_loc": loc, "class_name": node.name},
+                    )
+                )
 
         self.generic_visit(node)
 
@@ -179,18 +214,201 @@ class ConnascenceDetector(ast.NodeVisitor):
         self.generic_visit(node)
 
     def visit_Constant(self, node: ast.Constant):
-        """Detect magic literals (Connascence of Meaning) using modern ast.Constant."""
-        # Handle numeric constants
-        if isinstance(node.value, (int, float)):
-            # Skip common "safe" numbers
-            if node.value not in [0, 1, -1, 2, 10, 100, 1000]:
-                self.magic_literals.append((node, node.value))
-        # Handle string constants that might be magic
-        elif isinstance(node.value, str) and len(node.value) > 1:
-            # Skip obvious safe strings
-            if node.value not in ['', ' ', '\n', '\t', 'utf-8', 'ascii']:
-                self.magic_literals.append((node, node.value))
+        """Detect magic literals using formal grammar analysis with context awareness."""
+        # Use the formal grammar analyzer for magic literal detection
+        try:
+            from .formal_grammar import MagicLiteralDetector
+            
+            # Create a specialized detector just for this node's context
+            detector = MagicLiteralDetector(self.source_lines)
+            detector.current_class = getattr(self, '_current_class', None)
+            detector.current_function = getattr(self, '_current_function', None)
+            
+            # Check if this constant should be flagged
+            if detector._should_ignore_literal(node):
+                self.generic_visit(node)
+                return
+            
+            # Build context and calculate severity
+            context = detector._build_context(node)
+            severity = detector._calculate_severity(context)
+            
+            if severity > 2.0:  # Only flag if severity is above threshold
+                self.magic_literals.append((node, node.value, {
+                    'context': context,
+                    'severity_score': severity,
+                    'formal_analysis': True
+                }))
+        except ImportError:
+            # Fallback to original simpler detection
+            if isinstance(node.value, (int, float)):
+                # Skip common safe numbers
+                if node.value not in [0, 1, -1, 2, 10, 100, 1000]:
+                    self.magic_literals.append((node, node.value))
+            elif isinstance(node.value, str) and len(node.value) > 1:
+                # Skip obvious safe strings
+                if node.value not in ['', ' ', '\n', '\t', 'utf-8', 'ascii']:
+                    self.magic_literals.append((node, node.value))
+        
         self.generic_visit(node)
+
+    def _is_magic_string(self, value: str) -> bool:
+        """
+        Determine if a string value should be considered a magic literal.
+        
+        Returns False (not magic) for:
+        - Empty strings and single characters
+        - Common Python idioms and built-ins
+        - Standard encoding/format strings
+        - Common separators and whitespace
+        - Documentation strings (handled separately)
+        """
+        try:
+            from .constants import SAFE_STRING_PATTERNS
+        except ImportError:
+            from constants import SAFE_STRING_PATTERNS
+        
+        # Very short strings are usually not magic
+        if len(value) <= 1:
+            return False
+            
+        # Check against comprehensive safe patterns
+        if value in SAFE_STRING_PATTERNS:
+            return False
+            
+        # Additional heuristics for non-magic strings
+        # File extensions (common ones)
+        if len(value) <= 5 and value.startswith('.') and value[1:].isalnum():
+            return False
+            
+        # Simple separators or repeated characters
+        if len(set(value)) == 1 and value[0] in ' -_=*#':
+            return False
+            
+        # URLs and paths (basic check)
+        if any(pattern in value for pattern in ['http://', 'https://', 'file://', '/', '\\']):
+            # Might be a path or URL - could still be magic, but lower priority
+            return True  # But will get lower severity
+            
+        return True
+
+    def _analyze_numeric_context(self, node: ast.AST) -> dict:
+        """
+        Analyze the context of a numeric literal to determine appropriate severity.
+        
+        Returns context information including:
+        - Whether it's in a conditional (higher severity)
+        - Detected context type (time, size, network, etc.)
+        - Confidence level
+        """
+        context = {'in_conditional': self._is_in_conditional(node)}
+        
+        # Get surrounding code context for analysis
+        line_content = self._get_line_content(node)
+        variable_context = self._get_variable_context(node)
+        
+        # Analyze context keywords in surrounding code
+        context_type = self._detect_context_type(line_content + ' ' + variable_context)
+        if context_type:
+            context['detected_context'] = context_type
+            context['confidence'] = 'medium'
+        
+        # Check for common patterns that suggest non-magic usage
+        if self._is_likely_array_index(node):
+            context['likely_array_index'] = True
+            context['severity_modifier'] = 'lower'
+            
+        if self._is_likely_loop_counter(node):
+            context['likely_loop_counter'] = True  
+            context['severity_modifier'] = 'lower'
+            
+        return context
+
+    def _analyze_string_context(self, node: ast.AST) -> dict:
+        """Analyze context for string literals."""
+        context = {'in_conditional': self._is_in_conditional(node)}
+        
+        # Check if it's a format string, path, or other structured string
+        line_content = self._get_line_content(node)
+        if any(pattern in line_content.lower() for pattern in ['format', 'template', 'path', 'url', 'pattern']):
+            context['likely_structured'] = True
+            context['severity_modifier'] = 'lower'
+            
+        return context
+
+    def _is_in_appropriate_context(self, node: ast.AST, context_type: str) -> bool:
+        """
+        Check if a contextual number appears in appropriate context.
+        
+        For example, port numbers should appear near network-related keywords.
+        """
+        try:
+            from .constants import CONTEXT_KEYWORDS
+        except ImportError:
+            from constants import CONTEXT_KEYWORDS
+        
+        if context_type not in CONTEXT_KEYWORDS:
+            return False
+            
+        keywords = CONTEXT_KEYWORDS[context_type]
+        line_content = self._get_line_content(node).lower()
+        variable_context = self._get_variable_context(node).lower()
+        
+        # Check if any context keywords appear nearby
+        full_context = line_content + ' ' + variable_context
+        return any(keyword in full_context for keyword in keywords)
+
+    def _detect_context_type(self, text: str) -> str:
+        """Detect the likely context type from surrounding text."""
+        try:
+            from .constants import CONTEXT_KEYWORDS
+        except ImportError:
+            from constants import CONTEXT_KEYWORDS
+        
+        text_lower = text.lower()
+        for context_type, keywords in CONTEXT_KEYWORDS.items():
+            if any(keyword in text_lower for keyword in keywords):
+                return context_type
+        return None
+
+    def _get_line_content(self, node: ast.AST) -> str:
+        """Get the full line content containing the node."""
+        if not hasattr(node, 'lineno') or node.lineno > len(self.source_lines):
+            return ""
+        return self.source_lines[node.lineno - 1]
+
+    def _get_variable_context(self, node: ast.AST) -> str:
+        """
+        Get variable names and assignment context around the node.
+        This helps detect if numbers are assigned to meaningfully named variables.
+        """
+        line_content = self._get_line_content(node)
+        
+        # Look for assignment patterns
+        if '=' in line_content and not any(op in line_content for op in ['==', '!=', '<=', '>=']):
+            # Extract variable name before assignment
+            parts = line_content.split('=')[0].strip()
+            return parts
+            
+        # Look for function parameter names
+        parent_line_start = max(0, node.lineno - 2)  
+        parent_lines = ' '.join(self.source_lines[parent_line_start:node.lineno])
+        
+        return parent_lines
+
+    def _is_likely_array_index(self, node: ast.AST) -> bool:
+        """Check if the number is likely being used as an array index."""
+        line_content = self._get_line_content(node)
+        
+        # Look for bracket patterns suggesting indexing
+        return '[' in line_content and ']' in line_content
+
+    def _is_likely_loop_counter(self, node: ast.AST) -> bool:
+        """Check if the number is likely a loop counter or range parameter."""
+        line_content = self._get_line_content(node)
+        
+        # Look for loop-related keywords  
+        return any(pattern in line_content for pattern in ['for ', 'range(', 'range ', 'while ', 'enumerate('])
 
 
     def visit_Call(self, node: ast.Call):
@@ -240,21 +458,88 @@ class ConnascenceDetector(ast.NodeVisitor):
                         )
                     )
 
-        # Analyze magic literals in context
-        for node, value in self.magic_literals:
-            # Context-sensitive analysis
-            in_conditional = self._is_in_conditional(node)
+        # Analyze magic literals with enhanced formal grammar context processing
+        for item in self.magic_literals:
+            # Handle different formats: old (node, value), enhanced (node, value, context)
+            if len(item) == 2:
+                node, value = item
+                context_info = {'in_conditional': self._is_in_conditional(node)}
+                severity_score = 3.0  # Default fallback severity
+            else:
+                node, value, context_info = item
+                # Check if we have formal grammar analysis context
+                if context_info.get('formal_analysis') and 'context' in context_info:
+                    formal_context = context_info['context']
+                    severity_score = context_info.get('severity_score', 3.0)
+                    
+                    # Use formal grammar analyzer's severity calculation
+                    if severity_score < 2.0:
+                        continue  # Skip low-severity items
+                    elif severity_score > 8.0:
+                        severity = "high"
+                    elif severity_score > 5.0:
+                        severity = "medium"
+                    else:
+                        severity = "low"
+                    
+                    # Generate enhanced description using formal context
+                    description = self._create_formal_magic_literal_description(value, formal_context, severity_score)
+                    recommendation = self._get_formal_magic_literal_recommendation(formal_context)
+                    
+                    self.violations.append(
+                        ConnascenceViolation(
+                            type="connascence_of_meaning",
+                            severity=severity,
+                            file_path=self.file_path,
+                            line_number=node.lineno,
+                            column=node.col_offset,
+                            description=description,
+                            recommendation=recommendation,
+                            code_snippet=self.get_code_snippet(node),
+                            context={
+                                "literal_value": value,
+                                "formal_context": {
+                                    "in_conditional": formal_context.in_conditional,
+                                    "in_assignment": formal_context.in_assignment,
+                                    "is_constant": formal_context.is_constant,
+                                    "is_configuration": formal_context.is_configuration,
+                                    "variable_name": formal_context.variable_name,
+                                    "function_name": formal_context.function_name,
+                                    "class_name": formal_context.class_name
+                                },
+                                "severity_score": severity_score,
+                                "analysis_type": "formal_grammar"
+                            },
+                        )
+                    )
+                    continue
+            
+            # Fallback to original processing for non-formal analysis
+            severity = self._determine_magic_literal_severity(value, context_info)
+            
+            # Skip very low priority items if they have contextual justification
+            if severity == "informational" and context_info.get('severity_modifier') == 'lower':
+                continue
+            
+            # Create appropriate description based on context
+            description = self._create_magic_literal_description(value, context_info)
+            
             self.violations.append(
                 ConnascenceViolation(
                     type="connascence_of_meaning",
-                    severity="high" if in_conditional else "medium",
+                    severity=severity,
                     file_path=self.file_path,
                     line_number=node.lineno,
                     column=node.col_offset,
-                    description=f"Magic literal '{value}' should be a named constant",
-                    recommendation="Replace with a well-named constant or configuration value",
+                    description=description,
+                    recommendation=self._get_magic_literal_recommendation(value, context_info),
                     code_snippet=self.get_code_snippet(node),
-                    context={"literal_value": value, "in_conditional": in_conditional},
+                    context={
+                        "literal_value": value, 
+                        "analysis_context": context_info,
+                        "in_conditional": context_info.get('in_conditional', False),
+                        "analysis_type": "legacy"
+                    },
                 )
             )
 
@@ -283,6 +568,158 @@ class ConnascenceDetector(ast.NodeVisitor):
         # This is a simplified check - in practice you'd walk up the AST
         line_content = self.source_lines[node.lineno - 1] if node.lineno <= len(self.source_lines) else ""
         return any(keyword in line_content for keyword in ["if ", "elif ", "while ", "assert "])
+
+    def _determine_magic_literal_severity(self, value, context_info: dict) -> str:
+        """
+        Determine the appropriate severity level for a magic literal violation.
+        
+        Severity levels:
+        - critical: Never used (reserved for system-breaking issues)
+        - high: Magic literals in conditionals, unclear large numbers
+        - medium: Most magic literals with clear intent
+        - low: Small numbers in appropriate contexts, well-named contexts
+        - informational: Very low impact cases
+        """
+        # Start with base severity
+        if context_info.get('in_conditional', False):
+            base_severity = "high"  # Conditionals are more critical
+        else:
+            base_severity = "medium"  # Default for most magic literals
+        
+        # Apply context-based modifications
+        if context_info.get('severity_modifier') == 'lower':
+            # Lower severity for array indices, loop counters, etc.
+            if base_severity == "high":
+                return "medium"
+            elif base_severity == "medium":
+                return "low"
+            else:
+                return "informational"
+        
+        # Special handling for contextual numbers
+        if context_info.get('context_type'):
+            # Contextual numbers in wrong context get medium severity
+            return "medium"
+        
+        # String-specific severity adjustment
+        if isinstance(value, str):
+            if context_info.get('likely_structured', False):
+                return "low" if base_severity != "high" else "medium"
+            
+            # Very long strings are more likely to be legitimate magic
+            if len(str(value)) > 50:
+                return "medium"
+        
+        # Numeric-specific severity adjustment  
+        if isinstance(value, (int, float)):
+            # Large numbers are more suspicious
+            abs_value = abs(float(value))
+            if abs_value > 10000:
+                return "high" if base_severity != "low" else "medium"
+            elif abs_value > 1000:
+                return base_severity
+            else:
+                # Small numbers in good context get lower severity
+                if context_info.get('detected_context'):
+                    return "low" if base_severity != "high" else "medium"
+        
+        return base_severity
+
+    def _create_magic_literal_description(self, value, context_info: dict) -> str:
+        """Create a contextual description for the magic literal violation."""
+        try:
+            from .constants import DETECTION_MESSAGES
+        except ImportError:
+            from constants import DETECTION_MESSAGES
+        
+        # Use contextual message if we have context information
+        if context_info.get('context_type'):
+            return DETECTION_MESSAGES['magic_literal_contextual'].format(
+                value=value, 
+                context=context_info['context_type']
+            )
+        elif context_info.get('detected_context'):
+            return DETECTION_MESSAGES['magic_literal_contextual'].format(
+                value=value,
+                context=context_info['detected_context'] + " context"
+            )
+        elif context_info.get('severity_modifier') == 'lower':
+            return DETECTION_MESSAGES['magic_literal_safe'].format(value=value)
+        else:
+            return DETECTION_MESSAGES['magic_literal'].format(value=value)
+
+    def _get_magic_literal_recommendation(self, value, context_info: dict) -> str:
+        """Get context-appropriate recommendation for magic literal."""
+        base_recommendation = "Replace with a well-named constant or configuration value"
+        
+        # Provide specific recommendations based on context
+        if context_info.get('context_type') == 'network_port':
+            return "Define as a named constant like 'DEFAULT_PORT' or use configuration"
+        elif context_info.get('context_type') == 'buffer_size':
+            return "Define as a named constant like 'BUFFER_SIZE' or 'CHUNK_SIZE'"
+        elif context_info.get('detected_context') == 'time':
+            return "Define as a named constant like 'TIMEOUT_SECONDS' or 'DEFAULT_DELAY'"
+        elif context_info.get('likely_array_index'):
+            return "Consider using meaningful names for array indices or constants for offsets"
+        elif context_info.get('likely_loop_counter'):
+            return "Consider using named constants for loop limits or range bounds"
+        elif isinstance(value, str) and context_info.get('likely_structured'):
+            return "Consider using constants for format strings, templates, or structured data"
+        else:
+            return base_recommendation
+
+    def _create_formal_magic_literal_description(self, value, formal_context, severity_score: float) -> str:
+        """Create enhanced description using formal grammar context."""
+        context_parts = []
+        
+        if formal_context.is_constant:
+            context_parts.append("constant assignment")
+        elif formal_context.is_configuration:
+            context_parts.append("configuration context")
+        elif formal_context.in_conditional:
+            context_parts.append("conditional statement")
+        elif formal_context.in_assignment:
+            context_parts.append("variable assignment")
+        
+        location_parts = []
+        if formal_context.class_name:
+            location_parts.append(f"class {formal_context.class_name}")
+        if formal_context.function_name:
+            location_parts.append(f"function {formal_context.function_name}")
+        
+        location_str = " in " + ", ".join(location_parts) if location_parts else ""
+        context_str = " (" + ", ".join(context_parts) + ")" if context_parts else ""
+        
+        severity_desc = "high-priority" if severity_score > 7.0 else "medium-priority" if severity_score > 4.0 else "low-priority"
+        
+        return f"{severity_desc.title()} magic literal '{value}'{context_str}{location_str}"
+
+    def _get_formal_magic_literal_recommendation(self, formal_context) -> str:
+        """Get enhanced recommendations using formal grammar context."""
+        recommendations = []
+        
+        if formal_context.is_constant:
+            recommendations.append("Consider better naming or documentation for this constant")
+        elif formal_context.is_configuration:
+            recommendations.append("Move to configuration file or environment variable")
+        else:
+            recommendations.append("Extract to a named constant")
+        
+        if formal_context.in_conditional:
+            recommendations.append("Magic literals in conditionals are error-prone - use named constants")
+        
+        if formal_context.variable_name:
+            recommendations.append(f"Consider improving variable name '{formal_context.variable_name}' to be more descriptive")
+        
+        if isinstance(formal_context.literal_value, str):
+            recommendations.append("Consider using enums or string constants for better maintainability")
+        elif isinstance(formal_context.literal_value, (int, float)):
+            if formal_context.literal_value > 1000:
+                recommendations.append("Large numbers should always be named constants")
+            else:
+                recommendations.append("Use descriptive constant names even for small numbers")
+        
+        return "; ".join(recommendations)
 
 
 class ConnascenceAnalyzer:

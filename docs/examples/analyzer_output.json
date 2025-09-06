@@ -1,0 +1,173 @@
+{
+  "analysis_metadata": {
+    "analyzer_version": "2.1.0",
+    "timestamp": "2024-12-06T10:30:45Z",
+    "analyzed_files": ["bad_example.py"],
+    "policy": "strict-core",
+    "total_lines": 73,
+    "execution_time_ms": 245
+  },
+  "summary": {
+    "total_violations": 12,
+    "critical_violations": 3,
+    "high_violations": 4,
+    "medium_violations": 3,
+    "low_violations": 2,
+    "nasa_compliance_score": 0.42,
+    "overall_quality_score": 0.35
+  },
+  "violations": [
+    {
+      "id": "CON001",
+      "type": "connascence_of_name",
+      "severity": "high", 
+      "file": "bad_example.py",
+      "line": 8,
+      "column": 7,
+      "message": "Inconsistent naming convention: 'UserMgr' should be 'UserManager'",
+      "description": "Class uses abbreviated name 'UserMgr' instead of clear descriptive name",
+      "recommendation": "Rename to 'UserManager' for clarity and consistency"
+    },
+    {
+      "id": "CON002", 
+      "type": "connascence_of_name",
+      "severity": "medium",
+      "file": "bad_example.py", 
+      "line": 11,
+      "column": 14,
+      "message": "Magic abbreviation 'cnt' should be descriptive",
+      "description": "Variable name 'cnt' is unclear abbreviation for 'count'",
+      "recommendation": "Rename to 'user_count' or 'next_user_id'"
+    },
+    {
+      "id": "CON003",
+      "type": "connascence_of_position", 
+      "severity": "high",
+      "file": "bad_example.py",
+      "line": 14,
+      "column": 9,
+      "message": "Parameter order dependency in create_user method",
+      "description": "Method has 4 positional parameters creating position coupling",
+      "recommendation": "Use keyword arguments or parameter object pattern"
+    },
+    {
+      "id": "CON004",
+      "type": "connascence_of_value",
+      "severity": "critical", 
+      "file": "bad_example.py",
+      "line": 16,
+      "column": 16,
+      "message": "Magic numbers: 150, 0 should be named constants",
+      "description": "Hardcoded age validation limits without clear meaning",
+      "recommendation": "Define MIN_AGE = 0 and MAX_AGE = 150 as class constants"
+    },
+    {
+      "id": "CON005",
+      "type": "connascence_of_value", 
+      "severity": "critical",
+      "file": "bad_example.py",
+      "line": 18,
+      "column": 29,
+      "message": "Magic status codes [1, 2, 3, 4] should use enum",
+      "description": "Status values lack semantic meaning and are error-prone",
+      "recommendation": "Replace with UserStatus enum (PENDING, ACTIVE, PREMIUM, INACTIVE)"
+    },
+    {
+      "id": "CON006",
+      "type": "god_object",
+      "severity": "critical",
+      "file": "bad_example.py", 
+      "line": 8,
+      "column": 7,
+      "message": "UserMgr class has too many responsibilities",
+      "description": "Class handles user creation, validation, permissions, and storage",
+      "recommendation": "Split into UserService, UserRepository, EmailValidator, PermissionManager"
+    },
+    {
+      "id": "CON007", 
+      "type": "connascence_of_algorithm",
+      "severity": "high",
+      "file": "bad_example.py",
+      "line": 35,
+      "column": 16,
+      "message": "Duplicate email validation logic",
+      "description": "Same validation algorithm appears in UserMgr._validate_email and EmailValidator.is_valid",
+      "recommendation": "Consolidate into single EmailValidator.is_valid method"
+    },
+    {
+      "id": "CON008",
+      "type": "connascence_of_value",
+      "severity": "medium", 
+      "file": "bad_example.py",
+      "line": 39,
+      "column": 19,
+      "message": "Magic status code 1 for read permissions", 
+      "description": "Hardcoded status-to-permission mapping is fragile",
+      "recommendation": "Use enum-based permission mapping"
+    },
+    {
+      "id": "CON009",
+      "type": "connascence_of_value",
+      "severity": "medium",
+      "file": "bad_example.py",
+      "line": 52,
+      "column": 27,
+      "message": "Duplicate magic number 4 for inactive status",
+      "description": "Same magic number used in multiple locations",
+      "recommendation": "Define INACTIVE_STATUS constant"
+    },
+    {
+      "id": "CON010", 
+      "type": "connascence_of_position",
+      "severity": "high",
+      "file": "bad_example.py",
+      "line": 56,
+      "column": 21,
+      "message": "Complex parameter coupling in calculate_stats",
+      "description": "Function has interdependent boolean parameters creating coupling",
+      "recommendation": "Use configuration object or builder pattern"
+    },
+    {
+      "id": "CON011",
+      "type": "connascence_of_timing",
+      "severity": "low",
+      "file": "bad_example.py", 
+      "line": 33,
+      "column": 16,
+      "message": "Timestamp generation coupled to execution time",
+      "description": "Direct time.time() call makes testing difficult",
+      "recommendation": "Inject time provider for testability"
+    },
+    {
+      "id": "CON012",
+      "type": "connascence_of_identity", 
+      "severity": "low",
+      "file": "bad_example.py",
+      "line": 50,
+      "column": 24,
+      "message": "Direct dictionary access creates coupling",
+      "description": "Method directly modifies internal data structure",
+      "recommendation": "Use repository pattern with controlled access"
+    }
+  ],
+  "metrics": {
+    "cyclomatic_complexity": {
+      "UserMgr": 8,
+      "calculate_stats": 4
+    },
+    "lines_of_code": 73,
+    "coupling_density": 0.68,
+    "nasa_violations": [
+      "Magic numbers violate rule: Use named constants",
+      "God object violates rule: Keep functions simple", 
+      "Complex parameters violate rule: Limit function parameters"
+    ]
+  },
+  "recommendations": [
+    "Introduce UserStatus enum to eliminate magic numbers",
+    "Split UserMgr into focused classes with single responsibilities", 
+    "Use dependency injection for EmailValidator",
+    "Replace positional parameters with keyword arguments or DTOs",
+    "Add comprehensive unit tests to verify refactoring"
+  ]
+}

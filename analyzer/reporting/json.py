@@ -165,6 +165,32 @@ class JSONReporter:
         
         return compliance
     
+    def export_results(self, result, output_file=None):
+        """Export results to JSON format.
+        
+        Args:
+            result: Analysis result (dict or AnalysisResult object)
+            output_file: Optional file path to write to. If None, returns JSON string.
+            
+        Returns:
+            JSON string if output_file is None, otherwise writes to file.
+        """
+        # Handle both dict and AnalysisResult objects
+        if isinstance(result, dict):
+            # Convert dict result to JSON-friendly format
+            json_output = json.dumps(result, indent=2, sort_keys=True, ensure_ascii=False)
+        else:
+            # Use the generate method for AnalysisResult objects
+            json_output = self.generate(result)
+        
+        if output_file:
+            # Write to file
+            with open(output_file, 'w', encoding='utf-8') as f:
+                f.write(json_output)
+        else:
+            # Return JSON string
+            return json_output
+
     def _get_top_problematic_files(self, violations: List[Violation]) -> List[Dict[str, Any]]:
         """Get files with the most violations, sorted by weight."""
         file_stats = {}

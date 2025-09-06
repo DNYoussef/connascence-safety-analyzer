@@ -414,9 +414,92 @@ ERROR_CORRELATION_CONTEXT = {
 # =========================================================
 # Common magic strings and numbers that appear throughout the codebase
 
+# SMART MAGIC NUMBER DETECTION
+# ============================
+# Comprehensive whitelist of numbers that should NOT be flagged as magic
+# Based on common programming patterns and practical usage
+
+# Safe Numbers - Never flag these as magic
+SAFE_NUMBERS = frozenset([
+    # Basic mathematical constants
+    0, 1, -1, 2, 3, 5, 8,
+    
+    # Common programming numbers
+    10, 12, 16, 24, 32, 60, 100, 128, 256, 512, 1000, 1024,
+    
+    # Time-related constants (common patterns)
+    7, 30, 31, 365,  # days
+    3600, 86400,     # seconds
+    
+    # Common technical constants
+    64, 255, 4096,   # byte/memory related
+    8080, 3000,      # common dev ports (but still contextual)
+    
+    # HTTP status codes (common ones)
+    200, 201, 204, 301, 302, 400, 401, 403, 404, 409, 422, 500, 501, 502, 503
+])
+
+# Contextual Numbers - Flag these only in certain contexts
+CONTEXTUAL_NUMBERS = {
+    # Network/Port numbers - flag if not in obvious network context
+    8080: 'network_port',
+    3000: 'network_port', 
+    443: 'network_port',
+    80: 'network_port',
+    
+    # Large buffer sizes - flag if not in buffer/size context
+    4096: 'buffer_size',
+    8192: 'buffer_size',
+    
+    # Specific HTTP codes - less common ones
+    418: 'http_status',  # I'm a teapot
+    429: 'http_status',  # Rate limited
+}
+
+# Safe String Patterns - Common Python/programming idioms
+SAFE_STRING_PATTERNS = frozenset([
+    # Python built-ins and idioms
+    '__main__', '__name__', '__file__', '__path__', '__version__',
+    '__init__', '__str__', '__repr__', '__len__', '__iter__',
+    '__enter__', '__exit__', '__call__', '__getitem__', '__setitem__',
+    
+    # Common encoding/format strings
+    'utf-8', 'utf8', 'ascii', 'latin-1', 'iso-8859-1',
+    'json', 'xml', 'yaml', 'csv', 'txt', 'html', 'css', 'js',
+    
+    # HTTP methods and headers
+    'GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS',
+    'Content-Type', 'Authorization', 'Accept', 'User-Agent',
+    
+    # Common log levels
+    'DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL',
+    'debug', 'info', 'warning', 'error', 'critical',
+    
+    # Single characters and whitespace
+    '', ' ', '\n', '\t', '\r', '\r\n',
+    
+    # Common separators
+    ',', ';', ':', '|', '-', '_', '/', '\\',
+    
+    # Boolean-like strings
+    'true', 'false', 'True', 'False', 'yes', 'no', 'on', 'off'
+])
+
+# Context Keywords - Help determine if a number is in appropriate context
+CONTEXT_KEYWORDS = {
+    'network': ['port', 'host', 'server', 'client', 'socket', 'tcp', 'udp', 'http', 'https'],
+    'time': ['second', 'minute', 'hour', 'day', 'week', 'month', 'year', 'timeout', 'delay', 'sleep', 'wait'],
+    'size': ['size', 'length', 'count', 'limit', 'max', 'min', 'buffer', 'chunk', 'block'],
+    'http': ['status', 'code', 'response', 'request', 'error'],
+    'math': ['pi', 'e', 'sqrt', 'pow', 'log', 'sin', 'cos', 'tan'],
+    'config': ['config', 'setting', 'option', 'param', 'arg', 'flag']
+}
+
 # Detection Message Templates
 DETECTION_MESSAGES = {
     'magic_literal': "Magic literal '{value}' should be a named constant",
+    'magic_literal_contextual': "Magic literal '{value}' in {context} should be a named constant",
+    'magic_literal_safe': "Consider naming literal '{value}' for better maintainability (low priority)",
     'god_object': "Class '{name}' is a God Object: {method_count} methods, ~{loc} lines",
     'parameter_coupling': "Function '{name}' has too many parameters ({count}>{threshold})",
     'algorithm_coupling': "Algorithm pattern duplicated in {count} locations",

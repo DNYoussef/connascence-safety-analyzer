@@ -41,8 +41,20 @@ import psutil
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 # Import existing infrastructure
-from analyzer.unified_analyzer import UnifiedConnascenceAnalyzer, UnifiedAnalysisResult
-from dashboard.metrics import DashboardMetrics
+try:
+    from analyzer.unified_analyzer import UnifiedConnascenceAnalyzer, UnifiedAnalysisResult
+except ImportError:
+    # Fallback for when unified analyzer is not available
+    UnifiedConnascenceAnalyzer = None
+    UnifiedAnalysisResult = None
+
+try:
+    from dashboard.metrics import DashboardMetrics
+except ImportError:
+    # Fallback metrics collector
+    class DashboardMetrics:
+        def record_performance(self, **kwargs):
+            pass
 
 logger = logging.getLogger(__name__)
 

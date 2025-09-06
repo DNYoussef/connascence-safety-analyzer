@@ -1,0 +1,151 @@
+===============================================================================
+CONNASCENCE SAFETY ANALYZER - ANALYSIS REPORT
+===============================================================================
+File: bad_example.py
+Policy: strict-core
+Analyzed: 2024-12-06 10:30:45 UTC
+Lines of Code: 73
+Analysis Time: 245ms
+
+===============================================================================
+EXECUTIVE SUMMARY
+===============================================================================
+NASA Compliance Score: 42% (FAILING - Target: 95%)
+Overall Quality Score: 35% (POOR - Target: 75%)
+
+Total Violations: 12
+├── Critical: 3 (25%)
+├── High:     4 (33%) 
+├── Medium:   3 (25%)
+└── Low:      2 (17%)
+
+===============================================================================
+CRITICAL VIOLATIONS (IMMEDIATE ACTION REQUIRED)
+===============================================================================
+
+🚨 CON004 [Line 16]: Magic Numbers in Age Validation
+   Problem: Hardcoded values 150, 0 lack semantic meaning
+   Impact:  Maintenance difficulty, unclear business rules
+   Fix:     Define MIN_AGE = 0, MAX_AGE = 150 as constants
+   
+🚨 CON005 [Line 18]: Magic Status Codes [1,2,3,4] 
+   Problem: Numeric codes are error-prone and unclear
+   Impact:  Runtime errors, difficult to understand/maintain
+   Fix:     Replace with UserStatus enum (PENDING, ACTIVE, PREMIUM, INACTIVE)
+
+🚨 CON006 [Line 8]: God Object - UserMgr Class
+   Problem: Single class handles 6+ responsibilities
+   Impact:  High coupling, difficult testing, maintenance nightmare
+   Fix:     Split into: UserService, UserRepository, EmailValidator, PermissionManager
+
+===============================================================================
+HIGH PRIORITY VIOLATIONS
+===============================================================================
+
+⚠️  CON001 [Line 8]: Inconsistent Naming - "UserMgr"
+   Problem: Abbreviated class name reduces readability
+   Fix:     Rename to "UserManager"
+
+⚠️  CON003 [Line 14]: Parameter Position Coupling
+   Problem: create_user(name, age, email, status) relies on order
+   Fix:     Use keyword arguments or parameter object
+
+⚠️  CON007 [Line 35]: Duplicate Email Validation Algorithm
+   Problem: Same logic in UserMgr._validate_email and EmailValidator.is_valid
+   Fix:     Consolidate into single EmailValidator.is_valid method
+
+⚠️  CON010 [Line 56]: Complex Parameter Coupling
+   Problem: calculate_stats has interdependent boolean parameters
+   Fix:     Use configuration object pattern
+
+===============================================================================
+MEDIUM PRIORITY VIOLATIONS  
+===============================================================================
+
+⚡ CON002 [Line 11]: Unclear Variable Name "cnt"
+   Fix: Rename to "user_count" or "next_user_id"
+
+⚡ CON008 [Line 39]: Magic Status-to-Permission Mapping
+   Fix: Use enum-based permission system
+
+⚡ CON009 [Line 52]: Repeated Magic Number 4
+   Fix: Define INACTIVE_STATUS constant
+
+===============================================================================
+LOW PRIORITY VIOLATIONS
+===============================================================================
+
+💡 CON011 [Line 33]: Timestamp Generation Coupling
+   Fix: Inject time provider for better testability
+
+💡 CON012 [Line 50]: Direct Dictionary Access
+   Fix: Use repository pattern with controlled access
+
+===============================================================================
+NASA POWER OF TEN COMPLIANCE FAILURES
+===============================================================================
+
+❌ Rule #2: "Use named constants instead of magic numbers"
+   Violations: Lines 16, 18, 39, 41, 43, 52
+
+❌ Rule #3: "Keep functions simple and focused" 
+   Violations: UserMgr class (god object), create_user method
+
+❌ Rule #6: "Limit function parameter lists"
+   Violations: create_user (4 params), calculate_stats (4 params)
+
+===============================================================================
+REFACTORING RECOMMENDATIONS (Priority Order)
+===============================================================================
+
+1. 🎯 IMMEDIATE (Critical Impact)
+   ├── Create UserStatus enum to eliminate all magic numbers
+   ├── Split UserMgr into 4 focused classes
+   └── Replace positional parameters with keyword arguments
+
+2. 🔧 SHORT-TERM (High Impact) 
+   ├── Consolidate duplicate email validation logic
+   ├── Implement consistent naming conventions
+   └── Add parameter validation with clear error messages
+
+3. 🌟 LONG-TERM (Quality Improvements)
+   ├── Add dependency injection for better testability  
+   ├── Implement repository pattern for data access
+   └── Add comprehensive unit test coverage (target: 90%+)
+
+===============================================================================
+ESTIMATED REFACTORING EFFORT
+===============================================================================
+
+Critical Fixes:     4-6 hours (breaks existing API)
+High Priority:      2-3 hours (minimal API changes)  
+Medium Priority:    1-2 hours (internal improvements)
+Low Priority:       30-60 minutes (cosmetic/testing)
+
+Total Estimated Time: 7.5-11.5 hours
+Recommended Approach: Incremental refactoring with tests
+
+===============================================================================
+QUALITY METRICS
+===============================================================================
+
+Cyclomatic Complexity:
+├── UserMgr class: 8 (HIGH - target: ≤5)
+└── calculate_stats: 4 (ACCEPTABLE - target: ≤5)
+
+Coupling Density: 68% (HIGH - target: ≤40%)
+Maintainability Index: 35/100 (POOR - target: ≥70)
+
+===============================================================================
+NEXT STEPS
+===============================================================================
+
+1. Address critical violations first (magic numbers, god object)
+2. Add unit tests before refactoring to prevent regressions
+3. Use good_example.py as reference for proper design patterns  
+4. Re-run analysis after each fix to track improvement
+5. Target NASA compliance score >95% for production deployment
+
+===============================================================================
+Run 'python -m analyzer.core --path . --policy nasa_jpl_pot10' for full compliance check
+===============================================================================

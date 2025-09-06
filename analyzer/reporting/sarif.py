@@ -386,3 +386,101 @@ class SARIFReporter:
             })
         
         return related_locations
+    
+    def export_results(self, result, output_file=None):
+        """Export results to SARIF format.
+        
+        Args:
+            result: Analysis result (dict or AnalysisResult object)
+            output_file: Optional file path to write to. If None, returns SARIF string.
+            
+        Returns:
+            SARIF JSON string if output_file is None, otherwise writes to file.
+        """
+        # Handle both dict and AnalysisResult objects
+        if isinstance(result, dict):
+            # Convert dict result to SARIF-compatible format
+            sarif_output = self._convert_dict_to_sarif(result)
+        else:
+            # Use the generate method for AnalysisResult objects
+            sarif_output = self.generate(result)
+        
+        if output_file:
+            # Write to file
+            with open(output_file, 'w', encoding='utf-8') as f:
+                f.write(sarif_output)
+        else:
+            # Return SARIF string
+            return sarif_output
+    
+    def _convert_dict_to_sarif(self, result_dict):
+        """Convert dict-based analysis result to SARIF format."""
+        # Create a minimal SARIF report from dict results
+        violations = result_dict.get('violations', [])
+        
+        sarif_report = {
+            "$schema": "https://schemastore.azurewebsites.net/schemas/json/sarif-2.1.0.json",
+            "version": "2.1.0",
+            "runs": [{
+                "tool": self._create_tool(),
+                "automationDetails": {
+                    "id": f"connascence/{uuid.uuid4()}",
+                    "description": {
+                        "text": "Connascence analysis for Python codebases"
+                    }
+                },
+                "invocations": [{
+                    "executionSuccessful": result_dict.get('success', True),
+                    "startTimeUtc": datetime.now().isoformat(),
+                    "workingDirectory": {
+                        "uri": f"file://{result_dict.get('path', '.')}"
+                    }
+                }],
+                "results": [self._create_result_from_dict(violation) for violation in violations],
+                "properties": {
+                    "analysisType": "connascence",
+                    "policyPreset": result_dict.get('policy', 'default'),
+                    "summaryMetrics": result_dict.get('summary', {})
+                }
+            }]
+        }
+        
+        return json.dumps(sarif_report, indent=2, ensure_ascii=False)
+    
+    def _create_result_from_dict(self, violation_dict):
+        """Create SARIF result from violation dictionary."""
+        rule_id = violation_dict.get('rule_id', 'CON_UNKNOWN')
+        severity = violation_dict.get('severity', 'medium')
+        sarif_level = self._severity_to_sarif_level(severity)
+        
+        result = {
+            "ruleId": rule_id,
+            "level": sarif_level,
+            "message": {
+                "text": violation_dict.get('description', 'Connascence violation detected'),
+                "arguments": [violation_dict.get('description', 'Connascence violation detected')]
+            },
+            "locations": [{
+                "physicalLocation": {
+                    "artifactLocation": {
+                        "uri": self._normalize_path(violation_dict.get('file_path', 'unknown.py')),
+                        "uriBaseId": "%SRCROOT%"
+                    },
+                    "region": {
+                        "startLine": violation_dict.get('line_number', 1),
+                        "startColumn": 1
+                    }
+                }
+            }],
+            "partialFingerprints": {
+                "primaryLocationLineHash": violation_dict.get('id', str(uuid.uuid4())),
+                "connascenceFingerprint": violation_dict.get('id', str(uuid.uuid4()))
+            },
+            "properties": {
+                "connascenceType": violation_dict.get('type', 'unknown'),
+                "severity": severity,
+                "weight": violation_dict.get('weight', 1.0)
+            }
+        }
+        
+        return result
