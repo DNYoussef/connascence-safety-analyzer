@@ -136,21 +136,51 @@ select = [
     "UP",  # pyupgrade
     "SIM", # flake8-simplify
     "RUF", # Ruff-specific rules
+    "PLR", # Pylint refactor rules (includes PLR2004 for magic literals)
+    "PLW", # Pylint warnings
+    "PLE", # Pylint errors
+    "C90", # McCabe complexity
+    "ARG", # flake8-unused-arguments
 ]
 ignore = [
     "E501",  # line too long (handled by black)
     "B008",  # do not perform function calls in argument defaults
     "C901",  # too complex
     "B904",  # raise ... from None
+    # Allow certain violations in specific contexts
+    "PLR0913", # too-many-arguments (will be handled by connascence CoP detection)
+    "PLR0915", # too-many-statements (will be handled by connascence CoA detection)
+    "PLR0912", # too-many-branches (will be handled by connascence CoA detection)
 ]
 unfixable = [
     "B",  # Don't auto-fix potentially unsafe bugbear rules
+    "PLR2004", # Magic literals require manual review for context
 ]
 
 # Regex pattern linting to prevent future SyntaxWarning issues
 [tool.ruff.flake8-bugbear]
 # Enable additional regex-related checks
 extend-immutable-calls = ["re.compile", "re.Pattern"]
+
+# Connascence-specific Ruff integration
+[tool.ruff.pylint]
+# Configure PLR rules to align with connascence detection
+max-args = 4  # Connascence of Position (CoP) threshold
+max-branches = 8  # Connascence of Algorithm (CoA) complexity threshold
+max-returns = 6  # Connascence of Algorithm (CoA) threshold
+max-statements = 25  # Connascence of Algorithm (CoA) threshold
+max-public-methods = 15  # God class detection threshold
+
+# Magic literal detection aligned with Connascence of Meaning (CoM)
+[tool.ruff.flake8-magic-value]
+# Custom configuration for magic literal detection
+ignore-magic-value-types = ["str", "bytes"]
+ignore-names-ending-with = ["_test", "_Test"]
+ignore-functions = ["range", "enumerate"]
+
+# McCabe complexity aligned with Connascence of Algorithm (CoA)
+[tool.ruff.mccabe]
+max-complexity = 8  # Lower threshold to catch CoA violations early
 
 
 [tool.ruff.per-file-ignores]
@@ -159,10 +189,26 @@ extend-immutable-calls = ["re.compile", "re.Pattern"]
     "ARG",     # unused function args allowed in tests
     "FBT",     # boolean trap allowed in tests
     "PLR2004", # magic values allowed in tests
+    "PLR0913", # too-many-arguments allowed in test fixtures
+    "PLR0915", # too-many-statements allowed in test setup
 ]
 "examples/**/*.py" = [
     "PLR2004", # magic values allowed in examples
     "T201",    # print allowed in examples
+    "PLR0913", # demonstration code may have many parameters
+]
+# Configuration and CLI modules - higher complexity allowed
+"cli/**/*.py" = [
+    "PLR0912", # CLI modules may have complex branching
+    "PLR0915", # CLI modules may have many statements
+]
+"config/**/*.py" = [
+    "PLR2004", # Configuration files contain many literals
+]
+# Legacy integrations - gradual improvement
+"integrations/legacy/**/*.py" = [
+    "PLR0913", # Legacy code improvements in progress
+    "PLR0915", # Legacy code improvements in progress
 ]
 
 [tool.ruff.isort]

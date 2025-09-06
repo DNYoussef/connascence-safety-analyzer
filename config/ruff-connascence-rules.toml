@@ -1,0 +1,99 @@
+# Ruff Configuration Optimized for Connascence Detection
+# Maps standard Ruff rules to connascence types for better correlation
+
+[tool.ruff]
+target-version = "py38"
+line-length = 120
+
+# Enhanced rule selection for connascence detection
+select = [
+    # Core rules
+    "E", "W", "F", "I", "UP", "SIM", "RUF",
+    
+    # Connascence-specific rule groups
+    "PLR",  # Pylint refactor - primary connascence correlation
+    "PLW",  # Pylint warnings  
+    "PLE",  # Pylint errors
+    "C90",  # McCabe complexity - CoA detection
+    "ARG",  # Unused arguments - parameter analysis
+    "N",    # Naming conventions - CoN detection
+    "B",    # Bugbear - algorithm and complexity issues
+    "C4",   # Comprehensions - algorithm simplification
+]
+
+ignore = [
+    "E501",    # Line too long (handled by formatter)
+    "B008",    # Function call in defaults (contextual)
+    
+    # Strategic ignores - let connascence analyzer handle these
+    "PLR0911", # Too many returns (CoA - connascence handles better)
+    "PLR0912", # Too many branches (CoA - connascence handles better)  
+    "PLR0913", # Too many arguments (CoP - connascence handles better)
+    "PLR0915", # Too many statements (CoA - connascence handles better)
+    "C901",    # Too complex (CoA - connascence handles better)
+]
+
+# Enable auto-fixing for non-connascence issues
+fix = true
+show-fixes = true
+
+# Connascence-optimized rule configurations
+[tool.ruff.pylint]
+# Align with connascence thresholds
+max-args = 4              # CoP threshold
+max-branches = 8          # CoA threshold  
+max-returns = 6           # CoA threshold
+max-statements = 25       # CoA threshold
+max-public-methods = 15   # God class threshold
+
+[tool.ruff.mccabe]
+# Lower complexity threshold for early CoA detection
+max-complexity = 8
+
+[tool.ruff.per-file-ignores]
+# Test files - more lenient for connascence
+"tests/**/*.py" = [
+    "PLR2004",  # Magic values OK in tests
+    "ARG001",   # Unused args OK in fixtures
+    "PLR0913",  # Many parameters OK in test setup
+]
+
+"examples/**/*.py" = [
+    "PLR2004",  # Magic values for demonstration
+    "PLR0913",  # Example functions may have many params
+]
+
+"config/**/*.py" = [
+    "PLR2004",  # Configuration contains many constants
+]
+
+# CLI and legacy code - gradual improvement
+"cli/**/*.py" = ["PLR0912", "PLR0915"]
+"integrations/legacy/**/*.py" = ["PLR0913", "PLR0915"]
+
+[tool.ruff.isort]
+# Reduce import connascence
+combine-as-imports = true
+force-wrap-aliases = true
+known-first-party = ["analyzer", "policy", "reporting", "cli", "mcp"]
+
+# Connascence Rule Mapping Documentation
+# This configuration is designed to work alongside connascence analysis:
+#
+# PLR2004 -> CoM (Connascence of Meaning)
+#   - Magic literals that create hidden dependencies
+#   
+# PLR0913 -> CoP (Connascence of Position) 
+#   - Functions with too many positional parameters
+#
+# PLR0915, PLR0912, C901 -> CoA (Connascence of Algorithm)
+#   - Complex functions that may contain duplicated logic
+#
+# N801, N802, N803 -> CoN (Connascence of Name)
+#   - Naming inconsistencies that create coupling
+#
+# F401, F821 -> CoT (Connascence of Type)
+#   - Import and type-related dependencies
+#
+# ARG001, ARG002 -> CoP (Connascence of Position)
+#   - Unused parameters suggesting interface issues

@@ -1,0 +1,2153 @@
+{
+  "summary": {
+    "total_files_analyzed": 102,
+    "file_categories": {
+      "codeActions.ts": 1,
+      "dashboard.ts": 1,
+      "diagnostics.ts": 1,
+      "extension.ts": 1,
+      "simple-extension.ts": 1,
+      "statusBar.ts": 1,
+      "treeView.ts": 1,
+      "commands": 1,
+      "core": 1,
+      "features": 6,
+      "providers": 9,
+      "services": 6,
+      "test": 1,
+      "types": 1,
+      "ui": 2,
+      "utils": 4,
+      "root": 38,
+      "config": 1,
+      "build": 25
+    },
+    "import_statistics": {
+      "internal": 170,
+      "vscode-api": 92,
+      "external": 34,
+      "node-builtin": 58
+    },
+    "package_dependencies": {
+      "dependencies": {},
+      "devDependencies": {
+        "@types/vscode": "^1.74.0",
+        "@types/node": "18.x",
+        "@typescript-eslint/eslint-plugin": "^6.21.0",
+        "@typescript-eslint/parser": "^6.21.0",
+        "eslint": "^8.57.0",
+        "typescript": "^5.3.3",
+        "@vscode/test-electron": "^2.3.8",
+        "@vscode/vsce": "^2.15.0",
+        "mocha": "^10.2.0",
+        "@types/mocha": "^10.0.6",
+        "webpack": "^5.89.0",
+        "webpack-cli": "^5.1.4",
+        "ts-loader": "^9.5.1"
+      },
+      "total_deps": 13,
+      "prod_deps": 0,
+      "dev_deps": 13
+    }
+  },
+  "module_dependencies": {
+    "codeActions.ts": {
+      "internal": 1,
+      "vscode-api": 1,
+      "external": 2
+    },
+    "dashboard.ts": {
+      "internal": 1,
+      "vscode-api": 1,
+      "node-builtin": 1
+    },
+    "diagnostics.ts": {
+      "external": 1,
+      "vscode-api": 1,
+      "node-builtin": 1
+    },
+    "extension.ts": {
+      "internal": 11,
+      "vscode-api": 1
+    },
+    "simple-extension.ts": {
+      "vscode-api": 1,
+      "node-builtin": 1
+    },
+    "statusBar.ts": {
+      "vscode-api": 1
+    },
+    "treeView.ts": {
+      "internal": 1,
+      "vscode-api": 1,
+      "node-builtin": 1
+    },
+    "commands": {
+      "internal": 8,
+      "vscode-api": 1
+    },
+    "core": {
+      "internal": 15,
+      "vscode-api": 1
+    },
+    "features": {
+      "internal": 5,
+      "vscode-api": 6,
+      "node-builtin": 1
+    },
+    "providers": {
+      "internal": 10,
+      "vscode-api": 9,
+      "node-builtin": 1
+    },
+    "services": {
+      "vscode-api": 6,
+      "external": 4,
+      "internal": 9,
+      "node-builtin": 19
+    },
+    "test": {
+      "internal": 1,
+      "external": 1,
+      "vscode-api": 1,
+      "node-builtin": 1
+    },
+    "ui": {
+      "vscode-api": 2,
+      "internal": 2
+    },
+    "utils": {
+      "internal": 4,
+      "node-builtin": 2,
+      "external": 2,
+      "vscode-api": 3
+    }
+  },
+  "detailed_analysis": {
+    "src\\codeActions.ts": {
+      "category": "codeActions.ts",
+      "imports": [
+        [
+          "import",
+          "./diagnostics"
+        ],
+        [
+          "import",
+          "vscode"
+        ],
+        [
+          "import",
+          "child_process"
+        ],
+        [
+          "import",
+          "child_process"
+        ]
+      ],
+      "import_count": 4
+    },
+    "src\\dashboard.ts": {
+      "category": "dashboard.ts",
+      "imports": [
+        [
+          "import",
+          "./diagnostics"
+        ],
+        [
+          "import",
+          "vscode"
+        ],
+        [
+          "import",
+          "path"
+        ]
+      ],
+      "import_count": 3
+    },
+    "src\\diagnostics.ts": {
+      "category": "diagnostics.ts",
+      "imports": [
+        [
+          "import",
+          "child_process"
+        ],
+        [
+          "import",
+          "vscode"
+        ],
+        [
+          "import",
+          "path"
+        ]
+      ],
+      "import_count": 3
+    },
+    "src\\extension.ts": {
+      "category": "extension.ts",
+      "imports": [
+        [
+          "import",
+          "./core/ConnascenceExtension"
+        ],
+        [
+          "import",
+          "./utils/logger"
+        ],
+        [
+          "import",
+          "./utils/telemetry"
+        ],
+        [
+          "import",
+          "./providers/dashboardProvider"
+        ],
+        [
+          "import",
+          "./providers/analysisResultsProvider"
+        ],
+        [
+          "import",
+          "./features/visualHighlighting"
+        ],
+        [
+          "import",
+          "./features/notificationManager"
+        ],
+        [
+          "import",
+          "./features/brokenChainLogo"
+        ],
+        [
+          "import",
+          "./features/aiFixSuggestions"
+        ],
+        [
+          "import",
+          "./services/connascenceService"
+        ],
+        [
+          "import",
+          "./services/configurationService"
+        ],
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 12
+    },
+    "src\\simple-extension.ts": {
+      "category": "simple-extension.ts",
+      "imports": [
+        [
+          "import",
+          "vscode"
+        ],
+        [
+          "import",
+          "path"
+        ]
+      ],
+      "import_count": 2
+    },
+    "src\\statusBar.ts": {
+      "category": "statusBar.ts",
+      "imports": [
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 1
+    },
+    "src\\treeView.ts": {
+      "category": "treeView.ts",
+      "imports": [
+        [
+          "import",
+          "./diagnostics"
+        ],
+        [
+          "import",
+          "vscode"
+        ],
+        [
+          "import",
+          "path"
+        ]
+      ],
+      "import_count": 3
+    },
+    "src\\commands\\commandManager.ts": {
+      "category": "commands",
+      "imports": [
+        [
+          "import",
+          "../services/connascenceService"
+        ],
+        [
+          "import",
+          "../providers/diagnosticsProvider"
+        ],
+        [
+          "import",
+          "../ui/statusBarManager"
+        ],
+        [
+          "import",
+          "../ui/outputChannelManager"
+        ],
+        [
+          "import",
+          "../providers/treeProvider"
+        ],
+        [
+          "import",
+          "../utils/logger"
+        ],
+        [
+          "import",
+          "../features/settingsPanel"
+        ],
+        [
+          "import",
+          "../services/configurationService"
+        ],
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 9
+    },
+    "src\\core\\ConnascenceExtension.ts": {
+      "category": "core",
+      "imports": [
+        [
+          "import",
+          "../utils/logger"
+        ],
+        [
+          "import",
+          "../utils/telemetry"
+        ],
+        [
+          "import",
+          "../services/telemetryService"
+        ],
+        [
+          "import",
+          "../providers/diagnosticsProvider"
+        ],
+        [
+          "import",
+          "../providers/codeActionProvider"
+        ],
+        [
+          "import",
+          "../providers/completionProvider"
+        ],
+        [
+          "import",
+          "../providers/hoverProvider"
+        ],
+        [
+          "import",
+          "../providers/codeLensProvider"
+        ],
+        [
+          "import",
+          "../providers/treeProvider"
+        ],
+        [
+          "import",
+          "../ui/statusBarManager"
+        ],
+        [
+          "import",
+          "../ui/outputChannelManager"
+        ],
+        [
+          "import",
+          "../services/configurationService"
+        ],
+        [
+          "import",
+          "../services/connascenceService"
+        ],
+        [
+          "import",
+          "../commands/commandManager"
+        ],
+        [
+          "import",
+          "../services/fileWatcherService"
+        ],
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 16
+    },
+    "src\\features\\aiFixSuggestions.ts": {
+      "category": "features",
+      "imports": [
+        [
+          "import",
+          "../services/connascenceService"
+        ],
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 2
+    },
+    "src\\features\\brokenChainLogo.ts": {
+      "category": "features",
+      "imports": [
+        [
+          "import",
+          "vscode"
+        ],
+        [
+          "import",
+          "path"
+        ]
+      ],
+      "import_count": 2
+    },
+    "src\\features\\notificationManager.ts": {
+      "category": "features",
+      "imports": [
+        [
+          "import",
+          "../services/connascenceService"
+        ],
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 2
+    },
+    "src\\features\\qualityGateNotifications.ts": {
+      "category": "features",
+      "imports": [
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 1
+    },
+    "src\\features\\settingsPanel.ts": {
+      "category": "features",
+      "imports": [
+        [
+          "import",
+          "../services/configurationService"
+        ],
+        [
+          "import",
+          "../types/index"
+        ],
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 3
+    },
+    "src\\features\\visualHighlighting.ts": {
+      "category": "features",
+      "imports": [
+        [
+          "import",
+          "../services/connascenceService"
+        ],
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 2
+    },
+    "src\\providers\\analysisProvider.ts": {
+      "category": "providers",
+      "imports": [
+        [
+          "import",
+          "../services/connascenceService"
+        ],
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 2
+    },
+    "src\\providers\\analysisResultsProvider.ts": {
+      "category": "providers",
+      "imports": [
+        [
+          "import",
+          "../services/connascenceService"
+        ],
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 2
+    },
+    "src\\providers\\codeActionProvider.ts": {
+      "category": "providers",
+      "imports": [
+        [
+          "import",
+          "../services/connascenceService"
+        ],
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 2
+    },
+    "src\\providers\\codeLensProvider.ts": {
+      "category": "providers",
+      "imports": [
+        [
+          "import",
+          "../services/connascenceService"
+        ],
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 2
+    },
+    "src\\providers\\completionProvider.ts": {
+      "category": "providers",
+      "imports": [
+        [
+          "import",
+          "../services/connascenceService"
+        ],
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 2
+    },
+    "src\\providers\\dashboardProvider.ts": {
+      "category": "providers",
+      "imports": [
+        [
+          "import",
+          "../services/connascenceService"
+        ],
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 2
+    },
+    "src\\providers\\diagnosticsProvider.ts": {
+      "category": "providers",
+      "imports": [
+        [
+          "import",
+          "../services/connascenceService"
+        ],
+        [
+          "import",
+          "../utils/cache"
+        ],
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 3
+    },
+    "src\\providers\\hoverProvider.ts": {
+      "category": "providers",
+      "imports": [
+        [
+          "import",
+          "../services/connascenceService"
+        ],
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 2
+    },
+    "src\\providers\\treeProvider.ts": {
+      "category": "providers",
+      "imports": [
+        [
+          "import",
+          "../services/connascenceService"
+        ],
+        [
+          "import",
+          "vscode"
+        ],
+        [
+          "import",
+          "path"
+        ]
+      ],
+      "import_count": 3
+    },
+    "src\\services\\configurationService.ts": {
+      "category": "services",
+      "imports": [
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 1
+    },
+    "src\\services\\connascenceApiClient.ts": {
+      "category": "services",
+      "imports": [
+        [
+          "import",
+          "child_process"
+        ],
+        [
+          "import",
+          "./connascenceService"
+        ],
+        [
+          "import",
+          "vscode"
+        ],
+        [
+          "import",
+          "path"
+        ],
+        [
+          "import",
+          "fs"
+        ],
+        [
+          "import",
+          "fs"
+        ]
+      ],
+      "import_count": 6
+    },
+    "src\\services\\connascenceService.ts": {
+      "category": "services",
+      "imports": [
+        [
+          "import",
+          "child_process"
+        ],
+        [
+          "import",
+          "./configurationService"
+        ],
+        [
+          "import",
+          "./telemetryService"
+        ],
+        [
+          "import",
+          "./connascenceApiClient"
+        ],
+        [
+          "import",
+          "vscode"
+        ],
+        [
+          "import",
+          "path"
+        ],
+        [
+          "import",
+          "fs"
+        ],
+        [
+          "import",
+          "fs"
+        ],
+        [
+          "import",
+          "fs"
+        ],
+        [
+          "import",
+          "fs"
+        ],
+        [
+          "import",
+          "fs"
+        ],
+        [
+          "import",
+          "fs"
+        ],
+        [
+          "import",
+          "fs"
+        ],
+        [
+          "import",
+          "fs"
+        ],
+        [
+          "import",
+          "fs"
+        ],
+        [
+          "import",
+          "fs"
+        ],
+        [
+          "import",
+          "fs"
+        ],
+        [
+          "import",
+          "fs"
+        ]
+      ],
+      "import_count": 18
+    },
+    "src\\services\\fileWatcherService.ts": {
+      "category": "services",
+      "imports": [
+        [
+          "import",
+          "../providers/diagnosticsProvider"
+        ],
+        [
+          "import",
+          "./configurationService"
+        ],
+        [
+          "import",
+          "../utils/logger"
+        ],
+        [
+          "import",
+          "vscode"
+        ],
+        [
+          "import",
+          "debounce"
+        ],
+        [
+          "import",
+          "fs"
+        ],
+        [
+          "import",
+          "debounce"
+        ],
+        [
+          "import",
+          "fs"
+        ]
+      ],
+      "import_count": 8
+    },
+    "src\\services\\qualityGateIntegration.ts": {
+      "category": "services",
+      "imports": [
+        [
+          "import",
+          "../diagnostics"
+        ],
+        [
+          "import",
+          "../features/qualityGateNotifications"
+        ],
+        [
+          "import",
+          "vscode"
+        ],
+        [
+          "import",
+          "path"
+        ]
+      ],
+      "import_count": 4
+    },
+    "src\\services\\telemetryService.ts": {
+      "category": "services",
+      "imports": [
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 1
+    },
+    "src\\test\\integration.test.ts": {
+      "category": "test",
+      "imports": [
+        [
+          "import",
+          "../services/connascenceApiClient"
+        ],
+        [
+          "import",
+          "assert"
+        ],
+        [
+          "import",
+          "vscode"
+        ],
+        [
+          "import",
+          "path"
+        ]
+      ],
+      "import_count": 4
+    },
+    "src\\types\\index.ts": {
+      "category": "types",
+      "imports": [],
+      "import_count": 0
+    },
+    "src\\ui\\outputChannelManager.ts": {
+      "category": "ui",
+      "imports": [
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 1
+    },
+    "src\\ui\\statusBarManager.ts": {
+      "category": "ui",
+      "imports": [
+        [
+          "import",
+          "../services/connascenceService"
+        ],
+        [
+          "import",
+          "../services/configurationService"
+        ],
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 3
+    },
+    "src\\utils\\cache.ts": {
+      "category": "utils",
+      "imports": [
+        [
+          "import",
+          "../types"
+        ],
+        [
+          "import",
+          "fs"
+        ],
+        [
+          "import",
+          "crypto"
+        ],
+        [
+          "import",
+          "fs"
+        ],
+        [
+          "import",
+          "crypto"
+        ]
+      ],
+      "import_count": 5
+    },
+    "src\\utils\\errorHandler.ts": {
+      "category": "utils",
+      "imports": [
+        [
+          "import",
+          "./logger"
+        ],
+        [
+          "import",
+          "./telemetry"
+        ],
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 3
+    },
+    "src\\utils\\logger.ts": {
+      "category": "utils",
+      "imports": [
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 1
+    },
+    "src\\utils\\telemetry.ts": {
+      "category": "utils",
+      "imports": [
+        [
+          "import",
+          "./logger"
+        ],
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 2
+    },
+    "build-extension.js": {
+      "category": "root",
+      "imports": [
+        [
+          "import",
+          "fs"
+        ],
+        [
+          "import",
+          "path"
+        ],
+        [
+          "import",
+          "child_process"
+        ],
+        [
+          "import",
+          "fs"
+        ],
+        [
+          "import",
+          "path"
+        ],
+        [
+          "import",
+          "child_process"
+        ]
+      ],
+      "import_count": 6
+    },
+    "webpack.config.js": {
+      "category": "config",
+      "imports": [
+        [
+          "import",
+          "path"
+        ],
+        [
+          "import",
+          "path"
+        ]
+      ],
+      "import_count": 2
+    },
+    "out\\codeActions.js": {
+      "category": "build",
+      "imports": [
+        [
+          "import",
+          "child_process"
+        ],
+        [
+          "import",
+          "vscode"
+        ],
+        [
+          "import",
+          "child_process"
+        ]
+      ],
+      "import_count": 3
+    },
+    "out\\dashboard.js": {
+      "category": "build",
+      "imports": [],
+      "import_count": 0
+    },
+    "out\\diagnostics.js": {
+      "category": "build",
+      "imports": [
+        [
+          "import",
+          "child_process"
+        ],
+        [
+          "import",
+          "vscode"
+        ],
+        [
+          "import",
+          "path"
+        ],
+        [
+          "import",
+          "child_process"
+        ]
+      ],
+      "import_count": 4
+    },
+    "out\\extension.js": {
+      "category": "build",
+      "imports": [
+        [
+          "import",
+          "./core/ConnascenceExtension"
+        ],
+        [
+          "import",
+          "./utils/logger"
+        ],
+        [
+          "import",
+          "./utils/telemetry"
+        ],
+        [
+          "import",
+          "vscode"
+        ],
+        [
+          "import",
+          "./core/ConnascenceExtension"
+        ],
+        [
+          "import",
+          "./utils/logger"
+        ],
+        [
+          "import",
+          "./utils/telemetry"
+        ]
+      ],
+      "import_count": 7
+    },
+    "out\\simple-extension.js": {
+      "category": "build",
+      "imports": [
+        [
+          "import",
+          "vscode"
+        ],
+        [
+          "import",
+          "path"
+        ]
+      ],
+      "import_count": 2
+    },
+    "out\\statusBar.js": {
+      "category": "build",
+      "imports": [
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 1
+    },
+    "out\\treeView.js": {
+      "category": "build",
+      "imports": [
+        [
+          "import",
+          "vscode"
+        ],
+        [
+          "import",
+          "path"
+        ]
+      ],
+      "import_count": 2
+    },
+    "scripts\\validate-extension.js": {
+      "category": "root",
+      "imports": [
+        [
+          "import",
+          "fs"
+        ],
+        [
+          "import",
+          "path"
+        ],
+        [
+          "import",
+          "fs"
+        ],
+        [
+          "import",
+          "path"
+        ],
+        [
+          "import",
+          "child_process"
+        ]
+      ],
+      "import_count": 5
+    },
+    "temp-out\\codeActions.js": {
+      "category": "root",
+      "imports": [
+        [
+          "import",
+          "child_process"
+        ],
+        [
+          "import",
+          "vscode"
+        ],
+        [
+          "import",
+          "child_process"
+        ]
+      ],
+      "import_count": 3
+    },
+    "temp-out\\dashboard.js": {
+      "category": "root",
+      "imports": [
+        [
+          "import",
+          "vscode"
+        ],
+        [
+          "import",
+          "path"
+        ]
+      ],
+      "import_count": 2
+    },
+    "temp-out\\diagnostics.js": {
+      "category": "root",
+      "imports": [
+        [
+          "import",
+          "child_process"
+        ],
+        [
+          "import",
+          "vscode"
+        ],
+        [
+          "import",
+          "path"
+        ],
+        [
+          "import",
+          "child_process"
+        ]
+      ],
+      "import_count": 4
+    },
+    "temp-out\\extension.js": {
+      "category": "root",
+      "imports": [
+        [
+          "import",
+          "./core/ConnascenceExtension"
+        ],
+        [
+          "import",
+          "./utils/logger"
+        ],
+        [
+          "import",
+          "./utils/telemetry"
+        ],
+        [
+          "import",
+          "./providers/dashboardProvider"
+        ],
+        [
+          "import",
+          "./providers/analysisResultsProvider"
+        ],
+        [
+          "import",
+          "./features/visualHighlighting"
+        ],
+        [
+          "import",
+          "./features/notificationManager"
+        ],
+        [
+          "import",
+          "./features/brokenChainLogo"
+        ],
+        [
+          "import",
+          "./features/aiFixSuggestions"
+        ],
+        [
+          "import",
+          "vscode"
+        ],
+        [
+          "import",
+          "./core/ConnascenceExtension"
+        ],
+        [
+          "import",
+          "./utils/logger"
+        ],
+        [
+          "import",
+          "./utils/telemetry"
+        ],
+        [
+          "import",
+          "./providers/dashboardProvider"
+        ],
+        [
+          "import",
+          "./providers/analysisResultsProvider"
+        ],
+        [
+          "import",
+          "./features/visualHighlighting"
+        ],
+        [
+          "import",
+          "./features/notificationManager"
+        ],
+        [
+          "import",
+          "./features/brokenChainLogo"
+        ],
+        [
+          "import",
+          "./features/aiFixSuggestions"
+        ]
+      ],
+      "import_count": 19
+    },
+    "temp-out\\extension_backup.js": {
+      "category": "root",
+      "imports": [
+        [
+          "import",
+          "./core/ConnascenceExtension"
+        ],
+        [
+          "import",
+          "./utils/logger"
+        ],
+        [
+          "import",
+          "./utils/telemetry"
+        ],
+        [
+          "import",
+          "./providers/dashboardProvider"
+        ],
+        [
+          "import",
+          "./providers/analysisResultsProvider"
+        ],
+        [
+          "import",
+          "./features/visualHighlighting"
+        ],
+        [
+          "import",
+          "./features/notificationManager"
+        ],
+        [
+          "import",
+          "./features/brokenChainLogo"
+        ],
+        [
+          "import",
+          "./features/aiFixSuggestions"
+        ],
+        [
+          "import",
+          "./services/connascenceService"
+        ],
+        [
+          "import",
+          "vscode"
+        ],
+        [
+          "import",
+          "./core/ConnascenceExtension"
+        ],
+        [
+          "import",
+          "./utils/logger"
+        ],
+        [
+          "import",
+          "./utils/telemetry"
+        ],
+        [
+          "import",
+          "./providers/dashboardProvider"
+        ],
+        [
+          "import",
+          "./providers/analysisResultsProvider"
+        ],
+        [
+          "import",
+          "./features/visualHighlighting"
+        ],
+        [
+          "import",
+          "./features/notificationManager"
+        ],
+        [
+          "import",
+          "./features/brokenChainLogo"
+        ],
+        [
+          "import",
+          "./features/aiFixSuggestions"
+        ],
+        [
+          "import",
+          "./services/connascenceService"
+        ]
+      ],
+      "import_count": 21
+    },
+    "temp-out\\simple-extension.js": {
+      "category": "root",
+      "imports": [
+        [
+          "import",
+          "vscode"
+        ],
+        [
+          "import",
+          "path"
+        ]
+      ],
+      "import_count": 2
+    },
+    "temp-out\\statusBar.js": {
+      "category": "root",
+      "imports": [
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 1
+    },
+    "temp-out\\treeView.js": {
+      "category": "root",
+      "imports": [
+        [
+          "import",
+          "vscode"
+        ],
+        [
+          "import",
+          "path"
+        ]
+      ],
+      "import_count": 2
+    },
+    "out\\commands\\commandManager.js": {
+      "category": "build",
+      "imports": [
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 1
+    },
+    "out\\core\\ConnascenceExtension.js": {
+      "category": "build",
+      "imports": [
+        [
+          "import",
+          "../providers/diagnosticsProvider"
+        ],
+        [
+          "import",
+          "../providers/codeActionProvider"
+        ],
+        [
+          "import",
+          "../providers/completionProvider"
+        ],
+        [
+          "import",
+          "../providers/hoverProvider"
+        ],
+        [
+          "import",
+          "../providers/codeLensProvider"
+        ],
+        [
+          "import",
+          "../providers/treeProvider"
+        ],
+        [
+          "import",
+          "../ui/statusBarManager"
+        ],
+        [
+          "import",
+          "../ui/outputChannelManager"
+        ],
+        [
+          "import",
+          "../services/configurationService"
+        ],
+        [
+          "import",
+          "../services/connascenceService"
+        ],
+        [
+          "import",
+          "../commands/commandManager"
+        ],
+        [
+          "import",
+          "../services/fileWatcherService"
+        ],
+        [
+          "import",
+          "vscode"
+        ],
+        [
+          "import",
+          "../providers/diagnosticsProvider"
+        ],
+        [
+          "import",
+          "../providers/codeActionProvider"
+        ],
+        [
+          "import",
+          "../providers/completionProvider"
+        ],
+        [
+          "import",
+          "../providers/hoverProvider"
+        ],
+        [
+          "import",
+          "../providers/codeLensProvider"
+        ],
+        [
+          "import",
+          "../providers/treeProvider"
+        ],
+        [
+          "import",
+          "../ui/statusBarManager"
+        ],
+        [
+          "import",
+          "../ui/outputChannelManager"
+        ],
+        [
+          "import",
+          "../services/configurationService"
+        ],
+        [
+          "import",
+          "../services/connascenceService"
+        ],
+        [
+          "import",
+          "../commands/commandManager"
+        ],
+        [
+          "import",
+          "../services/fileWatcherService"
+        ]
+      ],
+      "import_count": 25
+    },
+    "out\\providers\\analysisProvider.js": {
+      "category": "build",
+      "imports": [
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 1
+    },
+    "out\\providers\\codeActionProvider.js": {
+      "category": "build",
+      "imports": [
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 1
+    },
+    "out\\providers\\codeLensProvider.js": {
+      "category": "build",
+      "imports": [
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 1
+    },
+    "out\\providers\\completionProvider.js": {
+      "category": "build",
+      "imports": [
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 1
+    },
+    "out\\providers\\diagnosticsProvider.js": {
+      "category": "build",
+      "imports": [
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 1
+    },
+    "out\\providers\\hoverProvider.js": {
+      "category": "build",
+      "imports": [
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 1
+    },
+    "out\\providers\\treeProvider.js": {
+      "category": "build",
+      "imports": [
+        [
+          "import",
+          "vscode"
+        ],
+        [
+          "import",
+          "path"
+        ]
+      ],
+      "import_count": 2
+    },
+    "out\\services\\configurationService.js": {
+      "category": "build",
+      "imports": [
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 1
+    },
+    "out\\services\\connascenceApiClient.js": {
+      "category": "build",
+      "imports": [
+        [
+          "import",
+          "vscode"
+        ],
+        [
+          "import",
+          "path"
+        ]
+      ],
+      "import_count": 2
+    },
+    "out\\services\\connascenceService.js": {
+      "category": "build",
+      "imports": [
+        [
+          "import",
+          "child_process"
+        ],
+        [
+          "import",
+          "./connascenceApiClient"
+        ],
+        [
+          "import",
+          "path"
+        ],
+        [
+          "import",
+          "child_process"
+        ],
+        [
+          "import",
+          "./connascenceApiClient"
+        ]
+      ],
+      "import_count": 5
+    },
+    "out\\services\\fileWatcherService.js": {
+      "category": "build",
+      "imports": [
+        [
+          "import",
+          "debounce"
+        ],
+        [
+          "import",
+          "fs"
+        ],
+        [
+          "import",
+          "vscode"
+        ],
+        [
+          "import",
+          "debounce"
+        ],
+        [
+          "import",
+          "fs"
+        ]
+      ],
+      "import_count": 5
+    },
+    "out\\services\\telemetryService.js": {
+      "category": "build",
+      "imports": [
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 1
+    },
+    "out\\ui\\outputChannelManager.js": {
+      "category": "build",
+      "imports": [
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 1
+    },
+    "out\\ui\\statusBarManager.js": {
+      "category": "build",
+      "imports": [
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 1
+    },
+    "out\\utils\\logger.js": {
+      "category": "build",
+      "imports": [
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 1
+    },
+    "out\\utils\\telemetry.js": {
+      "category": "build",
+      "imports": [
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 1
+    },
+    "temp-out\\commands\\commandManager.js": {
+      "category": "root",
+      "imports": [
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 1
+    },
+    "temp-out\\core\\ConnascenceExtension.js": {
+      "category": "root",
+      "imports": [
+        [
+          "import",
+          "../services/telemetryService"
+        ],
+        [
+          "import",
+          "../providers/diagnosticsProvider"
+        ],
+        [
+          "import",
+          "../providers/codeActionProvider"
+        ],
+        [
+          "import",
+          "../providers/completionProvider"
+        ],
+        [
+          "import",
+          "../providers/hoverProvider"
+        ],
+        [
+          "import",
+          "../providers/codeLensProvider"
+        ],
+        [
+          "import",
+          "../providers/treeProvider"
+        ],
+        [
+          "import",
+          "../ui/statusBarManager"
+        ],
+        [
+          "import",
+          "../ui/outputChannelManager"
+        ],
+        [
+          "import",
+          "../services/configurationService"
+        ],
+        [
+          "import",
+          "../services/connascenceService"
+        ],
+        [
+          "import",
+          "../commands/commandManager"
+        ],
+        [
+          "import",
+          "../services/fileWatcherService"
+        ],
+        [
+          "import",
+          "vscode"
+        ],
+        [
+          "import",
+          "../services/telemetryService"
+        ],
+        [
+          "import",
+          "../providers/diagnosticsProvider"
+        ],
+        [
+          "import",
+          "../providers/codeActionProvider"
+        ],
+        [
+          "import",
+          "../providers/completionProvider"
+        ],
+        [
+          "import",
+          "../providers/hoverProvider"
+        ],
+        [
+          "import",
+          "../providers/codeLensProvider"
+        ],
+        [
+          "import",
+          "../providers/treeProvider"
+        ],
+        [
+          "import",
+          "../ui/statusBarManager"
+        ],
+        [
+          "import",
+          "../ui/outputChannelManager"
+        ],
+        [
+          "import",
+          "../services/configurationService"
+        ],
+        [
+          "import",
+          "../services/connascenceService"
+        ],
+        [
+          "import",
+          "../commands/commandManager"
+        ],
+        [
+          "import",
+          "../services/fileWatcherService"
+        ]
+      ],
+      "import_count": 27
+    },
+    "temp-out\\features\\aiFixSuggestions.js": {
+      "category": "root",
+      "imports": [
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 1
+    },
+    "temp-out\\features\\brokenChainLogo.js": {
+      "category": "root",
+      "imports": [
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 1
+    },
+    "temp-out\\features\\notificationManager.js": {
+      "category": "root",
+      "imports": [
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 1
+    },
+    "temp-out\\features\\visualHighlighting.js": {
+      "category": "root",
+      "imports": [
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 1
+    },
+    "temp-out\\providers\\analysisProvider.js": {
+      "category": "root",
+      "imports": [
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 1
+    },
+    "temp-out\\providers\\analysisResultsProvider.js": {
+      "category": "root",
+      "imports": [
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 1
+    },
+    "temp-out\\providers\\codeActionProvider.js": {
+      "category": "root",
+      "imports": [
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 1
+    },
+    "temp-out\\providers\\codeLensProvider.js": {
+      "category": "root",
+      "imports": [
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 1
+    },
+    "temp-out\\providers\\completionProvider.js": {
+      "category": "root",
+      "imports": [
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 1
+    },
+    "temp-out\\providers\\dashboardProvider.js": {
+      "category": "root",
+      "imports": [
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 1
+    },
+    "temp-out\\providers\\diagnosticsProvider.js": {
+      "category": "root",
+      "imports": [
+        [
+          "import",
+          "../utils/cache"
+        ],
+        [
+          "import",
+          "vscode"
+        ],
+        [
+          "import",
+          "../utils/cache"
+        ]
+      ],
+      "import_count": 3
+    },
+    "temp-out\\providers\\hoverProvider.js": {
+      "category": "root",
+      "imports": [
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 1
+    },
+    "temp-out\\providers\\treeProvider.js": {
+      "category": "root",
+      "imports": [
+        [
+          "import",
+          "vscode"
+        ],
+        [
+          "import",
+          "path"
+        ]
+      ],
+      "import_count": 2
+    },
+    "temp-out\\services\\configurationService.js": {
+      "category": "root",
+      "imports": [
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 1
+    },
+    "temp-out\\services\\connascenceApiClient.js": {
+      "category": "root",
+      "imports": [
+        [
+          "import",
+          "child_process"
+        ],
+        [
+          "import",
+          "vscode"
+        ],
+        [
+          "import",
+          "path"
+        ],
+        [
+          "import",
+          "child_process"
+        ]
+      ],
+      "import_count": 4
+    },
+    "temp-out\\services\\connascenceService.js": {
+      "category": "root",
+      "imports": [
+        [
+          "import",
+          "child_process"
+        ],
+        [
+          "import",
+          "./connascenceApiClient"
+        ],
+        [
+          "import",
+          "path"
+        ],
+        [
+          "import",
+          "child_process"
+        ],
+        [
+          "import",
+          "./connascenceApiClient"
+        ]
+      ],
+      "import_count": 5
+    },
+    "temp-out\\services\\fileWatcherService.js": {
+      "category": "root",
+      "imports": [
+        [
+          "import",
+          "debounce"
+        ],
+        [
+          "import",
+          "fs"
+        ],
+        [
+          "import",
+          "vscode"
+        ],
+        [
+          "import",
+          "debounce"
+        ],
+        [
+          "import",
+          "fs"
+        ]
+      ],
+      "import_count": 5
+    },
+    "temp-out\\services\\telemetryService.js": {
+      "category": "root",
+      "imports": [
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 1
+    },
+    "temp-out\\test\\integration.test.js": {
+      "category": "root",
+      "imports": [
+        [
+          "import",
+          "../services/connascenceApiClient"
+        ],
+        [
+          "import",
+          "assert"
+        ],
+        [
+          "import",
+          "vscode"
+        ],
+        [
+          "import",
+          "path"
+        ],
+        [
+          "import",
+          "../services/connascenceApiClient"
+        ]
+      ],
+      "import_count": 5
+    },
+    "temp-out\\types\\index.js": {
+      "category": "root",
+      "imports": [],
+      "import_count": 0
+    },
+    "temp-out\\ui\\outputChannelManager.js": {
+      "category": "root",
+      "imports": [
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 1
+    },
+    "temp-out\\ui\\statusBarManager.js": {
+      "category": "root",
+      "imports": [
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 1
+    },
+    "temp-out\\utils\\cache.js": {
+      "category": "root",
+      "imports": [
+        [
+          "import",
+          "fs"
+        ],
+        [
+          "import",
+          "crypto"
+        ],
+        [
+          "import",
+          "fs"
+        ],
+        [
+          "import",
+          "crypto"
+        ]
+      ],
+      "import_count": 4
+    },
+    "temp-out\\utils\\errorHandler.js": {
+      "category": "root",
+      "imports": [
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 1
+    },
+    "temp-out\\utils\\logger.js": {
+      "category": "root",
+      "imports": [
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 1
+    },
+    "temp-out\\utils\\telemetry.js": {
+      "category": "root",
+      "imports": [
+        [
+          "import",
+          "vscode"
+        ]
+      ],
+      "import_count": 1
+    }
+  }
+}

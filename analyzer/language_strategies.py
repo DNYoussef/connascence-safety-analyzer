@@ -9,10 +9,16 @@ import re
 from dataclasses import dataclass
 
 try:
-    from .constants import NASA_PARAMETER_THRESHOLD, GOD_OBJECT_LOC_THRESHOLD
+    from .constants import (
+        NASA_PARAMETER_THRESHOLD, GOD_OBJECT_LOC_THRESHOLD,
+        DETECTION_MESSAGES, REGEX_PATTERNS, LANGUAGE_KEYWORDS
+    )
 except ImportError:
     # Fallback when running as script
-    from constants import NASA_PARAMETER_THRESHOLD, GOD_OBJECT_LOC_THRESHOLD
+    from constants import (
+        NASA_PARAMETER_THRESHOLD, GOD_OBJECT_LOC_THRESHOLD,
+        DETECTION_MESSAGES, REGEX_PATTERNS, LANGUAGE_KEYWORDS
+    )
 
 
 @dataclass
@@ -155,7 +161,7 @@ class LanguageStrategy:
             file_path=str(file_path),
             line_number=line_num,
             column=match.start(),
-            description=f"Magic literal '{match.group()}' should be a named constant",
+            description=DETECTION_MESSAGES['magic_literal'].format(value=match.group()),
             recommendation=f"Extract to a {self.get_constant_recommendation()}",
             code_snippet=code_snippet,
             context={"literal_type": literal_type, "value": match.group()},
@@ -212,7 +218,7 @@ class JavaScriptStrategy(LanguageStrategy):
         }
     
     def get_function_detector(self) -> re.Pattern:
-        return re.compile(r'^\s*(?:function\s+\w+|(?:const|let|var)\s+\w+\s*=\s*(?:function|\(.*?\)\s*=>)|\w+\s*:\s*function)')
+        return re.compile(REGEX_PATTERNS['function_def'].replace('def', 'function'))
     
     def get_parameter_detector(self) -> re.Pattern:
         return re.compile(r'(?:function\s+\w+|(?:const|let|var)\s+\w+\s*=\s*(?:function|\(.*?\)\s*=>))\s*\(([^)]+)\)')

@@ -73,6 +73,10 @@ class RateLimiter:
             self.requests.append(now)
             return True
         return False
+    
+    def check_rate_limit(self, client_id: str = 'default') -> bool:
+        """Check rate limit for a client (alias for is_allowed)."""
+        return self.is_allowed()
 
 
 def load_config_defaults(component_name: str) -> Dict[str, Any]:

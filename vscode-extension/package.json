@@ -609,6 +609,107 @@
           },
           "default": ["python", "c", "cpp", "javascript", "typescript"],
           "description": "List of programming languages supported by Connascence analysis"
+        },
+        "connascence.linterIntegration": {
+          "type": "object",
+          "properties": {
+            "enableRuffCorrelation": {
+              "type": "boolean",
+              "default": true,
+              "description": "Correlate Ruff linter issues with connascence violations"
+            },
+            "enablePylintCorrelation": {
+              "type": "boolean",
+              "default": true,
+              "description": "Correlate Pylint issues with connascence violations"
+            },
+            "showLinterMappings": {
+              "type": "boolean",
+              "default": true,
+              "description": "Show mappings between linter rules and connascence types"
+            },
+            "ruffConfigPath": {
+              "type": "string",
+              "default": "pyproject.toml",
+              "description": "Path to Ruff configuration file"
+            },
+            "prioritizeConnascenceFindings": {
+              "type": "boolean",
+              "default": true,
+              "description": "Show connascence violations above standard linter issues"
+            },
+            "unifiedDiagnostics": {
+              "type": "boolean",
+              "default": true,
+              "description": "Combine connascence and linter diagnostics in unified view"
+            }
+          },
+          "default": {
+            "enableRuffCorrelation": true,
+            "enablePylintCorrelation": true,
+            "showLinterMappings": true,
+            "ruffConfigPath": "pyproject.toml",
+            "prioritizeConnascenceFindings": true,
+            "unifiedDiagnostics": true
+          },
+          "description": "Linter integration and correlation settings"
+        },
+        "connascence.magicLiteralDetection": {
+          "type": "object",
+          "properties": {
+            "enableEnhancedDetection": {
+              "type": "boolean",
+              "default": true,
+              "description": "Enable enhanced magic literal detection beyond basic Ruff PLR2004"
+            },
+            "contextualAnalysis": {
+              "type": "boolean",
+              "default": true,
+              "description": "Analyze context to reduce false positives for magic literals"
+            },
+            "excludeCommonPatterns": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": ["0", "1", "-1", "True", "False", "None"],
+              "description": "Common literal values to exclude from magic literal detection"
+            }
+          },
+          "default": {
+            "enableEnhancedDetection": true,
+            "contextualAnalysis": true,
+            "excludeCommonPatterns": ["0", "1", "-1", "True", "False", "None"]
+          },
+          "description": "Magic literal (Connascence of Meaning) detection settings"
+        },
+        "connascence.parameterAnalysis": {
+          "type": "object",
+          "properties": {
+            "maxParameterCount": {
+              "type": "number",
+              "default": 4,
+              "minimum": 2,
+              "maximum": 10,
+              "description": "Maximum parameter count before flagging Connascence of Position"
+            },
+            "enableKeywordArgSuggestions": {
+              "type": "boolean",
+              "default": true,
+              "description": "Suggest keyword arguments for functions with many parameters"
+            },
+            "correlateWithRuffPLR0913": {
+              "type": "boolean",
+              "default": true,
+              "description": "Correlate parameter analysis with Ruff PLR0913 rule"
+            }
+          },
+          "default": {
+            "maxParameterCount": 4,
+            "enableKeywordArgSuggestions": true,
+            "correlateWithRuffPLR0913": true
+          },
+          "description": "Parameter analysis (Connascence of Position) settings"
         }
       }
     }
@@ -637,5 +738,16 @@
     "webpack-cli": "^5.1.4",
     "ts-loader": "^9.5.1"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "extensionDependencies": [
+    "ms-python.python"
+  ],
+  "contributes": {
+    "jsonValidation": [
+      {
+        "fileMatch": "pyproject.toml",
+        "url": "./schemas/ruff-connascence-schema.json"
+      }
+    ]
+  }
 }

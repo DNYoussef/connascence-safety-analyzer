@@ -1,0 +1,23 @@
+```mermaid
+C4Context
+    title Connascence Analyzer - System Context
+
+    Person(user, "Developer", "Uses connascence analyzer")
+    System(vscode, "VS Code", "IDE with extension")
+    System(ci_cd, "CI/CD Pipeline", "Automated analysis")
+
+    System_Boundary(connascence, "Connascence Analyzer") {
+        Container(cli, "CLI Interface", "Python", "Command-line tool")
+        Container(mcp, "MCP Server", "Python", "Model Context Protocol")
+        Container(analyzer, "Core Analyzer", "Python", "Analysis engine")
+        Container(vscode_ext, "VS Code Extension", "TypeScript", "IDE integration")
+    }
+
+    Rel(user, cli, "Runs analysis")
+    Rel(user, vscode, "Uses IDE")
+    Rel(vscode, vscode_ext, "Loads")
+    Rel(vscode_ext, mcp, "Communicates")
+    Rel(cli, analyzer, "Uses")
+    Rel(mcp, analyzer, "Uses")
+    Rel(ci_cd, cli, "Executes")
+```

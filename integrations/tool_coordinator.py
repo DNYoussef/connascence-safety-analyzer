@@ -348,8 +348,17 @@ class ToolCoordinator:
                     f"these are your most common connascence issues"
                 )
         
-        # Tool-specific recommendations
+        # Enhanced Ruff-specific recommendations
         if 'ruff' in tool_results and tool_results['ruff'].success:
+            ruff_tool = self.tools.get('ruff')
+            if ruff_tool and hasattr(ruff_tool, 'get_rule_recommendations'):
+                # Get enhanced rule-specific recommendations
+                rule_recommendations = ruff_tool.get_rule_recommendations(
+                    tool_results['ruff'].results, violations
+                )
+                recommendations.extend(rule_recommendations)
+            
+            # Fallback to basic recommendations
             ruff_issues = len(tool_results['ruff'].results.get('issues', []))
             if ruff_issues > 20:
                 recommendations.append(
@@ -370,11 +379,36 @@ class ToolCoordinator:
                     f"Add type hints to resolve {mypy_errors} MyPy type checking errors"
                 )
         
-        # Correlation-based recommendations
+        # Enhanced correlation-based recommendations
         complexity_alignment = correlations.get('complexity_alignment', {})
         if complexity_alignment.get('alignment_score', 0) < 0.5:
             recommendations.append(
                 "Consider refactoring complex functions identified by both Radon and Connascence analysis"
+            )
+        
+        # Magic literal correlation recommendations
+        magic_correlation = correlations.get('magic_literal_correlation', 0)
+        if magic_correlation > 0.7:
+            recommendations.append(
+                "High correlation between Ruff PLR2004 and CoM violations - consider extracting constants"
+            )
+        elif magic_correlation < 0.3 and len(violations) > 10:
+            recommendations.append(
+                "Low correlation suggests different magic literal detection approaches - review both tools"
+            )
+        
+        # Parameter correlation recommendations
+        param_correlation = correlations.get('parameter_position_correlation', 0)
+        if param_correlation > 0.6:
+            recommendations.append(
+                "Good alignment on parameter issues (CoP) - use keyword arguments or data classes"
+            )
+        
+        # NASA compliance recommendations
+        nasa_alignment = correlations.get('nasa_compliance_alignment', 0)
+        if nasa_alignment < 0.5:
+            recommendations.append(
+                "Enable additional Ruff rules (PLR*) to improve NASA Power of Ten compliance"
             )
         
         type_coverage = correlations.get('type_safety_coverage', {})
@@ -389,6 +423,13 @@ class ToolCoordinator:
             recommendations.insert(0, 
                 f" URGENT: Address {len(critical_violations)} critical connascence violations immediately"
             )
+        
+        # Prioritize recommendations by impact
+        if recommendations:
+            # Move critical connascence violations to top
+            critical_recs = [r for r in recommendations if 'URGENT' in r or 'critical' in r]
+            other_recs = [r for r in recommendations if r not in critical_recs]
+            recommendations = critical_recs + other_recs[:7]  # Limit total recommendations
         
         return recommendations
     

@@ -1,0 +1,592 @@
+{
+  "success": true,
+  "path": "..",
+  "threshold": 0.8,
+  "comprehensive": true,
+  "mece_score": 0.961,
+  "duplications": [
+    {
+      "id": "cluster_1",
+      "similarity_score": 0.857,
+      "block_count": 8,
+      "files_involved": [
+        "..\\autofix\\core.py",
+        "..\\autofix\\type_hints.py",
+        "..\\analyzer\\autofix\\magic_literals.py",
+        "..\\analyzer\\autofix\\type_hints.py",
+        "..\\autofix\\class_splits.py",
+        "..\\analyzer\\autofix\\class_splits.py",
+        "..\\analyzer\\autofix\\core.py",
+        "..\\autofix\\magic_literals.py"
+      ],
+      "blocks": [
+        {
+          "file_path": "..\\autofix\\class_splits.py",
+          "start_line": 350,
+          "end_line": 352,
+          "lines": [
+            350,
+            351,
+            352
+          ]
+        },
+        {
+          "file_path": "..\\autofix\\core.py",
+          "start_line": 474,
+          "end_line": 476,
+          "lines": [
+            474,
+            475,
+            476
+          ]
+        },
+        {
+          "file_path": "..\\autofix\\magic_literals.py",
+          "start_line": 231,
+          "end_line": 233,
+          "lines": [
+            231,
+            232,
+            233
+          ]
+        },
+        {
+          "file_path": "..\\autofix\\type_hints.py",
+          "start_line": 313,
+          "end_line": 315,
+          "lines": [
+            313,
+            314,
+            315
+          ]
+        },
+        {
+          "file_path": "..\\analyzer\\autofix\\class_splits.py",
+          "start_line": 350,
+          "end_line": 352,
+          "lines": [
+            350,
+            351,
+            352
+          ]
+        },
+        {
+          "file_path": "..\\analyzer\\autofix\\core.py",
+          "start_line": 474,
+          "end_line": 476,
+          "lines": [
+            474,
+            475,
+            476
+          ]
+        },
+        {
+          "file_path": "..\\analyzer\\autofix\\magic_literals.py",
+          "start_line": 231,
+          "end_line": 233,
+          "lines": [
+            231,
+            232,
+            233
+          ]
+        },
+        {
+          "file_path": "..\\analyzer\\autofix\\type_hints.py",
+          "start_line": 313,
+          "end_line": 315,
+          "lines": [
+            313,
+            314,
+            315
+          ]
+        }
+      ],
+      "description": "Found 8 similar code blocks with 85.7% average similarity"
+    },
+    {
+      "id": "cluster_2",
+      "similarity_score": 1.0,
+      "block_count": 3,
+      "files_involved": [
+        "..\\autofix\\core.py",
+        "..\\policy\\baselines.py",
+        "..\\analyzer\\autofix\\core.py"
+      ],
+      "blocks": [
+        {
+          "file_path": "..\\autofix\\core.py",
+          "start_line": 24,
+          "end_line": 35,
+          "lines": [
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35
+          ]
+        },
+        {
+          "file_path": "..\\policy\\baselines.py",
+          "start_line": 25,
+          "end_line": 36,
+          "lines": [
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36
+          ]
+        },
+        {
+          "file_path": "..\\analyzer\\autofix\\core.py",
+          "start_line": 24,
+          "end_line": 35,
+          "lines": [
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35
+          ]
+        }
+      ],
+      "description": "Found 3 similar code blocks with 100.0% average similarity"
+    },
+    {
+      "id": "cluster_3",
+      "similarity_score": 0.872,
+      "block_count": 4,
+      "files_involved": [
+        "..\\autofix\\core.py",
+        "..\\analyzer\\autofix\\param_bombs.py",
+        "..\\autofix\\param_bombs.py",
+        "..\\analyzer\\autofix\\core.py"
+      ],
+      "blocks": [
+        {
+          "file_path": "..\\autofix\\core.py",
+          "start_line": 478,
+          "end_line": 483,
+          "lines": [
+            478,
+            479,
+            480,
+            481,
+            482,
+            483
+          ]
+        },
+        {
+          "file_path": "..\\autofix\\param_bombs.py",
+          "start_line": 322,
+          "end_line": 329,
+          "lines": [
+            322,
+            323,
+            324,
+            325,
+            326,
+            327,
+            328,
+            329
+          ]
+        },
+        {
+          "file_path": "..\\analyzer\\autofix\\core.py",
+          "start_line": 478,
+          "end_line": 483,
+          "lines": [
+            478,
+            479,
+            480,
+            481,
+            482,
+            483
+          ]
+        },
+        {
+          "file_path": "..\\analyzer\\autofix\\param_bombs.py",
+          "start_line": 322,
+          "end_line": 329,
+          "lines": [
+            322,
+            323,
+            324,
+            325,
+            326,
+            327,
+            328,
+            329
+          ]
+        }
+      ],
+      "description": "Found 4 similar code blocks with 87.2% average similarity"
+    },
+    {
+      "id": "cluster_4",
+      "similarity_score": 0.78,
+      "block_count": 5,
+      "files_involved": [
+        "..\\autofix\\core.py",
+        "..\\grammar\\constrained_generator.py",
+        "..\\grammar\\ast_safe_refactoring.py",
+        "..\\analyzer\\autofix\\core.py"
+      ],
+      "blocks": [
+        {
+          "file_path": "..\\autofix\\core.py",
+          "start_line": 108,
+          "end_line": 110,
+          "lines": [
+            108,
+            109,
+            110
+          ]
+        },
+        {
+          "file_path": "..\\grammar\\ast_safe_refactoring.py",
+          "start_line": 106,
+          "end_line": 112,
+          "lines": [
+            106,
+            107,
+            108,
+            109,
+            110,
+            111,
+            112
+          ]
+        },
+        {
+          "file_path": "..\\grammar\\constrained_generator.py",
+          "start_line": 71,
+          "end_line": 77,
+          "lines": [
+            71,
+            72,
+            73,
+            74,
+            75,
+            76,
+            77
+          ]
+        },
+        {
+          "file_path": "..\\analyzer\\autofix\\core.py",
+          "start_line": 108,
+          "end_line": 110,
+          "lines": [
+            108,
+            109,
+            110
+          ]
+        },
+        {
+          "file_path": "..\\analyzer\\autofix\\core.py",
+          "start_line": 422,
+          "end_line": 428,
+          "lines": [
+            422,
+            423,
+            424,
+            425,
+            426,
+            427,
+            428
+          ]
+        }
+      ],
+      "description": "Found 5 similar code blocks with 78.0% average similarity"
+    },
+    {
+      "id": "cluster_5",
+      "similarity_score": 0.889,
+      "block_count": 4,
+      "files_involved": [
+        "..\\analyzer\\autofix\\magic_literals.py",
+        "..\\autofix\\magic_literals.py"
+      ],
+      "blocks": [
+        {
+          "file_path": "..\\autofix\\magic_literals.py",
+          "start_line": 235,
+          "end_line": 238,
+          "lines": [
+            235,
+            236,
+            237,
+            238
+          ]
+        },
+        {
+          "file_path": "..\\analyzer\\autofix\\magic_literals.py",
+          "start_line": 235,
+          "end_line": 238,
+          "lines": [
+            235,
+            236,
+            237,
+            238
+          ]
+        },
+        {
+          "file_path": "..\\analyzer\\autofix\\magic_literals.py",
+          "start_line": 240,
+          "end_line": 243,
+          "lines": [
+            240,
+            241,
+            242,
+            243
+          ]
+        },
+        {
+          "file_path": "..\\analyzer\\autofix\\magic_literals.py",
+          "start_line": 245,
+          "end_line": 248,
+          "lines": [
+            245,
+            246,
+            247,
+            248
+          ]
+        }
+      ],
+      "description": "Found 4 similar code blocks with 88.9% average similarity"
+    },
+    {
+      "id": "cluster_6",
+      "similarity_score": 1.0,
+      "block_count": 3,
+      "files_involved": [
+        "..\\tests\\conftest.py",
+        "..\\analyzer\\autofix\\patch_api.py",
+        "..\\autofix\\patch_api.py"
+      ],
+      "blocks": [
+        {
+          "file_path": "..\\autofix\\patch_api.py",
+          "start_line": 29,
+          "end_line": 31,
+          "lines": [
+            29,
+            30,
+            31
+          ]
+        },
+        {
+          "file_path": "..\\tests\\conftest.py",
+          "start_line": 357,
+          "end_line": 359,
+          "lines": [
+            357,
+            358,
+            359
+          ]
+        },
+        {
+          "file_path": "..\\analyzer\\autofix\\patch_api.py",
+          "start_line": 29,
+          "end_line": 31,
+          "lines": [
+            29,
+            30,
+            31
+          ]
+        }
+      ],
+      "description": "Found 3 similar code blocks with 100.0% average similarity"
+    },
+    {
+      "id": "cluster_7",
+      "similarity_score": 0.857,
+      "block_count": 5,
+      "files_involved": [
+        "..\\integrations\\mypy_integration.py",
+        "..\\integrations\\bandit_integration.py",
+        "..\\integrations\\radon_integration.py",
+        "..\\integrations\\black_integration.py",
+        "..\\integrations\\ruff_integration.py"
+      ],
+      "blocks": [
+        {
+          "file_path": "..\\integrations\\bandit_integration.py",
+          "start_line": 35,
+          "end_line": 42,
+          "lines": [
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42
+          ]
+        },
+        {
+          "file_path": "..\\integrations\\black_integration.py",
+          "start_line": 36,
+          "end_line": 43,
+          "lines": [
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43
+          ]
+        },
+        {
+          "file_path": "..\\integrations\\mypy_integration.py",
+          "start_line": 36,
+          "end_line": 43,
+          "lines": [
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43
+          ]
+        },
+        {
+          "file_path": "..\\integrations\\radon_integration.py",
+          "start_line": 35,
+          "end_line": 42,
+          "lines": [
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42
+          ]
+        },
+        {
+          "file_path": "..\\integrations\\ruff_integration.py",
+          "start_line": 40,
+          "end_line": 47,
+          "lines": [
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47
+          ]
+        }
+      ],
+      "description": "Found 5 similar code blocks with 85.7% average similarity"
+    },
+    {
+      "id": "cluster_8",
+      "similarity_score": 1.0,
+      "block_count": 3,
+      "files_involved": [
+        "..\\policy\\manager.py",
+        "..\\mcp\\server.py",
+        "..\\policy\\budgets.py"
+      ],
+      "blocks": [
+        {
+          "file_path": "..\\mcp\\server.py",
+          "start_line": 27,
+          "end_line": 39,
+          "lines": [
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39
+          ]
+        },
+        {
+          "file_path": "..\\policy\\budgets.py",
+          "start_line": 40,
+          "end_line": 52,
+          "lines": [
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52
+          ]
+        },
+        {
+          "file_path": "..\\policy\\manager.py",
+          "start_line": 20,
+          "end_line": 32,
+          "lines": [
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32
+          ]
+        }
+      ],
+      "description": "Found 3 similar code blocks with 100.0% average similarity"
+    }
+  ],
+  "summary": {
+    "total_duplications": 8,
+    "high_similarity_count": 7,
+    "coverage_score": 0.961,
+    "files_analyzed": 94,
+    "blocks_analyzed": 1280
+  }
+}

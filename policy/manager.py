@@ -21,14 +21,25 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent))
 
 from utils.config_loader import ConnascenceViolation, ThresholdConfig, load_config_defaults
+from analyzer.constants import (
+    resolve_policy_name,
+    validate_policy_name,
+    get_legacy_policy_name,
+    list_available_policies,
+    UNIFIED_POLICY_NAMES,
+    UNIFIED_POLICY_MAPPING
+)
 
 # Load configuration defaults
 POLICY_DEFAULTS = load_config_defaults('policy_manager')
+
+# Service defaults constants
 SERVICE_DEFAULTS_MAX_CYCLOMATIC_COMPLEXITY = 12
 SERVICE_DEFAULTS_COM_LIMIT = 8
 SERVICE_DEFAULTS_COP_LIMIT = 5
 SERVICE_DEFAULTS_TOTAL_VIOLATIONS_LIMIT = 30
 
+# Experimental constants
 EXPERIMENTAL_MAX_POSITIONAL_PARAMS = 6
 EXPERIMENTAL_GOD_CLASS_METHODS = 35
 EXPERIMENTAL_MAX_CYCLOMATIC_COMPLEXITY = 20
@@ -36,11 +47,22 @@ EXPERIMENTAL_COM_LIMIT = 15
 EXPERIMENTAL_COP_LIMIT = 8
 EXPERIMENTAL_TOTAL_VIOLATIONS_LIMIT = 50
 
+# Strict core constants (missing from original)
+STRICT_CORE_MAX_POSITIONAL_PARAMS = 2
+STRICT_CORE_GOD_CLASS_METHODS = 15
+STRICT_CORE_MAX_CYCLOMATIC_COMPLEXITY = 8
+STRICT_CORE_COM_LIMIT = 3
+STRICT_CORE_COP_LIMIT = 2
+STRICT_CORE_TOTAL_VIOLATIONS_LIMIT = 10
+
 class PolicyManager:
     def __init__(self):
+        # Unified standard presets (new canonical structure)
         self.presets = {
-            'strict-core': {
-                'name': 'Strict Core',
+            # NASA compliance (highest safety)
+            'nasa-compliance': {
+                'name': 'NASA Compliance',
+                'description': 'NASA JPL Power of Ten compliance standards',
                 'thresholds': {
                     'max_positional_params': STRICT_CORE_MAX_POSITIONAL_PARAMS,
                     'god_class_methods': STRICT_CORE_GOD_CLASS_METHODS,
@@ -52,11 +74,28 @@ class PolicyManager:
                     'total_violations': STRICT_CORE_TOTAL_VIOLATIONS_LIMIT
                 }
             },
-            'service-defaults': {
-                'name': 'Service Defaults', 
+            # Strict analysis
+            'strict': {
+                'name': 'Strict Analysis',
+                'description': 'Strict code quality standards', 
                 'thresholds': {
-                    'max_positional_params': 3,  # Expected by test
-                    'god_class_methods': 20,     # Expected by test
+                    'max_positional_params': STRICT_CORE_MAX_POSITIONAL_PARAMS,  # Expected by tests
+                    'god_class_methods': STRICT_CORE_GOD_CLASS_METHODS,     # Expected by tests
+                    'max_cyclomatic_complexity': STRICT_CORE_MAX_CYCLOMATIC_COMPLEXITY
+                },
+                'budget_limits': {
+                    'CoM': STRICT_CORE_COM_LIMIT,
+                    'CoP': STRICT_CORE_COP_LIMIT,
+                    'total_violations': STRICT_CORE_TOTAL_VIOLATIONS_LIMIT
+                }
+            },
+            # Standard balanced approach
+            'standard': {
+                'name': 'Standard Balanced',
+                'description': 'Balanced service defaults (recommended)',
+                'thresholds': {
+                    'max_positional_params': 3,  # Expected by tests
+                    'god_class_methods': 20,     # Expected by tests  
                     'max_cyclomatic_complexity': SERVICE_DEFAULTS_MAX_CYCLOMATIC_COMPLEXITY
                 },
                 'budget_limits': {
@@ -65,10 +104,12 @@ class PolicyManager:
                     'total_violations': SERVICE_DEFAULTS_TOTAL_VIOLATIONS_LIMIT
                 }
             },
-            'experimental': {
-                'name': 'Experimental',
+            # Lenient experimental
+            'lenient': {
+                'name': 'Lenient Experimental',
+                'description': 'Relaxed experimental settings',
                 'thresholds': {
-                    'max_positional_params': 4,  # Expected by test
+                    'max_positional_params': 4,  # Expected by tests
                     'god_class_methods': EXPERIMENTAL_GOD_CLASS_METHODS,
                     'max_cyclomatic_complexity': EXPERIMENTAL_MAX_CYCLOMATIC_COMPLEXITY
                 },
@@ -79,27 +120,60 @@ class PolicyManager:
                 }
             }
         }
+        
+        # Legacy aliases for backwards compatibility
+        self._add_legacy_aliases()
+        
         self.custom_policies = {}
     
-    def get_preset(self, name: str) -> ThresholdConfig:
-        """Get a policy preset by name."""
-        if name not in self.presets:
-            raise ValueError(f"Preset not found: {name}")
+    def _add_legacy_aliases(self):
+        """Add legacy policy aliases for backwards compatibility."""
+        # CLI legacy names
+        self.presets['nasa_jpl_pot10'] = self.presets['nasa-compliance'].copy()
+        self.presets['strict-core'] = self.presets['strict'].copy()
+        self.presets['default'] = self.presets['standard'].copy()
+        self.presets['service-defaults'] = self.presets['standard'].copy()
+        self.presets['experimental'] = self.presets['lenient'].copy()
         
-        preset_dict = self.presets[name].copy()
+        # VSCode legacy names  
+        self.presets['safety_level_1'] = self.presets['nasa-compliance'].copy()
+        self.presets['general_safety_strict'] = self.presets['strict'].copy()
+        self.presets['modern_general'] = self.presets['standard'].copy()
+        self.presets['safety_level_3'] = self.presets['lenient'].copy()
+    
+    def get_preset(self, name: str) -> ThresholdConfig:
+        """Get a policy preset by name with unified resolution."""
+        # Resolve to unified name first
+        unified_name = resolve_policy_name(name, warn_deprecated=True)
+        
+        # Check if unified preset exists
+        if unified_name in self.presets:
+            preset_dict = self.presets[unified_name].copy()
+        elif name in self.presets:
+            # Fallback to original name
+            preset_dict = self.presets[name].copy()
+        else:
+            available_policies = list_available_policies(include_legacy=True)
+            raise ValueError(
+                f"Preset not found: {name}. Available policies: {', '.join(available_policies)}"
+            )
+        
         return ThresholdConfig(
             max_positional_params=preset_dict.get('thresholds', {}).get('max_positional_params', 3),
             god_class_methods=preset_dict.get('thresholds', {}).get('god_class_methods', 20),
             max_cyclomatic_complexity=preset_dict.get('thresholds', {}).get('max_cyclomatic_complexity', 10)
         )
     
-    def list_presets(self) -> List[str]:
+    def list_presets(self, unified_only: bool = False) -> List[str]:
         """List available policy presets."""
-        return list(self.presets.keys())
+        if unified_only:
+            return UNIFIED_POLICY_NAMES.copy()
+        else:
+            return list(self.presets.keys())
     
     def validate_preset_name(self, name: str) -> bool:
-        """Validate if preset name exists."""
-        return name in self.presets
+        """Validate if preset name exists using unified system."""
+        return validate_policy_name(name) or name in self.presets
     
     def validate_policy(self, policy: Dict[str, Any]) -> Dict[str, Any]:
         """Validate policy configuration."""

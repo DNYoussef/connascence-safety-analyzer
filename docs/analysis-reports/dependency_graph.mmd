@@ -1,0 +1,98 @@
+```mermaid
+graph TD
+    %% Connascence Analyzer Architecture Dependency Graph
+
+    %% Node Definitions
+    analyzer[Analyzer]
+    class analyzer coreModule
+    autofix[Autofix]
+    class autofix featureModule
+    cli[CLI]
+    class cli interfaceModule
+    config[Config]
+    core[Core]
+    class core coreModule
+    dashboard[Dashboard]
+    class dashboard featureModule
+    experimental[Experimental]
+    class experimental featureModule
+    integrations[Integrations]
+    mcp[MCP]
+    class mcp interfaceModule
+    policy[Policy]
+    reporting[Reporting]
+    security[Security]
+    class security featureModule
+    tests[Tests]
+    utils[Utils]
+    class utils coreModule
+
+    %% Dependencies
+    analyzer ---|3| core
+    linkStyle 1 stroke:#feca57,stroke-width:2px
+    analyzer ---|6| reporting
+    linkStyle 2 stroke:#ff6b6b,stroke-width:3px
+    analyzer ---|4| mcp
+    linkStyle 3 stroke:#feca57,stroke-width:2px
+    analyzer ---|2| policy
+    linkStyle 4 stroke:#feca57,stroke-width:2px
+    analyzer ---|1| utils
+    analyzer ---|1| dashboard
+    cli ---|16| analyzer
+    linkStyle 7 stroke:#ff6b6b,stroke-width:3px
+    cli ---|9| experimental
+    linkStyle 8 stroke:#ff6b6b,stroke-width:3px
+    cli ---|3| policy
+    linkStyle 9 stroke:#feca57,stroke-width:2px
+    mcp ---|5| config
+    linkStyle 10 stroke:#feca57,stroke-width:2px
+    mcp ---|4| core
+    linkStyle 11 stroke:#feca57,stroke-width:2px
+    mcp ---|4| utils
+    linkStyle 12 stroke:#feca57,stroke-width:2px
+    mcp ---|10| analyzer
+    linkStyle 13 stroke:#ff6b6b,stroke-width:3px
+    policy ---|3| utils
+    linkStyle 14 stroke:#ff6b6b,stroke-width:3px
+    policy ---|6| analyzer
+    linkStyle 15 stroke:#ff6b6b,stroke-width:3px
+    utils ---|1| config
+    linkStyle 16 stroke:#ff6b6b,stroke-width:3px
+    integrations ---|4| config
+    linkStyle 17 stroke:#ff6b6b,stroke-width:3px
+    integrations ---|1| analyzer
+    linkStyle 18 stroke:#feca57,stroke-width:2px
+    tests ---|8| mcp
+    tests ---|22| analyzer
+    linkStyle 20 stroke:#feca57,stroke-width:2px
+    tests ---|10| autofix
+    linkStyle 21 stroke:#feca57,stroke-width:2px
+    tests ---|30| cli
+    linkStyle 22 stroke:#ff6b6b,stroke-width:3px
+    tests ---|9| policy
+    linkStyle 23 stroke:#feca57,stroke-width:2px
+    tests ---|1| reporting
+    tests ---|1| dashboard
+    tests ---|1| experimental
+    experimental ---|7| analyzer
+    linkStyle 27 stroke:#ff6b6b,stroke-width:3px
+    experimental ---|3| reporting
+    linkStyle 28 stroke:#feca57,stroke-width:2px
+    dashboard ---|4| analyzer
+    linkStyle 29 stroke:#ff6b6b,stroke-width:3px
+    dashboard ---|3| policy
+    linkStyle 30 stroke:#ff6b6b,stroke-width:3px
+    dashboard ---|1| reporting
+    linkStyle 31 stroke:#feca57,stroke-width:2px
+    dashboard ---|1| autofix
+    linkStyle 32 stroke:#feca57,stroke-width:2px
+    autofix ---|2| mcp
+    linkStyle 33 stroke:#feca57,stroke-width:2px
+    autofix ---|6| core
+    linkStyle 34 stroke:#ff6b6b,stroke-width:3px
+
+    %% Styling
+    classDef coreModule fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    classDef interfaceModule fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    classDef featureModule fill:#e8f5e8,stroke:#388e3c,stroke-width:2px
+```

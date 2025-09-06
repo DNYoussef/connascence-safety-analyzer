@@ -52,12 +52,16 @@ except ImportError:
 try:
     from .constants import (
         NASA_COMPLIANCE_THRESHOLD, MECE_QUALITY_THRESHOLD, 
-        OVERALL_QUALITY_THRESHOLD, VIOLATION_WEIGHTS
+        OVERALL_QUALITY_THRESHOLD, VIOLATION_WEIGHTS,
+        ERROR_CODE_MAPPING, ERROR_SEVERITY, INTEGRATION_ERROR_MAPPING,
+        ERROR_CORRELATION_CONTEXT
     )
 except ImportError:
     from constants import (
         NASA_COMPLIANCE_THRESHOLD, MECE_QUALITY_THRESHOLD, 
-        OVERALL_QUALITY_THRESHOLD, VIOLATION_WEIGHTS
+        OVERALL_QUALITY_THRESHOLD, VIOLATION_WEIGHTS,
+        ERROR_CODE_MAPPING, ERROR_SEVERITY, INTEGRATION_ERROR_MAPPING,
+        ERROR_CORRELATION_CONTEXT
     )
 
 # Try to import optional components with fallbacks
@@ -79,6 +83,26 @@ except ImportError:
     BudgetTracker = None
 
 logger = logging.getLogger(__name__)
+
+
+@dataclass
+class StandardError:
+    """Standard error response format across all integrations."""
+    code: int
+    message: str
+    severity: str
+    timestamp: str
+    integration: str
+    error_id: Optional[str] = None
+    context: Optional[Dict[str, Any]] = None
+    correlation_id: Optional[str] = None
+    file_path: Optional[str] = None
+    line_number: Optional[int] = None
+    suggestions: Optional[List[str]] = None
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert to dictionary for serialization."""
+        return asdict(self)
 
 
 @dataclass
@@ -114,9 +138,108 @@ class UnifiedAnalysisResult:
     priority_fixes: List[str]
     improvement_actions: List[str]
     
+    # Error tracking
+    errors: List[StandardError] = None
+    warnings: List[StandardError] = None
+    
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for serialization."""
         return asdict(self)
+    
+    def has_errors(self) -> bool:
+        """Check if analysis has any errors."""
+        return bool(self.errors)
+    
+    def has_critical_errors(self) -> bool:
+        """Check if analysis has critical errors."""
+        if not self.errors:
+            return False
+        return any(error.severity == ERROR_SEVERITY['CRITICAL'] for error in self.errors)
+
+
+class ErrorHandler:
+    """Centralized error handling for all integrations."""
+    
+    def __init__(self, integration: str = 'analyzer'):
+        self.integration = integration
+        self.correlation_id = self._generate_correlation_id()
+    
+    def _generate_correlation_id(self) -> str:
+        """Generate unique correlation ID for error tracking."""
+        import uuid
+        return str(uuid.uuid4())[:8]
+    
+    def create_error(self, 
+                    error_type: str, 
+                    message: str, 
+                    severity: str = ERROR_SEVERITY['MEDIUM'],
+                    context: Optional[Dict[str, Any]] = None,
+                    file_path: Optional[str] = None,
+                    line_number: Optional[int] = None,
+                    suggestions: Optional[List[str]] = None) -> StandardError:
+        """Create standardized error response."""
+        from datetime import datetime
+        
+        error_code = ERROR_CODE_MAPPING.get(error_type, ERROR_CODE_MAPPING['INTERNAL_ERROR'])
+        
+        return StandardError(
+            code=error_code,
+            message=message,
+            severity=severity,
+            timestamp=datetime.now().isoformat(),
+            integration=self.integration,
+            error_id=error_type,
+            context=context or {},
+            correlation_id=self.correlation_id,
+            file_path=file_path,
+            line_number=line_number,
+            suggestions=suggestions
+        )
+    
+    def handle_exception(self, 
+                        exception: Exception, 
+                        context: Optional[Dict[str, Any]] = None,
+                        file_path: Optional[str] = None) -> StandardError:
+        """Convert exception to standardized error."""
+        # Map common exceptions to error types
+        exception_mapping = {
+            FileNotFoundError: 'FILE_NOT_FOUND',
+            PermissionError: 'PERMISSION_DENIED',
+            SyntaxError: 'SYNTAX_ERROR',
+            TimeoutError: 'TIMEOUT_ERROR',
+            MemoryError: 'MEMORY_ERROR',
+            ValueError: 'ANALYSIS_FAILED',
+            ImportError: 'DEPENDENCY_MISSING'
+        }
+        
+        error_type = exception_mapping.get(type(exception), 'INTERNAL_ERROR')
+        severity = ERROR_SEVERITY['HIGH'] if error_type in ['FILE_NOT_FOUND', 'PERMISSION_DENIED'] else ERROR_SEVERITY['MEDIUM']
+        
+        return self.create_error(
+            error_type=error_type,
+            message=str(exception),
+            severity=severity,
+            context=context,
+            file_path=file_path
+        )
+    
+    def log_error(self, error: StandardError):
+        """Log error with appropriate level."""
+        log_level_mapping = {
+            ERROR_SEVERITY['CRITICAL']: logger.critical,
+            ERROR_SEVERITY['HIGH']: logger.error,
+            ERROR_SEVERITY['MEDIUM']: logger.warning,
+            ERROR_SEVERITY['LOW']: logger.info,
+            ERROR_SEVERITY['INFO']: logger.info
+        }
+        
+        log_func = log_level_mapping.get(error.severity, logger.error)
+        log_func(f"[{error.integration}:{error.correlation_id}] {error.message} (Code: {error.code})")
+        
+        if error.file_path:
+            log_func(f"  File: {error.file_path}:{error.line_number or 0}")
+        if error.suggestions:
+            log_func(f"  Suggestions: {', '.join(error.suggestions)}")
 
 
 class ComponentInitializer:
@@ -296,10 +419,18 @@ class UnifiedConnascenceAnalyzer:
     
     def __init__(self, config_path: Optional[str] = None):
         """Initialize the unified analyzer with available components."""
+        # Initialize error handling
+        self.error_handler = ErrorHandler('analyzer')
+        
         # Initialize core analyzers (always available)
-        self.ast_analyzer = ConnascenceASTAnalyzer()
-        self.orchestrator = AnalyzerOrchestrator()
-        self.mece_analyzer = MECEAnalyzer()
+        try:
+            self.ast_analyzer = ConnascenceASTAnalyzer()
+            self.orchestrator = AnalyzerOrchestrator()
+            self.mece_analyzer = MECEAnalyzer()
+        except Exception as e:
+            error = self.error_handler.handle_exception(e, {'component': 'core_analyzers'})
+            self.error_handler.log_error(error)
+            raise
         
         # Initialize optional components
         initializer = ComponentInitializer()
@@ -341,29 +472,70 @@ class UnifiedConnascenceAnalyzer:
         project_path = Path(project_path)
         options = options or {}
         start_time = self._get_timestamp_ms()
+        analysis_errors = []
+        analysis_warnings = []
         
         logger.info(f"Starting unified analysis of {project_path}")
         
-        # Run all analysis phases
-        violations = self._run_analysis_phases(project_path, policy_preset)
+        # Validate inputs
+        try:
+            self._validate_analysis_inputs(project_path, policy_preset)
+        except Exception as e:
+            error = self.error_handler.handle_exception(e, {
+                'project_path': str(project_path),
+                'policy_preset': policy_preset
+            })
+            analysis_errors.append(error)
+            self.error_handler.log_error(error)
         
-        # Calculate metrics and generate recommendations
-        metrics = self.metrics_calculator.calculate_comprehensive_metrics(
-            violations['connascence'], violations['duplication'], violations['nasa'], self.nasa_integration
-        )
+        # Run all analysis phases with error handling
+        try:
+            violations = self._run_analysis_phases(project_path, policy_preset)
+        except Exception as e:
+            error = self.error_handler.handle_exception(e, {
+                'phase': 'analysis',
+                'project_path': str(project_path)
+            })
+            analysis_errors.append(error)
+            self.error_handler.log_error(error)
+            # Provide empty violations as fallback
+            violations = {'connascence': [], 'duplication': [], 'nasa': []}
         
-        recommendations = self.recommendation_generator.generate_unified_recommendations(
-            violations['connascence'], violations['duplication'], violations['nasa'], self.nasa_integration
-        )
+        # Calculate metrics and generate recommendations with error handling
+        try:
+            metrics = self.metrics_calculator.calculate_comprehensive_metrics(
+                violations['connascence'], violations['duplication'], violations['nasa'], self.nasa_integration
+            )
+        except Exception as e:
+            error = self.error_handler.handle_exception(e, {'phase': 'metrics_calculation'})
+            analysis_errors.append(error)
+            self.error_handler.log_error(error)
+            # Provide default metrics
+            metrics = self._get_default_metrics()
+        
+        try:
+            recommendations = self.recommendation_generator.generate_unified_recommendations(
+                violations['connascence'], violations['duplication'], violations['nasa'], self.nasa_integration
+            )
+        except Exception as e:
+            error = self.error_handler.handle_exception(e, {'phase': 'recommendations'})
+            analysis_warnings.append(error)
+            self.error_handler.log_error(error)
+            # Provide empty recommendations
+            recommendations = {'priority_fixes': [], 'improvement_actions': []}
         
         # Build and return result
         analysis_time = self._get_timestamp_ms() - start_time
         result = self._build_unified_result(
-            violations, metrics, recommendations, project_path, policy_preset, analysis_time
+            violations, metrics, recommendations, project_path, policy_preset, analysis_time,
+            analysis_errors, analysis_warnings
         )
         
         logger.info(f"Unified analysis complete in {analysis_time}ms")
         logger.info(f"Found {result.total_violations} total violations across all analyzers")
+        
+        if result.has_errors():
+            logger.warning(f"Analysis completed with {len(result.errors)} errors")
         
         return result
     
@@ -439,9 +611,37 @@ class UnifiedConnascenceAnalyzer:
         
         return nasa_violations
     
+    def _validate_analysis_inputs(self, project_path: Path, policy_preset: str):
+        """Validate analysis inputs and raise appropriate errors."""
+        if not project_path.exists():
+            raise FileNotFoundError(f"Project path does not exist: {project_path}")
+        
+        if not project_path.is_dir():
+            raise ValueError(f"Project path is not a directory: {project_path}")
+        
+        valid_presets = ['service-defaults', 'strict-core', 'experimental', 'balanced', 'lenient']
+        if policy_preset not in valid_presets:
+            raise ValueError(f"Invalid policy preset: {policy_preset}. Valid options: {valid_presets}")
+    
+    def _get_default_metrics(self) -> Dict[str, Any]:
+        """Provide default metrics when calculation fails."""
+        return {
+            'total_violations': 0,
+            'critical_count': 0,
+            'high_count': 0,
+            'medium_count': 0,
+            'low_count': 0,
+            'connascence_index': 0.0,
+            'nasa_compliance_score': 1.0,
+            'duplication_score': 1.0,
+            'overall_quality_score': 0.8
+        }
+    
     def _build_unified_result(self, violations: Dict, metrics: Dict, recommendations: Dict, 
-                             project_path: Path, policy_preset: str, analysis_time: int) -> UnifiedAnalysisResult:
-        """Build the unified analysis result."""
+                             project_path: Path, policy_preset: str, analysis_time: int,
+                             errors: List[StandardError] = None,
+                             warnings: List[StandardError] = None) -> UnifiedAnalysisResult:
+        """Build the unified analysis result with error tracking."""
         return UnifiedAnalysisResult(
             connascence_violations=violations['connascence'],
             duplication_clusters=violations['duplication'],
@@ -465,35 +665,96 @@ class UnifiedConnascenceAnalyzer:
             timestamp=self._get_iso_timestamp(),
             
             priority_fixes=recommendations['priority_fixes'],
-            improvement_actions=recommendations['improvement_actions']
+            improvement_actions=recommendations['improvement_actions'],
+            
+            errors=errors or [],
+            warnings=warnings or []
         )
     
     def analyze_file(self, file_path: Union[str, Path]) -> Dict[str, Any]:
         """Analyze a single file with all available analyzers."""
         file_path = Path(file_path)
+        file_errors = []
+        file_warnings = []
+        
+        # Validate file input
+        try:
+            if not file_path.exists():
+                raise FileNotFoundError(f"File does not exist: {file_path}")
+            if not file_path.is_file():
+                raise ValueError(f"Path is not a file: {file_path}")
+        except Exception as e:
+            error = self.error_handler.handle_exception(e, file_path=str(file_path))
+            file_errors.append(error)
+            self.error_handler.log_error(error)
+            return self._get_empty_file_result(file_path, file_errors)
         
         # Run individual file analysis through each component
-        ast_violations = self.ast_analyzer.analyze_file(file_path)
-        
-        # Convert to unified format
-        violations = [self._violation_to_dict(v) for v in ast_violations]
+        try:
+            ast_violations = self.ast_analyzer.analyze_file(file_path)
+            violations = [self._violation_to_dict(v) for v in ast_violations]
+        except Exception as e:
+            error = self.error_handler.handle_exception(e, 
+                {'analysis_type': 'ast'}, str(file_path))
+            file_errors.append(error)
+            self.error_handler.log_error(error)
+            violations = []
         
         # Check NASA compliance for each violation
         nasa_violations = []
-        if self.nasa_integration:
-            for violation in violations:
-                nasa_checks = self.nasa_integration.check_nasa_violations(violation)
-                nasa_violations.extend(nasa_checks)
-        else:
-            # Extract NASA violations from existing connascence violations
-            nasa_violations = [v for v in violations if 'NASA' in v.get('rule_id', '')]
+        try:
+            if self.nasa_integration:
+                for violation in violations:
+                    nasa_checks = self.nasa_integration.check_nasa_violations(violation)
+                    nasa_violations.extend(nasa_checks)
+            else:
+                # Extract NASA violations from existing connascence violations
+                nasa_violations = [v for v in violations if 'NASA' in v.get('rule_id', '')]
+        except Exception as e:
+            error = self.error_handler.handle_exception(e, 
+                {'analysis_type': 'nasa'}, str(file_path))
+            file_warnings.append(error)
+            self.error_handler.log_error(error)
         
-        return {
+        # Calculate compliance score
+        try:
+            nasa_compliance_score = (max(0.0, 1.0 - (len(nasa_violations) * 0.1)) 
+                                    if not self.nasa_integration 
+                                    else self.nasa_integration.calculate_nasa_compliance_score(nasa_violations))
+        except Exception as e:
+            error = self.error_handler.handle_exception(e, 
+                {'calculation': 'nasa_compliance'}, str(file_path))
+            file_warnings.append(error)
+            self.error_handler.log_error(error)
+            nasa_compliance_score = 1.0
+        
+        result = {
             'file_path': str(file_path),
             'connascence_violations': violations,
             'nasa_violations': nasa_violations,
             'violation_count': len(violations),
-            'nasa_compliance_score': max(0.0, 1.0 - (len(nasa_violations) * 0.1)) if not self.nasa_integration else self.nasa_integration.calculate_nasa_compliance_score(nasa_violations)
+            'nasa_compliance_score': nasa_compliance_score
+        }
+        
+        # Add error information if present
+        if file_errors or file_warnings:
+            result['errors'] = [error.to_dict() for error in file_errors]
+            result['warnings'] = [warning.to_dict() for warning in file_warnings]
+            result['has_errors'] = bool(file_errors)
+        
+        return result
+    
+    def _get_empty_file_result(self, file_path: Path, errors: List[StandardError]) -> Dict[str, Any]:
+        """Return empty result structure when file analysis fails."""
+        return {
+            'file_path': str(file_path),
+            'connascence_violations': [],
+            'nasa_violations': [],
+            'violation_count': 0,
+            'nasa_compliance_score': 0.0,
+            'errors': [error.to_dict() for error in errors],
+            'warnings': [],
+            'has_errors': True
         }
     
     def get_dashboard_summary(self, analysis_result: UnifiedAnalysisResult) -> Dict[str, Any]:
@@ -589,6 +850,19 @@ class UnifiedConnascenceAnalyzer:
             'low': 1.0
         }
         return weights.get(severity, 2.0)
+    
+    def create_integration_error(self, integration: str, error_type: str, 
+                               message: str, context: Optional[Dict[str, Any]] = None) -> StandardError:
+        """Create integration-specific error with proper mapping."""
+        temp_handler = ErrorHandler(integration)
+        return temp_handler.create_error(error_type, message, context=context)
+    
+    def convert_exception_to_standard_error(self, exception: Exception, 
+                                          integration: str = 'analyzer',
+                                          context: Optional[Dict[str, Any]] = None) -> StandardError:
+        """Convert any exception to standardized error format."""
+        temp_handler = ErrorHandler(integration)
+        return temp_handler.handle_exception(exception, context)
 
 
 def loadConnascenceSystem():
@@ -610,13 +884,15 @@ def loadConnascenceSystem():
                 return result.to_dict()
             except Exception as e:
                 logger.error(f"Report generation failed: {e}")
+                error = analyzer.convert_exception_to_standard_error(e, 'vscode', 
+                    {'operation': 'generateConnascenceReport'})
                 return {
                     'connascence_violations': [],
                     'duplication_clusters': [],
                     'nasa_violations': [],
                     'total_violations': 0,
                     'overall_quality_score': 0.8,
-                    'error': str(e)
+                    'error': error.to_dict()
                 }
         
         def validateSafetyCompliance(options):
@@ -625,15 +901,25 @@ def loadConnascenceSystem():
                 file_result = analyzer.analyze_file(options.get('filePath'))
                 nasa_violations = file_result.get('nasa_violations', [])
                 
-                return {
+                result = {
                     'compliant': len(nasa_violations) == 0,
                     'violations': nasa_violations
                 }
+                
+                # Include error information if present
+                if file_result.get('has_errors'):
+                    result['errors'] = file_result.get('errors', [])
+                    result['warnings'] = file_result.get('warnings', [])
+                
+                return result
             except Exception as e:
                 logger.error(f"Safety validation failed: {e}")
+                error = analyzer.convert_exception_to_standard_error(e, 'vscode', 
+                    {'operation': 'validateSafetyCompliance', 'filePath': options.get('filePath')})
                 return {
                     'compliant': False,
-                    'violations': []
+                    'violations': [],
+                    'error': error.to_dict()
                 }
         
         def getRefactoringSuggestions(options):
@@ -651,10 +937,27 @@ def loadConnascenceSystem():
                         'preview': f"Consider refactoring line {violation.get('line_number', 0)}"
                     })
                 
+                # Include error context if present
+                if file_result.get('has_errors'):
+                    for error in file_result.get('errors', []):
+                        suggestions.append({
+                            'technique': 'Fix Analysis Error',
+                            'description': error.get('message', ''),
+                            'confidence': 0.9,
+                            'preview': f"Resolve: {error.get('error_id', 'Unknown error')}"
+                        })
+                
                 return suggestions
             except Exception as e:
                 logger.error(f"Refactoring suggestions failed: {e}")
-                return []
+                error = analyzer.convert_exception_to_standard_error(e, 'vscode', 
+                    {'operation': 'getRefactoringSuggestions'})
+                return [{
+                    'technique': 'Fix Analysis Error',
+                    'description': error.message,
+                    'confidence': 0.5,
+                    'preview': f"Error Code: {error.code}"
+                }]
         
         def getAutomatedFixes(options):
             """Get automated fixes for common violations."""
@@ -675,7 +978,15 @@ def loadConnascenceSystem():
                 return fixes
             except Exception as e:
                 logger.error(f"Automated fixes failed: {e}")
-                return []
+                error = analyzer.convert_exception_to_standard_error(e, 'vscode', 
+                    {'operation': 'getAutomatedFixes'})
+                return [{
+                    'line': 0,
+                    'issue': 'Analysis Error',
+                    'description': error.message,
+                    'replacement': f'# Error Code: {error.code}',
+                    'error': error.to_dict()
+                }]
         
         return {
             'generateConnascenceReport': generateConnascenceReport,

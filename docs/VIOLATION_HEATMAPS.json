@@ -1,0 +1,996 @@
+{
+  "heatmaps": {
+    "folder_heatmap": {
+      "analyzer": {
+        "total_violations": 2956,
+        "critical_violations": 1,
+        "files_affected": 22,
+        "violation_types": [
+          "god_object",
+          "CoA",
+          "connascence_of_position",
+          "connascence_of_algorithm",
+          "connascence_of_timing",
+          "connascence_of_meaning"
+        ],
+        "unique_violation_types": 6,
+        "severity_breakdown": {
+          "medium": 2727,
+          "high": 228,
+          "critical": 1
+        },
+        "heat_intensity": 0.04,
+        "risk_level": "EXTREME"
+      },
+      "autofix": {
+        "total_violations": 1093,
+        "critical_violations": 1,
+        "files_affected": 9,
+        "violation_types": [
+          "god_object",
+          "connascence_of_position",
+          "connascence_of_algorithm",
+          "CoA",
+          "connascence_of_meaning"
+        ],
+        "unique_violation_types": 5,
+        "severity_breakdown": {
+          "high": 208,
+          "medium": 884,
+          "critical": 1
+        },
+        "heat_intensity": 0.015,
+        "risk_level": "EXTREME"
+      },
+      "cli": {
+        "total_violations": 321,
+        "critical_violations": 0,
+        "files_affected": 2,
+        "violation_types": [
+          "connascence_of_meaning",
+          "connascence_of_algorithm"
+        ],
+        "unique_violation_types": 2,
+        "severity_breakdown": {
+          "medium": 303,
+          "high": 18
+        },
+        "heat_intensity": 0.004,
+        "risk_level": "HIGH"
+      },
+      "config": {
+        "total_violations": 137,
+        "critical_violations": 0,
+        "files_affected": 1,
+        "violation_types": [
+          "connascence_of_meaning"
+        ],
+        "unique_violation_types": 1,
+        "severity_breakdown": {
+          "medium": 137
+        },
+        "heat_intensity": 0.002,
+        "risk_level": "HIGH"
+      },
+      "core": {
+        "total_violations": 106,
+        "critical_violations": 0,
+        "files_affected": 1,
+        "violation_types": [
+          "connascence_of_meaning"
+        ],
+        "unique_violation_types": 1,
+        "severity_breakdown": {
+          "medium": 102,
+          "high": 4
+        },
+        "heat_intensity": 0.001,
+        "risk_level": "HIGH"
+      },
+      "dashboard": {
+        "total_violations": 1267,
+        "critical_violations": 0,
+        "files_affected": 6,
+        "violation_types": [
+          "connascence_of_timing",
+          "connascence_of_position",
+          "connascence_of_meaning",
+          "connascence_of_algorithm"
+        ],
+        "unique_violation_types": 4,
+        "severity_breakdown": {
+          "medium": 1218,
+          "high": 49
+        },
+        "heat_intensity": 0.017,
+        "risk_level": "HIGH"
+      },
+      "dogfood": {
+        "total_violations": 428,
+        "critical_violations": 0,
+        "files_affected": 5,
+        "violation_types": [
+          "connascence_of_position",
+          "connascence_of_meaning"
+        ],
+        "unique_violation_types": 2,
+        "severity_breakdown": {
+          "medium": 404,
+          "high": 24
+        },
+        "heat_intensity": 0.006,
+        "risk_level": "HIGH"
+      },
+      "examples": {
+        "total_violations": 33,
+        "critical_violations": 0,
+        "files_affected": 1,
+        "violation_types": [
+          "connascence_of_meaning"
+        ],
+        "unique_violation_types": 1,
+        "severity_breakdown": {
+          "medium": 32,
+          "high": 1
+        },
+        "heat_intensity": 0.0,
+        "risk_level": "LOW"
+      },
+      "grammar": {
+        "total_violations": 763,
+        "critical_violations": 3,
+        "files_affected": 7,
+        "violation_types": [
+          "god_object",
+          "connascence_of_position",
+          "connascence_of_algorithm",
+          "CoA",
+          "connascence_of_meaning"
+        ],
+        "unique_violation_types": 5,
+        "severity_breakdown": {
+          "critical": 3,
+          "high": 106,
+          "medium": 654
+        },
+        "heat_intensity": 0.01,
+        "risk_level": "EXTREME"
+      },
+      "integrations": {
+        "total_violations": 2383,
+        "critical_violations": 2,
+        "files_affected": 12,
+        "violation_types": [
+          "god_object",
+          "connascence_of_position",
+          "connascence_of_algorithm",
+          "CoA",
+          "connascence_of_meaning"
+        ],
+        "unique_violation_types": 5,
+        "severity_breakdown": {
+          "medium": 2049,
+          "high": 332,
+          "critical": 2
+        },
+        "heat_intensity": 0.032,
+        "risk_level": "EXTREME"
+      },
+      "mcp": {
+        "total_violations": 917,
+        "critical_violations": 0,
+        "files_affected": 4,
+        "violation_types": [
+          "CoA",
+          "connascence_of_position",
+          "connascence_of_meaning",
+          "connascence_of_algorithm"
+        ],
+        "unique_violation_types": 4,
+        "severity_breakdown": {
+          "medium": 865,
+          "high": 52
+        },
+        "heat_intensity": 0.012,
+        "risk_level": "HIGH"
+      },
+      "policy": {
+        "total_violations": 951,
+        "critical_violations": 0,
+        "files_affected": 7,
+        "violation_types": [
+          "connascence_of_timing",
+          "connascence_of_position",
+          "connascence_of_meaning",
+          "connascence_of_algorithm"
+        ],
+        "unique_violation_types": 4,
+        "severity_breakdown": {
+          "high": 92,
+          "medium": 859
+        },
+        "heat_intensity": 0.013,
+        "risk_level": "HIGH"
+      },
+      "reporting": {
+        "total_violations": 223,
+        "critical_violations": 0,
+        "files_affected": 4,
+        "violation_types": [
+          "connascence_of_position",
+          "connascence_of_meaning"
+        ],
+        "unique_violation_types": 2,
+        "severity_breakdown": {
+          "medium": 222,
+          "high": 1
+        },
+        "heat_intensity": 0.003,
+        "risk_level": "HIGH"
+      },
+      "scripts": {
+        "total_violations": 3412,
+        "critical_violations": 0,
+        "files_affected": 20,
+        "violation_types": [
+          "connascence_of_position",
+          "connascence_of_meaning",
+          "connascence_of_algorithm"
+        ],
+        "unique_violation_types": 3,
+        "severity_breakdown": {
+          "medium": 3097,
+          "high": 315
+        },
+        "heat_intensity": 0.046,
+        "risk_level": "HIGH"
+      },
+      "security": {
+        "total_violations": 780,
+        "critical_violations": 1,
+        "files_affected": 5,
+        "violation_types": [
+          "CoA",
+          "connascence_of_position",
+          "connascence_of_meaning",
+          "god_object"
+        ],
+        "unique_violation_types": 4,
+        "severity_breakdown": {
+          "critical": 1,
+          "high": 83,
+          "medium": 696
+        },
+        "heat_intensity": 0.011,
+        "risk_level": "EXTREME"
+      },
+      "utils": {
+        "total_violations": 104,
+        "critical_violations": 0,
+        "files_affected": 4,
+        "violation_types": [
+          "connascence_of_position",
+          "connascence_of_meaning"
+        ],
+        "unique_violation_types": 2,
+        "severity_breakdown": {
+          "medium": 99,
+          "high": 5
+        },
+        "heat_intensity": 0.001,
+        "risk_level": "HIGH"
+      },
+      "test_packages": {
+        "total_violations": 73882,
+        "critical_violations": 85,
+        "files_affected": 1472,
+        "violation_types": [
+          "god_object",
+          "CoA",
+          "connascence_of_position",
+          "connascence_of_algorithm",
+          "connascence_of_timing",
+          "connascence_of_meaning"
+        ],
+        "unique_violation_types": 6,
+        "severity_breakdown": {
+          "medium": 68402,
+          "high": 5395,
+          "critical": 85
+        },
+        "heat_intensity": 1.0,
+        "risk_level": "EXTREME"
+      },
+      "htmlcov": {
+        "total_violations": 139,
+        "critical_violations": 0,
+        "files_affected": 1,
+        "violation_types": [
+          "connascence_of_meaning",
+          "god_object"
+        ],
+        "unique_violation_types": 2,
+        "severity_breakdown": {
+          "medium": 139
+        },
+        "heat_intensity": 0.002,
+        "risk_level": "HIGH"
+      },
+      "vscode-extension": {
+        "total_violations": 4017,
+        "critical_violations": 0,
+        "files_affected": 62,
+        "violation_types": [
+          "connascence_of_meaning"
+        ],
+        "unique_violation_types": 1,
+        "severity_breakdown": {
+          "medium": 4017
+        },
+        "heat_intensity": 0.054,
+        "risk_level": "HIGH"
+      },
+      "vscode-extension-backup-20250905-142126": {
+        "total_violations": 1447,
+        "critical_violations": 0,
+        "files_affected": 27,
+        "violation_types": [
+          "connascence_of_meaning"
+        ],
+        "unique_violation_types": 1,
+        "severity_breakdown": {
+          "medium": 1447
+        },
+        "heat_intensity": 0.02,
+        "risk_level": "HIGH"
+      },
+      ".claude": {
+        "total_violations": 26,
+        "critical_violations": 0,
+        "files_affected": 1,
+        "violation_types": [
+          "connascence_of_meaning"
+        ],
+        "unique_violation_types": 1,
+        "severity_breakdown": {
+          "medium": 26
+        },
+        "heat_intensity": 0.0,
+        "risk_level": "LOW"
+      },
+      "tests": {
+        "total_violations": 6,
+        "critical_violations": 0,
+        "files_affected": 6,
+        "violation_types": [
+          "CoA"
+        ],
+        "unique_violation_types": 1,
+        "severity_breakdown": {
+          "high": 6
+        },
+        "heat_intensity": 0.0,
+        "risk_level": "MINIMAL"
+      }
+    },
+    "file_heatmap": {
+      "..\\test_packages\\curl\\tests\\libtest\\lib557.c": {
+        "violations": 1851,
+        "critical_violations": 0,
+        "unique_violation_types": 2,
+        "severity_breakdown": {
+          "medium": 1844,
+          "high": 7
+        },
+        "heat_intensity": 1.0,
+        "risk_level": "HIGH"
+      },
+      "..\\test_packages\\curl\\tests\\libtest\\lib1560.c": {
+        "violations": 1795,
+        "critical_violations": 0,
+        "unique_violation_types": 2,
+        "severity_breakdown": {
+          "medium": 1794,
+          "high": 1
+        },
+        "heat_intensity": 0.97,
+        "risk_level": "HIGH"
+      },
+      "..\\test_packages\\celery\\t\\integration\\test_canvas.py": {
+        "violations": 1080,
+        "critical_violations": 3,
+        "unique_violation_types": 6,
+        "severity_breakdown": {
+          "medium": 828,
+          "critical": 3,
+          "high": 249
+        },
+        "heat_intensity": 0.583,
+        "risk_level": "EXTREME"
+      },
+      "..\\test_packages\\celery\\t\\unit\\app\\test_schedules.py": {
+        "violations": 1080,
+        "critical_violations": 3,
+        "unique_violation_types": 5,
+        "severity_breakdown": {
+          "critical": 3,
+          "high": 298,
+          "medium": 779
+        },
+        "heat_intensity": 0.583,
+        "risk_level": "EXTREME"
+      },
+      "..\\test_packages\\curl\\include\\curl\\curl.h": {
+        "violations": 841,
+        "critical_violations": 0,
+        "unique_violation_types": 1,
+        "severity_breakdown": {
+          "medium": 841
+        },
+        "heat_intensity": 0.454,
+        "risk_level": "HIGH"
+      },
+      "..\\test_packages\\curl\\tests\\libtest\\lib517.c": {
+        "violations": 754,
+        "critical_violations": 0,
+        "unique_violation_types": 2,
+        "severity_breakdown": {
+          "medium": 753,
+          "high": 1
+        },
+        "heat_intensity": 0.407,
+        "risk_level": "HIGH"
+      },
+      "..\\test_packages\\celery\\t\\unit\\tasks\\test_canvas.py": {
+        "violations": 678,
+        "critical_violations": 4,
+        "unique_violation_types": 6,
+        "severity_breakdown": {
+          "critical": 4,
+          "high": 147,
+          "medium": 527
+        },
+        "heat_intensity": 0.366,
+        "risk_level": "EXTREME"
+      },
+      "..\\test_packages\\curl\\tests\\http\\test_02_download.py": {
+        "violations": 654,
+        "critical_violations": 1,
+        "unique_violation_types": 5,
+        "severity_breakdown": {
+          "critical": 1,
+          "high": 124,
+          "medium": 529
+        },
+        "heat_intensity": 0.353,
+        "risk_level": "EXTREME"
+      },
+      "..\\test_packages\\celery\\t\\unit\\tasks\\test_stamping.py": {
+        "violations": 650,
+        "critical_violations": 0,
+        "unique_violation_types": 3,
+        "severity_breakdown": {
+          "high": 130,
+          "medium": 520
+        },
+        "heat_intensity": 0.351,
+        "risk_level": "HIGH"
+      },
+      "..\\test_packages\\curl\\tests\\http\\test_07_upload.py": {
+        "violations": 649,
+        "critical_violations": 1,
+        "unique_violation_types": 5,
+        "severity_breakdown": {
+          "critical": 1,
+          "high": 109,
+          "medium": 539
+        },
+        "heat_intensity": 0.351,
+        "risk_level": "EXTREME"
+      },
+      "..\\test_packages\\celery\\t\\unit\\app\\test_app.py": {
+        "violations": 619,
+        "critical_violations": 1,
+        "unique_violation_types": 5,
+        "severity_breakdown": {
+          "critical": 1,
+          "high": 131,
+          "medium": 487
+        },
+        "heat_intensity": 0.334,
+        "risk_level": "EXTREME"
+      },
+      "..\\test_packages\\express\\test\\express.static.js": {
+        "violations": 573,
+        "critical_violations": 0,
+        "unique_violation_types": 1,
+        "severity_breakdown": {
+          "medium": 573
+        },
+        "heat_intensity": 0.31,
+        "risk_level": "HIGH"
+      },
+      "..\\test_packages\\celery\\t\\unit\\backends\\test_base.py": {
+        "violations": 563,
+        "critical_violations": 2,
+        "unique_violation_types": 5,
+        "severity_breakdown": {
+          "high": 128,
+          "critical": 2,
+          "medium": 433
+        },
+        "heat_intensity": 0.304,
+        "risk_level": "EXTREME"
+      },
+      "..\\test_packages\\curl\\src\\tool_listhelp.c": {
+        "violations": 561,
+        "critical_violations": 0,
+        "unique_violation_types": 1,
+        "severity_breakdown": {
+          "medium": 561
+        },
+        "heat_intensity": 0.303,
+        "risk_level": "HIGH"
+      },
+      "..\\test_packages\\curl\\lib\\http.c": {
+        "violations": 557,
+        "critical_violations": 0,
+        "unique_violation_types": 2,
+        "severity_breakdown": {
+          "medium": 554,
+          "high": 3
+        },
+        "heat_intensity": 0.301,
+        "risk_level": "HIGH"
+      },
+      "..\\vscode-extension\\temp-out\\features\\visualHighlighting.js": {
+        "violations": 540,
+        "critical_violations": 0,
+        "unique_violation_types": 1,
+        "severity_breakdown": {
+          "medium": 540
+        },
+        "heat_intensity": 0.292,
+        "risk_level": "HIGH"
+      },
+      "..\\test_packages\\express\\test\\express.urlencoded.js": {
+        "violations": 539,
+        "critical_violations": 0,
+        "unique_violation_types": 1,
+        "severity_breakdown": {
+          "medium": 539
+        },
+        "heat_intensity": 0.291,
+        "risk_level": "HIGH"
+      },
+      "..\\test_packages\\celery\\t\\unit\\backends\\test_redis.py": {
+        "violations": 526,
+        "critical_violations": 2,
+        "unique_violation_types": 5,
+        "severity_breakdown": {
+          "high": 198,
+          "critical": 2,
+          "medium": 326
+        },
+        "heat_intensity": 0.284,
+        "risk_level": "EXTREME"
+      },
+      "..\\test_packages\\celery\\t\\unit\\tasks\\test_tasks.py": {
+        "violations": 521,
+        "critical_violations": 2,
+        "unique_violation_types": 5,
+        "severity_breakdown": {
+          "high": 136,
+          "critical": 2,
+          "medium": 383
+        },
+        "heat_intensity": 0.281,
+        "risk_level": "EXTREME"
+      },
+      "..\\test_packages\\celery\\t\\unit\\backends\\test_elasticsearch.py": {
+        "violations": 518,
+        "critical_violations": 1,
+        "unique_violation_types": 4,
+        "severity_breakdown": {
+          "critical": 1,
+          "medium": 498,
+          "high": 19
+        },
+        "heat_intensity": 0.28,
+        "risk_level": "EXTREME"
+      },
+      "..\\test_packages\\express\\test\\express.json.js": {
+        "violations": 514,
+        "critical_violations": 0,
+        "unique_violation_types": 1,
+        "severity_breakdown": {
+          "medium": 514
+        },
+        "heat_intensity": 0.278,
+        "risk_level": "HIGH"
+      },
+      "..\\analyzer\\unified_analyzer.py": {
+        "violations": 513,
+        "critical_violations": 1,
+        "unique_violation_types": 4,
+        "severity_breakdown": {
+          "high": 34,
+          "critical": 1,
+          "medium": 478
+        },
+        "heat_intensity": 0.277,
+        "risk_level": "EXTREME"
+      },
+      "..\\test_packages\\curl\\tests\\http\\scorecard.py": {
+        "violations": 512,
+        "critical_violations": 1,
+        "unique_violation_types": 5,
+        "severity_breakdown": {
+          "high": 72,
+          "critical": 1,
+          "medium": 439
+        },
+        "heat_intensity": 0.277,
+        "risk_level": "EXTREME"
+      },
+      "..\\test_packages\\curl\\lib\\strcase.c": {
+        "violations": 511,
+        "critical_violations": 0,
+        "unique_violation_types": 1,
+        "severity_breakdown": {
+          "medium": 511
+        },
+        "heat_intensity": 0.276,
+        "risk_level": "HIGH"
+      },
+      "..\\mcp\\server.py": {
+        "violations": 503,
+        "critical_violations": 0,
+        "unique_violation_types": 3,
+        "severity_breakdown": {
+          "high": 24,
+          "medium": 479
+        },
+        "heat_intensity": 0.272,
+        "risk_level": "HIGH"
+      },
+      "..\\test_packages\\curl\\src\\tool_getparam.c": {
+        "violations": 497,
+        "critical_violations": 0,
+        "unique_violation_types": 2,
+        "severity_breakdown": {
+          "medium": 495,
+          "high": 2
+        },
+        "heat_intensity": 0.269,
+        "risk_level": "HIGH"
+      },
+      "..\\test_packages\\curl\\tests\\http\\test_17_ssl_use.py": {
+        "violations": 491,
+        "critical_violations": 1,
+        "unique_violation_types": 5,
+        "severity_breakdown": {
+          "critical": 1,
+          "high": 137,
+          "medium": 353
+        },
+        "heat_intensity": 0.265,
+        "risk_level": "EXTREME"
+      },
+      "..\\test_packages\\express\\test\\app.router.js": {
+        "violations": 484,
+        "critical_violations": 0,
+        "unique_violation_types": 1,
+        "severity_breakdown": {
+          "medium": 484
+        },
+        "heat_intensity": 0.261,
+        "risk_level": "HIGH"
+      },
+      "..\\test_packages\\curl\\lib\\vtls\\openssl.c": {
+        "violations": 474,
+        "critical_violations": 0,
+        "unique_violation_types": 2,
+        "severity_breakdown": {
+          "medium": 470,
+          "high": 4
+        },
+        "heat_intensity": 0.256,
+        "risk_level": "HIGH"
+      },
+      "..\\test_packages\\curl\\tests\\unit\\unit3205.c": {
+        "violations": 467,
+        "critical_violations": 0,
+        "unique_violation_types": 2,
+        "severity_breakdown": {
+          "medium": 466,
+          "high": 1
+        },
+        "heat_intensity": 0.252,
+        "risk_level": "HIGH"
+      },
+      "..\\test_packages\\curl\\lib\\vtls\\cipher_suite.c": {
+        "violations": 465,
+        "critical_violations": 0,
+        "unique_violation_types": 2,
+        "severity_breakdown": {
+          "medium": 465
+        },
+        "heat_intensity": 0.251,
+        "risk_level": "HIGH"
+      },
+      "..\\test_packages\\celery\\t\\unit\\utils\\test_platforms.py": {
+        "violations": 443,
+        "critical_violations": 1,
+        "unique_violation_types": 5,
+        "severity_breakdown": {
+          "high": 36,
+          "critical": 1,
+          "medium": 406
+        },
+        "heat_intensity": 0.239,
+        "risk_level": "EXTREME"
+      },
+      "..\\dashboard\\charts.py": {
+        "violations": 435,
+        "critical_violations": 0,
+        "unique_violation_types": 2,
+        "severity_breakdown": {
+          "medium": 427,
+          "high": 8
+        },
+        "heat_intensity": 0.235,
+        "risk_level": "HIGH"
+      },
+      "..\\test_packages\\curl\\lib\\vtls\\x509asn1.c": {
+        "violations": 433,
+        "critical_violations": 0,
+        "unique_violation_types": 2,
+        "severity_breakdown": {
+          "medium": 433
+        },
+        "heat_intensity": 0.234,
+        "risk_level": "HIGH"
+      },
+      "..\\test_packages\\curl\\tests\\unit\\unit1658.c": {
+        "violations": 431,
+        "critical_violations": 0,
+        "unique_violation_types": 2,
+        "severity_breakdown": {
+          "medium": 430,
+          "high": 1
+        },
+        "heat_intensity": 0.233,
+        "risk_level": "HIGH"
+      },
+      "..\\test_packages\\curl\\lib\\ftp.c": {
+        "violations": 429,
+        "critical_violations": 0,
+        "unique_violation_types": 3,
+        "severity_breakdown": {
+          "medium": 425,
+          "high": 4
+        },
+        "heat_intensity": 0.232,
+        "risk_level": "HIGH"
+      },
+      "..\\scripts\\reproduce_enterprise_demo.py": {
+        "violations": 418,
+        "critical_violations": 0,
+        "unique_violation_types": 2,
+        "severity_breakdown": {
+          "high": 52,
+          "medium": 366
+        },
+        "heat_intensity": 0.226,
+        "risk_level": "HIGH"
+      },
+      "..\\integrations\\enhanced_linter_integration.py": {
+        "violations": 400,
+        "critical_violations": 0,
+        "unique_violation_types": 2,
+        "severity_breakdown": {
+          "high": 37,
+          "medium": 363
+        },
+        "heat_intensity": 0.216,
+        "risk_level": "HIGH"
+      },
+      "..\\integrations\\legacy\\bandit_integration.py": {
+        "violations": 374,
+        "critical_violations": 0,
+        "unique_violation_types": 1,
+        "severity_breakdown": {
+          "medium": 329,
+          "high": 45
+        },
+        "heat_intensity": 0.202,
+        "risk_level": "HIGH"
+      },
+      "..\\test_packages\\express\\test\\express.text.js": {
+        "violations": 372,
+        "critical_violations": 0,
+        "unique_violation_types": 1,
+        "severity_breakdown": {
+          "medium": 372
+        },
+        "heat_intensity": 0.201,
+        "risk_level": "HIGH"
+      },
+      "..\\test_packages\\celery\\t\\unit\\events\\test_state.py": {
+        "violations": 367,
+        "critical_violations": 1,
+        "unique_violation_types": 5,
+        "severity_breakdown": {
+          "high": 82,
+          "critical": 1,
+          "medium": 284
+        },
+        "heat_intensity": 0.198,
+        "risk_level": "EXTREME"
+      },
+      "..\\test_packages\\curl\\tests\\server\\sws.c": {
+        "violations": 358,
+        "critical_violations": 0,
+        "unique_violation_types": 2,
+        "severity_breakdown": {
+          "medium": 351,
+          "high": 7
+        },
+        "heat_intensity": 0.193,
+        "risk_level": "HIGH"
+      },
+      "..\\test_packages\\celery\\t\\unit\\worker\\test_control.py": {
+        "violations": 356,
+        "critical_violations": 1,
+        "unique_violation_types": 5,
+        "severity_breakdown": {
+          "critical": 1,
+          "high": 87,
+          "medium": 268
+        },
+        "heat_intensity": 0.192,
+        "risk_level": "EXTREME"
+      },
+      "..\\integrations\\tool_coordinator.py": {
+        "violations": 353,
+        "critical_violations": 0,
+        "unique_violation_types": 3,
+        "severity_breakdown": {
+          "high": 80,
+          "medium": 273
+        },
+        "heat_intensity": 0.191,
+        "risk_level": "HIGH"
+      },
+      "..\\test_packages\\express\\test\\res.sendFile.js": {
+        "violations": 341,
+        "critical_violations": 0,
+        "unique_violation_types": 1,
+        "severity_breakdown": {
+          "medium": 341
+        },
+        "heat_intensity": 0.184,
+        "risk_level": "HIGH"
+      },
+      "..\\test_packages\\curl\\lib\\parsedate.c": {
+        "violations": 338,
+        "critical_violations": 0,
+        "unique_violation_types": 2,
+        "severity_breakdown": {
+          "medium": 337,
+          "high": 1
+        },
+        "heat_intensity": 0.183,
+        "risk_level": "HIGH"
+      },
+      "..\\test_packages\\express\\test\\express.raw.js": {
+        "violations": 336,
+        "critical_violations": 0,
+        "unique_violation_types": 1,
+        "severity_breakdown": {
+          "medium": 336
+        },
+        "heat_intensity": 0.182,
+        "risk_level": "HIGH"
+      },
+      "..\\test_packages\\curl\\tests\\http\\testenv\\curl.py": {
+        "violations": 330,
+        "critical_violations": 2,
+        "unique_violation_types": 6,
+        "severity_breakdown": {
+          "high": 77,
+          "medium": 251,
+          "critical": 2
+        },
+        "heat_intensity": 0.178,
+        "risk_level": "EXTREME"
+      },
+      "..\\analyzer\\smart_integration_engine.py": {
+        "violations": 329,
+        "critical_violations": 0,
+        "unique_violation_types": 3,
+        "severity_breakdown": {
+          "high": 39,
+          "medium": 290
+        },
+        "heat_intensity": 0.178,
+        "risk_level": "HIGH"
+      },
+      "..\\test_packages\\curl\\tests\\unit\\unit1664.c": {
+        "violations": 328,
+        "critical_violations": 0,
+        "unique_violation_types": 2,
+        "severity_breakdown": {
+          "medium": 327,
+          "high": 1
+        },
+        "heat_intensity": 0.177,
+        "risk_level": "HIGH"
+      }
+    },
+    "violation_type_heatmap": {
+      "connascence_of_algorithm": {
+        "total_violations": 1193,
+        "critical_violations": 0,
+        "files_affected": 139,
+        "folders_affected": 10,
+        "impact_score": 0.005,
+        "critical_ratio": 0.0
+      },
+      "connascence_of_meaning": {
+        "total_violations": 92086,
+        "critical_violations": 0,
+        "files_affected": 1672,
+        "folders_affected": 21,
+        "impact_score": 0.404,
+        "critical_ratio": 0.0
+      },
+      "connascence_of_position": {
+        "total_violations": 1178,
+        "critical_violations": 0,
+        "files_affected": 241,
+        "folders_affected": 13,
+        "impact_score": 0.006,
+        "critical_ratio": 0.0
+      },
+      "god_object": {
+        "total_violations": 711,
+        "critical_violations": 93,
+        "files_affected": 418,
+        "folders_affected": 7,
+        "impact_score": 0.056,
+        "critical_ratio": 0.131
+      },
+      "connascence_of_timing": {
+        "total_violations": 96,
+        "critical_violations": 0,
+        "files_affected": 45,
+        "folders_affected": 4,
+        "impact_score": 0.001,
+        "critical_ratio": 0.0
+      },
+      "CoA": {
+        "total_violations": 127,
+        "critical_violations": 0,
+        "files_affected": 103,
+        "folders_affected": 8,
+        "impact_score": 0.001,
+        "critical_ratio": 0.0
+      }
+    }
+  },
+  "visualizations": {
+    "folder_visualization": "\nFOLDER VIOLATION HEATMAP (Top 20)\n=================================\ntest_packages                  |##################################################|  73882 ( 85c) [1.000]\nvscode-extension               |##------------------------------------------------|   4017 (  0c) [0.054]\nscripts                        |##------------------------------------------------|   3412 (  0c) [0.046]\nanalyzer                       |##------------------------------------------------|   2956 (  1c) [0.040]\nintegrations                   |#-------------------------------------------------|   2383 (  2c) [0.032]\nvscode-extension-backup-202509 |#-------------------------------------------------|   1447 (  0c) [0.020]\ndashboard                      |--------------------------------------------------|   1267 (  0c) [0.017]\nautofix                        |--------------------------------------------------|   1093 (  1c) [0.015]\npolicy                         |--------------------------------------------------|    951 (  0c) [0.013]\nmcp                            |--------------------------------------------------|    917 (  0c) [0.012]\nsecurity                       |--------------------------------------------------|    780 (  1c) [0.011]\ngrammar                        |--------------------------------------------------|    763 (  3c) [0.010]\ndogfood                        |--------------------------------------------------|    428 (  0c) [0.006]\ncli                            |--------------------------------------------------|    321 (  0c) [0.004]\nreporting                      |--------------------------------------------------|    223 (  0c) [0.003]\nconfig                         |--------------------------------------------------|    137 (  0c) [0.002]\nhtmlcov                        |--------------------------------------------------|    139 (  0c) [0.002]\ncore                           |--------------------------------------------------|    106 (  0c) [0.001]\nutils                          |--------------------------------------------------|    104 (  0c) [0.001]\nexamples                       |--------------------------------------------------|     33 (  0c) [0.000]",
+    "file_visualization": "\nFILE VIOLATION HEATMAP (Top 20)\n===============================\n..\\test_packages\\curl\\tests\\li |##################################################|   1851 (  0c) [1.000]\n..\\test_packages\\curl\\tests\\li |################################################--|   1795 (  0c) [0.970]\n..\\test_packages\\celery\\t\\inte |#############################---------------------|   1080 (  3c) [0.583]\n..\\test_packages\\celery\\t\\unit |#############################---------------------|   1080 (  3c) [0.583]\n..\\test_packages\\curl\\include\\ |######################----------------------------|    841 (  0c) [0.454]\n..\\test_packages\\curl\\tests\\li |####################------------------------------|    754 (  0c) [0.407]\n..\\test_packages\\celery\\t\\unit |##################--------------------------------|    678 (  4c) [0.366]\n..\\test_packages\\curl\\tests\\ht |#################---------------------------------|    654 (  1c) [0.353]\n..\\test_packages\\celery\\t\\unit |#################---------------------------------|    650 (  0c) [0.351]\n..\\test_packages\\curl\\tests\\ht |#################---------------------------------|    649 (  1c) [0.351]\n..\\test_packages\\celery\\t\\unit |################----------------------------------|    619 (  1c) [0.334]\n..\\test_packages\\express\\test\\ |###############-----------------------------------|    573 (  0c) [0.310]\n..\\test_packages\\celery\\t\\unit |###############-----------------------------------|    563 (  2c) [0.304]\n..\\test_packages\\curl\\src\\tool |###############-----------------------------------|    561 (  0c) [0.303]\n..\\test_packages\\curl\\lib\\http |###############-----------------------------------|    557 (  0c) [0.301]\n..\\vscode-extension\\temp-out\\f |##############------------------------------------|    540 (  0c) [0.292]\n..\\test_packages\\express\\test\\ |##############------------------------------------|    539 (  0c) [0.291]\n..\\test_packages\\celery\\t\\unit |##############------------------------------------|    526 (  2c) [0.284]\n..\\test_packages\\celery\\t\\unit |##############------------------------------------|    521 (  2c) [0.281]\n..\\test_packages\\celery\\t\\unit |##############------------------------------------|    518 (  1c) [0.280]",
+    "type_visualization": "\nVIOLATION TYPE IMPACT HEATMAP (Top 20)\n======================================\nconnascence_of_meaning         |####################------------------------------|  92086 (  0c) [0.404]\ngod_object                     |##------------------------------------------------|    711 ( 93c) [0.056]\nconnascence_of_position        |--------------------------------------------------|   1178 (  0c) [0.006]\nconnascence_of_algorithm       |--------------------------------------------------|   1193 (  0c) [0.005]\nconnascence_of_timing          |--------------------------------------------------|     96 (  0c) [0.001]\nCoA                            |--------------------------------------------------|    127 (  0c) [0.001]"
+  },
+  "summary_stats": {
+    "total_violations_processed": 95391,
+    "folders_analyzed": 22,
+    "top_files_analyzed": 50,
+    "violation_types_found": 6,
+    "highest_risk_folder": "test_packages",
+    "most_impacted_type": "connascence_of_meaning"
+  }
+}

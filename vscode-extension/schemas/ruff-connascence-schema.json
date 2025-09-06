@@ -1,0 +1,197 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Ruff Configuration with Connascence Integration",
+  "description": "JSON Schema for Ruff configuration optimized for connascence detection",
+  "type": "object",
+  "properties": {
+    "tool": {
+      "type": "object",
+      "properties": {
+        "ruff": {
+          "type": "object",
+          "properties": {
+            "target-version": {
+              "type": "string",
+              "enum": ["py37", "py38", "py39", "py310", "py311", "py312"],
+              "description": "Python version to target for linting"
+            },
+            "line-length": {
+              "type": "integer",
+              "minimum": 80,
+              "maximum": 200,
+              "description": "Maximum line length (aligned with connascence readability standards)"
+            },
+            "select": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "E", "W", "F", "I", "UP", "SIM", "RUF",
+                  "PLR", "PLW", "PLE", "C90", "ARG", "N", "B", "C4"
+                ]
+              },
+              "description": "Linter rules to enable (optimized for connascence detection)"
+            },
+            "ignore": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Linter rules to ignore (strategic ignores for connascence focus)"
+            },
+            "pylint": {
+              "type": "object",
+              "properties": {
+                "max-args": {
+                  "type": "integer",
+                  "minimum": 2,
+                  "maximum": 10,
+                  "default": 4,
+                  "description": "Maximum function arguments (Connascence of Position threshold)"
+                },
+                "max-branches": {
+                  "type": "integer", 
+                  "minimum": 5,
+                  "maximum": 20,
+                  "default": 8,
+                  "description": "Maximum branches in function (Connascence of Algorithm threshold)"
+                },
+                "max-returns": {
+                  "type": "integer",
+                  "minimum": 3,
+                  "maximum": 10,
+                  "default": 6,
+                  "description": "Maximum return statements (Connascence of Algorithm threshold)"
+                },
+                "max-statements": {
+                  "type": "integer",
+                  "minimum": 15,
+                  "maximum": 50,
+                  "default": 25,
+                  "description": "Maximum statements per function (Connascence of Algorithm threshold)"
+                },
+                "max-public-methods": {
+                  "type": "integer",
+                  "minimum": 10,
+                  "maximum": 25,
+                  "default": 15,
+                  "description": "Maximum public methods per class (God class detection)"
+                }
+              },
+              "description": "Pylint-specific settings aligned with connascence thresholds"
+            },
+            "mccabe": {
+              "type": "object",
+              "properties": {
+                "max-complexity": {
+                  "type": "integer",
+                  "minimum": 5,
+                  "maximum": 15,
+                  "default": 8,
+                  "description": "Maximum cyclomatic complexity (Connascence of Algorithm threshold)"
+                }
+              },
+              "description": "McCabe complexity settings for CoA detection"
+            },
+            "per-file-ignores": {
+              "type": "object",
+              "patternProperties": {
+                "^.+$": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "description": "File-specific rule ignores for connascence-focused analysis"
+            },
+            "connascence-integration": {
+              "type": "object",
+              "properties": {
+                "enable-rule-mapping": {
+                  "type": "boolean",
+                  "default": true,
+                  "description": "Enable mapping between Ruff rules and connascence types"
+                },
+                "prioritize-connascence-rules": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": ["PLR2004", "PLR0913", "PLR0915", "PLR0912", "C901", "N801", "N802", "F821", "F401"]
+                  },
+                  "description": "Ruff rules that directly map to connascence types"
+                },
+                "nasa-compliance-mode": {
+                  "type": "boolean", 
+                  "default": false,
+                  "description": "Enable NASA Power of Ten compliance mode"
+                },
+                "magic-literal-threshold": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 50,
+                  "default": 10,
+                  "description": "Threshold for flagging magic literals (CoM detection)"
+                },
+                "parameter-count-threshold": {
+                  "type": "integer",
+                  "minimum": 2,
+                  "maximum": 8,
+                  "default": 4,
+                  "description": "Parameter count threshold for CoP detection"
+                },
+                "complexity-threshold": {
+                  "type": "integer",
+                  "minimum": 5,
+                  "maximum": 15,
+                  "default": 8,
+                  "description": "Complexity threshold for CoA detection"
+                }
+              },
+              "description": "Connascence-specific integration settings"
+            }
+          },
+          "description": "Ruff linter configuration optimized for connascence analysis"
+        }
+      }
+    }
+  },
+  "additionalProperties": false,
+  "examples": [
+    {
+      "tool": {
+        "ruff": {
+          "target-version": "py38",
+          "line-length": 120,
+          "select": ["E", "W", "F", "I", "UP", "SIM", "RUF", "PLR", "PLW", "PLE", "C90", "ARG", "N", "B", "C4"],
+          "ignore": ["E501", "B008", "PLR0911", "PLR0912", "PLR0913", "PLR0915", "C901"],
+          "fix": true,
+          "show-fixes": true,
+          "pylint": {
+            "max-args": 4,
+            "max-branches": 8,
+            "max-returns": 6,
+            "max-statements": 25,
+            "max-public-methods": 15
+          },
+          "mccabe": {
+            "max-complexity": 8
+          },
+          "per-file-ignores": {
+            "tests/**/*.py": ["PLR2004", "ARG001", "PLR0913"],
+            "examples/**/*.py": ["PLR2004", "PLR0913"],
+            "config/**/*.py": ["PLR2004"]
+          },
+          "connascence-integration": {
+            "enable-rule-mapping": true,
+            "prioritize-connascence-rules": ["PLR2004", "PLR0913", "PLR0915", "PLR0912", "C901"],
+            "nasa-compliance-mode": false,
+            "magic-literal-threshold": 10,
+            "parameter-count-threshold": 4,
+            "complexity-threshold": 8
+          }
+        }
+      }
+    }
+  ]
+}

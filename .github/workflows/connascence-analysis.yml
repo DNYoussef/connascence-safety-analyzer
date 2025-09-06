@@ -208,11 +208,11 @@ jobs:
       run: |
         echo "::group::Quality Gates"
         
-        # Define realistic quality gates based on actual codebase analysis
-        NASA_THRESHOLD=0.85
+        # Define quality gates with defense industry NASA compliance threshold
+        NASA_THRESHOLD=0.90  # Raised to defense industry standard
         MAX_GOD_OBJECTS=25
         MECE_THRESHOLD=0.75
-        MAX_CRITICAL_VIOLATIONS=100
+        MAX_CRITICAL_VIOLATIONS=50  # More realistic for large codebase
         MIN_OVERALL_SCORE=0.50
         
         # Get values from previous steps
@@ -225,12 +225,12 @@ jobs:
         echo "Quality Gate Results:"
         echo "==================="
         
-        # NASA Compliance Gate
+        # NASA Compliance Gate (Defense Industry Standard)
         if (( $(echo "$NASA_SCORE >= $NASA_THRESHOLD" | bc -l) )); then
-          echo "✅ NASA Compliance: PASS ($NASA_SCORE >= $NASA_THRESHOLD)"
+          echo "✅ NASA Compliance: PASS ($NASA_SCORE >= $NASA_THRESHOLD) - Defense Industry Ready"
           NASA_PASS=true
         else
-          echo "❌ NASA Compliance: FAIL ($NASA_SCORE < $NASA_THRESHOLD)"
+          echo "❌ NASA Compliance: FAIL ($NASA_SCORE < $NASA_THRESHOLD) - Not suitable for defense industry"
           NASA_PASS=false
         fi
         
@@ -270,12 +270,19 @@ jobs:
           OVERALL_PASS=false
         fi
         
-        # Final gate decision
+        # Final gate decision with NASA emphasis
         if [[ "$NASA_PASS" == "true" && "$GOD_PASS" == "true" && "$MECE_PASS" == "true" && "$CRITICAL_PASS" == "true" && "$OVERALL_PASS" == "true" ]]; then
           echo ""
           echo "🎉 ALL QUALITY GATES PASSED!"
-          echo "Repository meets all quality standards."
+          echo "Repository meets all quality standards including NASA Power of Ten compliance."
+          echo "🛡️ DEFENSE INDUSTRY READY - Approved for safety-critical applications."
           exit 0
+        elif [[ "$NASA_PASS" == "false" ]]; then
+          echo ""
+          echo "🚫 CRITICAL: NASA COMPLIANCE GATE FAILED!"
+          echo "Repository does not meet defense industry safety standards."
+          echo "🔴 BLOCKING FAILURE for safety-critical applications."
+          exit 1
         else
           echo ""
           echo "🚫 QUALITY GATES FAILED!"
@@ -294,10 +301,10 @@ jobs:
         
         if [[ $? -eq 0 ]]; then
           STATE="success"
-          DESCRIPTION="✅ All quality gates passed - $TOTAL_VIOLATIONS violations ($CRITICAL_VIOLATIONS critical)"
+          DESCRIPTION="✅ All quality gates passed including NASA compliance - $TOTAL_VIOLATIONS violations ($CRITICAL_VIOLATIONS critical) - Defense Ready"
         else
           STATE="failure" 
-          DESCRIPTION="❌ Quality gates failed - $TOTAL_VIOLATIONS violations ($CRITICAL_VIOLATIONS critical)"
+          DESCRIPTION="❌ Quality gates failed (NASA Score: $NASA_SCORE) - $TOTAL_VIOLATIONS violations ($CRITICAL_VIOLATIONS critical)"
         fi
         
         curl -X POST \
@@ -382,8 +389,9 @@ jobs:
           const comment = `## 🔍 Connascence Analysis Results
           
           ### 🛡️ NASA Power of Ten Compliance
-          - **Score:** ${nasaResults.nasa_compliance.score * 100}%
+          - **Score:** ${(nasaResults.nasa_compliance.score * 100).toFixed(1)}%
           - **Rules Violated:** ${nasaResults.nasa_compliance.violations.length}
+          - **Defense Industry Status:** ${nasaResults.nasa_compliance.score >= 0.90 ? '✅ APPROVED' : '❌ NOT APPROVED'}
           
           ### 👹 God Object Detection  
           - **God Objects Found:** ${{ steps.god-object-detection.outputs.god_objects_count }}

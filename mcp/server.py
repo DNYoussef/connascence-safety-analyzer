@@ -28,10 +28,49 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent))
 
 from utils.config_loader import ConnascenceViolation, RateLimiter, load_config_defaults
+from analyzer.constants import (
+    resolve_policy_name,
+    validate_policy_name, 
+    list_available_policies,
+    get_legacy_policy_name,
+    UNIFIED_POLICY_NAMES,
+    ERROR_CODE_MAPPING,
+    ERROR_SEVERITY,
+    INTEGRATION_ERROR_MAPPING
+)
+try:
+    from analyzer.unified_analyzer import StandardError, ErrorHandler
+except ImportError:
+    # Fallback for test environments
+    class StandardError:
+        def __init__(self, **kwargs):
+            for k, v in kwargs.items():
+                setattr(self, k, v)
+        def to_dict(self):
+            return {k: v for k, v in self.__dict__.items()}
+    
+    class ErrorHandler:
+        def __init__(self, integration):
+            self.integration = integration
+        def create_error(self, error_type, message, **kwargs):
+            return StandardError(code=5001, message=message, **kwargs)
+        def handle_exception(self, e, context=None, file_path=None):
+            return StandardError(code=5001, message=str(e), context=context or {})
 
 
-# Load configuration defaults
-MCP_DEFAULTS = load_config_defaults('mcp_server')
+# Load configuration defaults with error handling
+try:
+    MCP_DEFAULTS = load_config_defaults('mcp_server')
+except Exception:
+    # Fallback defaults
+    MCP_DEFAULTS = {
+        'max_requests_per_minute': 60,
+        'enable_audit_logging': True
+    }
+    
+# Default values for backward compatibility
+DEFAULT_RATE_LIMIT_REQUESTS = MCP_DEFAULTS.get('max_requests_per_minute', 60)
+DEFAULT_AUDIT_ENABLED = MCP_DEFAULTS.get('enable_audit_logging', True)
 
 class AuditLogger:
     """Audit logger for MCP server."""
@@ -56,24 +95,31 @@ class AuditLogger:
         })
 
 class ConnascenceMCPServer:
-    """Mock MCP server for connascence analysis."""
+    """Mock MCP server for connascence analysis with standardized error handling."""
     def __init__(self, config=None):
         self.config = config or {}
         self.name = "connascence"
         self.version = "2.0.0"  # Updated version to match test expectations
         
-        # Initialize components with custom config
-        rate_limit = self.config.get('max_requests_per_minute', DEFAULT_RATE_LIMIT_REQUESTS)
-        self.rate_limiter = RateLimiter(max_requests=rate_limit)
+        # Initialize error handler first
+        self.error_handler = ErrorHandler('mcp')
         
-        audit_enabled = self.config.get('enable_audit_logging', DEFAULT_AUDIT_ENABLED)
-        self.audit_logger = AuditLogger(enabled=audit_enabled)
-        
-        # Path restrictions
-        self.allowed_paths = self.config.get('allowed_paths', [])
-        
-        self.analyzer = self._create_analyzer()
-        self._tools = self._register_tools()
+        # Initialize components with custom config and error handling
+        try:
+            rate_limit = self.config.get('max_requests_per_minute', DEFAULT_RATE_LIMIT_REQUESTS)
+            self.rate_limiter = RateLimiter(max_requests=rate_limit)
+            
+            audit_enabled = self.config.get('enable_audit_logging', DEFAULT_AUDIT_ENABLED)
+            self.audit_logger = AuditLogger(enabled=audit_enabled)
+            
+            # Path restrictions
+            self.allowed_paths = self.config.get('allowed_paths', [])
+            
+            self.analyzer = self._create_analyzer()
+            self._tools = self._register_tools()
+        except Exception as e:
+            error = self.error_handler.handle_exception(e, {'component': 'server_initialization'})
+            raise Exception(f"MCP Server initialization failed: {error.message}")
     
     def _create_analyzer(self):
         """Create mock analyzer instance for tests."""
@@ -262,7 +308,7 @@ class ConnascenceMCPServer:
     def _execute_scan_path(self, arguments: Dict[str, Any]):
         """Execute scan_path tool."""
         path = arguments.get('path')
-        policy = arguments.get('policy', 'default')
+        policy = arguments.get('policy', 'standard')  # Use unified default
         
         if not path:
             raise ValueError("Path is required")
@@ -270,19 +316,30 @@ class ConnascenceMCPServer:
         if not self.validate_path(path):
             raise ValueError(f"Path not allowed: {path}")
         
+        # Validate and resolve policy name
+        if not validate_policy_name(policy):
+            raise ValueError(f"Invalid policy: {policy}")
+        
+        # Resolve to unified name for internal use
+        unified_policy = resolve_policy_name(policy, warn_deprecated=True)
+        
+        # Convert back to legacy MCP format for analyzer
+        legacy_policy = get_legacy_policy_name(unified_policy, "mcp")
+        
         path_obj = Path(path)
         if path_obj.is_dir():
-            violations = self.analyzer.analyze_directory(path, profile=policy)
+            violations = self.analyzer.analyze_directory(path, profile=legacy_policy)
             metrics = {'files_analyzed': 2, 'violations_found': len(violations), 'analysis_time': 0.3}
         else:
-            result = self.analyzer.analyze_path(path, profile=policy)
+            result = self.analyzer.analyze_path(path, profile=legacy_policy)
             violations = result['violations']
             metrics = result.get('metrics', {})
         
         return {
             'success': True,
             'path': path,
-            'policy': policy,
+            'policy': unified_policy,  # Return unified name
+            'policy_legacy': legacy_policy,  # For backwards compatibility
             'violations': [self._violation_to_dict(v) for v in violations],
             'metrics': metrics,
             'timestamp': time.time()
@@ -517,10 +574,13 @@ class ConnascenceMCPServer:
     # Additional methods expected by tests
     
     def _validate_policy_preset(self, preset: str):
-        """Validate policy preset name."""
-        valid_presets = ['strict-core', 'service-defaults', 'experimental', 'balanced', 'lenient']
-        if preset not in valid_presets:
-            raise ValueError(f"Invalid policy preset: {preset}")
+        """Validate policy preset name using unified system."""
+        if not validate_policy_name(preset):
+            available_policies = list_available_policies(include_legacy=True)
+            raise ValueError(
+                f"Invalid policy preset: {preset}. "
+                f"Available policies: {', '.join(available_policies)}"
+            )
     
     def _validate_path(self, path: str):
         """Validate file path for security."""
@@ -548,33 +608,57 @@ class ConnascenceMCPServer:
         # Audit logging
         self.audit_logger.log_request(tool_name='list_presets', timestamp=time.time(), client_id=client_id)
         
+        # Get unified and legacy policies
+        unified_presets = [
+            {'name': 'nasa-compliance', 'description': 'NASA JPL Power of Ten compliance (highest safety)', 'type': 'unified'},
+            {'name': 'strict', 'description': 'Strict code quality standards', 'type': 'unified'},
+            {'name': 'standard', 'description': 'Balanced service defaults (recommended)', 'type': 'unified'},
+            {'name': 'lenient', 'description': 'Relaxed experimental settings', 'type': 'unified'}
+        ]
+        
+        legacy_presets = [
+            {'name': 'nasa_jpl_pot10', 'description': 'NASA JPL Power of Ten (deprecated)', 'type': 'legacy', 'unified_equivalent': 'nasa-compliance'},
+            {'name': 'strict-core', 'description': 'Strict core policy (deprecated)', 'type': 'legacy', 'unified_equivalent': 'strict'},
+            {'name': 'service-defaults', 'description': 'Service defaults policy (deprecated)', 'type': 'legacy', 'unified_equivalent': 'standard'},
+            {'name': 'experimental', 'description': 'Experimental policy (deprecated)', 'type': 'legacy', 'unified_equivalent': 'lenient'}
+        ]
+        
         return {
             'success': True,
-            'presets': [
-                {'name': 'strict-core', 'description': 'Strict core policy'},
-                {'name': 'service-defaults', 'description': 'Service defaults policy'},
-                {'name': 'experimental', 'description': 'Experimental policy'},
-                {'name': 'balanced', 'description': 'Balanced policy'},
-                {'name': 'lenient', 'description': 'Lenient policy'}
-            ]
+            'presets': unified_presets + legacy_presets,
+            'unified_presets': unified_presets,
+            'legacy_presets': legacy_presets,
+            'policy_system_version': '2.0',
+            'recommendation': 'Use unified policy names for consistent behavior across all integrations'
         }
     
     async def validate_policy(self, arguments: Dict[str, Any]):
         """Validate policy configuration."""
-        policy_preset = arguments.get('policy_preset', 'default')
+        policy_preset = arguments.get('policy_preset', 'standard')
+        
         try:
             self._validate_policy_preset(policy_preset)
+            
+            # Resolve to unified name
+            unified_name = resolve_policy_name(policy_preset, warn_deprecated=False)
+            is_legacy = policy_preset != unified_name
+            
             return {
                 'success': True,
                 'valid': True,
                 'policy_preset': policy_preset,
-                'validation_details': f"Policy {policy_preset} is valid"
+                'unified_name': unified_name,
+                'is_legacy': is_legacy,
+                'validation_details': f"Policy {policy_preset} is valid" + 
+                                    (f" (unified as '{unified_name}')" if is_legacy else ""),
+                'deprecation_warning': is_legacy
             }
         except ValueError as e:
             return {
                 'success': True,
                 'valid': False,
-                'error': str(e)
+                'error': str(e),
+                'available_policies': list_available_policies(include_legacy=True)
             }
     
     async def get_metrics(self, arguments: Dict[str, Any]):
@@ -625,6 +709,35 @@ class ConnascenceMCPServer:
                 'violation_counts': violation_counts
             },
             'violations_over_budget': [self._violation_to_dict(v) for v in violations_over_budget]
+        }
+    
+    def _create_error_response(self, error: StandardError) -> Dict[str, Any]:
+        """Create standardized error response for sync operations."""
+        return {
+            'success': False,
+            'error': error.to_dict(),
+            'timestamp': time.time(),
+            'server_version': self.version
+        }
+    
+    def _create_async_error_response(self, error: StandardError) -> Dict[str, Any]:
+        """Create standardized error response for async operations."""
+        return {
+            'success': False,
+            'error': error.to_dict(),
+            'summary': {
+                'total_violations': 0, 
+                'critical_count': 0, 
+                'high_count': 0, 
+                'medium_count': 0, 
+                'low_count': 0
+            },
+            'violations': [],
+            'scan_metadata': {
+                'error': True,
+                'timestamp': time.time(),
+                'analyzer_version': self.version
+            }
         }
 
 

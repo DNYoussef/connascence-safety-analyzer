@@ -351,7 +351,11 @@ class RuffIntegration:
             'style_connascence_overlap': 0,
             'complexity_alignment': 0,
             'import_organization': 0,
-            'naming_consistency': 0
+            'naming_consistency': 0,
+            'magic_literal_correlation': 0,
+            'parameter_position_correlation': 0,
+            'nasa_compliance_alignment': 0,
+            'rule_mappings': self._get_connascence_rule_mappings()
         }
         
         ruff_issues = ruff_results.get('issues', [])
@@ -387,6 +391,18 @@ class RuffIntegration:
         # Naming consistency vs overall connascence
         naming_issues = categories.get('naming', [])
         correlations['naming_consistency'] = 1.0 - (len(naming_issues) / 50.0)  # Normalize
+        
+        # Enhanced magic literal correlation (CoM)
+        magic_literal_correlation = self._correlate_magic_literals(ruff_issues, connascence_violations)
+        correlations['magic_literal_correlation'] = magic_literal_correlation
+        
+        # Parameter position correlation (CoP)
+        param_correlation = self._correlate_parameter_issues(ruff_issues, connascence_violations)
+        correlations['parameter_position_correlation'] = param_correlation
+        
+        # NASA Power of Ten alignment
+        nasa_alignment = self._correlate_nasa_compliance(ruff_issues, connascence_violations)
+        correlations['nasa_compliance_alignment'] = nasa_alignment
         
         return correlations
     
@@ -449,3 +465,175 @@ class RuffIntegration:
                 commands.append(f"ruff check {project_path} --select E,W --fix")
         
         return commands
+    
+    def _get_connascence_rule_mappings(self) -> Dict[str, Dict[str, str]]:
+        """Get mappings between Ruff rules and connascence types."""
+        return {
+            # Connascence of Meaning (CoM) - Magic Literals
+            'PLR2004': {
+                'connascence_type': 'CoM',
+                'description': 'Magic value used in comparison',
+                'severity': 'medium',
+                'nasa_rule': 'Rule 5: No magic numbers'
+            },
+            # Connascence of Position (CoP) - Parameter Order
+            'PLR0913': {
+                'connascence_type': 'CoP',
+                'description': 'Too many arguments in function',
+                'severity': 'medium',
+                'nasa_rule': 'Rule 4: No goto, Rule 6: Restrict function size'
+            },
+            # Connascence of Algorithm (CoA) - Complexity
+            'PLR0915': {
+                'connascence_type': 'CoA',
+                'description': 'Too many statements',
+                'severity': 'medium',
+                'nasa_rule': 'Rule 6: Restrict function size'
+            },
+            'PLR0912': {
+                'connascence_type': 'CoA',
+                'description': 'Too many branches',
+                'severity': 'medium',
+                'nasa_rule': 'Rule 6: Restrict function size'
+            },
+            'C901': {
+                'connascence_type': 'CoA',
+                'description': 'Function is too complex',
+                'severity': 'high',
+                'nasa_rule': 'Rule 6: Restrict function size'
+            },
+            # Connascence of Name (CoN) - Naming Issues
+            'N801': {
+                'connascence_type': 'CoN',
+                'description': 'Class name should use CapWords convention',
+                'severity': 'low',
+                'nasa_rule': 'Rule 9: Use preprocessor judiciously'
+            },
+            'N802': {
+                'connascence_type': 'CoN',
+                'description': 'Function name should be lowercase',
+                'severity': 'low',
+                'nasa_rule': 'Rule 9: Use preprocessor judiciously'
+            },
+            # Connascence of Type (CoT) - Type Issues
+            'F821': {
+                'connascence_type': 'CoT',
+                'description': 'Undefined name',
+                'severity': 'high',
+                'nasa_rule': 'Rule 8: Restrict heap use'
+            },
+            'F401': {
+                'connascence_type': 'CoT',
+                'description': 'Module imported but unused',
+                'severity': 'medium',
+                'nasa_rule': 'Rule 10: Compiler warnings'
+            }
+        }
+    
+    def _correlate_magic_literals(self, ruff_issues: List[Dict], 
+                                connascence_violations: List[Dict]) -> float:
+        """Correlate PLR2004 (magic literals) with CoM violations."""
+        plr2004_issues = [issue for issue in ruff_issues if issue.get('code') == 'PLR2004']
+        com_violations = [v for v in connascence_violations if v.get('connascence_type') == 'CoM']
+        
+        if not plr2004_issues and not com_violations:
+            return 1.0  # Perfect correlation when both are empty
+        
+        if not plr2004_issues or not com_violations:
+            return 0.0  # No correlation when one is empty
+        
+        # Calculate file-based correlation
+        ruff_files = set(issue.get('filename', '') for issue in plr2004_issues)
+        conn_files = set(v.get('file_path', '') for v in com_violations)
+        
+        overlap = len(ruff_files.intersection(conn_files))
+        total_files = len(ruff_files.union(conn_files))
+        
+        return overlap / total_files if total_files > 0 else 0.0
+    
+    def _correlate_parameter_issues(self, ruff_issues: List[Dict], 
+                                  connascence_violations: List[Dict]) -> float:
+        """Correlate PLR0913 (too many arguments) with CoP violations."""
+        param_issues = [issue for issue in ruff_issues if issue.get('code') == 'PLR0913']
+        cop_violations = [v for v in connascence_violations if v.get('connascence_type') == 'CoP']
+        
+        if not param_issues and not cop_violations:
+            return 1.0
+        
+        if not param_issues or not cop_violations:
+            return 0.0
+        
+        # Calculate correlation based on function-level detection
+        ruff_functions = set()
+        for issue in param_issues:
+            filename = issue.get('filename', '')
+            line = issue.get('location', {}).get('row', 0)
+            ruff_functions.add(f"{filename}:{line}")
+        
+        conn_functions = set()
+        for violation in cop_violations:
+            filename = violation.get('file_path', '')
+            line = violation.get('line_number', 0)
+            conn_functions.add(f"{filename}:{line}")
+        
+        overlap = len(ruff_functions.intersection(conn_functions))
+        total_functions = len(ruff_functions.union(conn_functions))
+        
+        return overlap / total_functions if total_functions > 0 else 0.0
+    
+    def _correlate_nasa_compliance(self, ruff_issues: List[Dict], 
+                                 connascence_violations: List[Dict]) -> float:
+        """Correlate Ruff findings with NASA Power of Ten compliance."""
+        nasa_relevant_codes = {'PLR2004', 'PLR0913', 'PLR0915', 'C901', 'PLR0912'}
+        nasa_issues = [issue for issue in ruff_issues if issue.get('code') in nasa_relevant_codes]
+        
+        # Count high-severity connascence violations (likely NASA-relevant)
+        high_severity_violations = [
+            v for v in connascence_violations 
+            if v.get('severity') in ['high', 'critical']
+        ]
+        
+        if not nasa_issues and not high_severity_violations:
+            return 1.0  # Perfect compliance when no issues
+        
+        # Calculate alignment score
+        nasa_issue_count = len(nasa_issues)
+        high_severity_count = len(high_severity_violations)
+        
+        # Good alignment when both tools detect similar numbers of serious issues
+        if nasa_issue_count == 0 and high_severity_count == 0:
+            return 1.0
+        elif nasa_issue_count == 0 or high_severity_count == 0:
+            return 0.3  # Some alignment but one tool missed issues
+        else:
+            # Score based on ratio similarity
+            ratio = min(nasa_issue_count, high_severity_count) / max(nasa_issue_count, high_severity_count)
+            return ratio
+    
+    def get_rule_recommendations(self, ruff_results: Dict[str, Any], 
+                               connascence_violations: List[Dict]) -> List[str]:
+        """Generate rule-specific recommendations based on correlation analysis."""
+        recommendations = []
+        
+        issues = ruff_results.get('issues', [])
+        rule_mappings = self._get_connascence_rule_mappings()
+        
+        # Count issues by rule
+        rule_counts = {}
+        for issue in issues:
+            code = issue.get('code', '')
+            rule_counts[code] = rule_counts.get(code, 0) + 1
+        
+        # Generate recommendations for top issues
+        for rule_code, count in sorted(rule_counts.items(), key=lambda x: x[1], reverse=True)[:5]:
+            if rule_code in rule_mappings:
+                mapping = rule_mappings[rule_code]
+                conn_type = mapping['connascence_type']
+                nasa_rule = mapping.get('nasa_rule', 'General best practice')
+                
+                recommendations.append(
+                    f"Address {count} {rule_code} violations ({conn_type}): {mapping['description']} "
+                    f"- Aligns with {nasa_rule}"
+                )
+        
+        return recommendations

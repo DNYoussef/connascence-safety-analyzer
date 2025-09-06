@@ -1,0 +1,492 @@
+{
+  "metadata": {
+    "total_violations": 95391,
+    "critical_violations": 93,
+    "overall_quality_score": 0.48,
+    "analysis_timestamp": "2025-09-05T21:31:03.542571",
+    "dataset_size_mb": 33.8
+  },
+  "violation_breakdown": {
+    "severity_breakdown": {
+      "medium": 88379,
+      "high": 6919,
+      "critical": 93
+    },
+    "type_breakdown": {
+      "connascence_of_meaning": 92086,
+      "connascence_of_algorithm": 1193,
+      "connascence_of_position": 1178,
+      "god_object": 711,
+      "CoA": 127,
+      "connascence_of_timing": 96
+    },
+    "folder_breakdown": {
+      "test_packages": 73882,
+      "vscode-extension": 4017,
+      "scripts": 3412,
+      "analyzer": 2956,
+      "integrations": 2383,
+      "vscode-extension-backup-20250905-142126": 1447,
+      "dashboard": 1267,
+      "autofix": 1093,
+      "policy": 951,
+      "mcp": 917,
+      "security": 780,
+      "grammar": 763,
+      "dogfood": 428,
+      "cli": 321,
+      "reporting": 223,
+      "htmlcov": 139,
+      "config": 137,
+      "core": 106,
+      "utils": 104,
+      "examples": 33,
+      ".claude": 26,
+      "tests": 6
+    },
+    "top_problematic_files": {
+      "..\\test_packages\\curl\\tests\\libtest\\lib557.c": 1851,
+      "..\\test_packages\\curl\\tests\\libtest\\lib1560.c": 1795,
+      "..\\test_packages\\celery\\t\\integration\\test_canvas.py": 1080,
+      "..\\test_packages\\celery\\t\\unit\\app\\test_schedules.py": 1080,
+      "..\\test_packages\\curl\\include\\curl\\curl.h": 841,
+      "..\\test_packages\\curl\\tests\\libtest\\lib517.c": 754,
+      "..\\test_packages\\celery\\t\\unit\\tasks\\test_canvas.py": 678,
+      "..\\test_packages\\curl\\tests\\http\\test_02_download.py": 654,
+      "..\\test_packages\\celery\\t\\unit\\tasks\\test_stamping.py": 650,
+      "..\\test_packages\\curl\\tests\\http\\test_07_upload.py": 649,
+      "..\\test_packages\\celery\\t\\unit\\app\\test_app.py": 619,
+      "..\\test_packages\\express\\test\\express.static.js": 573,
+      "..\\test_packages\\celery\\t\\unit\\backends\\test_base.py": 563,
+      "..\\test_packages\\curl\\src\\tool_listhelp.c": 561,
+      "..\\test_packages\\curl\\lib\\http.c": 557,
+      "..\\vscode-extension\\temp-out\\features\\visualHighlighting.js": 540,
+      "..\\test_packages\\express\\test\\express.urlencoded.js": 539,
+      "..\\test_packages\\celery\\t\\unit\\backends\\test_redis.py": 526,
+      "..\\test_packages\\celery\\t\\unit\\tasks\\test_tasks.py": 521,
+      "..\\test_packages\\celery\\t\\unit\\backends\\test_elasticsearch.py": 518
+    }
+  },
+  "mece_duplication_analysis": {
+    "total_coa_violations": 1193,
+    "unique_duplication_patterns": 1102,
+    "most_duplicated_patterns": [
+      [
+        "Function 'setup_method' appears to duplicate algorithm from other functions",
+        12
+      ],
+      [
+        "Function '__init__' appears to duplicate algorithm from other functions",
+        7
+      ],
+      [
+        "Function 'test_reduce' appears to duplicate algorithm from other functions",
+        5
+      ],
+      [
+        "Function 'wait_dead' appears to duplicate algorithm from other functions",
+        5
+      ],
+      [
+        "Function 'wait_live' appears to duplicate algorithm from other functions",
+        5
+      ],
+      [
+        "Function '_parse_output' appears to duplicate algorithm from other functions",
+        4
+      ],
+      [
+        "Function 'test_sanity' appears to duplicate algorithm from other functions",
+        4
+      ],
+      [
+        "Function '_count_by_severity' appears to duplicate algorithm from other functions",
+        3
+      ],
+      [
+        "Function 'from_dict' appears to duplicate algorithm from other functions",
+        3
+      ],
+      [
+        "Function 'test_delete' appears to duplicate algorithm from other functions",
+        3
+      ]
+    ],
+    "cross_folder_duplications": {
+      "Function '_count_by_severity' appears to duplicate algorithm from other functions": [
+        "policy",
+        "mcp"
+      ]
+    },
+    "mece_score": 0.892
+  },
+  "architectural_analysis": {
+    "god_objects": 1036,
+    "nasa_violations": 0,
+    "coupling_violations": 111,
+    "architectural_hotspots": 157,
+    "top_hotspots": {
+      "..\\test_packages\\celery\\celery\\apps\\multi.py": [
+        "god_object",
+        "CoA",
+        "connascence_of_timing",
+        "connascence_of_meaning",
+        "connascence_of_algorithm",
+        "connascence_of_position"
+      ],
+      "..\\test_packages\\celery\\t\\integration\\test_canvas.py": [
+        "god_object",
+        "CoA",
+        "connascence_of_meaning",
+        "connascence_of_timing",
+        "connascence_of_algorithm",
+        "connascence_of_position"
+      ],
+      "..\\test_packages\\celery\\t\\integration\\test_tasks.py": [
+        "god_object",
+        "CoA",
+        "connascence_of_meaning",
+        "connascence_of_timing",
+        "connascence_of_algorithm",
+        "connascence_of_position"
+      ],
+      "..\\test_packages\\celery\\t\\unit\\tasks\\test_canvas.py": [
+        "god_object",
+        "CoA",
+        "connascence_of_timing",
+        "connascence_of_meaning",
+        "connascence_of_algorithm",
+        "connascence_of_position"
+      ],
+      "..\\test_packages\\curl\\tests\\http\\testenv\\curl.py": [
+        "god_object",
+        "CoA",
+        "connascence_of_timing",
+        "connascence_of_meaning",
+        "connascence_of_algorithm",
+        "connascence_of_position"
+      ],
+      "..\\test_packages\\curl\\tests\\http\\testenv\\nghttpx.py": [
+        "god_object",
+        "CoA",
+        "connascence_of_timing",
+        "connascence_of_meaning",
+        "connascence_of_algorithm",
+        "connascence_of_position"
+      ],
+      "..\\autofix\\patch_generator.py": [
+        "god_object",
+        "CoA",
+        "connascence_of_meaning",
+        "connascence_of_algorithm",
+        "connascence_of_position"
+      ],
+      "..\\grammar\\ast_safe_refactoring.py": [
+        "god_object",
+        "CoA",
+        "connascence_of_meaning",
+        "connascence_of_algorithm",
+        "connascence_of_position"
+      ],
+      "..\\grammar\\constrained_generator.py": [
+        "god_object",
+        "CoA",
+        "connascence_of_meaning",
+        "connascence_of_algorithm",
+        "connascence_of_position"
+      ],
+      "..\\analyzer\\performance\\parallel_analyzer.py": [
+        "CoA",
+        "connascence_of_timing",
+        "connascence_of_meaning",
+        "connascence_of_algorithm",
+        "connascence_of_position"
+      ]
+    }
+  },
+  "component_quality_scores": {
+    "component_scores": {
+      "analyzer": {
+        "quality_score": 0,
+        "total_violations": 2956,
+        "critical_violations": 1,
+        "file_count": 22,
+        "violations_per_file": 134.36
+      },
+      "autofix": {
+        "quality_score": 0,
+        "total_violations": 1093,
+        "critical_violations": 1,
+        "file_count": 9,
+        "violations_per_file": 121.44
+      },
+      "cli": {
+        "quality_score": 0,
+        "total_violations": 321,
+        "critical_violations": 0,
+        "file_count": 2,
+        "violations_per_file": 160.5
+      },
+      "config": {
+        "quality_score": 0,
+        "total_violations": 137,
+        "critical_violations": 0,
+        "file_count": 1,
+        "violations_per_file": 137.0
+      },
+      "core": {
+        "quality_score": 0,
+        "total_violations": 106,
+        "critical_violations": 0,
+        "file_count": 1,
+        "violations_per_file": 106.0
+      },
+      "dashboard": {
+        "quality_score": 0,
+        "total_violations": 1267,
+        "critical_violations": 0,
+        "file_count": 6,
+        "violations_per_file": 211.17
+      },
+      "dogfood": {
+        "quality_score": 0.144,
+        "total_violations": 428,
+        "critical_violations": 0,
+        "file_count": 5,
+        "violations_per_file": 85.6
+      },
+      "examples": {
+        "quality_score": 0.67,
+        "total_violations": 33,
+        "critical_violations": 0,
+        "file_count": 1,
+        "violations_per_file": 33.0
+      },
+      "grammar": {
+        "quality_score": 0,
+        "total_violations": 763,
+        "critical_violations": 3,
+        "file_count": 7,
+        "violations_per_file": 109.0
+      },
+      "integrations": {
+        "quality_score": 0,
+        "total_violations": 2383,
+        "critical_violations": 2,
+        "file_count": 12,
+        "violations_per_file": 198.58
+      },
+      "mcp": {
+        "quality_score": 0,
+        "total_violations": 917,
+        "critical_violations": 0,
+        "file_count": 4,
+        "violations_per_file": 229.25
+      },
+      "policy": {
+        "quality_score": 0,
+        "total_violations": 951,
+        "critical_violations": 0,
+        "file_count": 7,
+        "violations_per_file": 135.86
+      },
+      "reporting": {
+        "quality_score": 0.443,
+        "total_violations": 223,
+        "critical_violations": 0,
+        "file_count": 4,
+        "violations_per_file": 55.75
+      },
+      "scripts": {
+        "quality_score": 0,
+        "total_violations": 3412,
+        "critical_violations": 0,
+        "file_count": 20,
+        "violations_per_file": 170.6
+      },
+      "security": {
+        "quality_score": 0,
+        "total_violations": 780,
+        "critical_violations": 1,
+        "file_count": 5,
+        "violations_per_file": 156.0
+      },
+      "utils": {
+        "quality_score": 0.74,
+        "total_violations": 104,
+        "critical_violations": 0,
+        "file_count": 4,
+        "violations_per_file": 26.0
+      },
+      "test_packages": {
+        "quality_score": 0.498,
+        "total_violations": 73882,
+        "critical_violations": 85,
+        "file_count": 1472,
+        "violations_per_file": 50.19
+      },
+      "htmlcov": {
+        "quality_score": 0,
+        "total_violations": 139,
+        "critical_violations": 0,
+        "file_count": 1,
+        "violations_per_file": 139.0
+      },
+      "vscode-extension": {
+        "quality_score": 0.352,
+        "total_violations": 4017,
+        "critical_violations": 0,
+        "file_count": 62,
+        "violations_per_file": 64.79
+      },
+      "vscode-extension-backup-20250905-142126": {
+        "quality_score": 0.464,
+        "total_violations": 1447,
+        "critical_violations": 0,
+        "file_count": 27,
+        "violations_per_file": 53.59
+      },
+      ".claude": {
+        "quality_score": 0.74,
+        "total_violations": 26,
+        "critical_violations": 0,
+        "file_count": 1,
+        "violations_per_file": 26.0
+      },
+      "tests": {
+        "quality_score": 0.99,
+        "total_violations": 6,
+        "critical_violations": 0,
+        "file_count": 6,
+        "violations_per_file": 1.0
+      }
+    },
+    "worst_components": [
+      [
+        "analyzer",
+        {
+          "quality_score": 0,
+          "total_violations": 2956,
+          "critical_violations": 1,
+          "file_count": 22,
+          "violations_per_file": 134.36
+        }
+      ],
+      [
+        "autofix",
+        {
+          "quality_score": 0,
+          "total_violations": 1093,
+          "critical_violations": 1,
+          "file_count": 9,
+          "violations_per_file": 121.44
+        }
+      ],
+      [
+        "cli",
+        {
+          "quality_score": 0,
+          "total_violations": 321,
+          "critical_violations": 0,
+          "file_count": 2,
+          "violations_per_file": 160.5
+        }
+      ],
+      [
+        "config",
+        {
+          "quality_score": 0,
+          "total_violations": 137,
+          "critical_violations": 0,
+          "file_count": 1,
+          "violations_per_file": 137.0
+        }
+      ],
+      [
+        "core",
+        {
+          "quality_score": 0,
+          "total_violations": 106,
+          "critical_violations": 0,
+          "file_count": 1,
+          "violations_per_file": 106.0
+        }
+      ]
+    ],
+    "best_components": [
+      [
+        "test_packages",
+        {
+          "quality_score": 0.498,
+          "total_violations": 73882,
+          "critical_violations": 85,
+          "file_count": 1472,
+          "violations_per_file": 50.19
+        }
+      ],
+      [
+        "examples",
+        {
+          "quality_score": 0.67,
+          "total_violations": 33,
+          "critical_violations": 0,
+          "file_count": 1,
+          "violations_per_file": 33.0
+        }
+      ],
+      [
+        "utils",
+        {
+          "quality_score": 0.74,
+          "total_violations": 104,
+          "critical_violations": 0,
+          "file_count": 4,
+          "violations_per_file": 26.0
+        }
+      ],
+      [
+        ".claude",
+        {
+          "quality_score": 0.74,
+          "total_violations": 26,
+          "critical_violations": 0,
+          "file_count": 1,
+          "violations_per_file": 26.0
+        }
+      ],
+      [
+        "tests",
+        {
+          "quality_score": 0.99,
+          "total_violations": 6,
+          "critical_violations": 0,
+          "file_count": 6,
+          "violations_per_file": 1.0
+        }
+      ]
+    ],
+    "average_quality": 0.229
+  },
+  "critical_violations_analysis": {
+    "total_critical": 93,
+    "critical_by_type": {
+      "god_object": 93
+    },
+    "critical_by_folder": {
+      "analyzer": 1,
+      "autofix": 1,
+      "grammar": 3,
+      "security": 1,
+      "integrations": 2,
+      "test_packages": 85
+    },
+    "risk_assessment": {
+      "god_object": {
+        "count": 93,
+        "business_risk": "LOW",
+        "technical_debt_hours": 279
+      }
+    },
+    "estimated_total_debt_hours": 279
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "version": "2.1.0",
+  "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "connascence-safety-analyzer",
+          "version": "2.0.0",
+          "informationUri": "https://github.com/DNYoussef/connascence-safety-analyzer",
+          "rules": [
+            {
+              "id": "unknown",
+              "name": "Unknown",
+              "shortDescription": {
+                "text": "unknown violation"
+              },
+              "fullDescription": {
+                "text": "God Object detected: Class has 20 methods (threshold: 15)"
+              },
+              "help": {
+                "text": "This rule detects unknown connascence violations."
+              },
+              "properties": {
+                "category": "CoA",
+                "severity": "high"
+              }
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "unknown",
+          "level": "error",
+          "message": {
+            "text": "God Object detected: Class has 20 methods (threshold: 15)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "../large_class.py"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1
+                }
+              }
+            }
+          ],
+          "properties": {
+            "weight": 4.0,
+            "connascence_type": "CoA",
+            "violation_id": "god_object_1"
+          }
+        }
+      ],
+      "invocations": [
+        {
+          "executionSuccessful": true,
+          "startTimeUtc": "2025-09-05T12:21:23.482052Z"
+        }
+      ]
+    }
+  ]
+}

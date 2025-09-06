@@ -1,0 +1,108 @@
+{
+  "success": true,
+  "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\.claude\\agents\\stub_killer\\code_generator.py",
+  "violations": [
+    {
+      "id": "god_object_CodeGenerator",
+      "rule_id": "god_object",
+      "type": "god_object",
+      "severity": "high",
+      "description": "God Object detected: Class \"CodeGenerator\" has 34 methods (threshold: 15)",
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\.claude\\agents\\stub_killer\\code_generator.py",
+      "line_number": 44,
+      "weight": 4.0
+    },
+    {
+      "id": "magic_literal_654",
+      "rule_id": "connascence_of_meaning",
+      "type": "CoM",
+      "severity": "low",
+      "description": "Magic literal \"3\" should be a named constant",
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\.claude\\agents\\stub_killer\\code_generator.py",
+      "line_number": 654,
+      "weight": 1.0
+    },
+    {
+      "id": "magic_literal_658",
+      "rule_id": "connascence_of_meaning",
+      "type": "CoM",
+      "severity": "low",
+      "description": "Magic literal \"2\" should be a named constant",
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\.claude\\agents\\stub_killer\\code_generator.py",
+      "line_number": 658,
+      "weight": 1.0
+    },
+    {
+      "id": "magic_literal_701",
+      "rule_id": "connascence_of_meaning",
+      "type": "CoM",
+      "severity": "low",
+      "description": "Magic literal \"7\" should be a named constant",
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\.claude\\agents\\stub_killer\\code_generator.py",
+      "line_number": 701,
+      "weight": 1.0
+    },
+    {
+      "id": "magic_literal_878",
+      "rule_id": "connascence_of_meaning",
+      "type": "CoM",
+      "severity": "low",
+      "description": "Magic literal \"2\" should be a named constant",
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\.claude\\agents\\stub_killer\\code_generator.py",
+      "line_number": 878,
+      "weight": 1.0
+    },
+    {
+      "id": "magic_literal_883",
+      "rule_id": "connascence_of_meaning",
+      "type": "CoM",
+      "severity": "low",
+      "description": "Magic literal \"10\" should be a named constant",
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\.claude\\agents\\stub_killer\\code_generator.py",
+      "line_number": 883,
+      "weight": 1.0
+    },
+    {
+      "id": "magic_literal_586",
+      "rule_id": "connascence_of_meaning",
+      "type": "CoM",
+      "severity": "low",
+      "description": "Magic literal \"3\" should be a named constant",
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\.claude\\agents\\stub_killer\\code_generator.py",
+      "line_number": 586,
+      "weight": 1.0
+    },
+    {
+      "id": "magic_literal_1011",
+      "rule_id": "connascence_of_meaning",
+      "type": "CoM",
+      "severity": "low",
+      "description": "Magic literal \"60\" should be a named constant",
+      "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\.claude\\agents\\stub_killer\\code_generator.py",
+      "line_number": 1011,
+      "weight": 1.0
+    }
+  ],
+  "summary": {
+    "total_violations": 8,
+    "by_severity": {
+      "critical": 0,
+      "high": 1,
+      "medium": 0,
+      "low": 7
+    },
+    "by_type": {
+      "god_object": 1,
+      "CoM": 7
+    }
+  },
+  "integrations": {},
+  "metadata": {
+    "analysis_type": "full",
+    "file_path": "C:\\Users\\17175\\Desktop\\AIVillage\\.claude\\agents\\stub_killer\\code_generator.py",
+    "timestamp": 1757091991.6399472,
+    "server_version": "2.0.0"
+  },
+  "error_message": null,
+  "execution_time": 0.01120305061340332
+}
