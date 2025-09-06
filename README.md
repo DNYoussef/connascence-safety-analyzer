@@ -2,7 +2,7 @@
 
 **NASA-grade software quality analysis with enterprise-proven connascence detection and zero false positives**
 
-✅ **Production Ready** | ✅ **74,237+ Violations Analyzed** | ✅ **Fortune 500 Validated** | ✅ **468% Annual ROI**
+ **Production Ready** | **74,237+ Violations Analyzed** |  **Fortune 500 Validated** |  **468% Annual ROI**
 
 ## Key Features
 
@@ -272,11 +272,6 @@ ls enterprise-package/
 # ├── validation/         # 74,237 violation analysis results
 # └── artifacts/          # Generated reports and metrics
 ```
-
-### Pricing Tiers
-- **[Startup](enterprise-package/tiers/STARTUP_TIER.md)**: 2-10 developers, $15K-25K (perpetual license)
-- **[Professional](enterprise-package/tiers/PROFESSIONAL_TIER.md)**: 10-50 developers, $50K-75K (team features)
-- **[Enterprise](enterprise-package/tiers/ENTERPRISE_TIER.md)**: 50+ developers, custom pricing (unlimited scale)
 
 ## Documentation & Support
 
