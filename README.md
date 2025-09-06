@@ -32,22 +32,60 @@ python -m analyzer.core --path docs/examples/bad_example.py --policy nasa_jpl_po
 
 ### Copy-Paste Demo (30 seconds)
 
-Save this as `demo.py`:
-
+**30 lines with connascence violations:**
 ```python
-class UserMgr:  # Abbreviated name
+class UserProcessor:
     def __init__(self):
-        self.cnt = 0  # Unclear abbreviation
+        self.status = 1  # Magic number
+        self.max_users = 100  # Magic number
     
-    def create_user(self, name, age, email, status):  # Parameter coupling
-        if age > 150 or status not in [1, 2, 3]:  # Magic numbers
-            return False
-        return {"id": self.cnt + 1, "status": 1}  # More magic numbers
+    def process_users(self, users, format, timeout, retries, debug, validate):  # Too many params
+        if self.status == 1:  # Magic comparison
+            return self._process_active(users, format, timeout, retries, debug, validate)
+        elif self.status == 2:  # Magic comparison
+            return []
+    
+    def _process_active(self, users, format, timeout, retries, debug, validate):
+        results = []
+        for i in range(100):  # Magic number
+            if i % 10 == 0:  # Magic numbers
+                user = self._transform_user(users[i], format)
+                if len(user) > 50:  # Magic number  
+                    results.append(user)
+        return results
+    
+    def _transform_user(self, user, format):  # Algorithm duplication
+        if format == "json":  # String literal
+            return user.strip().lower()
+        elif format == "xml":  # String literal
+            return user.strip().upper() 
+        return user.strip()  # Duplicated .strip() calls
+    
+    def validate_user(self, user, format, timeout):  # Parameter position coupling
+        if format == "json":  # Duplicated string check
+            return user.strip().lower()
+        return user.strip()  # More duplication
 ```
 
-Run analyzer:
+**Analyzer Output:**
+```json
+{
+  "violations": [
+    {"type": "connascence_of_meaning", "line": 3, "description": "Magic literal '1'"},
+    {"type": "connascence_of_meaning", "line": 4, "description": "Magic literal '100'"},
+    {"type": "connascence_of_position", "line": 6, "description": "Too many parameters (6)"},
+    {"type": "connascence_of_algorithm", "line": 22, "description": "Duplicate algorithm pattern"},
+    {"type": "connascence_of_meaning", "line": 14, "description": "Magic literal '100'"},
+    {"type": "god_object", "line": 1, "severity": "critical", "description": "Class has low cohesion"}
+  ],
+  "summary": {"total_violations": 12, "critical": 1, "high": 4, "medium": 7}
+}
+```
+
+**One-Command Usage:**
 ```bash
-python -m analyzer.core --path demo.py --policy strict-core
+pip install connascence-analyzer
+connascence your-project/  # Analyze entire project
 ```
 
 **Real Output:**
