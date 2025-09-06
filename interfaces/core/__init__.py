@@ -1,0 +1,17 @@
+# SPDX-License-Identifier: MIT
+"""
+Core Interface Components
+
+Shared functionality across all interface types (CLI, Web, VSCode).
+Eliminates duplication and provides consistent behavior.
+"""
+
+from .shared_components import SharedAnalysisEngine, SharedFormatter, SharedValidation
+from .interface_base import InterfaceBase
+
+__all__ = [
+    "SharedAnalysisEngine",
+    "SharedFormatter", 
+    "SharedValidation",
+    "InterfaceBase"
+]
