@@ -12,6 +12,7 @@ from typing import Dict, List, Optional
 
 class UserStatus(Enum):
     """Eliminates magic numbers through named constants."""
+
     PENDING = "pending"
     ACTIVE = "active"
     PREMIUM = "premium"
@@ -20,6 +21,7 @@ class UserStatus(Enum):
 
 class Permission(Enum):
     """Clear permission definitions."""
+
     READ = "read"
     WRITE = "write"
     ADMIN = "admin"
@@ -28,6 +30,7 @@ class Permission(Enum):
 @dataclass
 class User:
     """Immutable user data with clear structure."""
+
     user_id: int
     name: str
     age: int
@@ -50,11 +53,11 @@ class EmailValidator:
             return False
         if len(email) > cls.MAX_EMAIL_LENGTH:
             return False
-        if email.count('@') != 1:
+        if email.count("@") != 1:
             return False
 
-        local, domain = email.split('@')
-        return len(local) > 0 and '.' in domain and len(domain.split('.')) >= 2
+        local, domain = email.split("@")
+        return len(local) > 0 and "." in domain and len(domain.split(".")) >= 2
 
 
 class PermissionManager:
@@ -64,7 +67,7 @@ class PermissionManager:
         UserStatus.PENDING: [Permission.READ],
         UserStatus.ACTIVE: [Permission.READ, Permission.WRITE],
         UserStatus.PREMIUM: [Permission.READ, Permission.WRITE, Permission.ADMIN],
-        UserStatus.INACTIVE: []
+        UserStatus.INACTIVE: [],
     }
 
     @classmethod
@@ -126,7 +129,7 @@ class UserService:
             email=email,
             status=status,
             created_at=int(time.time()),
-            permissions=permissions
+            permissions=permissions,
         )
 
         self._repository.save_user(user)
@@ -140,6 +143,7 @@ class UserService:
 @dataclass
 class UserStats:
     """Clear return type for statistics."""
+
     total_count: int
     average_age: float
     active_count: int
@@ -158,19 +162,13 @@ class UserAnalytics:
         if include_inactive:
             filtered_users = list(all_users.values())
         else:
-            filtered_users = [
-                user for user in all_users.values()
-                if user.status != UserStatus.INACTIVE
-            ]
+            filtered_users = [user for user in all_users.values() if user.status != UserStatus.INACTIVE]
 
         if not filtered_users:
             return UserStats(0, 0.0, 0)
 
         total_count = len(filtered_users)
         average_age = sum(user.age for user in filtered_users) / total_count
-        active_count = sum(
-            1 for user in filtered_users
-            if user.status in [UserStatus.ACTIVE, UserStatus.PREMIUM]
-        )
+        active_count = sum(1 for user in filtered_users if user.status in [UserStatus.ACTIVE, UserStatus.PREMIUM])
 
         return UserStats(total_count, average_age, active_count)

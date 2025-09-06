@@ -6,6 +6,7 @@ Copy and paste this into a file, then run the analyzer to see immediate results.
 
 # This file intentionally contains common connascence violations for demo purposes
 
+
 class PaymentProcessor:
     def __init__(self):
         self.data = {}
@@ -23,17 +24,18 @@ class PaymentProcessor:
         # God object - doing validation, processing, and storage
         payment_id = self.cnt + 1
         self.data[payment_id] = {
-            'amount': amount,
-            'type': card_type,
-            'processed_at': self._get_timestamp(),
-            'fee': self._calculate_fee(amount, card_type),
-            'status': 1  # Magic: 1=pending, 2=complete, 3=failed
+            "amount": amount,
+            "type": card_type,
+            "processed_at": self._get_timestamp(),
+            "fee": self._calculate_fee(amount, card_type),
+            "status": 1,  # Magic: 1=pending, 2=complete, 3=failed
         }
         self.cnt += 1
         return payment_id
 
     def _get_timestamp(self):
         import time
+
         return int(time.time())
 
     def _calculate_fee(self, amount, card_type):
@@ -44,6 +46,7 @@ class PaymentProcessor:
             return amount * 0.031
         else:  # Amex
             return amount * 0.035
+
 
 # Duplicate fee logic in different class
 class FeeCalculator:
@@ -57,18 +60,20 @@ class FeeCalculator:
         else:
             return amount * 0.035
 
+
 # Function with parameter position coupling
 def generate_report(payments, include_fees, sort_by_date, format_currency):
     # Parameters must be in exact order, creating coupling
     results = []
     for payment in payments.values():
-        if payment['status'] != 3:  # Magic number again
+        if payment["status"] != 3:  # Magic number again
             results.append(payment)
 
     if sort_by_date:
-        results.sort(key=lambda x: x['processed_at'])
+        results.sort(key=lambda x: x["processed_at"])
 
     return results
+
 
 """
 To see the analyzer in action:
