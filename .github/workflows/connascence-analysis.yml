@@ -35,7 +35,7 @@ jobs:
         # Install additional analysis dependencies
         pip install radon bandit ruff mypy black
 
-    - name: 🔤 Unicode Code Safety Check
+    - name: Unicode Code Safety Check
       id: unicode-check
       run: |
         echo "::group::Unicode Safety Validation"
@@ -51,11 +51,11 @@ jobs:
           echo "Unicode violations found - check unicode_violations.json for full report"
           exit 1
         else
-          echo "✅ No Unicode characters found in code - all clear!"
+          echo "No Unicode characters found in code - all clear!"
         fi
         echo "::endgroup::"
 
-    - name: 🛡️ NASA Power of Ten Rules Validation
+    - name: NASA Power of Ten Rules Validation
       id: nasa-validation
       run: |
         echo "::group::NASA Power of Ten Rules Analysis"
@@ -83,7 +83,7 @@ jobs:
         echo "NASA Compliance Score: $NASA_SCORE"
         echo "::endgroup::"
 
-    - name: 🔍 God Object Detection 
+    - name: God Object Detection 
       id: god-object-detection
       run: |
         echo "::group::God Object Analysis"
@@ -99,7 +99,7 @@ jobs:
         echo "God Objects Found: $GOD_OBJECTS"
         echo "::endgroup::"
 
-    - name: 🎯 MECE Duplication Analysis
+    - name: MECE Duplication Analysis
       id: mece-analysis
       run: |
         echo "::group::MECE Duplication Detection"
@@ -119,7 +119,7 @@ jobs:
         echo "Duplications Found: $DUPLICATION_COUNT"
         echo "::endgroup::"
 
-    - name: 📊 Complete Connascence Scoring
+    - name: Complete Connascence Scoring
       id: connascence-scoring
       run: |
         echo "::group::Full Connascence Analysis"
@@ -143,7 +143,7 @@ jobs:
         echo "Overall Quality Score: $OVERALL_SCORE"
         echo "::endgroup::"
 
-    - name: 🔗 Enhanced Tool Correlation
+    - name: Enhanced Tool Correlation
       id: tool-correlation
       run: |
         echo "::group::Cross-Tool Analysis Correlation"
@@ -178,7 +178,7 @@ jobs:
         echo "High Confidence Correlations: $HIGH_CONFIDENCE_CORRELATIONS"
         echo "::endgroup::"
 
-    - name: 📈 Generate Comprehensive Dashboard
+    - name: Generate Comprehensive Dashboard
       run: |
         echo "::group::Dashboard Generation"
         
@@ -192,17 +192,17 @@ jobs:
         echo "<h1>Connascence Analysis Results</h1>" >> comprehensive_dashboard.html
         echo "<p>Analysis completed successfully. See artifacts for detailed results.</p>" >> comprehensive_dashboard.html
         echo "<ul>" >> comprehensive_dashboard.html
-        if [ -f "nasa_analysis.json" ]; then echo "<li>NASA Compliance Analysis: ✅ Available</li>" >> comprehensive_dashboard.html; fi
-        if [ -f "god_objects.json" ]; then echo "<li>God Object Detection: ✅ Available</li>" >> comprehensive_dashboard.html; fi
-        if [ -f "mece_analysis.json" ]; then echo "<li>MECE Analysis: ✅ Available</li>" >> comprehensive_dashboard.html; fi
-        if [ -f "connascence_full.json" ]; then echo "<li>Full Connascence Analysis: ✅ Available</li>" >> comprehensive_dashboard.html; fi
-        if [ -f "correlated_results.json" ]; then echo "<li>Tool Correlation: ✅ Available</li>" >> comprehensive_dashboard.html; fi
+        if [ -f "nasa_analysis.json" ]; then echo "<li>NASA Compliance Analysis: Available</li>" >> comprehensive_dashboard.html; fi
+        if [ -f "god_objects.json" ]; then echo "<li>God Object Detection: Available</li>" >> comprehensive_dashboard.html; fi
+        if [ -f "mece_analysis.json" ]; then echo "<li>MECE Analysis: Available</li>" >> comprehensive_dashboard.html; fi
+        if [ -f "connascence_full.json" ]; then echo "<li>Full Connascence Analysis: Available</li>" >> comprehensive_dashboard.html; fi
+        if [ -f "correlated_results.json" ]; then echo "<li>Tool Correlation: Available</li>" >> comprehensive_dashboard.html; fi
         echo "</ul></body></html>" >> comprehensive_dashboard.html
         
         echo "Dashboard HTML generated successfully"
         echo "::endgroup::"
 
-    - name: ✅ Quality Gate Evaluation
+    - name: Quality Gate Evaluation
       run: |
         echo "::group::Quality Gates"
         
@@ -225,71 +225,71 @@ jobs:
         
         # NASA Compliance Gate (Defense Industry Standard)
         if python3 -c "exit(0 if float('${NASA_SCORE:-0}') >= float('$NASA_THRESHOLD') else 1)"; then
-          echo "✅ NASA Compliance: PASS ($NASA_SCORE >= $NASA_THRESHOLD) - Defense Industry Ready"
+          echo "NASA Compliance: PASS ($NASA_SCORE >= $NASA_THRESHOLD) - Defense Industry Ready"
           NASA_PASS=true
         else
-          echo "❌ NASA Compliance: FAIL ($NASA_SCORE < $NASA_THRESHOLD) - Not suitable for defense industry"
+          echo "NASA Compliance: FAIL ($NASA_SCORE < $NASA_THRESHOLD) - Not suitable for defense industry"
           NASA_PASS=false
         fi
         
         # God Object Gate
         if [[ $GOD_OBJECTS -le $MAX_GOD_OBJECTS ]]; then
-          echo "✅ God Objects: PASS ($GOD_OBJECTS <= $MAX_GOD_OBJECTS)"
+          echo "God Objects: PASS ($GOD_OBJECTS <= $MAX_GOD_OBJECTS)"
           GOD_PASS=true
         else
-          echo "❌ God Objects: FAIL ($GOD_OBJECTS > $MAX_GOD_OBJECTS)"
+          echo "God Objects: FAIL ($GOD_OBJECTS > $MAX_GOD_OBJECTS)"
           GOD_PASS=false
         fi
         
         # MECE Gate
         if python3 -c "exit(0 if float('${MECE_SCORE:-0}') >= float('$MECE_THRESHOLD') else 1)"; then
-          echo "✅ MECE Score: PASS ($MECE_SCORE >= $MECE_THRESHOLD)"
+          echo "MECE Score: PASS ($MECE_SCORE >= $MECE_THRESHOLD)"
           MECE_PASS=true
         else
-          echo "❌ MECE Score: FAIL ($MECE_SCORE < $MECE_THRESHOLD)"
+          echo "MECE Score: FAIL ($MECE_SCORE < $MECE_THRESHOLD)"
           MECE_PASS=false
         fi
         
         # Critical Violations Gate
         if [[ $CRITICAL_VIOLATIONS -le $MAX_CRITICAL_VIOLATIONS ]]; then
-          echo "✅ Critical Violations: PASS ($CRITICAL_VIOLATIONS <= $MAX_CRITICAL_VIOLATIONS)"
+          echo "Critical Violations: PASS ($CRITICAL_VIOLATIONS <= $MAX_CRITICAL_VIOLATIONS)"
           CRITICAL_PASS=true
         else
-          echo "❌ Critical Violations: FAIL ($CRITICAL_VIOLATIONS > $MAX_CRITICAL_VIOLATIONS)"
+          echo "Critical Violations: FAIL ($CRITICAL_VIOLATIONS > $MAX_CRITICAL_VIOLATIONS)"
           CRITICAL_PASS=false
         fi
         
         # Overall Score Gate
         if python3 -c "exit(0 if float('${OVERALL_SCORE:-0}') >= float('$MIN_OVERALL_SCORE') else 1)"; then
-          echo "✅ Overall Score: PASS ($OVERALL_SCORE >= $MIN_OVERALL_SCORE)"
+          echo "Overall Score: PASS ($OVERALL_SCORE >= $MIN_OVERALL_SCORE)"
           OVERALL_PASS=true
         else
-          echo "❌ Overall Score: FAIL ($OVERALL_SCORE < $MIN_OVERALL_SCORE)"
+          echo "Overall Score: FAIL ($OVERALL_SCORE < $MIN_OVERALL_SCORE)"
           OVERALL_PASS=false
         fi
         
         # Final gate decision with NASA emphasis
         if [[ "$NASA_PASS" == "true" && "$GOD_PASS" == "true" && "$MECE_PASS" == "true" && "$CRITICAL_PASS" == "true" && "$OVERALL_PASS" == "true" ]]; then
           echo ""
-          echo "🎉 ALL QUALITY GATES PASSED!"
+          echo "ALL QUALITY GATES PASSED!"
           echo "Repository meets all quality standards including NASA Power of Ten compliance."
-          echo "🛡️ DEFENSE INDUSTRY READY - Approved for safety-critical applications."
+          echo "DEFENSE INDUSTRY READY - Approved for safety-critical applications."
           exit 0
         elif [[ "$NASA_PASS" == "false" ]]; then
           echo ""
-          echo "🚫 CRITICAL: NASA COMPLIANCE GATE FAILED!"
+          echo "CRITICAL: NASA COMPLIANCE GATE FAILED!"
           echo "Repository does not meet defense industry safety standards."
-          echo "🔴 BLOCKING FAILURE for safety-critical applications."
+          echo "BLOCKING FAILURE for safety-critical applications."
           exit 1
         else
           echo ""
-          echo "🚫 QUALITY GATES FAILED!"
+          echo "QUALITY GATES FAILED!"
           echo "Repository does not meet quality standards."
           exit 1
         fi
         echo "::endgroup::"
 
-    - name: 📊 Update GitHub Status
+    - name: Update GitHub Status
       if: always()
       run: |
         # Set GitHub commit status
@@ -299,10 +299,10 @@ jobs:
         
         if [[ $? -eq 0 ]]; then
           STATE="success"
-          DESCRIPTION="✅ All quality gates passed including NASA compliance - $TOTAL_VIOLATIONS violations ($CRITICAL_VIOLATIONS critical) - Defense Ready"
+          DESCRIPTION="All quality gates passed including NASA compliance - $TOTAL_VIOLATIONS violations ($CRITICAL_VIOLATIONS critical) - Defense Ready"
         else
           STATE="failure" 
-          DESCRIPTION="❌ Quality gates failed (NASA Score: $NASA_SCORE) - $TOTAL_VIOLATIONS violations ($CRITICAL_VIOLATIONS critical)"
+          DESCRIPTION="Quality gates failed (NASA Score: $NASA_SCORE) - $TOTAL_VIOLATIONS violations ($CRITICAL_VIOLATIONS critical)"
         fi
         
         curl -X POST \
@@ -315,7 +315,21 @@ jobs:
             \"context\": \"connascence-analysis\"
           }"
 
-    - name: 📄 Generate SARIF Report
+    - name: Check Code Scanning Status
+      id: check-code-scanning
+      run: |
+        echo "::group::Code Scanning Status Check"
+        # Check if code scanning is enabled
+        if gh api repos/DNYoussef/connascence-safety-analyzer/code-scanning/alerts --jq 'length' 2>/dev/null; then
+          echo "code_scanning_enabled=true" >> $GITHUB_OUTPUT
+          echo "Code scanning is enabled - SARIF upload will work"
+        else
+          echo "code_scanning_enabled=false" >> $GITHUB_OUTPUT
+          echo "Code scanning is not enabled - SARIF upload will be skipped"
+        fi
+        echo "::endgroup::"
+
+    - name: Generate SARIF Report
       if: always()
       run: |
         echo "::group::SARIF Generation"
@@ -345,15 +359,29 @@ jobs:
         echo "Final SARIF file size: $(wc -c < connascence_analysis.sarif) bytes"
         echo "::endgroup::"
 
-    - name: 📤 Upload SARIF Results
+    - name: Upload SARIF Results
       uses: github/codeql-action/upload-sarif@v3
-      if: always()
-      continue-on-error: true  # Don't fail workflow if code scanning not enabled
+      if: always() && steps.check-code-scanning.outputs.code_scanning_enabled == 'true'
+      continue-on-error: true
       with:
         sarif_file: connascence_analysis.sarif
         category: connascence-analysis
 
-    - name: 📦 Upload Analysis Artifacts
+    - name: SARIF Upload Status
+      if: always()
+      run: |
+        if [[ "${{ steps.check-code-scanning.outputs.code_scanning_enabled }}" == "true" ]]; then
+          echo "SARIF upload attempted - check above for results"
+        else
+          echo "SARIF upload skipped - code scanning not enabled"
+          echo "To enable code scanning:"
+          echo "1. Enable GitHub Advanced Security in repository settings"
+          echo "2. Go to Settings > Code security and analysis"
+          echo "3. Enable 'Code scanning'"
+          echo "4. Or run the CodeQL workflow in .github/workflows/codeql-analysis.yml"
+        fi
+
+    - name: Upload Analysis Artifacts
       uses: actions/upload-artifact@v4
       if: always()
       with:
@@ -371,7 +399,7 @@ jobs:
           radon_results.json
           bandit_results.json
 
-    - name: 📝 Comment PR with Results
+    - name: Comment PR with Results
       if: github.event_name == 'pull_request'
       uses: actions/github-script@v7
       with:
@@ -384,32 +412,32 @@ jobs:
           const connascenceResults = JSON.parse(fs.readFileSync('connascence_full.json', 'utf8'));
           
           // Format comment
-          const comment = `## 🔍 Connascence Analysis Results
+          const comment = `## Connascence Analysis Results
           
-          ### 🛡️ NASA Power of Ten Compliance
+          ### NASA Power of Ten Compliance
           - **Score:** ${(nasaResults.nasa_compliance.score * 100).toFixed(1)}%
           - **Rules Violated:** ${nasaResults.nasa_compliance.violations.length}
-          - **Defense Industry Status:** ${nasaResults.nasa_compliance.score >= 0.90 ? '✅ APPROVED' : '❌ NOT APPROVED'}
+          - **Defense Industry Status:** ${nasaResults.nasa_compliance.score >= 0.90 ? 'APPROVED' : 'NOT APPROVED'}
           
-          ### 👹 God Object Detection  
+          ### God Object Detection  
           - **God Objects Found:** ${{ steps.god-object-detection.outputs.god_objects_count }}
           - **Threshold:** 15 methods/400 lines
           
-          ### 🎯 MECE Duplication Analysis
+          ### MECE Duplication Analysis
           - **MECE Score:** ${meceResults.mece_score}
           - **Duplications Found:** ${{ steps.mece-analysis.outputs.duplication_count }}
           
-          ### 📊 Overall Connascence Analysis
+          ### Overall Connascence Analysis
           - **Total Violations:** ${{ steps.connascence-scoring.outputs.total_violations }}
           - **Critical Violations:** ${{ steps.connascence-scoring.outputs.critical_violations }}
           - **Quality Score:** ${(connascenceResults.summary.overall_quality_score * 100).toFixed(1)}%
           
-          ### 🔗 Tool Correlations
+          ### Tool Correlations
           - **High Confidence Correlations:** ${{ steps.tool-correlation.outputs.high_confidence_correlations }}
           
           ---
           
-          📊 [View Detailed Dashboard](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) | 🛡️ [SARIF Report](https://github.com/${{ github.repository }}/security/code-scanning)
+          [View Detailed Dashboard](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) | [SARIF Report](https://github.com/${{ github.repository }}/security/code-scanning)
           `;
           
           github.rest.issues.createComment({
@@ -438,7 +466,7 @@ jobs:
       with:
         name: connascence-analysis-results
     
-    - name: 📈 Update Historical Trends
+    - name: Update Historical Trends
       run: |
         python -m dashboard.metrics \
           --update-trends \
@@ -447,14 +475,14 @@ jobs:
           --mece-results mece_analysis.json \
           --commit-sha ${{ github.sha }}
     
-    - name: 📊 Generate Trend Dashboard
+    - name: Generate Trend Dashboard
       run: |
         python -m dashboard.metrics \
           --generate-trends-dashboard \
           --days 30 \
           --output trend_dashboard.html
     
-    - name: 📤 Upload Trend Analysis
+    - name: Upload Trend Analysis
       uses: actions/upload-artifact@v4
       with:
         name: trend-analysis
