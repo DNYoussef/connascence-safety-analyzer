@@ -68,6 +68,7 @@ jobs:
           
       - name: Validate Extension Structure
         run: node scripts/validate-extension.js
+        working-directory: interfaces/vscode
         continue-on-error: false
         shell: bash
         env:

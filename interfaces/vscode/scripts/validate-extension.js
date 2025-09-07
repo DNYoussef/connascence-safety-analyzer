@@ -308,6 +308,12 @@ class ExtensionValidator {
             const mainEntry = this.getPackageMain();
             if (mainEntry) {
                 const entryPath = path.join(this.basePath, mainEntry);
+                if (this.verbose) {
+                    console.log(`  🔍 Checking entry point: ${mainEntry}`);
+                    console.log(`  📁 Base path: ${this.basePath}`);
+                    console.log(`  📄 Full entry path: ${entryPath}`);
+                    console.log(`  📋 Path exists: ${fs.existsSync(entryPath)}`);
+                }
                 if (!fs.existsSync(entryPath)) {
                     this.errors.push(`Extension entry point not found: ${mainEntry}`);
                 } else {

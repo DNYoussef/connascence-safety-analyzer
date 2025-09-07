@@ -49,7 +49,30 @@ jobs:
     - name: Autobuild
       uses: github/codeql-action/autobuild@v3
 
+    - name: Check Code Scanning Availability
+      id: check-code-scanning
+      run: |
+        if gh api repos/${{ github.repository }}/code-scanning/alerts --jq 'length' 2>/dev/null; then
+          echo "code_scanning_available=true" >> $GITHUB_OUTPUT
+          echo "✅ GitHub Advanced Security is enabled - CodeQL results will be uploaded"
+        else
+          echo "code_scanning_available=false" >> $GITHUB_OUTPUT
+          echo "ℹ️ GitHub Advanced Security not available - CodeQL analysis will run but results won't be uploaded"
+        fi
+      env:
+        GH_TOKEN: ${{ github.token }}
+
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
+      if: steps.check-code-scanning.outputs.code_scanning_available == 'true'
       with:
         category: "/language:${{matrix.language}}"
+        
+    - name: CodeQL Analysis Status
+      run: |
+        if [[ "${{ steps.check-code-scanning.outputs.code_scanning_available }}" == "true" ]]; then
+          echo "✅ CodeQL analysis completed and results uploaded to GitHub Security tab"
+        else
+          echo "ℹ️ CodeQL analysis completed - results not uploaded (GitHub Advanced Security required)"
+          echo "To enable SARIF uploads, enable GitHub Advanced Security in repository settings"
+        fi

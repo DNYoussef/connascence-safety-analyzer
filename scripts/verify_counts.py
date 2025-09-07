@@ -479,12 +479,11 @@ class SequentialThinkingValidator:
                     "error_details": r.error_details
                 }
                 for r in self.memory.validation_results
-            ],
-            "memory_storage": self.memory.memory_storage
+            ]
         }
 
         # Write report to file
-        report_path = self.base_path / "DEMO_ARTIFACTS" / "validation_report.json"
+        report_path = self.base_path / "DEMO_ARTIFACTS" / "validation_reports" / "validation_report.json"
         try:
             with open(report_path, 'w', encoding='utf-8') as f:
                 json.dump(report, f, indent=2, ensure_ascii=False)
