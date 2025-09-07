@@ -3,15 +3,15 @@ name: VS Code Extension CI/CD Pipeline
 on:
   push:
     branches: [main, develop]
-    paths: ['vscode-extension/**']
+    paths: ['interfaces/vscode/**']
   pull_request:
     branches: [main]
-    paths: ['vscode-extension/**']
+    paths: ['interfaces/vscode/**']
   release:
     types: [published]
 
 env:
-  EXTENSION_DIR: vscode-extension
+  EXTENSION_DIR: interfaces/vscode
   NODE_VERSION: '20'
 
 jobs:
@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: vscode-extension
+        working-directory: interfaces/vscode
     
     steps:
       - name: Checkout Code
@@ -31,7 +31,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: vscode-extension/package-lock.json
+          cache-dependency-path: interfaces/vscode/package-lock.json
           
       - name: Install Dependencies
         run: npm ci --include=dev --prefer-offline --no-audit --no-fund
@@ -97,7 +97,7 @@ jobs:
       fail-fast: false
     defaults:
       run:
-        working-directory: vscode-extension
+        working-directory: interfaces/vscode
         
     steps:
       - name: Checkout Code
@@ -108,7 +108,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: vscode-extension/package-lock.json
+          cache-dependency-path: interfaces/vscode/package-lock.json
           
       - name: Install Dependencies
         run: npm ci --include=dev --prefer-offline --no-audit --no-fund
@@ -158,7 +158,7 @@ jobs:
     if: github.event_name != 'pull_request'
     defaults:
       run:
-        working-directory: vscode-extension
+        working-directory: interfaces/vscode
         
     steps:
       - name: Checkout Code
@@ -171,7 +171,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: vscode-extension/package-lock.json
+          cache-dependency-path: interfaces/vscode/package-lock.json
           
       - name: Install Dependencies
         run: npm ci --include=dev --prefer-offline --no-audit --no-fund
@@ -277,7 +277,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: vscode-extension-${{ github.sha }}
-          path: vscode-extension/*.vsix
+          path: interfaces/vscode/*.vsix
           retention-days: 30
 
   security-scan:
@@ -286,7 +286,7 @@ jobs:
     needs: validate
     defaults:
       run:
-        working-directory: vscode-extension
+        working-directory: interfaces/vscode
         
     steps:
       - name: Checkout Code
@@ -332,7 +332,7 @@ jobs:
       - name: Scan for Secrets
         uses: trufflesecurity/trufflehog@main
         with:
-          path: ./vscode-extension
+          path: ./interfaces/vscode
           # Remove base/head to avoid "same commit" error
           # TruffleHog will automatically scan the current commit and recent changes
         continue-on-error: true
@@ -367,7 +367,7 @@ jobs:
     needs: build
     defaults:
       run:
-        working-directory: vscode-extension
+        working-directory: interfaces/vscode
         
     steps:
       - name: Checkout Code
@@ -382,7 +382,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: vscode-extension-${{ github.sha }}
-          path: vscode-extension/
+          path: interfaces/vscode/
           
       - name: Performance Benchmark
         shell: bash
@@ -463,7 +463,7 @@ jobs:
           
           # Run NASA compliance check on the entire codebase
           cd analyzer && python core.py \
-            --path ../vscode-extension \
+            --path ../interfaces/vscode \
             --policy nasa_jpl_pot10 \
             --format json \
             --output ../nasa_compliance_report.json \
@@ -600,7 +600,7 @@ jobs:
     needs: [build, security-scan, performance-test, nasa-compliance-validation]
     defaults:
       run:
-        working-directory: vscode-extension
+        working-directory: interfaces/vscode
         
     steps:
       - name: Checkout Code
@@ -610,7 +610,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: vscode-extension-${{ github.sha }}
-          path: vscode-extension/
+          path: interfaces/vscode/
           
       - name: Enterprise Readiness Assessment
         shell: bash
@@ -759,7 +759,7 @@ jobs:
     if: github.event_name == 'release' && github.event.action == 'published'
     defaults:
       run:
-        working-directory: vscode-extension
+        working-directory: interfaces/vscode
         
     steps:
       - name: Checkout Code
@@ -774,7 +774,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: vscode-extension-${{ github.sha }}
-          path: vscode-extension/
+          path: interfaces/vscode/
           
       - name: Publish to Marketplace
         shell: bash
