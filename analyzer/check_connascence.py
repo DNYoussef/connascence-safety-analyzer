@@ -43,13 +43,37 @@ TREE_SITTER_INTEGRATION_MSG = "Tree-sitter integration incomplete"
 # ConnascenceViolation now imported from utils.types
 
 class ConnascenceDetector(ast.NodeVisitor):
-    """AST visitor that detects connascence violations."""
+    """
+    AST visitor that detects connascence violations.
+    
+    REFACTORED: This class now delegates to specialized detectors via DetectorFactory
+    while maintaining backward compatibility with existing code.
+    """
 
     def __init__(self, file_path: str, source_lines: list[str]):
         self.file_path = file_path
         self.source_lines = source_lines
         self.violations: list[ConnascenceViolation] = []
 
+        # Initialize the new detector factory
+        try:
+            import sys
+            import os
+            # Add src directory to path for imports
+            src_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'src')
+            if src_path not in sys.path:
+                sys.path.insert(0, src_path)
+            
+            from detectors.detector_factory import DetectorFactory
+            self.detector_factory = DetectorFactory(file_path, source_lines)
+            self.using_factory = True
+        except ImportError as e:
+            # Fallback to original implementation if new detectors not available
+            self.using_factory = False
+            self._init_legacy_structures()
+    
+    def _init_legacy_structures(self):
+        """Initialize legacy tracking structures for fallback mode."""
         # Tracking structures
         self.function_definitions: dict[str, ast.FunctionDef] = {}
         self.class_definitions: dict[str, ast.ClassDef] = {}
@@ -721,6 +745,35 @@ class ConnascenceDetector(ast.NodeVisitor):
                 recommendations.append("Use descriptive constant names even for small numbers")
 
         return "; ".join(recommendations)
+    
+    def visit(self, node: ast.AST):
+        """
+        Main visit method - delegates to DetectorFactory if available.
+        
+        REFACTORED: Now uses specialized detectors for improved maintainability.
+        """
+        if self.using_factory:
+            # Use the new DetectorFactory approach
+            self.violations = self.detector_factory.detect_all(node)
+            # Copy factory attributes for backward compatibility
+            self.function_definitions = getattr(self.detector_factory, 'function_definitions', {})
+            self.class_definitions = getattr(self.detector_factory, 'class_definitions', {})
+            # Initialize empty collections for backward compatibility
+            if not hasattr(self, 'function_hashes'):
+                self.function_hashes = {}
+            if not hasattr(self, 'magic_literals'):
+                self.magic_literals = []
+            if not hasattr(self, 'sleep_calls'):
+                self.sleep_calls = []
+            if not hasattr(self, 'positional_params'):
+                self.positional_params = []
+            if not hasattr(self, 'global_vars'):
+                self.global_vars = set()
+            if not hasattr(self, 'imports'):
+                self.imports = set()
+        else:
+            # Fallback to original implementation
+            super().visit(node)
 
 
 class ConnascenceAnalyzer:
