@@ -145,7 +145,7 @@ jobs:
         
         PASSED=true
         
-        if (( $(echo "$NASA_SCORE < $SELF_NASA_THRESHOLD" | bc -l) )); then
+        if python3 -c "exit(1 if float('${NASA_SCORE:-0}') < float('$SELF_NASA_THRESHOLD') else 0)"; then
           echo "⚠️ NASA Compliance below threshold ($NASA_SCORE < $SELF_NASA_THRESHOLD)"
           PASSED=false
         fi
@@ -160,7 +160,7 @@ jobs:
           PASSED=false
         fi
         
-        if (( $(echo "$MECE_SCORE < $SELF_MECE_THRESHOLD" | bc -l) )); then
+        if python3 -c "exit(1 if float('${MECE_SCORE:-0}') < float('$SELF_MECE_THRESHOLD') else 0)"; then
           echo "⚠️ MECE score below threshold ($MECE_SCORE < $SELF_MECE_THRESHOLD)"
           PASSED=false
         fi

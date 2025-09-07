@@ -23,11 +23,21 @@ from typing import Any
 # Import canonical ConnascenceViolation
 from utils.types import ConnascenceViolation
 
+# Import Tree-sitter backend for multi-language support
+try:
+    from grammar.backends.tree_sitter_backend import TreeSitterBackend, LanguageSupport
+    TREE_SITTER_BACKEND_AVAILABLE = True
+except ImportError:
+    TREE_SITTER_BACKEND_AVAILABLE = False
+
 # Import optimization modules for enhanced performance
 try:
     OPTIMIZATION_AVAILABLE = True
 except ImportError:
     OPTIMIZATION_AVAILABLE = False
+
+# Constants
+TREE_SITTER_INTEGRATION_MSG = "Tree-sitter integration incomplete"
 
 
 # ConnascenceViolation now imported from utils.types
@@ -735,6 +745,11 @@ class ConnascenceAnalyzer:
         ]
         self.violations: list[ConnascenceViolation] = []
         self.file_stats: dict[str, dict] = {}
+        
+        # Initialize Tree-sitter backend if available
+        self.tree_sitter_backend = None
+        if TREE_SITTER_BACKEND_AVAILABLE:
+            self.tree_sitter_backend = TreeSitterBackend()
 
     def should_analyze_file(self, file_path: Path) -> bool:
         """Check if file should be analyzed based on exclusions and file type."""
@@ -787,10 +802,10 @@ class ConnascenceAnalyzer:
         # Determine file type
         if str(file_path).endswith(".py"):
             return self._analyze_python_file(file_path)
-        elif str(file_path).endswith((".js", ".mjs")):
-            return self._analyze_javascript_file(file_path)
+        elif str(file_path).endswith((".js", ".mjs", ".ts")):
+            return self._analyze_with_tree_sitter(file_path, LanguageSupport.JAVASCRIPT)
         elif str(file_path).endswith((".c", ".h", ".cpp", ".cxx", ".cc", ".hpp", ".hxx")):
-            return self._analyze_c_file(file_path)
+            return self._analyze_with_tree_sitter(file_path, LanguageSupport.C)
         else:
             return []  # Unsupported file type
 
@@ -851,7 +866,7 @@ class ConnascenceAnalyzer:
                     except Exception as e:
                         # For non-Python files, create a basic violation if parsing fails
                         if not str(source_file).endswith(".py"):
-                            print(f"Note: Could not analyze {source_file} - Tree-sitter not fully integrated yet")
+                            print(f"Note: Could not analyze {source_file} - Analysis failed: {e}")
                         else:
                             # Re-raise for Python files
                             raise e
@@ -936,6 +951,86 @@ class ConnascenceAnalyzer:
                     report_lines.append(f"  {os.path.basename(file_path):30s}: {stats['violations']:3d} violations")
 
         return "\n".join(report_lines)
+
+    def _analyze_with_tree_sitter(self, file_path: Path, language: 'LanguageSupport') -> list[ConnascenceViolation]:
+        """Analyze a file using Tree-sitter backend for real AST parsing."""
+        violations = []
+        
+        if not self.tree_sitter_backend or not self.tree_sitter_backend.is_available():
+            # Fallback to basic analysis if Tree-sitter not available
+            if language == LanguageSupport.JAVASCRIPT:
+                return self._analyze_javascript_file(file_path)
+            elif language == LanguageSupport.C:
+                return self._analyze_c_file(file_path)
+            else:
+                return []
+                
+        try:
+            with open(file_path, encoding="utf-8") as f:
+                source = f.read()
+                
+            # Parse with Tree-sitter
+            parse_result = self.tree_sitter_backend.parse(source, language)
+            
+            if not parse_result.success:
+                print(f"Note: Could not parse {file_path} - {parse_result.errors}")
+                # Fallback to basic analysis
+                if language == LanguageSupport.JAVASCRIPT:
+                    return self._analyze_javascript_file(file_path)
+                elif language == LanguageSupport.C:
+                    return self._analyze_c_file(file_path)
+                else:
+                    return []
+            
+            # Extract functions and analyze with Tree-sitter AST
+            functions = self.tree_sitter_backend.extract_functions(parse_result.ast, language)
+            
+            # Convert Tree-sitter analysis to ConnascenceViolations
+            for func in functions:
+                # Check for god functions (>50 lines)
+                if func.get("body_lines", 0) > 50:
+                    violations.append(
+                        ConnascenceViolation(
+                            type="connascence_of_position",
+                            severity="high",
+                            file_path=str(file_path),
+                            line_number=func.get("line_start", 1),
+                            column=0,
+                            description=f"Function '{func['name']}' is too large ({func['body_lines']} lines) - potential god object",
+                            recommendation="Break down large functions into smaller, focused functions",
+                            code_snippet="",
+                            context={"function_name": func["name"], "line_count": func["body_lines"]},
+                        )
+                    )
+                
+                # Check for too many parameters (>5)
+                param_count = len(func.get("parameters", []))
+                if param_count > 5:
+                    violations.append(
+                        ConnascenceViolation(
+                            type="connascence_of_position",
+                            severity="medium",
+                            file_path=str(file_path),
+                            line_number=func.get("line_start", 1),
+                            column=0,
+                            description=f"Function '{func['name']}' has too many parameters ({param_count}) - high parameter coupling",
+                            recommendation="Reduce parameter count by using objects or configuration patterns",
+                            code_snippet="",
+                            context={"function_name": func["name"], "parameter_count": param_count},
+                        )
+                    )
+            
+            return violations
+            
+        except Exception as e:
+            print(f"Note: Could not analyze {file_path} - Analysis failed: {e}")
+            # Fallback to basic analysis
+            if language == LanguageSupport.JAVASCRIPT:
+                return self._analyze_javascript_file(file_path)
+            elif language == LanguageSupport.C:
+                return self._analyze_c_file(file_path)
+            else:
+                return []
 
     def _analyze_javascript_file(self, file_path: Path) -> list[ConnascenceViolation]:
         """Analyze a JavaScript file using text-based patterns."""

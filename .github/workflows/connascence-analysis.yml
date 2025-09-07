@@ -226,7 +226,7 @@ jobs:
         echo "==================="
         
         # NASA Compliance Gate (Defense Industry Standard)
-        if (( $(echo "$NASA_SCORE >= $NASA_THRESHOLD" | bc -l) )); then
+        if python3 -c "exit(0 if float('${NASA_SCORE:-0}') >= float('$NASA_THRESHOLD') else 1)"; then
           echo "✅ NASA Compliance: PASS ($NASA_SCORE >= $NASA_THRESHOLD) - Defense Industry Ready"
           NASA_PASS=true
         else
@@ -244,7 +244,7 @@ jobs:
         fi
         
         # MECE Gate
-        if (( $(echo "$MECE_SCORE >= $MECE_THRESHOLD" | bc -l) )); then
+        if python3 -c "exit(0 if float('${MECE_SCORE:-0}') >= float('$MECE_THRESHOLD') else 1)"; then
           echo "✅ MECE Score: PASS ($MECE_SCORE >= $MECE_THRESHOLD)"
           MECE_PASS=true
         else
@@ -262,7 +262,7 @@ jobs:
         fi
         
         # Overall Score Gate
-        if (( $(echo "$OVERALL_SCORE >= $MIN_OVERALL_SCORE" | bc -l) )); then
+        if python3 -c "exit(0 if float('${OVERALL_SCORE:-0}') >= float('$MIN_OVERALL_SCORE') else 1)"; then
           echo "✅ Overall Score: PASS ($OVERALL_SCORE >= $MIN_OVERALL_SCORE)"
           OVERALL_PASS=true
         else

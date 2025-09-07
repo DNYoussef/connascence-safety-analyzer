@@ -28,25 +28,46 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Dict, List, Optional
 
-# tree-sitter imports (would be actual imports in real implementation)
-# For now, we'll mock the interface since tree-sitter-python may not be installed
+# tree-sitter imports with improved error handling
 try:
     import tree_sitter
     from tree_sitter import Language, Node, Parser
     TREE_SITTER_AVAILABLE = True
-except ImportError:
-    # Mock classes for development/testing
+except ImportError as e:
+    # Mock classes for development/testing with better logging
+    import sys
+    print(f"[INFO] Tree-sitter not available: {e}. Using mock backend.", file=sys.stderr)
+    
     class Language:
-        def __init__(self, library, name): pass
+        def __init__(self, library, name): 
+            self.name = name
+        def __str__(self):
+            return f"MockLanguage({self.name})"
+    
     class Parser:
-        def set_language(self, lang): pass
-        def parse(self, code): pass
-    class Node:
         def __init__(self):
-            self.type = "mock"
+            self.language = None
+        def set_language(self, lang): 
+            self.language = lang
+        def parse(self, code): 
+            return MockTree()
+    
+    class Node:
+        def __init__(self, node_type="mock"):
+            self.type = node_type
             self.children = []
             self.start_point = (0, 0)
             self.end_point = (0, 0)
+            self.text = b""
+        def __str__(self):
+            return f"MockNode({self.type})"
+    
+    class MockTree:
+        def __init__(self):
+            self.root_node = Node("program")
+        def __str__(self):
+            return "MockTree"
+    
     TREE_SITTER_AVAILABLE = False
 
 
@@ -146,6 +167,7 @@ class TreeSitterBackend:
             parser = self._parsers[language]
 
             if TREE_SITTER_AVAILABLE:
+                # Use tree-sitter-languages parser directly
                 tree = parser.parse(bytes(code, 'utf8'))
                 ast = tree.root_node
 
@@ -336,29 +358,44 @@ class TreeSitterBackend:
 
     def _initialize_languages(self):
         """Initialize tree-sitter parsers for supported languages."""
-        # In a real implementation, this would load compiled language grammars
-        # For now, we'll create mock parsers
-
+        # Load real tree-sitter language grammars
         supported = [LanguageSupport.C, LanguageSupport.PYTHON, LanguageSupport.JAVASCRIPT]
 
         for lang in supported:
             try:
                 if TREE_SITTER_AVAILABLE:
-                    # This would load actual language libraries
-                    # language = Language(library_path, lang.value)
-                    # parser = Parser()
-                    # parser.set_language(language)
-                    pass
+                    # Load actual language parsers using tree-sitter-languages
+                    from tree_sitter_languages import get_parser
+                    
+                    # Map our enum to tree-sitter-languages names
+                    lang_map = {
+                        LanguageSupport.C: 'c',
+                        LanguageSupport.PYTHON: 'python',
+                        LanguageSupport.JAVASCRIPT: 'javascript',
+                        LanguageSupport.TYPESCRIPT: 'typescript',
+                        LanguageSupport.CPP: 'cpp',
+                        LanguageSupport.GO: 'go',
+                        LanguageSupport.RUST: 'rust'
+                    }
+                    
+                    parser = get_parser(lang_map[lang])
+                    # Create a mock Language object since we use the parser directly
+                    language = type('Language', (), {'name': lang.value})()
+                    
+                    self._parsers[lang] = parser
+                    self._languages[lang] = language
                 else:
                     # Mock parser for development
                     parser = Parser()
                     language = Language(None, lang.value)
 
-                self._parsers[lang] = parser
-                self._languages[lang] = language
+                    self._parsers[lang] = parser
+                    self._languages[lang] = language
 
-            except Exception:
-                # Skip languages that fail to load
+            except Exception as e:
+                # Skip languages that fail to load, but don't fail silently in development
+                if self.config.get('debug', False):
+                    print(f"Warning: Failed to load {lang.value} parser: {e}")
                 continue
 
     def _extract_errors(self, ast: 'Node') -> List[Dict[str, Any]]:

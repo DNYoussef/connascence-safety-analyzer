@@ -62,14 +62,14 @@ class SARIFReporter:
                 "tool": {"driver": {"name": "connascence-cli", "version": self.tool_version}},
                 "invocation": {
                     "executionSuccessful": True,
-                    "startTimeUtc": result.timestamp,
-                    "endTimeUtc": datetime.now().isoformat(),
+                    "startTimeUtc": f"{result.timestamp}Z" if not result.timestamp.endswith('Z') else result.timestamp,
+                    "endTimeUtc": f"{datetime.now().isoformat()}Z",
                 },
             },
             "invocations": [
                 {
                     "executionSuccessful": True,
-                    "startTimeUtc": result.timestamp,
+                    "startTimeUtc": f"{result.timestamp}Z" if not result.timestamp.endswith('Z') else result.timestamp,
                     "workingDirectory": {"uri": f"file://{result.project_root}"},
                 }
             ],
@@ -268,7 +268,7 @@ class SARIFReporter:
                     }
                 }
             ],
-            "partialFingerprints": {"primaryLocationLineHash": violation.id, "connascenceFingerprint": violation.id},
+            "partialFingerprints": {"primaryLocationLineHash": str(violation.id), "connascenceFingerprint": str(violation.id)},
             "properties": {
                 "connascenceType": violation.type.value,
                 "severity": violation.severity.value,
@@ -386,7 +386,7 @@ class SARIFReporter:
                     "invocations": [
                         {
                             "executionSuccessful": result_dict.get("success", True),
-                            "startTimeUtc": datetime.now().isoformat(),
+                            "startTimeUtc": f"{datetime.now().isoformat()}Z",
                             "workingDirectory": {"uri": f"file://{result_dict.get('path', '.')}"},
                         }
                     ],
@@ -427,8 +427,8 @@ class SARIFReporter:
                 }
             ],
             "partialFingerprints": {
-                "primaryLocationLineHash": violation_dict.get("id", str(uuid.uuid4())),
-                "connascenceFingerprint": violation_dict.get("id", str(uuid.uuid4())),
+                "primaryLocationLineHash": str(violation_dict.get("id", str(uuid.uuid4()))),
+                "connascenceFingerprint": str(violation_dict.get("id", str(uuid.uuid4()))),
             },
             "properties": {
                 "connascenceType": violation_dict.get("type", "unknown"),
