@@ -272,13 +272,31 @@ class EnterpriseReproducer:
         repo_output_dir.mkdir(exist_ok=True)
 
         # Build analysis command using unified connascence CLI
-        cmd = [
-            "connascence", "analyze",
-            "--path", str(target_path),
-            "--profile", config["profile"],
-            "--format", "sarif,json,md",
-            "--output", str(repo_output_dir)
-        ]
+        # Try CLI first, fallback to direct Python if CLI not available
+        try:
+            # Check if CLI is available
+            result = subprocess.run(["connascence", "--version"], 
+                                  capture_output=True, timeout=10)
+            cli_available = result.returncode == 0
+        except (subprocess.SubprocessError, FileNotFoundError):
+            cli_available = False
+            
+        if cli_available:
+            cmd = [
+                "connascence", "analyze",
+                "--path", str(target_path),
+                "--profile", config["profile"],
+                "--format", "sarif,json,md",
+                "--output", str(repo_output_dir)
+            ]
+        else:
+            # Fallback to direct Python module execution
+            cmd = [
+                "python", "-m", "analyzer.check_connascence",
+                str(target_path),
+                "--format", "json",
+                "--output", str(repo_output_dir / f"{repo_name}_analysis.json")
+            ]
 
         # Add exclusions if specified
         if config.get("exclude"):

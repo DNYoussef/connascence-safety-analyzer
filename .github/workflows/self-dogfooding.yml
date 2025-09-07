@@ -31,6 +31,8 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+        # Install connascence CLI for enterprise demo scripts
+        pip install -e .
 
     - name: 🔬 Self-Analysis with NASA Rules
       run: |
