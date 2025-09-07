@@ -39,18 +39,16 @@ jobs:
       id: unicode-check
       run: |
         echo "::group::Unicode Safety Validation"
-        echo "Checking for Unicode characters in code..."
+        echo "Checking for Unicode characters using enhanced linting script..."
         
-        # Run Unicode removal script in check mode
-        cd scripts
-        python remove_unicode.py .. > unicode_check.log 2>&1
+        # Run enhanced Unicode script in check mode
+        python scripts/remove_unicode.py --check . --report-json unicode_violations.json
         
-        # Check if any Unicode was found
-        if grep -q "Replaced\|Removed" unicode_check.log; then
-          echo "::error::Unicode characters found in code!"
-          echo "Please run: cd scripts && python remove_unicode.py .. to fix"
-          echo "Unicode violations found:"
-          grep "Replaced\|Removed" unicode_check.log | head -5
+        # Check exit code and report results
+        if [ $? -ne 0 ]; then
+          echo "::error::Unicode violations detected! Check unicode_violations.json for details"
+          echo "Please run: python scripts/remove_unicode.py --fix . to fix issues"
+          echo "Unicode violations found - check unicode_violations.json for full report"
           exit 1
         else
           echo "✅ No Unicode characters found in code - all clear!"

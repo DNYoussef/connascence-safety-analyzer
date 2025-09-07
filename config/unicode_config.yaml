@@ -1,0 +1,139 @@
+# Unicode Linting Configuration for Connascence Analyzer
+# =====================================================
+
+# File types to check for Unicode violations
+include_types:
+  - py    # Python files
+  - js    # JavaScript files  
+  - ts    # TypeScript files
+  - tsx   # TypeScript React files
+  - jsx   # JavaScript React files
+  - md    # Markdown files
+  - yaml  # YAML configuration files
+  - yml   # YAML configuration files
+  - json  # JSON configuration files
+  - txt   # Text files
+  - sh    # Shell scripts
+  - bat   # Batch files
+
+# Directories to exclude from Unicode checking
+exclude_dirs:
+  - .git
+  - __pycache__
+  - .pytest_cache
+  - node_modules
+  - .venv
+  - venv
+  - dist
+  - build
+  - .tox
+  - .coverage
+
+# Unicode replacement mappings for common characters
+# These are ASCII-safe replacements for Unicode characters
+unicode_replacements:
+  # Arrows and symbols
+  "→": "->"
+  "←": "<-"
+  "↑": "^"
+  "↓": "v"
+  "⇒": "=>"
+  "⇐": "<="
+  "∞": "inf"
+  
+  # Math symbols
+  "≤": "<="
+  "≥": ">="
+  "≠": "!="
+  "±": "+/-"
+  "×": "*"
+  "÷": "/"
+  "√": "sqrt"
+  
+  # Bullets and markers
+  "•": "*"
+  "◦": "-"
+  "▪": "*"
+  "▫": "-"
+  "★": "*"
+  "☆": "*"
+  "✓": "OK"
+  "✗": "X"
+  "✅": "YES"
+  "❌": "NO"
+  "⚠": "WARNING"
+  "🚨": "ALERT"
+  "💡": "TIP"
+  "🔧": "TOOL"
+  "📊": "DATA"
+  "🎯": "TARGET"
+  "🚀": "LAUNCH"
+  "⭐": "STAR"
+  "🏗": "BUILD"
+  "🛡": "SECURITY"
+  "🏛": "ARCH"
+  "📈": "CHART"
+  "🔄": "CYCLE"
+  
+  # Quotes and dashes
+  """: "\""
+  "'": "'"
+  "'": "'"
+  "–": "-"     # En dash
+  "—": "--"    # Em dash
+  "…": "..."
+  
+  # Currency and misc
+  "©": "(c)"
+  "®": "(R)"
+  "™": "(TM)"
+  "§": "section"
+  "¶": "para"
+
+# Safe contexts where Unicode is allowed
+# These contexts preserve Unicode for user-facing content
+safe_contexts:
+  - comments        # Code comments
+  - docstrings      # Documentation strings
+  - string_literals # String literals for user messages
+  - print_statements # Print output statements
+  - f_strings       # Formatted string literals
+
+# Severity levels for different Unicode violations
+severity_rules:
+  # Critical: Unicode in executable code
+  executable_code: "critical"
+  
+  # Warning: Unicode in configuration or data files
+  config_files: "warning"
+  
+  # Info: Unicode in documentation or comments
+  documentation: "info"
+
+# CI Integration settings
+ci_integration:
+  # Exit with error code if Unicode violations found
+  fail_on_violations: true
+  
+  # Maximum violations before CI fails
+  max_violations: 0
+  
+  # Generate JSON report for CI systems
+  json_report: true
+  
+  # Report format for GitHub Actions
+  github_actions_format: true
+
+# Advanced options
+advanced:
+  # File size limit (bytes) - skip files larger than this
+  max_file_size: 1048576  # 1MB
+  
+  # Maximum line length to check
+  max_line_length: 2000
+  
+  # Check encoding of files
+  verify_utf8_encoding: true
+  
+  # Create backup files when fixing
+  create_backups: false

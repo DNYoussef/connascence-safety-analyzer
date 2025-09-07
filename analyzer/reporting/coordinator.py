@@ -188,9 +188,15 @@ class UnifiedReportingCoordinator:
         return generated_files
 
     def get_dashboard_report_data(self, analysis_result: UnifiedAnalysisResult) -> Dict[str, Any]:
-        """Generate data optimized for dashboard display."""
+        """Generate data optimized for dashboard display with enhanced cross-phase integration."""
 
-        return {
+        # Extract enhanced metadata if available
+        audit_trail = getattr(analysis_result, 'audit_trail', [])
+        correlations = getattr(analysis_result, 'correlations', [])
+        smart_recommendations = getattr(analysis_result, 'smart_recommendations', [])
+        cross_phase_analysis = getattr(analysis_result, 'cross_phase_analysis', False)
+
+        dashboard_data = {
             "project_info": {
                 "name": Path(analysis_result.project_path).name,
                 "path": analysis_result.project_path,
@@ -198,6 +204,7 @@ class UnifiedReportingCoordinator:
                 "analyzed_files": analysis_result.files_analyzed,
                 "analysis_time": analysis_result.analysis_duration_ms,
                 "timestamp": analysis_result.timestamp,
+                "cross_phase_analysis_enabled": cross_phase_analysis,
             },
             "quality_metrics": {
                 "overall_score": analysis_result.overall_quality_score,
@@ -222,14 +229,26 @@ class UnifiedReportingCoordinator:
             "recommendations": {
                 "priority_fixes": analysis_result.priority_fixes,
                 "improvement_actions": analysis_result.improvement_actions,
+                "smart_recommendations": smart_recommendations,
             },
             "charts": {
                 "severity_distribution": self._create_severity_chart_data(analysis_result),
                 "file_distribution": self._create_file_chart_data(analysis_result),
                 "type_distribution": self._create_type_chart_data(analysis_result),
                 "trend_data": self._create_trend_chart_data(analysis_result),
+                "correlation_network": self._create_correlation_chart_data(correlations),
+            },
+            # Enhanced cross-phase analysis data
+            "cross_phase_data": {
+                "correlations": correlations,
+                "audit_trail": audit_trail,
+                "phase_timings": self._extract_phase_timings(audit_trail),
+                "correlation_summary": self._create_correlation_summary(correlations),
+                "hotspot_analysis": self._create_hotspot_analysis(correlations),
             },
         }
+
+        return dashboard_data
 
     def get_cli_summary(self, analysis_result: UnifiedAnalysisResult, verbose: bool = False) -> str:
         """Generate CLI-friendly summary output."""
@@ -543,6 +562,96 @@ PRIORITY ACTIONS:
                 analysis_result.total_violations + 1,
                 analysis_result.total_violations,
             ],
+        }
+
+    def _create_correlation_chart_data(self, correlations: List) -> Dict:
+        """Create chart data for correlation network visualization."""
+        if not correlations:
+            return {"nodes": [], "edges": []}
+
+        # Create nodes for each analyzer type
+        analyzer_types = set()
+        for correlation in correlations:
+            analyzer_types.add(correlation.get("analyzer1", "unknown"))
+            analyzer_types.add(correlation.get("analyzer2", "unknown"))
+
+        nodes = [{"id": analyzer, "label": analyzer.replace("_", " ").title()} for analyzer in analyzer_types]
+
+        # Create edges for correlations
+        edges = []
+        for i, correlation in enumerate(correlations):
+            edges.append({
+                "id": f"correlation_{i}",
+                "source": correlation.get("analyzer1", "unknown"),
+                "target": correlation.get("analyzer2", "unknown"),
+                "weight": correlation.get("correlation_score", 0.5),
+                "label": f"{correlation.get('correlation_score', 0):.2f}",
+                "description": correlation.get("description", "")
+            })
+
+        return {"nodes": nodes, "edges": edges}
+
+    def _extract_phase_timings(self, audit_trail: List) -> Dict:
+        """Extract phase timing information from audit trail."""
+        phase_timings = {}
+
+        for entry in audit_trail:
+            phase = entry.get("phase", "unknown")
+            if "started" in entry:
+                phase_timings[phase] = {"started": entry["started"]}
+            elif "completed" in entry and phase in phase_timings:
+                phase_timings[phase]["completed"] = entry["completed"]
+                phase_timings[phase]["duration_info"] = entry
+
+        return phase_timings
+
+    def _create_correlation_summary(self, correlations: List) -> Dict:
+        """Create summary statistics for correlations."""
+        if not correlations:
+            return {"total": 0, "high_impact": 0, "categories": {}}
+
+        high_impact_correlations = [c for c in correlations if c.get("correlation_score", 0) > 0.7]
+        categories = {}
+
+        for correlation in correlations:
+            correlation_type = correlation.get("correlation_type", "general")
+            categories[correlation_type] = categories.get(correlation_type, 0) + 1
+
+        return {
+            "total": len(correlations),
+            "high_impact": len(high_impact_correlations),
+            "categories": categories,
+            "average_score": sum(c.get("correlation_score", 0) for c in correlations) / len(correlations)
+        }
+
+    def _create_hotspot_analysis(self, correlations: List) -> Dict:
+        """Analyze hotspot files from correlation data."""
+        hotspots = {}
+
+        for correlation in correlations:
+            if correlation.get("correlation_type") == "violation_hotspots":
+                hotspot_files = correlation.get("hotspot_files", [])
+                hotspot_details = correlation.get("hotspot_details", {})
+
+                for file_path in hotspot_files:
+                    if file_path in hotspot_details:
+                        hotspots[file_path] = {
+                            "violations": hotspot_details[file_path],
+                            "priority": correlation.get("priority", "medium"),
+                            "remediation_impact": correlation.get("remediation_impact", "unknown")
+                        }
+
+        # Sort by total violation count
+        sorted_hotspots = dict(sorted(
+            hotspots.items(),
+            key=lambda x: sum(x[1]["violations"].values()),
+            reverse=True
+        ))
+
+        return {
+            "count": len(sorted_hotspots),
+            "files": sorted_hotspots,
+            "top_hotspot": list(sorted_hotspots.keys())[0] if sorted_hotspots else None
         }
 
     def _convert_to_legacy_format(self, analysis_result: UnifiedAnalysisResult) -> Any:

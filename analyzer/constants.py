@@ -679,3 +679,204 @@ COMMON_DIRECTORIES = {
     "logs_dir": "logs",
     "cache_dir": "cache",
 }
+
+# ============================================================================
+# ENHANCED CROSS-PHASE CONFIGURATION FUNCTIONS
+# ============================================================================
+# Additional functions for the pipeline architecture enhancements
+
+# Default analysis configuration (enhanced)
+DEFAULT_POLICY_PRESET = "standard"  # Use the unified policy name
+MAX_FILE_SIZE_MB = 10
+MAX_TOTAL_MEMORY_MB = 512
+
+# Enhanced analysis thresholds and limits 
+ENHANCED_MECE_SIMILARITY_THRESHOLD = 0.7
+ENHANCED_MECE_CLUSTER_MIN_SIZE = 2
+ENHANCED_NASA_COMPLIANCE_THRESHOLD = 0.9
+CONNASCENCE_COMPLEXITY_THRESHOLD = 15
+
+# Performance and caching settings
+CACHE_ENABLED = True
+CACHE_SIZE_LIMIT = 1000  # Number of cached entries
+PARALLEL_ANALYSIS_WORKERS = 4
+ANALYSIS_TIMEOUT_SECONDS = 300
+
+# Cross-phase coordination settings
+SMART_INTEGRATION_ENABLED = True
+CROSS_PHASE_CORRELATION_THRESHOLD = 0.6
+AUDIT_TRAIL_ENABLED = True
+ENHANCED_RECOMMENDATIONS_ENABLED = True
+
+# Output and reporting settings
+REPORT_FORMAT_DEFAULT = "text"
+SARIF_SCHEMA_VERSION = "2.1.0"
+JSON_SCHEMA_VERSION = "1.0.0"
+
+# Component initialization settings
+COMPONENT_INITIALIZATION = {
+    "ast_engine": {
+        "enabled": True,
+        "fallback_on_error": True,
+        "cache_enabled": True,
+        "parallel_processing": True,
+    },
+    "mece_analyzer": {
+        "enabled": True,
+        "fallback_on_error": True,
+        "comprehensive_mode": False,
+        "similarity_threshold": ENHANCED_MECE_SIMILARITY_THRESHOLD,
+    },
+    "smart_integration": {
+        "enabled": SMART_INTEGRATION_ENABLED,
+        "fallback_on_error": True,
+        "correlation_analysis": True,
+        "enhanced_recommendations": ENHANCED_RECOMMENDATIONS_ENABLED,
+    },
+    "nasa_integration": {
+        "enabled": False,  # Only enabled when explicitly requested
+        "fallback_on_error": True,
+        "compliance_threshold": ENHANCED_NASA_COMPLIANCE_THRESHOLD,
+        "strict_mode": False,
+    },
+    "caching_system": {
+        "enabled": CACHE_ENABLED,
+        "size_limit": CACHE_SIZE_LIMIT,
+        "compression_enabled": True,
+        "persistence_enabled": True,
+    },
+}
+
+# Error handling configuration
+ERROR_HANDLING_CONFIG = {
+    "graceful_degradation": True,
+    "continue_on_component_failure": True,
+    "max_retry_attempts": 3,
+    "retry_backoff_seconds": 1,
+    "log_all_errors": True,
+    "include_error_context": True,
+}
+
+# Cross-phase data flow configuration
+CROSS_PHASE_CONFIG = {
+    "audit_trail": {
+        "enabled": AUDIT_TRAIL_ENABLED,
+        "include_timings": True,
+        "include_metadata": True,
+        "max_entries": 1000,
+    },
+    "correlation_analysis": {
+        "enabled": True,
+        "threshold": CROSS_PHASE_CORRELATION_THRESHOLD,
+        "include_complexity_correlations": True,
+        "include_file_level_correlations": True,
+        "include_hotspot_analysis": True,
+    },
+    "smart_recommendations": {
+        "enabled": ENHANCED_RECOMMENDATIONS_ENABLED,
+        "include_architectural_recommendations": True,
+        "include_priority_recommendations": True,
+        "include_hotspot_recommendations": True,
+        "max_recommendations": 20,
+    },
+}
+
+def get_enhanced_policy_configuration(policy_name: str) -> dict:
+    """
+    Get the enhanced configuration for a policy preset.
+    
+    This extends the existing policy resolution with cross-phase settings.
+    """
+    canonical_policy = resolve_policy_name(policy_name)
+    
+    # Base configuration from existing system
+    base_config = {
+        "safety_critical": {
+            "max_connascence_violations": 0,
+            "max_duplication_score": 0.95,
+            "nasa_compliance_required": True,
+            "god_object_threshold": 10,
+            "magic_literal_severity": "high",
+            "enable_all_analyzers": True,
+            "fail_on_critical": True,
+        },
+        "strict": {
+            "max_connascence_violations": 5,
+            "max_duplication_score": 0.9,
+            "nasa_compliance_required": False,
+            "god_object_threshold": 12,
+            "magic_literal_severity": "high",
+            "enable_all_analyzers": True,
+            "fail_on_critical": True,
+        },
+        "standard": {
+            "max_connascence_violations": 10,
+            "max_duplication_score": 0.8,
+            "nasa_compliance_required": False,
+            "god_object_threshold": 15,
+            "magic_literal_severity": "medium",
+            "enable_all_analyzers": True,
+            "fail_on_critical": False,
+        },
+        "lenient": {
+            "max_connascence_violations": 50,
+            "max_duplication_score": 0.6,
+            "nasa_compliance_required": False,
+            "god_object_threshold": 25,
+            "magic_literal_severity": "low",
+            "enable_all_analyzers": False,
+            "fail_on_critical": False,
+        },
+    }
+    
+    # Map canonical policy names to base config
+    policy_mapping = {
+        "nasa-compliance": "safety_critical",
+        "strict": "strict", 
+        "standard": "standard",
+        "lenient": "lenient"
+    }
+    
+    config_key = policy_mapping.get(canonical_policy, "standard")
+    config = base_config.get(config_key, base_config["standard"]).copy()
+    
+    # Add enhanced cross-phase settings
+    config.update({
+        "smart_integration_enabled": SMART_INTEGRATION_ENABLED,
+        "cross_phase_correlation_enabled": True,
+        "audit_trail_enabled": AUDIT_TRAIL_ENABLED,
+        "enhanced_recommendations_enabled": ENHANCED_RECOMMENDATIONS_ENABLED,
+        "correlation_threshold": CROSS_PHASE_CORRELATION_THRESHOLD,
+    })
+    
+    return config
+
+def get_component_config(component_name: str) -> dict:
+    """
+    Get the configuration for a specific component.
+    
+    This provides centralized access to component initialization
+    settings with fallback defaults.
+    """
+    return COMPONENT_INITIALIZATION.get(component_name, {
+        "enabled": True,
+        "fallback_on_error": True,
+    })
+
+def should_enable_component(component_name: str, policy_name: str = None) -> bool:
+    """
+    Determine if a component should be enabled based on policy and configuration.
+    
+    This eliminates scattered component enablement logic across the codebase.
+    """
+    component_config = get_component_config(component_name)
+    
+    if policy_name:
+        policy_config = get_enhanced_policy_configuration(policy_name)
+        # Some policies may disable certain components
+        if not policy_config.get("enable_all_analyzers", True):
+            # In lenient mode, only enable core components
+            core_components = ["ast_engine", "caching_system"]
+            return component_name in core_components
+    
+    return component_config.get("enabled", True)

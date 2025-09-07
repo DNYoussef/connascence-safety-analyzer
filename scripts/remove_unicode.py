@@ -15,6 +15,7 @@ This ensures code compatibility across all systems and terminals.
 from pathlib import Path
 import re
 import sys
+from datetime import datetime
 from typing import Tuple
 
 
@@ -25,8 +26,20 @@ class UnicodeRemover:
         self.stats = {
             'files_processed': 0,
             'unicode_removed': 0,
-            'files_modified': 0
+            'unicode_found': 0,
+            'files_modified': 0,
+            'files_with_unicode': 0,
+            'violations': []  # Detailed violation info for JSON reporting
         }
+        
+        # Enhanced mode support
+        self.quiet_mode = False
+        self.verbose_mode = False
+        self.check_mode = False
+        self.dry_run_mode = False
+        self.fix_mode = True
+        self.include_types = ['py', 'js', 'ts', 'tsx', 'jsx', 'md', 'yaml', 'yml', 'json']
+        self.exclude_dirs = ['.git', '__pycache__', '.pytest_cache', 'node_modules', '.venv', 'venv']
 
         # Unicode patterns that are safe in user-facing text
         self.safe_contexts = [
@@ -119,33 +132,91 @@ class UnicodeRemover:
     def remove_unicode_from_line(self, line: str, line_num: int, file_path: str) -> Tuple[str, int]:
         """Remove Unicode characters from a single line of code."""
         removed_count = 0
+        found_count = 0
         result = []
 
         for i, char in enumerate(line):
             if ord(char) > 127:  # Non-ASCII character
+                found_count += 1
+                
                 if self.is_safe_context(line, i):
                     # Keep Unicode in safe contexts
                     result.append(char)
                 elif char in self.unicode_replacements:
-                    # Replace with ASCII equivalent
-                    replacement = self.unicode_replacements[char]
-                    result.append(replacement)
-                    removed_count += 1
-                    try:
-                        print(f"  Replaced Unicode char with '{replacement}' at {file_path}:{line_num}:{i}")
-                    except UnicodeEncodeError:
-                        print(f"  Replaced Unicode char (U+{ord(char):04X}) with '{replacement}' at {file_path}:{line_num}:{i}")
+                    # Record violation for reporting
+                    violation = {
+                        'file': str(file_path),
+                        'line': line_num,
+                        'column': i,
+                        'char': char,
+                        'unicode_code': f"U+{ord(char):04X}",
+                        'replacement': self.unicode_replacements[char],
+                        'context': line.strip()[:50] + '...' if len(line.strip()) > 50 else line.strip()
+                    }
+                    self.stats['violations'].append(violation)
+                    
+                    if self.fix_mode and not self.check_mode and not self.dry_run_mode:
+                        # Replace with ASCII equivalent
+                        replacement = self.unicode_replacements[char]
+                        result.append(replacement)
+                        removed_count += 1
+                        if not self.quiet_mode:
+                            try:
+                                print(f"  Replaced Unicode char with '{replacement}' at {file_path}:{line_num}:{i}")
+                            except UnicodeEncodeError:
+                                print(f"  Replaced Unicode char (U+{ord(char):04X}) with '{replacement}' at {file_path}:{line_num}:{i}")
+                    elif self.dry_run_mode:
+                        # Show what would be replaced
+                        replacement = self.unicode_replacements[char]
+                        result.append(char)  # Keep original in dry run
+                        if not self.quiet_mode:
+                            print(f"  Would replace Unicode char with '{replacement}' at {file_path}:{line_num}:{i}")
+                    elif self.check_mode:
+                        # Just report the violation
+                        result.append(char)  # Keep original in check mode
+                        if not self.quiet_mode:
+                            print(f"  Found Unicode char (U+{ord(char):04X}) at {file_path}:{line_num}:{i}")
+                    else:
+                        result.append(char)
                 else:
-                    # Remove unknown Unicode character
-                    try:
-                        print(f"  Removed unknown Unicode char (U+{ord(char):04X}) at {file_path}:{line_num}:{i}")
-                    except UnicodeEncodeError:
-                        print(f"  Removed unknown Unicode (U+{ord(char):04X}) at {file_path}:{line_num}:{i}")
-                    removed_count += 1
-                    # Don't append anything (remove the character)
+                    # Handle unknown Unicode character
+                    violation = {
+                        'file': str(file_path),
+                        'line': line_num,
+                        'column': i,
+                        'char': char,
+                        'unicode_code': f"U+{ord(char):04X}",
+                        'replacement': '',  # No replacement available
+                        'context': line.strip()[:50] + '...' if len(line.strip()) > 50 else line.strip()
+                    }
+                    self.stats['violations'].append(violation)
+                    
+                    if self.fix_mode and not self.check_mode and not self.dry_run_mode:
+                        # Remove unknown Unicode character
+                        removed_count += 1
+                        if not self.quiet_mode:
+                            try:
+                                print(f"  Removed unknown Unicode char (U+{ord(char):04X}) at {file_path}:{line_num}:{i}")
+                            except UnicodeEncodeError:
+                                print(f"  Removed unknown Unicode (U+{ord(char):04X}) at {file_path}:{line_num}:{i}")
+                        # Don't append anything (remove the character)
+                    elif self.dry_run_mode:
+                        # Show what would be removed
+                        result.append(char)  # Keep original in dry run
+                        if not self.quiet_mode:
+                            print(f"  Would remove unknown Unicode char (U+{ord(char):04X}) at {file_path}:{line_num}:{i}")
+                    elif self.check_mode:
+                        # Just report the violation
+                        result.append(char)  # Keep original in check mode
+                        if not self.quiet_mode:
+                            print(f"  Found unknown Unicode char (U+{ord(char):04X}) at {file_path}:{line_num}:{i}")
+                    else:
+                        result.append(char)
             else:
                 result.append(char)
-
+        
+        # Update found count
+        self.stats['unicode_found'] += found_count
         return ''.join(result), removed_count
 
     def process_file(self, file_path: Path) -> bool:
@@ -189,13 +260,13 @@ class UnicodeRemover:
 
     def should_process_file(self, file_path: Path) -> bool:
         """Check if file should be processed."""
-        # Only process Python files
-        if file_path.suffix != '.py':
+        # Check if file extension is supported
+        valid_extensions = {f'.{ext}' for ext in self.include_types}
+        if file_path.suffix not in valid_extensions:
             return False
 
-        # Skip certain directories
-        skip_dirs = {'.git', '__pycache__', '.pytest_cache', 'node_modules', '.venv', 'venv'}
-        if any(skip_dir in str(file_path) for skip_dir in skip_dirs):
+        # Skip excluded directories
+        if any(skip_dir in str(file_path) for skip_dir in self.exclude_dirs):
             return False
 
         # Skip if file is too large (>1MB)
@@ -209,45 +280,150 @@ class UnicodeRemover:
         return True
 
     def process_directory(self, directory: Path) -> None:
-        """Process all Python files in directory recursively."""
+        """Process all supported files in directory recursively."""
         print(f"Processing directory: {directory}")
 
-        python_files = []
-        for file_path in directory.rglob('*.py'):
-            if self.should_process_file(file_path):
-                python_files.append(file_path)
+        # Build glob patterns for all supported file types
+        files_to_process = []
+        for ext in self.include_types:
+            for file_path in directory.rglob(f'*.{ext}'):
+                if self.should_process_file(file_path):
+                    files_to_process.append(file_path)
 
-        print(f"Found {len(python_files)} Python files to process")
+        print(f"Found {len(files_to_process)} files to process ({', '.join(self.include_types)} extensions)")
 
-        for file_path in python_files:
+        for file_path in files_to_process:
             self.process_file(file_path)
+            # Track files with unicode for reporting
+            if any(ord(char) > 127 for line in open(file_path, encoding='utf-8', errors='ignore') for char in line):
+                self.stats['files_with_unicode'] += 1
 
+    def generate_json_report(self, output_file: str) -> None:
+        """Generate detailed JSON report for CI integration."""
+        import json
+        
+        report = {
+            'timestamp': datetime.now().isoformat(),
+            'summary': {
+                'files_processed': self.stats['files_processed'],
+                'files_modified': self.stats['files_modified'],
+                'files_with_unicode': self.stats['files_with_unicode'],
+                'unicode_characters_found': self.stats['unicode_found'],
+                'unicode_characters_removed': self.stats['unicode_removed']
+            },
+            'violations': self.stats['violations'],
+            'configuration': {
+                'include_types': self.include_types,
+                'exclude_dirs': self.exclude_dirs,
+                'check_mode': self.check_mode,
+                'dry_run_mode': self.dry_run_mode,
+                'fix_mode': self.fix_mode
+            }
+        }
+        
+        with open(output_file, 'w', encoding='utf-8') as f:
+            json.dump(report, f, indent=2, ensure_ascii=True)
+        
+        print(f"JSON report saved to: {output_file}")
+    
     def print_stats(self) -> None:
         """Print processing statistics."""
         print("\n" + "="*50)
         print("UNICODE REMOVAL STATISTICS")
         print("="*50)
         print(f"Files processed: {self.stats['files_processed']}")
+        print(f"Files with Unicode: {self.stats['files_with_unicode']}")
         print(f"Files modified: {self.stats['files_modified']}")
+        print(f"Unicode characters found: {self.stats['unicode_found']}")
         print(f"Unicode characters removed: {self.stats['unicode_removed']}")
+        print(f"Violations detected: {len(self.stats['violations'])}")
         print("="*50)
 
 
 def main():
-    """Main entry point."""
-    if len(sys.argv) != 2:
-        print("Usage: python remove_unicode.py <directory>")
-        print("Example: python remove_unicode.py .")
-        sys.exit(1)
-
-    directory = Path(sys.argv[1])
+    """Main entry point with enhanced CLI modes."""
+    import argparse
+    
+    parser = argparse.ArgumentParser(
+        description="Enhanced Unicode Removal Tool for Code Safety",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  python remove_unicode.py .                    # Fix Unicode issues (default)
+  python remove_unicode.py --check .            # Check for Unicode without fixing
+  python remove_unicode.py --dry-run .          # Preview what would be changed
+  python remove_unicode.py --report-json . out.json  # Generate JSON report
+        """
+    )
+    
+    parser.add_argument('directory', help='Directory to process')
+    
+    # Operating modes
+    mode_group = parser.add_mutually_exclusive_group()
+    mode_group.add_argument('--check', action='store_true',
+                           help='Check for Unicode violations without modifying files (CI mode)')
+    mode_group.add_argument('--fix', action='store_true', default=True,
+                           help='Fix Unicode violations by modifying files (default)')
+    mode_group.add_argument('--dry-run', action='store_true',
+                           help='Show what would be changed without modifying files')
+    
+    # Reporting options
+    parser.add_argument('--report-json', metavar='OUTPUT_FILE',
+                       help='Generate detailed JSON report for CI integration')
+    parser.add_argument('--verbose', '-v', action='store_true',
+                       help='Enable verbose output with detailed information')
+    parser.add_argument('--quiet', '-q', action='store_true',
+                       help='Suppress all output except errors')
+    
+    # File filtering options
+    parser.add_argument('--include-types', nargs='*', 
+                       default=['py'],
+                       help='File extensions to process (default: py)')
+    parser.add_argument('--exclude-dirs', nargs='*',
+                       default=['.git', '__pycache__', '.pytest_cache', 'node_modules', '.venv', 'venv'],
+                       help='Directories to exclude from processing')
+    
+    args = parser.parse_args()
+    
+    # Determine mode
+    if args.check:
+        args.fix = False
+    elif args.dry_run:
+        args.fix = False
+    
+    # Validate directory
+    directory = Path(args.directory)
     if not directory.exists():
         print(f"Error: Directory {directory} does not exist")
         sys.exit(1)
 
+    # Create remover with enhanced options
     remover = UnicodeRemover()
+    remover.quiet_mode = args.quiet
+    remover.verbose_mode = args.verbose
+    remover.check_mode = args.check
+    remover.dry_run_mode = args.dry_run
+    remover.fix_mode = args.fix
+    remover.include_types = args.include_types
+    remover.exclude_dirs = args.exclude_dirs
+    
+    # Process directory
     remover.process_directory(directory)
-    remover.print_stats()
+    
+    # Generate reports
+    if args.report_json:
+        remover.generate_json_report(args.report_json)
+    
+    if not args.quiet:
+        remover.print_stats()
+    
+    # Exit codes for CI integration
+    if args.check and remover.stats['unicode_found'] > 0:
+        sys.exit(1)  # Unicode violations found
+    elif args.check:
+        sys.exit(0)  # No Unicode violations
+    else:
+        sys.exit(0)  # Fix or dry-run mode always succeeds
 
 
 if __name__ == '__main__':

@@ -10,14 +10,28 @@ class CorrelationAnalyzer:
     """Analyzes correlations between different analyzer findings."""
 
     def analyze_correlations(self, findings, duplication_clusters, nasa_violations):
-        """Analyze correlations between different analyzer findings."""
+        """Analyze correlations between different analyzer findings with enhanced cross-phase analysis."""
         correlations = []
 
         try:
-            correlations.extend(self._find_duplication_correlations(findings, duplication_clusters))
-            correlations.extend(self._find_nasa_correlations(findings, nasa_violations))
+            # Enhanced duplication correlations
+            dup_correlations = self._find_duplication_correlations(findings, duplication_clusters)
+            correlations.extend(dup_correlations)
+            
+            # Enhanced NASA correlations
+            nasa_correlations = self._find_nasa_correlations(findings, nasa_violations)
+            correlations.extend(nasa_correlations)
+            
+            # New: Cross-phase complexity correlations
+            complexity_correlations = self._find_complexity_correlations(findings, duplication_clusters, nasa_violations)
+            correlations.extend(complexity_correlations)
+            
+            # New: File-level aggregation correlations
+            file_correlations = self._find_file_level_correlations(findings, duplication_clusters, nasa_violations)
+            correlations.extend(file_correlations)
+            
         except Exception as e:
-            print(f"Warning: Correlation analysis failed: {e}")
+            print(f"Warning: Enhanced correlation analysis failed: {e}")
 
         return correlations
 
@@ -64,6 +78,102 @@ class CorrelationAnalyzer:
             ]
 
         return []
+
+    def _find_complexity_correlations(self, findings, duplication_clusters, nasa_violations):
+        """Find correlations between complexity violations across different analyzers."""
+        correlations = []
+        
+        try:
+            # Group findings by complexity indicators
+            high_complexity_files = set()
+            
+            # Identify complex files from connascence violations
+            for finding in findings:
+                if finding.get("severity") in ["critical", "high"] and finding.get("type") in ["CoA", "god_object", "complexity"]:
+                    high_complexity_files.add(finding.get("file_path", ""))
+            
+            # Check duplication clusters in complex files
+            complex_duplications = [
+                cluster for cluster in duplication_clusters
+                if any(file_path in high_complexity_files for file_path in cluster.get("files_involved", []))
+            ]
+            
+            if complex_duplications:
+                correlations.append({
+                    "analyzer1": "connascence",
+                    "analyzer2": "duplication", 
+                    "correlation_type": "complexity_concentration",
+                    "correlation_score": min(0.9, len(complex_duplications) / max(len(duplication_clusters), 1)),
+                    "affected_files": list(high_complexity_files),
+                    "description": f"High complexity files show {len(complex_duplications)} duplication clusters - suggests architectural issues",
+                    "priority": "high",
+                    "remediation_impact": "architectural_refactoring"
+                })
+        
+        except Exception as e:
+            print(f"Warning: Complexity correlation analysis failed: {e}")
+        
+        return correlations
+
+    def _find_file_level_correlations(self, findings, duplication_clusters, nasa_violations):
+        """Find file-level correlations across all analyzer types."""
+        correlations = []
+        
+        try:
+            # Create file-level violation mapping
+            file_violations = {}
+            
+            # Map connascence violations by file
+            for finding in findings:
+                file_path = finding.get("file_path", "")
+                if file_path:
+                    if file_path not in file_violations:
+                        file_violations[file_path] = {"connascence": 0, "duplication": 0, "nasa": 0, "types": set()}
+                    file_violations[file_path]["connascence"] += 1
+                    file_violations[file_path]["types"].add(finding.get("type", "unknown"))
+            
+            # Map duplication clusters by file
+            for cluster in duplication_clusters:
+                for file_path in cluster.get("files_involved", []):
+                    if file_path:
+                        if file_path not in file_violations:
+                            file_violations[file_path] = {"connascence": 0, "duplication": 0, "nasa": 0, "types": set()}
+                        file_violations[file_path]["duplication"] += 1
+                        file_violations[file_path]["types"].add("duplication")
+            
+            # Map NASA violations by file (if they have file context)
+            for nasa_violation in nasa_violations:
+                file_path = nasa_violation.get("file_path", "")
+                if file_path:
+                    if file_path not in file_violations:
+                        file_violations[file_path] = {"connascence": 0, "duplication": 0, "nasa": 0, "types": set()}
+                    file_violations[file_path]["nasa"] += 1
+                    file_violations[file_path]["types"].add("nasa_violation")
+            
+            # Find files with multiple violation types (hotspots)
+            hotspot_files = {
+                file_path: violations for file_path, violations in file_violations.items()
+                if sum([violations["connascence"], violations["duplication"], violations["nasa"]]) >= 3
+                and len(violations["types"]) >= 2
+            }
+            
+            if hotspot_files:
+                correlations.append({
+                    "analyzer1": "multi_analyzer",
+                    "analyzer2": "file_level",
+                    "correlation_type": "violation_hotspots",
+                    "correlation_score": min(0.95, len(hotspot_files) / max(len(file_violations), 1)),
+                    "hotspot_files": list(hotspot_files.keys()),
+                    "hotspot_details": hotspot_files,
+                    "description": f"Found {len(hotspot_files)} files with multiple violation types - these are architectural problem areas",
+                    "priority": "critical",
+                    "remediation_impact": "targeted_refactoring"
+                })
+        
+        except Exception as e:
+            print(f"Warning: File-level correlation analysis failed: {e}")
+        
+        return correlations
 
 
 class RecommendationEngine:

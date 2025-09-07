@@ -543,21 +543,56 @@ class UnifiedConnascenceAnalyzer:
         return result
 
     def _run_analysis_phases(self, project_path: Path, policy_preset: str) -> Dict[str, Any]:
-        """Run all analysis phases and collect violations."""
+        """Run all analysis phases and collect violations with enhanced cross-phase coordination."""
         violations = {"connascence": [], "duplication": [], "nasa": []}
+        phase_metadata = {"audit_trail": [], "correlations": [], "smart_results": None}
 
-        # Phase 1-2: Core AST Analysis
+        # Phase 1-2: Core AST Analysis with audit trail
+        logger.info("Phase 1-2: Starting core AST analysis")
+        phase_metadata["audit_trail"].append({"phase": "ast_analysis", "started": self._get_iso_timestamp()})
         violations["connascence"] = self._run_ast_analysis(project_path)
+        phase_metadata["audit_trail"].append({
+            "phase": "ast_analysis", 
+            "completed": self._get_iso_timestamp(),
+            "violations_found": len(violations["connascence"])
+        })
 
-        # Phase 3-4: MECE Duplication Detection
+        # Phase 3-4: MECE Duplication Detection with cross-reference
+        logger.info("Phase 3-4: Starting MECE duplication analysis")
+        phase_metadata["audit_trail"].append({"phase": "duplication_analysis", "started": self._get_iso_timestamp()})
         violations["duplication"] = self._run_duplication_analysis(project_path)
+        phase_metadata["audit_trail"].append({
+            "phase": "duplication_analysis", 
+            "completed": self._get_iso_timestamp(),
+            "clusters_found": len(violations["duplication"])
+        })
 
-        # Phase 5: Smart Integration (if available)
-        self._run_smart_integration(project_path, policy_preset)
+        # Phase 5: Smart Integration with enhanced correlation
+        logger.info("Phase 5: Running smart integration engine")
+        phase_metadata["audit_trail"].append({"phase": "smart_integration", "started": self._get_iso_timestamp()})
+        smart_results = self._run_smart_integration(project_path, policy_preset, violations)
+        if smart_results:
+            phase_metadata["smart_results"] = smart_results
+            phase_metadata["correlations"] = smart_results.get("correlations", [])
+        phase_metadata["audit_trail"].append({
+            "phase": "smart_integration", 
+            "completed": self._get_iso_timestamp(),
+            "correlations_found": len(phase_metadata["correlations"])
+        })
 
-        # Phase 6: NASA Compliance Check
-        violations["nasa"] = self._run_nasa_analysis(violations["connascence"])
+        # Phase 6: NASA Compliance Check with enhanced context
+        logger.info("Phase 6: Running NASA compliance analysis")
+        phase_metadata["audit_trail"].append({"phase": "nasa_analysis", "started": self._get_iso_timestamp()})
+        violations["nasa"] = self._run_nasa_analysis(violations["connascence"], phase_metadata)
+        phase_metadata["audit_trail"].append({
+            "phase": "nasa_analysis", 
+            "completed": self._get_iso_timestamp(),
+            "nasa_violations": len(violations["nasa"])
+        })
 
+        # Store audit trail in violations for downstream processing
+        violations["_metadata"] = phase_metadata
+        
         return violations
 
     def _run_ast_analysis(self, project_path: Path) -> List[Dict[str, Any]]:
@@ -580,33 +615,96 @@ class UnifiedConnascenceAnalyzer:
         dup_analysis = self.mece_analyzer.analyze_path(str(project_path), comprehensive=True)
         return dup_analysis.get("duplications", [])
 
-    def _run_smart_integration(self, project_path: Path, policy_preset: str):
-        """Run smart integration engine if available."""
+    def _run_smart_integration(self, project_path: Path, policy_preset: str, existing_violations: Dict = None):
+        """Run smart integration engine with enhanced correlation analysis."""
         if self.smart_engine:
-            logger.info("Phase 5: Running smart integration engine")
+            logger.info("Phase 5: Running smart integration engine with cross-phase correlation")
             try:
-                return self.smart_engine.comprehensive_analysis(str(project_path), policy_preset)
+                # Pass existing violations for correlation analysis
+                base_results = self.smart_engine.comprehensive_analysis(str(project_path), policy_preset)
+                
+                # Enhanced correlation analysis if we have existing violations
+                if existing_violations:
+                    correlations = self.smart_engine.analyze_correlations(
+                        existing_violations.get("connascence", []),
+                        existing_violations.get("duplication", []),
+                        existing_violations.get("nasa", [])
+                    )
+                    
+                    recommendations = self.smart_engine.generate_intelligent_recommendations(
+                        existing_violations.get("connascence", []),
+                        existing_violations.get("duplication", []),
+                        existing_violations.get("nasa", [])
+                    )
+                    
+                    # Enhance base results with cross-phase analysis
+                    if base_results:
+                        base_results["correlations"] = correlations
+                        base_results["enhanced_recommendations"] = recommendations
+                        base_results["cross_phase_analysis"] = True
+                    else:
+                        base_results = {
+                            "correlations": correlations,
+                            "enhanced_recommendations": recommendations,
+                            "cross_phase_analysis": True,
+                            "violations": [],
+                            "summary": {"total_violations": 0, "critical_violations": 0}
+                        }
+                
+                return base_results
+                
             except Exception as e:
                 logger.warning(f"Smart integration failed: {e}")
+                return {"error": str(e), "correlations": [], "enhanced_recommendations": []}
         else:
             logger.info("Phase 5: Smart integration engine not available")
-        return None
+            return None
 
-    def _run_nasa_analysis(self, connascence_violations: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """Run NASA compliance analysis."""
+    def _run_nasa_analysis(self, connascence_violations: List[Dict[str, Any]], phase_metadata: Dict = None) -> List[Dict[str, Any]]:
+        """Run NASA compliance analysis with enhanced context awareness."""
         nasa_violations = []
 
         if self.nasa_integration:
-            logger.info("Phase 6: Checking NASA Power of Ten compliance")
+            logger.info("Phase 6: Checking NASA Power of Ten compliance with cross-phase context")
             try:
+                # Enhanced NASA analysis with phase context
                 for violation in connascence_violations:
                     nasa_checks = self.nasa_integration.check_nasa_violations(violation)
+                    
+                    # Enhance NASA violations with cross-phase context
+                    for nasa_violation in nasa_checks:
+                        if phase_metadata and phase_metadata.get("correlations"):
+                            # Add correlation context to NASA violations
+                            related_correlations = [
+                                c for c in phase_metadata["correlations"] 
+                                if violation.get("file_path") in str(c.get("common_findings", []))
+                            ]
+                            if related_correlations:
+                                nasa_violation["cross_phase_correlations"] = related_correlations
+                                nasa_violation["enhanced_context"] = True
+                    
                     nasa_violations.extend(nasa_checks)
+                    
+                # Add metadata about NASA analysis
+                if phase_metadata:
+                    nasa_compliance_score = max(0.0, 1.0 - (len(nasa_violations) * 0.1))
+                    phase_metadata["nasa_compliance_score"] = nasa_compliance_score
+                    phase_metadata["nasa_rules_checked"] = ["Rule1", "Rule2", "Rule3", "Rule4", "Rule5", 
+                                                           "Rule6", "Rule7", "Rule8", "Rule9", "Rule10"]
+                    
             except Exception as e:
                 logger.warning(f"NASA compliance check failed: {e}")
+                if phase_metadata:
+                    phase_metadata["nasa_analysis_error"] = str(e)
         else:
+            logger.info("Phase 6: Using fallback NASA compliance extraction")
             # Extract NASA violations from existing connascence violations
             nasa_violations = [v for v in connascence_violations if "NASA" in v.get("rule_id", "")]
+            
+            # Add enhanced context even for fallback mode
+            for violation in nasa_violations:
+                violation["analysis_mode"] = "fallback"
+                violation["enhanced_context"] = False
 
         return nasa_violations
 
@@ -647,8 +745,22 @@ class UnifiedConnascenceAnalyzer:
         errors: List[StandardError] = None,
         warnings: List[StandardError] = None,
     ) -> UnifiedAnalysisResult:
-        """Build the unified analysis result with error tracking."""
-        return UnifiedAnalysisResult(
+        """Build the unified analysis result with enhanced metadata and cross-phase integration."""
+        
+        # Extract metadata and enhance recommendations with cross-phase analysis
+        phase_metadata = violations.get("_metadata", {})
+        enhanced_recommendations = recommendations.copy()
+        
+        # Integrate smart integration results into recommendations
+        if phase_metadata.get("smart_results"):
+            smart_results = phase_metadata["smart_results"]
+            if smart_results.get("enhanced_recommendations"):
+                enhanced_recommendations["smart_recommendations"] = smart_results["enhanced_recommendations"]
+            if smart_results.get("correlations"):
+                enhanced_recommendations["correlations"] = smart_results["correlations"]
+        
+        # Build the result with enhanced data
+        result = UnifiedAnalysisResult(
             connascence_violations=violations["connascence"],
             duplication_clusters=violations["duplication"],
             nasa_violations=violations["nasa"],
@@ -666,11 +778,20 @@ class UnifiedConnascenceAnalyzer:
             analysis_duration_ms=analysis_time,
             files_analyzed=len(violations["connascence"]),
             timestamp=self._get_iso_timestamp(),
-            priority_fixes=recommendations["priority_fixes"],
-            improvement_actions=recommendations["improvement_actions"],
+            priority_fixes=enhanced_recommendations["priority_fixes"],
+            improvement_actions=enhanced_recommendations["improvement_actions"],
             errors=errors or [],
             warnings=warnings or [],
         )
+        
+        # Add enhanced metadata as custom attributes for downstream processing
+        if hasattr(result, '__dict__'):
+            result.__dict__['audit_trail'] = phase_metadata.get("audit_trail", [])
+            result.__dict__['correlations'] = phase_metadata.get("correlations", [])
+            result.__dict__['smart_recommendations'] = enhanced_recommendations.get("smart_recommendations", [])
+            result.__dict__['cross_phase_analysis'] = phase_metadata.get("smart_results", {}).get("cross_phase_analysis", False)
+        
+        return result
 
     def analyze_file(self, file_path: Union[str, Path]) -> Dict[str, Any]:
         """Analyze a single file with all available analyzers."""
