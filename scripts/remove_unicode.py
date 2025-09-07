@@ -142,76 +142,71 @@ class UnicodeRemover:
                 if self.is_safe_context(line, i):
                     # Keep Unicode in safe contexts
                     result.append(char)
-                elif char in self.unicode_replacements:
-                    # Record violation for reporting
-                    violation = {
-                        'file': str(file_path),
-                        'line': line_num,
-                        'column': i,
-                        'char': char,
-                        'unicode_code': f"U+{ord(char):04X}",
-                        'replacement': self.unicode_replacements[char],
-                        'context': line.strip()[:50] + '...' if len(line.strip()) > 50 else line.strip()
-                    }
-                    self.stats['violations'].append(violation)
-                    
-                    if self.fix_mode and not self.check_mode and not self.dry_run_mode:
-                        # Replace with ASCII equivalent
-                        replacement = self.unicode_replacements[char]
-                        result.append(replacement)
-                        removed_count += 1
-                        if not self.quiet_mode:
-                            try:
-                                print(f"  Replaced Unicode char with '{replacement}' at {file_path}:{line_num}:{i}")
-                            except UnicodeEncodeError:
-                                print(f"  Replaced Unicode char (U+{ord(char):04X}) with '{replacement}' at {file_path}:{line_num}:{i}")
-                    elif self.dry_run_mode:
-                        # Show what would be replaced
-                        replacement = self.unicode_replacements[char]
-                        result.append(char)  # Keep original in dry run
-                        if not self.quiet_mode:
-                            print(f"  Would replace Unicode char with '{replacement}' at {file_path}:{line_num}:{i}")
-                    elif self.check_mode:
-                        # Just report the violation
-                        result.append(char)  # Keep original in check mode
-                        if not self.quiet_mode:
-                            print(f"  Found Unicode char (U+{ord(char):04X}) at {file_path}:{line_num}:{i}")
-                    else:
-                        result.append(char)
                 else:
-                    # Handle unknown Unicode character
+                    # Record violation for ALL Unicode outside safe contexts
+                    if char in self.unicode_replacements:
+                        replacement = self.unicode_replacements[char]
+                    else:
+                        replacement = ''  # No replacement available
+                    
                     violation = {
                         'file': str(file_path),
                         'line': line_num,
                         'column': i,
                         'char': char,
                         'unicode_code': f"U+{ord(char):04X}",
-                        'replacement': '',  # No replacement available
+                        'replacement': replacement,
                         'context': line.strip()[:50] + '...' if len(line.strip()) > 50 else line.strip()
                     }
                     self.stats['violations'].append(violation)
                     
-                    if self.fix_mode and not self.check_mode and not self.dry_run_mode:
-                        # Remove unknown Unicode character
-                        removed_count += 1
-                        if not self.quiet_mode:
-                            try:
-                                print(f"  Removed unknown Unicode char (U+{ord(char):04X}) at {file_path}:{line_num}:{i}")
-                            except UnicodeEncodeError:
-                                print(f"  Removed unknown Unicode (U+{ord(char):04X}) at {file_path}:{line_num}:{i}")
-                        # Don't append anything (remove the character)
-                    elif self.dry_run_mode:
-                        # Show what would be removed
-                        result.append(char)  # Keep original in dry run
-                        if not self.quiet_mode:
-                            print(f"  Would remove unknown Unicode char (U+{ord(char):04X}) at {file_path}:{line_num}:{i}")
-                    elif self.check_mode:
-                        # Just report the violation
-                        result.append(char)  # Keep original in check mode
-                        if not self.quiet_mode:
-                            print(f"  Found unknown Unicode char (U+{ord(char):04X}) at {file_path}:{line_num}:{i}")
+                    if char in self.unicode_replacements:
+                        if self.fix_mode and not self.check_mode and not self.dry_run_mode:
+                            # Replace with ASCII equivalent
+                            replacement = self.unicode_replacements[char]
+                            result.append(replacement)
+                            removed_count += 1
+                            if not self.quiet_mode:
+                                try:
+                                    print(f"  Replaced Unicode char with '{replacement}' at {file_path}:{line_num}:{i}")
+                                except UnicodeEncodeError:
+                                    print(f"  Replaced Unicode char (U+{ord(char):04X}) with '{replacement}' at {file_path}:{line_num}:{i}")
+                        elif self.dry_run_mode:
+                            # Show what would be replaced
+                            replacement = self.unicode_replacements[char]
+                            result.append(char)  # Keep original in dry run
+                            if not self.quiet_mode:
+                                print(f"  Would replace Unicode char with '{replacement}' at {file_path}:{line_num}:{i}")
+                        elif self.check_mode:
+                            # Just report the violation
+                            result.append(char)  # Keep original in check mode
+                            if not self.quiet_mode:
+                                print(f"  Found Unicode char (U+{ord(char):04X}) at {file_path}:{line_num}:{i}")
+                        else:
+                            result.append(char)
                     else:
-                        result.append(char)
+                        # Handle unknown Unicode character
+                        if self.fix_mode and not self.check_mode and not self.dry_run_mode:
+                            # Remove unknown Unicode character
+                            removed_count += 1
+                            if not self.quiet_mode:
+                                try:
+                                    print(f"  Removed unknown Unicode char (U+{ord(char):04X}) at {file_path}:{line_num}:{i}")
+                                except UnicodeEncodeError:
+                                    print(f"  Removed unknown Unicode (U+{ord(char):04X}) at {file_path}:{line_num}:{i}")
+                            # Don't append anything (remove the character)
+                        elif self.dry_run_mode:
+                            # Show what would be removed
+                            result.append(char)  # Keep original in dry run
+                            if not self.quiet_mode:
+                                print(f"  Would remove unknown Unicode char (U+{ord(char):04X}) at {file_path}:{line_num}:{i}")
+                        elif self.check_mode:
+                            # Just report the violation
+                            result.append(char)  # Keep original in check mode
+                            if not self.quiet_mode:
+                                print(f"  Found unknown Unicode char (U+{ord(char):04X}) at {file_path}:{line_num}:{i}")
+                        else:
+                            result.append(char)
             else:
                 result.append(char)
         
@@ -418,7 +413,7 @@ Examples:
         remover.print_stats()
     
     # Exit codes for CI integration
-    if args.check and remover.stats['unicode_found'] > 0:
+    if args.check and len(remover.stats['violations']) > 0:
         sys.exit(1)  # Unicode violations found
     elif args.check:
         sys.exit(0)  # No Unicode violations

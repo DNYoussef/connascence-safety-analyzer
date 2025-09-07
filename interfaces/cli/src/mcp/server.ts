@@ -371,15 +371,147 @@ export class MCPServer {
       throw new Error('No AI providers available');
     }
 
-    const prompt = this.buildFixPrompt(finding, context, options);
+    // Check if we have enhanced pipeline data
+    const enhancedContext = await this.getEnhancedPipelineContext(finding);
+    const prompt = this.buildFixPrompt(finding, context, options, enhancedContext);
     const response = await this.callProvider(provider, prompt);
 
     return {
       patch: response.code || '',
       confidence: response.confidence || 75,
       description: response.description || 'AI-generated fix',
-      safety: response.safety || 'caution'
+      safety: response.safety || 'caution',
+      enhanced_recommendations: enhancedContext.smart_recommendations || [],
+      cross_phase_analysis: enhancedContext.correlations || []
     };
+  }
+
+  private async getEnhancedPipelineContext(finding: any): Promise<any> {
+    try {
+      const { spawn } = require('child_process');
+      const path = require('path');
+      
+      // Get file path from finding object
+      const filePath = finding.file || finding.path || process.cwd();
+      
+      // Find the enhanced unified analyzer path
+      const analyzerBasePath = process.env.CONNASCENCE_ANALYZER_PATH || '../../../analyzer';
+      const analyzerPath = path.resolve(__dirname, analyzerBasePath, 'unified_analyzer.py');
+      
+      // Build enhanced analysis command with cross-phase features enabled
+      const args = [
+        analyzerPath,
+        '--path', filePath,
+        '--format', 'json',
+        '--enable-correlations',
+        '--enable-audit-trail', 
+        '--enable-smart-recommendations',
+        '--policy', 'standard' // Default policy for MCP context
+      ];
+      
+      return new Promise((resolve, reject) => {
+        const process = spawn('python', args, {
+          stdio: ['pipe', 'pipe', 'pipe'],
+          cwd: path.dirname(analyzerPath),
+          timeout: 30000 // 30 second timeout
+        });
+        
+        let stdout = '';
+        let stderr = '';
+        
+        process.stdout.on('data', (data) => {
+          stdout += data.toString();
+        });
+        
+        process.stderr.on('data', (data) => {
+          stderr += data.toString();
+        });
+        
+        process.on('close', (code) => {
+          if (code !== 0) {
+            console.warn(`Enhanced pipeline process failed with code ${code}: ${stderr}`);
+            // Return minimal context on failure but don't fail completely
+            resolve({
+              smart_recommendations: [],
+              correlations: [],
+              audit_trail: [],
+              cross_phase_analysis: false,
+              error: `Pipeline exit code: ${code}`
+            });
+            return;
+          }
+          
+          try {
+            const result = JSON.parse(stdout);
+            
+            // Extract and format enhanced context for MCP use
+            const enhancedContext = {
+              smart_recommendations: result.smart_recommendations || [],
+              correlations: result.correlations || [],
+              audit_trail: result.audit_trail || [],
+              cross_phase_analysis: result.cross_phase_analysis || false,
+              canonical_policy: result.canonical_policy,
+              components_used: result.components_used || {},
+              policy_config: result.policy_config || {}
+            };
+            
+            console.log(`Enhanced pipeline context retrieved: ${enhancedContext.correlations.length} correlations, ${enhancedContext.smart_recommendations.length} recommendations`);
+            resolve(enhancedContext);
+            
+          } catch (parseError) {
+            console.warn(`Failed to parse enhanced pipeline JSON output: ${parseError}`);
+            console.warn(`Raw stdout: ${stdout.substring(0, 500)}...`);
+            
+            // Return partial context on parse failure
+            resolve({
+              smart_recommendations: [],
+              correlations: [],
+              audit_trail: [],
+              cross_phase_analysis: false,
+              parse_error: parseError.message
+            });
+          }
+        });
+        
+        process.on('error', (error) => {
+          console.warn(`Failed to spawn enhanced pipeline process: ${error}`);
+          resolve({
+            smart_recommendations: [],
+            correlations: [],
+            audit_trail: [],
+            cross_phase_analysis: false,
+            spawn_error: error.message
+          });
+        });
+        
+        // Handle timeout explicitly
+        const timeoutId = setTimeout(() => {
+          console.warn('Enhanced pipeline analysis timed out after 30 seconds');
+          process.kill('SIGTERM');
+          resolve({
+            smart_recommendations: [],
+            correlations: [],
+            audit_trail: [],
+            cross_phase_analysis: false,
+            timeout: true
+          });
+        }, 30000);
+        
+        process.on('close', () => {
+          clearTimeout(timeoutId);
+        });
+      });
+      
+    } catch (error) {
+      console.warn('Enhanced pipeline context setup error:', error);
+      return {
+        smart_recommendations: [],
+        correlations: [],
+        audit_trail: [],
+        cross_phase_analysis: false,
+        setup_error: error.message
+      };
+    }
   }
 
   private async generateSuggestions(finding: any, context: string, options: any): Promise<any[]> {
@@ -388,10 +520,28 @@ export class MCPServer {
       return [];
     }
 
-    const prompt = this.buildSuggestionsPrompt(finding, context, options);
+    // Get enhanced pipeline context for better suggestions
+    const enhancedContext = await this.getEnhancedPipelineContext(finding);
+    const prompt = this.buildSuggestionsPrompt(finding, context, options, enhancedContext);
     const response = await this.callProvider(provider, prompt);
 
-    return response.suggestions || [];
+    // Enhance suggestions with pipeline context
+    const suggestions = response.suggestions || [];
+    if (enhancedContext?.smart_recommendations?.length > 0) {
+      // Add smart recommendations as additional suggestions
+      const smartSuggestions = enhancedContext.smart_recommendations.slice(0, 2).map((rec: any, index: number) => ({
+        technique: `Smart Rec: ${rec.category || 'Architectural'}`,
+        description: rec.description,
+        confidence: 85,
+        complexity: rec.effort?.toLowerCase() || 'medium',
+        risk: rec.priority === 'high' ? 'low' : 'medium',
+        source: 'enhanced_pipeline'
+      }));
+      
+      suggestions.push(...smartSuggestions);
+    }
+
+    return suggestions;
   }
 
   private async generateExplanation(finding: any, options: any): Promise<any> {
@@ -540,58 +690,162 @@ export class MCPServer {
     }
   }
 
-  private buildFixPrompt(finding: any, context: string, options: any): string {
-    return `You are a code quality expert. Generate a fix for this connascence violation:
+  private buildFixPrompt(finding: any, context: string, options: any, enhancedContext?: any): string {
+    let prompt = `You are a senior software architect with access to advanced cross-phase connascence analysis. Generate an optimal fix for this violation:
 
 Type: ${finding.type}
 Message: ${finding.message}
 Severity: ${finding.severity}
+File: ${finding.file || 'unknown'}
+Line: ${finding.line || 'unknown'}
 
 Context:
-${context}
+${context}`;
 
-Requirements:
-- Provide working code that fixes the violation
-- Maintain functionality while reducing coupling
-- Include confidence score (0-100)
-- Assess safety level (safe/caution/unsafe)
+    // Add enhanced pipeline context with detailed recommendations
+    if (enhancedContext && (enhancedContext.correlations?.length > 0 || enhancedContext.smart_recommendations?.length > 0)) {
+      prompt += `\n\n=== ENHANCED ARCHITECTURAL ANALYSIS ===`;
+      
+      // Add cross-phase correlations with architectural insights
+      if (enhancedContext.correlations?.length > 0) {
+        prompt += `\n\nCross-Phase Correlations (${enhancedContext.correlations.length} found):`;
+        enhancedContext.correlations.slice(0, 5).forEach((corr: any, index: number) => {
+          const score = (corr.correlation_score * 100).toFixed(1);
+          const priority = corr.priority || 'medium';
+          prompt += `\n${index + 1}. [${priority.toUpperCase()}] ${corr.analyzer1} ↔ ${corr.analyzer2} (${score}% correlation)`;
+          prompt += `\n   Impact: ${corr.description}`;
+          if (corr.remediation_impact) {
+            prompt += `\n   Remediation: ${corr.remediation_impact}`;
+          }
+          if (corr.affected_files?.length > 0) {
+            prompt += `\n   Affects: ${corr.affected_files.slice(0, 3).join(', ')}${corr.affected_files.length > 3 ? '...' : ''}`;
+          }
+        });
+      }
+      
+      // Add smart architectural recommendations with detailed context
+      if (enhancedContext.smart_recommendations?.length > 0) {
+        prompt += `\n\nSmart Architectural Recommendations (${enhancedContext.smart_recommendations.length} generated):`;
+        enhancedContext.smart_recommendations.slice(0, 4).forEach((rec: any, index: number) => {
+          const priority = rec.priority || 'medium';
+          const category = rec.category || 'General';
+          const impact = rec.impact || 'unknown';
+          const effort = rec.effort || 'unknown';
+          
+          prompt += `\n${index + 1}. [${priority.toUpperCase()} PRIORITY] ${category}`;
+          prompt += `\n   Recommendation: ${rec.description}`;
+          prompt += `\n   Impact: ${impact} | Effort: ${effort}`;
+          
+          if (rec.rationale) {
+            prompt += `\n   Rationale: ${rec.rationale}`;
+          }
+          if (rec.implementation_notes) {
+            prompt += `\n   Implementation: ${rec.implementation_notes}`;
+          }
+        });
+      }
+      
+      // Add policy and component information
+      if (enhancedContext.canonical_policy) {
+        prompt += `\n\nActive Policy: ${enhancedContext.canonical_policy}`;
+      }
+      if (enhancedContext.components_used) {
+        const activeComponents = Object.entries(enhancedContext.components_used)
+          .filter(([_, enabled]) => enabled)
+          .map(([component, _]) => component);
+        if (activeComponents.length > 0) {
+          prompt += `\nActive Analyzers: ${activeComponents.join(', ')}`;
+        }
+      }
+    }
+
+    prompt += `\n\n=== REQUIREMENTS ===
+- Generate working code that eliminates the connascence violation
+- Preserve all functionality while reducing coupling strength
+- Apply architectural patterns identified in enhanced analysis
+- Consider cross-phase correlations to avoid introducing new violations
+- Leverage smart recommendations for optimal architectural decisions
+- Include detailed confidence assessment (0-100)
+- Assess safety level: safe (no risk), caution (minor risk), unsafe (breaking change risk)
+${enhancedContext?.correlations?.length > 0 ? '- Account for cross-analyzer correlations to prevent cascade effects' : ''}
+${enhancedContext?.smart_recommendations?.length > 0 ? '- Align with smart architectural recommendations for long-term maintainability' : ''}
 
 Response format:
 {
-  "code": "fixed code here",
-  "description": "what was changed",
+  "code": "// Complete fixed code with comments explaining architectural decisions",
+  "description": "Detailed explanation of changes and architectural improvements",
   "confidence": 85,
-  "safety": "safe"
+  "safety": "safe",
+  "architectural_pattern": "Design pattern or principle applied"${enhancedContext?.correlations?.length > 0 || enhancedContext?.smart_recommendations?.length > 0 ? ',\n  "enhanced_rationale": "How enhanced analysis influenced this solution",\n  "correlation_impact": "How this fix addresses cross-phase correlations",\n  "recommendation_alignment": "Which smart recommendations this implements"' : ''}
 }`;
+
+    return prompt;
   }
 
-  private buildSuggestionsPrompt(finding: any, context: string, options: any): string {
-    return `Generate refactoring suggestions for this connascence violation:
+  private buildSuggestionsPrompt(finding: any, context: string, options: any, enhancedContext?: any): string {
+    let prompt = `Generate comprehensive refactoring suggestions for this connascence violation using advanced architectural analysis:
 
 Type: ${finding.type}
 Message: ${finding.message}
+Severity: ${finding.severity}
+File: ${finding.file || 'unknown'}
 
 Context:
-${context}
+${context}`;
 
-Provide 3-5 different approaches with:
-- Technique name
-- Description
-- Confidence level
-- Complexity assessment
+    // Add enhanced analysis context for better suggestions
+    if (enhancedContext && (enhancedContext.correlations?.length > 0 || enhancedContext.smart_recommendations?.length > 0)) {
+      prompt += `\n\n=== ENHANCED ARCHITECTURAL CONTEXT ===`;
+      
+      if (enhancedContext.correlations?.length > 0) {
+        prompt += `\nCross-Phase Correlations:`;
+        enhancedContext.correlations.slice(0, 3).forEach((corr: any, index: number) => {
+          const score = (corr.correlation_score * 100).toFixed(1);
+          prompt += `\n• ${corr.analyzer1} ↔ ${corr.analyzer2} (${score}%): ${corr.description}`;
+        });
+      }
+      
+      if (enhancedContext.smart_recommendations?.length > 0) {
+        prompt += `\nSmart Architectural Recommendations:`;
+        enhancedContext.smart_recommendations.slice(0, 3).forEach((rec: any, index: number) => {
+          prompt += `\n• [${rec.priority || 'medium'}] ${rec.category}: ${rec.description}`;
+        });
+      }
+    }
+
+    prompt += `
+
+Generate 4-6 different refactoring approaches considering:
+- Traditional connascence reduction techniques
+- Modern architectural patterns
+- Cross-phase impact analysis
+${enhancedContext?.correlations?.length > 0 ? '- Correlation cascade effects' : ''}
+${enhancedContext?.smart_recommendations?.length > 0 ? '- Smart architectural recommendations alignment' : ''}
+
+For each suggestion provide:
+- Technique name (clear, descriptive)
+- Detailed description with implementation steps
+- Confidence level (0-100)
+- Complexity assessment (low/medium/high)
+- Risk level (low/medium/high)
+- Expected impact on coupling
+${enhancedContext ? '- Architectural pattern category' : ''}
 
 Response format:
 {
   "suggestions": [
     {
       "technique": "Extract Constant",
-      "description": "Move magic literal to named constant",
+      "description": "Move magic literal to named constant to reduce connascence of literal",
       "confidence": 90,
       "complexity": "low",
-      "risk": "low"
+      "risk": "low",
+      "coupling_impact": "reduces connascence of literal"${enhancedContext ? ',\n      "architectural_pattern": "Information Hiding",\n      "enhanced_rationale": "Aligns with smart recommendations for separation of concerns"' : ''}
     }
   ]
 }`;
+
+    return prompt;
   }
 
   private buildExplanationPrompt(finding: any, options: any): string {

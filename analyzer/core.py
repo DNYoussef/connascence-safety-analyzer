@@ -5,6 +5,7 @@ Provides the main entry point for connascence analysis.
 """
 
 import argparse
+from datetime import datetime
 import json
 from pathlib import Path
 import sys
@@ -476,6 +477,25 @@ def create_parser() -> argparse.ArgumentParser:
 
     parser.add_argument("--compliance-threshold", type=int, default=95, help="Compliance threshold percentage (0-100)")
 
+    # Enhanced Pipeline CLI Arguments
+    parser.add_argument("--enable-correlations", action="store_true", help="Enable cross-phase correlation analysis")
+    
+    parser.add_argument("--enable-audit-trail", action="store_true", help="Enable analysis audit trail tracking")
+    
+    parser.add_argument("--enable-smart-recommendations", action="store_true", help="Enable AI-powered smart recommendations")
+    
+    parser.add_argument("--correlation-threshold", type=float, default=0.7, help="Minimum correlation threshold for cross-phase analysis (0.0-1.0)")
+    
+    parser.add_argument("--export-audit-trail", type=str, help="Export audit trail to specified file path")
+    
+    parser.add_argument("--export-correlations", type=str, help="Export correlation data to specified file path")
+    
+    parser.add_argument("--export-recommendations", type=str, help="Export smart recommendations to specified file path")
+    
+    parser.add_argument("--enhanced-output", action="store_true", help="Include enhanced pipeline metadata in output")
+    
+    parser.add_argument("--phase-timing", action="store_true", help="Display detailed phase timing information")
+
     return parser
 
 
@@ -526,17 +546,45 @@ def main():
         analyzer.duplication_analyzer.similarity_threshold = duplication_threshold
 
     try:
-        # Run analysis
-        result = analyzer.analyze_path(
-            path=args.path,
-            policy=policy,
-            include_duplication=include_duplication,
-            duplication_threshold=duplication_threshold,
-            nasa_validation=args.nasa_validation,
-            strict_mode=args.strict_mode,
-            enable_tool_correlation=args.enable_tool_correlation,
-            confidence_threshold=args.confidence_threshold,
-        )
+        # Check if we should use enhanced unified analyzer
+        use_enhanced_analyzer = (args.enable_correlations or 
+                               args.enable_audit_trail or 
+                               args.enable_smart_recommendations or 
+                               args.enhanced_output)
+        
+        if use_enhanced_analyzer and UNIFIED_ANALYZER_AVAILABLE:
+            print("Using enhanced unified analyzer for cross-phase analysis...")
+            
+            # Create enhanced analyzer instance
+            enhanced_analyzer = UnifiedConnascenceAnalyzer()
+            
+            # Run enhanced analysis with new features
+            result = enhanced_analyzer.analyze_path(
+                path=args.path,
+                policy=policy,
+                enable_cross_phase_correlation=args.enable_correlations,
+                enable_audit_trail=args.enable_audit_trail,
+                enable_smart_recommendations=args.enable_smart_recommendations,
+                correlation_threshold=args.correlation_threshold,
+                include_duplication=include_duplication,
+                duplication_threshold=duplication_threshold,
+                nasa_validation=args.nasa_validation,
+                strict_mode=args.strict_mode,
+                enable_tool_correlation=args.enable_tool_correlation,
+                confidence_threshold=args.confidence_threshold
+            )
+        else:
+            # Use standard analyzer for backward compatibility
+            result = analyzer.analyze_path(
+                path=args.path,
+                policy=policy,
+                include_duplication=include_duplication,
+                duplication_threshold=duplication_threshold,
+                nasa_validation=args.nasa_validation,
+                strict_mode=args.strict_mode,
+                enable_tool_correlation=args.enable_tool_correlation,
+                confidence_threshold=args.confidence_threshold,
+            )
 
         # Handle different output formats
         if args.format == "sarif":
@@ -572,6 +620,68 @@ def main():
                     f.write(str(result))
             else:
                 print(result)
+
+        # Handle enhanced pipeline exports
+        if use_enhanced_analyzer and UNIFIED_ANALYZER_AVAILABLE:
+            # Export audit trail if requested
+            if args.export_audit_trail and result.get("audit_trail"):
+                with open(args.export_audit_trail, "w") as f:
+                    json.dump(result["audit_trail"], f, indent=2, default=str)
+                print(f"Audit trail exported to: {args.export_audit_trail}")
+            
+            # Export correlations if requested
+            if args.export_correlations and result.get("correlations"):
+                with open(args.export_correlations, "w") as f:
+                    json.dump(result["correlations"], f, indent=2, default=str)
+                print(f"Correlations exported to: {args.export_correlations}")
+            
+            # Export smart recommendations if requested
+            if args.export_recommendations and result.get("smart_recommendations"):
+                with open(args.export_recommendations, "w") as f:
+                    json.dump(result["smart_recommendations"], f, indent=2, default=str)
+                print(f"Smart recommendations exported to: {args.export_recommendations}")
+            
+            # Display phase timing information if requested
+            if args.phase_timing and result.get("audit_trail"):
+                print("\n=== Analysis Phase Timing ===")
+                for phase in result["audit_trail"]:
+                    if phase.get("started") and phase.get("completed"):
+                        start_time = datetime.fromisoformat(phase["started"].replace("Z", "+00:00"))
+                        end_time = datetime.fromisoformat(phase["completed"].replace("Z", "+00:00"))
+                        duration = (end_time - start_time).total_seconds() * 1000
+                        
+                        phase_name = phase["phase"].replace("_", " ").title()
+                        violations = phase.get("violations_found", 0)
+                        clusters = phase.get("clusters_found", 0)
+                        
+                        print(f"{phase_name:25} | {duration:8.1f}ms | {violations:3d} violations | {clusters:3d} clusters")
+            
+            # Display correlation summary if available
+            if result.get("correlations") and len(result["correlations"]) > 0:
+                print(f"\n=== Cross-Phase Analysis Summary ===")
+                correlations = result["correlations"]
+                print(f"Found {len(correlations)} cross-phase correlations")
+                
+                # Show highest correlations
+                sorted_corr = sorted(correlations, key=lambda x: x.get("correlation_score", 0), reverse=True)
+                for i, corr in enumerate(sorted_corr[:3]):  # Show top 3
+                    score = corr.get("correlation_score", 0) * 100
+                    analyzer1 = corr.get("analyzer1", "Unknown")
+                    analyzer2 = corr.get("analyzer2", "Unknown")
+                    print(f"{i+1}. {analyzer1} <-> {analyzer2}: {score:.1f}% correlation")
+            
+            # Display smart recommendations summary
+            if result.get("smart_recommendations") and len(result["smart_recommendations"]) > 0:
+                print(f"\n=== Smart Recommendations Summary ===")
+                recommendations = result["smart_recommendations"]
+                print(f"Generated {len(recommendations)} architectural recommendations")
+                
+                # Show high priority recommendations
+                high_priority = [r for r in recommendations if r.get("priority", "").lower() == "high"]
+                for rec in high_priority[:3]:  # Show top 3 high priority
+                    category = rec.get("category", "General")
+                    description = rec.get("description", "No description")[:60] + "..."
+                    print(f"• [{category}] {description}")
 
         # Exit with appropriate code
         if result.get("success", False):

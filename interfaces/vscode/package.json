@@ -345,13 +345,17 @@
           "type": "string",
           "enum": [
             "none",
+            "nasa-compliance",
+            "strict", 
+            "standard",
+            "lenient",
             "general_safety_strict",
             "safety_level_1",
             "safety_level_3",
             "modern_general"
           ],
-          "default": "modern_general",
-          "description": "Active safety profile for analysis"
+          "default": "standard",
+          "description": "Active safety profile for analysis. Enhanced unified policy names: nasa-compliance (highest), strict, standard (balanced), lenient. Legacy names supported for compatibility."
         },
         "connascence.grammarValidation": {
           "type": "boolean",
@@ -572,6 +576,52 @@
           "type": "boolean",
           "default": false,
           "description": "Enable experimental features (may be unstable)"
+        },
+        "connascence.enhancedPipeline": {
+          "type": "object",
+          "properties": {
+            "enableCrossPhaseCor relation": {
+              "type": "boolean",
+              "default": true,
+              "description": "Enable cross-phase correlation analysis"
+            },
+            "enableAuditTrail": {
+              "type": "boolean",
+              "default": true,
+              "description": "Enable detailed audit trail of analysis phases"
+            },
+            "enableSmartRecommendations": {
+              "type": "boolean",
+              "default": true,
+              "description": "Enable AI-powered smart recommendations based on cross-phase analysis"
+            },
+            "enableHotspotAnalysis": {
+              "type": "boolean",
+              "default": true,
+              "description": "Enable file-level hotspot analysis across all analyzers"
+            },
+            "showPhaseTimings": {
+              "type": "boolean",
+              "default": false,
+              "description": "Show analysis phase timing information"
+            },
+            "correlationThreshold": {
+              "type": "number",
+              "default": 0.6,
+              "minimum": 0.0,
+              "maximum": 1.0,
+              "description": "Threshold for cross-phase correlation detection (0.0-1.0)"
+            }
+          },
+          "default": {
+            "enableCrossPhaseCorrelation": true,
+            "enableAuditTrail": true,
+            "enableSmartRecommendations": true,
+            "enableHotspotAnalysis": true,
+            "showPhaseTimings": false,
+            "correlationThreshold": 0.6
+          },
+          "description": "Enhanced analysis pipeline configuration"
         },
         "connascence.customRules": {
           "type": "array",

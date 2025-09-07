@@ -166,6 +166,91 @@ class ConnascenceDashboard {
                 }
             }
         });
+        
+        // Enhanced Pipeline Charts
+        this.initializeEnhancedCharts();
+    }
+    
+    initializeEnhancedCharts() {
+        // Cross-Phase Correlation Network Chart
+        const correlationCtx = document.getElementById('correlationChart').getContext('2d');
+        this.charts.correlation = new Chart(correlationCtx, {
+            type: 'scatter',
+            data: {
+                datasets: [{
+                    label: 'Phase Correlations',
+                    data: [],
+                    backgroundColor: 'rgba(99, 102, 241, 0.6)',
+                    borderColor: '#6366f1',
+                    borderWidth: 2,
+                    pointRadius: 8,
+                    pointHoverRadius: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Analyzer Phase 1'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Analyzer Phase 2'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const point = context.raw;
+                                return `${point.analyzer1} ↔ ${point.analyzer2}: ${(point.correlation_score * 100).toFixed(1)}%`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Analysis Audit Trail Timeline Chart
+        const auditCtx = document.getElementById('auditTrailChart').getContext('2d');
+        this.charts.auditTrail = new Chart(auditCtx, {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Phase Duration (ms)',
+                    data: [],
+                    backgroundColor: 'rgba(16, 185, 129, 0.6)',
+                    borderColor: '#10b981',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Duration (ms)'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
     }
     
     switchTab(tabName) {
@@ -313,6 +398,137 @@ class ConnascenceDashboard {
         this.charts.types.data.labels = Object.keys(violationsByType);
         this.charts.types.data.datasets[0].data = Object.values(violationsByType);
         this.charts.types.update();
+        
+        // Update enhanced charts with cross-phase data
+        this.updateEnhancedCharts(data);
+    }
+    
+    updateEnhancedCharts(data) {
+        // Update cross-phase correlation chart
+        if (data.correlations && data.correlations.length > 0) {
+            this.updateCorrelationChart(data.correlations);
+            this.updateCorrelationDetails(data.correlations);
+        }
+        
+        // Update audit trail chart
+        if (data.audit_trail && data.audit_trail.length > 0) {
+            this.updateAuditTrailChart(data.audit_trail);
+            this.updateAuditTrailSummary(data.audit_trail);
+        }
+        
+        // Update smart recommendations
+        if (data.smart_recommendations && data.smart_recommendations.length > 0) {
+            this.updateSmartRecommendations(data.smart_recommendations);
+        }
+    }
+    
+    updateCorrelationChart(correlations) {
+        // Convert correlations to scatter plot data
+        const scatterData = correlations.map((corr, index) => ({
+            x: index * 2, // Spacing for visualization
+            y: corr.correlation_score * 100,
+            analyzer1: corr.analyzer1,
+            analyzer2: corr.analyzer2,
+            correlation_score: corr.correlation_score,
+            description: corr.description
+        }));
+        
+        this.charts.correlation.data.datasets[0].data = scatterData;
+        this.charts.correlation.update();
+    }
+    
+    updateCorrelationDetails(correlations) {
+        const container = document.getElementById('correlationDetails');
+        const highestCorr = correlations.reduce((max, corr) => 
+            corr.correlation_score > max.correlation_score ? corr : max, correlations[0]);
+        
+        container.innerHTML = `
+            <p class="mb-1"><strong>Highest Correlation:</strong> ${(highestCorr.correlation_score * 100).toFixed(1)}%</p>
+            <p class="mb-0">${highestCorr.analyzer1} ↔ ${highestCorr.analyzer2}</p>
+            <small class="text-muted">${correlations.length} total correlations found</small>
+        `;
+    }
+    
+    updateAuditTrailChart(auditTrail) {
+        const completedPhases = auditTrail.filter(phase => phase.started && phase.completed);
+        
+        const labels = completedPhases.map(phase => 
+            phase.phase.replace('_', ' ').toUpperCase());
+        const durations = completedPhases.map(phase => {
+            const startTime = new Date(phase.started).getTime();
+            const endTime = new Date(phase.completed).getTime();
+            return endTime - startTime;
+        });
+        
+        this.charts.auditTrail.data.labels = labels;
+        this.charts.auditTrail.data.datasets[0].data = durations;
+        this.charts.auditTrail.update();
+    }
+    
+    updateAuditTrailSummary(auditTrail) {
+        const container = document.getElementById('auditTrailSummary');
+        const completedPhases = auditTrail.filter(phase => phase.started && phase.completed);
+        
+        const totalDuration = completedPhases.reduce((sum, phase) => {
+            const startTime = new Date(phase.started).getTime();
+            const endTime = new Date(phase.completed).getTime();
+            return sum + (endTime - startTime);
+        }, 0);
+        
+        const totalViolations = auditTrail.reduce((sum, phase) => 
+            sum + (phase.violations_found || 0), 0);
+        
+        container.innerHTML = `
+            <p class="mb-1"><strong>Total Analysis Time:</strong> ${totalDuration}ms</p>
+            <p class="mb-0"><strong>Violations Found:</strong> ${totalViolations}</p>
+            <small class="text-muted">${completedPhases.length} phases completed</small>
+        `;
+    }
+    
+    updateSmartRecommendations(recommendations) {
+        const container = document.getElementById('recommendationsList');
+        
+        if (!recommendations || recommendations.length === 0) {
+            container.innerHTML = `
+                <div class="col-12 text-center text-muted py-4">
+                    <i class="fas fa-lightbulb fa-2x mb-2"></i>
+                    <p>No smart recommendations available</p>
+                </div>
+            `;
+            return;
+        }
+        
+        // Show top 5 recommendations
+        const topRecommendations = recommendations.slice(0, 5);
+        
+        container.innerHTML = topRecommendations.map(rec => `
+            <div class="col-12">
+                <div class="recommendation-card p-3 mb-2 bg-light border-start border-primary border-4">
+                    <div class="d-flex align-items-start">
+                        <div class="flex-grow-1">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fas fa-lightbulb text-warning me-2"></i>
+                                <strong class="text-primary">${rec.category || 'General'}</strong>
+                                <span class="badge bg-secondary ms-2">${rec.priority || 'Medium'}</span>
+                            </div>
+                            <p class="mb-2">${rec.description}</p>
+                            <div class="row text-muted small">
+                                <div class="col-sm-6">
+                                    <strong>Impact:</strong> ${rec.impact || 'Unknown'}
+                                </div>
+                                <div class="col-sm-6">
+                                    <strong>Effort:</strong> ${rec.effort || 'Unknown'}
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-primary" 
+                                onclick="dashboard.showRecommendationDetails('${rec.id || 'unknown'}')">
+                            <i class="fas fa-info-circle"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
     }
     
     updateViolationsList(violations) {

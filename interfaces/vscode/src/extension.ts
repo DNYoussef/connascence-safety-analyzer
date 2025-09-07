@@ -17,6 +17,7 @@ import { BrokenChainLogoManager } from './features/brokenChainLogo';
 import { AIFixSuggestionsProvider } from './features/aiFixSuggestions';
 import { ConnascenceService } from './services/connascenceService';
 import { ConfigurationService } from './services/configurationService';
+import { EnhancedPipelineProvider } from './providers/enhancedPipelineProvider';
 
 let extension: ConnascenceExtension;
 let logger: ExtensionLogger;
@@ -30,6 +31,7 @@ let notificationManager: NotificationManager;
 let brokenChainLogo: BrokenChainLogoManager;
 let aiFixSuggestions: AIFixSuggestionsProvider;
 let connascenceService: ConnascenceService;
+let enhancedPipelineProvider: EnhancedPipelineProvider;
 
 export function activate(context: vscode.ExtensionContext) {
     // Initialize logger and telemetry
@@ -78,6 +80,10 @@ export function activate(context: vscode.ExtensionContext) {
 function initializeFeatureManagers(context: vscode.ExtensionContext) {
     logger.info('🔧 Initializing feature managers...');
     
+    // Initialize enhanced pipeline provider first
+    enhancedPipelineProvider = EnhancedPipelineProvider.getInstance();
+    context.subscriptions.push(enhancedPipelineProvider);
+    
     // Initialize visual highlighting
     visualHighlighting = new VisualHighlightingManager();
     context.subscriptions.push(visualHighlighting as any);
@@ -92,7 +98,7 @@ function initializeFeatureManagers(context: vscode.ExtensionContext) {
     // Initialize AI fix suggestions
     aiFixSuggestions = AIFixSuggestionsProvider.getInstance();
     
-    logger.info('✅ Feature managers initialized');
+    logger.info('✅ Feature managers initialized with enhanced pipeline support');
 }
 
 function initializeTreeProviders(context: vscode.ExtensionContext) {
@@ -141,6 +147,39 @@ function registerAllCommands(context: vscode.ExtensionContext) {
         analysisResultsProvider.setGroupBy('type');
     });
     
+    // Enhanced analysis commands
+    const enhancedAnalysisCommand = vscode.commands.registerCommand('connascence.runEnhancedAnalysis', async () => {
+        const activeEditor = vscode.window.activeTextEditor;
+        if (!activeEditor) {
+            vscode.window.showErrorMessage('No active file to analyze');
+            return;
+        }
+        
+        try {
+            const result = await enhancedPipelineProvider.runEnhancedAnalysis(activeEditor.document.uri);
+            if (result) {
+                await enhancedPipelineProvider.showEnhancedAnalysisResults(result);
+            }
+        } catch (error) {
+            vscode.window.showErrorMessage(`Enhanced analysis failed: ${error}`);
+        }
+    });
+
+    const showCorrelationsCommand = vscode.commands.registerCommand('connascence.showCorrelations', async () => {
+        const activeEditor = vscode.window.activeTextEditor;
+        if (!activeEditor) {
+            vscode.window.showErrorMessage('No active file to analyze');
+            return;
+        }
+        
+        const result = await enhancedPipelineProvider.runEnhancedAnalysis(activeEditor.document.uri);
+        if (result?.correlations?.length) {
+            await enhancedPipelineProvider.showEnhancedAnalysisResults(result);
+        } else {
+            vscode.window.showInformationMessage('No cross-phase correlations found');
+        }
+    });
+
     // Highlighting commands
     const toggleHighlightingCommand = vscode.commands.registerCommand('connascence.toggleHighlighting', () => {
         const config = vscode.workspace.getConfiguration('connascence');
@@ -159,6 +198,8 @@ function registerAllCommands(context: vscode.ExtensionContext) {
     
     // Add all commands to context subscriptions
     context.subscriptions.push(
+        enhancedAnalysisCommand,
+        showCorrelationsCommand,
         notificationControlsCommand,
         showLogoCommand,
         refreshDashboardCommand,

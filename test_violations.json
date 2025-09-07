@@ -1,0 +1,27 @@
+{
+  "timestamp": "2025-09-07T09:04:30.703800",
+  "summary": {
+    "files_processed": 649,
+    "files_modified": 0,
+    "files_with_unicode": 44,
+    "unicode_characters_found": 653,
+    "unicode_characters_removed": 0
+  },
+  "violations": [],
+  "configuration": {
+    "include_types": [
+      "py"
+    ],
+    "exclude_dirs": [
+      ".git",
+      "__pycache__",
+      ".pytest_cache",
+      "node_modules",
+      ".venv",
+      "venv"
+    ],
+    "check_mode": true,
+    "dry_run_mode": false,
+    "fix_mode": false
+  }
+}
