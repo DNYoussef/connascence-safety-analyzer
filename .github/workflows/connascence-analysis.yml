@@ -41,30 +41,19 @@ jobs:
         echo "::group::Unicode Safety Validation"
         echo "Checking for Unicode characters in code..."
         
-        # Run Unicode removal script in check mode with better error handling
-        if [ -f "scripts/remove_unicode.py" ]; then
-          echo "Found Unicode removal script, running check..."
-          cd scripts
-          if python remove_unicode.py .. > unicode_check.log 2>&1; then
-            echo "Unicode script executed successfully"
-          else
-            echo "Unicode script encountered issues but continuing..."
-          fi
-          
-          # Check if any Unicode was found
-          if [ -f "unicode_check.log" ] && grep -q "Replaced\|Removed" unicode_check.log; then
-            echo "::error::Unicode characters found in code!"
-            echo "Please run: cd scripts && python remove_unicode.py .. to fix"
-            echo "Unicode violations found:"
-            grep "Replaced\|Removed" unicode_check.log | head -5 || echo "Could not display Unicode violations"
-            exit 1
-          else
-            echo "✅ No Unicode characters found in code - all clear!"
-          fi
-          cd ..
+        # Run Unicode removal script in check mode
+        cd scripts
+        python remove_unicode.py .. > unicode_check.log 2>&1
+        
+        # Check if any Unicode was found
+        if grep -q "Replaced\|Removed" unicode_check.log; then
+          echo "::error::Unicode characters found in code!"
+          echo "Please run: cd scripts && python remove_unicode.py .. to fix"
+          echo "Unicode violations found:"
+          grep "Replaced\|Removed" unicode_check.log | head -5
+          exit 1
         else
-          echo "⚠️ Unicode removal script not found - skipping Unicode check"
-          echo "This is acceptable if Unicode safety is verified by other means"
+          echo "✅ No Unicode characters found in code - all clear!"
         fi
         echo "::endgroup::"
 
@@ -195,15 +184,10 @@ jobs:
       run: |
         echo "::group::Dashboard Generation"
         
-        # Try dashboard generation with fallback
-        if [ -d "dashboard" ] && [ -f "dashboard/ci_integration.py" ]; then
-          echo "Found dashboard module, using integrated generation..."
-          python -m dashboard.ci_integration \
-            --output-dir . \
-            --policy nasa_jpl_pot10 || echo "Dashboard generation completed with fallbacks"
-        else
-          echo "Dashboard module not found, using fallback generation..."
-        fi
+        # Generate comprehensive dashboard with integrated system
+        python -m dashboard.ci_integration \
+          --output-dir . \
+          --policy nasa_jpl_pot10
         
         # Create a simple HTML summary as fallback
         echo "<!DOCTYPE html><html><head><title>Connascence Analysis Results</title></head><body>" > comprehensive_dashboard.html
@@ -458,41 +442,19 @@ jobs:
     
     - name: 📈 Update Historical Trends
       run: |
-        if [ -d "dashboard" ] && [ -f "dashboard/metrics.py" ]; then
-          echo "Found dashboard.metrics module, updating trends..."
-          python -m dashboard.metrics \
-            --update-trends \
-            --nasa-results nasa_analysis.json \
-            --connascence-results connascence_full.json \
-            --mece-results mece_analysis.json \
-            --commit-sha ${{ github.sha }} || echo "Trends update completed with warnings"
-        else
-          echo "Dashboard metrics module not found, using fallback trend tracking..."
-          mkdir -p historical_data
-          echo '{"commit": "${{ github.sha }}", "timestamp": "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'", "analysis_completed": true}' > historical_data/trend_$(date +%Y%m%d_%H%M%S).json
-        fi
+        python -m dashboard.metrics \
+          --update-trends \
+          --nasa-results nasa_analysis.json \
+          --connascence-results connascence_full.json \
+          --mece-results mece_analysis.json \
+          --commit-sha ${{ github.sha }}
     
     - name: 📊 Generate Trend Dashboard
       run: |
-        if [ -d "dashboard" ] && [ -f "dashboard/metrics.py" ]; then
-          echo "Generating trend dashboard with dashboard.metrics..."
-          python -m dashboard.metrics \
-            --generate-trends-dashboard \
-            --days 30 \
-            --output trend_dashboard.html || echo "Dashboard generation completed with fallbacks"
-        else
-          echo "Dashboard module not found, creating basic trend report..."
-          cat > trend_dashboard.html << 'EOF'
-<!DOCTYPE html>
-<html><head><title>Connascence Analysis Trends</title></head>
-<body>
-<h1>Connascence Analysis Historical Trends</h1>
-<p>Trend analysis completed for commit: ${{ github.sha }}</p>
-<p>Analysis timestamp: $(date -u +%Y-%m-%dT%H:%M:%SZ)</p>
-<p>Full dashboard module not available - basic tracking active</p>
-</body></html>
-EOF
-        fi
+        python -m dashboard.metrics \
+          --generate-trends-dashboard \
+          --days 30 \
+          --output trend_dashboard.html
     
     - name: 📤 Upload Trend Analysis
       uses: actions/upload-artifact@v4
