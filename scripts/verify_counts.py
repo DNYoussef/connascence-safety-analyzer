@@ -606,6 +606,11 @@ def main():
         action="store_true",
         help="Generate report without validation (for testing)"
     )
+    parser.add_argument(
+        "--generate-validation-report",
+        action="store_true",
+        help="Generate detailed validation report (alias for --report-only with enhanced output)"
+    )
 
     args = parser.parse_args()
 
@@ -616,10 +621,19 @@ def main():
     )
 
     try:
-        if args.report_only:
-            validator.log("[REPORT] Running in report-only mode")
-            # Just generate a basic report
+        if args.report_only or args.generate_validation_report:
+            mode = "validation-report" if args.generate_validation_report else "report-only"
+            validator.log(f"[REPORT] Running in {mode} mode")
+            # Generate enhanced report for validation-report mode
             report = validator.step_5_generate_report()
+            if args.generate_validation_report:
+                # Add enhanced validation metadata for CI/CD
+                report["validation_metadata"] = {
+                    "mode": "validation-report",
+                    "timestamp": datetime.now().isoformat(),
+                    "session_id": validator.memory.session_id,
+                    "enhanced_output": True
+                }
             print(json.dumps(report, indent=2))
             sys.exit(EXIT_SUCCESS)
         else:

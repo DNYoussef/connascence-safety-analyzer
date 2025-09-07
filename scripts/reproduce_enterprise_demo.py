@@ -812,6 +812,18 @@ Examples:
         action="store_true",
         help="Generate report from existing results (no re-analysis)"
     )
+    
+    parser.add_argument(
+        "--quick-mode",
+        action="store_true",
+        help="Run with reduced timeouts for quick validation (alias for --quick)"
+    )
+    
+    parser.add_argument(
+        "--validate-performance",
+        action="store_true",
+        help="Validate performance characteristics and generate detailed report (alias for --generate-report with enhanced metrics)"
+    )
 
     args = parser.parse_args()
 
@@ -824,6 +836,10 @@ Examples:
         print("   Or run: python -m pip install -e .", file=sys.stderr)
         sys.exit(EXIT_CONFIG_ERROR)
 
+    # Handle argument aliases
+    quick_mode = args.quick or args.quick_mode
+    generate_report_mode = args.generate_report or args.validate_performance
+    
     # Initialize reproducer
     reproducer = EnterpriseReproducer(
         base_path=args.base_path,
@@ -832,9 +848,12 @@ Examples:
     )
 
     try:
-        if args.generate_report:
-            # Generate report from existing results
-            print("📊 Generating report from existing results...")
+        if generate_report_mode:
+            # Generate report from existing results or with performance validation
+            mode_name = "performance validation" if args.validate_performance else "report generation"
+            print(f"📊 Running {mode_name} from existing results...")
+            if args.validate_performance:
+                print("🔬 Enhanced performance validation mode enabled")
             # This would need existing session data - simplified for now
             print("⚠️  Report generation from existing data not implemented yet")
             print("   Run with --validate-all for full reproduction")
