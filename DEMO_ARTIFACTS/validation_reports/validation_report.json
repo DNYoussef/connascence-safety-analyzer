@@ -1,0 +1,146 @@
+{
+  "validation_session": {
+    "session_id": "verification-20250907-101400",
+    "timestamp": "2025-09-07T10:14:00.704747",
+    "base_path": "C:\\Users\\17175\\Desktop\\connascence"
+  },
+  "summary": {
+    "total_tests": 14,
+    "passed": 5,
+    "failed": 9,
+    "errors": 0,
+    "success_rate": 35.71
+  },
+  "expected_counts": {
+    "celery": 4630,
+    "curl": 1061,
+    "express": 52,
+    "total": 5743
+  },
+  "actual_counts": {
+    "readme": {},
+    "index_json": {}
+  },
+  "sequential_steps": {
+    "step_1": "Parse README.md for violation counts",
+    "step_2": "Parse DEMO_ARTIFACTS/index.json for expected counts",
+    "step_3": "Validate individual artifact files exist and parse correctly",
+    "step_4": "Cross-reference all counts for consistency",
+    "step_5": "Generate comprehensive validation report",
+    "step_6": "Store results in memory for CI coordination"
+  },
+  "detailed_results": [
+    {
+      "test_name": "readme_parsing",
+      "status": "PASS",
+      "expected": "Parse violation counts from README",
+      "actual": {},
+      "message": "Successfully parsed 0 counts from README",
+      "error_details": null
+    },
+    {
+      "test_name": "index_json_exists",
+      "status": "FAIL",
+      "expected": "index.json exists",
+      "actual": "File not found",
+      "message": "DEMO_ARTIFACTS/index.json not found",
+      "error_details": null
+    },
+    {
+      "test_name": "readme_count_celery",
+      "status": "FAIL",
+      "expected": 4630,
+      "actual": 0,
+      "message": "README celery count mismatch",
+      "error_details": null
+    },
+    {
+      "test_name": "index_count_celery",
+      "status": "FAIL",
+      "expected": 4630,
+      "actual": 0,
+      "message": "Index.json celery count mismatch",
+      "error_details": null
+    },
+    {
+      "test_name": "consistency_celery",
+      "status": "PASS",
+      "expected": "README and index counts match",
+      "actual": "Both show 0",
+      "message": "celery counts are consistent between sources",
+      "error_details": null
+    },
+    {
+      "test_name": "readme_count_curl",
+      "status": "FAIL",
+      "expected": 1061,
+      "actual": 0,
+      "message": "README curl count mismatch",
+      "error_details": null
+    },
+    {
+      "test_name": "index_count_curl",
+      "status": "FAIL",
+      "expected": 1061,
+      "actual": 0,
+      "message": "Index.json curl count mismatch",
+      "error_details": null
+    },
+    {
+      "test_name": "consistency_curl",
+      "status": "PASS",
+      "expected": "README and index counts match",
+      "actual": "Both show 0",
+      "message": "curl counts are consistent between sources",
+      "error_details": null
+    },
+    {
+      "test_name": "readme_count_express",
+      "status": "FAIL",
+      "expected": 52,
+      "actual": 0,
+      "message": "README express count mismatch",
+      "error_details": null
+    },
+    {
+      "test_name": "index_count_express",
+      "status": "FAIL",
+      "expected": 52,
+      "actual": 0,
+      "message": "Index.json express count mismatch",
+      "error_details": null
+    },
+    {
+      "test_name": "consistency_express",
+      "status": "PASS",
+      "expected": "README and index counts match",
+      "actual": "Both show 0",
+      "message": "express counts are consistent between sources",
+      "error_details": null
+    },
+    {
+      "test_name": "readme_count_total",
+      "status": "FAIL",
+      "expected": 5743,
+      "actual": 0,
+      "message": "README total count mismatch",
+      "error_details": null
+    },
+    {
+      "test_name": "index_count_total",
+      "status": "FAIL",
+      "expected": 5743,
+      "actual": 0,
+      "message": "Index.json total count mismatch",
+      "error_details": null
+    },
+    {
+      "test_name": "consistency_total",
+      "status": "PASS",
+      "expected": "README and index counts match",
+      "actual": "Both show 0",
+      "message": "total counts are consistent between sources",
+      "error_details": null
+    }
+  ]
+}
