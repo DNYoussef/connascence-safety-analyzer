@@ -8,7 +8,7 @@ import ast
 from typing import List
 
 from utils.types import ConnascenceViolation
-from base import DetectorBase
+from .base import DetectorBase
 
 
 class TimingDetector(DetectorBase):
@@ -17,6 +17,7 @@ class TimingDetector(DetectorBase):
     def detect_violations(self, tree: ast.AST) -> List[ConnascenceViolation]:
         """
         Detect timing violations in the AST tree.
+        NASA Rule 5 compliant: Added input validation assertions.
         
         Args:
             tree: AST tree to analyze
@@ -24,22 +25,32 @@ class TimingDetector(DetectorBase):
         Returns:
             List of timing-related violations
         """
+        # NASA Rule 5: Input validation assertions
+        assert tree is not None, "AST tree cannot be None"
+        assert isinstance(tree, ast.AST), "Input must be valid AST object"
+        
         self.violations.clear()
         
         for node in ast.walk(tree):
             if isinstance(node, ast.Call):
                 self._analyze_call(node)
         
+        # NASA Rule 7: Validate return value
+        assert isinstance(self.violations, list), "violations must be a list"
         return self.violations
     
     def _analyze_call(self, node: ast.Call) -> None:
         """Analyze function calls for timing-related patterns."""
-        # Check for sleep() calls
+        # NASA Rule 5: Input validation assertions
+        assert node is not None, "Call node cannot be None"
+        assert isinstance(node, ast.Call), "Node must be a function call"
+        
+        # NASA Rule 1: Use guard clauses to avoid nesting
         if self._is_sleep_call(node):
             self._create_sleep_violation(node)
+            return
         
-        # Check for other timing-related calls
-        elif self._is_timing_related_call(node):
+        if self._is_timing_related_call(node):
             self._create_timing_violation(node)
     
     def _is_sleep_call(self, node: ast.Call) -> bool:

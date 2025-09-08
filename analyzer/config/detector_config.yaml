@@ -1,0 +1,101 @@
+# Detector Configuration - Eliminates Connascence of Values
+# Centralizes all hardcoded values, thresholds, and magic constants
+
+# Values Detector Configuration
+values_detector:
+  config_keywords:
+    - config
+    - setting
+    - option
+    - param
+    - default
+    - threshold
+    - timeout
+    - limit
+    - size
+    - count
+    - max
+    - min
+    - port
+    - host
+  
+  thresholds:
+    duplicate_literal_minimum: 3
+    configuration_coupling_limit: 10
+    configuration_line_spread: 5
+  
+  exclusions:
+    common_strings:
+      - ""
+      - " "
+      - "\n"
+      - "\t"
+      - "utf-8"
+      - "ascii"
+    common_numbers:
+      - 0
+      - 1
+      - -1
+      - 2
+      - 10
+      - 100
+
+# Position Detector Configuration  
+position_detector:
+  max_positional_params: 3
+  severity_mapping:
+    4-6: medium
+    7-10: high
+    11+: critical
+
+# Algorithm Detector Configuration
+algorithm_detector:
+  minimum_function_lines: 3
+  duplicate_threshold: 2
+  normalization:
+    ignore_variable_names: true
+    ignore_comments: true
+    focus_on_structure: true
+
+# Magic Literal Detector Configuration
+magic_literal_detector:
+  severity_rules:
+    in_conditionals: high
+    large_numbers: medium
+    string_literals: low
+  thresholds:
+    number_repetition: 3
+    string_repetition: 2
+    
+# God Object Detector Configuration
+god_object_detector:
+  method_threshold: 20
+  loc_threshold: 500
+  parameter_threshold: 10
+  
+# Timing Detector Configuration
+timing_detector:
+  sleep_detection: true
+  timeout_patterns:
+    - "timeout"
+    - "delay"
+    - "wait"
+  severity: medium
+
+# Convention Detector Configuration
+convention_detector:
+  naming_patterns:
+    class_pattern: "^[A-Z][a-zA-Z0-9]*$"
+    function_pattern: "^[a-z][a-z0-9_]*$"
+    constant_pattern: "^[A-Z][A-Z0-9_]*$"
+  
+# Execution Detector Configuration  
+execution_detector:
+  dangerous_functions:
+    - eval
+    - exec
+    - compile
+  subprocess_patterns:
+    - subprocess.call
+    - os.system
+    - subprocess.Popen

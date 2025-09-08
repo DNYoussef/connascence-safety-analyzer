@@ -8,7 +8,7 @@ import ast
 from typing import List, Tuple, Any, Dict
 
 from utils.types import ConnascenceViolation
-from base import DetectorBase
+from .base import DetectorBase
 
 
 class MagicLiteralDetector(DetectorBase):
@@ -23,6 +23,7 @@ class MagicLiteralDetector(DetectorBase):
     def detect_violations(self, tree: ast.AST) -> List[ConnascenceViolation]:
         """
         Detect magic literals in the AST tree.
+        NASA Rule 5 compliant: Added input validation assertions.
         
         Args:
             tree: AST tree to analyze
@@ -30,6 +31,10 @@ class MagicLiteralDetector(DetectorBase):
         Returns:
             List of magic literal violations
         """
+        # NASA Rule 5: Input validation assertions
+        assert tree is not None, "AST tree cannot be None"
+        assert isinstance(tree, ast.AST), "Input must be valid AST object"
+        
         self.violations.clear()
         self.magic_literals.clear()
         
@@ -41,10 +46,16 @@ class MagicLiteralDetector(DetectorBase):
         # Process collected literals
         self._finalize_magic_literal_analysis()
         
+        # NASA Rule 7: Validate return value
+        assert isinstance(self.violations, list), "violations must be a list"
         return self.violations
     
     def _analyze_constant(self, node: ast.Constant) -> None:
         """Analyze a constant node for magic literal patterns."""
+        # NASA Rule 5: Input validation assertions
+        assert node is not None, "Constant node cannot be None"
+        assert isinstance(node, ast.Constant), "Node must be a constant"
+        
         # Use formal grammar analyzer if available, otherwise fallback
         try:
             from analyzer.formal_grammar import MagicLiteralDetector as FormalDetector

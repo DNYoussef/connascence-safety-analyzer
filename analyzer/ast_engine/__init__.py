@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: MIT
 # AST Engine module stub for backward compatibility
-from mcp.server import ConnascenceViolation
+# Removed circular import: from mcp.server import ConnascenceViolation
+from utils.types import ConnascenceViolation
 
 
 class ConnascenceASTAnalyzer:

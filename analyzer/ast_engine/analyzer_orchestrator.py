@@ -9,7 +9,7 @@ from pathlib import Path
 import sys
 from typing import List
 
-from mcp.server import ConnascenceViolation
+from utils.types import ConnascenceViolation
 
 
 class GodObjectAnalyzer:

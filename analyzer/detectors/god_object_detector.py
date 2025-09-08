@@ -8,7 +8,7 @@ import ast
 from typing import List
 
 from utils.types import ConnascenceViolation
-from base import DetectorBase
+from .base import DetectorBase
 
 
 class GodObjectDetector(DetectorBase):
@@ -20,6 +20,7 @@ class GodObjectDetector(DetectorBase):
     def detect_violations(self, tree: ast.AST) -> List[ConnascenceViolation]:
         """
         Detect god objects in the AST tree.
+        NASA Rule 5 compliant: Added input validation assertions.
         
         Args:
             tree: AST tree to analyze
@@ -27,16 +28,26 @@ class GodObjectDetector(DetectorBase):
         Returns:
             List of god object violations
         """
+        # NASA Rule 5: Input validation assertions
+        assert tree is not None, "AST tree cannot be None"
+        assert isinstance(tree, ast.AST), "Input must be valid AST object"
+        
         self.violations.clear()
         
         for node in ast.walk(tree):
             if isinstance(node, ast.ClassDef):
                 self._analyze_class(node)
         
+        # NASA Rule 7: Validate return value
+        assert isinstance(self.violations, list), "violations must be a list"
         return self.violations
     
     def _analyze_class(self, node: ast.ClassDef) -> None:
         """Analyze a class for god object patterns."""
+        # NASA Rule 5: Input validation assertions
+        assert node is not None, "Class node cannot be None"
+        assert isinstance(node, ast.ClassDef), "Node must be a class definition"
+        
         # Try context-aware analysis first
         try:
             from analyzer.context_analyzer import ContextAnalyzer
@@ -44,7 +55,7 @@ class GodObjectDetector(DetectorBase):
             context_analyzer = ContextAnalyzer()
             class_analysis = context_analyzer.analyze_class_context(node, self.source_lines, self.file_path)
             
-            # Only create violation if context-aware analysis determines it's a god object
+            # NASA Rule 1: Use guard clause to reduce nesting
             if context_analyzer.is_god_object_with_context(class_analysis):
                 self._create_context_aware_violation(node, class_analysis)
                 return

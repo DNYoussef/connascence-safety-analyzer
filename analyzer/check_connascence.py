@@ -32,6 +32,10 @@ except ImportError:
 
 # Import optimization modules for enhanced performance
 try:
+    from optimization.file_cache import (
+        cached_file_content, cached_ast_tree, cached_file_lines,
+        cached_python_files, get_global_cache
+    )
     OPTIMIZATION_AVAILABLE = True
 except ImportError:
     OPTIMIZATION_AVAILABLE = False
@@ -458,30 +462,55 @@ class ConnascenceDetector(ast.NodeVisitor):
         self.generic_visit(node)
 
     def finalize_analysis(self):
-        """Perform final analysis that requires complete traversal."""
+        """Perform final analysis that requires complete traversal. NASA Rule 4 compliant."""
+        # NASA Rule 5: Input validation assertions
+        assert hasattr(self, 'function_hashes'), "function_hashes must be initialized"
+        assert hasattr(self, 'magic_literals'), "magic_literals must be initialized"
+        
         # Check for algorithm duplicates
-        for body_hash, functions in self.function_hashes.items():
-            if len(functions) > 1:
-                for file_path, func_node in functions:
-                    self.violations.append(
-                        ConnascenceViolation(
-                            type="connascence_of_algorithm",
-                            severity="medium",
-                            file_path=file_path,
-                            line_number=func_node.lineno,
-                            column=func_node.col_offset,
-                            description=f"Function '{func_node.name}' appears to duplicate algorithm from other functions",
-                            recommendation="Extract common algorithm into shared function or module",
-                            code_snippet=self.get_code_snippet(func_node),
-                            context={
-                                "duplicate_count": len(functions),
-                                "function_name": func_node.name,
-                                "similar_functions": [f.name for _, f in functions if f != func_node],
-                            },
-                        )
-                    )
-
+        self._process_algorithm_duplicates()
+        
         # Analyze magic literals with enhanced formal grammar context processing
+        self._process_magic_literals()
+    
+    def _process_algorithm_duplicates(self):
+        """Process algorithm duplicates and create violations. NASA Rule 4 compliant."""
+        for body_hash, functions in self.function_hashes.items():
+            # NASA Rule 1: Use guard clause to avoid nesting
+            if len(functions) <= 1:
+                continue
+                
+            for file_path, func_node in functions:
+                violation = self._create_algorithm_duplicate_violation(file_path, func_node, functions)
+                self.violations.append(violation)
+    
+    def _create_algorithm_duplicate_violation(self, file_path, func_node, functions):
+        """Create algorithm duplicate violation. NASA Rule 4 compliant."""
+        # NASA Rule 5: Input validation assertions
+        assert file_path is not None, "file_path cannot be None"
+        assert func_node is not None, "func_node cannot be None"
+        
+        return ConnascenceViolation(
+            type="connascence_of_algorithm",
+            severity="medium",
+            file_path=file_path,
+            line_number=func_node.lineno,
+            column=func_node.col_offset,
+            description=f"Function '{func_node.name}' appears to duplicate algorithm from other functions",
+            recommendation="Extract common algorithm into shared function or module",
+            code_snippet=self.get_code_snippet(func_node),
+            context={
+                "duplicate_count": len(functions),
+                "function_name": func_node.name,
+                "similar_functions": [f.name for _, f in functions if f != func_node],
+            },
+        )
+    
+    def _process_magic_literals(self):
+        """Process magic literals with formal grammar context. NASA Rule 4 compliant."""
+        # NASA Rule 5: Input validation assertion
+        assert hasattr(self, 'magic_literals'), "magic_literals must be initialized"
+        
         for item in self.magic_literals:
             # Handle different formats: old (node, value), enhanced (node, value, context)
             if len(item) == 2:
@@ -797,7 +826,7 @@ class ConnascenceAnalyzer:
         self.file_stats: dict[str, dict] = {}
 
     def analyze_file(self, file_path: Path) -> list[ConnascenceViolation]:
-        """Analyze a single Python file using the new modular architecture."""
+        """Analyze a single Python file using optimized caching."""
         try:
             # Import the new service
             import sys, os
@@ -807,35 +836,56 @@ class ConnascenceAnalyzer:
             analyzer = AnalyzerService()
             return analyzer.analyze_file(file_path)
         except ImportError:
-            # Fallback to legacy implementation if new services not available
-            return self._analyze_python_file(file_path)
+            # Fallback to optimized implementation
+            return self._analyze_python_file_optimized(file_path)
 
-    def _analyze_python_file(self, file_path: Path) -> list[ConnascenceViolation]:
-        """Fallback legacy implementation."""
+    def _analyze_python_file_optimized(self, file_path: Path) -> list[ConnascenceViolation]:
+        """Optimized implementation using file cache."""
         if not file_path.exists() or file_path.suffix != '.py':
             return []
 
         try:
-            source_code = file_path.read_text(encoding='utf-8')
-            source_lines = source_code.splitlines()
+            # Use cached file operations if available
+            if OPTIMIZATION_AVAILABLE:
+                source_code = cached_file_content(file_path)
+                source_lines = cached_file_lines(file_path)
+                tree = cached_ast_tree(file_path)
+                
+                if not source_code or not tree:
+                    return []
+            else:
+                # Fallback to direct file operations
+                source_code = file_path.read_text(encoding='utf-8')
+                source_lines = source_code.splitlines()
+                tree = ast.parse(source_code, filename=str(file_path))
             
-            tree = ast.parse(source_code, filename=str(file_path))
             detector = ConnascenceDetector(str(file_path), source_lines)
             detector.visit(tree)
             
             return detector.violations
         except Exception:
             return []
+            
+    def _analyze_python_file(self, file_path: Path) -> list[ConnascenceViolation]:
+        """Legacy fallback implementation."""
+        return self._analyze_python_file_optimized(file_path)
 
     def analyze_directory(self, target_path: Path) -> list[ConnascenceViolation]:
-        """Analyze all Python files in a directory."""
+        """Analyze all Python files in a directory with optimized file discovery."""
         all_violations = []
         
         if target_path.is_file():
             return self.analyze_file(target_path)
         
-        # Find all Python files
-        for py_file in target_path.rglob('*.py'):
+        # Optimized: Use cached Python file discovery
+        if OPTIMIZATION_AVAILABLE:
+            python_files = cached_python_files(target_path)
+            py_file_paths = [Path(f) for f in python_files]
+        else:
+            py_file_paths = list(target_path.rglob('*.py'))
+        
+        # Process files with exclusion filtering
+        for py_file in py_file_paths:
             # Skip excluded patterns
             if any(py_file.match(pattern) for pattern in self.exclusions):
                 continue
