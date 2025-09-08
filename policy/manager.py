@@ -18,7 +18,12 @@ from pathlib import Path
 import sys
 from typing import Any, Dict, List, Union
 
-import yaml
+try:
+    import yaml
+    YAML_AVAILABLE = True
+except ImportError:
+    YAML_AVAILABLE = False
+    yaml = None
 
 sys.path.append(str(Path(__file__).parent.parent))
 

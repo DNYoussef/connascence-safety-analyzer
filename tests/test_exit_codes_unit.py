@@ -41,7 +41,7 @@ class TestCLIExitCodes:
     def test_success_exit_code(self):
         """Test that successful operations return exit code 0."""
         try:
-            from cli.connascence import ConnascenceCLI
+            from interfaces.cli.connascence import ConnascenceCLI
 
             cli = ConnascenceCLI()
 
@@ -59,7 +59,7 @@ class TestCLIExitCodes:
         """Test exit code when no command is provided."""
         try:
             from analyzer.constants import EXIT_SUCCESS as ExitCode
-            from cli.connascence import ConnascenceCLI
+            from interfaces.cli.connascence import ConnascenceCLI
 
             cli = ConnascenceCLI()
             exit_code = cli.run([])
@@ -73,7 +73,7 @@ class TestCLIExitCodes:
     def test_invalid_command_exit_code(self):
         """Test exit code for invalid commands."""
         try:
-            from cli.connascence import ConnascenceCLI
+            from interfaces.cli.connascence import ConnascenceCLI
 
             cli = ConnascenceCLI()
 
@@ -91,7 +91,7 @@ class TestCLIExitCodes:
         """Test exit code when user interrupts with Ctrl+C."""
         try:
             from analyzer.constants import EXIT_SUCCESS as ExitCode
-            from cli.connascence import ConnascenceCLI
+            from interfaces.cli.connascence import ConnascenceCLI
 
             cli = ConnascenceCLI()
 
@@ -107,7 +107,7 @@ class TestCLIExitCodes:
         """Test exit code for general errors."""
         try:
             from analyzer.constants import EXIT_SUCCESS as ExitCode
-            from cli.connascence import ConnascenceCLI
+            from interfaces.cli.connascence import ConnascenceCLI
 
             cli = ConnascenceCLI()
 
@@ -123,8 +123,8 @@ class TestCLIExitCodes:
         """Test exit code for license validation errors."""
         try:
             from analyzer.constants import EXIT_SUCCESS as ExitCode
-            import cli.connascence
-            from cli.connascence import ConnascenceCLI
+            import interfaces.cli.connascence
+            from interfaces.cli.connascence import ConnascenceCLI
 
             cli = ConnascenceCLI()
 
@@ -173,7 +173,7 @@ class TestCLIExitCodes:
 
             # If package is not installed, that's OK for development
             # Just test that we can import the main function
-            from cli.connascence import main
+            from interfaces.cli.connascence import main
             assert callable(main)
 
         except subprocess.TimeoutExpired:
@@ -184,7 +184,7 @@ class TestCLIExitCodes:
     def test_version_command_exit_code(self):
         """Test that version command returns proper exit code."""
         try:
-            from cli.connascence import ConnascenceCLI
+            from interfaces.cli.connascence import ConnascenceCLI
 
             cli = ConnascenceCLI()
 
@@ -200,7 +200,7 @@ class TestCLIExitCodes:
     def test_all_subcommand_parsers_exist(self):
         """Test that all expected subcommand parsers can be created."""
         try:
-            from cli.connascence import ConnascenceCLI
+            from interfaces.cli.connascence import ConnascenceCLI
 
             cli = ConnascenceCLI()
             parser = cli.create_parser()
@@ -234,7 +234,7 @@ class TestCLIExitCodes:
     def test_verbose_flag_handling(self):
         """Test that verbose flag is handled properly."""
         try:
-            from cli.connascence import ConnascenceCLI
+            from interfaces.cli.connascence import ConnascenceCLI
 
             cli = ConnascenceCLI()
 
@@ -249,7 +249,7 @@ class TestCLIExitCodes:
     def test_config_file_handling(self):
         """Test that config file parameter is handled."""
         try:
-            from cli.connascence import ConnascenceCLI
+            from interfaces.cli.connascence import ConnascenceCLI
 
             cli = ConnascenceCLI()
             parser = cli.create_parser()
@@ -264,7 +264,7 @@ class TestCLIExitCodes:
     def test_skip_license_check_flag(self):
         """Test skip license check flag functionality."""
         try:
-            from cli.connascence import ConnascenceCLI
+            from interfaces.cli.connascence import ConnascenceCLI
 
             cli = ConnascenceCLI()
 
@@ -283,7 +283,7 @@ class TestCommandHandlerIntegration:
     def test_scan_handler_integration(self):
         """Test that scan command handler integrates properly."""
         try:
-            from cli.connascence import ConnascenceCLI
+            from interfaces.cli.connascence import ConnascenceCLI
 
             cli = ConnascenceCLI()
             assert cli.scan_handler is not None
@@ -296,7 +296,7 @@ class TestCommandHandlerIntegration:
     def test_baseline_handler_integration(self):
         """Test that baseline command handler integrates properly."""
         try:
-            from cli.connascence import ConnascenceCLI
+            from interfaces.cli.connascence import ConnascenceCLI
 
             cli = ConnascenceCLI()
             assert cli.baseline_handler is not None
@@ -309,7 +309,7 @@ class TestCommandHandlerIntegration:
     def test_autofix_handler_integration(self):
         """Test that autofix command handler integrates properly."""
         try:
-            from cli.connascence import ConnascenceCLI
+            from interfaces.cli.connascence import ConnascenceCLI
 
             cli = ConnascenceCLI()
             assert cli.autofix_handler is not None
@@ -322,7 +322,7 @@ class TestCommandHandlerIntegration:
     def test_mcp_handler_integration(self):
         """Test that MCP command handler integrates properly."""
         try:
-            from cli.connascence import ConnascenceCLI
+            from interfaces.cli.connascence import ConnascenceCLI
 
             cli = ConnascenceCLI()
             assert cli.mcp_handler is not None

@@ -835,5 +835,8 @@ def main():
     return 0
 
 
+__all__ = ["ConnascenceMCPServer", "MCPConnascenceTool"]
+
+
 if __name__ == "__main__":
     sys.exit(main())

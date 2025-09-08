@@ -33,6 +33,7 @@ from pathlib import Path
 import time
 from typing import Any, Dict, List, Optional
 
+from utils.types import ConnascenceViolation
 
 # Mock ConnascenceViolation for removed analyzer dependency
 # ConnascenceViolation now available from utils.types

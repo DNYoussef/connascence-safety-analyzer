@@ -13,6 +13,7 @@ import time
 from typing import List, Dict, Any
 
 from utils.types import ConnascenceViolation
+from .check_connascence import ConnascenceDetector
 
 
 class ConnascenceAnalyzer:

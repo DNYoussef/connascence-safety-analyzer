@@ -20,6 +20,7 @@ import subprocess
 import time
 from typing import Any, Dict, List, Optional
 
+from utils.types import ConnascenceViolation
 
 # Need to create a mock ConnascenceViolation since analyzer.core was removed
 # ConnascenceViolation now available from utils.types

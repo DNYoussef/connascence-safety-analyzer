@@ -34,7 +34,7 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from cli.connascence import ConnascenceCLI
+from interfaces.cli.connascence import ConnascenceCLI
 from tests.e2e.test_cli_workflows import SequentialWorkflowValidator
 
 

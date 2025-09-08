@@ -60,13 +60,8 @@ jobs:
       run: |
         echo "::group::NASA Power of Ten Rules Analysis"
         
-        # Run NASA analysis with consolidated analyzer
-        cd analyzer && python core.py \
-          --path .. \
-          --policy nasa_jpl_pot10 \
-          --format json \
-          --output ../nasa_analysis.json || echo "NASA analysis completed with warnings"
-        cd ..
+        # Use CLI-first approach for NASA analysis
+        connascence scan --policy nasa_jpl_pot10 --format json --output nasa_analysis.json || echo "NASA analysis completed with warnings"
         
         # Validate and extract NASA compliance score
         if [ -f "nasa_analysis.json" ] && python -m json.tool nasa_analysis.json > /dev/null 2>&1; then
@@ -87,11 +82,9 @@ jobs:
       id: god-object-detection
       run: |
         echo "::group::God Object Analysis"
-        cd analyzer && python check_connascence.py \
-          .. \
-          --format json \
-          --output ../god_objects.json || echo "God object analysis completed with warnings"
-        cd ..
+        
+        # Use CLI-first approach for god object detection
+        connascence scan --god-objects --format json --output god_objects.json || echo "God object analysis completed with warnings"
         
         # Count god objects
         GOD_OBJECTS=$(python -c "import json; data=json.load(open('god_objects.json')); print(len([v for v in data if 'God Object' in v.get('description', '')]))")
@@ -103,12 +96,9 @@ jobs:
       id: mece-analysis
       run: |
         echo "::group::MECE Duplication Detection"
-        cd analyzer && python -m dup_detection.mece_analyzer \
-          --path .. \
-          --comprehensive \
-          --threshold 0.8 \
-          --output ../mece_analysis.json || echo "MECE analysis completed with warnings"
-        cd ..
+        
+        # Use CLI-first approach for duplication analysis
+        connascence scan --duplication-analysis --comprehensive --threshold 0.8 --format json --output mece_analysis.json || echo "MECE analysis completed with warnings"
         
         # Extract MECE score
         MECE_SCORE=$(python -c "import json; data=json.load(open('mece_analysis.json')); print(data.get('mece_score', 0.0))")
@@ -123,11 +113,9 @@ jobs:
       id: connascence-scoring
       run: |
         echo "::group::Full Connascence Analysis"
-        cd analyzer && python check_connascence.py \
-          .. \
-          --format json \
-          --output ../connascence_full.json || echo "Connascence analysis completed with warnings"
-        cd ..
+        
+        # Use CLI-first approach for complete connascence analysis
+        connascence scan --comprehensive --format json --output connascence_full.json || echo "Connascence analysis completed with warnings"
         
         # Extract comprehensive metrics
         TOTAL_VIOLATIONS=$(python -c "import json; data=json.load(open('connascence_full.json')); print(len(data))")
@@ -217,87 +205,91 @@ print(f'{final_score:.2f}')
 
     - name: Quality Gate Evaluation
       run: |
-        echo "::group::Quality Gates"
+        echo "::group::CLI-Based Quality Gates"
         
-        # Define quality gates with defense industry NASA compliance threshold
-        NASA_THRESHOLD=0.90  # Raised to defense industry standard
-        MAX_GOD_OBJECTS=25
-        MECE_THRESHOLD=0.75
-        MAX_CRITICAL_VIOLATIONS=50  # More realistic for large codebase
-        MIN_OVERALL_SCORE=0.50
+        # Use CLI-based configurable quality gates with smart thresholds
+        echo "Running configurable quality gates with CLI..."
         
-        # Get values from previous steps
-        NASA_SCORE=${{ steps.nasa-validation.outputs.nasa_score }}
-        GOD_OBJECTS=${{ steps.god-object-detection.outputs.god_objects_count }}
-        MECE_SCORE=${{ steps.mece-analysis.outputs.mece_score }}
-        CRITICAL_VIOLATIONS=${{ steps.connascence-scoring.outputs.critical_violations }}
-        OVERALL_SCORE=${{ steps.connascence-scoring.outputs.overall_score }}
-        
-        echo "Quality Gate Results:"
-        echo "==================="
-        
-        # NASA Compliance Gate (Defense Industry Standard)
-        if python3 -c "exit(0 if float('${NASA_SCORE:-0}') >= float('$NASA_THRESHOLD') else 1)"; then
-          echo "NASA Compliance: PASS ($NASA_SCORE >= $NASA_THRESHOLD) - Defense Industry Ready"
-          NASA_PASS=true
+        # NASA Compliance Gate with CLI
+        echo "Evaluating NASA compliance gate..."
+        if connascence gate nasa --min-score 0.90 --input nasa_analysis.json; then
+          echo "NASA Compliance Gate: PASS - Defense Industry Ready"
+          NASA_GATE_PASS=true
         else
-          echo "NASA Compliance: FAIL ($NASA_SCORE < $NASA_THRESHOLD) - Not suitable for defense industry"
-          NASA_PASS=false
+          echo "NASA Compliance Gate: FAIL - Not suitable for defense industry"
+          NASA_GATE_PASS=false
         fi
         
-        # God Object Gate
-        if [[ $GOD_OBJECTS -le $MAX_GOD_OBJECTS ]]; then
-          echo "God Objects: PASS ($GOD_OBJECTS <= $MAX_GOD_OBJECTS)"
-          GOD_PASS=true
+        # God Object Gate with CLI
+        echo "Evaluating god objects gate..."
+        if connascence gate god-objects --max-count 25 --input god_objects.json; then
+          echo "God Objects Gate: PASS"
+          GOD_GATE_PASS=true
         else
-          echo "God Objects: FAIL ($GOD_OBJECTS > $MAX_GOD_OBJECTS)"
-          GOD_PASS=false
+          echo "God Objects Gate: FAIL"
+          GOD_GATE_PASS=false
         fi
         
-        # MECE Gate
-        if python3 -c "exit(0 if float('${MECE_SCORE:-0}') >= float('$MECE_THRESHOLD') else 1)"; then
-          echo "MECE Score: PASS ($MECE_SCORE >= $MECE_THRESHOLD)"
-          MECE_PASS=true
+        # Critical Violations Gate with CLI
+        echo "Evaluating critical violations gate..."
+        if connascence gate violations --max-critical 50 --input connascence_full.json; then
+          echo "Critical Violations Gate: PASS"
+          VIOLATIONS_GATE_PASS=true
         else
-          echo "MECE Score: FAIL ($MECE_SCORE < $MECE_THRESHOLD)"
-          MECE_PASS=false
+          echo "Critical Violations Gate: FAIL"
+          VIOLATIONS_GATE_PASS=false
         fi
         
-        # Critical Violations Gate
-        if [[ $CRITICAL_VIOLATIONS -le $MAX_CRITICAL_VIOLATIONS ]]; then
-          echo "Critical Violations: PASS ($CRITICAL_VIOLATIONS <= $MAX_CRITICAL_VIOLATIONS)"
-          CRITICAL_PASS=true
+        # MECE Quality Gate with CLI
+        echo "Evaluating MECE quality gate..."
+        if connascence gate mece --min-score 0.75 --input mece_analysis.json; then
+          echo "MECE Quality Gate: PASS"
+          MECE_GATE_PASS=true
         else
-          echo "Critical Violations: FAIL ($CRITICAL_VIOLATIONS > $MAX_CRITICAL_VIOLATIONS)"
-          CRITICAL_PASS=false
+          echo "MECE Quality Gate: FAIL"
+          MECE_GATE_PASS=false
         fi
         
-        # Overall Score Gate
-        if python3 -c "exit(0 if float('${OVERALL_SCORE:-0}') >= float('$MIN_OVERALL_SCORE') else 1)"; then
-          echo "Overall Score: PASS ($OVERALL_SCORE >= $MIN_OVERALL_SCORE)"
-          OVERALL_PASS=true
+        # Overall Quality Gate with CLI
+        echo "Evaluating overall quality gate..."
+        if connascence gate overall --min-score 0.50 --input connascence_full.json; then
+          echo "Overall Quality Gate: PASS"
+          OVERALL_GATE_PASS=true
         else
-          echo "Overall Score: FAIL ($OVERALL_SCORE < $MIN_OVERALL_SCORE)"
-          OVERALL_PASS=false
+          echo "Overall Quality Gate: FAIL"
+          OVERALL_GATE_PASS=false
         fi
         
-        # Final gate decision with NASA emphasis
-        if [[ "$NASA_PASS" == "true" && "$GOD_PASS" == "true" && "$MECE_PASS" == "true" && "$CRITICAL_PASS" == "true" && "$OVERALL_PASS" == "true" ]]; then
+        echo ""
+        echo "Quality Gate Summary:"
+        echo "===================="
+        
+        # Final gate decision with enhanced CLI-based evaluation
+        if [[ "$NASA_GATE_PASS" == "true" && "$GOD_GATE_PASS" == "true" && "$VIOLATIONS_GATE_PASS" == "true" && "$MECE_GATE_PASS" == "true" && "$OVERALL_GATE_PASS" == "true" ]]; then
           echo ""
-          echo "ALL QUALITY GATES PASSED!"
-          echo "Repository meets all quality standards including NASA Power of Ten compliance."
-          echo "DEFENSE INDUSTRY READY - Approved for safety-critical applications."
+          echo "ALL CLI-BASED QUALITY GATES PASSED!"
+          echo "Repository meets all quality standards with configurable thresholds."
+          echo "DEFENSE INDUSTRY READY - NASA compliance verified via CLI."
+          
+          # Generate success report using CLI
+          connascence report --gates-passed --output quality_gate_report.json
           exit 0
-        elif [[ "$NASA_PASS" == "false" ]]; then
+        elif [[ "$NASA_GATE_PASS" == "false" ]]; then
           echo ""
           echo "CRITICAL: NASA COMPLIANCE GATE FAILED!"
-          echo "Repository does not meet defense industry safety standards."
+          echo "CLI-based evaluation indicates defense industry standards not met."
           echo "BLOCKING FAILURE for safety-critical applications."
+          
+          # Generate failure report using CLI
+          connascence report --gates-failed --focus nasa --output quality_gate_report.json
           exit 1
         else
           echo ""
           echo "QUALITY GATES FAILED!"
-          echo "Repository does not meet quality standards."
+          echo "CLI-based evaluation indicates quality standards not met."
+          
+          # Generate detailed failure report using CLI
+          connascence report --gates-failed --detailed --output quality_gate_report.json
           exit 1
         fi
         echo "::endgroup::"
@@ -347,12 +339,8 @@ print(f'{final_score:.2f}')
       run: |
         echo "::group::SARIF Generation"
         
-        # Generate SARIF with consolidated analyzer
-        cd analyzer && python core.py \
-          --path .. \
-          --format sarif \
-          --output ../connascence_analysis.sarif || echo "SARIF generation failed, but continuing..."
-        cd ..
+        # Use CLI-first approach for SARIF generation
+        connascence scan --format sarif --output connascence_analysis.sarif || echo "SARIF generation failed, but continuing..."
         
         # Validate SARIF file exists and is valid JSON
         if [ -f "connascence_analysis.sarif" ]; then
@@ -407,6 +395,7 @@ print(f'{final_score:.2f}')
           correlated_results.json
           comprehensive_dashboard.html
           connascence_analysis.sarif
+          quality_gate_report.json
           ruff_results.json
           mypy_results/
           radon_results.json

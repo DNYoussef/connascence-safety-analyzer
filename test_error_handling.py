@@ -66,7 +66,7 @@ def test_unified_analyzer_errors():
 def test_cli_error_handling():
     """Test CLI error handling."""
     try:
-        from cli.connascence import ConnascenceCLI
+        from interfaces.cli.connascence import ConnascenceCLI
 
         cli = ConnascenceCLI()
 

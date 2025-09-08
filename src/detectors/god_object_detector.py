@@ -18,19 +18,9 @@ class GodObjectDetector(ast.NodeVisitor):
         self.class_definitions: Dict[str, ast.ClassDef] = {}
     
     def get_code_snippet(self, node: ast.AST, context_lines: int = 2) -> str:
-        """Extract code snippet around the given node."""
-        if not hasattr(node, "lineno"):
-            return ""
-
-        start_line = max(0, node.lineno - context_lines - 1)
-        end_line = min(len(self.source_lines), node.lineno + context_lines)
-
-        lines = []
-        for i in range(start_line, end_line):
-            marker = ">>>" if i == node.lineno - 1 else "   "
-            lines.append(f"{marker} {i+1:3d}: {self.source_lines[i].rstrip()}")
-
-        return "\n".join(lines)
+        """Extract code snippet around the given node. Consolidated implementation."""
+        from analyzer.utils.code_utils import get_code_snippet_for_node
+        return get_code_snippet_for_node(node, self.source_lines, context_lines)
     
     def _calculate_class_metrics(self, node: ast.ClassDef) -> Dict[str, int]:
         """Calculate metrics for god object detection."""

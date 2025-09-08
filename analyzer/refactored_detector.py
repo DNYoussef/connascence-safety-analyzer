@@ -13,9 +13,11 @@ from typing import Any, List
 from utils.types import ConnascenceViolation
 try:
     from .optimization.unified_visitor import UnifiedASTVisitor, ASTNodeData
+    from .utils.code_utils import get_code_snippet_for_node
 except ImportError:
     # Fallback for script execution
     from optimization.unified_visitor import UnifiedASTVisitor, ASTNodeData
+    from utils.code_utils import get_code_snippet_for_node
 try:
     from .detectors import (
         PositionDetector,
@@ -63,19 +65,8 @@ class RefactoredConnascenceDetector(ast.NodeVisitor):
         self._acquired_detectors = {}  # Track acquired detectors for cleanup
 
     def get_code_snippet(self, node: ast.AST, context_lines: int = 2) -> str:
-        """Extract code snippet around the given node."""
-        if not hasattr(node, "lineno"):
-            return ""
-
-        start_line = max(0, node.lineno - context_lines - 1)
-        end_line = min(len(self.source_lines), node.lineno + context_lines)
-
-        lines = []
-        for i in range(start_line, end_line):
-            marker = ">>>" if i == node.lineno - 1 else "   "
-            lines.append(f"{marker} {i+1:3d}: {self.source_lines[i].rstrip()}")
-
-        return "\n".join(lines)
+        """Extract code snippet around the given node using consolidated utility."""
+        return get_code_snippet_for_node(node, self.source_lines, context_lines)
 
     def visit_FunctionDef(self, node: ast.FunctionDef):
         """Track function definitions for analysis."""
@@ -162,12 +153,17 @@ class RefactoredConnascenceDetector(ast.NodeVisitor):
         
         # Get detector pool instance
         if self._detector_pool is None:
-            self._detector_pool = get_detector_pool()
+            # self._detector_pool = get_detector_pool()  # Temporarily disabled
+            pass
         
         # Acquire all detectors from pool
-        self._acquired_detectors = self._detector_pool.acquire_all_detectors(
-            self.file_path, self.source_lines
-        )
+        if self._detector_pool:
+            self._acquired_detectors = self._detector_pool.acquire_all_detectors(
+                self.file_path, self.source_lines
+            )
+        else:
+            # Fallback when detector pool is disabled
+            self._acquired_detectors = {}
         
         # Run analysis with pooled detectors
         violations.extend(self._run_pooled_detector_analysis(collected_data))
@@ -294,7 +290,7 @@ class RefactoredConnascenceDetector(ast.NodeVisitor):
                             column=node.col_offset,
                             description=f"Excessive global variable usage: {len(self.global_vars)} globals",
                             recommendation="Use dependency injection, configuration objects, or class attributes",
-                            code_snippet=self.get_code_snippet(node),
+                            code_snippet=get_code_snippet_for_node(node, self.source_lines),
                             context={
                                 "global_count": len(self.global_vars), 
                                 "global_vars": list(self.global_vars)

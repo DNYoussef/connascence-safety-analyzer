@@ -22,7 +22,7 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
-from experimental.packages.agents.core.agent_interface import AgentInterface
+from interfaces.core.interface_base import InterfaceBase as AgentInterface
 import pytest
 
 

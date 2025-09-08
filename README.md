@@ -23,7 +23,7 @@ cd connascence-safety-analyzer
 pip install -e .
 
 # Analyze demo file (30 seconds to results)
-python -m analyzer.core --path docs/examples/bad_example.py --policy nasa_jpl_pot10
+connascence scan docs/examples/bad_example.py --policy nasa_jpl_pot10
 ```
 
 **See concrete results immediately. Real violations, specific fixes, measurable improvements.**
@@ -174,7 +174,7 @@ cat docs/examples/analyzer_output.json
 ### One-Command Setup (30 seconds)
 
 ```bash
-git clone https://github.com/DNYoussef/connascence-safety-analyzer.git && cd connascence-safety-analyzer && pip install -e . && python -m analyzer.core --path docs/examples/bad_example.py --policy nasa_jpl_pot10
+git clone https://github.com/DNYoussef/connascence-safety-analyzer.git && cd connascence-safety-analyzer && pip install -e . && connascence scan docs/examples/bad_example.py --policy nasa_jpl_pot10
 ```
 
 **That's it!** You'll immediately see real analyzer output with 12 violations detected.
@@ -190,7 +190,7 @@ cd connascence-safety-analyzer
 pip install -e .
 
 # 3. Verify with demo
-python -m analyzer.core --path docs/examples/bad_example.py --policy strict-core
+connascence scan docs/examples/bad_example.py --policy strict-core
 ```
 
 ### Requirements
@@ -202,24 +202,74 @@ python -m analyzer.core --path docs/examples/bad_example.py --policy strict-core
 ```bash
 # If "No module named 'analyzer'" error:
 cd connascence-safety-analyzer  # Make sure you're in repo root
-python -m analyzer.core --help  # Should work now
+connascence --help  # Should work now
 ```
 
 ## Core Usage
 
-### Basic Analysis
+### CLI Commands
+
+#### Basic Analysis
 ```bash
 # NASA Power of Ten compliance analysis
-python -m analyzer.core --path . --policy nasa_jpl_pot10
+connascence scan . --policy nasa_jpl_pot10
 
 # Full connascence + duplication analysis with JSON output
-python -m analyzer.core --path . --format json --output analysis.json
+connascence scan . --format json --output analysis.json
 
 # Duplication-only analysis with custom threshold
-python -m analyzer.core --path . --duplication-threshold 0.8 --no-duplication
+connascence scan . --duplication-threshold 0.8 --no-duplication
 
 # SARIF output for GitHub Code Scanning
-python -m analyzer.core --path . --format sarif --output results.sarif
+connascence scan . --format sarif --output results.sarif
+```
+
+#### Streaming Analysis
+```bash
+# Real-time file monitoring with streaming analysis
+connascence scan . --watch --enable-streaming
+
+# Watch specific file types
+connascence scan . --watch --file-patterns "*.py,*.js" --enable-streaming
+
+# Streaming with custom output format
+connascence scan . --watch --enable-streaming --format json
+```
+
+#### Incremental Analysis
+```bash
+# Analyze changes since last commit
+connascence scan . --incremental --since HEAD~1
+
+# Analyze changes in specific branch
+connascence scan . --incremental --since origin/main
+
+# Incremental with custom threshold
+connascence scan . --incremental --since HEAD~5 --duplication-threshold 0.9
+```
+
+#### Performance Analysis
+```bash
+# Comprehensive performance analysis
+connascence analyze-performance .
+
+# Performance analysis with specific metrics
+connascence analyze-performance . --metrics complexity,coupling,duplication
+
+# Performance analysis with output format
+connascence analyze-performance . --format json --output perf-report.json
+```
+
+#### Architecture Validation
+```bash
+# NASA compliance architecture validation
+connascence validate-architecture . --compliance-level nasa
+
+# Enterprise-level architecture validation
+connascence validate-architecture . --compliance-level enterprise
+
+# Custom architecture validation with specific rules
+connascence validate-architecture . --compliance-level custom --rules power-of-ten,single-responsibility
 ```
 
 ### Analysis Policies
@@ -272,7 +322,7 @@ jobs:
         run: pip install connascence-analyzer
         
       - name: Run Analysis
-        run: python -m analyzer.core --path . --format sarif --output results.sarif
+        run: connascence scan . --format sarif --output results.sarif
         
       - name: Upload Results
         uses: github/codeql-action/upload-sarif@v2
@@ -283,10 +333,10 @@ jobs:
 ### Quality Gates
 ```bash
 # Fail build on critical violations
-python -m analyzer.core --path . --fail-on-critical --max-god-objects 5
+connascence scan . --fail-on-critical --max-god-objects 5
 
 # Enterprise compliance validation
-python -m analyzer.core --path . --policy nasa_jpl_pot10 --compliance-threshold 95
+connascence scan . --policy nasa_jpl_pot10 --compliance-threshold 95
 ```
 
 ## Business Package

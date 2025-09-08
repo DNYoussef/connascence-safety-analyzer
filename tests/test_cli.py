@@ -28,7 +28,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from cli.connascence import ConnascenceCLI
+from interfaces.cli.connascence import ConnascenceCLI
 
 
 class TestConnascenceCLI:

@@ -298,7 +298,7 @@ class TestCriticalFunctionality:
     def test_main_cli_function_exists(self):
         """Test that the main CLI function exists and is callable."""
         try:
-            from cli.connascence import main
+            from interfaces.cli.connascence import main
             assert callable(main)
         except ImportError as e:
             pytest.fail(f"Failed to import main CLI function: {e}")
@@ -306,7 +306,7 @@ class TestCriticalFunctionality:
     def test_connascence_cli_class_instantiation(self):
         """Test that ConnascenceCLI class can be instantiated."""
         try:
-            from cli.connascence import ConnascenceCLI
+            from interfaces.cli.connascence import ConnascenceCLI
             cli = ConnascenceCLI()
             assert cli is not None
             assert hasattr(cli, 'run')

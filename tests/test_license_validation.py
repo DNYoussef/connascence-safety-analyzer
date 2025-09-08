@@ -300,7 +300,7 @@ class TestCLIIntegration:
 
     def test_cli_license_validate_command(self):
         """Test CLI license validate command."""
-        from cli.connascence import ConnascenceCLI
+        from interfaces.cli.connascence import ConnascenceCLI
 
         # Create test project
         project_root = self.temp_dir / "cli_test_project"
@@ -324,7 +324,7 @@ class TestCLIIntegration:
 
     def test_cli_skip_license_check(self):
         """Test CLI --skip-license-check flag."""
-        from cli.connascence import ConnascenceCLI
+        from interfaces.cli.connascence import ConnascenceCLI
 
         cli = ConnascenceCLI()
 
@@ -338,7 +338,7 @@ class TestCLIIntegration:
     @patch('sys.stderr')
     def test_automatic_license_validation(self, mock_stderr):
         """Test automatic license validation on CLI commands."""
-        from cli.connascence import ConnascenceCLI
+        from interfaces.cli.connascence import ConnascenceCLI
 
         # Create project without license
         project_root = self.temp_dir / "auto_validate_project"
