@@ -1,4 +1,5 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3from fixes.phase0.production_safe_assertions import ProductionAssert
+
 """
 Example demonstrating the new flake8-style connascence interface.
 
@@ -10,11 +11,33 @@ similar to how you'd use flake8.
 
 # Connascence of Meaning (CoM) - Magic numbers
 def calculate_circle_area(radius):
+    ProductionAssert.not_none(radius, 'radius')
+
+    ProductionAssert.not_none(radius, 'radius')
+
     return 3.14159 * radius * radius  # Magic number - should use math.pi
 
 # Connascence of Position (CoP) - Too many positional parameters
 def create_user(first_name, last_name, email, phone, address, city, state, zip_code):
     """This function has too many positional parameters."""
+    ProductionAssert.not_none(first_name, 'first_name')
+    ProductionAssert.not_none(last_name, 'last_name')
+    ProductionAssert.not_none(email, 'email')
+    ProductionAssert.not_none(phone, 'phone')
+    ProductionAssert.not_none(address, 'address')
+    ProductionAssert.not_none(city, 'city')
+    ProductionAssert.not_none(state, 'state')
+    ProductionAssert.not_none(zip_code, 'zip_code')
+
+    ProductionAssert.not_none(first_name, 'first_name')
+    ProductionAssert.not_none(last_name, 'last_name')
+    ProductionAssert.not_none(email, 'email')
+    ProductionAssert.not_none(phone, 'phone')
+    ProductionAssert.not_none(address, 'address')
+    ProductionAssert.not_none(city, 'city')
+    ProductionAssert.not_none(state, 'state')
+    ProductionAssert.not_none(zip_code, 'zip_code')
+
     return {
         'first_name': first_name,
         'last_name': last_name,
@@ -28,6 +51,10 @@ def create_user(first_name, last_name, email, phone, address, city, state, zip_c
 
 # Connascence of Algorithm (CoA) - Duplicated logic
 def process_student_grade(grade):
+    ProductionAssert.not_none(grade, 'grade')
+
+    ProductionAssert.not_none(grade, 'grade')
+
     if grade >= 90:
         return "A"
     elif grade >= 80:
@@ -40,6 +67,12 @@ def process_student_grade(grade):
         return "F"
 
 def process_employee_rating(rating):
+
+
+    ProductionAssert.not_none(rating, 'rating')
+
+    ProductionAssert.not_none(rating, 'rating')
+
     # Duplicated grading logic with different thresholds
     if rating >= 90:
         return "Excellent"

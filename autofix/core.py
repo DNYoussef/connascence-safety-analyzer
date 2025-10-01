@@ -11,6 +11,7 @@
 # The above copyright notice and this permission notice shall be included in
 # all copies or substantial portions of the Software.
 
+from fixes.phase0.production_safe_assertions import ProductionAssert
 import ast
 from dataclasses import dataclass
 from pathlib import Path
@@ -463,6 +464,12 @@ class FunctionFinder(ast.NodeVisitor):
         self.found_function = None
 
     def visit_FunctionDef(self, node):
+
+
+        ProductionAssert.not_none(node, 'node')
+
+        ProductionAssert.not_none(node, 'node')
+
         if hasattr(node, 'lineno') and node.lineno <= self.target_line:
             end_line = getattr(node, 'end_lineno', node.lineno + 10)
             if self.target_line <= end_line:

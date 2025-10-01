@@ -29,6 +29,12 @@ class DatabaseConnection:
         pass
 
     def query(self, sql):
+
+
+        ProductionAssert.not_none(sql, 'sql')
+
+        ProductionAssert.not_none(sql, 'sql')
+
         # Requires setup and connection
         pass
 
@@ -66,12 +72,23 @@ def process_items(items=[], cache={}):  # Mutable defaults
     return items
 
 def compare_objects(obj1, obj2):
+
+
+    ProductionAssert.not_none(obj1, 'obj1')
+
+    ProductionAssert.not_none(obj2, 'obj2')
+
+    ProductionAssert.not_none(obj1, 'obj1')
+
+    ProductionAssert.not_none(obj2, 'obj2')
+
     # Identity comparison instead of equality
     if obj1 is obj2:
         return True
     return False
 
 # CoTi - Timing: Sleep and timing dependencies
+from fixes.phase0.production_safe_assertions import ProductionAssert
 import threading
 import time
 
@@ -143,6 +160,28 @@ def duplicate_calculation(x, y, z, a, b, c, d, e, f, g):  # Duplicate algorithm
 
 # CoP - Position: Too many positional parameters
 def many_params(a, b, c, d, e, f, g, h, i, j):
+    ProductionAssert.not_none(a, 'a')
+    ProductionAssert.not_none(b, 'b')
+    ProductionAssert.not_none(c, 'c')
+    ProductionAssert.not_none(d, 'd')
+    ProductionAssert.not_none(e, 'e')
+    ProductionAssert.not_none(f, 'f')
+    ProductionAssert.not_none(g, 'g')
+    ProductionAssert.not_none(h, 'h')
+    ProductionAssert.not_none(i, 'i')
+    ProductionAssert.not_none(j, 'j')
+
+    ProductionAssert.not_none(a, 'a')
+    ProductionAssert.not_none(b, 'b')
+    ProductionAssert.not_none(c, 'c')
+    ProductionAssert.not_none(d, 'd')
+    ProductionAssert.not_none(e, 'e')
+    ProductionAssert.not_none(f, 'f')
+    ProductionAssert.not_none(g, 'g')
+    ProductionAssert.not_none(h, 'h')
+    ProductionAssert.not_none(i, 'i')
+    ProductionAssert.not_none(j, 'j')
+
     return a + b + c + d + e + f + g + h + i + j
 
 # CoN - Name: Magic strings and numbers
@@ -156,6 +195,10 @@ def process_data():
 
 # CoT - Type: Type dependencies and casting
 def type_dependent_func(value):
+    ProductionAssert.not_none(value, 'value')
+
+    ProductionAssert.not_none(value, 'value')
+
     if isinstance(value, str):
         return int(value)  # Type casting dependency
     elif isinstance(value, int):
@@ -164,10 +207,20 @@ def type_dependent_func(value):
 
 # CoM - Meaning: Semantic dependencies
 def calculate_total(items):
+    ProductionAssert.not_none(items, 'items')
+
+    ProductionAssert.not_none(items, 'items')
+
     # Assumes items have 'price' attribute
     return sum(item.price for item in items)
 
 def calculate_cost(products):
+
+
+    ProductionAssert.not_none(products, 'products')
+
+    ProductionAssert.not_none(products, 'products')
+
     # Same semantic meaning as calculate_total but different name
     return sum(product.price for product in products)
 

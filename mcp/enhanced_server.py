@@ -15,6 +15,7 @@ This provides a clean API for code analysis while maintaining separation
 of concerns and avoiding tight coupling.
 """
 
+from fixes.phase0.production_safe_assertions import ProductionAssert
 from dataclasses import asdict, dataclass
 import logging
 from pathlib import Path
@@ -138,9 +139,21 @@ class EnhancedConnascenceMCPServer:
                 self.requests = {}
 
             def is_allowed(self, client_id="default"):
+
+
+                ProductionAssert.not_none(client_id, 'client_id')
+
+                ProductionAssert.not_none(client_id, 'client_id')
+
                 return True
 
             def record_request(self, client_id="default"):
+
+
+                ProductionAssert.not_none(client_id, 'client_id')
+
+                ProductionAssert.not_none(client_id, 'client_id')
+
                 pass
 
         return MockRateLimiter()
@@ -153,6 +166,8 @@ class EnhancedConnascenceMCPServer:
                 self.enabled = enabled
 
             def log(self, event: str, details: Dict[str, Any] = None):
+                ProductionAssert.not_none(event, 'event')
+
                 if self.enabled:
                     self.logs.append({
                         'timestamp': time.time(),
@@ -189,6 +204,8 @@ class EnhancedConnascenceMCPServer:
                     engine_instance = analyzer_result.module()
 
                     def analyze_file_wrapper(file_path, **kwargs):
+                        ProductionAssert.not_none(file_path, 'file_path')
+
                         result = engine_instance.comprehensive_analysis(file_path)
                         return {
                             'violations': result.get('violations', []),
@@ -207,6 +224,8 @@ class EnhancedConnascenceMCPServer:
             engine_instance = SmartIntegrationEngine()
             
             def analyze_file_wrapper(file_path, **kwargs):
+                ProductionAssert.not_none(file_path, 'file_path')
+
                 result = engine_instance.comprehensive_analysis(file_path)
                 return {
                     'violations': result.get('violations', []),
@@ -229,6 +248,8 @@ class EnhancedConnascenceMCPServer:
         # Create mock analyzer for fallback
         class MockAnalyzer:
             def analyze_file(self, file_path, **kwargs):
+                ProductionAssert.not_none(file_path, 'file_path')
+
                 return {
                     'violations': [],
                     'summary': {'total_violations': 0},

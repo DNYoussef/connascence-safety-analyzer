@@ -1,0 +1,61 @@
+
+======================================================================
+NASA POT10 BASELINE ANALYSIS REPORT
+======================================================================
+
+Analysis Date: 2025-09-23T19:59:09.092228
+Project Path: C:\Users\17175\Desktop\connascence
+Analysis Time: 14.94 seconds
+
+----------------------------------------
+SUMMARY
+----------------------------------------
+Files Analyzed: 774
+Total Violations: 36331
+Files with Violations: 662
+Clean Files: 112
+
+----------------------------------------
+METRICS
+----------------------------------------
+NASA Compliance: 33.4%
+Clean Files: 14.5%
+Avg Violations per File: 46.94
+
+----------------------------------------
+VIOLATIONS BY RULE
+----------------------------------------
+  Rule nasa_rule_1: 979 violations
+  Rule nasa_rule_10: 648 violations
+  Rule nasa_rule_2: 78 violations
+  Rule nasa_rule_3: 107 violations
+  Rule nasa_rule_4: 290 violations
+  Rule nasa_rule_5: 19483 violations
+  Rule nasa_rule_6: 34 violations
+  Rule nasa_rule_7: 14255 violations
+  Rule nasa_rule_8: 66 violations
+  Rule nasa_rule_9: 391 violations
+
+----------------------------------------
+VIOLATIONS BY SEVERITY
+----------------------------------------
+  Critical: 5 violations
+  High: 1140 violations
+  Low: 1073 violations
+  Medium: 34113 violations
+
+----------------------------------------
+TOP VIOLATING FILES
+----------------------------------------
+  test_packages\celery\t\integration\test_canvas.py: 638 violations
+  test_packages\celery\t\unit\app\test_app.py: 462 violations
+  test_packages\celery\t\unit\backends\test_redis.py: 445 violations
+  test_packages\celery\t\unit\worker\test_worker.py: 406 violations
+  analyzer\unified_analyzer.py: 387 violations
+  test_packages\celery\t\unit\tasks\test_tasks.py: 381 violations
+  test_packages\celery\celery\canvas.py: 372 violations
+  test_packages\celery\t\unit\tasks\test_stamping.py: 355 violations
+  test_packages\celery\t\unit\backends\test_base.py: 345 violations
+  test_packages\celery\t\unit\worker\test_request.py: 332 violations
+
+======================================================================

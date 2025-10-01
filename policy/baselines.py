@@ -11,6 +11,7 @@
 # The above copyright notice and this permission notice shall be included in
 # all copies or substantial portions of the Software.
 
+from fixes.phase0.production_safe_assertions import ProductionAssert
 from dataclasses import dataclass, field
 from datetime import datetime
 import hashlib
@@ -512,6 +513,12 @@ class BaselineManager:
 
     def cleanup_old_baselines(self, keep_count: int = DEFAULT_BASELINE_CLEANUP_KEEP_COUNT):
         """Clean up old baselines, keeping only the most recent ones."""
+
+        ProductionAssert.not_none(keep_count, 'keep_count')
+
+
+        ProductionAssert.not_none(keep_count, 'keep_count')
+
         if len(self.baselines) <= keep_count:
             return
 

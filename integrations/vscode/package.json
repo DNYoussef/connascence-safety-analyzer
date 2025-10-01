@@ -1,0 +1,230 @@
+{
+  "name": "connascence-safety-analyzer",
+  "displayName": "Connascence Safety Analyzer",
+  "description": "NASA-grade software quality analysis with enterprise-proven connascence detection",
+  "version": "2.0.0",
+  "publisher": "connascence-systems",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Linters",
+    "Programming Languages",
+    "Other"
+  ],
+  "keywords": [
+    "connascence",
+    "code quality",
+    "NASA compliance",
+    "coupling analysis",
+    "python",
+    "javascript",
+    "typescript"
+  ],
+  "activationEvents": [
+    "onLanguage:python",
+    "onLanguage:javascript",
+    "onLanguage:typescript",
+    "onCommand:connascence.analyze",
+    "onCommand:connascence.showReport",
+    "onView:connascenceExplorer"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "connascence-sidebar",
+          "title": "Connascence Analyzer",
+          "icon": "resources/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "connascence-sidebar": [
+        {
+          "id": "connascenceExplorer",
+          "name": "Violations",
+          "icon": "resources/icon.svg",
+          "contextualTitle": "Connascence Violations"
+        },
+        {
+          "id": "connascenceMetrics",
+          "name": "Quality Metrics",
+          "icon": "resources/icon.svg",
+          "contextualTitle": "Code Quality Metrics"
+        },
+        {
+          "id": "connascenceActions",
+          "name": "Quick Actions",
+          "icon": "resources/icon.svg",
+          "contextualTitle": "Analysis Actions"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "connascence.analyze",
+        "title": "Analyze Connascence",
+        "category": "Connascence",
+        "icon": "$(search)"
+      },
+      {
+        "command": "connascence.showReport",
+        "title": "Show Analysis Report",
+        "category": "Connascence",
+        "icon": "$(file-text)"
+      },
+      {
+        "command": "connascence.fix",
+        "title": "Fix Violations",
+        "category": "Connascence",
+        "icon": "$(wrench)"
+      },
+      {
+        "command": "connascence.configure",
+        "title": "Configure Analyzer",
+        "category": "Connascence",
+        "icon": "$(settings-gear)"
+      },
+      {
+        "command": "connascence.refreshViolations",
+        "title": "Refresh Violations",
+        "category": "Connascence",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "connascence.openViolation",
+        "title": "Open Violation in Editor",
+        "category": "Connascence",
+        "icon": "$(go-to-file)"
+      },
+      {
+        "command": "connascence.fixViolation",
+        "title": "Fix This Violation",
+        "category": "Connascence",
+        "icon": "$(check)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "connascence.refreshViolations",
+          "when": "view == connascenceExplorer",
+          "group": "navigation"
+        },
+        {
+          "command": "connascence.analyze",
+          "when": "view == connascenceExplorer",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "connascence.openViolation",
+          "when": "view == connascenceExplorer && viewItem == violation",
+          "group": "inline"
+        },
+        {
+          "command": "connascence.fixViolation",
+          "when": "view == connascenceExplorer && viewItem == violation",
+          "group": "inline"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Connascence Analyzer",
+      "properties": {
+        "connascence.policy": {
+          "type": "string",
+          "default": "standard",
+          "enum": [
+            "nasa-compliance",
+            "strict",
+            "standard",
+            "lenient"
+          ],
+          "description": "Analysis policy to use"
+        },
+        "connascence.enableRealTime": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable real-time analysis as you type"
+        },
+        "connascence.showInlineHints": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show inline hints for violations"
+        },
+        "connascence.autoFix": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically fix simple violations on save"
+        },
+        "connascence.mcpServerPort": {
+          "type": "number",
+          "default": 8765,
+          "description": "Port for MCP server communication"
+        }
+      }
+    },
+    "languages": [
+      {
+        "id": "python",
+        "extensions": [
+          ".py"
+        ]
+      },
+      {
+        "id": "javascript",
+        "extensions": [
+          ".js",
+          ".jsx"
+        ]
+      },
+      {
+        "id": "typescript",
+        "extensions": [
+          ".ts",
+          ".tsx"
+        ]
+      }
+    ],
+    "problemMatchers": [
+      {
+        "name": "connascence",
+        "owner": "connascence",
+        "fileLocation": [
+          "relative",
+          "${workspaceFolder}"
+        ],
+        "pattern": {
+          "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)\\s+\\[(.*)\\]$",
+          "file": 1,
+          "line": 2,
+          "column": 3,
+          "severity": 4,
+          "message": 5,
+          "code": 6
+        }
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "test": "npm run compile && node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/node": "^20.x",
+    "@types/vscode": "^1.85.0",
+    "@types/ws": "^8.18.1",
+    "@vscode/test-electron": "^2.3.8",
+    "typescript": "^5.3.0"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "ws": "^8.16.0"
+  }
+}

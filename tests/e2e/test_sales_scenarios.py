@@ -18,6 +18,7 @@ End-to-End Sales Scenario Tests
 Validates the exact scenarios used in customer demos
 """
 
+from fixes.phase0.production_safe_assertions import ProductionAssert
 import json
 from pathlib import Path
 import tempfile
@@ -65,6 +66,12 @@ class Celery:
 
     def retry_logic_1(self, task):
         """Duplicate algorithm - CoA violation"""
+
+        ProductionAssert.not_none(task, 'task')
+
+
+        ProductionAssert.not_none(task, 'task')
+
         max_retries = 3
         delay = 1.0
         for attempt in range(max_retries):
@@ -79,6 +86,12 @@ class Celery:
 
     def retry_logic_2(self, task):
         """Duplicate algorithm - CoA violation"""
+
+        ProductionAssert.not_none(task, 'task')
+
+
+        ProductionAssert.not_none(task, 'task')
+
         max_retries = 3
         delay = 1.0
         for attempt in range(max_retries):
@@ -260,6 +273,28 @@ router.use('/users', (req, res, next) => {
         test_file = vscode_workspace / "test.py"
         test_file.write_text('''
 def problematic_function(a, b, c, d, e, f, g, h, i, j):
+    ProductionAssert.not_none(a, 'a')
+    ProductionAssert.not_none(b, 'b')
+    ProductionAssert.not_none(c, 'c')
+    ProductionAssert.not_none(d, 'd')
+    ProductionAssert.not_none(e, 'e')
+    ProductionAssert.not_none(f, 'f')
+    ProductionAssert.not_none(g, 'g')
+    ProductionAssert.not_none(h, 'h')
+    ProductionAssert.not_none(i, 'i')
+    ProductionAssert.not_none(j, 'j')
+
+    ProductionAssert.not_none(a, 'a')
+    ProductionAssert.not_none(b, 'b')
+    ProductionAssert.not_none(c, 'c')
+    ProductionAssert.not_none(d, 'd')
+    ProductionAssert.not_none(e, 'e')
+    ProductionAssert.not_none(f, 'f')
+    ProductionAssert.not_none(g, 'g')
+    ProductionAssert.not_none(h, 'h')
+    ProductionAssert.not_none(i, 'i')
+    ProductionAssert.not_none(j, 'j')
+
     magic_timeout = 5000  # Magic number
     if a:
         if b:

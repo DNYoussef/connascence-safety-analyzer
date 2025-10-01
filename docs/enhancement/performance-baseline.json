@@ -1,0 +1,176 @@
+{
+  "benchmark_metadata": {
+    "timestamp": "2025-09-23 19:02:11",
+    "total_benchmark_time": 12.302107810974121,
+    "target_path": "C:\\Users\\17175\\Desktop\\spek template",
+    "python_version": "3.12.5 (tags/v3.12.5:ff3bc82, Aug  6 2024, 20:45:27) [MSC v.1940 64 bit (AMD64)]",
+    "platform": "win32"
+  },
+  "performance_metrics": [
+    {
+      "operation": "module_import",
+      "duration_seconds": 2.8096065521240234,
+      "memory_peak_mb": 24.35382843017578,
+      "memory_current_mb": 24.27051544189453,
+      "cpu_percent": 47.5,
+      "files_processed": 0,
+      "throughput_files_per_sec": 0,
+      "status": "success",
+      "error_message": ""
+    },
+    {
+      "operation": "single_file_analysis",
+      "duration_seconds": 0.23935985565185547,
+      "memory_peak_mb": 0.9453983306884766,
+      "memory_current_mb": 0.47534942626953125,
+      "cpu_percent": 50.1,
+      "files_processed": 1,
+      "throughput_files_per_sec": 4.177810006095934,
+      "status": "success",
+      "error_message": ""
+    },
+    {
+      "operation": "detector_PositionDetector",
+      "duration_seconds": 0.0,
+      "memory_peak_mb": 0.000835418701171875,
+      "memory_current_mb": 0.000743865966796875,
+      "cpu_percent": 0,
+      "files_processed": 1,
+      "throughput_files_per_sec": 0,
+      "status": "failed",
+      "error_message": "PositionDetector.__init__() missing 2 required positional arguments: 'file_path' and 'source_lines'"
+    },
+    {
+      "operation": "detector_MagicLiteralDetector",
+      "duration_seconds": 0.0,
+      "memory_peak_mb": 0.0008182525634765625,
+      "memory_current_mb": 0.0002593994140625,
+      "cpu_percent": 0,
+      "files_processed": 1,
+      "throughput_files_per_sec": 0,
+      "status": "failed",
+      "error_message": "MagicLiteralDetector.__init__() missing 2 required positional arguments: 'file_path' and 'source_lines'"
+    },
+    {
+      "operation": "detector_AlgorithmDetector",
+      "duration_seconds": 0.0005168914794921875,
+      "memory_peak_mb": 0.0008230209350585938,
+      "memory_current_mb": 0.00025653839111328125,
+      "cpu_percent": 0,
+      "files_processed": 1,
+      "throughput_files_per_sec": 1934.6420664206642,
+      "status": "failed",
+      "error_message": "AlgorithmDetector.__init__() missing 2 required positional arguments: 'file_path' and 'source_lines'"
+    },
+    {
+      "operation": "detector_GodObjectDetector",
+      "duration_seconds": 0.0,
+      "memory_peak_mb": 0.0007600784301757812,
+      "memory_current_mb": 0.0006074905395507812,
+      "cpu_percent": 0,
+      "files_processed": 1,
+      "throughput_files_per_sec": 0,
+      "status": "failed",
+      "error_message": "'GodObjectDetector' object has no attribute 'detect'"
+    },
+    {
+      "operation": "detector_TimingDetector",
+      "duration_seconds": 0.0,
+      "memory_peak_mb": 0.0007114410400390625,
+      "memory_current_mb": 0.0005588531494140625,
+      "cpu_percent": 0,
+      "files_processed": 1,
+      "throughput_files_per_sec": 0,
+      "status": "failed",
+      "error_message": "'TimingDetector' object has no attribute 'detect'"
+    },
+    {
+      "operation": "batch_analysis_10",
+      "duration_seconds": 0.5717709064483643,
+      "memory_peak_mb": 3.0807886123657227,
+      "memory_current_mb": 0.08635616302490234,
+      "cpu_percent": 48.6,
+      "files_processed": 10,
+      "throughput_files_per_sec": 17.48952226708493,
+      "status": "success",
+      "error_message": ""
+    },
+    {
+      "operation": "memory_scaling_100_files",
+      "duration_seconds": 6.80598521232605,
+      "memory_peak_mb": 12.723572731018066,
+      "memory_current_mb": 11.56640625,
+      "cpu_percent": 0,
+      "files_processed": 100,
+      "throughput_files_per_sec": 14.692949937489427,
+      "status": "success",
+      "error_message": ""
+    }
+  ],
+  "bottleneck_analysis": [
+    {
+      "component": "Module Import",
+      "severity": "high",
+      "impact_percent": 56.19213104248046,
+      "description": "Import takes 2.8s - too slow for interactive use",
+      "optimization_recommendation": "Lazy import detectors, reduce initialization overhead",
+      "estimated_improvement": "60-80% reduction"
+    }
+  ],
+  "parallelization_analysis": {
+    "opportunities": [
+      {
+        "component": "File Analysis",
+        "type": "embarrassingly_parallel",
+        "estimated_speedup": "4-8x with multiprocessing.Pool",
+        "implementation": "Process files in parallel batches",
+        "complexity": "low"
+      },
+      {
+        "component": "Detector Execution",
+        "type": "parallel_detectors",
+        "estimated_speedup": "2-3x with concurrent.futures",
+        "implementation": "Run independent detectors in parallel",
+        "complexity": "medium"
+      },
+      {
+        "component": "AST Parsing",
+        "type": "caching",
+        "estimated_speedup": "40-60% for repeated analysis",
+        "implementation": "Cache parsed AST trees with LRU",
+        "complexity": "low"
+      }
+    ],
+    "estimated_combined_speedup": "8-15x with all optimizations"
+  },
+  "optimization_roadmap": {
+    "phase1_quick_wins": [
+      {
+        "task": "Optimize Module Import",
+        "effort": "low",
+        "impact": "high",
+        "recommendation": "Lazy import detectors, reduce initialization overhead"
+      }
+    ],
+    "phase2_parallelization": [],
+    "phase3_algorithmic": [],
+    "phase4_architecture": []
+  },
+  "production_readiness": {
+    "overall_score": 75.0,
+    "requirements_met": {
+      "handle_1000_files": true,
+      "realtime_analysis": true,
+      "memory_efficient": true,
+      "incremental_support": false
+    },
+    "production_ready": true,
+    "critical_blockers": [],
+    "recommendation": "PRODUCTION READY"
+  },
+  "summary": {
+    "total_bottlenecks": 1,
+    "critical_bottlenecks": 0,
+    "estimated_improvement_potential": "8-15x with full optimization"
+  }
+}

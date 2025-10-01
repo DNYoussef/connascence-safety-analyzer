@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <!-- Shield/Badge shape representing security and quality -->
+  <path d="M16 2 L26 6 L26 14 Q26 22 16 30 Q6 22 6 14 L6 6 Z"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"/>
+
+  <!-- Checkmark representing validation -->
+  <path d="M11 16 L14 19 L21 12"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
+
+  <!-- Connection dots representing connascence -->
+  <circle cx="10" cy="10" r="1.5" fill="currentColor"/>
+  <circle cx="16" cy="8" r="1.5" fill="currentColor"/>
+  <circle cx="22" cy="10" r="1.5" fill="currentColor"/>
+  <line x1="10" y1="10" x2="16" y2="8" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+  <line x1="16" y1="8" x2="22" y2="10" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+</svg>

@@ -21,6 +21,7 @@ Validates coordination between different test coordinators, data persistence,
 cross-module scenario tracking, and comprehensive test result aggregation.
 """
 
+from fixes.phase0.production_safe_assertions import ProductionAssert
 import json
 from pathlib import Path
 import sys
@@ -92,7 +93,13 @@ class MasterMemoryCoordinator:
 
     def store_integration_test_result(self, test_id: str, integration_data: Dict[str, Any]):
         """Store integration test results that involve multiple coordinators."""
-        self.integration_tests[test_id] = {
+
+        ProductionAssert.not_none(test_id, 'test_id')
+
+        ProductionAssert.not_none(integration_data, 'integration_data')
+        ProductionAssert.not_none(test_id, 'test_id')
+
+        ProductionAssert.not_none(integration_data, 'integration_data')        self.integration_tests[test_id] = {
             'data': integration_data,
             'timestamp': time.time(),
             'coordinators_involved': self._detect_coordinators_involved(integration_data)

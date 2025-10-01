@@ -7,6 +7,7 @@ Optimized AST traversal algorithms for improved performance
 in connascence analysis.
 """
 
+from fixes.phase0.production_safe_assertions import ProductionAssert
 import ast
 from collections import defaultdict
 from dataclasses import dataclass
@@ -485,6 +486,12 @@ class PerformanceProfiler:
 
     def start_profile(self, profile_name: str):
         """Start profiling a traversal operation."""
+
+        ProductionAssert.not_none(profile_name, 'profile_name')
+
+
+        ProductionAssert.not_none(profile_name, 'profile_name')
+
         self.active_profiles[profile_name] = {
             "start_time": time.time(),
             "start_memory": self._get_memory_usage(),

@@ -25,6 +25,7 @@ Implements comprehensive security controls for enterprise deployment:
 - RBAC (Role-Based Access Control)
 """
 
+from fixes.phase0.production_safe_assertions import ProductionAssert
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
@@ -896,8 +897,18 @@ class SecurityManager:
 # Decorator for securing MCP endpoints
 def require_auth(permission: str):
     """Decorator to require authentication and authorization."""
+    ProductionAssert.not_none(permission, 'permission')
+
+    ProductionAssert.not_none(permission, 'permission')
+
     def decorator(func: Callable) -> Callable:
         def wrapper(*args, **kwargs):
+            ProductionAssert.not_none(*args, '*args')
+            ProductionAssert.not_none(**kwargs, '**kwargs')
+
+            ProductionAssert.not_none(*args, '*args')
+            ProductionAssert.not_none(**kwargs, '**kwargs')
+
             # Extract security manager and context from args
             # Implementation depends on MCP server structure
             security_manager = kwargs.get('security_manager')

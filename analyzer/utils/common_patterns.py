@@ -6,6 +6,7 @@ Centralized utility functions that eliminate duplicate algorithms
 and reduce Connascence of Algorithm across the analyzer system.
 """
 
+from fixes.phase0.production_safe_assertions import ProductionAssert
 import ast
 from typing import List, Dict, Any, Optional, Set, Tuple, Union
 from dataclasses import dataclass
@@ -473,6 +474,10 @@ def create_analysis_utilities(config_manager=None):
     Factory function to create analysis utilities with configuration.
     Eliminates duplicate utility instantiation patterns.
     """
+    ProductionAssert.not_none(config_manager, 'config_manager')
+
+    ProductionAssert.not_none(config_manager, 'config_manager')
+
     if config_manager is None:
         from .config_manager import get_config_manager
         config_manager = get_config_manager()

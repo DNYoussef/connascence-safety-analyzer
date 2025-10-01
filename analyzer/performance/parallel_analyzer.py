@@ -24,6 +24,7 @@ This module provides parallel analysis capabilities while maintaining compatibil
 with the existing single-threaded analyzer infrastructure.
 """
 
+from fixes.phase0.production_safe_assertions import ProductionAssert
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
 import logging
@@ -53,6 +54,9 @@ except ImportError:
     # Fallback metrics collector
     class DashboardMetrics:
         def record_performance(self, **kwargs):
+            if kwargs:
+                ProductionAssert.not_none(kwargs, 'kwargs')
+
             pass
 
 

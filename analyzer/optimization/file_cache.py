@@ -225,13 +225,27 @@ class FileContentCache:
             for py_file in dir_path.rglob("*.py"):
                 # Skip common non-source directories
                 skip_patterns = [
-                    '__pycache__', '.git', '.pytest_cache', 
-                    'test_', '_test.py', '/tests/', '\\tests\\'
+                    '__pycache__', '.git', '.pytest_cache', '.mypy_cache',
+                    '.ruff_cache', '.tox', '.venv', 'venv', 'node_modules'
                 ]
                 path_str = str(py_file)
-                if not any(pattern in path_str for pattern in skip_patterns):
-                    python_files.append(str(py_file))
-            
+                path_parts = py_file.parts
+                filename = py_file.name
+
+                # Check system directories
+                if any(pattern in path_str for pattern in skip_patterns):
+                    continue
+
+                # Skip files in /tests/ or \tests\ directories (actual test directories)
+                if 'tests' in path_parts:
+                    continue
+
+                # Skip files that start with test_ or end with _test.py (actual test files)
+                if filename.startswith('test_') or filename.endswith('_test.py'):
+                    continue
+
+                python_files.append(str(py_file))
+
             return python_files
             
         except Exception:

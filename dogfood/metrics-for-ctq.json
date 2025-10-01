@@ -1,0 +1,25 @@
+{
+  "nasa": {
+    "score": 0.19323971985299215
+  },
+  "security": {
+    "score": 0,
+    "critical": 0,
+    "high": 0
+  },
+  "connascence": {
+    "positive_deltas": 0
+  },
+  "god_objects": {
+    "delta": 0
+  },
+  "duplication": {
+    "mece": 0.75
+  },
+  "mutation": {
+    "mutation_score_changed": 0.6
+  },
+  "performance": {
+    "regressions": 0
+  }
+}

@@ -8,6 +8,7 @@ analysis for accurate code pattern detection. Provides language-specific
 formal grammar definitions and parsing rules.
 """
 
+from fixes.phase0.production_safe_assertions import ProductionAssert
 from abc import ABC, abstractmethod
 import ast
 from dataclasses import dataclass
@@ -212,6 +213,12 @@ class PythonASTVisitor(ast.NodeVisitor):
 
     def visit_ClassDef(self, node: ast.ClassDef):
         """Visit class definitions."""
+
+        ProductionAssert.not_none(node, 'node')
+
+
+        ProductionAssert.not_none(node, 'node')
+
         self.current_class = node.name
         self.scope_stack.append(("class", node.name))
 
@@ -240,6 +247,12 @@ class PythonASTVisitor(ast.NodeVisitor):
 
     def visit_FunctionDef(self, node: ast.FunctionDef):
         """Visit function definitions."""
+
+        ProductionAssert.not_none(node, 'node')
+
+
+        ProductionAssert.not_none(node, 'node')
+
         self.current_function = node.name
         self.scope_stack.append(("function", node.name))
 
@@ -276,6 +289,12 @@ class PythonASTVisitor(ast.NodeVisitor):
 
     def visit_Import(self, node: ast.Import):
         """Visit import statements."""
+
+        ProductionAssert.not_none(node, 'node')
+
+
+        ProductionAssert.not_none(node, 'node')
+
         for alias in node.names:
             self.matches.append(
                 GrammarMatch(
@@ -292,6 +311,12 @@ class PythonASTVisitor(ast.NodeVisitor):
 
     def visit_ImportFrom(self, node: ast.ImportFrom):
         """Visit from...import statements."""
+
+        ProductionAssert.not_none(node, 'node')
+
+
+        ProductionAssert.not_none(node, 'node')
+
         for alias in node.names:
             self.matches.append(
                 GrammarMatch(
@@ -338,6 +363,12 @@ class MagicLiteralDetector(ast.NodeVisitor):
 
     def visit_ClassDef(self, node: ast.ClassDef):
         """Track class context."""
+
+        ProductionAssert.not_none(node, 'node')
+
+
+        ProductionAssert.not_none(node, 'node')
+
         old_class = self.current_class
         self.current_class = node.name
         self.generic_visit(node)
@@ -345,6 +376,12 @@ class MagicLiteralDetector(ast.NodeVisitor):
 
     def visit_FunctionDef(self, node: ast.FunctionDef):
         """Track function context."""
+
+        ProductionAssert.not_none(node, 'node')
+
+
+        ProductionAssert.not_none(node, 'node')
+
         old_function = self.current_function
         self.current_function = node.name
         self.generic_visit(node)
@@ -352,6 +389,12 @@ class MagicLiteralDetector(ast.NodeVisitor):
 
     def visit_If(self, node: ast.If):
         """Track conditional context."""
+
+        ProductionAssert.not_none(node, 'node')
+
+
+        ProductionAssert.not_none(node, 'node')
+
         old_conditional = self.in_conditional
         self.in_conditional = True
         self.visit(node.test)  # Visit the condition
@@ -365,6 +408,12 @@ class MagicLiteralDetector(ast.NodeVisitor):
 
     def visit_For(self, node: ast.For):
         """Track loop context."""
+
+        ProductionAssert.not_none(node, 'node')
+
+
+        ProductionAssert.not_none(node, 'node')
+
         old_loop = self.in_loop
         self.in_loop = True
         self.generic_visit(node)
@@ -372,6 +421,12 @@ class MagicLiteralDetector(ast.NodeVisitor):
 
     def visit_While(self, node: ast.While):
         """Track loop context."""
+
+        ProductionAssert.not_none(node, 'node')
+
+
+        ProductionAssert.not_none(node, 'node')
+
         old_loop = self.in_loop
         self.in_loop = True
         self.generic_visit(node)
@@ -379,6 +434,12 @@ class MagicLiteralDetector(ast.NodeVisitor):
 
     def visit_Return(self, node: ast.Return):
         """Track return context."""
+
+        ProductionAssert.not_none(node, 'node')
+
+
+        ProductionAssert.not_none(node, 'node')
+
         old_return = self.in_return
         self.in_return = True
         if node.value:
@@ -387,6 +448,12 @@ class MagicLiteralDetector(ast.NodeVisitor):
 
     def visit_Assign(self, node: ast.Assign):
         """Track assignment context and constants."""
+
+        ProductionAssert.not_none(node, 'node')
+
+
+        ProductionAssert.not_none(node, 'node')
+
         old_assignment = self.in_assignment
         old_target = self.current_assignment_target
 
@@ -410,6 +477,12 @@ class MagicLiteralDetector(ast.NodeVisitor):
 
     def visit_Constant(self, node: ast.Constant):
         """Analyze constant literals with comprehensive context."""
+
+        ProductionAssert.not_none(node, 'node')
+
+
+        ProductionAssert.not_none(node, 'node')
+
         if self._should_ignore_literal(node):
             return
 
@@ -568,6 +641,12 @@ class FunctionSignatureDetector(ast.NodeVisitor):
 
     def visit_FunctionDef(self, node: ast.FunctionDef):
         """Analyze function signatures for parameter coupling."""
+
+        ProductionAssert.not_none(node, 'node')
+
+
+        ProductionAssert.not_none(node, 'node')
+
         param_count = len(node.args.args)
 
         # Exclude 'self' parameter for methods

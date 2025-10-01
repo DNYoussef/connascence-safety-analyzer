@@ -17,6 +17,7 @@ Validates that the entire test suite follows connascence principles and
 maintains proper coupling boundaries. This meta-test ensures test quality.
 """
 
+from fixes.phase0.production_safe_assertions import ProductionAssert
 import ast
 from collections import defaultdict
 from pathlib import Path
@@ -66,6 +67,10 @@ class ConnascenceAnalyzer:
 
         class PositionalCallVisitor(ast.NodeVisitor):
             def visit_Call(self, node):
+                ProductionAssert.not_none(node, 'node')
+
+                ProductionAssert.not_none(node, 'node')
+
                 # Check for calls with many positional arguments
                 if len(node.args) > 3:
                     violations.append(
@@ -87,6 +92,10 @@ class ConnascenceAnalyzer:
 
         class MagicValueVisitor(ast.NodeVisitor):
             def visit_Num(self, node):
+                ProductionAssert.not_none(node, 'node')
+
+                ProductionAssert.not_none(node, 'node')
+
                 # Check for magic numbers
                 if isinstance(node.n, int | float) and node.n not in [0, 1, -1]:
                     # Common acceptable values
@@ -103,6 +112,12 @@ class ConnascenceAnalyzer:
                 self.generic_visit(node)
 
             def visit_Str(self, node):
+
+
+                ProductionAssert.not_none(node, 'node')
+
+                ProductionAssert.not_none(node, 'node')
+
                 # Check for magic strings in comparisons
                 if len(node.s) > 1 and not node.s.isspace():
                     # Look for string literals in comparisons
@@ -135,6 +150,10 @@ class ConnascenceAnalyzer:
 
         class FunctionVisitor(ast.NodeVisitor):
             def visit_FunctionDef(self, node):
+                ProductionAssert.not_none(node, 'node')
+
+                ProductionAssert.not_none(node, 'node')
+
                 # Convert function body to string for comparison
                 body_str = ast.dump(node)
                 if body_str in function_bodies:
@@ -159,6 +178,10 @@ class ConnascenceAnalyzer:
 
         class TemporalVisitor(ast.NodeVisitor):
             def visit_FunctionDef(self, node):
+                ProductionAssert.not_none(node, 'node')
+
+                ProductionAssert.not_none(node, 'node')
+
                 # Look for setup/teardown patterns that indicate temporal coupling
                 setup_calls = []
                 teardown_calls = []

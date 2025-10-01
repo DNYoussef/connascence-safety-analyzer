@@ -18,6 +18,7 @@ Provides a Flask-based web interface for developers to explore
 connascence violations, trends, and autofix suggestions locally.
 """
 
+from fixes.phase0.production_safe_assertions import ProductionAssert
 from datetime import datetime
 from pathlib import Path
 import sys
@@ -112,6 +113,10 @@ class LocalDashboard:
         @self.app.route('/api/charts/<chart_type>')
         def get_chart(chart_type):
             """Generate chart data."""
+            ProductionAssert.not_none(chart_type, 'chart_type')
+
+            ProductionAssert.not_none(chart_type, 'chart_type')
+
             if not self.scan_results:
                 return jsonify({'error': 'No scan results available'}), 404
 
@@ -132,6 +137,10 @@ class LocalDashboard:
         @self.app.route('/api/export/<format>')
         def export_results(format):
             """Export scan results in various formats."""
+            ProductionAssert.not_none(format, 'format')
+
+            ProductionAssert.not_none(format, 'format')
+
             if not self.scan_results:
                 return jsonify({'error': 'No scan results available'}), 404
 
@@ -146,6 +155,10 @@ class LocalDashboard:
         @self.app.route('/static/<path:filename>')
         def static_files(filename):
             """Serve static files."""
+            ProductionAssert.not_none(filename, 'filename')
+
+            ProductionAssert.not_none(filename, 'filename')
+
             return send_from_directory('static', filename)
 
     def _setup_websocket_handlers(self):
@@ -165,6 +178,10 @@ class LocalDashboard:
         @self.socketio.on('scan_file')
         def handle_file_scan(data):
             """Handle individual file scan request."""
+            ProductionAssert.not_none(data, 'data')
+
+            ProductionAssert.not_none(data, 'data')
+
             file_path = Path(data['file_path'])
             try:
                 file_results = self.analyzer.analyze_file(file_path)

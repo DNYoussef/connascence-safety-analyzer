@@ -9,6 +9,7 @@ This tool detects various forms of connascence in Python code, focusing on:
 Based on Meilir Page-Jones' connascence theory for reducing coupling.
 """
 
+from fixes.phase0.production_safe_assertions import ProductionAssert
 import argparse
 import ast
 import collections
@@ -133,6 +134,12 @@ class ConnascenceDetector(ast.NodeVisitor):
 
     def visit_FunctionDef(self, node: ast.FunctionDef):
         """Detect connascence violations in function definitions."""
+
+        ProductionAssert.not_none(node, 'node')
+
+
+        ProductionAssert.not_none(node, 'node')
+
         self.function_definitions[node.name] = node
 
         # Check for Connascence of Position (>3 positional parameters)
@@ -162,6 +169,12 @@ class ConnascenceDetector(ast.NodeVisitor):
 
     def visit_ClassDef(self, node: ast.ClassDef):
         """Detect God Objects using context-aware analysis."""
+
+        ProductionAssert.not_none(node, 'node')
+
+
+        ProductionAssert.not_none(node, 'node')
+
         self.class_definitions[node.name] = node
 
         # Use context-aware analysis for more accurate god object detection
@@ -226,12 +239,24 @@ class ConnascenceDetector(ast.NodeVisitor):
 
     def visit_Import(self, node: ast.Import):
         """Track imports for dependency analysis."""
+
+        ProductionAssert.not_none(node, 'node')
+
+
+        ProductionAssert.not_none(node, 'node')
+
         for alias in node.names:
             self.imports.add(alias.name)
         self.generic_visit(node)
 
     def visit_ImportFrom(self, node: ast.ImportFrom):
         """Track imports for dependency analysis."""
+
+        ProductionAssert.not_none(node, 'node')
+
+
+        ProductionAssert.not_none(node, 'node')
+
         if node.module:
             for alias in node.names:
                 self.imports.add(f"{node.module}.{alias.name}")
@@ -239,12 +264,24 @@ class ConnascenceDetector(ast.NodeVisitor):
 
     def visit_Global(self, node: ast.Global):
         """Track global variable usage (Connascence of Identity)."""
+
+        ProductionAssert.not_none(node, 'node')
+
+
+        ProductionAssert.not_none(node, 'node')
+
         for name in node.names:
             self.global_vars.add(name)
         self.generic_visit(node)
 
     def visit_Constant(self, node: ast.Constant):
         """Detect magic literals using formal grammar analysis with context awareness."""
+
+        ProductionAssert.not_none(node, 'node')
+
+
+        ProductionAssert.not_none(node, 'node')
+
         # Use the formal grammar analyzer for magic literal detection
         try:
             from .formal_grammar import MagicLiteralDetector
@@ -440,6 +477,12 @@ class ConnascenceDetector(ast.NodeVisitor):
 
     def visit_Call(self, node: ast.Call):
         """Detect timing-related calls and other patterns."""
+
+        ProductionAssert.not_none(node, 'node')
+
+
+        ProductionAssert.not_none(node, 'node')
+
         # Connascence of Timing - sleep() calls
         if (isinstance(node.func, ast.Name) and node.func.id == "sleep") or (
             isinstance(node.func, ast.Attribute) and node.func.attr == "sleep"
@@ -781,6 +824,12 @@ class ConnascenceDetector(ast.NodeVisitor):
         
         REFACTORED: Now uses specialized detectors for improved maintainability.
         """
+    
+        ProductionAssert.not_none(node, 'node')
+
+    
+        ProductionAssert.not_none(node, 'node')
+
         if self.using_factory:
             # Use the new DetectorFactory approach
             self.violations = self.detector_factory.detect_all(node)

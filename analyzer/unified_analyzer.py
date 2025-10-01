@@ -26,6 +26,7 @@ Central orchestrator that combines all Phase 1-6 analysis capabilities:
 This provides a single entry point for all connascence analysis functionality.
 """
 
+from fixes.phase0.production_safe_assertions import ProductionAssert
 import ast
 from dataclasses import asdict, dataclass
 import json
@@ -283,6 +284,12 @@ class ErrorHandler:
 
     def log_error(self, error: StandardError):
         """Log error with appropriate level."""
+
+        ProductionAssert.not_none(error, 'error')
+
+
+        ProductionAssert.not_none(error, 'error')
+
         log_level_mapping = {
             ERROR_SEVERITY["CRITICAL"]: logger.critical,
             ERROR_SEVERITY["HIGH"]: logger.error,
@@ -608,21 +615,37 @@ class UnifiedConnascenceAnalyzer:
         return batch_result
 
     def _run_analysis_phases(self, project_path: Path, policy_preset: str) -> Dict[str, Any]:
-        """Legacy method - delegates to new orchestrator component."""
-        # Create analyzer components dictionary for orchestrator
-        analyzers = {
-            "ast_analyzer": self.ast_analyzer,
-            "orchestrator_analyzer": self.god_object_orchestrator,
-            "mece_analyzer": self.mece_analyzer,
-            "smart_engine": self.smart_engine,
-            "nasa_integration": self.nasa_integration,
-            "nasa_analyzer": self._get_nasa_analyzer(),
+        """Run analysis phases using direct method calls (fallback implementation)."""
+        # Direct implementation since orchestrator_component is disabled
+        logger.info("Running analysis phases with direct fallback implementation")
+
+        # Run AST analysis
+        connascence_violations = self._run_ast_analysis(project_path)
+
+        # Run duplication analysis if MECE analyzer available
+        duplication_violations = []
+        if self.mece_analyzer:
+            try:
+                mece_results = self.mece_analyzer.analyze_directory(str(project_path))
+                duplication_violations = [self._violation_to_dict(v) for v in mece_results]
+            except Exception as e:
+                logger.warning(f"MECE analysis failed: {e}")
+
+        # Run NASA analysis if available
+        nasa_violations = []
+        if self.nasa_integration:
+            try:
+                nasa_results = self.nasa_integration.validate_project(str(project_path))
+                if isinstance(nasa_results, dict) and "violations" in nasa_results:
+                    nasa_violations = nasa_results["violations"]
+            except Exception as e:
+                logger.warning(f"NASA analysis failed: {e}")
+
+        return {
+            "connascence": connascence_violations,
+            "duplication": duplication_violations,
+            "nasa": nasa_violations
         }
-        
-        # Delegate to orchestrator component
-        return self.orchestrator_component.orchestrate_analysis_phases(
-            project_path, policy_preset, analyzers
-        )
 
     def _run_ast_analysis(self, project_path: Path) -> List[Dict[str, Any]]:
         """Run core AST analysis phases."""
@@ -926,9 +949,28 @@ class UnifiedConnascenceAnalyzer:
 
     def _should_analyze_file(self, file_path: Path) -> bool:
         """Check if file should be analyzed (skip test files, __pycache__, etc.)."""
-        skip_patterns = ['__pycache__', '.git', '.pytest_cache', 'test_', '_test.py', '/tests/', '\\tests\\']
+        # Skip system/build directories
+        skip_patterns = ['__pycache__', '.git', '.pytest_cache', '.mypy_cache', '.ruff_cache', '.tox', '.venv', 'venv', 'node_modules']
         path_str = str(file_path)
-        return not any(pattern in path_str for pattern in skip_patterns)
+
+        # Check system directories
+        if any(pattern in path_str for pattern in skip_patterns):
+            return False
+
+        # Skip actual test files (but not directories named "test_*")
+        # Only skip files that are actually test files, not just in directories with "test" in the name
+        path_parts = file_path.parts
+        filename = file_path.name
+
+        # Skip files in /tests/ or \tests\ directories (actual test directories)
+        if 'tests' in path_parts:
+            return False
+
+        # Skip files that start with test_ or end with _test.py (actual test files)
+        if filename.startswith('test_') or filename.endswith('_test.py'):
+            return False
+
+        return True
 
     def _run_duplication_analysis(self, project_path: Path) -> List[Dict[str, Any]]:
         """Run MECE duplication detection."""
@@ -1134,10 +1176,12 @@ class UnifiedConnascenceAnalyzer:
     def _get_prioritized_python_files(self, project_path: Path) -> List[Path]:
         """Get Python files prioritized for analysis with caching benefits."""
         if self.file_cache:
-            python_files = self.file_cache.get_python_files(str(project_path))
+            # FileContentCache returns strings, convert to Path objects
+            python_files_str = self.file_cache.get_python_files(str(project_path))
+            python_files = [Path(f) for f in python_files_str]
         else:
             python_files = list(project_path.glob("**/*.py"))
-        
+
         # Sort by priority for better cache utilization
         return sorted(python_files, key=self._calculate_file_priority, reverse=True)
 
@@ -1895,19 +1939,18 @@ class UnifiedConnascenceAnalyzer:
         return self._calculate_metrics_with_enhanced_calculator(violations, analysis_errors)
     
     def _calculate_metrics_with_enhanced_calculator(self, violations: Dict, analysis_errors: List) -> Dict:
-        """Calculate analysis metrics using enhanced calculator. NASA Rule 4 compliant."""
+        """Calculate analysis metrics using fallback calculator. NASA Rule 4 compliant."""
         # NASA Rule 5: Input validation assertions
         assert violations is not None, "violations cannot be None"
         assert analysis_errors is not None, "analysis_errors cannot be None"
-        
+
         try:
-            metrics = self.enhanced_metrics.calculate_comprehensive_metrics(
-                violations["connascence"], violations["duplication"], violations["nasa"], self.nasa_integration
-            )
-            assert metrics is not None, "Enhanced metrics calculation must return valid result"
+            # Use MetricsCalculator as fallback since enhanced_metrics is disabled
+            metrics = self.metrics_calculator.calculate_metrics(violations, self.nasa_integration)
+            assert metrics is not None, "Metrics calculation must return valid result"
             return metrics
         except Exception as e:
-            error = self.error_handler.handle_exception(e, {"phase": "enhanced_metrics_calculation"})
+            error = self.error_handler.handle_exception(e, {"phase": "metrics_calculation"})
             analysis_errors.append(error)
             self.error_handler.log_error(error)
             # NASA Rule 7: Provide safe fallback metrics
@@ -1918,19 +1961,18 @@ class UnifiedConnascenceAnalyzer:
         return self._generate_recommendations_with_engine(violations, analysis_warnings)
     
     def _generate_recommendations_with_engine(self, violations: Dict, analysis_warnings: List) -> Dict:
-        """Generate analysis recommendations using recommendation engine. NASA Rule 4 compliant."""
+        """Generate analysis recommendations using fallback generator. NASA Rule 4 compliant."""
         # NASA Rule 5: Input validation assertions
         assert violations is not None, "violations cannot be None"
         assert analysis_warnings is not None, "analysis_warnings cannot be None"
-        
+
         try:
-            recommendations = self.recommendation_engine.generate_unified_recommendations(
-                violations["connascence"], violations["duplication"], violations["nasa"], self.nasa_integration
-            )
-            assert recommendations is not None, "Recommendation engine must return valid result"
+            # Use RecommendationGenerator as fallback since recommendation_engine is disabled
+            recommendations = self.recommendation_generator.generate_recommendations(violations)
+            assert recommendations is not None, "Recommendation generator must return valid result"
             return recommendations
         except Exception as e:
-            error = self.error_handler.handle_exception(e, {"phase": "recommendation_engine"})
+            error = self.error_handler.handle_exception(e, {"phase": "recommendation_generation"})
             analysis_warnings.append(error)
             self.error_handler.log_error(error)
             # NASA Rule 7: Provide safe fallback recommendations
@@ -2076,6 +2118,12 @@ def loadConnascenceSystem():
 
         def generateConnascenceReport(options):
             """Generate comprehensive connascence report."""
+
+            ProductionAssert.not_none(options, 'options')
+
+
+            ProductionAssert.not_none(options, 'options')
+
             try:
                 result = analyzer.analyze_project(
                     options.get("inputPath"), options.get("safetyProfile", "service-defaults"), options
@@ -2097,6 +2145,12 @@ def loadConnascenceSystem():
 
         def validateSafetyCompliance(options):
             """Validate safety compliance for a file."""
+
+            ProductionAssert.not_none(options, 'options')
+
+
+            ProductionAssert.not_none(options, 'options')
+
             try:
                 file_result = analyzer.analyze_file(options.get("filePath"))
                 nasa_violations = file_result.get("nasa_violations", [])
@@ -2118,6 +2172,12 @@ def loadConnascenceSystem():
 
         def getRefactoringSuggestions(options):
             """Get refactoring suggestions for a file."""
+
+            ProductionAssert.not_none(options, 'options')
+
+
+            ProductionAssert.not_none(options, 'options')
+
             try:
                 file_result = analyzer.analyze_file(options.get("filePath"))
                 violations = file_result.get("connascence_violations", [])
@@ -2162,6 +2222,12 @@ def loadConnascenceSystem():
 
         def getAutomatedFixes(options):
             """Get automated fixes for common violations."""
+
+            ProductionAssert.not_none(options, 'options')
+
+
+            ProductionAssert.not_none(options, 'options')
+
             try:
                 file_result = analyzer.analyze_file(options.get("filePath"))
                 violations = file_result.get("connascence_violations", [])

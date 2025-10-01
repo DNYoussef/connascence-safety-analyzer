@@ -12,6 +12,7 @@ This addresses the architectural fragmentation root cause by providing
 consistent, maintainable integration patterns.
 """
 
+from fixes.phase0.production_safe_assertions import ProductionAssert
 import json
 import re
 from typing import Any, Dict, List, Optional
@@ -338,14 +339,30 @@ def get_available_integrations(config: Optional[Dict] = None) -> Dict[str, Unifi
 # Provide backwards compatibility for existing code
 def BlackIntegrationLegacy(config=None):
     """Legacy compatibility wrapper."""
+    ProductionAssert.not_none(config, 'config')
+
+    ProductionAssert.not_none(config, 'config')
+
     return BlackIntegration(config)
 
 def MyPyIntegrationLegacy(config=None):
     """Legacy compatibility wrapper."""
+
+    ProductionAssert.not_none(config, 'config')
+
+
+    ProductionAssert.not_none(config, 'config')
+
     return MyPyIntegration(config)
 
 def RuffIntegrationLegacy(config=None):
     """Legacy compatibility wrapper."""
+
+    ProductionAssert.not_none(config, 'config')
+
+
+    ProductionAssert.not_none(config, 'config')
+
     return RuffIntegration(config)
 
 # Export the registry for external use

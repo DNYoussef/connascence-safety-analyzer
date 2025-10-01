@@ -6,6 +6,7 @@ Standardized error handling patterns that eliminate duplicate error handling
 algorithms across the analyzer system and provide consistent error responses.
 """
 
+from fixes.phase0.production_safe_assertions import ProductionAssert
 import logging
 import traceback
 from typing import Any, Dict, List, Optional, Callable, Type
@@ -277,6 +278,16 @@ class SafeExecutionMixin:
     
     def safe_parse_ast(self, source_code: str, file_path: str):
         """Safely parse source code to AST with standardized error handling."""
+    
+        ProductionAssert.not_none(source_code, 'source_code')
+    
+        ProductionAssert.not_none(file_path, 'file_path')
+
+    
+        ProductionAssert.not_none(source_code, 'source_code')
+    
+        ProductionAssert.not_none(file_path, 'file_path')
+
         import ast
         
         def parse_operation():
@@ -292,6 +303,16 @@ class SafeExecutionMixin:
     
     def safe_file_read(self, file_path: str, encoding: str = 'utf-8'):
         """Safely read file with standardized error handling."""
+    
+        ProductionAssert.not_none(file_path, 'file_path')
+    
+        ProductionAssert.not_none(encoding, 'encoding')
+
+    
+        ProductionAssert.not_none(file_path, 'file_path')
+    
+        ProductionAssert.not_none(encoding, 'encoding')
+
         def read_operation():
             with open(file_path, 'r', encoding=encoding) as f:
                 content = f.read()
@@ -325,8 +346,17 @@ def handle_errors(
         log_errors: Whether to log errors
     """
     def decorator(func):
+        ProductionAssert.not_none(func, 'func')
+
+        ProductionAssert.not_none(func, 'func')
+
         @wraps(func)
         def wrapper(self, *args, **kwargs):
+            if args:
+                ProductionAssert.not_none(args, 'args')
+            if kwargs:
+                ProductionAssert.not_none(kwargs, 'kwargs')
+
             try:
                 return func(self, *args, **kwargs)
             except Exception as e:

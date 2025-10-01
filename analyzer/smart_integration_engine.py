@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: MIT
 # Smart integration engine for real connascence analysis
 
+from fixes.phase0.production_safe_assertions import ProductionAssert
 import ast
 from pathlib import Path
 from typing import Any, Dict, List
@@ -11,6 +12,20 @@ class CorrelationAnalyzer:
 
     def analyze_correlations(self, findings, duplication_clusters, nasa_violations):
         """Analyze correlations between different analyzer findings with enhanced cross-phase analysis."""
+
+        ProductionAssert.not_none(findings, 'findings')
+
+        ProductionAssert.not_none(duplication_clusters, 'duplication_clusters')
+
+        ProductionAssert.not_none(nasa_violations, 'nasa_violations')
+
+
+        ProductionAssert.not_none(findings, 'findings')
+
+        ProductionAssert.not_none(duplication_clusters, 'duplication_clusters')
+
+        ProductionAssert.not_none(nasa_violations, 'nasa_violations')
+
         correlations = []
 
         try:
@@ -181,6 +196,20 @@ class RecommendationEngine:
 
     def generate_intelligent_recommendations(self, findings, duplication_clusters, nasa_violations):
         """Generate intelligent recommendations based on analysis results."""
+
+        ProductionAssert.not_none(findings, 'findings')
+
+        ProductionAssert.not_none(duplication_clusters, 'duplication_clusters')
+
+        ProductionAssert.not_none(nasa_violations, 'nasa_violations')
+
+
+        ProductionAssert.not_none(findings, 'findings')
+
+        ProductionAssert.not_none(duplication_clusters, 'duplication_clusters')
+
+        ProductionAssert.not_none(nasa_violations, 'nasa_violations')
+
         recommendations = []
 
         try:
@@ -498,6 +527,16 @@ class PythonASTAnalyzer:
         """Calculate maximum nesting depth in a function."""
 
         def depth_visitor(current_node, current_depth=0):
+
+
+            ProductionAssert.not_none(current_node, 'current_node')
+
+            ProductionAssert.not_none(current_depth, 'current_depth')
+
+            ProductionAssert.not_none(current_node, 'current_node')
+
+            ProductionAssert.not_none(current_depth, 'current_depth')
+
             max_depth = current_depth
 
             for child in ast.iter_child_nodes(current_node):
@@ -526,14 +565,49 @@ class SmartIntegrationEngine:
 
     def integrate(self, *args, **kwargs):
         """Legacy integration method for backward compatibility."""
+
+        if args:
+            ProductionAssert.not_none(args, 'args')
+
+        if kwargs:
+            ProductionAssert.not_none(kwargs, 'kwargs')
+
         return []
 
     def analyze_correlations(self, findings, duplication_clusters, nasa_violations):
         """Analyze correlations between different analyzer findings."""
+
+        ProductionAssert.not_none(findings, 'findings')
+
+        ProductionAssert.not_none(duplication_clusters, 'duplication_clusters')
+
+        ProductionAssert.not_none(nasa_violations, 'nasa_violations')
+
+
+        ProductionAssert.not_none(findings, 'findings')
+
+        ProductionAssert.not_none(duplication_clusters, 'duplication_clusters')
+
+        ProductionAssert.not_none(nasa_violations, 'nasa_violations')
+
         return self.correlation_analyzer.analyze_correlations(findings, duplication_clusters, nasa_violations)
 
     def generate_intelligent_recommendations(self, findings, duplication_clusters, nasa_violations):
         """Generate intelligent recommendations based on analysis results."""
+
+        ProductionAssert.not_none(findings, 'findings')
+
+        ProductionAssert.not_none(duplication_clusters, 'duplication_clusters')
+
+        ProductionAssert.not_none(nasa_violations, 'nasa_violations')
+
+
+        ProductionAssert.not_none(findings, 'findings')
+
+        ProductionAssert.not_none(duplication_clusters, 'duplication_clusters')
+
+        ProductionAssert.not_none(nasa_violations, 'nasa_violations')
+
         return self.recommendation_engine.generate_intelligent_recommendations(
             findings, duplication_clusters, nasa_violations
         )

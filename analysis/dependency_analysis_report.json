@@ -1,0 +1,970 @@
+{
+  "summary": {
+    "total_folders_analyzed": 14,
+    "total_files_analyzed": 225,
+    "total_dependencies": 261,
+    "circular_dependencies_found": 3,
+    "total_violations": 20
+  },
+  "dependency_matrix": "DEPENDENCY MATRIX (source -> target):\n==================================================\n      Source | analyzer  autofix      cli   config     core dashboar experime integrat      mcp   policy reportin security    tests    utils \n--------------------------------------------------------------------------------------------------------------------------------------------\n    analyzer |       --                                   6        1                          1        2                                  30 \n     autofix |                --                                                              1                                            4 \n         cli |                         --                                                                                                    \n      config |                                  --                                                                                           \n        core |                                           --                                                                                  \n   dashboard |                                                    --                                                                         \nexperimental |                                                             --                                                                \nintegrations |        1                          3                                  --                                                       \n         mcp |        8                          2        3                          1       --                                            4 \n      policy |        4                                                                               --                                   5 \n   reporting |                                                                                                 --                            \n    security |                                                                                                          --                   \n       tests |      144        9        1                          1                          5        8        1                --       15 \n       utils |                                   1                                                                                        -- \n",
+  "coupling_analysis": "\nCOUPLING ANALYSIS:\n==============================\n\nHigh Coupling Pairs (>10%):\n         utils -> config       (100.00%)\n       autofix -> utils        (80.00%)\n         tests -> analyzer     (78.26%)\n      analyzer -> utils        (75.00%)\n  integrations -> config       (75.00%)\n        policy -> utils        (55.56%)\n           mcp -> analyzer     (44.44%)\n        policy -> analyzer     (44.44%)\n  integrations -> analyzer     (25.00%)\n           mcp -> utils        (22.22%)\n\nFan-In Analysis (most depended upon):\n      analyzer: 157 dependencies\n         utils: 58 dependencies\n        policy: 10 dependencies\n          core: 9 dependencies\n       autofix: 9 dependencies\n           mcp: 7 dependencies\n        config: 6 dependencies\n     dashboard: 2 dependencies\n\nFan-Out Analysis (most dependent):\n         tests: 184 outgoing dependencies\n      analyzer: 40 outgoing dependencies\n           mcp: 18 outgoing dependencies\n        policy: 9 outgoing dependencies\n       autofix: 5 outgoing dependencies\n  integrations: 4 outgoing dependencies\n         utils: 1 outgoing dependencies\n",
+  "circular_dependencies": [
+    [
+      "analyzer",
+      "mcp",
+      "analyzer",
+      "analyzer"
+    ],
+    [
+      "analyzer",
+      "mcp",
+      "integrations",
+      "analyzer",
+      "analyzer"
+    ],
+    [
+      "analyzer",
+      "policy",
+      "analyzer",
+      "analyzer"
+    ]
+  ],
+  "violations": [
+    {
+      "type": "high_coupling",
+      "source": "tests",
+      "target": "analyzer",
+      "strength": 0.782608695652174,
+      "description": "High coupling between tests and analyzer (78.26%)"
+    },
+    {
+      "type": "high_coupling",
+      "source": "analyzer",
+      "target": "utils",
+      "strength": 0.75,
+      "description": "High coupling between analyzer and utils (75.00%)"
+    },
+    {
+      "type": "high_coupling",
+      "source": "integrations",
+      "target": "config",
+      "strength": 0.75,
+      "description": "High coupling between integrations and config (75.00%)"
+    },
+    {
+      "type": "high_coupling",
+      "source": "utils",
+      "target": "config",
+      "strength": 1.0,
+      "description": "High coupling between utils and config (100.00%)"
+    },
+    {
+      "type": "high_coupling",
+      "source": "mcp",
+      "target": "analyzer",
+      "strength": 0.4444444444444444,
+      "description": "High coupling between mcp and analyzer (44.44%)"
+    },
+    {
+      "type": "high_coupling",
+      "source": "policy",
+      "target": "analyzer",
+      "strength": 0.4444444444444444,
+      "description": "High coupling between policy and analyzer (44.44%)"
+    },
+    {
+      "type": "high_coupling",
+      "source": "policy",
+      "target": "utils",
+      "strength": 0.5555555555555556,
+      "description": "High coupling between policy and utils (55.56%)"
+    },
+    {
+      "type": "high_coupling",
+      "source": "autofix",
+      "target": "utils",
+      "strength": 0.8,
+      "description": "High coupling between autofix and utils (80.00%)"
+    },
+    {
+      "type": "circular_dependency",
+      "cycle": [
+        "analyzer",
+        "mcp",
+        "analyzer",
+        "analyzer"
+      ],
+      "description": "Circular dependency detected: analyzer -> mcp -> analyzer -> analyzer"
+    },
+    {
+      "type": "circular_dependency",
+      "cycle": [
+        "analyzer",
+        "mcp",
+        "integrations",
+        "analyzer",
+        "analyzer"
+      ],
+      "description": "Circular dependency detected: analyzer -> mcp -> integrations -> analyzer -> analyzer"
+    },
+    {
+      "type": "circular_dependency",
+      "cycle": [
+        "analyzer",
+        "policy",
+        "analyzer",
+        "analyzer"
+      ],
+      "description": "Circular dependency detected: analyzer -> policy -> analyzer -> analyzer"
+    },
+    {
+      "type": "layering_violation",
+      "source": "mcp",
+      "target": "core",
+      "description": "Layering violation: mcp should not depend on core"
+    },
+    {
+      "type": "layering_violation",
+      "source": "mcp",
+      "target": "integrations",
+      "description": "Layering violation: mcp should not depend on integrations"
+    },
+    {
+      "type": "layering_violation",
+      "source": "analyzer",
+      "target": "mcp",
+      "description": "Layering violation: analyzer should not depend on mcp"
+    },
+    {
+      "type": "layering_violation",
+      "source": "analyzer",
+      "target": "policy",
+      "description": "Layering violation: analyzer should not depend on policy"
+    },
+    {
+      "type": "layering_violation",
+      "source": "analyzer",
+      "target": "dashboard",
+      "description": "Layering violation: analyzer should not depend on dashboard"
+    },
+    {
+      "type": "layering_violation",
+      "source": "tests",
+      "target": "autofix",
+      "description": "Layering violation: tests should not depend on autofix"
+    },
+    {
+      "type": "layering_violation",
+      "source": "tests",
+      "target": "policy",
+      "description": "Layering violation: tests should not depend on policy"
+    },
+    {
+      "type": "layering_violation",
+      "source": "tests",
+      "target": "reporting",
+      "description": "Layering violation: tests should not depend on reporting"
+    },
+    {
+      "type": "layering_violation",
+      "source": "tests",
+      "target": "dashboard",
+      "description": "Layering violation: tests should not depend on dashboard"
+    }
+  ],
+  "recommendations": "\nREFACTORING RECOMMENDATIONS:\n========================================\n\n1. HIGH PRIORITY - Reduce Coupling:\n   - Decouple tests from analyzer (current: 78.26%)\n   - Decouple analyzer from utils (current: 75.00%)\n   - Decouple integrations from config (current: 75.00%)\n   - Decouple utils from config (current: 100.00%)\n   - Decouple mcp from analyzer (current: 44.44%)\n\n2. CRITICAL - Break Circular Dependencies:\n   - Break cycle: analyzer -> mcp -> analyzer -> analyzer\n   - Break cycle: analyzer -> mcp -> integrations -> analyzer -> analyzer\n   - Break cycle: analyzer -> policy -> analyzer -> analyzer\n\n3. MEDIUM - Fix Layering Violations:\n   - Move dependency from mcp to core through proper abstraction layer\n   - Move dependency from mcp to integrations through proper abstraction layer\n   - Move dependency from analyzer to mcp through proper abstraction layer\n   - Move dependency from analyzer to policy through proper abstraction layer\n   - Move dependency from analyzer to dashboard through proper abstraction layer\n\n4. ARCHITECTURAL IMPROVEMENTS:\n   - Extract common interfaces for high fan-in modules\n   - Consider dependency injection for tightly coupled components\n   - Implement facade patterns for complex subsystem interactions\n   - Create abstract base classes for shared behaviors\n",
+  "detailed_metrics": {
+    "import_graph": {
+      "analyzer": {
+        "utils": 30,
+        "core": 6,
+        "mcp": 1,
+        "policy": 2,
+        "dashboard": 1,
+        "tests": 0,
+        "cli": 0,
+        "config": 0,
+        "security": 0,
+        "integrations": 0,
+        "experimental": 0,
+        "reporting": 0,
+        "autofix": 0,
+        "analyzer": 0
+      },
+      "mcp": {
+        "config": 2,
+        "core": 3,
+        "utils": 4,
+        "analyzer": 8,
+        "integrations": 1,
+        "tests": 0,
+        "cli": 0,
+        "security": 0,
+        "dashboard": 0,
+        "experimental": 0,
+        "reporting": 0,
+        "policy": 0,
+        "autofix": 0,
+        "mcp": 0
+      },
+      "policy": {
+        "utils": 5,
+        "analyzer": 4,
+        "tests": 0,
+        "cli": 0,
+        "config": 0,
+        "security": 0,
+        "dashboard": 0,
+        "integrations": 0,
+        "experimental": 0,
+        "mcp": 0,
+        "core": 0,
+        "reporting": 0,
+        "autofix": 0,
+        "policy": 0
+      },
+      "utils": {
+        "config": 1,
+        "tests": 0,
+        "cli": 0,
+        "analyzer": 0,
+        "security": 0,
+        "dashboard": 0,
+        "integrations": 0,
+        "experimental": 0,
+        "mcp": 0,
+        "core": 0,
+        "reporting": 0,
+        "policy": 0,
+        "autofix": 0,
+        "utils": 0
+      },
+      "integrations": {
+        "config": 3,
+        "analyzer": 1,
+        "tests": 0,
+        "cli": 0,
+        "security": 0,
+        "dashboard": 0,
+        "experimental": 0,
+        "utils": 0,
+        "mcp": 0,
+        "core": 0,
+        "reporting": 0,
+        "policy": 0,
+        "autofix": 0,
+        "integrations": 0
+      },
+      "tests": {
+        "utils": 15,
+        "analyzer": 144,
+        "autofix": 9,
+        "mcp": 5,
+        "policy": 8,
+        "reporting": 1,
+        "dashboard": 1,
+        "cli": 1,
+        "config": 0,
+        "security": 0,
+        "integrations": 0,
+        "experimental": 0,
+        "core": 0,
+        "tests": 0
+      },
+      "autofix": {
+        "mcp": 1,
+        "utils": 4,
+        "tests": 0,
+        "cli": 0,
+        "config": 0,
+        "analyzer": 0,
+        "security": 0,
+        "dashboard": 0,
+        "integrations": 0,
+        "experimental": 0,
+        "core": 0,
+        "reporting": 0,
+        "policy": 0,
+        "autofix": 0
+      },
+      "cli": {
+        "tests": 0,
+        "config": 0,
+        "analyzer": 0,
+        "security": 0,
+        "dashboard": 0,
+        "integrations": 0,
+        "experimental": 0,
+        "utils": 0,
+        "mcp": 0,
+        "core": 0,
+        "reporting": 0,
+        "policy": 0,
+        "autofix": 0,
+        "cli": 0
+      },
+      "config": {
+        "tests": 0,
+        "cli": 0,
+        "analyzer": 0,
+        "security": 0,
+        "dashboard": 0,
+        "integrations": 0,
+        "experimental": 0,
+        "utils": 0,
+        "mcp": 0,
+        "core": 0,
+        "reporting": 0,
+        "policy": 0,
+        "autofix": 0,
+        "config": 0
+      },
+      "security": {
+        "tests": 0,
+        "cli": 0,
+        "config": 0,
+        "analyzer": 0,
+        "dashboard": 0,
+        "integrations": 0,
+        "experimental": 0,
+        "utils": 0,
+        "mcp": 0,
+        "core": 0,
+        "reporting": 0,
+        "policy": 0,
+        "autofix": 0,
+        "security": 0
+      },
+      "dashboard": {
+        "tests": 0,
+        "cli": 0,
+        "config": 0,
+        "analyzer": 0,
+        "security": 0,
+        "integrations": 0,
+        "experimental": 0,
+        "utils": 0,
+        "mcp": 0,
+        "core": 0,
+        "reporting": 0,
+        "policy": 0,
+        "autofix": 0,
+        "dashboard": 0
+      },
+      "experimental": {
+        "tests": 0,
+        "cli": 0,
+        "config": 0,
+        "analyzer": 0,
+        "security": 0,
+        "dashboard": 0,
+        "integrations": 0,
+        "utils": 0,
+        "mcp": 0,
+        "core": 0,
+        "reporting": 0,
+        "policy": 0,
+        "autofix": 0,
+        "experimental": 0
+      },
+      "core": {
+        "tests": 0,
+        "cli": 0,
+        "config": 0,
+        "analyzer": 0,
+        "security": 0,
+        "dashboard": 0,
+        "integrations": 0,
+        "experimental": 0,
+        "utils": 0,
+        "mcp": 0,
+        "reporting": 0,
+        "policy": 0,
+        "autofix": 0,
+        "core": 0
+      },
+      "reporting": {
+        "tests": 0,
+        "cli": 0,
+        "config": 0,
+        "analyzer": 0,
+        "security": 0,
+        "dashboard": 0,
+        "integrations": 0,
+        "experimental": 0,
+        "utils": 0,
+        "mcp": 0,
+        "core": 0,
+        "policy": 0,
+        "autofix": 0,
+        "reporting": 0
+      }
+    },
+    "coupling_matrix": {
+      "tests": {
+        "tests": 0.0,
+        "cli": 0.005434782608695652,
+        "config": 0.0,
+        "analyzer": 0.782608695652174,
+        "security": 0.0,
+        "dashboard": 0.005434782608695652,
+        "integrations": 0.0,
+        "experimental": 0.0,
+        "utils": 0.08152173913043478,
+        "mcp": 0.02717391304347826,
+        "core": 0.0,
+        "reporting": 0.005434782608695652,
+        "policy": 0.043478260869565216,
+        "autofix": 0.04891304347826087
+      },
+      "cli": {
+        "tests": 0.0,
+        "cli": 0.0,
+        "config": 0.0,
+        "analyzer": 0.0,
+        "security": 0.0,
+        "dashboard": 0.0,
+        "integrations": 0.0,
+        "experimental": 0.0,
+        "utils": 0.0,
+        "mcp": 0.0,
+        "core": 0.0,
+        "reporting": 0.0,
+        "policy": 0.0,
+        "autofix": 0.0
+      },
+      "config": {
+        "tests": 0.0,
+        "cli": 0.0,
+        "config": 0.0,
+        "analyzer": 0.0,
+        "security": 0.0,
+        "dashboard": 0.0,
+        "integrations": 0.0,
+        "experimental": 0.0,
+        "utils": 0.0,
+        "mcp": 0.0,
+        "core": 0.0,
+        "reporting": 0.0,
+        "policy": 0.0,
+        "autofix": 0.0
+      },
+      "analyzer": {
+        "tests": 0.0,
+        "cli": 0.0,
+        "config": 0.0,
+        "analyzer": 0.0,
+        "security": 0.0,
+        "dashboard": 0.025,
+        "integrations": 0.0,
+        "experimental": 0.0,
+        "utils": 0.75,
+        "mcp": 0.025,
+        "core": 0.15,
+        "reporting": 0.0,
+        "policy": 0.05,
+        "autofix": 0.0
+      },
+      "security": {
+        "tests": 0.0,
+        "cli": 0.0,
+        "config": 0.0,
+        "analyzer": 0.0,
+        "security": 0.0,
+        "dashboard": 0.0,
+        "integrations": 0.0,
+        "experimental": 0.0,
+        "utils": 0.0,
+        "mcp": 0.0,
+        "core": 0.0,
+        "reporting": 0.0,
+        "policy": 0.0,
+        "autofix": 0.0
+      },
+      "dashboard": {
+        "tests": 0.0,
+        "cli": 0.0,
+        "config": 0.0,
+        "analyzer": 0.0,
+        "security": 0.0,
+        "dashboard": 0.0,
+        "integrations": 0.0,
+        "experimental": 0.0,
+        "utils": 0.0,
+        "mcp": 0.0,
+        "core": 0.0,
+        "reporting": 0.0,
+        "policy": 0.0,
+        "autofix": 0.0
+      },
+      "integrations": {
+        "tests": 0.0,
+        "cli": 0.0,
+        "config": 0.75,
+        "analyzer": 0.25,
+        "security": 0.0,
+        "dashboard": 0.0,
+        "integrations": 0.0,
+        "experimental": 0.0,
+        "utils": 0.0,
+        "mcp": 0.0,
+        "core": 0.0,
+        "reporting": 0.0,
+        "policy": 0.0,
+        "autofix": 0.0
+      },
+      "experimental": {
+        "tests": 0.0,
+        "cli": 0.0,
+        "config": 0.0,
+        "analyzer": 0.0,
+        "security": 0.0,
+        "dashboard": 0.0,
+        "integrations": 0.0,
+        "experimental": 0.0,
+        "utils": 0.0,
+        "mcp": 0.0,
+        "core": 0.0,
+        "reporting": 0.0,
+        "policy": 0.0,
+        "autofix": 0.0
+      },
+      "utils": {
+        "tests": 0.0,
+        "cli": 0.0,
+        "config": 1.0,
+        "analyzer": 0.0,
+        "security": 0.0,
+        "dashboard": 0.0,
+        "integrations": 0.0,
+        "experimental": 0.0,
+        "utils": 0.0,
+        "mcp": 0.0,
+        "core": 0.0,
+        "reporting": 0.0,
+        "policy": 0.0,
+        "autofix": 0.0
+      },
+      "mcp": {
+        "tests": 0.0,
+        "cli": 0.0,
+        "config": 0.1111111111111111,
+        "analyzer": 0.4444444444444444,
+        "security": 0.0,
+        "dashboard": 0.0,
+        "integrations": 0.05555555555555555,
+        "experimental": 0.0,
+        "utils": 0.2222222222222222,
+        "mcp": 0.0,
+        "core": 0.16666666666666666,
+        "reporting": 0.0,
+        "policy": 0.0,
+        "autofix": 0.0
+      },
+      "core": {
+        "tests": 0.0,
+        "cli": 0.0,
+        "config": 0.0,
+        "analyzer": 0.0,
+        "security": 0.0,
+        "dashboard": 0.0,
+        "integrations": 0.0,
+        "experimental": 0.0,
+        "utils": 0.0,
+        "mcp": 0.0,
+        "core": 0.0,
+        "reporting": 0.0,
+        "policy": 0.0,
+        "autofix": 0.0
+      },
+      "reporting": {
+        "tests": 0.0,
+        "cli": 0.0,
+        "config": 0.0,
+        "analyzer": 0.0,
+        "security": 0.0,
+        "dashboard": 0.0,
+        "integrations": 0.0,
+        "experimental": 0.0,
+        "utils": 0.0,
+        "mcp": 0.0,
+        "core": 0.0,
+        "reporting": 0.0,
+        "policy": 0.0,
+        "autofix": 0.0
+      },
+      "policy": {
+        "tests": 0.0,
+        "cli": 0.0,
+        "config": 0.0,
+        "analyzer": 0.4444444444444444,
+        "security": 0.0,
+        "dashboard": 0.0,
+        "integrations": 0.0,
+        "experimental": 0.0,
+        "utils": 0.5555555555555556,
+        "mcp": 0.0,
+        "core": 0.0,
+        "reporting": 0.0,
+        "policy": 0.0,
+        "autofix": 0.0
+      },
+      "autofix": {
+        "tests": 0.0,
+        "cli": 0.0,
+        "config": 0.0,
+        "analyzer": 0.0,
+        "security": 0.0,
+        "dashboard": 0.0,
+        "integrations": 0.0,
+        "experimental": 0.0,
+        "utils": 0.8,
+        "mcp": 0.2,
+        "core": 0.0,
+        "reporting": 0.0,
+        "policy": 0.0,
+        "autofix": 0.0
+      }
+    },
+    "fan_in": {
+      "utils": 58,
+      "core": 9,
+      "mcp": 7,
+      "policy": 10,
+      "dashboard": 2,
+      "config": 6,
+      "analyzer": 157,
+      "integrations": 1,
+      "autofix": 9,
+      "reporting": 1,
+      "cli": 1
+    },
+    "fan_out": {
+      "analyzer": 40,
+      "mcp": 18,
+      "policy": 9,
+      "utils": 1,
+      "integrations": 4,
+      "tests": 184,
+      "autofix": 5
+    },
+    "interface_analysis": {
+      "analyzer": {
+        "exports_to": [
+          "utils",
+          "core",
+          "mcp",
+          "policy",
+          "dashboard",
+          "tests",
+          "cli",
+          "config",
+          "security",
+          "integrations",
+          "experimental",
+          "reporting",
+          "autofix"
+        ],
+        "imports_from": [
+          "mcp",
+          "policy",
+          "integrations",
+          "tests"
+        ],
+        "shared_modules": [],
+        "coupling_strength": 40
+      },
+      "cli": {
+        "exports_to": [
+          "tests",
+          "config",
+          "analyzer",
+          "security",
+          "dashboard",
+          "integrations",
+          "experimental",
+          "utils",
+          "mcp",
+          "core",
+          "reporting",
+          "policy",
+          "autofix"
+        ],
+        "imports_from": [
+          "tests"
+        ],
+        "shared_modules": [],
+        "coupling_strength": 0
+      },
+      "mcp": {
+        "exports_to": [
+          "config",
+          "core",
+          "utils",
+          "analyzer",
+          "integrations",
+          "tests",
+          "cli",
+          "security",
+          "dashboard",
+          "experimental",
+          "reporting",
+          "policy",
+          "autofix"
+        ],
+        "imports_from": [
+          "analyzer",
+          "tests",
+          "autofix"
+        ],
+        "shared_modules": [],
+        "coupling_strength": 18
+      },
+      "config": {
+        "exports_to": [
+          "tests",
+          "cli",
+          "analyzer",
+          "security",
+          "dashboard",
+          "integrations",
+          "experimental",
+          "utils",
+          "mcp",
+          "core",
+          "reporting",
+          "policy",
+          "autofix"
+        ],
+        "imports_from": [
+          "mcp",
+          "utils",
+          "integrations"
+        ],
+        "shared_modules": [],
+        "coupling_strength": 0
+      },
+      "policy": {
+        "exports_to": [
+          "utils",
+          "analyzer",
+          "tests",
+          "cli",
+          "config",
+          "security",
+          "dashboard",
+          "integrations",
+          "experimental",
+          "mcp",
+          "core",
+          "reporting",
+          "autofix"
+        ],
+        "imports_from": [
+          "analyzer",
+          "tests"
+        ],
+        "shared_modules": [],
+        "coupling_strength": 9
+      },
+      "utils": {
+        "exports_to": [
+          "config",
+          "tests",
+          "cli",
+          "analyzer",
+          "security",
+          "dashboard",
+          "integrations",
+          "experimental",
+          "mcp",
+          "core",
+          "reporting",
+          "policy",
+          "autofix"
+        ],
+        "imports_from": [
+          "analyzer",
+          "mcp",
+          "policy",
+          "tests",
+          "autofix"
+        ],
+        "shared_modules": [],
+        "coupling_strength": 1
+      },
+      "integrations": {
+        "exports_to": [
+          "config",
+          "analyzer",
+          "tests",
+          "cli",
+          "security",
+          "dashboard",
+          "experimental",
+          "utils",
+          "mcp",
+          "core",
+          "reporting",
+          "policy",
+          "autofix"
+        ],
+        "imports_from": [
+          "mcp"
+        ],
+        "shared_modules": [],
+        "coupling_strength": 4
+      },
+      "security": {
+        "exports_to": [
+          "tests",
+          "cli",
+          "config",
+          "analyzer",
+          "dashboard",
+          "integrations",
+          "experimental",
+          "utils",
+          "mcp",
+          "core",
+          "reporting",
+          "policy",
+          "autofix"
+        ],
+        "imports_from": [],
+        "shared_modules": [],
+        "coupling_strength": 0
+      },
+      "tests": {
+        "exports_to": [
+          "utils",
+          "analyzer",
+          "autofix",
+          "mcp",
+          "policy",
+          "reporting",
+          "dashboard",
+          "cli",
+          "config",
+          "security",
+          "integrations",
+          "experimental",
+          "core"
+        ],
+        "imports_from": [],
+        "shared_modules": [],
+        "coupling_strength": 184
+      },
+      "experimental": {
+        "exports_to": [
+          "tests",
+          "cli",
+          "config",
+          "analyzer",
+          "security",
+          "dashboard",
+          "integrations",
+          "utils",
+          "mcp",
+          "core",
+          "reporting",
+          "policy",
+          "autofix"
+        ],
+        "imports_from": [],
+        "shared_modules": [],
+        "coupling_strength": 0
+      },
+      "core": {
+        "exports_to": [
+          "tests",
+          "cli",
+          "config",
+          "analyzer",
+          "security",
+          "dashboard",
+          "integrations",
+          "experimental",
+          "utils",
+          "mcp",
+          "reporting",
+          "policy",
+          "autofix"
+        ],
+        "imports_from": [
+          "analyzer",
+          "mcp"
+        ],
+        "shared_modules": [],
+        "coupling_strength": 0
+      },
+      "reporting": {
+        "exports_to": [
+          "tests",
+          "cli",
+          "config",
+          "analyzer",
+          "security",
+          "dashboard",
+          "integrations",
+          "experimental",
+          "utils",
+          "mcp",
+          "core",
+          "policy",
+          "autofix"
+        ],
+        "imports_from": [
+          "tests"
+        ],
+        "shared_modules": [],
+        "coupling_strength": 0
+      },
+      "dashboard": {
+        "exports_to": [
+          "tests",
+          "cli",
+          "config",
+          "analyzer",
+          "security",
+          "integrations",
+          "experimental",
+          "utils",
+          "mcp",
+          "core",
+          "reporting",
+          "policy",
+          "autofix"
+        ],
+        "imports_from": [
+          "analyzer",
+          "tests"
+        ],
+        "shared_modules": [],
+        "coupling_strength": 0
+      },
+      "autofix": {
+        "exports_to": [
+          "mcp",
+          "utils",
+          "tests",
+          "cli",
+          "config",
+          "analyzer",
+          "security",
+          "dashboard",
+          "integrations",
+          "experimental",
+          "core",
+          "reporting",
+          "policy"
+        ],
+        "imports_from": [
+          "tests"
+        ],
+        "shared_modules": [],
+        "coupling_strength": 5
+      }
+    }
+  }
+}

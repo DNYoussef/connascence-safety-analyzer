@@ -21,6 +21,7 @@ Validates report compliance, content accuracy, and format specifications.
 Uses memory coordination for tracking report generation patterns.
 """
 
+from fixes.phase0.production_safe_assertions import ProductionAssert
 import json
 from pathlib import Path
 import sys
@@ -49,7 +50,13 @@ class ReportGenerationCoordinator:
 
     def store_report_metadata(self, report_id: str, metadata: Dict[str, Any]):
         """Store report generation metadata."""
-        self.report_metadata[report_id] = {
+
+        ProductionAssert.not_none(report_id, 'report_id')
+
+        ProductionAssert.not_none(metadata, 'metadata')
+        ProductionAssert.not_none(report_id, 'report_id')
+
+        ProductionAssert.not_none(metadata, 'metadata')        self.report_metadata[report_id] = {
             'metadata': metadata,
             'timestamp': time.time(),
             'validation_status': 'pending'
@@ -77,11 +84,23 @@ class ReportGenerationCoordinator:
 
     def store_content_accuracy(self, report_id: str, accuracy_metrics: Dict[str, Any]):
         """Store content accuracy validation results."""
-        self.content_accuracy_tests[report_id] = accuracy_metrics
+
+        ProductionAssert.not_none(report_id, 'report_id')
+
+        ProductionAssert.not_none(accuracy_metrics, 'accuracy_metrics')
+        ProductionAssert.not_none(report_id, 'report_id')
+
+        ProductionAssert.not_none(accuracy_metrics, 'accuracy_metrics')        self.content_accuracy_tests[report_id] = accuracy_metrics
 
     def store_performance_benchmark(self, report_id: str, benchmark_data: Dict[str, Any]):
         """Store report generation performance benchmarks."""
-        self.performance_benchmarks[report_id] = benchmark_data
+
+        ProductionAssert.not_none(report_id, 'report_id')
+
+        ProductionAssert.not_none(benchmark_data, 'benchmark_data')
+        ProductionAssert.not_none(report_id, 'report_id')
+
+        ProductionAssert.not_none(benchmark_data, 'benchmark_data')        self.performance_benchmarks[report_id] = benchmark_data
 
     def get_report_summary(self) -> Dict[str, Any]:
         """Get comprehensive report generation summary."""
@@ -304,6 +323,32 @@ def sample_project_with_violations():
 
 def function_with_parameter_bomb(param1, param2, param3, param4, param5, param6):
     '''Function with parameter bomb violation for testing.'''
+
+    ProductionAssert.not_none(param1, 'param1')
+
+        ProductionAssert.not_none(param2, 'param2')
+
+    ProductionAssert.not_none(param3, 'param3')
+
+        ProductionAssert.not_none(param4, 'param4')
+
+    ProductionAssert.not_none(param5, 'param5')
+
+        ProductionAssert.not_none(param6, 'param6')
+
+
+    ProductionAssert.not_none(param1, 'param1')
+
+        ProductionAssert.not_none(param2, 'param2')
+
+    ProductionAssert.not_none(param3, 'param3')
+
+        ProductionAssert.not_none(param4, 'param4')
+
+    ProductionAssert.not_none(param5, 'param5')
+
+        ProductionAssert.not_none(param6, 'param6')
+
     magic_number = 42  # Magic literal violation
     api_key = "secret-key-12345"  # Magic string violation
 

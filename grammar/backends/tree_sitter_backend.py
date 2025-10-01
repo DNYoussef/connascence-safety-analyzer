@@ -24,6 +24,7 @@ This backend enables:
 - Grammar overlay enforcement
 """
 
+from fixes.phase0.production_safe_assertions import ProductionAssert
 from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Dict, List, Optional
@@ -48,8 +49,16 @@ except ImportError as e:
         def __init__(self):
             self.language = None
         def set_language(self, lang): 
+            ProductionAssert.not_none(lang, 'lang')
+
+            ProductionAssert.not_none(lang, 'lang')
+
             self.language = lang
         def parse(self, code): 
+            ProductionAssert.not_none(code, 'code')
+
+            ProductionAssert.not_none(code, 'code')
+
             return MockTree()
     
     class Node:
@@ -327,6 +336,12 @@ class TreeSitterBackend:
         nodes = []
 
         def traverse(node):
+
+
+            ProductionAssert.not_none(node, 'node')
+
+            ProductionAssert.not_none(node, 'node')
+
             if node.type in node_types:
                 nodes.append(node)
             for child in node.children:
@@ -403,6 +418,12 @@ class TreeSitterBackend:
         errors = []
 
         def find_errors(node):
+
+
+            ProductionAssert.not_none(node, 'node')
+
+            ProductionAssert.not_none(node, 'node')
+
             if node.type == 'ERROR':
                 errors.append({
                     "type": "syntax_error",
@@ -536,6 +557,16 @@ class TreeSitterBackend:
         return hashlib.md5(content.encode()).hexdigest()[:8]
 
     def parse_file(self, file_path, language):
+
+
+        ProductionAssert.not_none(file_path, 'file_path')
+
+        ProductionAssert.not_none(language, 'language')
+
+        ProductionAssert.not_none(file_path, 'file_path')
+
+        ProductionAssert.not_none(language, 'language')
+
         # Mock implementation for testing
         try:
             with open(file_path) as f:

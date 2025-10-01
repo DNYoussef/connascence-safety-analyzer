@@ -1,0 +1,5159 @@
+{
+  "metadata": {
+    "analysis_timestamp": "2025-09-23T19:02:59.263013",
+    "analyzer_version": "2.0.0",
+    "total_files_analyzed": 100,
+    "baseline_violations": 20673,
+    "compliance_status": "CATASTROPHIC"
+  },
+  "summary": {
+    "total_violations": 1504,
+    "rule_1_violations": 137,
+    "rule_2_violations": 55,
+    "rule_4_violations": 1312,
+    "total_fix_effort_loc": 4899
+  },
+  "critical_rules_analysis": {
+    "rule_1_simpler_code": {
+      "compliance": "0%",
+      "violations_found": 137,
+      "primary_issues": [
+        "Cyclomatic complexity > 10 (target: <= 10)",
+        "Nesting depth > 3 (target: <= 3)",
+        "Complex boolean logic in conditionals"
+      ],
+      "severity_breakdown": {
+        "high": 17,
+        "medium": 78
+      },
+      "auto_fixable": false,
+      "remediation_strategy": "Extract methods, simplify conditionals, reduce nesting"
+    },
+    "rule_2_no_gotos": {
+      "compliance": "0%",
+      "violations_found": 55,
+      "primary_issues": [
+        "Nested break/continue statements",
+        "Complex control flow patterns",
+        "Goto-like behavior via exception handling"
+      ],
+      "severity_breakdown": {
+        "high": 55
+      },
+      "auto_fixable": false,
+      "remediation_strategy": "Refactor to use early returns, extract helper functions"
+    },
+    "rule_4_assertions": {
+      "compliance": "0%",
+      "violations_found": 1312,
+      "primary_issues": [
+        "Missing input validation assertions",
+        "No defensive programming checks",
+        "Assertion density < 2% (current: ~0%)"
+      ],
+      "severity_breakdown": {
+        "medium": 1312
+      },
+      "auto_fixable": true,
+      "remediation_strategy": "Add precondition/postcondition assertions, validate inputs"
+    }
+  },
+  "top_100_files": [
+    {
+      "file": "ast_engine\\core_analyzer.py",
+      "violations": {
+        "rule_1": 0,
+        "rule_2": 0,
+        "rule_4": 5,
+        "total": 5
+      },
+      "loc": 34,
+      "density": 147.06,
+      "fix_effort_loc": 10,
+      "details": {
+        "rule_1": [],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "__init__",
+            "line": 9,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "analyze_file",
+            "line": 12,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "analyze_directory",
+            "line": 15,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "language_strategies.py",
+      "violations": {
+        "rule_1": 1,
+        "rule_2": 1,
+        "rule_4": 38,
+        "total": 40
+      },
+      "loc": 346,
+      "density": 115.61,
+      "fix_effort_loc": 98,
+      "details": {
+        "rule_1": [
+          {
+            "type": "nesting",
+            "function": "detect_god_functions",
+            "line": 82,
+            "value": 4,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          }
+        ],
+        "rule_2": [
+          {
+            "type": "nested_break_continue",
+            "line": 64,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 10
+          }
+        ],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "__init__",
+            "line": 34,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "detect_magic_literals",
+            "line": 37,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "detect_god_functions",
+            "line": 82,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "utils\\injection\\container.py",
+      "violations": {
+        "rule_1": 1,
+        "rule_2": 3,
+        "rule_4": 27,
+        "total": 31
+      },
+      "loc": 371,
+      "density": 83.56,
+      "fix_effort_loc": 96,
+      "details": {
+        "rule_1": [
+          {
+            "type": "nesting",
+            "function": "_create_with_injection",
+            "line": 129,
+            "value": 4,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          }
+        ],
+        "rule_2": [
+          {
+            "type": "nested_break_continue",
+            "line": 272,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 10
+          },
+          {
+            "type": "nested_break_continue",
+            "line": 157,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 10
+          },
+          {
+            "type": "nested_break_continue",
+            "line": 167,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 10
+          }
+        ],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "get_container",
+            "line": 203,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "_setup_default_services",
+            "line": 212,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "inject",
+            "line": 228,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "interfaces\\detector_interface.py",
+      "violations": {
+        "rule_1": 0,
+        "rule_2": 0,
+        "rule_4": 28,
+        "total": 28
+      },
+      "loc": 353,
+      "density": 79.32,
+      "fix_effort_loc": 56,
+      "details": {
+        "rule_1": [],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "register_detector",
+            "line": 322,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "__post_init__",
+            "line": 29,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "__post_init__",
+            "line": 48,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "utils\\error_handling.py",
+      "violations": {
+        "rule_1": 1,
+        "rule_2": 0,
+        "rule_4": 29,
+        "total": 30
+      },
+      "loc": 420,
+      "density": 71.43,
+      "fix_effort_loc": 70,
+      "details": {
+        "rule_1": [
+          {
+            "type": "nesting",
+            "function": "_log_error",
+            "line": 183,
+            "value": 4,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          }
+        ],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "handle_errors",
+            "line": 311,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "__post_init__",
+            "line": 54,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "to_dict",
+            "line": 60,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "detectors\\execution_detector.py",
+      "violations": {
+        "rule_1": 1,
+        "rule_2": 0,
+        "rule_4": 20,
+        "total": 21
+      },
+      "loc": 309,
+      "density": 67.96,
+      "fix_effort_loc": 60,
+      "details": {
+        "rule_1": [
+          {
+            "type": "nesting",
+            "function": "detect_violations",
+            "line": 34,
+            "value": 8,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 20
+          }
+        ],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "__init__",
+            "line": 19,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "detect_violations",
+            "line": 34,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "_track_global_usage",
+            "line": 72,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "utils\\config_manager.py",
+      "violations": {
+        "rule_1": 0,
+        "rule_2": 0,
+        "rule_4": 22,
+        "total": 22
+      },
+      "loc": 328,
+      "density": 67.07,
+      "fix_effort_loc": 44,
+      "details": {
+        "rule_1": [],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "get_config_manager",
+            "line": 300,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "initialize_config_manager",
+            "line": 308,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "get_detector_config",
+            "line": 316,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "utils\\common_patterns.py",
+      "violations": {
+        "rule_1": 4,
+        "rule_2": 3,
+        "rule_4": 25,
+        "total": 32
+      },
+      "loc": 488,
+      "density": 65.57,
+      "fix_effort_loc": 136,
+      "details": {
+        "rule_1": [
+          {
+            "type": "nesting",
+            "function": "get_function_complexity",
+            "line": 88,
+            "value": 4,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          },
+          {
+            "type": "nesting",
+            "function": "detect_configuration_patterns",
+            "line": 206,
+            "value": 4,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          },
+          {
+            "type": "nesting",
+            "function": "extract_literal_values",
+            "line": 225,
+            "value": 6,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 20
+          }
+        ],
+        "rule_2": [
+          {
+            "type": "nested_break_continue",
+            "line": 422,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 10
+          },
+          {
+            "type": "nested_break_continue",
+            "line": 442,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 10
+          },
+          {
+            "type": "nested_break_continue",
+            "line": 445,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 10
+          }
+        ],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "create_analysis_utilities",
+            "line": 471,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "__str__",
+            "line": 24,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "get_node_location",
+            "line": 35,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "ast_engine\\analyzer_orchestrator.py",
+      "violations": {
+        "rule_1": 2,
+        "rule_2": 0,
+        "rule_4": 9,
+        "total": 11
+      },
+      "loc": 169,
+      "density": 65.09,
+      "fix_effort_loc": 42,
+      "details": {
+        "rule_1": [
+          {
+            "type": "nesting",
+            "function": "analyze_path",
+            "line": 21,
+            "value": 4,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          },
+          {
+            "type": "nesting",
+            "function": "_analyze_file",
+            "line": 42,
+            "value": 4,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          }
+        ],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "main",
+            "line": 119,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "__init__",
+            "line": 18,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "analyze_path",
+            "line": 21,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "formal_grammar.py",
+      "violations": {
+        "rule_1": 3,
+        "rule_2": 2,
+        "rule_4": 40,
+        "total": 45
+      },
+      "loc": 752,
+      "density": 59.84,
+      "fix_effort_loc": 132,
+      "details": {
+        "rule_1": [
+          {
+            "type": "nesting",
+            "function": "_regex_fallback_magic_literals",
+            "line": 148,
+            "value": 4,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          },
+          {
+            "type": "complexity",
+            "function": "_calculate_severity",
+            "line": 500,
+            "value": 11,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 8
+          },
+          {
+            "type": "nesting",
+            "function": "detect_function_signatures",
+            "line": 666,
+            "value": 4,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          }
+        ],
+        "rule_2": [
+          {
+            "type": "nested_break_continue",
+            "line": 160,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 10
+          },
+          {
+            "type": "nested_break_continue",
+            "line": 180,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 10
+          }
+        ],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "analyze_file",
+            "line": 70,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "detect_magic_literals",
+            "line": 75,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "detect_function_signatures",
+            "line": 80,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "enterprise\\sixsigma\\dpmo_calculator.py",
+      "violations": {
+        "rule_1": 1,
+        "rule_2": 0,
+        "rule_4": 8,
+        "total": 9
+      },
+      "loc": 151,
+      "density": 59.6,
+      "fix_effort_loc": 28,
+      "details": {
+        "rule_1": [
+          {
+            "type": "nesting",
+            "function": "sigma_to_dpmo",
+            "line": 63,
+            "value": 5,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          }
+        ],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "main",
+            "line": 129,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "calculate_dpmo",
+            "line": 45,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "dpmo_to_sigma",
+            "line": 55,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "smart_integration_engine.py",
+      "violations": {
+        "rule_1": 4,
+        "rule_2": 0,
+        "rule_4": 34,
+        "total": 38
+      },
+      "loc": 641,
+      "density": 59.28,
+      "fix_effort_loc": 112,
+      "details": {
+        "rule_1": [
+          {
+            "type": "complexity",
+            "function": "_find_file_level_correlations",
+            "line": 118,
+            "value": 14,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 8
+          },
+          {
+            "type": "nesting",
+            "function": "_find_file_level_correlations",
+            "line": 118,
+            "value": 5,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          },
+          {
+            "type": "nesting",
+            "function": "_analyze_data_class",
+            "line": 336,
+            "value": 4,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          }
+        ],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "analyze_correlations",
+            "line": 12,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "_find_duplication_correlations",
+            "line": 38,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "_find_nasa_correlations",
+            "line": 63,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "optimization\\streaming_performance_monitor.py",
+      "violations": {
+        "rule_1": 0,
+        "rule_2": 0,
+        "rule_4": 21,
+        "total": 21
+      },
+      "loc": 361,
+      "density": 58.17,
+      "fix_effort_loc": 42,
+      "details": {
+        "rule_1": [],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "get_global_streaming_monitor",
+            "line": 331,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "start_streaming_monitoring",
+            "line": 340,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "stop_streaming_monitoring",
+            "line": 346,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "optimization\\file_cache.py",
+      "violations": {
+        "rule_1": 1,
+        "rule_2": 1,
+        "rule_4": 20,
+        "total": 22
+      },
+      "loc": 384,
+      "density": 57.29,
+      "fix_effort_loc": 62,
+      "details": {
+        "rule_1": [
+          {
+            "type": "nesting",
+            "function": "get_ast_tree",
+            "line": 155,
+            "value": 4,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          }
+        ],
+        "rule_2": [
+          {
+            "type": "nested_break_continue",
+            "line": 275,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 10
+          }
+        ],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "get_global_cache",
+            "line": 346,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "clear_global_cache",
+            "line": 358,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "cached_file_content",
+            "line": 367,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "caching\\ast_cache.py",
+      "violations": {
+        "rule_1": 4,
+        "rule_2": 1,
+        "rule_4": 25,
+        "total": 30
+      },
+      "loc": 532,
+      "density": 56.39,
+      "fix_effort_loc": 108,
+      "details": {
+        "rule_1": [
+          {
+            "type": "nesting",
+            "function": "clear_cache",
+            "line": 226,
+            "value": 4,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          },
+          {
+            "type": "nesting",
+            "function": "_remove_entry",
+            "line": 387,
+            "value": 4,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          },
+          {
+            "type": "nesting",
+            "function": "_persist_entry",
+            "line": 435,
+            "value": 4,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          }
+        ],
+        "rule_2": [
+          {
+            "type": "nested_break_continue",
+            "line": 431,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 10
+          }
+        ],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "get_cached_ast",
+            "line": 510,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "cache_ast",
+            "line": 515,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "get_cache_stats",
+            "line": 520,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "theater_detection\\patterns.py",
+      "violations": {
+        "rule_1": 2,
+        "rule_2": 1,
+        "rule_4": 25,
+        "total": 28
+      },
+      "loc": 499,
+      "density": 56.11,
+      "fix_effort_loc": 84,
+      "details": {
+        "rule_1": [
+          {
+            "type": "nesting",
+            "function": "detect_patterns",
+            "line": 382,
+            "value": 4,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          },
+          {
+            "type": "nesting",
+            "function": "calculate_theater_score",
+            "line": 417,
+            "value": 5,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          }
+        ],
+        "rule_2": [
+          {
+            "type": "nested_break_continue",
+            "line": 441,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 10
+          }
+        ],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "__init__",
+            "line": 32,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "_initialize_categories",
+            "line": 38,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "_initialize_patterns",
+            "line": 51,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "architecture\\configuration_manager.py",
+      "violations": {
+        "rule_1": 0,
+        "rule_2": 0,
+        "rule_4": 17,
+        "total": 17
+      },
+      "loc": 309,
+      "density": 55.02,
+      "fix_effort_loc": 34,
+      "details": {
+        "rule_1": [],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "__init__",
+            "line": 25,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "initialize_component_settings",
+            "line": 100,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "_load_config_file",
+            "line": 118,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "dup_detection\\mece_analyzer.py",
+      "violations": {
+        "rule_1": 3,
+        "rule_2": 2,
+        "rule_4": 15,
+        "total": 20
+      },
+      "loc": 365,
+      "density": 54.79,
+      "fix_effort_loc": 86,
+      "details": {
+        "rule_1": [
+          {
+            "type": "nesting",
+            "function": "_extract_code_blocks",
+            "line": 115,
+            "value": 4,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          },
+          {
+            "type": "nesting",
+            "function": "_extract_blocks_from_file",
+            "line": 128,
+            "value": 4,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          },
+          {
+            "type": "nesting",
+            "function": "_calculate_average_similarity",
+            "line": 262,
+            "value": 4,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          }
+        ],
+        "rule_2": [
+          {
+            "type": "nested_break_continue",
+            "line": 206,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 10
+          },
+          {
+            "type": "nested_break_continue",
+            "line": 212,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 10
+          }
+        ],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "main",
+            "line": 334,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "__init__",
+            "line": 67,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "analyze",
+            "line": 72,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "detectors\\convention_detector.py",
+      "violations": {
+        "rule_1": 2,
+        "rule_2": 0,
+        "rule_4": 10,
+        "total": 12
+      },
+      "loc": 220,
+      "density": 54.55,
+      "fix_effort_loc": 44,
+      "details": {
+        "rule_1": [
+          {
+            "type": "nesting",
+            "function": "detect_violations",
+            "line": 34,
+            "value": 5,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          },
+          {
+            "type": "nesting",
+            "function": "_analyze_assignment_conventions",
+            "line": 129,
+            "value": 4,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          }
+        ],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "__init__",
+            "line": 19,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "detect_violations",
+            "line": 34,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "_analyze_function_conventions",
+            "line": 68,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "optimization\\ast_optimizer.py",
+      "violations": {
+        "rule_1": 4,
+        "rule_2": 0,
+        "rule_4": 29,
+        "total": 33
+      },
+      "loc": 610,
+      "density": 54.1,
+      "fix_effort_loc": 110,
+      "details": {
+        "rule_1": [
+          {
+            "type": "nesting",
+            "function": "find_patterns_fast",
+            "line": 129,
+            "value": 5,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          },
+          {
+            "type": "nesting",
+            "function": "_get_node_cache_key",
+            "line": 236,
+            "value": 5,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          },
+          {
+            "type": "nesting",
+            "function": "_group_patterns_by_type",
+            "line": 264,
+            "value": 6,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 20
+          }
+        ],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "optimize_ast_analysis",
+            "line": 556,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "get_optimization_statistics",
+            "line": 593,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "__init__",
+            "line": 46,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "nasa_engine\\nasa_analyzer.py",
+      "violations": {
+        "rule_1": 4,
+        "rule_2": 0,
+        "rule_4": 19,
+        "total": 23
+      },
+      "loc": 430,
+      "density": 53.49,
+      "fix_effort_loc": 90,
+      "details": {
+        "rule_1": [
+          {
+            "type": "nesting",
+            "function": "analyze_file",
+            "line": 100,
+            "value": 5,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          },
+          {
+            "type": "nesting",
+            "function": "_collect_ast_elements",
+            "line": 155,
+            "value": 7,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 20
+          },
+          {
+            "type": "complexity",
+            "function": "_check_rule_7_return_values",
+            "line": 280,
+            "value": 12,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 8
+          }
+        ],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "__init__",
+            "line": 39,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "_find_nasa_config",
+            "line": 55,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "_load_nasa_config",
+            "line": 70,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "utils\\types.py",
+      "violations": {
+        "rule_1": 0,
+        "rule_2": 0,
+        "rule_4": 2,
+        "total": 2
+      },
+      "loc": 38,
+      "density": 52.63,
+      "fix_effort_loc": 4,
+      "details": {
+        "rule_1": [],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "__post_init__",
+            "line": 22,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "to_dict",
+            "line": 26,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "detectors\\values_detector.py",
+      "violations": {
+        "rule_1": 1,
+        "rule_2": 0,
+        "rule_4": 14,
+        "total": 15
+      },
+      "loc": 287,
+      "density": 52.26,
+      "fix_effort_loc": 48,
+      "details": {
+        "rule_1": [
+          {
+            "type": "nesting",
+            "function": "_get_usage_contexts",
+            "line": 191,
+            "value": 6,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 20
+          }
+        ],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "__init__",
+            "line": 31,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "detect_violations",
+            "line": 44,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "_track_literal_value",
+            "line": 100,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "architecture\\aggregator.py",
+      "violations": {
+        "rule_1": 0,
+        "rule_2": 0,
+        "rule_4": 16,
+        "total": 16
+      },
+      "loc": 311,
+      "density": 51.45,
+      "fix_effort_loc": 32,
+      "details": {
+        "rule_1": [],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "__init__",
+            "line": 24,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "_standardize_connascence_violations",
+            "line": 83,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "_standardize_duplication_violations",
+            "line": 93,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "architecture\\enhanced_metrics.py",
+      "violations": {
+        "rule_1": 0,
+        "rule_2": 0,
+        "rule_4": 19,
+        "total": 19
+      },
+      "loc": 373,
+      "density": 50.94,
+      "fix_effort_loc": 38,
+      "details": {
+        "rule_1": [],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "__init__",
+            "line": 24,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "_count_by_severity",
+            "line": 74,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "_calculate_connascence_index_enhanced",
+            "line": 89,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "utils\\connascence_validator.py",
+      "violations": {
+        "rule_1": 1,
+        "rule_2": 0,
+        "rule_4": 20,
+        "total": 21
+      },
+      "loc": 416,
+      "density": 50.48,
+      "fix_effort_loc": 52,
+      "details": {
+        "rule_1": [
+          {
+            "type": "nesting",
+            "function": "_count_hardcoded_values",
+            "line": 176,
+            "value": 5,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          }
+        ],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "validate_connascence_reduction",
+            "line": 386,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "total_violations",
+            "line": 33,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "to_dict",
+            "line": 40,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "refactored_detector.py",
+      "violations": {
+        "rule_1": 0,
+        "rule_2": 2,
+        "rule_4": 14,
+        "total": 16
+      },
+      "loc": 327,
+      "density": 48.93,
+      "fix_effort_loc": 48,
+      "details": {
+        "rule_1": [],
+        "rule_2": [
+          {
+            "type": "nested_break_continue",
+            "line": 199,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 10
+          },
+          {
+            "type": "nested_break_continue",
+            "line": 300,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 10
+          }
+        ],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "__init__",
+            "line": 51,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "get_code_snippet",
+            "line": 67,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "visit_FunctionDef",
+            "line": 71,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "theater_detection\\validation.py",
+      "violations": {
+        "rule_1": 5,
+        "rule_2": 2,
+        "rule_4": 6,
+        "total": 13
+      },
+      "loc": 269,
+      "density": 48.33,
+      "fix_effort_loc": 92,
+      "details": {
+        "rule_1": [
+          {
+            "type": "complexity",
+            "function": "validate_test_claims",
+            "line": 33,
+            "value": 13,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 8
+          },
+          {
+            "type": "nesting",
+            "function": "validate_test_claims",
+            "line": 33,
+            "value": 4,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          },
+          {
+            "type": "complexity",
+            "function": "validate_code_changes",
+            "line": 104,
+            "value": 16,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 8
+          }
+        ],
+        "rule_2": [
+          {
+            "type": "nested_break_continue",
+            "line": 65,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 10
+          },
+          {
+            "type": "nested_break_continue",
+            "line": 267,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 10
+          }
+        ],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "__init__",
+            "line": 30,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "validate_test_claims",
+            "line": 33,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "validate_quality_metrics",
+            "line": 88,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "check_connascence.py",
+      "violations": {
+        "rule_1": 7,
+        "rule_2": 6,
+        "rule_4": 34,
+        "total": 47
+      },
+      "loc": 977,
+      "density": 48.11,
+      "fix_effort_loc": 228,
+      "details": {
+        "rule_1": [
+          {
+            "type": "nesting",
+            "function": "_normalize_function_body",
+            "line": 108,
+            "value": 8,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 20
+          },
+          {
+            "type": "complexity",
+            "function": "_process_magic_literals",
+            "line": 509,
+            "value": 13,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 8
+          },
+          {
+            "type": "nesting",
+            "function": "_process_magic_literals",
+            "line": 509,
+            "value": 6,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 20
+          }
+        ],
+        "rule_2": [
+          {
+            "type": "nested_break_continue",
+            "line": 481,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 10
+          },
+          {
+            "type": "nested_break_continue",
+            "line": 574,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 10
+          },
+          {
+            "type": "nested_break_continue",
+            "line": 891,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 10
+          }
+        ],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "main",
+            "line": 906,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "__init__",
+            "line": 57,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "_init_legacy_structures",
+            "line": 79,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "context_analyzer.py",
+      "violations": {
+        "rule_1": 10,
+        "rule_2": 2,
+        "rule_4": 17,
+        "total": 29
+      },
+      "loc": 603,
+      "density": 48.09,
+      "fix_effort_loc": 204,
+      "details": {
+        "rule_1": [
+          {
+            "type": "complexity",
+            "function": "_classify_class_context",
+            "line": 197,
+            "value": 22,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 15
+          },
+          {
+            "type": "nesting",
+            "function": "_classify_class_context",
+            "line": 197,
+            "value": 6,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 20
+          },
+          {
+            "type": "nesting",
+            "function": "_calculate_method_complexity",
+            "line": 343,
+            "value": 4,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          }
+        ],
+        "rule_2": [
+          {
+            "type": "nested_break_continue",
+            "line": 230,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 10
+          },
+          {
+            "type": "nested_break_continue",
+            "line": 257,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 10
+          }
+        ],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "__post_init__",
+            "line": 59,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "__init__",
+            "line": 79,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "analyze_class_context",
+            "line": 158,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "agents\\realtime_auditor.py",
+      "violations": {
+        "rule_1": 4,
+        "rule_2": 0,
+        "rule_4": 14,
+        "total": 18
+      },
+      "loc": 375,
+      "density": 48.0,
+      "fix_effort_loc": 68,
+      "details": {
+        "rule_1": [
+          {
+            "type": "complexity",
+            "function": "_classify_violation",
+            "line": 125,
+            "value": 11,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 8
+          },
+          {
+            "type": "nesting",
+            "function": "_assess_quality_impact",
+            "line": 145,
+            "value": 5,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          },
+          {
+            "type": "complexity",
+            "function": "_generate_fix_suggestion",
+            "line": 172,
+            "value": 13,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 8
+          }
+        ],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "main",
+            "line": 337,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "__init__",
+            "line": 86,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "ingest_diagnostic_event",
+            "line": 91,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "unified_analyzer.py",
+      "violations": {
+        "rule_1": 16,
+        "rule_2": 10,
+        "rule_4": 85,
+        "total": 111
+      },
+      "loc": 2323,
+      "density": 47.78,
+      "fix_effort_loc": 462,
+      "details": {
+        "rule_1": [
+          {
+            "type": "complexity",
+            "function": "loadConnascenceSystem",
+            "line": 2069,
+            "value": 12,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 8
+          },
+          {
+            "type": "complexity",
+            "function": "_run_refactored_analysis",
+            "line": 648,
+            "value": 11,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 8
+          },
+          {
+            "type": "nesting",
+            "function": "_run_refactored_analysis",
+            "line": 648,
+            "value": 5,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          }
+        ],
+        "rule_2": [
+          {
+            "type": "nested_break_continue",
+            "line": 673,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 10
+          },
+          {
+            "type": "nested_break_continue",
+            "line": 689,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 10
+          },
+          {
+            "type": "nested_break_continue",
+            "line": 700,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 10
+          }
+        ],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "loadConnascenceSystem",
+            "line": 2069,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "_get_fallback_functions",
+            "line": 2220,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "validate_architecture_compliance",
+            "line": 2241,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "streaming\\stream_processor.py",
+      "violations": {
+        "rule_1": 2,
+        "rule_2": 2,
+        "rule_4": 33,
+        "total": 37
+      },
+      "loc": 786,
+      "density": 47.07,
+      "fix_effort_loc": 118,
+      "details": {
+        "rule_1": [
+          {
+            "type": "nesting",
+            "function": "_handle_change",
+            "line": 156,
+            "value": 6,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 20
+          },
+          {
+            "type": "nesting",
+            "function": "_run_full_analysis",
+            "line": 537,
+            "value": 4,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          }
+        ],
+        "rule_2": [
+          {
+            "type": "nested_break_continue",
+            "line": 432,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 10
+          },
+          {
+            "type": "nested_break_continue",
+            "line": 715,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 10
+          }
+        ],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "create_stream_processor",
+            "line": 754,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "process_file_changes_stream",
+            "line": 759,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "__init__",
+            "line": 98,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "optimization\\memory_monitor.py",
+      "violations": {
+        "rule_1": 0,
+        "rule_2": 0,
+        "rule_4": 24,
+        "total": 24
+      },
+      "loc": 526,
+      "density": 45.63,
+      "fix_effort_loc": 48,
+      "details": {
+        "rule_1": [],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "get_global_memory_monitor",
+            "line": 477,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "start_global_monitoring",
+            "line": 488,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "stop_global_monitoring",
+            "line": 494,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "duplication_unified.py",
+      "violations": {
+        "rule_1": 5,
+        "rule_2": 1,
+        "rule_4": 16,
+        "total": 22
+      },
+      "loc": 485,
+      "density": 45.36,
+      "fix_effort_loc": 102,
+      "details": {
+        "rule_1": [
+          {
+            "type": "nesting",
+            "function": "_run_similarity_analysis",
+            "line": 122,
+            "value": 4,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          },
+          {
+            "type": "complexity",
+            "function": "_run_algorithm_analysis",
+            "line": 181,
+            "value": 11,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 8
+          },
+          {
+            "type": "nesting",
+            "function": "_run_algorithm_analysis",
+            "line": 181,
+            "value": 4,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          }
+        ],
+        "rule_2": [
+          {
+            "type": "nested_break_continue",
+            "line": 205,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 10
+          }
+        ],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "main",
+            "line": 454,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "__post_init__",
+            "line": 65,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "__init__",
+            "line": 77,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "enterprise\\supply_chain\\sbom_generator.py",
+      "violations": {
+        "rule_1": 2,
+        "rule_2": 1,
+        "rule_4": 11,
+        "total": 14
+      },
+      "loc": 309,
+      "density": 45.31,
+      "fix_effort_loc": 56,
+      "details": {
+        "rule_1": [
+          {
+            "type": "nesting",
+            "function": "_scan_requirements",
+            "line": 82,
+            "value": 4,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          },
+          {
+            "type": "nesting",
+            "function": "_detect_license",
+            "line": 258,
+            "value": 4,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          }
+        ],
+        "rule_2": [
+          {
+            "type": "nested_break_continue",
+            "line": 90,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 10
+          }
+        ],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "main",
+            "line": 278,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "__init__",
+            "line": 59,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "scan_dependencies",
+            "line": 64,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "streaming\\incremental_cache.py",
+      "violations": {
+        "rule_1": 7,
+        "rule_2": 2,
+        "rule_4": 17,
+        "total": 26
+      },
+      "loc": 580,
+      "density": 44.83,
+      "fix_effort_loc": 130,
+      "details": {
+        "rule_1": [
+          {
+            "type": "nesting",
+            "function": "get_global_incremental_cache",
+            "line": 555,
+            "value": 4,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          },
+          {
+            "type": "complexity",
+            "function": "track_file_change",
+            "line": 155,
+            "value": 15,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 8
+          },
+          {
+            "type": "nesting",
+            "function": "track_file_change",
+            "line": 155,
+            "value": 5,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          }
+        ],
+        "rule_2": [
+          {
+            "type": "nested_break_continue",
+            "line": 380,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 10
+          },
+          {
+            "type": "nested_break_continue",
+            "line": 457,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 10
+          }
+        ],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "get_global_incremental_cache",
+            "line": 555,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "clear_incremental_cache",
+            "line": 572,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "is_stale",
+            "line": 70,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "architecture\\recommendation_engine.py",
+      "violations": {
+        "rule_1": 0,
+        "rule_2": 0,
+        "rule_4": 15,
+        "total": 15
+      },
+      "loc": 339,
+      "density": 44.25,
+      "fix_effort_loc": 30,
+      "details": {
+        "rule_1": [],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "__init__",
+            "line": 23,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "_initialize_priority_rules",
+            "line": 74,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "_generate_priority_fixes",
+            "line": 88,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "optimization\\incremental_analyzer.py",
+      "violations": {
+        "rule_1": 2,
+        "rule_2": 3,
+        "rule_4": 24,
+        "total": 29
+      },
+      "loc": 673,
+      "density": 43.09,
+      "fix_effort_loc": 102,
+      "details": {
+        "rule_1": [
+          {
+            "type": "nesting",
+            "function": "_detect_changed_files",
+            "line": 336,
+            "value": 5,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          },
+          {
+            "type": "nesting",
+            "function": "_update_dependency_cache",
+            "line": 570,
+            "value": 4,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          }
+        ],
+        "rule_2": [
+          {
+            "type": "nested_break_continue",
+            "line": 357,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 10
+          },
+          {
+            "type": "nested_break_continue",
+            "line": 361,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 10
+          },
+          {
+            "type": "nested_break_continue",
+            "line": 368,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 10
+          }
+        ],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "get_incremental_analyzer",
+            "line": 671,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "__init__",
+            "line": 80,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "analyze_changes",
+            "line": 102,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "theater_detection\\validator.py",
+      "violations": {
+        "rule_1": 6,
+        "rule_2": 1,
+        "rule_4": 15,
+        "total": 22
+      },
+      "loc": 516,
+      "density": 42.64,
+      "fix_effort_loc": 100,
+      "details": {
+        "rule_1": [
+          {
+            "type": "complexity",
+            "function": "validate_evidence_consistency",
+            "line": 175,
+            "value": 14,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 8
+          },
+          {
+            "type": "nesting",
+            "function": "_check_metric_inconsistency",
+            "line": 232,
+            "value": 4,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          },
+          {
+            "type": "complexity",
+            "function": "validate_measurement_methodology",
+            "line": 264,
+            "value": 13,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 8
+          }
+        ],
+        "rule_2": [
+          {
+            "type": "nested_break_continue",
+            "line": 205,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 10
+          }
+        ],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "__init__",
+            "line": 24,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "_initialize_validation_rules",
+            "line": 30,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "validate_evidence_file",
+            "line": 65,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "reporting\\coordinator.py",
+      "violations": {
+        "rule_1": 3,
+        "rule_2": 1,
+        "rule_4": 26,
+        "total": 30
+      },
+      "loc": 720,
+      "density": 41.67,
+      "fix_effort_loc": 102,
+      "details": {
+        "rule_1": [
+          {
+            "type": "complexity",
+            "function": "generate_report",
+            "line": 78,
+            "value": 12,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 8
+          },
+          {
+            "type": "nesting",
+            "function": "generate_report",
+            "line": 78,
+            "value": 8,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 20
+          },
+          {
+            "type": "nesting",
+            "function": "_create_hotspot_analysis",
+            "line": 627,
+            "value": 4,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          }
+        ],
+        "rule_2": [
+          {
+            "type": "nested_break_continue",
+            "line": 164,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 10
+          }
+        ],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "__init__",
+            "line": 68,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "generate_report",
+            "line": 78,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "generate_multi_format_report",
+            "line": 136,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "optimization\\resource_manager.py",
+      "violations": {
+        "rule_1": 0,
+        "rule_2": 0,
+        "rule_4": 26,
+        "total": 26
+      },
+      "loc": 632,
+      "density": 41.14,
+      "fix_effort_loc": 52,
+      "details": {
+        "rule_1": [],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "managed_file_handle",
+            "line": 521,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "managed_ast_tree",
+            "line": 545,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "managed_cache_entry",
+            "line": 577,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "theater_detection\\core.py",
+      "violations": {
+        "rule_1": 2,
+        "rule_2": 0,
+        "rule_4": 7,
+        "total": 9
+      },
+      "loc": 220,
+      "density": 40.91,
+      "fix_effort_loc": 42,
+      "details": {
+        "rule_1": [
+          {
+            "type": "complexity",
+            "function": "detect_test_gaming",
+            "line": 67,
+            "value": 11,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 8
+          },
+          {
+            "type": "nesting",
+            "function": "detect_test_gaming",
+            "line": 67,
+            "value": 6,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 20
+          }
+        ],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "__init__",
+            "line": 64,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "detect_test_gaming",
+            "line": 67,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "detect_error_masking",
+            "line": 106,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "enterprise\\sixsigma\\telemetry.py",
+      "violations": {
+        "rule_1": 1,
+        "rule_2": 0,
+        "rule_4": 15,
+        "total": 16
+      },
+      "loc": 393,
+      "density": 40.71,
+      "fix_effort_loc": 50,
+      "details": {
+        "rule_1": [
+          {
+            "type": "nesting",
+            "function": "calculate_sigma_level",
+            "line": 185,
+            "value": 6,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 20
+          }
+        ],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "to_dict",
+            "line": 46,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "__init__",
+            "line": 94,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "record_connascence_violation",
+            "line": 112,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "detectors\\position_detector.py",
+      "violations": {
+        "rule_1": 0,
+        "rule_2": 0,
+        "rule_4": 8,
+        "total": 8
+      },
+      "loc": 197,
+      "density": 40.61,
+      "fix_effort_loc": 16,
+      "details": {
+        "rule_1": [],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "__init__",
+            "line": 32,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "detect_violations",
+            "line": 38,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "_check_function_parameters",
+            "line": 74,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "enterprise\\sixsigma\\calculator.py",
+      "violations": {
+        "rule_1": 2,
+        "rule_2": 0,
+        "rule_4": 19,
+        "total": 21
+      },
+      "loc": 518,
+      "density": 40.54,
+      "fix_effort_loc": 70,
+      "details": {
+        "rule_1": [
+          {
+            "type": "nesting",
+            "function": "_interpret_capability",
+            "line": 460,
+            "value": 5,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          },
+          {
+            "type": "nesting",
+            "function": "_estimate_defect_rate",
+            "line": 475,
+            "value": 6,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 20
+          }
+        ],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "__init__",
+            "line": 76,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "calculate_from_violations",
+            "line": 86,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "_create_metric",
+            "line": 137,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "streaming\\result_aggregator.py",
+      "violations": {
+        "rule_1": 0,
+        "rule_2": 0,
+        "rule_4": 22,
+        "total": 22
+      },
+      "loc": 545,
+      "density": 40.37,
+      "fix_effort_loc": 44,
+      "details": {
+        "rule_1": [],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "get_global_stream_aggregator",
+            "line": 521,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "add_streaming_result",
+            "line": 530,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "get_streaming_dashboard_data",
+            "line": 536,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "streaming\\dashboard_reporter.py",
+      "violations": {
+        "rule_1": 1,
+        "rule_2": 0,
+        "rule_4": 24,
+        "total": 25
+      },
+      "loc": 621,
+      "density": 40.26,
+      "fix_effort_loc": 60,
+      "details": {
+        "rule_1": [
+          {
+            "type": "nesting",
+            "function": "_generate_trends_data",
+            "line": 346,
+            "value": 4,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          }
+        ],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "get_global_dashboard_reporter",
+            "line": 601,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "generate_dashboard_report",
+            "line": 610,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "add_dashboard_metrics_sample",
+            "line": 616,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "detectors\\timing_detector.py",
+      "violations": {
+        "rule_1": 0,
+        "rule_2": 0,
+        "rule_4": 5,
+        "total": 5
+      },
+      "loc": 131,
+      "density": 38.17,
+      "fix_effort_loc": 10,
+      "details": {
+        "rule_1": [],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "_is_sleep_call",
+            "line": 56,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "_is_timing_related_call",
+            "line": 68,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "_create_sleep_violation",
+            "line": 84,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "ml_modules\\compliance_forecaster.py",
+      "violations": {
+        "rule_1": 1,
+        "rule_2": 0,
+        "rule_4": 13,
+        "total": 14
+      },
+      "loc": 374,
+      "density": 37.43,
+      "fix_effort_loc": 38,
+      "details": {
+        "rule_1": [
+          {
+            "type": "nesting",
+            "function": "_generate_recommendations",
+            "line": 269,
+            "value": 5,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          }
+        ],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "main",
+            "line": 326,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "__init__",
+            "line": 64,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "add_snapshot",
+            "line": 73,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "enterprise\\supply_chain\\slsa_attestation.py",
+      "violations": {
+        "rule_1": 1,
+        "rule_2": 0,
+        "rule_4": 14,
+        "total": 15
+      },
+      "loc": 402,
+      "density": 37.31,
+      "fix_effort_loc": 40,
+      "details": {
+        "rule_1": [
+          {
+            "type": "nesting",
+            "function": "collect_build_artifacts",
+            "line": 110,
+            "value": 4,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          }
+        ],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "main",
+            "line": 346,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "__init__",
+            "line": 79,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "collect_build_materials",
+            "line": 84,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "reporting\\json.py",
+      "violations": {
+        "rule_1": 0,
+        "rule_2": 0,
+        "rule_4": 8,
+        "total": 8
+      },
+      "loc": 216,
+      "density": 37.04,
+      "fix_effort_loc": 16,
+      "details": {
+        "rule_1": [],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "__init__",
+            "line": 30,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "generate",
+            "line": 33,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "_create_metadata",
+            "line": 47,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "check_connascence_minimal.py",
+      "violations": {
+        "rule_1": 0,
+        "rule_2": 1,
+        "rule_4": 5,
+        "total": 6
+      },
+      "loc": 165,
+      "density": 36.36,
+      "fix_effort_loc": 20,
+      "details": {
+        "rule_1": [],
+        "rule_2": [
+          {
+            "type": "nested_break_continue",
+            "line": 79,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 10
+          }
+        ],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "main",
+            "line": 94,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "__init__",
+            "line": 27,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "analyze_file",
+            "line": 37,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "architecture\\orchestrator.py",
+      "violations": {
+        "rule_1": 1,
+        "rule_2": 0,
+        "rule_4": 12,
+        "total": 13
+      },
+      "loc": 363,
+      "density": 35.81,
+      "fix_effort_loc": 36,
+      "details": {
+        "rule_1": [
+          {
+            "type": "nesting",
+            "function": "_run_dedicated_nasa_analyzer",
+            "line": 292,
+            "value": 4,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          }
+        ],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "__init__",
+            "line": 24,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "_initialize_phase_metadata",
+            "line": 65,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "_execute_smart_integration_phase",
+            "line": 130,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "enterprise\\sixsigma\\ctq_calculator.py",
+      "violations": {
+        "rule_1": 1,
+        "rule_2": 0,
+        "rule_4": 13,
+        "total": 14
+      },
+      "loc": 394,
+      "density": 35.53,
+      "fix_effort_loc": 46,
+      "details": {
+        "rule_1": [
+          {
+            "type": "nesting",
+            "function": "_calculate_ctq_score",
+            "line": 230,
+            "value": 7,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 20
+          }
+        ],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "main",
+            "line": 361,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "__init__",
+            "line": 87,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "load_ctq_definitions",
+            "line": 92,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "theater_detection\\detector.py",
+      "violations": {
+        "rule_1": 4,
+        "rule_2": 1,
+        "rule_4": 19,
+        "total": 24
+      },
+      "loc": 680,
+      "density": 35.29,
+      "fix_effort_loc": 88,
+      "details": {
+        "rule_1": [
+          {
+            "type": "complexity",
+            "function": "_validate_statistical_plausibility",
+            "line": 285,
+            "value": 11,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 8
+          },
+          {
+            "type": "nesting",
+            "function": "_check_theater_pattern",
+            "line": 380,
+            "value": 5,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          },
+          {
+            "type": "complexity",
+            "function": "_validate_connascence_claim",
+            "line": 439,
+            "value": 12,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 8
+          }
+        ],
+        "rule_2": [
+          {
+            "type": "nested_break_continue",
+            "line": 451,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 10
+          }
+        ],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "__init__",
+            "line": 68,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "_initialize_theater_patterns",
+            "line": 92,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "_initialize_connascence_weights",
+            "line": 201,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "architecture\\detector_pool.py",
+      "violations": {
+        "rule_1": 2,
+        "rule_2": 0,
+        "rule_4": 11,
+        "total": 13
+      },
+      "loc": 371,
+      "density": 35.04,
+      "fix_effort_loc": 46,
+      "details": {
+        "rule_1": [
+          {
+            "type": "nesting",
+            "function": "release_detector",
+            "line": 249,
+            "value": 4,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          },
+          {
+            "type": "nesting",
+            "function": "_cleanup_idle_detectors",
+            "line": 319,
+            "value": 5,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          }
+        ],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "get_detector_pool",
+            "line": 366,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "release",
+            "line": 97,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "__new__",
+            "line": 132,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "performance\\parallel_analyzer.py",
+      "violations": {
+        "rule_1": 2,
+        "rule_2": 3,
+        "rule_4": 23,
+        "total": 28
+      },
+      "loc": 802,
+      "density": 34.91,
+      "fix_effort_loc": 100,
+      "details": {
+        "rule_1": [
+          {
+            "type": "nesting",
+            "function": "_discover_files",
+            "line": 323,
+            "value": 5,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          },
+          {
+            "type": "nesting",
+            "function": "_analyze_chunk",
+            "line": 410,
+            "value": 4,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          }
+        ],
+        "rule_2": [
+          {
+            "type": "nested_break_continue",
+            "line": 798,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 10
+          },
+          {
+            "type": "nested_break_continue",
+            "line": 435,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 10
+          },
+          {
+            "type": "nested_break_continue",
+            "line": 350,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 10
+          }
+        ],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "__init__",
+            "line": 108,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "analyze_project_parallel",
+            "line": 122,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "analyze_files_batch",
+            "line": 211,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "enterprise\\nasa_pot10_enhanced.py",
+      "violations": {
+        "rule_1": 0,
+        "rule_2": 0,
+        "rule_4": 23,
+        "total": 23
+      },
+      "loc": 662,
+      "density": 34.74,
+      "fix_effort_loc": 46,
+      "details": {
+        "rule_1": [],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "main",
+            "line": 590,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "calculate_weighted_penalty",
+            "line": 101,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "calculate_bonus_points",
+            "line": 110,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "reporting\\markdown.py",
+      "violations": {
+        "rule_1": 0,
+        "rule_2": 2,
+        "rule_4": 8,
+        "total": 10
+      },
+      "loc": 289,
+      "density": 34.6,
+      "fix_effort_loc": 36,
+      "details": {
+        "rule_1": [],
+        "rule_2": [
+          {
+            "type": "nested_break_continue",
+            "line": 144,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 10
+          },
+          {
+            "type": "nested_break_continue",
+            "line": 188,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 10
+          }
+        ],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "__init__",
+            "line": 30,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "generate",
+            "line": 34,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "_create_header",
+            "line": 59,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "enterprise\\sixsigma\\integration.py",
+      "violations": {
+        "rule_1": 1,
+        "rule_2": 0,
+        "rule_4": 12,
+        "total": 13
+      },
+      "loc": 376,
+      "density": 34.57,
+      "fix_effort_loc": 36,
+      "details": {
+        "rule_1": [
+          {
+            "type": "nesting",
+            "function": "_extract_violations",
+            "line": 93,
+            "value": 4,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          }
+        ],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "__init__",
+            "line": 28,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "_get_target_level",
+            "line": 39,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "process_analysis_results",
+            "line": 50,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "detectors\\magic_literal_detector.py",
+      "violations": {
+        "rule_1": 1,
+        "rule_2": 0,
+        "rule_4": 7,
+        "total": 8
+      },
+      "loc": 239,
+      "density": 33.47,
+      "fix_effort_loc": 26,
+      "details": {
+        "rule_1": [
+          {
+            "type": "nesting",
+            "function": "_create_formal_description",
+            "line": 184,
+            "value": 4,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          }
+        ],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "__init__",
+            "line": 17,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "_is_magic_literal",
+            "line": 82,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "_finalize_magic_literal_analysis",
+            "line": 93,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "ml_modules\\quality_predictor.py",
+      "violations": {
+        "rule_1": 0,
+        "rule_2": 0,
+        "rule_4": 10,
+        "total": 10
+      },
+      "loc": 302,
+      "density": 33.11,
+      "fix_effort_loc": 20,
+      "details": {
+        "rule_1": [],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "main",
+            "line": 256,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "__init__",
+            "line": 66,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "add_snapshot",
+            "line": 80,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "detectors\\base.py",
+      "violations": {
+        "rule_1": 0,
+        "rule_2": 0,
+        "rule_4": 5,
+        "total": 5
+      },
+      "loc": 154,
+      "density": 32.47,
+      "fix_effort_loc": 10,
+      "details": {
+        "rule_1": [],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "analyze_from_data",
+            "line": 22,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "detect_violations",
+            "line": 85,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "get_line_content",
+            "line": 123,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "ml_modules\\theater_classifier.py",
+      "violations": {
+        "rule_1": 0,
+        "rule_2": 0,
+        "rule_4": 11,
+        "total": 11
+      },
+      "loc": 362,
+      "density": 30.39,
+      "fix_effort_loc": 22,
+      "details": {
+        "rule_1": [],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "main",
+            "line": 298,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "to_vector",
+            "line": 65,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "__init__",
+            "line": 102,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "reporting\\sarif.py",
+      "violations": {
+        "rule_1": 0,
+        "rule_2": 0,
+        "rule_4": 13,
+        "total": 13
+      },
+      "loc": 440,
+      "density": 29.55,
+      "fix_effort_loc": 26,
+      "details": {
+        "rule_1": [],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "__init__",
+            "line": 36,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "generate",
+            "line": 42,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "_create_run",
+            "line": 52,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "enterprise\\sixsigma\\analyzer.py",
+      "violations": {
+        "rule_1": 1,
+        "rule_2": 0,
+        "rule_4": 13,
+        "total": 14
+      },
+      "loc": 488,
+      "density": 28.69,
+      "fix_effort_loc": 38,
+      "details": {
+        "rule_1": [
+          {
+            "type": "nesting",
+            "function": "_identify_root_causes",
+            "line": 328,
+            "value": 5,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          }
+        ],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "__init__",
+            "line": 65,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "analyze_violations",
+            "line": 78,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "_calculate_ctq_metrics",
+            "line": 156,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "enterprise\\compliance\\nist_ssdf_aligner.py",
+      "violations": {
+        "rule_1": 0,
+        "rule_2": 0,
+        "rule_4": 10,
+        "total": 10
+      },
+      "loc": 369,
+      "density": 27.1,
+      "fix_effort_loc": 20,
+      "details": {
+        "rule_1": [],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "main",
+            "line": 336,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "__init__",
+            "line": 81,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "assess_prepare_organization",
+            "line": 85,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "optimization\\performance_benchmark.py",
+      "violations": {
+        "rule_1": 2,
+        "rule_2": 0,
+        "rule_4": 11,
+        "total": 13
+      },
+      "loc": 481,
+      "density": 27.03,
+      "fix_effort_loc": 46,
+      "details": {
+        "rule_1": [
+          {
+            "type": "nesting",
+            "function": "benchmark_file_reading",
+            "line": 130,
+            "value": 4,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          },
+          {
+            "type": "nesting",
+            "function": "benchmark_ast_parsing",
+            "line": 182,
+            "value": 4,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          }
+        ],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "benchmark_timer",
+            "line": 38,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "main",
+            "line": 460,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "__init__",
+            "line": 47,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "utils\\code_utils.py",
+      "violations": {
+        "rule_1": 0,
+        "rule_2": 0,
+        "rule_4": 1,
+        "total": 1
+      },
+      "loc": 37,
+      "density": 27.03,
+      "fix_effort_loc": 2,
+      "details": {
+        "rule_1": [],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "get_code_snippet_for_node",
+            "line": 11,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "enterprise\\compliance\\soc2_collector.py",
+      "violations": {
+        "rule_1": 1,
+        "rule_2": 0,
+        "rule_4": 8,
+        "total": 9
+      },
+      "loc": 344,
+      "density": 26.16,
+      "fix_effort_loc": 28,
+      "details": {
+        "rule_1": [
+          {
+            "type": "nesting",
+            "function": "collect_access_control_evidence",
+            "line": 78,
+            "value": 5,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          }
+        ],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "main",
+            "line": 311,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "__init__",
+            "line": 74,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "collect_access_control_evidence",
+            "line": 78,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "duplication_helper.py",
+      "violations": {
+        "rule_1": 0,
+        "rule_2": 0,
+        "rule_4": 3,
+        "total": 3
+      },
+      "loc": 116,
+      "density": 25.86,
+      "fix_effort_loc": 6,
+      "details": {
+        "rule_1": [],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "format_duplication_analysis",
+            "line": 9,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "get_duplication_severity_counts",
+            "line": 83,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "calculate_duplication_impact_score",
+            "line": 95,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "enterprise\\compliance\\iso27001_mapper.py",
+      "violations": {
+        "rule_1": 0,
+        "rule_2": 0,
+        "rule_4": 9,
+        "total": 9
+      },
+      "loc": 362,
+      "density": 24.86,
+      "fix_effort_loc": 18,
+      "details": {
+        "rule_1": [],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "main",
+            "line": 329,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "__init__",
+            "line": 97,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "map_access_controls",
+            "line": 101,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "optimization\\unified_visitor.py",
+      "violations": {
+        "rule_1": 0,
+        "rule_2": 0,
+        "rule_4": 9,
+        "total": 9
+      },
+      "loc": 366,
+      "density": 24.59,
+      "fix_effort_loc": 18,
+      "details": {
+        "rule_1": [],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "_is_timing_call",
+            "line": 304,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "_is_threading_call",
+            "line": 312,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "_is_magic_literal",
+            "line": 318,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "thresholds.py",
+      "violations": {
+        "rule_1": 0,
+        "rule_2": 0,
+        "rule_4": 2,
+        "total": 2
+      },
+      "loc": 88,
+      "density": 22.73,
+      "fix_effort_loc": 4,
+      "details": {
+        "rule_1": [],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "get_connascence_severity",
+            "line": 66,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "get_severity_weight",
+            "line": 71,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "core.py",
+      "violations": {
+        "rule_1": 2,
+        "rule_2": 0,
+        "rule_4": 15,
+        "total": 17
+      },
+      "loc": 781,
+      "density": 21.77,
+      "fix_effort_loc": 57,
+      "details": {
+        "rule_1": [
+          {
+            "type": "complexity",
+            "function": "main",
+            "line": 502,
+            "value": 52,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 15
+          },
+          {
+            "type": "nesting",
+            "function": "main",
+            "line": 502,
+            "value": 5,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 12
+          }
+        ],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "create_parser",
+            "line": 406,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "main",
+            "line": 502,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "convert_to_sarif",
+            "line": 761,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "detectors\\algorithm_detector.py",
+      "violations": {
+        "rule_1": 2,
+        "rule_2": 1,
+        "rule_4": 1,
+        "total": 4
+      },
+      "loc": 209,
+      "density": 19.14,
+      "fix_effort_loc": 40,
+      "details": {
+        "rule_1": [
+          {
+            "type": "complexity",
+            "function": "_get_statement_type",
+            "line": 81,
+            "value": 11,
+            "severity": "medium",
+            "auto_fixable": false,
+            "fix_effort_loc": 8
+          },
+          {
+            "type": "nesting",
+            "function": "_get_statement_type",
+            "line": 81,
+            "value": 10,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 20
+          }
+        ],
+        "rule_2": [
+          {
+            "type": "nested_break_continue",
+            "line": 117,
+            "severity": "high",
+            "auto_fixable": false,
+            "fix_effort_loc": 10
+          }
+        ],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "__init__",
+            "line": 18,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "detectors\\god_object_detector.py",
+      "violations": {
+        "rule_1": 0,
+        "rule_2": 0,
+        "rule_4": 2,
+        "total": 2
+      },
+      "loc": 129,
+      "density": 15.5,
+      "fix_effort_loc": 4,
+      "details": {
+        "rule_1": [],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "_create_context_aware_violation",
+            "line": 70,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "_basic_god_object_analysis",
+            "line": 98,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "constants.py",
+      "violations": {
+        "rule_1": 0,
+        "rule_2": 0,
+        "rule_4": 7,
+        "total": 7
+      },
+      "loc": 882,
+      "density": 7.94,
+      "fix_effort_loc": 14,
+      "details": {
+        "rule_1": [],
+        "rule_2": [],
+        "rule_4": [
+          {
+            "type": "missing_assertion",
+            "function": "resolve_policy_name",
+            "line": 200,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "get_legacy_policy_name",
+            "line": 244,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          },
+          {
+            "type": "missing_assertion",
+            "function": "validate_policy_name",
+            "line": 269,
+            "severity": "medium",
+            "auto_fixable": true,
+            "fix_effort_loc": 2
+          }
+        ]
+      }
+    },
+    {
+      "file": "__init__.py",
+      "violations": {
+        "rule_1": 0,
+        "rule_2": 0,
+        "rule_4": 0,
+        "total": 0
+      },
+      "loc": 7,
+      "density": 0.0,
+      "fix_effort_loc": 0,
+      "details": {
+        "rule_1": [],
+        "rule_2": [],
+        "rule_4": []
+      }
+    },
+    {
+      "file": "__main__.py",
+      "violations": {
+        "rule_1": 0,
+        "rule_2": 0,
+        "rule_4": 0,
+        "total": 0
+      },
+      "loc": 8,
+      "density": 0.0,
+      "fix_effort_loc": 0,
+      "details": {
+        "rule_1": [],
+        "rule_2": [],
+        "rule_4": []
+      }
+    },
+    {
+      "file": "agents\\__init__.py",
+      "violations": {
+        "rule_1": 0,
+        "rule_2": 0,
+        "rule_4": 0,
+        "total": 0
+      },
+      "loc": 8,
+      "density": 0.0,
+      "fix_effort_loc": 0,
+      "details": {
+        "rule_1": [],
+        "rule_2": [],
+        "rule_4": []
+      }
+    },
+    {
+      "file": "architecture\\__init__.py",
+      "violations": {
+        "rule_1": 0,
+        "rule_2": 0,
+        "rule_4": 0,
+        "total": 0
+      },
+      "loc": 32,
+      "density": 0.0,
+      "fix_effort_loc": 0,
+      "details": {
+        "rule_1": [],
+        "rule_2": [],
+        "rule_4": []
+      }
+    },
+    {
+      "file": "ast_engine\\__init__.py",
+      "violations": {
+        "rule_1": 0,
+        "rule_2": 0,
+        "rule_4": 0,
+        "total": 0
+      },
+      "loc": 5,
+      "density": 0.0,
+      "fix_effort_loc": 0,
+      "details": {
+        "rule_1": [],
+        "rule_2": [],
+        "rule_4": []
+      }
+    },
+    {
+      "file": "ast_engine\\__main__.py",
+      "violations": {
+        "rule_1": 0,
+        "rule_2": 0,
+        "rule_4": 0,
+        "total": 0
+      },
+      "loc": 8,
+      "density": 0.0,
+      "fix_effort_loc": 0,
+      "details": {
+        "rule_1": [],
+        "rule_2": [],
+        "rule_4": []
+      }
+    },
+    {
+      "file": "detectors\\__init__.py",
+      "violations": {
+        "rule_1": 0,
+        "rule_2": 0,
+        "rule_4": 0,
+        "total": 0
+      },
+      "loc": 28,
+      "density": 0.0,
+      "fix_effort_loc": 0,
+      "details": {
+        "rule_1": [],
+        "rule_2": [],
+        "rule_4": []
+      }
+    },
+    {
+      "file": "dup_detection\\__init__.py",
+      "violations": {
+        "rule_1": 0,
+        "rule_2": 0,
+        "rule_4": 0,
+        "total": 0
+      },
+      "loc": 5,
+      "density": 0.0,
+      "fix_effort_loc": 0,
+      "details": {
+        "rule_1": [],
+        "rule_2": [],
+        "rule_4": []
+      }
+    },
+    {
+      "file": "dup_detection\\__main__.py",
+      "violations": {
+        "rule_1": 0,
+        "rule_2": 0,
+        "rule_4": 0,
+        "total": 0
+      },
+      "loc": 8,
+      "density": 0.0,
+      "fix_effort_loc": 0,
+      "details": {
+        "rule_1": [],
+        "rule_2": [],
+        "rule_4": []
+      }
+    },
+    {
+      "file": "enterprise\\__init__.py",
+      "violations": {
+        "rule_1": 0,
+        "rule_2": 0,
+        "rule_4": 0,
+        "total": 0
+      },
+      "loc": 28,
+      "density": 0.0,
+      "fix_effort_loc": 0,
+      "details": {
+        "rule_1": [],
+        "rule_2": [],
+        "rule_4": []
+      }
+    },
+    {
+      "file": "ml_modules\\__init__.py",
+      "violations": {
+        "rule_1": 0,
+        "rule_2": 0,
+        "rule_4": 0,
+        "total": 0
+      },
+      "loc": 9,
+      "density": 0.0,
+      "fix_effort_loc": 0,
+      "details": {
+        "rule_1": [],
+        "rule_2": [],
+        "rule_4": []
+      }
+    },
+    {
+      "file": "nasa_engine\\__init__.py",
+      "violations": {
+        "rule_1": 0,
+        "rule_2": 0,
+        "rule_4": 0,
+        "total": 0
+      },
+      "loc": 10,
+      "density": 0.0,
+      "fix_effort_loc": 0,
+      "details": {
+        "rule_1": [],
+        "rule_2": [],
+        "rule_4": []
+      }
+    },
+    {
+      "file": "optimization\\__init__.py",
+      "violations": {
+        "rule_1": 0,
+        "rule_2": 0,
+        "rule_4": 0,
+        "total": 0
+      },
+      "loc": 43,
+      "density": 0.0,
+      "fix_effort_loc": 0,
+      "details": {
+        "rule_1": [],
+        "rule_2": [],
+        "rule_4": []
+      }
+    },
+    {
+      "file": "performance\\__init__.py",
+      "violations": {
+        "rule_1": 0,
+        "rule_2": 0,
+        "rule_4": 0,
+        "total": 0
+      },
+      "loc": 20,
+      "density": 0.0,
+      "fix_effort_loc": 0,
+      "details": {
+        "rule_1": [],
+        "rule_2": [],
+        "rule_4": []
+      }
+    },
+    {
+      "file": "reporting\\__init__.py",
+      "violations": {
+        "rule_1": 0,
+        "rule_2": 0,
+        "rule_4": 0,
+        "total": 0
+      },
+      "loc": 20,
+      "density": 0.0,
+      "fix_effort_loc": 0,
+      "details": {
+        "rule_1": [],
+        "rule_2": [],
+        "rule_4": []
+      }
+    },
+    {
+      "file": "streaming\\__init__.py",
+      "violations": {
+        "rule_1": 0,
+        "rule_2": 0,
+        "rule_4": 0,
+        "total": 0
+      },
+      "loc": 84,
+      "density": 0.0,
+      "fix_effort_loc": 0,
+      "details": {
+        "rule_1": [],
+        "rule_2": [],
+        "rule_4": []
+      }
+    },
+    {
+      "file": "theater_detection\\__init__.py",
+      "violations": {
+        "rule_1": 0,
+        "rule_2": 0,
+        "rule_4": 0,
+        "total": 0
+      },
+      "loc": 16,
+      "density": 0.0,
+      "fix_effort_loc": 0,
+      "details": {
+        "rule_1": [],
+        "rule_2": [],
+        "rule_4": []
+      }
+    },
+    {
+      "file": "utils\\__init__.py",
+      "violations": {
+        "rule_1": 0,
+        "rule_2": 0,
+        "rule_4": 0,
+        "total": 0
+      },
+      "loc": 2,
+      "density": 0.0,
+      "fix_effort_loc": 0,
+      "details": {
+        "rule_1": [],
+        "rule_2": [],
+        "rule_4": []
+      }
+    },
+    {
+      "file": "enterprise\\compliance\\__init__.py",
+      "violations": {
+        "rule_1": 0,
+        "rule_2": 0,
+        "rule_4": 0,
+        "total": 0
+      },
+      "loc": 9,
+      "density": 0.0,
+      "fix_effort_loc": 0,
+      "details": {
+        "rule_1": [],
+        "rule_2": [],
+        "rule_4": []
+      }
+    },
+    {
+      "file": "enterprise\\sixsigma\\__init__.py",
+      "violations": {
+        "rule_1": 0,
+        "rule_2": 0,
+        "rule_4": 0,
+        "total": 0
+      },
+      "loc": 14,
+      "density": 0.0,
+      "fix_effort_loc": 0,
+      "details": {
+        "rule_1": [],
+        "rule_2": [],
+        "rule_4": []
+      }
+    },
+    {
+      "file": "enterprise\\supply_chain\\__init__.py",
+      "violations": {
+        "rule_1": 0,
+        "rule_2": 0,
+        "rule_4": 0,
+        "total": 0
+      },
+      "loc": 4,
+      "density": 0.0,
+      "fix_effort_loc": 0,
+      "details": {
+        "rule_1": [],
+        "rule_2": [],
+        "rule_4": []
+      }
+    }
+  ],
+  "remediation_priorities": [
+    {
+      "priority": 1,
+      "file": "unified_analyzer.py",
+      "total_violations": 111,
+      "fix_effort_loc": 462,
+      "quick_wins": 3,
+      "recommended_actions": [
+        "Add 85 assertions (auto-fixable)",
+        "Refactor 16 complex functions",
+        "Fix 10 control flow issues"
+      ]
+    },
+    {
+      "priority": 2,
+      "file": "check_connascence.py",
+      "total_violations": 47,
+      "fix_effort_loc": 228,
+      "quick_wins": 3,
+      "recommended_actions": [
+        "Add 34 assertions (auto-fixable)",
+        "Refactor 7 complex functions",
+        "Fix 6 control flow issues"
+      ]
+    },
+    {
+      "priority": 3,
+      "file": "formal_grammar.py",
+      "total_violations": 45,
+      "fix_effort_loc": 132,
+      "quick_wins": 3,
+      "recommended_actions": [
+        "Add 40 assertions (auto-fixable)",
+        "Refactor 3 complex functions",
+        "Fix 2 control flow issues"
+      ]
+    },
+    {
+      "priority": 4,
+      "file": "language_strategies.py",
+      "total_violations": 40,
+      "fix_effort_loc": 98,
+      "quick_wins": 3,
+      "recommended_actions": [
+        "Add 38 assertions (auto-fixable)",
+        "Refactor 1 complex functions",
+        "Fix 1 control flow issues"
+      ]
+    },
+    {
+      "priority": 5,
+      "file": "smart_integration_engine.py",
+      "total_violations": 38,
+      "fix_effort_loc": 112,
+      "quick_wins": 3,
+      "recommended_actions": [
+        "Add 34 assertions (auto-fixable)",
+        "Refactor 4 complex functions"
+      ]
+    },
+    {
+      "priority": 6,
+      "file": "streaming\\stream_processor.py",
+      "total_violations": 37,
+      "fix_effort_loc": 118,
+      "quick_wins": 3,
+      "recommended_actions": [
+        "Add 33 assertions (auto-fixable)",
+        "Refactor 2 complex functions",
+        "Fix 2 control flow issues"
+      ]
+    },
+    {
+      "priority": 7,
+      "file": "optimization\\ast_optimizer.py",
+      "total_violations": 33,
+      "fix_effort_loc": 110,
+      "quick_wins": 3,
+      "recommended_actions": [
+        "Add 29 assertions (auto-fixable)",
+        "Refactor 4 complex functions"
+      ]
+    },
+    {
+      "priority": 8,
+      "file": "utils\\common_patterns.py",
+      "total_violations": 32,
+      "fix_effort_loc": 136,
+      "quick_wins": 3,
+      "recommended_actions": [
+        "Add 25 assertions (auto-fixable)",
+        "Refactor 4 complex functions",
+        "Fix 3 control flow issues"
+      ]
+    },
+    {
+      "priority": 9,
+      "file": "utils\\injection\\container.py",
+      "total_violations": 31,
+      "fix_effort_loc": 96,
+      "quick_wins": 3,
+      "recommended_actions": [
+        "Add 27 assertions (auto-fixable)",
+        "Refactor 1 complex functions",
+        "Fix 3 control flow issues"
+      ]
+    },
+    {
+      "priority": 10,
+      "file": "utils\\error_handling.py",
+      "total_violations": 30,
+      "fix_effort_loc": 70,
+      "quick_wins": 3,
+      "recommended_actions": [
+        "Add 29 assertions (auto-fixable)",
+        "Refactor 1 complex functions"
+      ]
+    },
+    {
+      "priority": 11,
+      "file": "caching\\ast_cache.py",
+      "total_violations": 30,
+      "fix_effort_loc": 108,
+      "quick_wins": 3,
+      "recommended_actions": [
+        "Add 25 assertions (auto-fixable)",
+        "Refactor 4 complex functions",
+        "Fix 1 control flow issues"
+      ]
+    },
+    {
+      "priority": 12,
+      "file": "reporting\\coordinator.py",
+      "total_violations": 30,
+      "fix_effort_loc": 102,
+      "quick_wins": 3,
+      "recommended_actions": [
+        "Add 26 assertions (auto-fixable)",
+        "Refactor 3 complex functions",
+        "Fix 1 control flow issues"
+      ]
+    },
+    {
+      "priority": 13,
+      "file": "context_analyzer.py",
+      "total_violations": 29,
+      "fix_effort_loc": 204,
+      "quick_wins": 3,
+      "recommended_actions": [
+        "Add 17 assertions (auto-fixable)",
+        "Refactor 10 complex functions",
+        "Fix 2 control flow issues"
+      ]
+    },
+    {
+      "priority": 14,
+      "file": "optimization\\incremental_analyzer.py",
+      "total_violations": 29,
+      "fix_effort_loc": 102,
+      "quick_wins": 3,
+      "recommended_actions": [
+        "Add 24 assertions (auto-fixable)",
+        "Refactor 2 complex functions",
+        "Fix 3 control flow issues"
+      ]
+    },
+    {
+      "priority": 15,
+      "file": "interfaces\\detector_interface.py",
+      "total_violations": 28,
+      "fix_effort_loc": 56,
+      "quick_wins": 3,
+      "recommended_actions": [
+        "Add 28 assertions (auto-fixable)"
+      ]
+    },
+    {
+      "priority": 16,
+      "file": "theater_detection\\patterns.py",
+      "total_violations": 28,
+      "fix_effort_loc": 84,
+      "quick_wins": 3,
+      "recommended_actions": [
+        "Add 25 assertions (auto-fixable)",
+        "Refactor 2 complex functions",
+        "Fix 1 control flow issues"
+      ]
+    },
+    {
+      "priority": 17,
+      "file": "performance\\parallel_analyzer.py",
+      "total_violations": 28,
+      "fix_effort_loc": 100,
+      "quick_wins": 3,
+      "recommended_actions": [
+        "Add 23 assertions (auto-fixable)",
+        "Refactor 2 complex functions",
+        "Fix 3 control flow issues"
+      ]
+    },
+    {
+      "priority": 18,
+      "file": "streaming\\incremental_cache.py",
+      "total_violations": 26,
+      "fix_effort_loc": 130,
+      "quick_wins": 3,
+      "recommended_actions": [
+        "Add 17 assertions (auto-fixable)",
+        "Refactor 7 complex functions",
+        "Fix 2 control flow issues"
+      ]
+    },
+    {
+      "priority": 19,
+      "file": "optimization\\resource_manager.py",
+      "total_violations": 26,
+      "fix_effort_loc": 52,
+      "quick_wins": 3,
+      "recommended_actions": [
+        "Add 26 assertions (auto-fixable)"
+      ]
+    },
+    {
+      "priority": 20,
+      "file": "streaming\\dashboard_reporter.py",
+      "total_violations": 25,
+      "fix_effort_loc": 60,
+      "quick_wins": 3,
+      "recommended_actions": [
+        "Add 24 assertions (auto-fixable)",
+        "Refactor 1 complex functions"
+      ]
+    }
+  ]
+}

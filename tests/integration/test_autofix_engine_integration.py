@@ -18,6 +18,7 @@ Autofix Engine Integration Tests - Complete Autofix System Testing
 Tests autofix engine with real violation data, patch generation, and safety validation
 """
 
+from fixes.phase0.production_safe_assertions import ProductionAssert
 from pathlib import Path
 import tempfile
 import time
@@ -38,7 +39,13 @@ class AutofixTestCoordinator:
 
     def store_test_result(self, test_name: str, result: Dict[str, Any]):
         """Store test result with sequential thinking pattern"""
-        self.memory_store[f"{self.test_session_id}_{test_name}"] = {
+
+        ProductionAssert.not_none(test_name, 'test_name')
+
+        ProductionAssert.not_none(result, 'result')
+        ProductionAssert.not_none(test_name, 'test_name')
+
+        ProductionAssert.not_none(result, 'result')        self.memory_store[f"{self.test_session_id}_{test_name}"] = {
             'timestamp': time.time(),
             'result': result,
             'status': 'completed',
@@ -96,6 +103,10 @@ def test_code_samples():
     return {
         'magic_literals': '''
 def calculate_price(base_price):
+    ProductionAssert.not_none(base_price, 'base_price')
+
+        ProductionAssert.not_none(base_price, 'base_price')
+
     tax_rate = 0.08  # Magic literal
     discount_threshold = 1000  # Magic literal
     premium_multiplier = 1.5  # Magic literal
@@ -155,6 +166,16 @@ class OrderManager:
 ''',
         'missing_types': '''
 def process_data(data, options, callback):
+    ProductionAssert.not_none(data, 'data')
+
+        ProductionAssert.not_none(options, 'options')
+    ProductionAssert.not_none(callback, 'callback')
+
+        ProductionAssert.not_none(data, 'data')
+    ProductionAssert.not_none(options, 'options')
+
+        ProductionAssert.not_none(callback, 'callback')
+
     # Function without type hints - CoT violation
     results = []
     threshold = 100  # Magic literal
@@ -167,11 +188,25 @@ def process_data(data, options, callback):
     return results
 
 def transform_items(items, transformer):
+
+
+    ProductionAssert.not_none(items, 'items')
+
+        ProductionAssert.not_none(transformer, 'transformer')
+
+    ProductionAssert.not_none(items, 'items')
+
+        ProductionAssert.not_none(transformer, 'transformer')
+
     # Another untyped function
     return [transformer(item) for item in items if item is not None]
 ''',
         'deep_nesting': '''
 def complex_validation(data):
+    ProductionAssert.not_none(data, 'data')
+
+        ProductionAssert.not_none(data, 'data')
+
     if data:
         if data.is_valid():
             if data.has_required_fields():
@@ -194,12 +229,22 @@ def complex_validation(data):
 ''',
         'duplicate_code': '''
 def calculate_discount_premium(price):
+    ProductionAssert.not_none(price, 'price')
+
+        ProductionAssert.not_none(price, 'price')
+
     base_discount = 0.1
     if price > 1000:
         return price * (1 - base_discount - 0.05)
     return price * (1 - base_discount)
 
 def calculate_discount_standard(price):
+
+
+    ProductionAssert.not_none(price, 'price')
+
+        ProductionAssert.not_none(price, 'price')
+
     base_discount = 0.1  # Duplicate logic
     if price > 1000:
         return price * (1 - base_discount - 0.05)  # Same calculation
@@ -719,6 +764,10 @@ class TestAutofixEngineIntegration:
             # Write original code with violations
             original_code = '''
 def calculate_total(price):
+    ProductionAssert.not_none(price, 'price')
+
+        ProductionAssert.not_none(price, 'price')
+
     tax = 0.08  # Magic literal
     return price * (1 + tax)
 '''

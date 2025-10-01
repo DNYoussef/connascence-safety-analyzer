@@ -1,0 +1,74 @@
+{
+  "total_modules": 21,
+  "dependencies": {
+    "analyzer": [
+      "mcp",
+      "analyzer_orchestrator",
+      "policy"
+    ],
+    "autofix": [
+      "mcp"
+    ],
+    "cli": [],
+    "config": [],
+    "core": [],
+    "dashboard": [],
+    "dogfood": [
+      "analyzer"
+    ],
+    "examples": [],
+    "grammar": [],
+    "integrations": [
+      "analyzer"
+    ],
+    "interfaces": [
+      "policy",
+      "policy_detection",
+      "analyzer"
+    ],
+    "mcp": [
+      "integrations",
+      "analyzer"
+    ],
+    "policy": [
+      "analyzer"
+    ],
+    "scripts": [
+      "integrations",
+      "mcp",
+      "analyzer"
+    ],
+    "security": [],
+    "src": [
+      "analyzer"
+    ],
+    "tests": [
+      "mcp",
+      "policy",
+      "analyzer"
+    ],
+    "utils": [],
+    "docs": [],
+    "fixes": [],
+    "test_packages": []
+  },
+  "circular_dependencies": [
+    [
+      "analyzer",
+      "mcp",
+      "integrations",
+      "analyzer"
+    ],
+    [
+      "analyzer",
+      "mcp",
+      "analyzer"
+    ],
+    [
+      "analyzer",
+      "policy",
+      "analyzer"
+    ]
+  ],
+  "cycle_count": 3
+}

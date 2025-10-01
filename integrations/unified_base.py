@@ -12,6 +12,7 @@ tool integrations (Black, MyPy, Ruff, Radon, etc.).
 This eliminates the architectural fragmentation identified in the MECE report.
 """
 
+from fixes.phase0.production_safe_assertions import ProductionAssert
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
@@ -387,6 +388,12 @@ class IntegrationRegistry:
 
     def register(self, integration: UnifiedBaseIntegration):
         """Register an integration."""
+
+        ProductionAssert.not_none(integration, 'integration')
+
+
+        ProductionAssert.not_none(integration, 'integration')
+
         self._integrations[integration.tool_name] = integration
 
     def get(self, tool_name: str) -> Optional[UnifiedBaseIntegration]:

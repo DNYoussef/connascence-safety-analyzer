@@ -6,6 +6,7 @@ Provides centralized dependency management that reduces coupling between
 components and eliminates hardcoded instantiation patterns.
 """
 
+from fixes.phase0.production_safe_assertions import ProductionAssert
 from typing import Any, Callable, Dict, Optional, Type, TypeVar, Union
 from functools import wraps
 import inspect
@@ -232,12 +233,34 @@ def inject(**dependencies):
     Usage:
         @inject(config_manager='config_manager', logger='logger')
         def my_function(config_manager, logger, other_param):
+            ProductionAssert.not_none(config_manager, 'config_manager')
+            ProductionAssert.not_none(logger, 'logger')
+            ProductionAssert.not_none(other_param, 'other_param')
+
+            ProductionAssert.not_none(config_manager, 'config_manager')
+            ProductionAssert.not_none(logger, 'logger')
+            ProductionAssert.not_none(other_param, 'other_param')
+
             # config_manager and logger will be injected automatically
             pass
     """
+    ProductionAssert.not_none(**dependencies, '**dependencies')
+
+    ProductionAssert.not_none(**dependencies, '**dependencies')
+
     def decorator(func):
+
+        ProductionAssert.not_none(func, 'func')
+
+        ProductionAssert.not_none(func, 'func')
+
         @wraps(func)
         def wrapper(*args, **kwargs):
+            if args:
+                ProductionAssert.not_none(args, 'args')
+            if kwargs:
+                ProductionAssert.not_none(kwargs, 'kwargs')
+
             container = get_container()
             
             # Inject dependencies
@@ -301,6 +324,10 @@ def singleton(name: Optional[str] = None):
     Args:
         name: Optional service name (defaults to lowercase class name)
     """
+    ProductionAssert.not_none(name, 'name')
+
+    ProductionAssert.not_none(name, 'name')
+
     def decorator(cls):
         service_name = name or cls.__name__.lower()
         instance = cls()
@@ -316,6 +343,14 @@ def service(name: Optional[str] = None):
     Args:
         name: Optional service name (defaults to lowercase class name)
     """
+
+
+    ProductionAssert.not_none(name, 'name')
+
+
+
+    ProductionAssert.not_none(name, 'name')
+
     def decorator(cls):
         service_name = name or cls.__name__.lower()
         get_container().register_type(service_name, cls)
@@ -330,7 +365,20 @@ def factory(name: str):
     Args:
         name: Service name
     """
+
+
+    ProductionAssert.not_none(name, 'name')
+
+
+
+    ProductionAssert.not_none(name, 'name')
+
     def decorator(func):
+
+        ProductionAssert.not_none(func, 'func')
+
+        ProductionAssert.not_none(func, 'func')
+
         get_container().register_factory(name, func)
         return func
     return decorator

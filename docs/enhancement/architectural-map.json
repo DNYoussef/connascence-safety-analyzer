@@ -1,0 +1,1736 @@
+{
+  "metadata": {
+    "total_files": 762,
+    "analyzed_date": "2025-09-23",
+    "baseline_nasa_compliance": 19.3
+  },
+  "module_structure": {
+    "analyzer": {
+      "files": 100,
+      "total_loc": 33757,
+      "avg_loc_per_file": 337
+    },
+    "tests": {
+      "files": 79,
+      "total_loc": 39036,
+      "avg_loc_per_file": 494
+    },
+    "interfaces": {
+      "files": 17,
+      "total_loc": 4619,
+      "avg_loc_per_file": 271
+    },
+    "mcp": {
+      "files": 4,
+      "total_loc": 1945,
+      "avg_loc_per_file": 486
+    },
+    "security": {
+      "files": 6,
+      "total_loc": 2147,
+      "avg_loc_per_file": 357
+    },
+    "core": {
+      "files": 1,
+      "total_loc": 445,
+      "avg_loc_per_file": 445
+    },
+    "autofix": {
+      "files": 10,
+      "total_loc": 3000,
+      "avg_loc_per_file": 300
+    },
+    "integrations": {
+      "files": 6,
+      "total_loc": 2998,
+      "avg_loc_per_file": 499
+    }
+  },
+  "god_objects": [
+    {
+      "class": "UnifiedConnascenceAnalyzer",
+      "file": "analyzer\\unified_analyzer.py",
+      "methods": 70,
+      "loc": 1679,
+      "priority": "critical"
+    },
+    {
+      "class": "ConnascenceDetector",
+      "file": "analyzer\\check_connascence.py",
+      "methods": 31,
+      "loc": 756,
+      "priority": "high"
+    },
+    {
+      "class": "UnifiedASTVisitor",
+      "file": "analyzer\\optimization\\unified_visitor.py",
+      "methods": 30,
+      "loc": 299,
+      "priority": "medium"
+    },
+    {
+      "class": "MassiveGodClass",
+      "file": "tests\\test_comprehensive_connascence.py",
+      "methods": 27,
+      "loc": 27,
+      "priority": "medium"
+    },
+    {
+      "class": "GodClass",
+      "file": "tests\\fixtures\\comprehensive_violation_sample.py",
+      "methods": 26,
+      "loc": 38,
+      "priority": "medium"
+    },
+    {
+      "class": "TheaterPatternLibrary",
+      "file": "analyzer\\theater_detection\\patterns.py",
+      "methods": 25,
+      "loc": 473,
+      "priority": "medium"
+    },
+    {
+      "class": "TestSalesDemoScenarios",
+      "file": "tests\\e2e\\test_sales_scenarios.py",
+      "methods": 25,
+      "loc": 838,
+      "priority": "medium"
+    },
+    {
+      "class": "BuildFlagsIntegration",
+      "file": "integrations\\build_flags_integration.py",
+      "methods": 24,
+      "loc": 603,
+      "priority": "medium"
+    },
+    {
+      "class": "MasterMemoryCoordinator",
+      "file": "tests\\e2e\\test_memory_coordination.py",
+      "methods": 24,
+      "loc": 427,
+      "priority": "medium"
+    },
+    {
+      "class": "NASAAnalyzer",
+      "file": "analyzer\\nasa_engine\\nasa_analyzer.py",
+      "methods": 23,
+      "loc": 394,
+      "priority": "medium"
+    },
+    {
+      "class": "ASTSafeRefactoring",
+      "file": "grammar\\ast_safe_refactoring.py",
+      "methods": 22,
+      "loc": 560,
+      "priority": "medium"
+    },
+    {
+      "class": "IncrementalAnalyzer",
+      "file": "analyzer\\optimization\\incremental_analyzer.py",
+      "methods": 22,
+      "loc": 593,
+      "priority": "medium"
+    },
+    {
+      "class": "UnifiedReportingCoordinator",
+      "file": "analyzer\\reporting\\coordinator.py",
+      "methods": 22,
+      "loc": 667,
+      "priority": "medium"
+    },
+    {
+      "class": "TreeSitterBackend",
+      "file": "grammar\\backends\\tree_sitter_backend.py",
+      "methods": 22,
+      "loc": 418,
+      "priority": "medium"
+    },
+    {
+      "class": "ConfigDiscovery",
+      "file": "interfaces\\cli\\config_discovery.py",
+      "methods": 22,
+      "loc": 558,
+      "priority": "medium"
+    },
+    {
+      "class": "ConnascenceCLI",
+      "file": "interfaces\\cli\\main_python.py",
+      "methods": 22,
+      "loc": 925,
+      "priority": "medium"
+    },
+    {
+      "class": "PatchGenerator",
+      "file": "autofix\\patch_generator.py",
+      "methods": 21,
+      "loc": 521,
+      "priority": "medium"
+    },
+    {
+      "class": "DataProcessor",
+      "file": "examples\\simple_usage.py",
+      "methods": 21,
+      "loc": 31,
+      "priority": "medium"
+    },
+    {
+      "class": "TestCLIInterface",
+      "file": "tests\\test_cli_interface.py",
+      "methods": 21,
+      "loc": 321,
+      "priority": "medium"
+    },
+    {
+      "class": "ViolationAggregator",
+      "file": "analyzer\\architecture\\aggregator.py",
+      "methods": 21,
+      "loc": 290,
+      "priority": "medium"
+    },
+    {
+      "class": "ConfigurationManager",
+      "file": "analyzer\\architecture\\configuration_manager.py",
+      "methods": 21,
+      "loc": 287,
+      "priority": "medium"
+    },
+    {
+      "class": "ResourceManager",
+      "file": "analyzer\\optimization\\resource_manager.py",
+      "methods": 21,
+      "loc": 435,
+      "priority": "medium"
+    },
+    {
+      "class": "DashboardReporter",
+      "file": "analyzer\\streaming\\dashboard_reporter.py",
+      "methods": 21,
+      "loc": 522,
+      "priority": "medium"
+    },
+    {
+      "class": "TestWebDashboardEnhancedIntegration",
+      "file": "tests\\enhanced\\test_web_dashboard_integration.py",
+      "methods": 21,
+      "loc": 519,
+      "priority": "medium"
+    }
+  ],
+  "coupling_analysis": {
+    "most_coupled": [
+      {
+        "file": "analyzer\\unified_analyzer.py",
+        "import_count": 27
+      },
+      {
+        "file": "analyzer\\check_connascence.py",
+        "import_count": 18
+      },
+      {
+        "file": "security\\enterprise_security.py",
+        "import_count": 18
+      },
+      {
+        "file": "interfaces\\web\\server_flask.py",
+        "import_count": 17
+      },
+      {
+        "file": "tests\\enhanced\\test_performance_benchmarks.py",
+        "import_count": 15
+      },
+      {
+        "file": "tests\\performance\\benchmark_runner.py",
+        "import_count": 15
+      },
+      {
+        "file": "analyzer\\streaming\\stream_processor.py",
+        "import_count": 14
+      },
+      {
+        "file": "tests\\e2e\\test_performance.py",
+        "import_count": 14
+      },
+      {
+        "file": "analyzer\\core.py",
+        "import_count": 13
+      },
+      {
+        "file": "analyzer\\performance\\parallel_analyzer.py",
+        "import_count": 13
+      },
+      {
+        "file": "tests\\e2e\\test_error_handling.py",
+        "import_count": 13
+      },
+      {
+        "file": "integrations\\tool_coordinator.py",
+        "import_count": 12
+      },
+      {
+        "file": "integrations\\unified_base.py",
+        "import_count": 12
+      },
+      {
+        "file": "mcp\\enhanced_server.py",
+        "import_count": 12
+      },
+      {
+        "file": "scripts\\performance-benchmark.py",
+        "import_count": 12
+      },
+      {
+        "file": "tests\\test_production_readiness.py",
+        "import_count": 12
+      },
+      {
+        "file": "tests\\test_smoke_imports.py",
+        "import_count": 12
+      },
+      {
+        "file": "analyzer\\caching\\ast_cache.py",
+        "import_count": 12
+      },
+      {
+        "file": "analyzer\\enterprise\\nasa_pot10_enhanced.py",
+        "import_count": 12
+      },
+      {
+        "file": "analyzer\\optimization\\memory_monitor.py",
+        "import_count": 12
+      }
+    ],
+    "avg_coupling": 5
+  },
+  "violation_hotspots": [
+    {
+      "rank": 1,
+      "file": "test_packages\\celery\\celery\\canvas.py",
+      "violations": 397,
+      "loc": 2413,
+      "density": 0.1645,
+      "rules_violated": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 2,
+      "file": "test_packages\\celery\\t\\unit\\tasks\\test_stamping.py",
+      "violations": 372,
+      "loc": 1313,
+      "density": 0.2833,
+      "rules_violated": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "priority": "high"
+    },
+    {
+      "rank": 3,
+      "file": "analyzer\\unified_analyzer.py",
+      "violations": 250,
+      "loc": 2323,
+      "density": 0.1076,
+      "rules_violated": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 4,
+      "file": "test_packages\\celery\\celery\\utils\\collections.py",
+      "violations": 229,
+      "loc": 863,
+      "density": 0.2654,
+      "rules_violated": [
+        "1",
+        "2",
+        "4"
+      ],
+      "priority": "high"
+    },
+    {
+      "rank": 5,
+      "file": "test_packages\\celery\\celery\\app\\base.py",
+      "violations": 218,
+      "loc": 1541,
+      "density": 0.1415,
+      "rules_violated": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 6,
+      "file": "test_packages\\curl\\tests\\http\\testenv\\env.py",
+      "violations": 182,
+      "loc": 756,
+      "density": 0.2407,
+      "rules_violated": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "priority": "high"
+    },
+    {
+      "rank": 7,
+      "file": "test_packages\\celery\\celery\\result.py",
+      "violations": 166,
+      "loc": 1091,
+      "density": 0.1522,
+      "rules_violated": [
+        "1",
+        "2",
+        "3",
+        "4"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 8,
+      "file": "test_packages\\celery\\t\\integration\\test_canvas.py",
+      "violations": 161,
+      "loc": 3763,
+      "density": 0.0428,
+      "rules_violated": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "8"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 9,
+      "file": "test_packages\\curl\\tests\\http\\testenv\\curl.py",
+      "violations": 156,
+      "loc": 1046,
+      "density": 0.1491,
+      "rules_violated": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "8"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 10,
+      "file": "test_packages\\celery\\celery\\app\\task.py",
+      "violations": 150,
+      "loc": 1168,
+      "density": 0.1284,
+      "rules_violated": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 11,
+      "file": "test_packages\\celery\\t\\unit\\tasks\\test_tasks.py",
+      "violations": 146,
+      "loc": 1704,
+      "density": 0.0857,
+      "rules_violated": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 12,
+      "file": "test_packages\\celery\\t\\unit\\tasks\\test_canvas.py",
+      "violations": 141,
+      "loc": 1962,
+      "density": 0.0719,
+      "rules_violated": [
+        "1",
+        "2",
+        "4"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 13,
+      "file": "test_packages\\celery\\celery\\concurrency\\asynpool.py",
+      "violations": 135,
+      "loc": 1367,
+      "density": 0.0988,
+      "rules_violated": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 14,
+      "file": "test_packages\\celery\\celery\\backends\\base.py",
+      "violations": 134,
+      "loc": 1219,
+      "density": 0.1099,
+      "rules_violated": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "8"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 15,
+      "file": "test_packages\\celery\\celery\\beat.py",
+      "violations": 129,
+      "loc": 734,
+      "density": 0.1757,
+      "rules_violated": [
+        "1",
+        "2",
+        "4"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 16,
+      "file": "test_packages\\curl\\tests\\http\\scorecard.py",
+      "violations": 128,
+      "loc": 929,
+      "density": 0.1378,
+      "rules_violated": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 17,
+      "file": "analyzer\\formal_grammar.py",
+      "violations": 125,
+      "loc": 752,
+      "density": 0.1662,
+      "rules_violated": [
+        "1",
+        "2",
+        "4",
+        "5",
+        "8"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 18,
+      "file": "test_packages\\celery\\t\\unit\\app\\test_app.py",
+      "violations": 124,
+      "loc": 1728,
+      "density": 0.0718,
+      "rules_violated": [
+        "1",
+        "2",
+        "4"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 19,
+      "file": "analyzer\\check_connascence.py",
+      "violations": 123,
+      "loc": 977,
+      "density": 0.1259,
+      "rules_violated": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 20,
+      "file": "test_packages\\celery\\celery\\events\\state.py",
+      "violations": 118,
+      "loc": 730,
+      "density": 0.1616,
+      "rules_violated": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 21,
+      "file": "test_packages\\celery\\t\\unit\\conftest.py",
+      "violations": 116,
+      "loc": 780,
+      "density": 0.1487,
+      "rules_violated": [
+        "1",
+        "2",
+        "4"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 22,
+      "file": "test_packages\\celery\\t\\unit\\worker\\test_worker.py",
+      "violations": 115,
+      "loc": 1242,
+      "density": 0.0926,
+      "rules_violated": [
+        "1",
+        "2",
+        "4"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 23,
+      "file": "tests\\e2e\\test_performance.py",
+      "violations": 114,
+      "loc": 1524,
+      "density": 0.0748,
+      "rules_violated": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 24,
+      "file": "test_packages\\celery\\t\\unit\\backends\\test_base.py",
+      "violations": 112,
+      "loc": 1651,
+      "density": 0.0678,
+      "rules_violated": [
+        "1",
+        "2",
+        "4"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 25,
+      "file": "test_packages\\celery\\celery\\schedules.py",
+      "violations": 111,
+      "loc": 896,
+      "density": 0.1239,
+      "rules_violated": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "8"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 26,
+      "file": "test_packages\\celery\\celery\\app\\control.py",
+      "violations": 111,
+      "loc": 788,
+      "density": 0.1409,
+      "rules_violated": [
+        "1",
+        "2",
+        "3",
+        "4"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 27,
+      "file": "test_packages\\celery\\celery\\local.py",
+      "violations": 105,
+      "loc": 540,
+      "density": 0.1944,
+      "rules_violated": [
+        "1",
+        "2",
+        "4"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 28,
+      "file": "test_packages\\celery\\celery\\worker\\control.py",
+      "violations": 105,
+      "loc": 625,
+      "density": 0.168,
+      "rules_violated": [
+        "1",
+        "2",
+        "4",
+        "5"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 29,
+      "file": "test_packages\\celery\\t\\unit\\app\\test_schedules.py",
+      "violations": 105,
+      "loc": 1014,
+      "density": 0.1036,
+      "rules_violated": [
+        "1",
+        "2",
+        "4"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 30,
+      "file": "scripts\\run_all_tests.py",
+      "violations": 104,
+      "loc": 509,
+      "density": 0.2043,
+      "rules_violated": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "priority": "high"
+    },
+    {
+      "rank": 31,
+      "file": "test_packages\\celery\\t\\unit\\backends\\test_redis.py",
+      "violations": 101,
+      "loc": 1315,
+      "density": 0.0768,
+      "rules_violated": [
+        "1",
+        "2",
+        "4"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 32,
+      "file": "analyzer\\language_strategies.py",
+      "violations": 100,
+      "loc": 346,
+      "density": 0.289,
+      "rules_violated": [
+        "1",
+        "2",
+        "4",
+        "8"
+      ],
+      "priority": "high"
+    },
+    {
+      "rank": 33,
+      "file": "analyzer\\enterprise\\nasa_pot10_enhanced.py",
+      "violations": 99,
+      "loc": 662,
+      "density": 0.1495,
+      "rules_violated": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "8"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 34,
+      "file": "tests\\integration\\test_autofix_engine_integration.py",
+      "violations": 96,
+      "loc": 1007,
+      "density": 0.0953,
+      "rules_violated": [
+        "1",
+        "2",
+        "3",
+        "4"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 35,
+      "file": "test_packages\\celery\\celery\\bin\\multi.py",
+      "violations": 95,
+      "loc": 480,
+      "density": 0.1979,
+      "rules_violated": [
+        "1",
+        "2",
+        "4"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 36,
+      "file": "test_packages\\celery\\celery\\backends\\redis.py",
+      "violations": 94,
+      "loc": 673,
+      "density": 0.1397,
+      "rules_violated": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 37,
+      "file": "test_packages\\celery\\celery\\utils\\term.py",
+      "violations": 94,
+      "loc": 184,
+      "density": 0.5109,
+      "rules_violated": [
+        "1",
+        "2",
+        "4"
+      ],
+      "priority": "critical"
+    },
+    {
+      "rank": 38,
+      "file": "integrations\\tool_coordinator.py",
+      "violations": 93,
+      "loc": 758,
+      "density": 0.1227,
+      "rules_violated": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 39,
+      "file": "analyzer\\theater_detection\\detector.py",
+      "violations": 93,
+      "loc": 680,
+      "density": 0.1368,
+      "rules_violated": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 40,
+      "file": "analyzer\\smart_integration_engine.py",
+      "violations": 91,
+      "loc": 641,
+      "density": 0.142,
+      "rules_violated": [
+        "1",
+        "2",
+        "4",
+        "5"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 41,
+      "file": "security\\enterprise_security.py",
+      "violations": 91,
+      "loc": 921,
+      "density": 0.0988,
+      "rules_violated": [
+        "1",
+        "2",
+        "3",
+        "4"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 42,
+      "file": "test_packages\\celery\\t\\unit\\app\\test_beat.py",
+      "violations": 91,
+      "loc": 930,
+      "density": 0.0978,
+      "rules_violated": [
+        "1",
+        "2",
+        "4"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 43,
+      "file": "test_packages\\celery\\celery\\worker\\request.py",
+      "violations": 90,
+      "loc": 798,
+      "density": 0.1128,
+      "rules_violated": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 44,
+      "file": "test_packages\\celery\\t\\unit\\worker\\test_loops.py",
+      "violations": 88,
+      "loc": 549,
+      "density": 0.1603,
+      "rules_violated": [
+        "1",
+        "4"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 45,
+      "file": "test_packages\\curl\\tests\\http\\testenv\\certs.py",
+      "violations": 88,
+      "loc": 563,
+      "density": 0.1563,
+      "rules_violated": [
+        "1",
+        "2",
+        "4",
+        "5"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 46,
+      "file": "test_packages\\celery\\t\\unit\\apps\\test_multi.py",
+      "violations": 87,
+      "loc": 429,
+      "density": 0.2028,
+      "rules_violated": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "8"
+      ],
+      "priority": "high"
+    },
+    {
+      "rank": 47,
+      "file": "analyzer\\reporting\\coordinator.py",
+      "violations": 86,
+      "loc": 720,
+      "density": 0.1194,
+      "rules_violated": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 48,
+      "file": "analyzer\\streaming\\stream_processor.py",
+      "violations": 86,
+      "loc": 786,
+      "density": 0.1094,
+      "rules_violated": [
+        "1",
+        "2",
+        "4",
+        "5"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 49,
+      "file": "test_packages\\celery\\t\\unit\\worker\\test_request.py",
+      "violations": 85,
+      "loc": 1418,
+      "density": 0.0599,
+      "rules_violated": [
+        "1",
+        "2",
+        "4"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 50,
+      "file": "policy\\baselines.py",
+      "violations": 83,
+      "loc": 599,
+      "density": 0.1386,
+      "rules_violated": [
+        "1",
+        "2",
+        "4",
+        "5"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 51,
+      "file": "test_packages\\celery\\celery\\apps\\multi.py",
+      "violations": 83,
+      "loc": 506,
+      "density": 0.164,
+      "rules_violated": [
+        "1",
+        "2",
+        "4",
+        "8"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 52,
+      "file": "test_packages\\celery\\celery\\utils\\time.py",
+      "violations": 83,
+      "loc": 451,
+      "density": 0.184,
+      "rules_violated": [
+        "1",
+        "2",
+        "4"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 53,
+      "file": "test_packages\\celery\\t\\unit\\concurrency\\test_prefork.py",
+      "violations": 83,
+      "loc": 625,
+      "density": 0.1328,
+      "rules_violated": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 54,
+      "file": "integrations\\consolidated_integrations.py",
+      "violations": 81,
+      "loc": 357,
+      "density": 0.2269,
+      "rules_violated": [
+        "1",
+        "2",
+        "4"
+      ],
+      "priority": "high"
+    },
+    {
+      "rank": 55,
+      "file": "tests\\e2e\\test_error_handling.py",
+      "violations": 81,
+      "loc": 1220,
+      "density": 0.0664,
+      "rules_violated": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 56,
+      "file": "tests\\e2e\\test_exit_codes.py",
+      "violations": 81,
+      "loc": 1295,
+      "density": 0.0625,
+      "rules_violated": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 57,
+      "file": "analyzer\\optimization\\performance_benchmark.py",
+      "violations": 79,
+      "loc": 481,
+      "density": 0.1642,
+      "rules_violated": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 58,
+      "file": "test_packages\\curl\\tests\\http\\testenv\\httpd.py",
+      "violations": 79,
+      "loc": 588,
+      "density": 0.1344,
+      "rules_violated": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 59,
+      "file": "tests\\fixtures\\test_connascence_compliance.py",
+      "violations": 78,
+      "loc": 609,
+      "density": 0.1281,
+      "rules_violated": [
+        "1",
+        "2",
+        "4",
+        "5"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 60,
+      "file": "mcp\\enhanced_server.py",
+      "violations": 77,
+      "loc": 787,
+      "density": 0.0978,
+      "rules_violated": [
+        "1",
+        "2",
+        "3",
+        "4"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 61,
+      "file": "analyzer\\optimization\\ast_optimizer.py",
+      "violations": 77,
+      "loc": 610,
+      "density": 0.1262,
+      "rules_violated": [
+        "1",
+        "2",
+        "4",
+        "5"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 62,
+      "file": "test_packages\\celery\\celery\\utils\\functional.py",
+      "violations": 77,
+      "loc": 402,
+      "density": 0.1915,
+      "rules_violated": [
+        "1",
+        "2",
+        "4",
+        "8"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 63,
+      "file": "tests\\e2e\\test_enterprise_scale.py",
+      "violations": 76,
+      "loc": 1396,
+      "density": 0.0544,
+      "rules_violated": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 64,
+      "file": "test_packages\\celery\\celery\\app\\amqp.py",
+      "violations": 76,
+      "loc": 656,
+      "density": 0.1159,
+      "rules_violated": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 65,
+      "file": "test_packages\\celery\\t\\integration\\tasks.py",
+      "violations": 76,
+      "loc": 526,
+      "density": 0.1445,
+      "rules_violated": [
+        "1",
+        "2",
+        "4"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 66,
+      "file": "analyzer\\optimization\\resource_manager.py",
+      "violations": 75,
+      "loc": 632,
+      "density": 0.1187,
+      "rules_violated": [
+        "1",
+        "2",
+        "3",
+        "4"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 67,
+      "file": "analyzer\\streaming\\dashboard_reporter.py",
+      "violations": 75,
+      "loc": 621,
+      "density": 0.1208,
+      "rules_violated": [
+        "1",
+        "2",
+        "4"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 68,
+      "file": "grammar\\ast_safe_refactoring.py",
+      "violations": 73,
+      "loc": 674,
+      "density": 0.1083,
+      "rules_violated": [
+        "1",
+        "2",
+        "4",
+        "5",
+        "8"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 69,
+      "file": "mcp\\server.py",
+      "violations": 72,
+      "loc": 842,
+      "density": 0.0855,
+      "rules_violated": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 70,
+      "file": "tests\\integration\\test_mcp_server_integration.py",
+      "violations": 72,
+      "loc": 995,
+      "density": 0.0724,
+      "rules_violated": [
+        "1",
+        "2",
+        "3",
+        "4"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 71,
+      "file": "analyzer\\performance\\parallel_analyzer.py",
+      "violations": 71,
+      "loc": 802,
+      "density": 0.0885,
+      "rules_violated": [
+        "1",
+        "2",
+        "3",
+        "4"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 72,
+      "file": "test_packages\\celery\\celery\\bin\\base.py",
+      "violations": 71,
+      "loc": 306,
+      "density": 0.232,
+      "rules_violated": [
+        "1",
+        "2",
+        "4"
+      ],
+      "priority": "high"
+    },
+    {
+      "rank": 73,
+      "file": "test_packages\\curl\\tests\\http\\test_02_download.py",
+      "violations": 71,
+      "loc": 783,
+      "density": 0.0907,
+      "rules_violated": [
+        "1",
+        "2",
+        "4",
+        "5"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 74,
+      "file": "analyzer\\context_analyzer.py",
+      "violations": 70,
+      "loc": 603,
+      "density": 0.1161,
+      "rules_violated": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 75,
+      "file": "integrations\\enhanced_linter_integration.py",
+      "violations": 70,
+      "loc": 704,
+      "density": 0.0994,
+      "rules_violated": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "8"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 76,
+      "file": "grammar\\backends\\tree_sitter_backend.py",
+      "violations": 70,
+      "loc": 547,
+      "density": 0.128,
+      "rules_violated": [
+        "1",
+        "2",
+        "4",
+        "8"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 77,
+      "file": "tests\\performance\\benchmark_runner.py",
+      "violations": 70,
+      "loc": 956,
+      "density": 0.0732,
+      "rules_violated": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 78,
+      "file": "test_packages\\celery\\t\\unit\\tasks\\test_result.py",
+      "violations": 70,
+      "loc": 1056,
+      "density": 0.0663,
+      "rules_violated": [
+        "1",
+        "2",
+        "4"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 79,
+      "file": "tests\\integration\\test_workflow_integration.py",
+      "violations": 69,
+      "loc": 1140,
+      "density": 0.0605,
+      "rules_violated": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 80,
+      "file": "test_packages\\celery\\celery\\bootsteps.py",
+      "violations": 69,
+      "loc": 415,
+      "density": 0.1663,
+      "rules_violated": [
+        "1",
+        "2",
+        "4"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 81,
+      "file": "test_packages\\celery\\celery\\worker\\consumer\\consumer.py",
+      "violations": 69,
+      "loc": 780,
+      "density": 0.0885,
+      "rules_violated": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 82,
+      "file": "analyzer\\optimization\\memory_monitor.py",
+      "violations": 68,
+      "loc": 526,
+      "density": 0.1293,
+      "rules_violated": [
+        "1",
+        "2",
+        "4"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 83,
+      "file": "test_packages\\celery\\celery\\utils\\graph.py",
+      "violations": 68,
+      "loc": 309,
+      "density": 0.2201,
+      "rules_violated": [
+        "1",
+        "2",
+        "4"
+      ],
+      "priority": "high"
+    },
+    {
+      "rank": 84,
+      "file": "analyzer\\theater_detection\\validator.py",
+      "violations": 67,
+      "loc": 516,
+      "density": 0.1298,
+      "rules_violated": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 85,
+      "file": "analyzer\\enterprise\\sixsigma\\calculator.py",
+      "violations": 66,
+      "loc": 518,
+      "density": 0.1274,
+      "rules_violated": [
+        "1",
+        "2",
+        "3",
+        "4"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 86,
+      "file": "tests\\e2e\\test_memory_coordination.py",
+      "violations": 66,
+      "loc": 886,
+      "density": 0.0745,
+      "rules_violated": [
+        "1",
+        "2",
+        "4",
+        "5"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 87,
+      "file": "test_packages\\celery\\celery\\backends\\asynchronous.py",
+      "violations": 66,
+      "loc": 378,
+      "density": 0.1746,
+      "rules_violated": [
+        "1",
+        "2",
+        "4"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 88,
+      "file": "test_packages\\celery\\celery\\utils\\timer2.py",
+      "violations": 66,
+      "loc": 157,
+      "density": 0.4204,
+      "rules_violated": [
+        "1",
+        "2",
+        "4"
+      ],
+      "priority": "critical"
+    },
+    {
+      "rank": 89,
+      "file": "analyzer\\streaming\\result_aggregator.py",
+      "violations": 64,
+      "loc": 545,
+      "density": 0.1174,
+      "rules_violated": [
+        "1",
+        "2",
+        "4"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 90,
+      "file": "analyzer\\theater_detection\\patterns.py",
+      "violations": 64,
+      "loc": 499,
+      "density": 0.1283,
+      "rules_violated": [
+        "1",
+        "2",
+        "3",
+        "4"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 91,
+      "file": "test_packages\\celery\\celery\\app\\utils.py",
+      "violations": 64,
+      "loc": 415,
+      "density": 0.1542,
+      "rules_violated": [
+        "1",
+        "2",
+        "4",
+        "5",
+        "8"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 92,
+      "file": "autofix\\patch_generator.py",
+      "violations": 63,
+      "loc": 641,
+      "density": 0.0983,
+      "rules_violated": [
+        "1",
+        "2",
+        "4",
+        "5"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 93,
+      "file": "tests\\e2e\\test_report_generation.py",
+      "violations": 63,
+      "loc": 1076,
+      "density": 0.0586,
+      "rules_violated": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 94,
+      "file": "test_packages\\celery\\celery\\platforms.py",
+      "violations": 63,
+      "loc": 837,
+      "density": 0.0753,
+      "rules_violated": [
+        "1",
+        "2",
+        "4",
+        "5"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 95,
+      "file": "analyzer\\utils\\error_handling.py",
+      "violations": 62,
+      "loc": 420,
+      "density": 0.1476,
+      "rules_violated": [
+        "1",
+        "2",
+        "4"
+      ],
+      "priority": "medium"
+    },
+    {
+      "rank": 96,
+      "file": "analyzer\\enterprise\\sixsigma\\integration.py",
+      "violations": 62,
+      "loc": 376,
+      "density": 0.1649,
+      "rules_violated": [
+        "1",
+        "2",
+        "3",
+        "4"
+      ],
+      "priority": "medium"
+    }
+  ],
+  "nasa_root_causes": {
+    "rule_1_pointer_usage": {
+      "total_violations": 7780,
+      "root_cause": "False positive detection of Python operators as C pointers",
+      "patterns": {
+        "->": "String operators mistaken for pointer dereference",
+        "*kwargs, *args": "Python unpacking mistaken for pointer usage",
+        "multiplication": "Math operators (*) flagged incorrectly"
+      },
+      "fix_strategy": "Implement Python-aware AST analysis instead of regex patterns"
+    },
+    "rule_2_dynamic_memory": {
+      "total_violations": 4077,
+      "root_cause": "Normal Python collections treated as dynamic allocation",
+      "patterns": {
+        ".append(), .extend()": "1966 violations - standard list operations",
+        "set(), dict(), list()": "1590 violations - built-in constructors",
+        ".update(), .insert()": "259 violations - collection mutations"
+      },
+      "fix_strategy": "Distinguish between heap allocation and Python collection APIs"
+    },
+    "rule_4_assertion_density": {
+      "total_violations": 8145,
+      "root_cause": "Production code flagged for missing test assertions",
+      "patterns": {
+        "0.0% density": "8101 violations - non-test files incorrectly analyzed"
+      },
+      "fix_strategy": "Only analyze test files (test_*.py, *_test.py) for assertion density"
+    }
+  },
+  "priority_refactoring": [
+    {
+      "rank": 1,
+      "target": "NASA Rule Detection Logic",
+      "issue": "False positive rate >95% due to regex-based C pattern detection in Python code",
+      "impact": "Blocks defense industry adoption, creates 19,000+ fake violations",
+      "solution": "Rewrite rules 1,2,4 using Python AST analysis instead of regex",
+      "estimated_effort": "3-5 days",
+      "compliance_gain": "+75% (from 19% to 94%)"
+    },
+    {
+      "rank": 2,
+      "target": "UnifiedConnascenceAnalyzer class",
+      "issue": "God object with 70 methods, 1679 LOC, 27 imports",
+      "impact": "Maintenance bottleneck, testing difficulty, high coupling",
+      "solution": "Split into 5 focused classes: CoreAnalyzer, ReportGenerator, CacheManager, IntegrationCoordinator, ConfigManager",
+      "estimated_effort": "5-7 days",
+      "files_affected": 1
+    },
+    {
+      "rank": 3,
+      "target": "analyzer/constants.py (882 LOC)",
+      "issue": "Massive constants file causing import coupling",
+      "impact": "Every module change triggers full rebuild",
+      "solution": "Split into domain-specific constant modules: nasa_constants.py, connascence_constants.py, config_constants.py",
+      "estimated_effort": "1-2 days",
+      "files_affected": 50
+    },
+    {
+      "rank": 4,
+      "target": "Top 30 violation hotspots",
+      "issue": "0.28-0.57 violations/LOC density in critical files",
+      "impact": "Concentrated technical debt in core modules",
+      "solution": "Systematic refactoring of files with density >0.2",
+      "estimated_effort": "10-15 days",
+      "files_affected": 30
+    }
+  ]
+}

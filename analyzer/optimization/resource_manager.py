@@ -14,6 +14,7 @@ Features:
 - Resource usage monitoring and optimization
 """
 
+from fixes.phase0.production_safe_assertions import ProductionAssert
 import ast
 import gc
 import threading
@@ -520,6 +521,9 @@ class ResourceManager:
 @contextmanager
 def managed_file_handle(file_path: Union[str, Path], mode: str = 'r', **kwargs):
     """Context manager for automatic file handle cleanup."""
+    ProductionAssert.not_none(file_path, 'file_path')
+    ProductionAssert.not_none(mode, 'mode')
+
     resource_manager = get_global_resource_manager()
     file_handle = None
     tracking_id = None
@@ -544,6 +548,8 @@ def managed_file_handle(file_path: Union[str, Path], mode: str = 'r', **kwargs):
 @contextmanager
 def managed_ast_tree(file_path: Union[str, Path], source_code: Optional[str] = None):
     """Context manager for automatic AST tree cleanup."""
+    ProductionAssert.not_none(file_path, 'file_path')
+
     resource_manager = get_global_resource_manager()
     tree = None
     tracking_id = None
@@ -576,6 +582,14 @@ def managed_ast_tree(file_path: Union[str, Path], source_code: Optional[str] = N
 @contextmanager
 def managed_cache_entry(cache_key: str, cache_obj: Any, size_bytes: int = 0):
     """Context manager for automatic cache entry cleanup."""
+    ProductionAssert.not_none(cache_key, 'cache_key')
+    ProductionAssert.not_none(cache_obj, 'cache_obj')
+    ProductionAssert.not_none(size_bytes, 'size_bytes')
+
+    ProductionAssert.not_none(cache_key, 'cache_key')
+    ProductionAssert.not_none(cache_obj, 'cache_obj')
+    ProductionAssert.not_none(size_bytes, 'size_bytes')
+
     resource_manager = get_global_resource_manager()
     
     tracking_id = resource_manager.register_resource(

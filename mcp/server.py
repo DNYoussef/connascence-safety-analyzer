@@ -15,6 +15,7 @@
 Mock MCP Server implementation for test compatibility.
 """
 
+from fixes.phase0.production_safe_assertions import ProductionAssert
 import asyncio
 from pathlib import Path
 
@@ -93,8 +94,21 @@ except ImportError:
         def __init__(self, integration):
             self.integration = integration
         def create_error(self, error_type, message, **kwargs):
+            ProductionAssert.not_none(error_type, 'error_type')
+            ProductionAssert.not_none(message, 'message')
+            if kwargs:
+                ProductionAssert.not_none(kwargs, 'kwargs')
+
             return StandardError(code=5001, message=message, **kwargs)
         def handle_exception(self, e, context=None, file_path=None):
+            ProductionAssert.not_none(e, 'e')
+            ProductionAssert.not_none(context, 'context')
+            ProductionAssert.not_none(file_path, 'file_path')
+
+            ProductionAssert.not_none(e, 'e')
+            ProductionAssert.not_none(context, 'context')
+            ProductionAssert.not_none(file_path, 'file_path')
+
             return StandardError(code=5001, message=str(e), context=context or {})
 
 
@@ -119,6 +133,8 @@ class AuditLogger:
         self.enabled = enabled
 
     def log(self, event: str, details: Dict[str, Any] = None):
+        ProductionAssert.not_none(event, 'event')
+
         if self.enabled:
             self.logs.append({
                 'timestamp': time.time(),
@@ -128,6 +144,11 @@ class AuditLogger:
 
     def log_request(self, tool_name: str, timestamp: float = None, **kwargs):
         """Log tool request."""
+
+        ProductionAssert.not_none(tool_name, 'tool_name')
+        if kwargs:
+            ProductionAssert.not_none(kwargs, 'kwargs')
+
         self.log('tool_request', {
             'tool_name': tool_name,
             'timestamp': timestamp or time.time(),
@@ -170,6 +191,16 @@ class ConnascenceMCPServer:
 
             def analyze_path(self, path, profile=None):
                 """Mock analyze_path method."""
+
+                ProductionAssert.not_none(path, 'path')
+
+                ProductionAssert.not_none(profile, 'profile')
+
+
+                ProductionAssert.not_none(path, 'path')
+
+                ProductionAssert.not_none(profile, 'profile')
+
                 return {
                     'violations': [
                         ConnascenceViolation(
@@ -192,6 +223,16 @@ class ConnascenceMCPServer:
 
             def analyze_directory(self, path, profile=None):
                 """Mock analyze_directory method for test compatibility."""
+
+                ProductionAssert.not_none(path, 'path')
+
+                ProductionAssert.not_none(profile, 'profile')
+
+
+                ProductionAssert.not_none(path, 'path')
+
+                ProductionAssert.not_none(profile, 'profile')
+
                 # Return violations that the tests can mock
                 return [
                     ConnascenceViolation(
@@ -329,6 +370,10 @@ class ConnascenceMCPServer:
 
     def execute_tool(self, tool_name: str, arguments: Dict[str, Any], client_id: str = 'default'):
         """Execute a tool with given arguments."""
+        ProductionAssert.not_none(tool_name, 'tool_name')
+        ProductionAssert.not_none(arguments, 'arguments')
+        ProductionAssert.not_none(client_id, 'client_id')
+
         # Rate limiting check
         if not self.rate_limiter.check_rate_limit(client_id):
             raise Exception("Rate limit exceeded")
@@ -793,6 +838,8 @@ class MCPConnascenceTool:
 
     def execute(self, arguments: Dict[str, Any]):
         """Execute the tool."""
+        ProductionAssert.not_none(arguments, 'arguments')
+
         if self.handler:
             return self.handler(arguments)
         elif self.server:

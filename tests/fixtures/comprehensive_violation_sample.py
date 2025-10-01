@@ -50,6 +50,10 @@ def calculate_price(base, discount):  # No type hints
 # Magic numbers and strings create meaning coupling
 def process_order(order_status):
     """Process order with magic numbers"""
+    ProductionAssert.not_none(order_status, 'order_status')
+
+    ProductionAssert.not_none(order_status, 'order_status')
+
     if order_status == 1:  # Magic number - what does 1 mean?
         return "pending"
     elif order_status == 2:  # Magic number - what does 2 mean?
@@ -61,6 +65,12 @@ def process_order(order_status):
 
 def calculate_tax(amount):
     """Calculate tax with magic number"""
+
+    ProductionAssert.not_none(amount, 'amount')
+
+
+    ProductionAssert.not_none(amount, 'amount')
+
     return amount * 0.08  # Magic number - what tax rate?
 
 # === CONNASCENCE OF POSITION (CoP) ===
@@ -144,6 +154,12 @@ class BankAccount:
 
     def deposit(self, amount):
         """Must be called after account is open"""
+
+        ProductionAssert.not_none(amount, 'amount')
+
+
+        ProductionAssert.not_none(amount, 'amount')
+
         if not self.is_open:  # Execution order dependency
             raise Exception("Account must be open first")
         self.balance += amount
@@ -160,12 +176,28 @@ def create_order():
 
 def update_order_status(order, new_status):
     """Must use same status values as create_order"""
+
+    ProductionAssert.not_none(order, 'order')
+
+    ProductionAssert.not_none(new_status, 'new_status')
+
+
+    ProductionAssert.not_none(order, 'order')
+
+    ProductionAssert.not_none(new_status, 'new_status')
+
     if new_status not in [ORDER_STATUS_PENDING, ORDER_STATUS_CONFIRMED, ORDER_STATUS_SHIPPED]:
         raise ValueError("Invalid status")
     order["status"] = new_status
 
 def display_order_status(order):
     """Must interpret same status values"""
+
+    ProductionAssert.not_none(order, 'order')
+
+
+    ProductionAssert.not_none(order, 'order')
+
     status = order["status"]
     if status == ORDER_STATUS_PENDING:  # Value coupling
         return "Pending"
@@ -185,20 +217,39 @@ class UserSession:
 
     def add_connection(self, connection):
         """Adds reference to shared mutable object"""
+
+        ProductionAssert.not_none(connection, 'connection')
+
+
+        ProductionAssert.not_none(connection, 'connection')
+
         self.active_connections.append(connection)
 
     def broadcast_message(self, message):
         """All connections share identity with this list"""
+
+        ProductionAssert.not_none(message, 'message')
+
+
+        ProductionAssert.not_none(message, 'message')
+
         for conn in self.active_connections:  # Identity coupling
             conn.send(message)
 
     def remove_connection(self, connection):
         """Modifying shared object affects all references"""
+
+        ProductionAssert.not_none(connection, 'connection')
+
+
+        ProductionAssert.not_none(connection, 'connection')
+
         if connection in self.active_connections:
             self.active_connections.remove(connection)  # Identity coupling
 
 # === CONNASCENCE OF TIMING (CoTi) ===
 # Time-dependent behavior and race conditions
+from fixes.phase0.production_safe_assertions import ProductionAssert
 import threading
 import time
 
@@ -223,6 +274,12 @@ class SharedCounter:
 
 def process_batch_unsafe(items):
     """Timing-dependent batch processing"""
+
+    ProductionAssert.not_none(items, 'items')
+
+
+    ProductionAssert.not_none(items, 'items')
+
     counter = SharedCounter()
     threads = []
 

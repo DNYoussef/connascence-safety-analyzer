@@ -7,6 +7,7 @@ Intelligent caching system for AST parsing and analysis results
 to improve performance on repeated analysis runs.
 """
 
+from fixes.phase0.production_safe_assertions import ProductionAssert
 import ast
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
@@ -125,6 +126,24 @@ class ASTCache:
     def put_ast(self, file_path: Union[str, Path], ast_tree: ast.AST, analysis_duration_ms: float = 0.0):
         """Cache AST for file."""
 
+        ProductionAssert.not_none(file_path, 'file_path')
+
+        ProductionAssert.not_none(file_path, 'file_path')
+
+        ProductionAssert.not_none(ast_tree, 'ast_tree')
+
+        ProductionAssert.not_none(analysis_duration_ms, 'analysis_duration_ms')
+
+
+        ProductionAssert.not_none(file_path, 'file_path')
+
+        ProductionAssert.not_none(file_path, 'file_path')
+
+        ProductionAssert.not_none(ast_tree, 'ast_tree')
+
+        ProductionAssert.not_none(analysis_duration_ms, 'analysis_duration_ms')
+
+
         file_path = Path(file_path)
         cache_key = self._generate_cache_key(file_path, "ast")
 
@@ -211,6 +230,16 @@ class ASTCache:
 
     def invalidate_file(self, file_path: Union[str, Path]):
         """Invalidate all cache entries for a specific file."""
+
+        ProductionAssert.not_none(file_path, 'file_path')
+
+        ProductionAssert.not_none(file_path, 'file_path')
+
+
+        ProductionAssert.not_none(file_path, 'file_path')
+
+        ProductionAssert.not_none(file_path, 'file_path')
+
 
         file_path = Path(file_path)
 
@@ -313,11 +342,31 @@ class ASTCache:
     def warm_cache(self, file_paths: List[Union[str, Path]], max_workers: int = 4):
         """Pre-warm cache by analyzing multiple files in parallel."""
 
+        ProductionAssert.not_none(file_paths, 'file_paths')
+
+        ProductionAssert.not_none(file_paths, 'file_paths')
+
+        ProductionAssert.not_none(max_workers, 'max_workers')
+
+
+        ProductionAssert.not_none(file_paths, 'file_paths')
+
+        ProductionAssert.not_none(file_paths, 'file_paths')
+
+        ProductionAssert.not_none(max_workers, 'max_workers')
+
+
         logger.info(f"Warming cache for {len(file_paths)} files with {max_workers} workers")
         start_time = time.time()
 
         def analyze_and_cache(file_path):
             """Analyze file and cache results."""
+
+            ProductionAssert.not_none(file_path, 'file_path')
+
+
+            ProductionAssert.not_none(file_path, 'file_path')
+
             file_path = Path(file_path)
 
             try:
@@ -502,6 +551,32 @@ class ASTCache:
 
         logger.debug(f"Saved {saved_count} cache entries to disk")
 
+    def get_python_files(self, project_path: str) -> List[Path]:
+        """
+        Get all Python files in project directory.
+        This method is required by UnifiedConnascenceAnalyzer.
+        """
+        ProductionAssert.not_none(project_path, 'project_path')
+
+        project_path_obj = Path(project_path)
+
+        if not project_path_obj.exists():
+            logger.warning(f"Project path does not exist: {project_path}")
+            return []
+
+        if not project_path_obj.is_dir():
+            logger.warning(f"Project path is not a directory: {project_path}")
+            return []
+
+        # Use glob to find all Python files recursively
+        try:
+            python_files = list(project_path_obj.glob("**/*.py"))
+            logger.debug(f"Found {len(python_files)} Python files in {project_path}")
+            return python_files
+        except Exception as e:
+            logger.error(f"Failed to find Python files in {project_path}: {e}")
+            return []
+
 
 # Global cache instance
 ast_cache = ASTCache()
@@ -514,6 +589,32 @@ def get_cached_ast(file_path: Union[str, Path]) -> Optional[ast.AST]:
 
 def cache_ast(file_path: Union[str, Path], ast_tree: ast.AST, analysis_duration_ms: float = 0.0):
     """Cache AST for file (convenience function)."""
+
+
+    ProductionAssert.not_none(file_path, 'file_path')
+
+
+    ProductionAssert.not_none(file_path, 'file_path')
+
+
+    ProductionAssert.not_none(ast_tree, 'ast_tree')
+
+
+    ProductionAssert.not_none(analysis_duration_ms, 'analysis_duration_ms')
+
+
+
+    ProductionAssert.not_none(file_path, 'file_path')
+
+
+    ProductionAssert.not_none(file_path, 'file_path')
+
+
+    ProductionAssert.not_none(ast_tree, 'ast_tree')
+
+
+    ProductionAssert.not_none(analysis_duration_ms, 'analysis_duration_ms')
+
     ast_cache.put_ast(file_path, ast_tree, analysis_duration_ms)
 
 

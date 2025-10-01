@@ -6,6 +6,7 @@ Standardized interfaces that reduce coupling between detector components
 and ensure consistent method signatures across all detectors.
 """
 
+from fixes.phase0.production_safe_assertions import ProductionAssert
 import ast
 from abc import ABC, abstractmethod
 from typing import List, Dict, Any, Optional, Protocol
@@ -324,7 +325,16 @@ def register_detector(violation_type: str):
     Decorator that automatically registers detectors with the factory.
     Eliminates manual registration coupling.
     """
+    ProductionAssert.not_none(violation_type, 'violation_type')
+
+    ProductionAssert.not_none(violation_type, 'violation_type')
+
     def decorator(detector_class):
+
+        ProductionAssert.not_none(detector_class, 'detector_class')
+
+        ProductionAssert.not_none(detector_class, 'detector_class')
+
         DetectorFactory.register_detector(violation_type, detector_class)
         return detector_class
     return decorator

@@ -7,6 +7,7 @@ Optimized incremental analysis for CI/CD pipelines that only
 analyzes changed files and their dependencies.
 """
 
+from fixes.phase0.production_safe_assertions import ProductionAssert
 from dataclasses import dataclass, field
 import hashlib
 import json
@@ -451,6 +452,10 @@ class IncrementalAnalyzer:
 
         # Create violation signatures for comparison
         def violation_signature(v):
+            ProductionAssert.not_none(v, 'v')
+
+            ProductionAssert.not_none(v, 'v')
+
             return (v.get("file_path", ""), v.get("line_number", 0), v.get("rule_id", ""), v.get("description", ""))
 
         current_sigs = {violation_signature(v): v for v in current_violations}

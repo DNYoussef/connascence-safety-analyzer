@@ -1,0 +1,52 @@
+{
+  "success": true,
+  "path": "test_packages/express",
+  "policy": "default",
+  "violations": [],
+  "summary": {
+    "total_violations": 0,
+    "critical_violations": 0,
+    "overall_quality_score": 1.0
+  },
+  "nasa_compliance": {
+    "score": 1.0,
+    "violations": [],
+    "passing": true
+  },
+  "mece_analysis": {
+    "score": 1.0,
+    "duplications": [],
+    "passing": true
+  },
+  "duplication_analysis": {
+    "score": 1.0,
+    "violations": [],
+    "summary": {
+      "total_violations": 0,
+      "similarity_violations": 0,
+      "algorithm_violations": 0,
+      "files_with_duplications": 0,
+      "average_similarity": 0.0,
+      "priority_recommendation": "No significant duplications detected - maintain current code quality"
+    },
+    "available": true,
+    "error": null,
+    "threshold_used": 0.7,
+    "analysis_methods": [
+      "mece_similarity",
+      "coa_algorithm"
+    ]
+  },
+  "god_objects": [],
+  "metrics": {
+    "files_analyzed": 0,
+    "analysis_time": 0.083,
+    "timestamp": 1759323017.0550961,
+    "connascence_index": 0.0
+  },
+  "quality_gates": {
+    "overall_passing": true,
+    "nasa_passing": true,
+    "mece_passing": true
+  }
+}
