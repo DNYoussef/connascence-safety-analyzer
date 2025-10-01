@@ -117,7 +117,7 @@ class UnifiedDuplicationAnalyzer:
             )
 
         except Exception as e:
-            return UnifiedDuplicationResult(success=False, path=str(path), error=f"Analysis error: {str(e)}")
+            return UnifiedDuplicationResult(success=False, path=str(path), error=f"Analysis error: {e!s}")
 
     def _run_similarity_analysis(self, path_obj: Path) -> List[DuplicationViolation]:
         """Run MECE similarity-based analysis."""
@@ -208,7 +208,6 @@ class UnifiedDuplicationAnalyzer:
         violation_id = 1
         for pattern_hash, functions in self.function_hashes.items():
             if len(functions) >= 2:  # Found duplicates
-
                 # Calculate algorithm similarity
                 avg_similarity = self._calculate_algorithm_similarity(functions)
 

@@ -76,12 +76,12 @@ class TestPerformanceRegression:
 
         # Performance thresholds (adjust based on baseline measurements)
         self.performance_thresholds = {
-            'small_file_time': 2.0,      # seconds for small file (< 100 lines)
-            'medium_file_time': 5.0,     # seconds for medium file (100-500 lines)
-            'large_file_time': 15.0,     # seconds for large file (500+ lines)
-            'directory_time': 30.0,      # seconds for directory analysis
-            'memory_limit_mb': 100.0,    # MB memory increase limit
-            'files_per_second': 1.0,     # minimum files processed per second
+            "small_file_time": 2.0,  # seconds for small file (< 100 lines)
+            "medium_file_time": 5.0,  # seconds for medium file (100-500 lines)
+            "large_file_time": 15.0,  # seconds for large file (500+ lines)
+            "directory_time": 30.0,  # seconds for directory analysis
+            "memory_limit_mb": 100.0,  # MB memory increase limit
+            "files_per_second": 1.0,  # minimum files processed per second
         }
 
     def test_small_file_performance(self):
@@ -109,11 +109,13 @@ class SimpleClass:
             violations = self._analyze_code_string(small_file_code)
 
         # Performance assertions
-        assert monitor.execution_time < self.performance_thresholds['small_file_time'], \
-            f"Small file analysis too slow: {monitor.execution_time:.3f}s"
+        assert (
+            monitor.execution_time < self.performance_thresholds["small_file_time"]
+        ), f"Small file analysis too slow: {monitor.execution_time:.3f}s"
 
-        assert monitor.memory_delta_mb < self.performance_thresholds['memory_limit_mb'], \
-            f"Memory usage too high: {monitor.memory_delta_mb:.2f}MB"
+        assert (
+            monitor.memory_delta_mb < self.performance_thresholds["memory_limit_mb"]
+        ), f"Memory usage too high: {monitor.memory_delta_mb:.2f}MB"
 
         # Should find violations quickly
         assert len(violations) > 0, "Should find at least one violation"
@@ -129,11 +131,13 @@ class SimpleClass:
             self._analyze_code_string(medium_file_code)
 
         # Performance assertions
-        assert monitor.execution_time < self.performance_thresholds['medium_file_time'], \
-            f"Medium file analysis too slow: {monitor.execution_time:.3f}s"
+        assert (
+            monitor.execution_time < self.performance_thresholds["medium_file_time"]
+        ), f"Medium file analysis too slow: {monitor.execution_time:.3f}s"
 
-        assert monitor.memory_delta_mb < self.performance_thresholds['memory_limit_mb'], \
-            f"Memory usage too high: {monitor.memory_delta_mb:.2f}MB"
+        assert (
+            monitor.memory_delta_mb < self.performance_thresholds["memory_limit_mb"]
+        ), f"Memory usage too high: {monitor.memory_delta_mb:.2f}MB"
 
         print(f"Medium file performance: {monitor.execution_time:.3f}s, {monitor.memory_delta_mb:.2f}MB")
 
@@ -146,11 +150,13 @@ class SimpleClass:
             self._analyze_code_string(large_file_code)
 
         # Performance assertions
-        assert monitor.execution_time < self.performance_thresholds['large_file_time'], \
-            f"Large file analysis too slow: {monitor.execution_time:.3f}s"
+        assert (
+            monitor.execution_time < self.performance_thresholds["large_file_time"]
+        ), f"Large file analysis too slow: {monitor.execution_time:.3f}s"
 
-        assert monitor.memory_delta_mb < self.performance_thresholds['memory_limit_mb'], \
-            f"Memory usage too high: {monitor.memory_delta_mb:.2f}MB"
+        assert (
+            monitor.memory_delta_mb < self.performance_thresholds["memory_limit_mb"]
+        ), f"Memory usage too high: {monitor.memory_delta_mb:.2f}MB"
 
         print(f"Large file performance: {monitor.execution_time:.3f}s, {monitor.memory_delta_mb:.2f}MB")
 
@@ -162,21 +168,20 @@ class SimpleClass:
             pytest.skip("Analyzer directory not found")
 
         with PerformanceMonitor() as monitor:
-            result = self.analyzer.analyze_path(
-                path=str(analyzer_dir),
-                policy="standard"
-            )
+            result = self.analyzer.analyze_path(path=str(analyzer_dir), policy="standard")
 
         # Performance assertions
-        assert monitor.execution_time < self.performance_thresholds['directory_time'], \
-            f"Directory analysis too slow: {monitor.execution_time:.3f}s"
+        assert (
+            monitor.execution_time < self.performance_thresholds["directory_time"]
+        ), f"Directory analysis too slow: {monitor.execution_time:.3f}s"
 
         # Calculate files per second
-        files_analyzed = result.get('metrics', {}).get('files_analyzed', 1)
+        files_analyzed = result.get("metrics", {}).get("files_analyzed", 1)
         files_per_second = files_analyzed / monitor.execution_time if monitor.execution_time > 0 else 0
 
-        assert files_per_second >= self.performance_thresholds['files_per_second'], \
-            f"Processing rate too slow: {files_per_second:.2f} files/second"
+        assert (
+            files_per_second >= self.performance_thresholds["files_per_second"]
+        ), f"Processing rate too slow: {files_per_second:.2f} files/second"
 
         print("Directory analysis performance:")
         print(f"  Time: {monitor.execution_time:.3f}s")
@@ -197,22 +202,27 @@ class SimpleClass:
             with PerformanceMonitor() as monitor:
                 violations = self._analyze_code_string(test_code)
 
-            memory_measurements.append({
-                'lines': size,
-                'time': monitor.execution_time,
-                'memory_mb': monitor.memory_delta_mb,
-                'violations': len(violations)
-            })
+            memory_measurements.append(
+                {
+                    "lines": size,
+                    "time": monitor.execution_time,
+                    "memory_mb": monitor.memory_delta_mb,
+                    "violations": len(violations),
+                }
+            )
 
         # Check that memory usage doesn't grow excessively
         for measurement in memory_measurements:
-            assert measurement['memory_mb'] < self.performance_thresholds['memory_limit_mb'], \
-                f"Memory usage too high for {measurement['lines']} lines: {measurement['memory_mb']:.2f}MB"
+            assert (
+                measurement["memory_mb"] < self.performance_thresholds["memory_limit_mb"]
+            ), f"Memory usage too high for {measurement['lines']} lines: {measurement['memory_mb']:.2f}MB"
 
         # Print memory scaling results
         print("Memory scalability results:")
         for m in memory_measurements:
-            print(f"  {m['lines']:3d} lines: {m['time']:.3f}s, {m['memory_mb']:5.2f}MB, {m['violations']:3d} violations")
+            print(
+                f"  {m['lines']:3d} lines: {m['time']:.3f}s, {m['memory_mb']:5.2f}MB, {m['violations']:3d} violations"
+            )
 
     def test_performance_constants_compliance(self):
         """Test compliance with performance constants from constants.py."""
@@ -222,27 +232,23 @@ class SimpleClass:
             pytest.skip("Analyzer directory not found")
 
         with PerformanceMonitor() as monitor:
-            result = self.analyzer.analyze_path(
-                path=str(analyzer_dir),
-                policy="standard"
-            )
+            result = self.analyzer.analyze_path(path=str(analyzer_dir), policy="standard")
 
         # Check against MAX_ANALYSIS_TIME_SECONDS
-        assert monitor.execution_time < MAX_ANALYSIS_TIME_SECONDS, \
-            f"Analysis exceeded maximum time: {monitor.execution_time}s > {MAX_ANALYSIS_TIME_SECONDS}s"
+        assert (
+            monitor.execution_time < MAX_ANALYSIS_TIME_SECONDS
+        ), f"Analysis exceeded maximum time: {monitor.execution_time}s > {MAX_ANALYSIS_TIME_SECONDS}s"
 
         # Verify no files over MAX_FILE_SIZE_KB were processed
         # (This would be logged/tracked by the analyzer)
-        assert result['success'] is True, "Analysis should succeed within time limits"
+        assert result["success"] is True, "Analysis should succeed within time limits"
 
     def test_concurrent_analysis_performance(self):
         """Test performance of concurrent analysis operations."""
         import concurrent.futures
 
         # Create multiple small analysis tasks
-        test_codes = [
-            self._generate_test_code(lines=50) for _ in range(5)
-        ]
+        test_codes = [self._generate_test_code(lines=50) for _ in range(5)]
 
         def analyze_code(code):
             return self._analyze_code_string(code)
@@ -305,7 +311,9 @@ class SimpleClass:
 
         # Warm analysis should not be significantly slower
         if warm_monitor.execution_time > cold_monitor.execution_time * 2:
-            pytest.fail(f"Warm analysis unexpectedly slow: {warm_monitor.execution_time:.3f}s vs {cold_monitor.execution_time:.3f}s")
+            pytest.fail(
+                f"Warm analysis unexpectedly slow: {warm_monitor.execution_time:.3f}s vs {cold_monitor.execution_time:.3f}s"
+            )
 
         print("Caching performance:")
         print(f"  Cold: {cold_monitor.execution_time:.3f}s")
@@ -314,7 +322,7 @@ class SimpleClass:
     def test_large_violation_count_performance(self):
         """Test performance when many violations are found."""
         # Generate code with many intentional violations
-        violation_heavy_code = '''
+        violation_heavy_code = """
 def violation_heavy_function():
     # Many magic numbers
     a = 42
@@ -356,7 +364,7 @@ class ViolationHeavyClass:
     def method21(self): pass
     def method22(self): pass
     def method23(self): pass
-'''
+"""
 
         with PerformanceMonitor() as monitor:
             violations = self._analyze_code_string(violation_heavy_code)
@@ -383,11 +391,11 @@ class ViolationHeavyClass:
     def _violation_to_dict(self, violation) -> Dict[str, Any]:
         """Convert violation to dictionary."""
         return {
-            'type': violation.type,
-            'severity': violation.severity,
-            'file_path': violation.file_path,
-            'line_number': violation.line_number,
-            'description': violation.description
+            "type": violation.type,
+            "severity": violation.severity,
+            "file_path": violation.file_path,
+            "line_number": violation.line_number,
+            "description": violation.description,
         }
 
     def _generate_test_code(self, lines: int) -> str:
@@ -398,11 +406,11 @@ class ViolationHeavyClass:
             "import sys",
             "",
             "class TestClass:",
-            "    \"\"\"A test class for performance testing.\"\"\"",
+            '    """A test class for performance testing."""',
             "    ",
             "    def __init__(self):",
             "        self.value = 0",
-            ""
+            "",
         ]
 
         # Add methods to reach desired line count
@@ -433,10 +441,7 @@ class TestPerformanceBenchmarks:
     def test_baseline_benchmark_small_project(self):
         """Establish baseline performance for small projects."""
         # Use a small subset of the analyzer code
-        test_files = [
-            self.project_root / "analyzer" / "constants.py",
-            self.project_root / "analyzer" / "thresholds.py"
-        ]
+        test_files = [self.project_root / "analyzer" / "constants.py", self.project_root / "analyzer" / "thresholds.py"]
 
         existing_files = [f for f in test_files if f.exists()]
         if not existing_files:
@@ -450,7 +455,7 @@ class TestPerformanceBenchmarks:
                 result = self.analyzer.analyze_path(str(file_path), policy="standard")
 
             total_time += monitor.execution_time
-            total_violations += len(result.get('violations', []))
+            total_violations += len(result.get("violations", []))
 
         avg_time_per_file = total_time / len(existing_files)
 
@@ -473,8 +478,8 @@ class TestPerformanceBenchmarks:
         with PerformanceMonitor() as monitor:
             result = self.analyzer.analyze_path(str(analyzer_dir), policy="standard")
 
-        files_analyzed = result.get('metrics', {}).get('files_analyzed', 1)
-        violations_found = len(result.get('violations', []))
+        files_analyzed = result.get("metrics", {}).get("files_analyzed", 1)
+        violations_found = len(result.get("violations", []))
 
         print("Medium project benchmark:")
         print(f"  Analysis time: {monitor.execution_time:.3f}s")

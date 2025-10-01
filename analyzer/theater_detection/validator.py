@@ -4,13 +4,13 @@ Evidence Validator for Theater Detection
 Validates evidence quality and authenticity for connascence analysis claims.
 """
 
+from datetime import datetime
 import hashlib
 import json
-import re
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Any
-from datetime import datetime, timedelta
 import logging
+from pathlib import Path
+import re
+from typing import Any, Dict, List, Tuple
 
 logger = logging.getLogger(__name__)
 
@@ -30,36 +30,36 @@ class EvidenceValidator:
     def _initialize_validation_rules(self) -> Dict[str, Dict]:
         """Initialize validation rules for different evidence types"""
         return {
-            'metrics_report': {
-                'required_fields': ['timestamp', 'metrics', 'file_count', 'violation_count'],
-                'format_patterns': [r'\.json$', r'\.xml$', r'\.csv$'],
-                'min_size_bytes': 100,
-                'max_age_days': 30
+            "metrics_report": {
+                "required_fields": ["timestamp", "metrics", "file_count", "violation_count"],
+                "format_patterns": [r"\.json$", r"\.xml$", r"\.csv$"],
+                "min_size_bytes": 100,
+                "max_age_days": 30,
             },
-            'baseline_measurement': {
-                'required_fields': ['baseline_date', 'baseline_values', 'measurement_method'],
-                'format_patterns': [r'\.json$', r'\.log$', r'\.txt$'],
-                'min_size_bytes': 50,
-                'max_age_days': 90
+            "baseline_measurement": {
+                "required_fields": ["baseline_date", "baseline_values", "measurement_method"],
+                "format_patterns": [r"\.json$", r"\.log$", r"\.txt$"],
+                "min_size_bytes": 50,
+                "max_age_days": 90,
             },
-            'improvement_data': {
-                'required_fields': ['before', 'after', 'change_percentage'],
-                'format_patterns': [r'\.json$', r'\.csv$'],
-                'min_size_bytes': 100,
-                'max_age_days': 7
+            "improvement_data": {
+                "required_fields": ["before", "after", "change_percentage"],
+                "format_patterns": [r"\.json$", r"\.csv$"],
+                "min_size_bytes": 100,
+                "max_age_days": 7,
             },
-            'test_results': {
-                'required_fields': ['test_count', 'pass_count', 'coverage'],
-                'format_patterns': [r'\.xml$', r'\.json$', r'\.html$'],
-                'min_size_bytes': 500,
-                'max_age_days': 3
+            "test_results": {
+                "required_fields": ["test_count", "pass_count", "coverage"],
+                "format_patterns": [r"\.xml$", r"\.json$", r"\.html$"],
+                "min_size_bytes": 500,
+                "max_age_days": 3,
             },
-            'violation_report': {
-                'required_fields': ['violations', 'severity_distribution', 'file_list'],
-                'format_patterns': [r'\.json$', r'\.sarif$', r'\.xml$'],
-                'min_size_bytes': 200,
-                'max_age_days': 7
-            }
+            "violation_report": {
+                "required_fields": ["violations", "severity_distribution", "file_list"],
+                "format_patterns": [r"\.json$", r"\.sarif$", r"\.xml$"],
+                "min_size_bytes": 200,
+                "max_age_days": 7,
+            },
         }
 
     def validate_evidence_file(self, file_path: str, evidence_type: str) -> Tuple[bool, str, float]:
@@ -88,27 +88,25 @@ class EvidenceValidator:
         issues = []
 
         # Check file format
-        format_valid = any(re.search(pattern, file_path) for pattern in rules['format_patterns'])
+        format_valid = any(re.search(pattern, file_path) for pattern in rules["format_patterns"])
         if not format_valid:
             confidence_score *= 0.7
             issues.append(f"Non-standard format for {evidence_type}")
 
         # Check file size
         file_size = path.stat().st_size
-        if file_size < rules['min_size_bytes']:
+        if file_size < rules["min_size_bytes"]:
             confidence_score *= 0.5
             issues.append(f"File too small ({file_size} bytes)")
 
         # Check file age
         file_age = datetime.now() - datetime.fromtimestamp(path.stat().st_mtime)
-        if file_age.days > rules['max_age_days']:
+        if file_age.days > rules["max_age_days"]:
             confidence_score *= 0.8
             issues.append(f"File is {file_age.days} days old")
 
         # Try to parse and validate content
-        content_valid, content_message, content_score = self._validate_file_content(
-            path, rules['required_fields']
-        )
+        content_valid, content_message, content_score = self._validate_file_content(path, rules["required_fields"])
         if not content_valid:
             issues.append(content_message)
         confidence_score *= content_score
@@ -124,11 +122,11 @@ class EvidenceValidator:
         # Cache result
         file_hash = self._hash_file(path)
         self.evidence_cache[file_hash] = {
-            'path': file_path,
-            'type': evidence_type,
-            'valid': confidence_score >= 0.5,
-            'score': confidence_score,
-            'timestamp': datetime.now().isoformat()
+            "path": file_path,
+            "type": evidence_type,
+            "valid": confidence_score >= 0.5,
+            "score": confidence_score,
+            "timestamp": datetime.now().isoformat(),
         }
 
         return confidence_score >= 0.5, message, confidence_score
@@ -137,10 +135,10 @@ class EvidenceValidator:
         """Validate the content of an evidence file"""
         try:
             # Try to read file content
-            content = path.read_text(encoding='utf-8')
+            content = path.read_text(encoding="utf-8")
 
             # Try JSON parsing
-            if path.suffix == '.json':
+            if path.suffix == ".json":
                 try:
                     data = json.loads(content)
                     return self._validate_json_structure(data, required_fields)
@@ -159,7 +157,7 @@ class EvidenceValidator:
                 return False, "Required fields missing", field_ratio * 0.5
 
         except Exception as e:
-            return False, f"Error reading file: {str(e)}", 0.1
+            return False, f"Error reading file: {e!s}", 0.1
 
     def _validate_json_structure(self, data: Dict, required_fields: List[str]) -> Tuple[bool, str, float]:
         """Validate JSON structure against required fields"""
@@ -191,14 +189,14 @@ class EvidenceValidator:
         # Check temporal consistency
         timestamps = []
         for file_data in evidence_files:
-            if 'timestamp' in file_data:
-                timestamps.append(file_data['timestamp'])
+            if "timestamp" in file_data:
+                timestamps.append(file_data["timestamp"])
 
         if timestamps:
             timestamps.sort()
             # Check for suspicious gaps or patterns
             for i in range(1, len(timestamps)):
-                gap = timestamps[i] - timestamps[i-1]
+                gap = timestamps[i] - timestamps[i - 1]
                 if gap < 1:  # Less than 1 second between files
                     confidence_score *= 0.7
                     inconsistencies.append("Suspiciously close timestamps")
@@ -207,8 +205,8 @@ class EvidenceValidator:
         # Check metric consistency
         metrics = []
         for file_data in evidence_files:
-            if 'metrics' in file_data:
-                metrics.append(file_data['metrics'])
+            if "metrics" in file_data:
+                metrics.append(file_data["metrics"])
 
         if metrics and self._check_metric_inconsistency(metrics):
             confidence_score *= 0.6
@@ -236,17 +234,17 @@ class EvidenceValidator:
 
         # Check if metrics contradict each other
         for i in range(1, len(metrics)):
-            prev = metrics[i-1]
+            prev = metrics[i - 1]
             curr = metrics[i]
 
             # Check for impossible improvements
             for key in set(prev.keys()) & set(curr.keys()):
                 if isinstance(prev[key], (int, float)) and isinstance(curr[key], (int, float)):
                     # Violations should decrease, not increase
-                    if 'violation' in key.lower() and curr[key] > prev[key] * 1.5:
+                    if "violation" in key.lower() and curr[key] > prev[key] * 1.5:
                         return True
                     # Complexity should decrease, not increase
-                    if 'complexity' in key.lower() and curr[key] > prev[key] * 1.2:
+                    if "complexity" in key.lower() and curr[key] > prev[key] * 1.2:
                         return True
 
         return False
@@ -255,10 +253,10 @@ class EvidenceValidator:
         """Check for duplicate evidence across files"""
         hashes = set()
         for file_data in evidence_files:
-            if 'content_hash' in file_data:
-                if file_data['content_hash'] in hashes:
+            if "content_hash" in file_data:
+                if file_data["content_hash"] in hashes:
                     return True
-                hashes.add(file_data['content_hash'])
+                hashes.add(file_data["content_hash"])
         return False
 
     def validate_measurement_methodology(self, methodology: str) -> Tuple[bool, str, float]:
@@ -280,9 +278,21 @@ class EvidenceValidator:
 
         # Check for good methodology keywords
         good_keywords = [
-            'baseline', 'control', 'repeated', 'average', 'statistical',
-            'sample', 'measurement', 'methodology', 'procedure', 'protocol',
-            'before', 'after', 'comparison', 'benchmark', 'standard'
+            "baseline",
+            "control",
+            "repeated",
+            "average",
+            "statistical",
+            "sample",
+            "measurement",
+            "methodology",
+            "procedure",
+            "protocol",
+            "before",
+            "after",
+            "comparison",
+            "benchmark",
+            "standard",
         ]
 
         for keyword in good_keywords:
@@ -292,8 +302,16 @@ class EvidenceValidator:
 
         # Check for bad methodology indicators
         bad_keywords = [
-            'roughly', 'approximately', 'guess', 'estimate', 'probably',
-            'maybe', 'instant', 'immediate', 'perfect', 'magic'
+            "roughly",
+            "approximately",
+            "guess",
+            "estimate",
+            "probably",
+            "maybe",
+            "instant",
+            "immediate",
+            "perfect",
+            "magic",
         ]
 
         for keyword in bad_keywords:
@@ -302,12 +320,12 @@ class EvidenceValidator:
                 bad_indicators.append(keyword)
 
         # Check for specific measurements
-        if re.search(r'\d+', methodology):
+        if re.search(r"\d+", methodology):
             confidence_score += 0.1  # Contains numbers
             good_indicators.append("specific measurements")
 
         # Check for time periods
-        if re.search(r'\d+\s*(day|hour|minute|second|week|month)', methodology.lower()):
+        if re.search(r"\d+\s*(day|hour|minute|second|week|month)", methodology.lower()):
             confidence_score += 0.05
             good_indicators.append("time periods specified")
 
@@ -328,8 +346,7 @@ class EvidenceValidator:
 
         return confidence_score >= 0.4, message, confidence_score
 
-    def validate_improvement_claim(self, baseline: float, improved: float,
-                                  claim_type: str) -> Tuple[bool, str, float]:
+    def validate_improvement_claim(self, baseline: float, improved: float, claim_type: str) -> Tuple[bool, str, float]:
         """
         Validate an improvement claim based on baseline and improved values
 
@@ -347,7 +364,7 @@ class EvidenceValidator:
         improvement_percent = ((baseline - improved) / baseline) * 100
 
         # Different validation based on claim type
-        if claim_type == 'violations':
+        if claim_type == "violations":
             # Violations should decrease
             if improved >= baseline:
                 return False, "Violations increased or stayed same", 0.0
@@ -357,7 +374,7 @@ class EvidenceValidator:
                 return False, "Negligible improvement", 0.3
             confidence = min(1.0, 0.5 + (improvement_percent / 100))
 
-        elif claim_type == 'complexity':
+        elif claim_type == "complexity":
             # Complexity should decrease
             if improved >= baseline:
                 return False, "Complexity increased or stayed same", 0.0
@@ -365,7 +382,7 @@ class EvidenceValidator:
                 return False, "Unrealistic complexity reduction", 0.3
             confidence = min(1.0, 0.4 + (improvement_percent / 80))
 
-        elif claim_type == 'coverage':
+        elif claim_type == "coverage":
             # Coverage should increase
             if improved <= baseline:
                 return False, "Coverage decreased or stayed same", 0.0
@@ -388,14 +405,14 @@ class EvidenceValidator:
     def _hash_file(self, path: Path) -> str:
         """Generate hash of file content for caching"""
         hasher = hashlib.sha256()
-        with open(path, 'rb') as f:
+        with open(path, "rb") as f:
             while chunk := f.read(8192):
                 hasher.update(chunk)
         return hasher.hexdigest()
 
-    def generate_validation_report(self, evidence_files: List[str],
-                                  methodology: str,
-                                  claims: List[Dict]) -> Dict[str, Any]:
+    def generate_validation_report(
+        self, evidence_files: List[str], methodology: str, claims: List[Dict]
+    ) -> Dict[str, Any]:
         """
         Generate comprehensive evidence validation report
 
@@ -408,11 +425,11 @@ class EvidenceValidator:
             Comprehensive validation report
         """
         report = {
-            'timestamp': datetime.now().isoformat(),
-            'evidence_files': [],
-            'methodology_validation': {},
-            'claims_validation': [],
-            'overall_assessment': {}
+            "timestamp": datetime.now().isoformat(),
+            "evidence_files": [],
+            "methodology_validation": {},
+            "claims_validation": [],
+            "overall_assessment": {},
         }
 
         # Validate each evidence file
@@ -421,22 +438,14 @@ class EvidenceValidator:
             # Guess evidence type from filename
             evidence_type = self._guess_evidence_type(file_path)
             is_valid, message, score = self.validate_evidence_file(file_path, evidence_type)
-            report['evidence_files'].append({
-                'path': file_path,
-                'type': evidence_type,
-                'valid': is_valid,
-                'message': message,
-                'score': score
-            })
+            report["evidence_files"].append(
+                {"path": file_path, "type": evidence_type, "valid": is_valid, "message": message, "score": score}
+            )
             total_score += score
 
         # Validate methodology
         method_valid, method_message, method_score = self.validate_measurement_methodology(methodology)
-        report['methodology_validation'] = {
-            'valid': method_valid,
-            'message': method_message,
-            'score': method_score
-        }
+        report["methodology_validation"] = {"valid": method_valid, "message": method_message, "score": method_score}
         total_score += method_score
 
         # Validate claims
@@ -445,32 +454,32 @@ class EvidenceValidator:
             claim_message = "Claim validated"
             claim_score = 0.5
 
-            if 'baseline' in claim and 'improved' in claim:
+            if "baseline" in claim and "improved" in claim:
                 claim_valid, claim_message, claim_score = self.validate_improvement_claim(
-                    claim['baseline'],
-                    claim['improved'],
-                    claim.get('type', 'generic')
+                    claim["baseline"], claim["improved"], claim.get("type", "generic")
                 )
 
-            report['claims_validation'].append({
-                'claim': claim.get('description', 'Unknown claim'),
-                'valid': claim_valid,
-                'message': claim_message,
-                'score': claim_score
-            })
+            report["claims_validation"].append(
+                {
+                    "claim": claim.get("description", "Unknown claim"),
+                    "valid": claim_valid,
+                    "message": claim_message,
+                    "score": claim_score,
+                }
+            )
             total_score += claim_score
 
         # Calculate overall assessment
         total_items = len(evidence_files) + 1 + len(claims)  # +1 for methodology
         average_score = total_score / total_items if total_items > 0 else 0
 
-        report['overall_assessment'] = {
-            'average_score': round(average_score, 3),
-            'confidence_level': self._get_confidence_level(average_score),
-            'recommendation': self._get_validation_recommendation(average_score),
-            'total_evidence_files': len(evidence_files),
-            'valid_evidence_files': sum(1 for f in report['evidence_files'] if f['valid']),
-            'valid_claims': sum(1 for c in report['claims_validation'] if c['valid'])
+        report["overall_assessment"] = {
+            "average_score": round(average_score, 3),
+            "confidence_level": self._get_confidence_level(average_score),
+            "recommendation": self._get_validation_recommendation(average_score),
+            "total_evidence_files": len(evidence_files),
+            "valid_evidence_files": sum(1 for f in report["evidence_files"] if f["valid"]),
+            "valid_claims": sum(1 for c in report["claims_validation"] if c["valid"]),
         }
 
         # Store in history
@@ -482,16 +491,16 @@ class EvidenceValidator:
         """Guess evidence type from filename"""
         path_lower = file_path.lower()
 
-        if 'baseline' in path_lower:
-            return 'baseline_measurement'
-        elif 'test' in path_lower or 'coverage' in path_lower:
-            return 'test_results'
-        elif 'violation' in path_lower or 'issue' in path_lower:
-            return 'violation_report'
-        elif 'improve' in path_lower or 'after' in path_lower:
-            return 'improvement_data'
+        if "baseline" in path_lower:
+            return "baseline_measurement"
+        elif "test" in path_lower or "coverage" in path_lower:
+            return "test_results"
+        elif "violation" in path_lower or "issue" in path_lower:
+            return "violation_report"
+        elif "improve" in path_lower or "after" in path_lower:
+            return "improvement_data"
         else:
-            return 'metrics_report'
+            return "metrics_report"
 
     def _get_confidence_level(self, score: float) -> str:
         """Get confidence level description from score"""

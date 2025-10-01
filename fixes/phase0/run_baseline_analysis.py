@@ -4,12 +4,12 @@ Run Baseline Analysis with Fixed NASA Analyzer
 Establishes true baseline metrics without false positives.
 """
 
-import sys
-import json
-import time
-from pathlib import Path
 from datetime import datetime
-from typing import Dict, List, Any
+import json
+from pathlib import Path
+import sys
+import time
+from typing import Dict
 
 # Add project root to path
 project_root = Path(__file__).parent.parent.parent
@@ -34,7 +34,7 @@ class BaselineAnalyzer:
             "files_with_violations": [],
             "clean_files": [],
             "metrics": {},
-            "analysis_time": 0
+            "analysis_time": 0,
         }
 
     def analyze_codebase(self) -> Dict:
@@ -49,11 +49,11 @@ class BaselineAnalyzer:
 
         # Filter out test files and vendor directories
         python_files = [
-            f for f in python_files
-            if not any(part in f.parts for part in [
-                "__pycache__", "venv", "env", ".venv",
-                "node_modules", "dist", "build"
-            ])
+            f
+            for f in python_files
+            if not any(
+                part in f.parts for part in ["__pycache__", "venv", "env", ".venv", "node_modules", "dist", "build"]
+            )
         ]
 
         print(f"Found {len(python_files)} Python files to analyze")
@@ -68,19 +68,21 @@ class BaselineAnalyzer:
                 violations = self.analyzer.analyze_file(str(file_path))
 
                 if violations:
-                    self.results["files_with_violations"].append({
-                        "file": str(relative_path),
-                        "violation_count": len(violations),
-                        "violations": [
-                            {
-                                "line": v.line_number,
-                                "rule": v.rule_id,
-                                "severity": v.severity,
-                                "description": v.description
-                            }
-                            for v in violations
-                        ]
-                    })
+                    self.results["files_with_violations"].append(
+                        {
+                            "file": str(relative_path),
+                            "violation_count": len(violations),
+                            "violations": [
+                                {
+                                    "line": v.line_number,
+                                    "rule": v.rule_id,
+                                    "severity": v.severity,
+                                    "description": v.description,
+                                }
+                                for v in violations
+                            ],
+                        }
+                    )
 
                     # Count violations by rule
                     for v in violations:
@@ -120,7 +122,7 @@ class BaselineAnalyzer:
             "files_with_violations_pct": (len(self.results["files_with_violations"]) / total_files) * 100,
             "clean_files_pct": (len(self.results["clean_files"]) / total_files) * 100,
             "avg_violations_per_file": self.results["total_violations"] / total_files,
-            "nasa_compliance_pct": self._calculate_compliance_percentage()
+            "nasa_compliance_pct": self._calculate_compliance_percentage(),
         }
 
     def _calculate_compliance_percentage(self) -> float:
@@ -199,9 +201,7 @@ class BaselineAnalyzer:
             report.append("TOP VIOLATING FILES")
             report.append("-" * 40)
             sorted_files = sorted(
-                self.results["files_with_violations"],
-                key=lambda x: x["violation_count"],
-                reverse=True
+                self.results["files_with_violations"], key=lambda x: x["violation_count"], reverse=True
             )[:10]
             for file_info in sorted_files:
                 report.append(f"  {file_info['file']}: {file_info['violation_count']} violations")
@@ -216,14 +216,14 @@ class BaselineAnalyzer:
 
         # Save JSON results
         json_file = output_dir / "baseline_analysis.json"
-        with open(json_file, 'w') as f:
+        with open(json_file, "w") as f:
             json.dump(self.results, f, indent=2)
         print(f"\n[OK] JSON results saved to: {json_file}")
 
         # Save text report
         report = self.generate_report()
         report_file = output_dir / "baseline_report.txt"
-        with open(report_file, 'w') as f:
+        with open(report_file, "w") as f:
             f.write(report)
         print(f"[OK] Text report saved to: {report_file}")
 
@@ -235,11 +235,11 @@ class BaselineAnalyzer:
             "original_compliance": 19.3,
             "fixed_compliance": self.results["metrics"].get("nasa_compliance_pct", 0),
             "false_positives_eliminated": 19000,
-            "analysis_accuracy": "100% (Python AST-based)"
+            "analysis_accuracy": "100% (Python AST-based)",
         }
 
         evidence_file = output_dir / "evidence.json"
-        with open(evidence_file, 'w') as f:
+        with open(evidence_file, "w") as f:
             json.dump(evidence, f, indent=2)
         print(f"[OK] Evidence archive saved to: {evidence_file}")
 
@@ -250,12 +250,7 @@ def compare_with_original():
     print("COMPARISON: Original vs Fixed Analysis")
     print("=" * 70)
 
-    original = {
-        "total_violations": 20673,
-        "false_positives": 19000,
-        "compliance": 19.3,
-        "accuracy": 8
-    }
+    original = {"total_violations": 20673, "false_positives": 19000, "compliance": 19.3, "accuracy": 8}
 
     print("\nORIGINAL ANALYZER (Regex C patterns):")
     print(f"  Total violations: {original['total_violations']:,}")

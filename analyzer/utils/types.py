@@ -1,8 +1,8 @@
 """Type definitions for analyzer utilities."""
 
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional
 from pathlib import Path
+from typing import Any, Dict, Optional
 
 
 @dataclass
@@ -34,5 +34,5 @@ class ConnascenceViolation:
             "column_number": self.column_number,
             "message": self.message,
             "context": self.context,
-            "recommendation": self.recommendation
+            "recommendation": self.recommendation,
         }

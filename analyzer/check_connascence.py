@@ -9,24 +9,23 @@ This tool detects various forms of connascence in Python code, focusing on:
 Based on Meilir Page-Jones' connascence theory for reducing coupling.
 """
 
-from fixes.phase0.production_safe_assertions import ProductionAssert
 import argparse
 import ast
 import collections
-from dataclasses import asdict
-import json
-import os
 from pathlib import Path
 import sys
 import time
 from typing import Any
+
+from fixes.phase0.production_safe_assertions import ProductionAssert
 
 # Import canonical ConnascenceViolation
 from utils.types import ConnascenceViolation
 
 # Import Tree-sitter backend for multi-language support
 try:
-    from grammar.backends.tree_sitter_backend import TreeSitterBackend, LanguageSupport
+    from grammar.backends.tree_sitter_backend import LanguageSupport, TreeSitterBackend
+
     TREE_SITTER_BACKEND_AVAILABLE = True
 except ImportError:
     TREE_SITTER_BACKEND_AVAILABLE = False
@@ -34,9 +33,13 @@ except ImportError:
 # Import optimization modules for enhanced performance
 try:
     from optimization.file_cache import (
-        cached_file_content, cached_ast_tree, cached_file_lines,
-        cached_python_files, get_global_cache
+        cached_ast_tree,
+        cached_file_content,
+        cached_file_lines,
+        cached_python_files,
+        get_global_cache,
     )
+
     OPTIMIZATION_AVAILABLE = True
 except ImportError:
     OPTIMIZATION_AVAILABLE = False
@@ -47,10 +50,11 @@ TREE_SITTER_INTEGRATION_MSG = "Tree-sitter integration incomplete"
 
 # ConnascenceViolation now imported from utils.types
 
+
 class ConnascenceDetector(ast.NodeVisitor):
     """
     AST visitor that detects connascence violations.
-    
+
     REFACTORED: This class now delegates to specialized detectors via DetectorFactory
     while maintaining backward compatibility with existing code.
     """
@@ -62,21 +66,23 @@ class ConnascenceDetector(ast.NodeVisitor):
 
         # Initialize the new detector factory
         try:
-            import sys
             import os
+            import sys
+
             # Add src directory to path for imports
-            src_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'src')
+            src_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "src")
             if src_path not in sys.path:
                 sys.path.insert(0, src_path)
-            
+
             from detectors.detector_factory import DetectorFactory
+
             self.detector_factory = DetectorFactory(file_path, source_lines)
             self.using_factory = True
-        except ImportError as e:
+        except ImportError:
             # Fallback to original implementation if new detectors not available
             self.using_factory = False
             self._init_legacy_structures()
-    
+
     def _init_legacy_structures(self):
         """Initialize legacy tracking structures for fallback mode."""
         # Tracking structures
@@ -135,10 +141,9 @@ class ConnascenceDetector(ast.NodeVisitor):
     def visit_FunctionDef(self, node: ast.FunctionDef):
         """Detect connascence violations in function definitions."""
 
-        ProductionAssert.not_none(node, 'node')
+        ProductionAssert.not_none(node, "node")
 
-
-        ProductionAssert.not_none(node, 'node')
+        ProductionAssert.not_none(node, "node")
 
         self.function_definitions[node.name] = node
 
@@ -170,10 +175,9 @@ class ConnascenceDetector(ast.NodeVisitor):
     def visit_ClassDef(self, node: ast.ClassDef):
         """Detect God Objects using context-aware analysis."""
 
-        ProductionAssert.not_none(node, 'node')
+        ProductionAssert.not_none(node, "node")
 
-
-        ProductionAssert.not_none(node, 'node')
+        ProductionAssert.not_none(node, "node")
 
         self.class_definitions[node.name] = node
 
@@ -240,10 +244,9 @@ class ConnascenceDetector(ast.NodeVisitor):
     def visit_Import(self, node: ast.Import):
         """Track imports for dependency analysis."""
 
-        ProductionAssert.not_none(node, 'node')
+        ProductionAssert.not_none(node, "node")
 
-
-        ProductionAssert.not_none(node, 'node')
+        ProductionAssert.not_none(node, "node")
 
         for alias in node.names:
             self.imports.add(alias.name)
@@ -252,10 +255,9 @@ class ConnascenceDetector(ast.NodeVisitor):
     def visit_ImportFrom(self, node: ast.ImportFrom):
         """Track imports for dependency analysis."""
 
-        ProductionAssert.not_none(node, 'node')
+        ProductionAssert.not_none(node, "node")
 
-
-        ProductionAssert.not_none(node, 'node')
+        ProductionAssert.not_none(node, "node")
 
         if node.module:
             for alias in node.names:
@@ -265,10 +267,9 @@ class ConnascenceDetector(ast.NodeVisitor):
     def visit_Global(self, node: ast.Global):
         """Track global variable usage (Connascence of Identity)."""
 
-        ProductionAssert.not_none(node, 'node')
+        ProductionAssert.not_none(node, "node")
 
-
-        ProductionAssert.not_none(node, 'node')
+        ProductionAssert.not_none(node, "node")
 
         for name in node.names:
             self.global_vars.add(name)
@@ -277,10 +278,9 @@ class ConnascenceDetector(ast.NodeVisitor):
     def visit_Constant(self, node: ast.Constant):
         """Detect magic literals using formal grammar analysis with context awareness."""
 
-        ProductionAssert.not_none(node, 'node')
+        ProductionAssert.not_none(node, "node")
 
-
-        ProductionAssert.not_none(node, 'node')
+        ProductionAssert.not_none(node, "node")
 
         # Use the formal grammar analyzer for magic literal detection
         try:
@@ -478,10 +478,9 @@ class ConnascenceDetector(ast.NodeVisitor):
     def visit_Call(self, node: ast.Call):
         """Detect timing-related calls and other patterns."""
 
-        ProductionAssert.not_none(node, 'node')
+        ProductionAssert.not_none(node, "node")
 
-
-        ProductionAssert.not_none(node, 'node')
+        ProductionAssert.not_none(node, "node")
 
         # Connascence of Timing - sleep() calls
         if (isinstance(node.func, ast.Name) and node.func.id == "sleep") or (
@@ -507,32 +506,32 @@ class ConnascenceDetector(ast.NodeVisitor):
     def finalize_analysis(self):
         """Perform final analysis that requires complete traversal. NASA Rule 4 compliant."""
         # NASA Rule 5: Input validation assertions
-        assert hasattr(self, 'function_hashes'), "function_hashes must be initialized"
-        assert hasattr(self, 'magic_literals'), "magic_literals must be initialized"
-        
+        assert hasattr(self, "function_hashes"), "function_hashes must be initialized"
+        assert hasattr(self, "magic_literals"), "magic_literals must be initialized"
+
         # Check for algorithm duplicates
         self._process_algorithm_duplicates()
-        
+
         # Analyze magic literals with enhanced formal grammar context processing
         self._process_magic_literals()
-    
+
     def _process_algorithm_duplicates(self):
         """Process algorithm duplicates and create violations. NASA Rule 4 compliant."""
         for body_hash, functions in self.function_hashes.items():
             # NASA Rule 1: Use guard clause to avoid nesting
             if len(functions) <= 1:
                 continue
-                
+
             for file_path, func_node in functions:
                 violation = self._create_algorithm_duplicate_violation(file_path, func_node, functions)
                 self.violations.append(violation)
-    
+
     def _create_algorithm_duplicate_violation(self, file_path, func_node, functions):
         """Create algorithm duplicate violation. NASA Rule 4 compliant."""
         # NASA Rule 5: Input validation assertions
         assert file_path is not None, "file_path cannot be None"
         assert func_node is not None, "func_node cannot be None"
-        
+
         return ConnascenceViolation(
             type="connascence_of_algorithm",
             severity="medium",
@@ -548,12 +547,12 @@ class ConnascenceDetector(ast.NodeVisitor):
                 "similar_functions": [f.name for _, f in functions if f != func_node],
             },
         )
-    
+
     def _process_magic_literals(self):
         """Process magic literals with formal grammar context. NASA Rule 4 compliant."""
         # NASA Rule 5: Input validation assertion
-        assert hasattr(self, 'magic_literals'), "magic_literals must be initialized"
-        
+        assert hasattr(self, "magic_literals"), "magic_literals must be initialized"
+
         for item in self.magic_literals:
             # Handle different formats: old (node, value), enhanced (node, value, context)
             if len(item) == 2:
@@ -713,10 +712,9 @@ class ConnascenceDetector(ast.NodeVisitor):
                 return "high" if base_severity != "low" else "medium"
             elif abs_value > 1000:
                 return base_severity
-            else:
-                # Small numbers in good context get lower severity
-                if context_info.get("detected_context"):
-                    return "low" if base_severity != "high" else "medium"
+            # Small numbers in good context get lower severity
+            elif context_info.get("detected_context"):
+                return "low" if base_severity != "high" else "medium"
 
         return base_severity
 
@@ -817,59 +815,66 @@ class ConnascenceDetector(ast.NodeVisitor):
                 recommendations.append("Use descriptive constant names even for small numbers")
 
         return "; ".join(recommendations)
-    
+
     def visit(self, node: ast.AST):
         """
         Main visit method - delegates to DetectorFactory if available.
-        
+
         REFACTORED: Now uses specialized detectors for improved maintainability.
         """
-    
-        ProductionAssert.not_none(node, 'node')
 
-    
-        ProductionAssert.not_none(node, 'node')
+        ProductionAssert.not_none(node, "node")
+
+        ProductionAssert.not_none(node, "node")
 
         if self.using_factory:
             # Use the new DetectorFactory approach
             self.violations = self.detector_factory.detect_all(node)
             # Copy factory attributes for backward compatibility
-            self.function_definitions = getattr(self.detector_factory, 'function_definitions', {})
-            self.class_definitions = getattr(self.detector_factory, 'class_definitions', {})
+            self.function_definitions = getattr(self.detector_factory, "function_definitions", {})
+            self.class_definitions = getattr(self.detector_factory, "class_definitions", {})
             # Initialize empty collections for backward compatibility
-            if not hasattr(self, 'function_hashes'):
+            if not hasattr(self, "function_hashes"):
                 self.function_hashes = {}
-            if not hasattr(self, 'magic_literals'):
+            if not hasattr(self, "magic_literals"):
                 self.magic_literals = []
-            if not hasattr(self, 'sleep_calls'):
+            if not hasattr(self, "sleep_calls"):
                 self.sleep_calls = []
-            if not hasattr(self, 'positional_params'):
+            if not hasattr(self, "positional_params"):
                 self.positional_params = []
-            if not hasattr(self, 'global_vars'):
+            if not hasattr(self, "global_vars"):
                 self.global_vars = set()
-            if not hasattr(self, 'imports'):
+            if not hasattr(self, "imports"):
                 self.imports = set()
         else:
             # Fallback to original implementation
             super().visit(node)
 
 
-
-
 class ConnascenceAnalyzer:
     """
     Lightweight analyzer wrapper that delegates to the new modular architecture.
-    
+
     REFACTORED: Now uses DetectorFactory and ConnascenceAnalyzer service
     while maintaining 100% backward compatibility.
     """
 
     def __init__(self, exclusions: list[str] = None):
         self.exclusions = exclusions or [
-            "test_*", "tests/", "*_test.py", "conftest.py",
-            "deprecated/", "archive/", "experimental/",
-            "__pycache__/", ".git/", "build/", "dist/",
-            "*.egg-info/", "venv*/", "*env*/",
+            "test_*",
+            "tests/",
+            "*_test.py",
+            "conftest.py",
+            "deprecated/",
+            "archive/",
+            "experimental/",
+            "__pycache__/",
+            ".git/",
+            "build/",
+            "dist/",
+            "*.egg-info/",
+            "venv*/",
+            "*env*/",
         ]
         self.violations: list[ConnascenceViolation] = []
         self.file_stats: dict[str, dict] = {}
@@ -878,10 +883,12 @@ class ConnascenceAnalyzer:
         """Analyze a single Python file using optimized caching."""
         try:
             # Import the new service
-            import sys, os
-            sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(__file__)), 'src'))
+            import os
+            import sys
+
+            sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(__file__)), "src"))
             from services.connascence_analyzer import ConnascenceAnalyzer as AnalyzerService
-            
+
             analyzer = AnalyzerService()
             return analyzer.analyze_file(file_path)
         except ImportError:
@@ -890,7 +897,7 @@ class ConnascenceAnalyzer:
 
     def _analyze_python_file_optimized(self, file_path: Path) -> list[ConnascenceViolation]:
         """Optimized implementation using file cache."""
-        if not file_path.exists() or file_path.suffix != '.py':
+        if not file_path.exists() or file_path.suffix != ".py":
             return []
 
         try:
@@ -899,22 +906,22 @@ class ConnascenceAnalyzer:
                 source_code = cached_file_content(file_path)
                 source_lines = cached_file_lines(file_path)
                 tree = cached_ast_tree(file_path)
-                
+
                 if not source_code or not tree:
                     return []
             else:
                 # Fallback to direct file operations
-                source_code = file_path.read_text(encoding='utf-8')
+                source_code = file_path.read_text(encoding="utf-8")
                 source_lines = source_code.splitlines()
                 tree = ast.parse(source_code, filename=str(file_path))
-            
+
             detector = ConnascenceDetector(str(file_path), source_lines)
             detector.visit(tree)
-            
+
             return detector.violations
         except Exception:
             return []
-            
+
     def _analyze_python_file(self, file_path: Path) -> list[ConnascenceViolation]:
         """Legacy fallback implementation."""
         return self._analyze_python_file_optimized(file_path)
@@ -922,32 +929,32 @@ class ConnascenceAnalyzer:
     def analyze_directory(self, target_path: Path) -> list[ConnascenceViolation]:
         """Analyze all Python files in a directory with optimized file discovery."""
         all_violations = []
-        
+
         if target_path.is_file():
             return self.analyze_file(target_path)
-        
+
         # Optimized: Use cached Python file discovery
         if OPTIMIZATION_AVAILABLE:
             python_files = cached_python_files(target_path)
             py_file_paths = [Path(f) for f in python_files]
         else:
-            py_file_paths = list(target_path.rglob('*.py'))
-        
+            py_file_paths = list(target_path.rglob("*.py"))
+
         # Process files with exclusion filtering
         for py_file in py_file_paths:
             # Skip excluded patterns
             if any(py_file.match(pattern) for pattern in self.exclusions):
                 continue
-                
+
             file_violations = self.analyze_file(py_file)
             all_violations.extend(file_violations)
-            
+
             # Update stats
             self.file_stats[str(py_file)] = {
-                'violations': len(file_violations),
-                'types': list(set(v.type for v in file_violations))
+                "violations": len(file_violations),
+                "types": list(set(v.type for v in file_violations)),
             }
-        
+
         self.violations = all_violations
         return all_violations
 
@@ -961,28 +968,29 @@ def main():
     parser.add_argument("--severity", "-s", choices=["low", "medium", "high", "critical"])
     parser.add_argument("--exclude", "-e", help="Additional exclusion patterns")
     parser.add_argument("--verbose", "-v", action="store_true")
-    
+
     args = parser.parse_args()
-    
+
     target_path = Path(args.path).resolve()
     if not target_path.exists():
         print(f"Error: Path {target_path} does not exist")
         return 1
-    
+
     start_time = time.time()
     analyzer = ConnascenceAnalyzer()
     violations = analyzer.analyze_directory(target_path)
     elapsed = time.time() - start_time
-    
+
     # Filter by severity if specified
     if args.severity:
         severity_order = {"low": 0, "medium": 1, "high": 2, "critical": 3}
         min_level = severity_order[args.severity]
         violations = [v for v in violations if severity_order.get(v.severity, 0) >= min_level]
-    
+
     # Generate report
     if args.format == "json":
         import json
+
         report_data = [
             {
                 "type": v.type,
@@ -992,7 +1000,7 @@ def main():
                 "column": v.column,
                 "description": v.description,
                 "recommendation": v.recommendation,
-                "context": v.context
+                "context": v.context,
             }
             for v in violations
         ]
@@ -1005,18 +1013,18 @@ def main():
             report_lines.append(f"  File: {v.file_path}:{v.line_number}")
             report_lines.append(f"  Fix: {v.recommendation}\n")
         report = "\n".join(report_lines)
-    
+
     # Output
     if args.output:
         with open(args.output, "w", encoding="utf-8") as f:
             f.write(report)
     else:
         print(report)
-    
+
     if args.verbose:
         print(f"Analysis completed in {elapsed:.2f} seconds")
         print(f"Found {len(violations)} violations")
-    
+
     # Exit with error code if critical violations found
     critical_count = sum(1 for v in violations if v.severity == "critical")
     return min(critical_count, 1)

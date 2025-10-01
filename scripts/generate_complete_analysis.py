@@ -11,6 +11,7 @@ import sys
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
+
 def run_complete_analysis(codebase_path: str, output_dir: str):
     """Generate all 4 analysis types for a codebase"""
     codebase_name = Path(codebase_path).name
@@ -23,6 +24,7 @@ def run_complete_analysis(codebase_path: str, output_dir: str):
     print("  1/4 Connascence analysis...")
     try:
         from analyzer.check_connascence import ConnascenceAnalyzer
+
         connascence_analyzer = ConnascenceAnalyzer()
 
         # Analyze all files in codebase
@@ -49,15 +51,15 @@ def run_complete_analysis(codebase_path: str, output_dir: str):
                     "type": v.type,
                     "severity": v.severity,
                     "file_path": str(v.file_path),
-                    "line_number": getattr(v, 'line_number', 0),
+                    "line_number": getattr(v, "line_number", 0),
                     "description": v.description,
-                    "recommendation": getattr(v, 'recommendation', ''),
+                    "recommendation": getattr(v, "recommendation", ""),
                 }
                 for v in violations
-            ]
+            ],
         }
 
-        with open(output_path / f"{codebase_name}_connascence.json", 'w') as f:
+        with open(output_path / f"{codebase_name}_connascence.json", "w") as f:
             json.dump(connascence_data, f, indent=2)
         print(f"    ✓ {len(violations)} connascence violations found")
 
@@ -73,29 +75,33 @@ def run_complete_analysis(codebase_path: str, output_dir: str):
         # Basic NASA compliance checks
         for file_path in codebase_path_obj.rglob("**/*.py"):
             try:
-                with open(file_path, encoding='utf-8') as f:
+                with open(file_path, encoding="utf-8") as f:
                     content = f.read()
-                    lines = content.split('\n')
+                    lines = content.split("\n")
 
                     for i, line in enumerate(lines, 1):
                         # NASA Rule violations
-                        if 'goto' in line.lower():
-                            nasa_violations.append({
-                                "rule": "NASA-01",
-                                "description": "Avoid goto statements",
-                                "file_path": str(file_path),
-                                "line_number": i,
-                                "severity": "high"
-                            })
+                        if "goto" in line.lower():
+                            nasa_violations.append(
+                                {
+                                    "rule": "NASA-01",
+                                    "description": "Avoid goto statements",
+                                    "file_path": str(file_path),
+                                    "line_number": i,
+                                    "severity": "high",
+                                }
+                            )
 
-                        if line.count('(') > 5:  # Complex expressions
-                            nasa_violations.append({
-                                "rule": "NASA-08",
-                                "description": "Limit expression complexity",
-                                "file_path": str(file_path),
-                                "line_number": i,
-                                "severity": "medium"
-                            })
+                        if line.count("(") > 5:  # Complex expressions
+                            nasa_violations.append(
+                                {
+                                    "rule": "NASA-08",
+                                    "description": "Limit expression complexity",
+                                    "file_path": str(file_path),
+                                    "line_number": i,
+                                    "severity": "medium",
+                                }
+                            )
             except:
                 continue
 
@@ -104,10 +110,10 @@ def run_complete_analysis(codebase_path: str, output_dir: str):
             "codebase": codebase_name,
             "compliance_score": max(0, 1.0 - len(nasa_violations) / 100),
             "total_violations": len(nasa_violations),
-            "violations": nasa_violations
+            "violations": nasa_violations,
         }
 
-        with open(output_path / f"{codebase_name}_nasa_safety.json", 'w') as f:
+        with open(output_path / f"{codebase_name}_nasa_safety.json", "w") as f:
             json.dump(nasa_data, f, indent=2)
         print(f"    ✓ {len(nasa_violations)} NASA safety violations found")
 
@@ -123,21 +129,23 @@ def run_complete_analysis(codebase_path: str, output_dir: str):
         file_contents = {}
         for file_path in codebase_path_obj.rglob("**/*.py"):
             try:
-                with open(file_path, encoding='utf-8') as f:
+                with open(file_path, encoding="utf-8") as f:
                     content = f.read()
-                    lines = [line.strip() for line in content.split('\n') if line.strip()]
+                    lines = [line.strip() for line in content.split("\n") if line.strip()]
 
                     # Look for duplicate function signatures
                     for i, line in enumerate(lines):
-                        if line.startswith('def ') and len(line) > 20:
+                        if line.startswith("def ") and len(line) > 20:
                             signature = line[:50]  # First 50 chars
                             if signature in file_contents:
-                                duplications.append({
-                                    "type": "function_signature",
-                                    "pattern": signature,
-                                    "files": [file_contents[signature], str(file_path)],
-                                    "severity": "medium"
-                                })
+                                duplications.append(
+                                    {
+                                        "type": "function_signature",
+                                        "pattern": signature,
+                                        "files": [file_contents[signature], str(file_path)],
+                                        "severity": "medium",
+                                    }
+                                )
                             else:
                                 file_contents[signature] = str(file_path)
             except:
@@ -147,10 +155,10 @@ def run_complete_analysis(codebase_path: str, output_dir: str):
             "analysis_type": "duplication",
             "codebase": codebase_name,
             "total_duplications": len(duplications),
-            "duplications": duplications
+            "duplications": duplications,
         }
 
-        with open(output_path / f"{codebase_name}_duplication.json", 'w') as f:
+        with open(output_path / f"{codebase_name}_duplication.json", "w") as f:
             json.dump(duplication_data, f, indent=2)
         print(f"    ✓ {len(duplications)} duplications found")
 
@@ -166,22 +174,22 @@ def run_complete_analysis(codebase_path: str, output_dir: str):
             "business_logic": [],
             "ui_presentation": [],
             "configuration": [],
-            "testing": []
+            "testing": [],
         }
 
         # Categorize files by MECE principles
         for file_path in codebase_path_obj.rglob("**/*.py"):
             try:
-                with open(file_path, encoding='utf-8') as f:
+                with open(file_path, encoding="utf-8") as f:
                     content = f.read().lower()
 
-                    if 'database' in content or 'db' in content or 'sql' in content:
+                    if "database" in content or "db" in content or "sql" in content:
                         mece_categories["data_access"].append(str(file_path))
-                    elif 'test' in str(file_path).lower():
+                    elif "test" in str(file_path).lower():
                         mece_categories["testing"].append(str(file_path))
-                    elif 'config' in content or 'setting' in content:
+                    elif "config" in content or "setting" in content:
                         mece_categories["configuration"].append(str(file_path))
-                    elif 'render' in content or 'template' in content:
+                    elif "render" in content or "template" in content:
                         mece_categories["ui_presentation"].append(str(file_path))
                     else:
                         mece_categories["business_logic"].append(str(file_path))
@@ -196,14 +204,16 @@ def run_complete_analysis(codebase_path: str, output_dir: str):
         overlaps = []
         for file_path in codebase_path_obj.rglob("**/*.py"):
             try:
-                with open(file_path, encoding='utf-8') as f:
+                with open(file_path, encoding="utf-8") as f:
                     content = f.read().lower()
-                    if 'database' in content and 'render' in content:
-                        overlaps.append({
-                            "file": str(file_path),
-                            "violation": "Data access mixed with UI presentation",
-                            "severity": "high"
-                        })
+                    if "database" in content and "render" in content:
+                        overlaps.append(
+                            {
+                                "file": str(file_path),
+                                "violation": "Data access mixed with UI presentation",
+                                "severity": "high",
+                            }
+                        )
             except:
                 continue
 
@@ -213,10 +223,10 @@ def run_complete_analysis(codebase_path: str, output_dir: str):
             "mece_score": max(0, mece_score - len(overlaps) * 0.1),
             "categories": mece_categories,
             "overlaps": overlaps,
-            "total_overlaps": len(overlaps)
+            "total_overlaps": len(overlaps),
         }
 
-        with open(output_path / f"{codebase_name}_mece_duplication.json", 'w') as f:
+        with open(output_path / f"{codebase_name}_mece_duplication.json", "w") as f:
             json.dump(mece_data, f, indent=2)
         print(f"    ✓ {len(overlaps)} MECE violations found")
 
@@ -224,6 +234,7 @@ def run_complete_analysis(codebase_path: str, output_dir: str):
         print(f"    ✗ MECE analysis failed: {e}")
 
     print(f"Complete analysis finished for {codebase_name}")
+
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:

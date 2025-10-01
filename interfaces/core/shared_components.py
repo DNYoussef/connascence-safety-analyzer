@@ -31,27 +31,22 @@ class SharedFormatter:
     @staticmethod
     def format_summary_stats(analysis_result: Dict[str, Any]) -> Dict[str, Any]:
         """Extract and format common summary statistics."""
-        summary = analysis_result.get('summary', {})
+        summary = analysis_result.get("summary", {})
         return {
-            'total_violations': summary.get('total_violations', 0),
-            'critical_violations': summary.get('critical_violations', 0),
-            'high_violations': summary.get('high_violations', 0),
-            'medium_violations': summary.get('medium_violations', 0),
-            'low_violations': summary.get('low_violations', 0),
-            'files_analyzed': analysis_result.get('metrics', {}).get('files_analyzed', 0),
-            'analysis_time': analysis_result.get('metrics', {}).get('analysis_time', 0)
+            "total_violations": summary.get("total_violations", 0),
+            "critical_violations": summary.get("critical_violations", 0),
+            "high_violations": summary.get("high_violations", 0),
+            "medium_violations": summary.get("medium_violations", 0),
+            "low_violations": summary.get("low_violations", 0),
+            "files_analyzed": analysis_result.get("metrics", {}).get("files_analyzed", 0),
+            "analysis_time": analysis_result.get("metrics", {}).get("analysis_time", 0),
         }
 
     @staticmethod
     def get_severity_color(severity: str) -> str:
         """Get color code for severity level."""
-        colors = {
-            'critical': '#d73a49',
-            'high': '#f66a0a',
-            'medium': '#dbab09',
-            'low': '#28a745'
-        }
-        return colors.get(severity, '#6c757d')
+        colors = {"critical": "#d73a49", "high": "#f66a0a", "medium": "#dbab09", "low": "#28a745"}
+        return colors.get(severity, "#6c757d")
 
 
 class SharedValidation:
@@ -67,7 +62,7 @@ class SharedValidation:
         if path_obj.is_file() and path_obj.suffix != ".py":
             return False, f"File is not a Python file: {path}"
 
-        if path_obj.is_dir() and not any(path_obj.rglob('*.py')):
+        if path_obj.is_dir() and not any(path_obj.rglob("*.py")):
             return False, f"Directory contains no Python files: {path}"
 
         return True, None
@@ -75,7 +70,7 @@ class SharedValidation:
     @staticmethod
     def validate_policy(policy: str) -> tuple[bool, Optional[str]]:
         """Validate policy name."""
-        valid_policies = ['default', 'strict-core', 'nasa_jpl_pot10', 'lenient']
+        valid_policies = ["default", "strict-core", "nasa_jpl_pot10", "lenient"]
         if policy not in valid_policies:
             return False, f"Invalid policy: {policy}. Valid options: {valid_policies}"
         return True, None

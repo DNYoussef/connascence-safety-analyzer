@@ -15,12 +15,13 @@ from enum import Enum
 
 
 class UserRole(Enum):
-    VIEWER = 'viewer'
-    ANALYST = 'analyst'
-    DEVELOPER = 'developer'
-    AUDITOR = 'auditor'
-    SECURITY_OFFICER = 'security_officer'
-    ADMIN = 'admin'
+    VIEWER = "viewer"
+    ANALYST = "analyst"
+    DEVELOPER = "developer"
+    AUDITOR = "auditor"
+    SECURITY_OFFICER = "security_officer"
+    ADMIN = "admin"
+
 
 class SecurityManager:
     def __init__(self, air_gapped=False):
@@ -29,13 +30,16 @@ class SecurityManager:
     def authenticate_user(self, username, password, ip):
         # Mock authentication
         from dataclasses import dataclass
+
         @dataclass
         class AuthContext:
             username: str
             roles: list = None
+
             def __post_init__(self):
                 if self.roles is None:
                     self.roles = []
+
         return AuthContext(username)
 
     def check_permission(self, context, resource, action):

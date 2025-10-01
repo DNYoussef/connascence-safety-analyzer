@@ -690,7 +690,7 @@ DEFAULT_POLICY_PRESET = "standard"  # Use the unified policy name
 MAX_FILE_SIZE_MB = 10
 MAX_TOTAL_MEMORY_MB = 512
 
-# Enhanced analysis thresholds and limits 
+# Enhanced analysis thresholds and limits
 ENHANCED_MECE_SIMILARITY_THRESHOLD = 0.7
 ENHANCED_MECE_CLUSTER_MIN_SIZE = 2
 ENHANCED_NASA_COMPLIANCE_THRESHOLD = 0.9
@@ -781,14 +781,15 @@ CROSS_PHASE_CONFIG = {
     },
 }
 
+
 def get_enhanced_policy_configuration(policy_name: str) -> dict:
     """
     Get the enhanced configuration for a policy preset.
-    
+
     This extends the existing policy resolution with cross-phase settings.
     """
     canonical_policy = resolve_policy_name(policy_name)
-    
+
     # Base configuration from existing system
     base_config = {
         "safety_critical": {
@@ -828,49 +829,56 @@ def get_enhanced_policy_configuration(policy_name: str) -> dict:
             "fail_on_critical": False,
         },
     }
-    
+
     # Map canonical policy names to base config
     policy_mapping = {
         "nasa-compliance": "safety_critical",
-        "strict": "strict", 
+        "strict": "strict",
         "standard": "standard",
-        "lenient": "lenient"
+        "lenient": "lenient",
     }
-    
+
     config_key = policy_mapping.get(canonical_policy, "standard")
     config = base_config.get(config_key, base_config["standard"]).copy()
-    
+
     # Add enhanced cross-phase settings
-    config.update({
-        "smart_integration_enabled": SMART_INTEGRATION_ENABLED,
-        "cross_phase_correlation_enabled": True,
-        "audit_trail_enabled": AUDIT_TRAIL_ENABLED,
-        "enhanced_recommendations_enabled": ENHANCED_RECOMMENDATIONS_ENABLED,
-        "correlation_threshold": CROSS_PHASE_CORRELATION_THRESHOLD,
-    })
-    
+    config.update(
+        {
+            "smart_integration_enabled": SMART_INTEGRATION_ENABLED,
+            "cross_phase_correlation_enabled": True,
+            "audit_trail_enabled": AUDIT_TRAIL_ENABLED,
+            "enhanced_recommendations_enabled": ENHANCED_RECOMMENDATIONS_ENABLED,
+            "correlation_threshold": CROSS_PHASE_CORRELATION_THRESHOLD,
+        }
+    )
+
     return config
+
 
 def get_component_config(component_name: str) -> dict:
     """
     Get the configuration for a specific component.
-    
+
     This provides centralized access to component initialization
     settings with fallback defaults.
     """
-    return COMPONENT_INITIALIZATION.get(component_name, {
-        "enabled": True,
-        "fallback_on_error": True,
-    })
+    return COMPONENT_INITIALIZATION.get(
+        component_name,
+        {
+            "enabled": True,
+            "fallback_on_error": True,
+        },
+    )
+
 
 def should_enable_component(component_name: str, policy_name: str = None) -> bool:
     """
     Determine if a component should be enabled based on policy and configuration.
-    
+
     This eliminates scattered component enablement logic across the codebase.
     """
     component_config = get_component_config(component_name)
-    
+
     if policy_name:
         policy_config = get_enhanced_policy_configuration(policy_name)
         # Some policies may disable certain components
@@ -878,5 +886,5 @@ def should_enable_component(component_name: str, policy_name: str = None) -> boo
             # In lenient mode, only enable core components
             core_components = ["ast_engine", "caching_system"]
             return component_name in core_components
-    
+
     return component_config.get("enabled", True)

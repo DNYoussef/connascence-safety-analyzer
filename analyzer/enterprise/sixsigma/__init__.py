@@ -1,14 +1,14 @@
 """Six Sigma Quality Metrics for Connascence Analysis."""
 
-from .telemetry import SixSigmaTelemetry, SixSigmaMetrics, QualityLevel
 from .analyzer import SixSigmaAnalyzer
 from .calculator import CTQCalculator, ProcessCapability
+from .telemetry import QualityLevel, SixSigmaMetrics, SixSigmaTelemetry
 
 __all__ = [
-    'SixSigmaTelemetry',
-    'SixSigmaMetrics',
-    'QualityLevel',
-    'SixSigmaAnalyzer',
-    'CTQCalculator',
-    'ProcessCapability'
+    "CTQCalculator",
+    "ProcessCapability",
+    "QualityLevel",
+    "SixSigmaAnalyzer",
+    "SixSigmaMetrics",
+    "SixSigmaTelemetry",
 ]

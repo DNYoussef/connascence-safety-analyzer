@@ -13,16 +13,15 @@ Target: Achieve 95%+ NASA POT10 compliance for defense industry certification.
 """
 
 import ast
-import re
-import subprocess
-import sys
-import json
-from collections import defaultdict, Counter
+from collections import defaultdict
 from dataclasses import dataclass, field
-from pathlib import Path
-from typing import Dict, List, Optional, Set, Tuple, Any
 from datetime import datetime
+import json
 import logging
+from pathlib import Path
+import re
+import sys
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -70,31 +69,21 @@ class EnhancedComplianceMetrics:
 
 
 class WeightedScoringEngine:
-    SEVERITY_WEIGHTS = {
-        'critical': 5.0,
-        'high': 3.0,
-        'medium': 2.0,
-        'low': 1.0
-    }
+    SEVERITY_WEIGHTS = {"critical": 5.0, "high": 3.0, "medium": 2.0, "low": 1.0}
 
-    CATEGORY_WEIGHTS = {
-        'code': 1.0,
-        'testing': 0.9,
-        'security': 1.2,
-        'documentation': 0.7
-    }
+    CATEGORY_WEIGHTS = {"code": 1.0, "testing": 0.9, "security": 1.2, "documentation": 0.7}
 
     RULE_PRIORITY = {
-        1: 'critical',
-        2: 'critical',
-        3: 'high',
-        4: 'high',
-        5: 'high',
-        6: 'medium',
-        7: 'high',
-        8: 'medium',
-        9: 'high',
-        10: 'critical'
+        1: "critical",
+        2: "critical",
+        3: "high",
+        4: "high",
+        5: "high",
+        6: "medium",
+        7: "high",
+        8: "medium",
+        9: "high",
+        10: "critical",
     }
 
     @classmethod
@@ -123,57 +112,56 @@ class WeightedScoringEngine:
 
 
 class EnhancedNASAPowerOfTenAnalyzer:
-
     def __init__(self, root_path: str, enable_defense_mode: bool = True):
         self.root_path = Path(root_path)
         self.enable_defense_mode = enable_defense_mode
         self.scoring_engine = WeightedScoringEngine()
 
         self.dynamic_memory_patterns = [
-            r'\bmalloc\s*\(',
-            r'\bcalloc\s*\(',
-            r'\brealloc\s*\(',
-            r'\bfree\s*\(',
-            r'\bnew\s+\w+',
-            r'\bdelete\s+',
-            r'\.append\s*\(',
-            r'\.extend\s*\(',
-            r'\.insert\s*\(',
-            r'\+\=.*\[',
-            r'dict\s*\(',
-            r'list\s*\(',
-            r'set\s*\(',
-            r'\.update\s*\(',
+            r"\bmalloc\s*\(",
+            r"\bcalloc\s*\(",
+            r"\brealloc\s*\(",
+            r"\bfree\s*\(",
+            r"\bnew\s+\w+",
+            r"\bdelete\s+",
+            r"\.append\s*\(",
+            r"\.extend\s*\(",
+            r"\.insert\s*\(",
+            r"\+\=.*\[",
+            r"dict\s*\(",
+            r"list\s*\(",
+            r"set\s*\(",
+            r"\.update\s*\(",
         ]
 
         self.pointer_patterns = [
-            r'\*\w+',
-            r'\w+\s*\*',
-            r'->',
-            r'&\w+',
-            r'ctypes\.',
-            r'pointer\(',
+            r"\*\w+",
+            r"\w+\s*\*",
+            r"->",
+            r"&\w+",
+            r"ctypes\.",
+            r"pointer\(",
         ]
 
         self.preprocessor_patterns = [
-            r'#define\s+',
-            r'#ifdef\s+',
-            r'#ifndef\s+',
-            r'#if\s+',
-            r'#else',
-            r'#endif',
-            r'#pragma\s+',
-            r'exec\s*\(',
-            r'eval\s*\(',
-            r'compile\s*\(',
+            r"#define\s+",
+            r"#ifdef\s+",
+            r"#ifndef\s+",
+            r"#if\s+",
+            r"#else",
+            r"#endif",
+            r"#pragma\s+",
+            r"exec\s*\(",
+            r"eval\s*\(",
+            r"compile\s*\(",
         ]
 
         self.assertion_patterns = [
-            r'\bassert\s+',
-            r'\.assert\w*\(',
-            r'\braise\s+\w+',
-            r'\bif\s+.*:\s*raise',
-            r'logging\.(error|critical|exception)',
+            r"\bassert\s+",
+            r"\.assert\w*\(",
+            r"\braise\s+\w+",
+            r"\bif\s+.*:\s*raise",
+            r"logging\.(error|critical|exception)",
         ]
 
     def analyze_codebase(self) -> EnhancedComplianceMetrics:
@@ -183,7 +171,7 @@ class EnhancedNASAPowerOfTenAnalyzer:
         all_violations = []
 
         python_files = []
-        for py_file in self.root_path.rglob('*.py'):
+        for py_file in self.root_path.rglob("*.py"):
             if not self._should_skip_file(py_file):
                 python_files.append(py_file)
 
@@ -212,29 +200,33 @@ class EnhancedNASAPowerOfTenAnalyzer:
         violations = []
 
         try:
-            with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+            with open(file_path, encoding="utf-8", errors="ignore") as f:
                 content = f.read()
 
-            lines = content.split('\n')
+            lines = content.split("\n")
 
             try:
                 tree = ast.parse(content, filename=str(file_path))
             except SyntaxError as e:
-                violations.append(EnhancedNASAViolation(
-                    rule_number=10,
-                    rule_name="Compile with zero warnings",
-                    category='code',
-                    file_path=str(file_path),
-                    line_number=getattr(e, 'lineno', 1),
-                    function_name=None,
-                    severity='critical',
-                    weight=5.0,
-                    description=f"Syntax error prevents compilation: {e}",
-                    code_snippet=lines[getattr(e, 'lineno', 1) - 1] if len(lines) >= getattr(e, 'lineno', 1) else "",
-                    suggested_fix="Fix syntax error to enable compilation",
-                    auto_fixable=False,
-                    confidence_score=1.0
-                ))
+                violations.append(
+                    EnhancedNASAViolation(
+                        rule_number=10,
+                        rule_name="Compile with zero warnings",
+                        category="code",
+                        file_path=str(file_path),
+                        line_number=getattr(e, "lineno", 1),
+                        function_name=None,
+                        severity="critical",
+                        weight=5.0,
+                        description=f"Syntax error prevents compilation: {e}",
+                        code_snippet=lines[getattr(e, "lineno", 1) - 1]
+                        if len(lines) >= getattr(e, "lineno", 1)
+                        else "",
+                        suggested_fix="Fix syntax error to enable compilation",
+                        auto_fixable=False,
+                        confidence_score=1.0,
+                    )
+                )
                 return violations
 
             for node in ast.walk(tree):
@@ -250,153 +242,168 @@ class EnhancedNASAPowerOfTenAnalyzer:
 
         return violations
 
-    def _analyze_function(self, file_path: Path, content: str, lines: List[str],
-                         func_node: ast.FunctionDef) -> List[EnhancedNASAViolation]:
+    def _analyze_function(
+        self, file_path: Path, content: str, lines: List[str], func_node: ast.FunctionDef
+    ) -> List[EnhancedNASAViolation]:
         violations = []
 
         func_start = func_node.lineno
-        func_end = getattr(func_node, 'end_lineno', func_start)
-        func_lines = lines[func_start-1:func_end]
-        func_content = '\n'.join(func_lines)
+        func_end = getattr(func_node, "end_lineno", func_start)
+        func_lines = lines[func_start - 1 : func_end]
+        func_content = "\n".join(func_lines)
         func_length = len(func_lines)
 
         category = self._determine_category(file_path, func_node.name)
 
         if func_length > 60:
-            severity = 'high' if func_length > 100 else 'medium'
-            violations.append(EnhancedNASAViolation(
-                rule_number=3,
-                rule_name="Limit function size to 60 lines",
-                category=category,
-                file_path=str(file_path),
-                line_number=func_start,
-                function_name=func_node.name,
-                severity=severity,
-                weight=self.scoring_engine.SEVERITY_WEIGHTS[severity],
-                description=f"Function '{func_node.name}' is {func_length} lines (max: 60)",
-                code_snippet=f"def {func_node.name}(...):",
-                suggested_fix=self._generate_function_split_fix(func_node, func_content),
-                auto_fixable=True,
-                confidence_score=0.9
-            ))
+            severity = "high" if func_length > 100 else "medium"
+            violations.append(
+                EnhancedNASAViolation(
+                    rule_number=3,
+                    rule_name="Limit function size to 60 lines",
+                    category=category,
+                    file_path=str(file_path),
+                    line_number=func_start,
+                    function_name=func_node.name,
+                    severity=severity,
+                    weight=self.scoring_engine.SEVERITY_WEIGHTS[severity],
+                    description=f"Function '{func_node.name}' is {func_length} lines (max: 60)",
+                    code_snippet=f"def {func_node.name}(...):",
+                    suggested_fix=self._generate_function_split_fix(func_node, func_content),
+                    auto_fixable=True,
+                    confidence_score=0.9,
+                )
+            )
 
         assertion_count = self._count_assertions(func_content)
         assertion_density = (assertion_count / func_length) * 100 if func_length > 0 else 0
 
         if assertion_density < 2.0:
-            violations.append(EnhancedNASAViolation(
-                rule_number=4,
-                rule_name="Assert density >= 2%",
-                category='testing',
-                file_path=str(file_path),
-                line_number=func_start,
-                function_name=func_node.name,
-                severity='high',
-                weight=3.0,
-                description=f"Assertion density {assertion_density:.1f}% < 2.0%",
-                code_snippet=f"def {func_node.name}(...):",
-                suggested_fix=self._generate_assertion_fix(func_node, func_content, assertion_count),
-                auto_fixable=True,
-                confidence_score=0.85
-            ))
+            violations.append(
+                EnhancedNASAViolation(
+                    rule_number=4,
+                    rule_name="Assert density >= 2%",
+                    category="testing",
+                    file_path=str(file_path),
+                    line_number=func_start,
+                    function_name=func_node.name,
+                    severity="high",
+                    weight=3.0,
+                    description=f"Assertion density {assertion_density:.1f}% < 2.0%",
+                    code_snippet=f"def {func_node.name}(...):",
+                    suggested_fix=self._generate_assertion_fix(func_node, func_content, assertion_count),
+                    auto_fixable=True,
+                    confidence_score=0.85,
+                )
+            )
 
         complexity = self._calculate_complexity(func_node)
         if complexity > 10:
-            violations.append(EnhancedNASAViolation(
-                rule_number=5,
-                rule_name="Cyclomatic complexity <= 10",
-                category='code',
-                file_path=str(file_path),
-                line_number=func_start,
-                function_name=func_node.name,
-                severity='high',
-                weight=3.0,
-                description=f"Cyclomatic complexity {complexity} > 10",
-                code_snippet=f"def {func_node.name}(...):",
-                suggested_fix=self._generate_complexity_fix(func_node, complexity),
-                auto_fixable=False,
-                confidence_score=0.95
-            ))
+            violations.append(
+                EnhancedNASAViolation(
+                    rule_number=5,
+                    rule_name="Cyclomatic complexity <= 10",
+                    category="code",
+                    file_path=str(file_path),
+                    line_number=func_start,
+                    function_name=func_node.name,
+                    severity="high",
+                    weight=3.0,
+                    description=f"Cyclomatic complexity {complexity} > 10",
+                    code_snippet=f"def {func_node.name}(...):",
+                    suggested_fix=self._generate_complexity_fix(func_node, complexity),
+                    auto_fixable=False,
+                    confidence_score=0.95,
+                )
+            )
 
         memory_violations = self._find_memory_violations(func_content, func_start, func_node.name, category)
         violations.extend([self._set_file_path(v, str(file_path)) for v in memory_violations])
 
         return violations
 
-    def _analyze_file_level(self, file_path: Path, content: str, lines: List[str],
-                           tree: ast.AST) -> List[EnhancedNASAViolation]:
+    def _analyze_file_level(
+        self, file_path: Path, content: str, lines: List[str], tree: ast.AST
+    ) -> List[EnhancedNASAViolation]:
         violations = []
 
         scope_violations = self._analyze_variable_scope(tree)
         for scope_violation in scope_violations:
-            violations.append(EnhancedNASAViolation(
-                rule_number=6,
-                rule_name="Declare objects at smallest scope",
-                category='code',
-                file_path=str(file_path),
-                line_number=scope_violation['line'],
-                function_name=scope_violation.get('function'),
-                severity='low',
-                weight=1.0,
-                description=scope_violation['description'],
-                code_snippet=lines[scope_violation['line']-1] if scope_violation['line'] <= len(lines) else "",
-                suggested_fix="Move variable declaration closer to usage",
-                auto_fixable=True,
-                confidence_score=0.7
-            ))
+            violations.append(
+                EnhancedNASAViolation(
+                    rule_number=6,
+                    rule_name="Declare objects at smallest scope",
+                    category="code",
+                    file_path=str(file_path),
+                    line_number=scope_violation["line"],
+                    function_name=scope_violation.get("function"),
+                    severity="low",
+                    weight=1.0,
+                    description=scope_violation["description"],
+                    code_snippet=lines[scope_violation["line"] - 1] if scope_violation["line"] <= len(lines) else "",
+                    suggested_fix="Move variable declaration closer to usage",
+                    auto_fixable=True,
+                    confidence_score=0.7,
+                )
+            )
 
         preprocessor_violations = self._find_preprocessor_usage(content, lines)
         violations.extend([self._set_file_path(v, str(file_path)) for v in preprocessor_violations])
 
         return violations
 
-    def _find_memory_violations(self, func_content: str, func_start: int,
-                               func_name: str, category: str) -> List[EnhancedNASAViolation]:
+    def _find_memory_violations(
+        self, func_content: str, func_start: int, func_name: str, category: str
+    ) -> List[EnhancedNASAViolation]:
         violations = []
 
         for pattern in self.dynamic_memory_patterns:
             matches = re.finditer(pattern, func_content, re.MULTILINE)
             for match in matches:
-                line_offset = func_content[:match.start()].count('\n')
+                line_offset = func_content[: match.start()].count("\n")
                 line_num = func_start + line_offset
 
-                violations.append(EnhancedNASAViolation(
-                    rule_number=2,
-                    rule_name="Restrict dynamic memory allocation",
-                    category=category,
-                    file_path="",
-                    line_number=line_num,
-                    function_name=func_name,
-                    severity='high',
-                    weight=3.0,
-                    description=f"Dynamic memory allocation: {match.group()}",
-                    code_snippet=match.group(),
-                    suggested_fix=self._generate_memory_fix(match.group()),
-                    auto_fixable=True,
-                    confidence_score=0.8
-                ))
+                violations.append(
+                    EnhancedNASAViolation(
+                        rule_number=2,
+                        rule_name="Restrict dynamic memory allocation",
+                        category=category,
+                        file_path="",
+                        line_number=line_num,
+                        function_name=func_name,
+                        severity="high",
+                        weight=3.0,
+                        description=f"Dynamic memory allocation: {match.group()}",
+                        code_snippet=match.group(),
+                        suggested_fix=self._generate_memory_fix(match.group()),
+                        auto_fixable=True,
+                        confidence_score=0.8,
+                    )
+                )
 
         for pattern in self.pointer_patterns:
             matches = re.finditer(pattern, func_content, re.MULTILINE)
             for match in matches:
-                line_offset = func_content[:match.start()].count('\n')
+                line_offset = func_content[: match.start()].count("\n")
                 line_num = func_start + line_offset
 
-                violations.append(EnhancedNASAViolation(
-                    rule_number=1,
-                    rule_name="Restrict pointer use",
-                    category='security',
-                    file_path="",
-                    line_number=line_num,
-                    function_name=func_name,
-                    severity='high',
-                    weight=3.0,
-                    description=f"Pointer usage: {match.group()}",
-                    code_snippet=match.group(),
-                    suggested_fix="Replace pointer with safe alternative",
-                    auto_fixable=False,
-                    confidence_score=0.9
-                ))
+                violations.append(
+                    EnhancedNASAViolation(
+                        rule_number=1,
+                        rule_name="Restrict pointer use",
+                        category="security",
+                        file_path="",
+                        line_number=line_num,
+                        function_name=func_name,
+                        severity="high",
+                        weight=3.0,
+                        description=f"Pointer usage: {match.group()}",
+                        code_snippet=match.group(),
+                        suggested_fix="Replace pointer with safe alternative",
+                        auto_fixable=False,
+                        confidence_score=0.9,
+                    )
+                )
 
         return violations
 
@@ -406,23 +413,25 @@ class EnhancedNASAPowerOfTenAnalyzer:
         for pattern in self.preprocessor_patterns:
             matches = re.finditer(pattern, content, re.MULTILINE)
             for match in matches:
-                line_num = content[:match.start()].count('\n') + 1
+                line_num = content[: match.start()].count("\n") + 1
 
-                violations.append(EnhancedNASAViolation(
-                    rule_number=8,
-                    rule_name="Limit preprocessor use",
-                    category='security',
-                    file_path="",
-                    line_number=line_num,
-                    function_name=None,
-                    severity='medium',
-                    weight=2.0,
-                    description=f"Preprocessor/dynamic execution: {match.group()}",
-                    code_snippet=lines[line_num-1] if line_num <= len(lines) else "",
-                    suggested_fix="Avoid dynamic code execution for security",
-                    auto_fixable=False,
-                    confidence_score=0.95
-                ))
+                violations.append(
+                    EnhancedNASAViolation(
+                        rule_number=8,
+                        rule_name="Limit preprocessor use",
+                        category="security",
+                        file_path="",
+                        line_number=line_num,
+                        function_name=None,
+                        severity="medium",
+                        weight=2.0,
+                        description=f"Preprocessor/dynamic execution: {match.group()}",
+                        code_snippet=lines[line_num - 1] if line_num <= len(lines) else "",
+                        suggested_fix="Avoid dynamic code execution for security",
+                        auto_fixable=False,
+                        confidence_score=0.95,
+                    )
+                )
 
         return violations
 
@@ -436,51 +445,56 @@ class EnhancedNASAPowerOfTenAnalyzer:
         for rule_num in range(1, 11):
             rule_violations = len(metrics.violations_by_rule[rule_num])
             if metrics.total_files > 0:
-                metrics.rule_compliance[rule_num] = max(0,
-                    (metrics.total_files - rule_violations) / metrics.total_files * 100)
+                metrics.rule_compliance[rule_num] = max(
+                    0, (metrics.total_files - rule_violations) / metrics.total_files * 100
+                )
             else:
                 metrics.rule_compliance[rule_num] = 100.0
 
-        code_violations = len(metrics.violations_by_category.get('code', []))
-        test_violations = len(metrics.violations_by_category.get('testing', []))
-        security_violations = len(metrics.violations_by_category.get('security', []))
-        doc_violations = len(metrics.violations_by_category.get('documentation', []))
+        code_violations = len(metrics.violations_by_category.get("code", []))
+        test_violations = len(metrics.violations_by_category.get("testing", []))
+        security_violations = len(metrics.violations_by_category.get("security", []))
+        doc_violations = len(metrics.violations_by_category.get("documentation", []))
 
         total_possible = metrics.total_files if metrics.total_files > 0 else 1
 
         metrics.multi_category.code_compliance = max(0, (total_possible - code_violations) / total_possible * 100)
         metrics.multi_category.testing_compliance = max(0, (total_possible - test_violations) / total_possible * 100)
-        metrics.multi_category.security_compliance = max(0, (total_possible - security_violations) / total_possible * 100)
-        metrics.multi_category.documentation_compliance = max(0, (total_possible - doc_violations) / total_possible * 100)
+        metrics.multi_category.security_compliance = max(
+            0, (total_possible - security_violations) / total_possible * 100
+        )
+        metrics.multi_category.documentation_compliance = max(
+            0, (total_possible - doc_violations) / total_possible * 100
+        )
 
         metrics.multi_category.overall_compliance = sum(metrics.rule_compliance.values()) / 10
 
         base_weighted = (
-            metrics.multi_category.code_compliance * 1.0 +
-            metrics.multi_category.testing_compliance * 0.9 +
-            metrics.multi_category.security_compliance * 1.2 +
-            metrics.multi_category.documentation_compliance * 0.7
+            metrics.multi_category.code_compliance * 1.0
+            + metrics.multi_category.testing_compliance * 0.9
+            + metrics.multi_category.security_compliance * 1.2
+            + metrics.multi_category.documentation_compliance * 0.7
         ) / 3.8
 
         metrics.multi_category.bonus_points = self.scoring_engine.calculate_bonus_points(metrics)
         metrics.multi_category.weighted_score = min(100, base_weighted + metrics.multi_category.bonus_points)
 
         metrics.multi_category.defense_ready = (
-            metrics.multi_category.weighted_score >= 95.0 and
-            metrics.multi_category.security_compliance >= 98.0 and
-            metrics.multi_category.code_compliance >= 95.0
+            metrics.multi_category.weighted_score >= 95.0
+            and metrics.multi_category.security_compliance >= 98.0
+            and metrics.multi_category.code_compliance >= 95.0
         )
 
     def _calculate_defense_certification(self, metrics: EnhancedComplianceMetrics) -> None:
         if self.enable_defense_mode:
             metrics.defense_certification_status = {
-                'dfars_compliant': metrics.multi_category.security_compliance >= 98.0,
-                'nist_ssdf_level': 'high' if metrics.multi_category.weighted_score >= 95.0 else 'medium',
-                'certification_ready': metrics.multi_category.defense_ready,
-                'audit_trail_complete': True,
-                'timestamp': datetime.now().isoformat(),
-                'weighted_score': metrics.multi_category.weighted_score,
-                'bonus_points_earned': metrics.multi_category.bonus_points
+                "dfars_compliant": metrics.multi_category.security_compliance >= 98.0,
+                "nist_ssdf_level": "high" if metrics.multi_category.weighted_score >= 95.0 else "medium",
+                "certification_ready": metrics.multi_category.defense_ready,
+                "audit_trail_complete": True,
+                "timestamp": datetime.now().isoformat(),
+                "weighted_score": metrics.multi_category.weighted_score,
+                "bonus_points_earned": metrics.multi_category.bonus_points,
             }
 
     def _generate_prioritized_recommendations(self, metrics: EnhancedComplianceMetrics) -> List[str]:
@@ -489,12 +503,10 @@ class EnhancedNASAPowerOfTenAnalyzer:
         priority_rules = sorted(
             range(1, 11),
             key=lambda r: (
-                self.scoring_engine.SEVERITY_WEIGHTS.get(
-                    self.scoring_engine.RULE_PRIORITY.get(r, 'low'), 1.0
-                ),
-                len(metrics.violations_by_rule.get(r, []))
+                self.scoring_engine.SEVERITY_WEIGHTS.get(self.scoring_engine.RULE_PRIORITY.get(r, "low"), 1.0),
+                len(metrics.violations_by_rule.get(r, [])),
             ),
-            reverse=True
+            reverse=True,
         )
 
         for rule_num in priority_rules:
@@ -511,27 +523,35 @@ class EnhancedNASAPowerOfTenAnalyzer:
 
         if metrics.multi_category.weighted_score < 95.0:
             needed = 95.0 - metrics.multi_category.weighted_score
-            recommendations.insert(0,
-                f"PRIORITY: Increase compliance by {needed:.1f}% to achieve defense certification"
+            recommendations.insert(
+                0, f"PRIORITY: Increase compliance by {needed:.1f}% to achieve defense certification"
             )
 
         return recommendations
 
     def _determine_category(self, file_path: Path, func_name: str) -> str:
         path_str = str(file_path).lower()
-        if 'test' in path_str or func_name.startswith('test_'):
-            return 'testing'
-        elif 'security' in path_str or 'auth' in path_str:
-            return 'security'
-        elif 'doc' in path_str or func_name.startswith('doc_'):
-            return 'documentation'
+        if "test" in path_str or func_name.startswith("test_"):
+            return "testing"
+        elif "security" in path_str or "auth" in path_str:
+            return "security"
+        elif "doc" in path_str or func_name.startswith("doc_"):
+            return "documentation"
         else:
-            return 'code'
+            return "code"
 
     def _should_skip_file(self, file_path: Path) -> bool:
         skip_patterns = [
-            '__pycache__', '.git', '.pytest_cache', 'venv', '.venv',
-            'node_modules', '.coverage', '.tox', 'build', 'dist'
+            "__pycache__",
+            ".git",
+            ".pytest_cache",
+            "venv",
+            ".venv",
+            "node_modules",
+            ".coverage",
+            ".tox",
+            "build",
+            "dist",
         ]
         return any(pattern in str(file_path) for pattern in skip_patterns)
 
@@ -549,9 +569,17 @@ class EnhancedNASAPowerOfTenAnalyzer:
     def _calculate_complexity(self, node: ast.AST) -> int:
         complexity = 1
         complexity_nodes = {
-            ast.If, ast.While, ast.For, ast.ExceptHandler,
-            ast.With, ast.AsyncWith, ast.ListComp, ast.DictComp,
-            ast.SetComp, ast.GeneratorExp, ast.BoolOp
+            ast.If,
+            ast.While,
+            ast.For,
+            ast.ExceptHandler,
+            ast.With,
+            ast.AsyncWith,
+            ast.ListComp,
+            ast.DictComp,
+            ast.SetComp,
+            ast.GeneratorExp,
+            ast.BoolOp,
         }
 
         for child in ast.walk(node):
@@ -569,7 +597,7 @@ class EnhancedNASAPowerOfTenAnalyzer:
         return f"Extract methods: Split {func_node.name}() into smaller focused functions"
 
     def _generate_assertion_fix(self, func_node: ast.FunctionDef, func_content: str, current_count: int) -> str:
-        lines = len(func_content.split('\n'))
+        lines = len(func_content.split("\n"))
         needed = max(1, int(lines * 0.02) - current_count)
         return f"Add {needed} assertions for input/state/result validation"
 
@@ -577,11 +605,11 @@ class EnhancedNASAPowerOfTenAnalyzer:
         return f"Reduce complexity from {complexity} to <=10: Extract conditions into helper functions"
 
     def _generate_memory_fix(self, allocation: str) -> str:
-        if '.append(' in allocation:
+        if ".append(" in allocation:
             return "Use pre-allocated list with fixed size"
-        elif 'dict(' in allocation:
+        elif "dict(" in allocation:
             return "Use namedtuple or dataclass instead"
-        elif 'list(' in allocation:
+        elif "list(" in allocation:
             return "Use tuple or pre-allocated array"
         else:
             return "Replace with static allocation or object pooling"
@@ -590,11 +618,12 @@ class EnhancedNASAPowerOfTenAnalyzer:
 def main():
     import argparse
 
-    parser = argparse.ArgumentParser(description='Enhanced NASA POT10 Compliance Analyzer')
-    parser.add_argument('--path', default='.', help='Root path to analyze')
-    parser.add_argument('--defense-mode', action='store_true', default=True,
-                       help='Enable defense industry certification mode')
-    parser.add_argument('--report', default='nasa_enhanced_report.json', help='Report output file')
+    parser = argparse.ArgumentParser(description="Enhanced NASA POT10 Compliance Analyzer")
+    parser.add_argument("--path", default=".", help="Root path to analyze")
+    parser.add_argument(
+        "--defense-mode", action="store_true", default=True, help="Enable defense industry certification mode"
+    )
+    parser.add_argument("--report", default="nasa_enhanced_report.json", help="Report output file")
 
     args = parser.parse_args()
 
@@ -602,47 +631,46 @@ def main():
     metrics = analyzer.analyze_codebase()
 
     report = {
-        'timestamp': datetime.now().isoformat(),
-        'analyzer_version': 'NASA_POT10_Enhanced_v2.0',
-        'multi_category_compliance': {
-            'code': metrics.multi_category.code_compliance,
-            'testing': metrics.multi_category.testing_compliance,
-            'security': metrics.multi_category.security_compliance,
-            'documentation': metrics.multi_category.documentation_compliance,
-            'overall': metrics.multi_category.overall_compliance,
-            'weighted_score': metrics.multi_category.weighted_score,
-            'bonus_points': metrics.multi_category.bonus_points,
-            'defense_ready': metrics.multi_category.defense_ready
+        "timestamp": datetime.now().isoformat(),
+        "analyzer_version": "NASA_POT10_Enhanced_v2.0",
+        "multi_category_compliance": {
+            "code": metrics.multi_category.code_compliance,
+            "testing": metrics.multi_category.testing_compliance,
+            "security": metrics.multi_category.security_compliance,
+            "documentation": metrics.multi_category.documentation_compliance,
+            "overall": metrics.multi_category.overall_compliance,
+            "weighted_score": metrics.multi_category.weighted_score,
+            "bonus_points": metrics.multi_category.bonus_points,
+            "defense_ready": metrics.multi_category.defense_ready,
         },
-        'rule_compliance': metrics.rule_compliance,
-        'total_files': metrics.total_files,
-        'weighted_penalty_score': metrics.weighted_penalty_score,
-        'violations_by_rule': {
+        "rule_compliance": metrics.rule_compliance,
+        "total_files": metrics.total_files,
+        "weighted_penalty_score": metrics.weighted_penalty_score,
+        "violations_by_rule": {
             str(rule): [
                 {
-                    'file': v.file_path,
-                    'line': v.line_number,
-                    'function': v.function_name,
-                    'severity': v.severity,
-                    'weight': v.weight,
-                    'category': v.category,
-                    'description': v.description,
-                    'auto_fixable': v.auto_fixable,
-                    'confidence': v.confidence_score
+                    "file": v.file_path,
+                    "line": v.line_number,
+                    "function": v.function_name,
+                    "severity": v.severity,
+                    "weight": v.weight,
+                    "category": v.category,
+                    "description": v.description,
+                    "auto_fixable": v.auto_fixable,
+                    "confidence": v.confidence_score,
                 }
                 for v in violations
             ]
             for rule, violations in metrics.violations_by_rule.items()
         },
-        'violations_by_category': {
-            category: len(violations)
-            for category, violations in metrics.violations_by_category.items()
+        "violations_by_category": {
+            category: len(violations) for category, violations in metrics.violations_by_category.items()
         },
-        'defense_certification': metrics.defense_certification_status,
-        'recommendations': metrics.fix_recommendations
+        "defense_certification": metrics.defense_certification_status,
+        "recommendations": metrics.fix_recommendations,
     }
 
-    with open(args.report, 'w') as f:
+    with open(args.report, "w") as f:
         json.dump(report, f, indent=2)
 
     logger.info(f"Enhanced report saved to {args.report}")
@@ -657,6 +685,6 @@ def main():
         return 2
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     sys.exit(main())

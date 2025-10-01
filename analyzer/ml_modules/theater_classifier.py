@@ -21,22 +21,22 @@ Models:
 @requires scikit-learn>=1.0.0
 """
 
+from dataclasses import dataclass
 import json
-import pickle
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Any
-from dataclasses import dataclass, field
 import logging
+from pathlib import Path
+import pickle
+from typing import Any, Dict, List, Tuple
 
 logger = logging.getLogger(__name__)
 
 try:
+    import numpy as np
     from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier
     from sklearn.linear_model import LogisticRegression
-    from sklearn.preprocessing import StandardScaler
-    from sklearn.model_selection import train_test_split
     from sklearn.metrics import classification_report, confusion_matrix
-    import numpy as np
+    from sklearn.model_selection import train_test_split
+    from sklearn.preprocessing import StandardScaler
 
     SKLEARN_AVAILABLE = True
 except ImportError:
@@ -76,7 +76,7 @@ class TheaterFeatures:
             self.cosmetic_changes_ratio,
             float(self.total_violations),
             float(self.critical_violations),
-            self.violation_density
+            self.violation_density,
         ]
 
 
@@ -90,13 +90,20 @@ class ClassificationResult:
 
 
 class TheaterClassifier:
-
     FEATURE_NAMES = [
-        "test_gaming_score", "error_masking_score", "metrics_inflation_score",
-        "documentation_theater_score", "quality_facade_score",
-        "empty_test_ratio", "assert_true_ratio", "bare_except_ratio",
-        "hardcoded_metrics_ratio", "cosmetic_changes_ratio",
-        "total_violations", "critical_violations", "violation_density"
+        "test_gaming_score",
+        "error_masking_score",
+        "metrics_inflation_score",
+        "documentation_theater_score",
+        "quality_facade_score",
+        "empty_test_ratio",
+        "assert_true_ratio",
+        "bare_except_ratio",
+        "hardcoded_metrics_ratio",
+        "cosmetic_changes_ratio",
+        "total_violations",
+        "critical_violations",
+        "violation_density",
     ]
 
     def __init__(self, model_type: str = "gradient_boosting"):
@@ -112,23 +119,11 @@ class TheaterClassifier:
 
     def _initialize_sklearn_model(self):
         if self.model_type == "gradient_boosting":
-            self.model = GradientBoostingClassifier(
-                n_estimators=100,
-                learning_rate=0.1,
-                max_depth=3,
-                random_state=42
-            )
+            self.model = GradientBoostingClassifier(n_estimators=100, learning_rate=0.1, max_depth=3, random_state=42)
         elif self.model_type == "random_forest":
-            self.model = RandomForestClassifier(
-                n_estimators=100,
-                max_depth=5,
-                random_state=42
-            )
+            self.model = RandomForestClassifier(n_estimators=100, max_depth=5, random_state=42)
         elif self.model_type == "logistic":
-            self.model = LogisticRegression(
-                max_iter=1000,
-                random_state=42
-            )
+            self.model = LogisticRegression(max_iter=1000, random_state=42)
 
         self.scaler = StandardScaler()
 
@@ -136,11 +131,21 @@ class TheaterClassifier:
         features = TheaterFeatures()
 
         type_breakdown = theater_report.get("type_breakdown", {})
-        features.test_gaming_score = type_breakdown.get("test_gaming", 0) / max(1, theater_report.get("total_patterns", 1))
-        features.error_masking_score = type_breakdown.get("error_masking", 0) / max(1, theater_report.get("total_patterns", 1))
-        features.metrics_inflation_score = type_breakdown.get("metrics_inflation", 0) / max(1, theater_report.get("total_patterns", 1))
-        features.documentation_theater_score = type_breakdown.get("documentation_theater", 0) / max(1, theater_report.get("total_patterns", 1))
-        features.quality_facade_score = type_breakdown.get("quality_facade", 0) / max(1, theater_report.get("total_patterns", 1))
+        features.test_gaming_score = type_breakdown.get("test_gaming", 0) / max(
+            1, theater_report.get("total_patterns", 1)
+        )
+        features.error_masking_score = type_breakdown.get("error_masking", 0) / max(
+            1, theater_report.get("total_patterns", 1)
+        )
+        features.metrics_inflation_score = type_breakdown.get("metrics_inflation", 0) / max(
+            1, theater_report.get("total_patterns", 1)
+        )
+        features.documentation_theater_score = type_breakdown.get("documentation_theater", 0) / max(
+            1, theater_report.get("total_patterns", 1)
+        )
+        features.quality_facade_score = type_breakdown.get("quality_facade", 0) / max(
+            1, theater_report.get("total_patterns", 1)
+        )
 
         patterns = theater_report.get("patterns", [])
         if patterns:
@@ -179,9 +184,7 @@ class TheaterClassifier:
         X = np.array([features.to_vector() for features, _ in training_data])
         y = np.array([int(is_theater) for _, is_theater in training_data])
 
-        X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=0.2, random_state=42, stratify=y
-        )
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
 
         X_train_scaled = self.scaler.fit_transform(X_train)
         X_test_scaled = self.scaler.transform(X_test)
@@ -201,7 +204,7 @@ class TheaterClassifier:
             "precision": report.get("1", {}).get("precision", 0.0),
             "recall": report.get("1", {}).get("recall", 0.0),
             "f1_score": report.get("1", {}).get("f1-score", 0.0),
-            "samples_used": len(training_data)
+            "samples_used": len(training_data),
         }
 
     def predict(self, features: TheaterFeatures) -> ClassificationResult:
@@ -220,12 +223,9 @@ class TheaterClassifier:
         return ClassificationResult(
             is_theater=bool(prediction),
             confidence=max(probabilities),
-            probabilities={
-                "authentic": float(probabilities[0]),
-                "theater": float(probabilities[1])
-            },
+            probabilities={"authentic": float(probabilities[0]), "theater": float(probabilities[1])},
             features_used=self.FEATURE_NAMES,
-            model_type=self.model_type
+            model_type=self.model_type,
         )
 
     def _rule_based_predict(self, features: TheaterFeatures) -> ClassificationResult:
@@ -240,7 +240,7 @@ class TheaterClassifier:
             (features.assert_true_ratio > 0.3, "trivial_assertions"),
             (features.bare_except_ratio > 0.2, "error_suppression"),
             (features.cosmetic_changes_ratio > 0.6, "cosmetic_work"),
-            (features.critical_violations > 5, "critical_issues")
+            (features.critical_violations > 5, "critical_issues"),
         ]
 
         for check, _ in checks:
@@ -254,12 +254,9 @@ class TheaterClassifier:
         return ClassificationResult(
             is_theater=is_theater,
             confidence=abs(theater_score - 0.5) * 2,
-            probabilities={
-                "authentic": 1.0 - theater_score,
-                "theater": theater_score
-            },
+            probabilities={"authentic": 1.0 - theater_score, "theater": theater_score},
             features_used=["rule_based_heuristics"],
-            model_type="rule_based"
+            model_type="rule_based",
         )
 
     def save_model(self, output_path: str):
@@ -271,10 +268,10 @@ class TheaterClassifier:
             "model": self.model,
             "scaler": self.scaler,
             "model_type": self.model_type,
-            "feature_names": self.FEATURE_NAMES
+            "feature_names": self.FEATURE_NAMES,
         }
 
-        with open(output_path, 'wb') as f:
+        with open(output_path, "wb") as f:
             pickle.dump(model_data, f)
 
         logger.info(f"Model saved to {output_path}")
@@ -284,7 +281,7 @@ class TheaterClassifier:
             logger.warning("Cannot load: scikit-learn unavailable")
             return
 
-        with open(model_path, 'rb') as f:
+        with open(model_path, "rb") as f:
             model_data = pickle.load(f)
 
         self.model = model_data["model"]
@@ -298,24 +295,25 @@ class TheaterClassifier:
 def main():
     import argparse
 
-    parser = argparse.ArgumentParser(description='ML Theater Classifier')
-    parser.add_argument('--mode', choices=['train', 'predict'], required=True)
-    parser.add_argument('--training-data', help='Path to training data JSON')
-    parser.add_argument('--theater-report', help='Path to theater detection report')
-    parser.add_argument('--model-path', default='theater_classifier.pkl', help='Model file path')
-    parser.add_argument('--model-type', choices=['gradient_boosting', 'random_forest', 'logistic'],
-                       default='gradient_boosting')
+    parser = argparse.ArgumentParser(description="ML Theater Classifier")
+    parser.add_argument("--mode", choices=["train", "predict"], required=True)
+    parser.add_argument("--training-data", help="Path to training data JSON")
+    parser.add_argument("--theater-report", help="Path to theater detection report")
+    parser.add_argument("--model-path", default="theater_classifier.pkl", help="Model file path")
+    parser.add_argument(
+        "--model-type", choices=["gradient_boosting", "random_forest", "logistic"], default="gradient_boosting"
+    )
 
     args = parser.parse_args()
 
     classifier = TheaterClassifier(model_type=args.model_type)
 
-    if args.mode == 'train':
+    if args.mode == "train":
         if not args.training_data:
             print("Error: --training-data required for training mode")
             return
 
-        with open(args.training_data, 'r') as f:
+        with open(args.training_data) as f:
             training_data_raw = json.load(f)
 
         training_data = []
@@ -334,7 +332,7 @@ def main():
         classifier.save_model(args.model_path)
         print(f"\nModel saved to {args.model_path}")
 
-    elif args.mode == 'predict':
+    elif args.mode == "predict":
         if not args.theater_report:
             print("Error: --theater-report required for prediction mode")
             return
@@ -342,21 +340,21 @@ def main():
         if Path(args.model_path).exists():
             classifier.load_model(args.model_path)
 
-        with open(args.theater_report, 'r') as f:
+        with open(args.theater_report) as f:
             theater_report = json.load(f)
 
         features = classifier.extract_features_from_theater_report(theater_report)
         result = classifier.predict(features)
 
-        print(f"\nClassification Result:")
+        print("\nClassification Result:")
         print(f"  Theater Detected: {result.is_theater}")
         print(f"  Confidence: {result.confidence:.2%}")
-        print(f"  Probabilities:")
+        print("  Probabilities:")
         print(f"    Authentic: {result.probabilities['authentic']:.2%}")
         print(f"    Theater: {result.probabilities['theater']:.2%}")
         print(f"  Model: {result.model_type}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     main()

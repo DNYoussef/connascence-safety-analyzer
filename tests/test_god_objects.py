@@ -15,8 +15,8 @@ from typing import List
 import pytest
 
 from analyzer.check_connascence import ConnascenceAnalyzer, ConnascenceDetector
-from utils.types import ConnascenceViolation
 from analyzer.constants import GOD_OBJECT_METHOD_THRESHOLD_CI
+from utils.types import ConnascenceViolation
 
 
 class TestGodObjectContextAware:
@@ -85,8 +85,10 @@ class DatabaseConfig:
             # If flagged, should be lower severity
             config_violation = god_object_violations[0]
             # Could be medium instead of critical for config classes
-            assert config_violation.severity in ["medium", "high"], \
-                f"Config class should have reduced severity, got {config_violation.severity}"
+            assert config_violation.severity in [
+                "medium",
+                "high",
+            ], f"Config class should have reduced severity, got {config_violation.severity}"
 
     def test_business_logic_classes_strict_detection(self):
         """Test that business logic classes are subject to strict detection."""
@@ -132,8 +134,9 @@ class OrderProcessor:
         assert len(god_object_violations) > 0, "Business logic class with many methods should be flagged"
 
         business_violation = god_object_violations[0]
-        assert business_violation.severity == "critical", \
-            f"Business logic god object should be critical severity, got {business_violation.severity}"
+        assert (
+            business_violation.severity == "critical"
+        ), f"Business logic god object should be critical severity, got {business_violation.severity}"
 
     def test_data_model_vs_controller_thresholds(self):
         """Test different thresholds for data models vs API controllers."""
@@ -228,8 +231,7 @@ class UserController:
 
         # Controller should be more likely to be flagged or flagged with higher severity
         if controller_god_violations:
-            assert controller_god_violations[0].severity == "critical", \
-                "Controller god object should be critical"
+            assert controller_god_violations[0].severity == "critical", "Controller god object should be critical"
 
     def test_dynamic_threshold_calculation(self):
         """Test dynamic threshold calculation based on class type and context."""
@@ -349,8 +351,10 @@ class StringUtils:
             # Should be lower severity for utility classes
             utility_violation = god_object_violations[0]
             # Utility classes might get medium severity instead of critical
-            assert utility_violation.severity in ["medium", "high"], \
-                f"Utility class should have reduced severity, got {utility_violation.severity}"
+            assert utility_violation.severity in [
+                "medium",
+                "high",
+            ], f"Utility class should have reduced severity, got {utility_violation.severity}"
 
     def test_interface_implementation_classes(self):
         """Test classes that implement large interfaces."""
@@ -442,8 +446,9 @@ class LegacyOrderSystem:
         assert len(god_object_violations) > 0, "Legacy god object should be flagged"
 
         legacy_violation = god_object_violations[0]
-        assert legacy_violation.severity == "critical", \
-            f"Legacy god object should be critical severity, got {legacy_violation.severity}"
+        assert (
+            legacy_violation.severity == "critical"
+        ), f"Legacy god object should be critical severity, got {legacy_violation.severity}"
 
     def _analyze_code_string(self, code: str) -> List[ConnascenceViolation]:
         """Helper method to analyze code string."""

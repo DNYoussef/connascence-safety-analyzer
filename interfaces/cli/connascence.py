@@ -45,14 +45,17 @@ except ImportError:
         def __init__(self, **kwargs):
             for k, v in kwargs.items():
                 setattr(self, k, v)
+
         def to_dict(self):
             return dict(self.__dict__.items())
 
     class ErrorHandler:
         def __init__(self, integration):
             self.integration = integration
+
         def create_error(self, error_type, message, **kwargs):
             return StandardError(code=5001, message=message, **kwargs)
+
         def handle_exception(self, e, context=None):
             return StandardError(code=5001, message=str(e), context=context or {})
 
@@ -62,35 +65,19 @@ class ConnascenceCLI:
 
     def __init__(self):
         self.parser = self._create_parser()
-        self.error_handler = ErrorHandler('cli')
+        self.error_handler = ErrorHandler("cli")
         self.errors = []
         self.warnings = []
 
     def _create_parser(self) -> argparse.ArgumentParser:
         """Create argument parser for CLI."""
-        parser = argparse.ArgumentParser(
-            description="Connascence Safety Analyzer CLI",
-            prog="connascence"
-        )
+        parser = argparse.ArgumentParser(description="Connascence Safety Analyzer CLI", prog="connascence")
 
-        parser.add_argument(
-            "paths",
-            nargs="*",
-            help="Paths to analyze"
-        )
+        parser.add_argument("paths", nargs="*", help="Paths to analyze")
 
-        parser.add_argument(
-            "--config",
-            type=str,
-            help="Configuration file path"
-        )
+        parser.add_argument("--config", type=str, help="Configuration file path")
 
-        parser.add_argument(
-            "--output",
-            "-o",
-            type=str,
-            help="Output file path"
-        )
+        parser.add_argument("--output", "-o", type=str, help="Output file path")
 
         parser.add_argument(
             "--policy",
@@ -99,33 +86,17 @@ class ConnascenceCLI:
             type=str,
             default="standard",
             help=f"Policy preset to use. Unified names: {', '.join(UNIFIED_POLICY_NAMES)}. "
-                 f"Legacy names supported with deprecation warnings."
+            f"Legacy names supported with deprecation warnings.",
         )
 
-        parser.add_argument(
-            "--format",
-            choices=["json", "markdown", "sarif"],
-            default="json",
-            help="Output format"
-        )
+        parser.add_argument("--format", choices=["json", "markdown", "sarif"], default="json", help="Output format")
+
+        parser.add_argument("--verbose", "-v", action="store_true", help="Verbose output")
+
+        parser.add_argument("--dry-run", action="store_true", help="Dry run mode")
 
         parser.add_argument(
-            "--verbose",
-            "-v",
-            action="store_true",
-            help="Verbose output"
-        )
-
-        parser.add_argument(
-            "--dry-run",
-            action="store_true",
-            help="Dry run mode"
-        )
-
-        parser.add_argument(
-            "--list-policies",
-            action="store_true",
-            help="List all available policy names (unified and legacy)"
+            "--list-policies", action="store_true", help="List all available policy names (unified and legacy)"
         )
 
         return parser
@@ -154,16 +125,13 @@ class ConnascenceCLI:
             return 0
 
         # Validate and resolve policy name with error handling
-        if hasattr(parsed_args, 'policy'):
+        if hasattr(parsed_args, "policy"):
             if not validate_policy_name(parsed_args.policy):
                 error = self.error_handler.create_error(
-                    'POLICY_INVALID',
+                    "POLICY_INVALID",
                     f"Unknown policy '{parsed_args.policy}'",
-                    ERROR_SEVERITY['HIGH'],
-                    {
-                        'policy': parsed_args.policy,
-                        'available_policies': list_available_policies(include_legacy=True)
-                    }
+                    ERROR_SEVERITY["HIGH"],
+                    {"policy": parsed_args.policy, "available_policies": list_available_policies(include_legacy=True)},
                 )
                 self._handle_cli_error(error)
                 print(f"Available policies: {', '.join(list_available_policies(include_legacy=True))}")
@@ -177,7 +145,7 @@ class ConnascenceCLI:
 
         if parsed_args.verbose:
             print("Running connascence analysis...")
-            if hasattr(parsed_args, 'policy'):
+            if hasattr(parsed_args, "policy"):
                 print(f"Using policy: {parsed_args.policy}")
 
         # Validate paths with standardized error handling
@@ -186,7 +154,7 @@ class ConnascenceCLI:
 
         if parsed_args.dry_run:
             print("Dry run mode - would analyze:", parsed_args.paths)
-            if hasattr(parsed_args, 'policy'):
+            if hasattr(parsed_args, "policy"):
                 print(f"Would use policy: {parsed_args.policy}")
             return 0
 
@@ -196,13 +164,14 @@ class ConnascenceCLI:
             "paths_analyzed": parsed_args.paths,
             "violations_found": 0,
             "status": "completed",
-            "policy_used": getattr(parsed_args, 'policy', 'standard'),
-            "policy_system": "unified_v2.0"
+            "policy_used": getattr(parsed_args, "policy", "standard"),
+            "policy_system": "unified_v2.0",
         }
 
         if parsed_args.output:
             import json
-            with open(parsed_args.output, 'w') as f:
+
+            with open(parsed_args.output, "w") as f:
                 json.dump(result, f, indent=2)
             print(f"Results written to {parsed_args.output}")
         else:
@@ -216,19 +185,20 @@ class ConnascenceCLI:
 
         # Map severity to CLI-friendly display
         severity_prefix = {
-            ERROR_SEVERITY['CRITICAL']: '💥 CRITICAL',
-            ERROR_SEVERITY['HIGH']: '❌ ERROR',
-            ERROR_SEVERITY['MEDIUM']: '⚠️  WARNING',
-            ERROR_SEVERITY['LOW']: 'i️  INFO'
+            ERROR_SEVERITY["CRITICAL"]: "💥 CRITICAL",
+            ERROR_SEVERITY["HIGH"]: "❌ ERROR",
+            ERROR_SEVERITY["MEDIUM"]: "⚠️  WARNING",
+            ERROR_SEVERITY["LOW"]: "i️  INFO",
         }
 
-        prefix = severity_prefix.get(error.severity, '❌ ERROR')
+        prefix = severity_prefix.get(error.severity, "❌ ERROR")
         print(f"{prefix}: {error.message}", file=sys.stderr)
 
         # Show relevant context
-        if hasattr(error, 'context') and error.context:
-            relevant_context = {k: v for k, v in error.context.items()
-                              if k in ['path', 'file_path', 'required_argument', 'config_path']}
+        if hasattr(error, "context") and error.context:
+            relevant_context = {
+                k: v for k, v in error.context.items() if k in ["path", "file_path", "required_argument", "config_path"]
+            }
             if relevant_context:
                 print(f"  Context: {relevant_context}", file=sys.stderr)
 
@@ -236,10 +206,10 @@ class ConnascenceCLI:
         """Validate input paths with error handling."""
         if not paths:
             error = self.error_handler.create_error(
-                'CLI_ARGUMENT_INVALID',
-                'No paths specified for analysis',
-                ERROR_SEVERITY['HIGH'],
-                {'required_argument': 'paths'}
+                "CLI_ARGUMENT_INVALID",
+                "No paths specified for analysis",
+                ERROR_SEVERITY["HIGH"],
+                {"required_argument": "paths"},
             )
             self._handle_cli_error(error)
             return False
@@ -248,10 +218,10 @@ class ConnascenceCLI:
         for path in paths:
             if not Path(path).exists():
                 error = self.error_handler.create_error(
-                    'FILE_NOT_FOUND',
-                    f'Path does not exist: {path}',
-                    ERROR_SEVERITY['HIGH'],
-                    {'path': path, 'operation': 'path_validation'}
+                    "FILE_NOT_FOUND",
+                    f"Path does not exist: {path}",
+                    ERROR_SEVERITY["HIGH"],
+                    {"path": path, "operation": "path_validation"},
                 )
                 self._handle_cli_error(error)
                 return False

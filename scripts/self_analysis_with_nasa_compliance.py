@@ -61,14 +61,14 @@ class ComprehensiveSelfAnalysis:
     def __init__(self):
         self.project_root = project_root
         self.results = {
-            'timestamp': datetime.now().isoformat(),
-            'analysis_type': 'comprehensive_self_analysis',
-            'connascence_analysis': {},
-            'nasa_compliance': {},
-            'mece_duplication': {},
-            'tool_integration': {},
-            'recommendations': [],
-            'metrics': {}
+            "timestamp": datetime.now().isoformat(),
+            "analysis_type": "comprehensive_self_analysis",
+            "connascence_analysis": {},
+            "nasa_compliance": {},
+            "mece_duplication": {},
+            "tool_integration": {},
+            "recommendations": [],
+            "metrics": {},
         }
 
         # Initialize analyzers
@@ -133,18 +133,22 @@ class ComprehensiveSelfAnalysis:
         severity_counts = {}
 
         for violation in violations:
-            v_type = violation.type.value if hasattr(violation, 'type') else str(violation.get('type', 'unknown'))
-            severity = violation.severity.value if hasattr(violation, 'severity') else str(violation.get('severity', 'unknown'))
+            v_type = violation.type.value if hasattr(violation, "type") else str(violation.get("type", "unknown"))
+            severity = (
+                violation.severity.value
+                if hasattr(violation, "severity")
+                else str(violation.get("severity", "unknown"))
+            )
 
             violation_counts[v_type] = violation_counts.get(v_type, 0) + 1
             severity_counts[severity] = severity_counts.get(severity, 0) + 1
 
-        self.results['connascence_analysis'] = {
-            'files_analyzed': files_analyzed,
-            'total_violations': len(violations),
-            'violations_by_type': violation_counts,
-            'violations_by_severity': severity_counts,
-            'violations': [self._serialize_violation(v) for v in violations[:50]]  # First 50 for report
+        self.results["connascence_analysis"] = {
+            "files_analyzed": files_analyzed,
+            "total_violations": len(violations),
+            "violations_by_type": violation_counts,
+            "violations_by_severity": severity_counts,
+            "violations": [self._serialize_violation(v) for v in violations[:50]],  # First 50 for report
         }
 
         print(f"    📊 Found {len(violations)} violations across {files_analyzed} files")
@@ -159,7 +163,7 @@ class ComprehensiveSelfAnalysis:
         compliance_scores = []
 
         # Get connascence violations to check against NASA rules
-        connascence_violations = self.results['connascence_analysis'].get('violations', [])
+        connascence_violations = self.results["connascence_analysis"].get("violations", [])
 
         for violation in connascence_violations[:20]:  # Check subset for performance
             nasa_violations = self.nasa_integration.check_nasa_violations(violation)
@@ -174,15 +178,15 @@ class ComprehensiveSelfAnalysis:
         # Count violations by NASA rule
         rule_violations = {}
         for nasa_violation in all_nasa_violations:
-            rule_id = nasa_violation.get('rule_id', 'unknown')
+            rule_id = nasa_violation.get("rule_id", "unknown")
             rule_violations[rule_id] = rule_violations.get(rule_id, 0) + 1
 
-        self.results['nasa_compliance'] = {
-            'overall_compliance_score': overall_compliance,
-            'is_nasa_compliant': overall_compliance >= 0.9,
-            'total_nasa_violations': len(all_nasa_violations),
-            'violations_by_rule': rule_violations,
-            'nasa_violations': all_nasa_violations[:20]  # First 20 for report
+        self.results["nasa_compliance"] = {
+            "overall_compliance_score": overall_compliance,
+            "is_nasa_compliant": overall_compliance >= 0.9,
+            "total_nasa_violations": len(all_nasa_violations),
+            "violations_by_rule": rule_violations,
+            "nasa_violations": all_nasa_violations[:20],  # First 20 for report
         }
 
         print(f"    📊 NASA Compliance Score: {overall_compliance:.2%}")
@@ -195,10 +199,10 @@ class ComprehensiveSelfAnalysis:
         print("  🔍 Analyzing code duplications...")
 
         try:
-            results = self.mece_analyzer.analyze_codebase(str(self.project_root), ['*.py'])
+            results = self.mece_analyzer.analyze_codebase(str(self.project_root), ["*.py"])
 
-            clusters = results.get('duplication_clusters', [])
-            opportunities = results.get('consolidation_opportunities', [])
+            clusters = results.get("duplication_clusters", [])
+            opportunities = results.get("consolidation_opportunities", [])
 
             # Categorize clusters by type
             cluster_types = {}
@@ -206,14 +210,14 @@ class ComprehensiveSelfAnalysis:
                 cluster_type = cluster.duplication_type
                 cluster_types[cluster_type] = cluster_types.get(cluster_type, 0) + 1
 
-            self.results['mece_duplication'] = {
-                'files_analyzed': results.get('files_analyzed', 0),
-                'duplication_clusters_found': len(clusters),
-                'consolidation_opportunities': len(opportunities),
-                'clusters_by_type': cluster_types,
-                'duplication_percentage': results.get('metrics', {}).get('duplication_percentage', 0),
-                'high_confidence_clusters': len([c for c in clusters if c.confidence > 0.8]),
-                'top_clusters': self._serialize_clusters(clusters[:10])
+            self.results["mece_duplication"] = {
+                "files_analyzed": results.get("files_analyzed", 0),
+                "duplication_clusters_found": len(clusters),
+                "consolidation_opportunities": len(opportunities),
+                "clusters_by_type": cluster_types,
+                "duplication_percentage": results.get("metrics", {}).get("duplication_percentage", 0),
+                "high_confidence_clusters": len([c for c in clusters if c.confidence > 0.8]),
+                "top_clusters": self._serialize_clusters(clusters[:10]),
             }
 
             print(f"    📊 Duplication Clusters: {len(clusters)}")
@@ -223,7 +227,7 @@ class ComprehensiveSelfAnalysis:
 
         except Exception as e:
             print(f"    ⚠️ MECE analysis failed: {e}")
-            self.results['mece_duplication'] = {'error': str(e)}
+            self.results["mece_duplication"] = {"error": str(e)}
 
     async def _analyze_tool_integration(self):
         """Analyze multi-tool integration effectiveness."""
@@ -233,12 +237,10 @@ class ComprehensiveSelfAnalysis:
             # Run integrated analysis on a subset of files
             test_dir = self.project_root / "analyzer"
             if test_dir.exists():
-                enabled_tools = {'ruff', 'mypy', 'radon', 'bandit', 'black'}
+                enabled_tools = {"ruff", "mypy", "radon", "bandit", "black"}
 
                 integration_results = await self.tool_coordinator.analyze_project(
-                    test_dir,
-                    enabled_tools=enabled_tools,
-                    include_connascence=True
+                    test_dir, enabled_tools=enabled_tools, include_connascence=True
                 )
 
                 # Analyze correlation effectiveness
@@ -247,15 +249,19 @@ class ComprehensiveSelfAnalysis:
 
                 correlation_scores = {}
                 for tool_pair, correlation in correlations.items():
-                    score = correlation.get('correlation_score', 0)
+                    score = correlation.get("correlation_score", 0)
                     correlation_scores[tool_pair] = score
 
-                self.results['tool_integration'] = {
-                    'tools_analyzed': list(enabled_tools),
-                    'correlation_scores': correlation_scores,
-                    'average_correlation': sum(correlation_scores.values()) / len(correlation_scores) if correlation_scores else 0,
-                    'tool_coverage': {tool: len(results) for tool, results in tool_results.items()},
-                    'integration_effectiveness': 'high' if sum(correlation_scores.values()) / len(correlation_scores) > 0.7 else 'medium'
+                self.results["tool_integration"] = {
+                    "tools_analyzed": list(enabled_tools),
+                    "correlation_scores": correlation_scores,
+                    "average_correlation": sum(correlation_scores.values()) / len(correlation_scores)
+                    if correlation_scores
+                    else 0,
+                    "tool_coverage": {tool: len(results) for tool, results in tool_results.items()},
+                    "integration_effectiveness": "high"
+                    if sum(correlation_scores.values()) / len(correlation_scores) > 0.7
+                    else "medium",
                 }
 
                 print(f"    📊 Tools Integrated: {len(enabled_tools)}")
@@ -263,61 +269,69 @@ class ComprehensiveSelfAnalysis:
 
         except Exception as e:
             print(f"    ⚠️ Tool integration analysis failed: {e}")
-            self.results['tool_integration'] = {'error': str(e)}
+            self.results["tool_integration"] = {"error": str(e)}
 
     def _generate_recommendations(self):
         """Generate actionable improvement recommendations."""
         recommendations = []
 
         # Connascence recommendations
-        connascence_violations = self.results['connascence_analysis'].get('total_violations', 0)
+        connascence_violations = self.results["connascence_analysis"].get("total_violations", 0)
         if connascence_violations > 100:
-            recommendations.append({
-                'priority': 'HIGH',
-                'category': 'Code Quality',
-                'issue': f'{connascence_violations} connascence violations found',
-                'recommendation': 'Focus on reducing connascence of meaning (magic literals) and algorithm (god objects)',
-                'estimated_effort': 'Medium',
-                'impact': 'High - Improved maintainability'
-            })
+            recommendations.append(
+                {
+                    "priority": "HIGH",
+                    "category": "Code Quality",
+                    "issue": f"{connascence_violations} connascence violations found",
+                    "recommendation": "Focus on reducing connascence of meaning (magic literals) and algorithm (god objects)",
+                    "estimated_effort": "Medium",
+                    "impact": "High - Improved maintainability",
+                }
+            )
 
         # NASA compliance recommendations
-        nasa_compliance = self.results['nasa_compliance'].get('overall_compliance_score', 1.0)
+        nasa_compliance = self.results["nasa_compliance"].get("overall_compliance_score", 1.0)
         if nasa_compliance < 0.9:
-            recommendations.append({
-                'priority': 'HIGH',
-                'category': 'Safety Compliance',
-                'issue': f'NASA compliance score: {nasa_compliance:.2%}',
-                'recommendation': 'Address NASA Power of Ten violations, especially Rules 1, 4, and 5',
-                'estimated_effort': 'High',
-                'impact': 'Critical - Safety compliance required'
-            })
+            recommendations.append(
+                {
+                    "priority": "HIGH",
+                    "category": "Safety Compliance",
+                    "issue": f"NASA compliance score: {nasa_compliance:.2%}",
+                    "recommendation": "Address NASA Power of Ten violations, especially Rules 1, 4, and 5",
+                    "estimated_effort": "High",
+                    "impact": "Critical - Safety compliance required",
+                }
+            )
 
         # Duplication recommendations
-        duplication_clusters = self.results['mece_duplication'].get('duplication_clusters_found', 0)
+        duplication_clusters = self.results["mece_duplication"].get("duplication_clusters_found", 0)
         if duplication_clusters > 10:
-            recommendations.append({
-                'priority': 'MEDIUM',
-                'category': 'Code Duplication',
-                'issue': f'{duplication_clusters} duplication clusters found',
-                'recommendation': 'Consolidate exact duplicates first, then similar functions',
-                'estimated_effort': 'Medium',
-                'impact': 'Medium - Reduced maintenance burden'
-            })
+            recommendations.append(
+                {
+                    "priority": "MEDIUM",
+                    "category": "Code Duplication",
+                    "issue": f"{duplication_clusters} duplication clusters found",
+                    "recommendation": "Consolidate exact duplicates first, then similar functions",
+                    "estimated_effort": "Medium",
+                    "impact": "Medium - Reduced maintenance burden",
+                }
+            )
 
         # Tool integration recommendations
-        integration_score = self.results['tool_integration'].get('average_correlation', 0)
+        integration_score = self.results["tool_integration"].get("average_correlation", 0)
         if integration_score < 0.5:
-            recommendations.append({
-                'priority': 'LOW',
-                'category': 'Tool Integration',
-                'issue': f'Low tool correlation score: {integration_score:.2f}',
-                'recommendation': 'Improve correlation algorithms and tool result normalization',
-                'estimated_effort': 'Low',
-                'impact': 'Low - Better tool synergy'
-            })
+            recommendations.append(
+                {
+                    "priority": "LOW",
+                    "category": "Tool Integration",
+                    "issue": f"Low tool correlation score: {integration_score:.2f}",
+                    "recommendation": "Improve correlation algorithms and tool result normalization",
+                    "estimated_effort": "Low",
+                    "impact": "Low - Better tool synergy",
+                }
+            )
 
-        self.results['recommendations'] = recommendations
+        self.results["recommendations"] = recommendations
 
         print(f"    💡 Generated {len(recommendations)} recommendations")
         for rec in recommendations:
@@ -325,25 +339,25 @@ class ComprehensiveSelfAnalysis:
 
     def _calculate_metrics(self):
         """Calculate overall quality metrics."""
-        connascence_total = self.results['connascence_analysis'].get('total_violations', 0)
-        files_analyzed = self.results['connascence_analysis'].get('files_analyzed', 1)
-        nasa_compliance = self.results['nasa_compliance'].get('overall_compliance_score', 1.0)
-        duplication_percentage = self.results['mece_duplication'].get('duplication_percentage', 0)
+        connascence_total = self.results["connascence_analysis"].get("total_violations", 0)
+        files_analyzed = self.results["connascence_analysis"].get("files_analyzed", 1)
+        nasa_compliance = self.results["nasa_compliance"].get("overall_compliance_score", 1.0)
+        duplication_percentage = self.results["mece_duplication"].get("duplication_percentage", 0)
 
         # Calculate composite quality score
         quality_score = (
-            min(1.0, max(0.0, 1.0 - connascence_total / (files_analyzed * 10))) * 0.4 +  # 40% connascence
-            nasa_compliance * 0.4 +  # 40% NASA compliance
-            max(0.0, 1.0 - duplication_percentage / 100) * 0.2  # 20% duplication
+            min(1.0, max(0.0, 1.0 - connascence_total / (files_analyzed * 10))) * 0.4
+            + nasa_compliance * 0.4  # 40% connascence
+            + max(0.0, 1.0 - duplication_percentage / 100) * 0.2  # 40% NASA compliance  # 20% duplication
         )
 
-        self.results['metrics'] = {
-            'overall_quality_score': quality_score,
-            'quality_grade': self._get_quality_grade(quality_score),
-            'connascence_density': connascence_total / files_analyzed if files_analyzed > 0 else 0,
-            'nasa_compliance_score': nasa_compliance,
-            'duplication_percentage': duplication_percentage,
-            'tool_integration_score': self.results['tool_integration'].get('average_correlation', 0)
+        self.results["metrics"] = {
+            "overall_quality_score": quality_score,
+            "quality_grade": self._get_quality_grade(quality_score),
+            "connascence_density": connascence_total / files_analyzed if files_analyzed > 0 else 0,
+            "nasa_compliance_score": nasa_compliance,
+            "duplication_percentage": duplication_percentage,
+            "tool_integration_score": self.results["tool_integration"].get("average_correlation", 0),
         }
 
         print(f"    📊 Overall Quality Score: {quality_score:.2%}")
@@ -351,25 +365,27 @@ class ComprehensiveSelfAnalysis:
 
     def _should_analyze_file(self, file_path: Path) -> bool:
         """Check if file should be analyzed."""
-        if file_path.name.startswith('.'):
+        if file_path.name.startswith("."):
             return False
-        if 'test' in str(file_path).lower():
+        if "test" in str(file_path).lower():
             return False
-        if '__pycache__' in str(file_path):
+        if "__pycache__" in str(file_path):
             return False
-        if 'node_modules' in str(file_path):
+        if "node_modules" in str(file_path):
             return False
         return True
 
     def _serialize_violation(self, violation) -> Dict[str, Any]:
         """Serialize violation for JSON output."""
-        if hasattr(violation, '__dict__'):
+        if hasattr(violation, "__dict__"):
             return {
-                'type': violation.type.value if hasattr(violation.type, 'value') else str(violation.type),
-                'severity': violation.severity.value if hasattr(violation.severity, 'value') else str(violation.severity),
-                'message': getattr(violation, 'message', ''),
-                'file': getattr(violation, 'file_path', ''),
-                'line': getattr(violation, 'line_number', 0)
+                "type": violation.type.value if hasattr(violation.type, "value") else str(violation.type),
+                "severity": violation.severity.value
+                if hasattr(violation.severity, "value")
+                else str(violation.severity),
+                "message": getattr(violation, "message", ""),
+                "file": getattr(violation, "file_path", ""),
+                "line": getattr(violation, "line_number", 0),
             }
         return violation if isinstance(violation, dict) else str(violation)
 
@@ -378,32 +394,39 @@ class ComprehensiveSelfAnalysis:
         serialized = []
         for cluster in clusters:
             try:
-                serialized.append({
-                    'cluster_id': cluster.cluster_id,
-                    'type': cluster.duplication_type,
-                    'confidence': cluster.confidence,
-                    'files_involved': cluster.files_involved,
-                    'similarity_score': cluster.similarity_score,
-                    'recommendation': cluster.consolidation_recommendation
-                })
+                serialized.append(
+                    {
+                        "cluster_id": cluster.cluster_id,
+                        "type": cluster.duplication_type,
+                        "confidence": cluster.confidence,
+                        "files_involved": cluster.files_involved,
+                        "similarity_score": cluster.similarity_score,
+                        "recommendation": cluster.consolidation_recommendation,
+                    }
+                )
             except AttributeError:
                 serialized.append(str(cluster))
         return serialized
 
     def _get_quality_grade(self, score: float) -> str:
         """Get letter grade for quality score."""
-        if score >= 0.9: return 'A'
-        elif score >= 0.8: return 'B'
-        elif score >= 0.7: return 'C'
-        elif score >= 0.6: return 'D'
-        else: return 'F'
+        if score >= 0.9:
+            return "A"
+        elif score >= 0.8:
+            return "B"
+        elif score >= 0.7:
+            return "C"
+        elif score >= 0.6:
+            return "D"
+        else:
+            return "F"
 
 
 def save_results(results: Dict[str, Any], output_file: str = "self_analysis_results.json"):
     """Save analysis results to file."""
     output_path = project_root / output_file
 
-    with open(output_path, 'w', encoding='utf-8') as f:
+    with open(output_path, "w", encoding="utf-8") as f:
         json.dump(results, f, indent=2, default=str)
 
     print(f"\n📄 Results saved to: {output_path}")
@@ -412,11 +435,11 @@ def save_results(results: Dict[str, Any], output_file: str = "self_analysis_resu
 
 def print_summary(results: Dict[str, Any]):
     """Print executive summary of results."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("🏆 COMPREHENSIVE SELF-ANALYSIS SUMMARY")
-    print("="*60)
+    print("=" * 60)
 
-    metrics = results.get('metrics', {})
+    metrics = results.get("metrics", {})
 
     print(f"📊 Overall Quality Score: {metrics.get('overall_quality_score', 0):.2%}")
     print(f"🎖️ Quality Grade: {metrics.get('quality_grade', 'N/A')}")
@@ -429,7 +452,7 @@ def print_summary(results: Dict[str, Any]):
     print(f"  • Files Analyzed: {results['connascence_analysis'].get('files_analyzed', 0)}")
     print()
 
-    recommendations = results.get('recommendations', [])
+    recommendations = results.get("recommendations", [])
     if recommendations:
         print("💡 Top Recommendations:")
         for i, rec in enumerate(recommendations[:3], 1):
@@ -438,7 +461,7 @@ def print_summary(results: Dict[str, Any]):
         print()
 
     print("✅ Analysis Complete! See detailed results in JSON file.")
-    print("="*60)
+    print("=" * 60)
 
 
 async def main():
@@ -458,8 +481,8 @@ async def main():
         print_summary(results)
 
         # Additional output for CI/CD
-        if '--ci' in sys.argv:
-            quality_score = results.get('metrics', {}).get('overall_quality_score', 0)
+        if "--ci" in sys.argv:
+            quality_score = results.get("metrics", {}).get("overall_quality_score", 0)
             if quality_score < 0.7:
                 print("\n❌ Quality score below threshold (70%)")
                 sys.exit(1)
@@ -471,6 +494,7 @@ async def main():
     except Exception as e:
         print(f"\n❌ Analysis failed: {e}")
         import traceback
+
         traceback.print_exc()
         return 1
 

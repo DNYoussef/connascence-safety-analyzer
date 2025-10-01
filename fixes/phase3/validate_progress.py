@@ -4,12 +4,12 @@ Phase 3 Progress Validation Script
 Measures NASA POT10 compliance improvement after each phase.
 """
 
-import sys
-import json
-import time
-from pathlib import Path
 from datetime import datetime
-from typing import Dict, Any
+import json
+from pathlib import Path
+import sys
+import time
+from typing import Dict
 
 # Add project root to path
 project_root = Path(__file__).parent.parent.parent
@@ -29,18 +29,18 @@ class ProgressValidator:
 
     def load_baseline(self) -> Dict:
         """Load baseline metrics from Phase 0.5."""
-        with open(self.baseline_file, 'r') as f:
+        with open(self.baseline_file) as f:
             return json.load(f)
 
     def run_analysis(self, sample_size: int = 100) -> Dict:
         """Run NASA analyzer on sample of files."""
-        print(f"\nRunning NASA POT10 compliance analysis...")
+        print("\nRunning NASA POT10 compliance analysis...")
         print("-" * 40)
 
         baseline = self.load_baseline()
 
         # Get top violating files from baseline
-        files_to_analyze = baseline['files_with_violations'][:sample_size]
+        files_to_analyze = baseline["files_with_violations"][:sample_size]
 
         results = {
             "timestamp": datetime.now().isoformat(),
@@ -49,13 +49,13 @@ class ProgressValidator:
             "violations_by_rule": {},
             "violations_by_severity": {},
             "improved_files": [],
-            "unchanged_files": []
+            "unchanged_files": [],
         }
 
         start_time = time.time()
 
         for i, file_info in enumerate(files_to_analyze, 1):
-            file_path = self.project_path / file_info['file']
+            file_path = self.project_path / file_info["file"]
 
             if not file_path.exists():
                 continue
@@ -68,17 +68,19 @@ class ProgressValidator:
 
                 # Count violations
                 current_count = len(violations)
-                original_count = file_info['violation_count']
+                original_count = file_info["violation_count"]
 
                 if current_count < original_count:
-                    results["improved_files"].append({
-                        "file": file_info['file'],
-                        "original": original_count,
-                        "current": current_count,
-                        "improvement": original_count - current_count
-                    })
+                    results["improved_files"].append(
+                        {
+                            "file": file_info["file"],
+                            "original": original_count,
+                            "current": current_count,
+                            "improvement": original_count - current_count,
+                        }
+                    )
                 else:
-                    results["unchanged_files"].append(file_info['file'])
+                    results["unchanged_files"].append(file_info["file"])
 
                 # Count by rule
                 for v in violations:
@@ -105,8 +107,8 @@ class ProgressValidator:
     def calculate_improvement(self, current_results: Dict, baseline: Dict) -> Dict:
         """Calculate improvement metrics."""
         # Calculate compliance percentage
-        baseline_violations = baseline['total_violations']
-        current_violations = current_results['total_violations']
+        baseline_violations = baseline["total_violations"]
+        current_violations = current_results["total_violations"]
 
         # Simple calculation based on violation reduction
         if baseline_violations > 0:
@@ -128,7 +130,7 @@ class ProgressValidator:
             "reduction_percentage": reduction_pct,
             "baseline_compliance": baseline_compliance,
             "estimated_compliance": min(100, estimated_compliance),
-            "compliance_improvement": compliance_improvement
+            "compliance_improvement": compliance_improvement,
         }
 
     def generate_report(self, phase: str) -> str:
@@ -170,11 +172,7 @@ class ProgressValidator:
             report.append("\n" + "-" * 40)
             report.append("TOP IMPROVED FILES")
             report.append("-" * 40)
-            top_improved = sorted(
-                current_results["improved_files"],
-                key=lambda x: x["improvement"],
-                reverse=True
-            )[:10]
+            top_improved = sorted(current_results["improved_files"], key=lambda x: x["improvement"], reverse=True)[:10]
             for file_info in top_improved:
                 report.append(f"  {file_info['file']}: -{file_info['improvement']} violations")
 
@@ -197,21 +195,17 @@ class ProgressValidator:
         """Save progress tracking data."""
         # Load existing progress or create new
         if self.progress_file.exists():
-            with open(self.progress_file, 'r') as f:
+            with open(self.progress_file) as f:
                 progress = json.load(f)
         else:
             progress = {"phases": {}}
 
         # Add this phase
-        progress["phases"][phase] = {
-            "timestamp": results["timestamp"],
-            "results": results,
-            "improvement": improvement
-        }
+        progress["phases"][phase] = {"timestamp": results["timestamp"], "results": results, "improvement": improvement}
 
         # Save
         self.progress_file.parent.mkdir(exist_ok=True)
-        with open(self.progress_file, 'w') as f:
+        with open(self.progress_file, "w") as f:
             json.dump(progress, f, indent=2)
 
         print(f"[OK] Progress saved to: {self.progress_file}")
@@ -230,7 +224,7 @@ def main():
     print(report)
 
     # Check if we met the target
-    with open(validator.progress_file, 'r') as f:
+    with open(validator.progress_file) as f:
         progress = json.load(f)
 
     phase_31 = progress["phases"]["3.1"]

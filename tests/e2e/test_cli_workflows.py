@@ -46,19 +46,14 @@ class E2EMemoryCoordinator:
 
     def store_test_scenario(self, scenario_id: str, config: Dict[str, Any]):
         """Store test scenario configuration."""
-        self.test_scenarios[scenario_id] = {
-            'config': config,
-            'timestamp': time.time(),
-            'status': 'initialized'
-        }
+        self.test_scenarios[scenario_id] = {"config": config, "timestamp": time.time(), "status": "initialized"}
 
-    def update_scenario_status(self, scenario_id: str, status: str,
-                             results: Optional[Dict] = None):
+    def update_scenario_status(self, scenario_id: str, status: str, results: Optional[Dict] = None):
         """Update scenario status and results."""
         if scenario_id in self.test_scenarios:
-            self.test_scenarios[scenario_id]['status'] = status
+            self.test_scenarios[scenario_id]["status"] = status
             if results:
-                self.test_scenarios[scenario_id]['results'] = results
+                self.test_scenarios[scenario_id]["results"] = results
 
     def store_performance_metrics(self, scenario_id: str, metrics: Dict[str, Any]):
         """Store performance metrics for scenario."""
@@ -68,26 +63,26 @@ class E2EMemoryCoordinator:
         """Store sequential workflow execution trace."""
         self.workflow_traces[scenario_id] = trace
 
-    def store_exit_code_scenario(self, scenario_id: str, expected_code: int,
-                               actual_code: int, conditions: Dict):
+    def store_exit_code_scenario(self, scenario_id: str, expected_code: int, actual_code: int, conditions: Dict):
         """Store exit code test scenario results."""
         self.exit_code_scenarios[scenario_id] = {
-            'expected': expected_code,
-            'actual': actual_code,
-            'conditions': conditions,
-            'passed': expected_code == actual_code,
-            'timestamp': time.time()
+            "expected": expected_code,
+            "actual": actual_code,
+            "conditions": conditions,
+            "passed": expected_code == actual_code,
+            "timestamp": time.time(),
         }
 
     def get_scenario_summary(self) -> Dict[str, Any]:
         """Get summary of all test scenarios."""
         return {
-            'total_scenarios': len(self.test_scenarios),
-            'completed': len([s for s in self.test_scenarios.values() if s['status'] == 'completed']),
-            'failed': len([s for s in self.test_scenarios.values() if s['status'] == 'failed']),
-            'performance_tests': len(self.performance_metrics),
-            'exit_code_tests': len(self.exit_code_scenarios),
-            'exit_code_pass_rate': sum(1 for s in self.exit_code_scenarios.values() if s['passed']) / max(len(self.exit_code_scenarios), 1)
+            "total_scenarios": len(self.test_scenarios),
+            "completed": len([s for s in self.test_scenarios.values() if s["status"] == "completed"]),
+            "failed": len([s for s in self.test_scenarios.values() if s["status"] == "failed"]),
+            "performance_tests": len(self.performance_metrics),
+            "exit_code_tests": len(self.exit_code_scenarios),
+            "exit_code_pass_rate": sum(1 for s in self.exit_code_scenarios.values() if s["passed"])
+            / max(len(self.exit_code_scenarios), 1),
         }
 
 
@@ -107,35 +102,23 @@ class SequentialWorkflowValidator:
         """Start a new workflow scenario with sequential validation."""
         self.current_scenario = scenario_id
         self.workflow_steps = []
-        self.memory.store_test_scenario(scenario_id, {
-            'description': description,
-            'start_time': time.time()
-        })
+        self.memory.store_test_scenario(scenario_id, {"description": description, "start_time": time.time()})
 
     def add_step(self, step_name: str, step_data: Dict[str, Any]):
         """Add a workflow step with validation."""
-        step = {
-            'name': step_name,
-            'timestamp': time.time(),
-            'data': step_data,
-            'index': len(self.workflow_steps)
-        }
+        step = {"name": step_name, "timestamp": time.time(), "data": step_data, "index": len(self.workflow_steps)}
         self.workflow_steps.append(step)
 
     def validate_step_sequence(self, expected_sequence: List[str]) -> bool:
         """Validate that steps occurred in expected sequence."""
-        actual_sequence = [step['name'] for step in self.workflow_steps]
+        actual_sequence = [step["name"] for step in self.workflow_steps]
         return actual_sequence == expected_sequence
 
     def complete_scenario(self, success: bool, results: Dict[str, Any]):
         """Complete scenario with results."""
         if self.current_scenario:
             self.memory.store_workflow_trace(self.current_scenario, self.workflow_steps)
-            self.memory.update_scenario_status(
-                self.current_scenario,
-                'completed' if success else 'failed',
-                results
-            )
+            self.memory.update_scenario_status(self.current_scenario, "completed" if success else "failed", results)
 
 
 @pytest.fixture
@@ -152,7 +135,8 @@ def temp_project():
     (project_path / "config").mkdir()
 
     # Main application with multiple violation types
-    (project_path / "src" / "app.py").write_text("""
+    (project_path / "src" / "app.py").write_text(
+        """
 def complex_function(param1, param2, param3, param4, param5, param6):
     '''Function with parameter bomb violation.'''
     MAGIC_THRESHOLD = 100  # Should be extracted to constant
@@ -258,10 +242,12 @@ class MegaProcessor:
 
     def initialize_system(self, config):  # Missing type hints
         pass
-""")
+"""
+    )
 
     # Utilities with type violations
-    (project_path / "src" / "utils" / "helpers.py").write_text("""
+    (project_path / "src" / "utils" / "helpers.py").write_text(
+        """
 def untyped_helper(data, options, flags):  # Missing type hints + position connascence
     if flags[0] == True and flags[1] == False:  # Meaning connascence with booleans
         return data * 2.5  # Magic literal
@@ -273,31 +259,37 @@ def another_helper(a, b, c, d, e):  # Parameter bomb
     if a > threshold:
         return b + c + d + e + 42  # Magic literal
     return 0
-""")
+"""
+    )
 
     # Configuration with violations
-    (project_path / "config" / "settings.py").write_text("""
+    (project_path / "config" / "settings.py").write_text(
+        """
 # Configuration with magic literals and strings
 DATABASE_URL = "postgresql://user:pass@localhost:5432/db"  # Magic string
 CACHE_TIMEOUT = 3600  # Magic literal - should be named constant
 MAX_CONNECTIONS = 100  # Magic literal
 RETRY_ATTEMPTS = 5  # Magic literal
 SECRET_TOKEN = "super-secret-key-12345"  # Magic string
-""")
+"""
+    )
 
     # Test file (should be excluded)
-    (project_path / "tests" / "test_app.py").write_text("""
+    (project_path / "tests" / "test_app.py").write_text(
+        """
 import pytest
 
 def test_complex_function():
     # This file should be excluded from analysis
     assert True
-""")
+"""
+    )
 
     yield project_path
 
     # Cleanup
     import shutil
+
     shutil.rmtree(temp_dir)
 
 
@@ -328,36 +320,33 @@ class TestCLIWorkflowsEndToEnd:
         exit_code = cli.run(args)
         execution_time = time.time() - start_time
 
-        workflow_validator.add_step("execute_scan", {
-            "exit_code": exit_code,
-            "execution_time_ms": execution_time * 1000
-        })
+        workflow_validator.add_step(
+            "execute_scan", {"exit_code": exit_code, "execution_time_ms": execution_time * 1000}
+        )
 
         # Step 4: Validate exit code
         # Should return 1 if violations found, 0 if none
         assert exit_code in [0, 1], f"Unexpected exit code: {exit_code}"
 
-        workflow_validator.add_step("validate_exit_code", {
-            "expected_codes": [0, 1],
-            "actual_code": exit_code
-        })
+        workflow_validator.add_step("validate_exit_code", {"expected_codes": [0, 1], "actual_code": exit_code})
 
         # Step 5: Store performance metrics
-        memory_coordinator.store_performance_metrics(scenario_id, {
-            "execution_time_ms": execution_time * 1000,
-            "files_analyzed": 4,  # Expected file count
-            "expected_violation_types": ["CoM", "CoP", "CoT", "CoA"]
-        })
+        memory_coordinator.store_performance_metrics(
+            scenario_id,
+            {
+                "execution_time_ms": execution_time * 1000,
+                "files_analyzed": 4,  # Expected file count
+                "expected_violation_types": ["CoM", "CoP", "CoT", "CoA"],
+            },
+        )
 
         # Validate sequential workflow
         expected_sequence = ["cli_init", "prepare_args", "execute_scan", "validate_exit_code"]
         assert workflow_validator.validate_step_sequence(expected_sequence)
 
-        workflow_validator.complete_scenario(True, {
-            "exit_code": exit_code,
-            "execution_time_ms": execution_time * 1000,
-            "workflow_completed": True
-        })
+        workflow_validator.complete_scenario(
+            True, {"exit_code": exit_code, "execution_time_ms": execution_time * 1000, "workflow_completed": True}
+        )
 
     def test_scan_with_policy_workflow(self, temp_project, workflow_validator):
         """Test scan with different policy presets."""
@@ -378,24 +367,20 @@ class TestCLIWorkflowsEndToEnd:
             exit_code = cli.run(args)
             execution_time = time.time() - start_time
 
-            workflow_validator.add_step(f"execute_policy_{policy}", {
-                "policy": policy,
-                "exit_code": exit_code,
-                "execution_time_ms": execution_time * 1000
-            })
+            workflow_validator.add_step(
+                f"execute_policy_{policy}",
+                {"policy": policy, "exit_code": exit_code, "execution_time_ms": execution_time * 1000},
+            )
 
             # Store exit code scenario
             memory_coordinator.store_exit_code_scenario(
                 f"{scenario_id}_{policy}",
                 1,  # Expected: violations should be found
                 exit_code,
-                {"policy": policy, "has_violations": True}
+                {"policy": policy, "has_violations": True},
             )
 
-        workflow_validator.complete_scenario(True, {
-            "policies_tested": len(policies),
-            "all_policies_completed": True
-        })
+        workflow_validator.complete_scenario(True, {"policies_tested": len(policies), "all_policies_completed": True})
 
     def test_output_format_workflow(self, temp_project, workflow_validator):
         """Test all output formats end-to-end."""
@@ -413,23 +398,22 @@ class TestCLIWorkflowsEndToEnd:
             output_file = temp_project / f"report.{format_type}"
 
             cli = ConnascenceCLI()
-            args = [
-                "scan", str(temp_project),
-                "--format", format_type,
-                "--output", str(output_file)
-            ]
+            args = ["scan", str(temp_project), "--format", format_type, "--output", str(output_file)]
 
             # Step 2: Execute with format
             start_time = time.time()
             exit_code = cli.run(args)
             execution_time = time.time() - start_time
 
-            workflow_validator.add_step(f"execute_format_{format_type}", {
-                "format": format_type,
-                "output_file": str(output_file),
-                "exit_code": exit_code,
-                "execution_time_ms": execution_time * 1000
-            })
+            workflow_validator.add_step(
+                f"execute_format_{format_type}",
+                {
+                    "format": format_type,
+                    "output_file": str(output_file),
+                    "exit_code": exit_code,
+                    "execution_time_ms": execution_time * 1000,
+                },
+            )
 
             # Step 3: Validate output file was created
             assert output_file.exists(), f"Output file not created for format {format_type}"
@@ -456,7 +440,9 @@ class TestCLIWorkflowsEndToEnd:
                     pytest.fail("Invalid SARIF JSON output")
 
             elif format_type == "markdown":
-                assert "# Connascence Analysis Report" in content or "# CONNASCENCE" in content, "Markdown output missing header"
+                assert (
+                    "# Connascence Analysis Report" in content or "# CONNASCENCE" in content
+                ), "Markdown output missing header"
                 assert "violations" in content.lower(), "Markdown output missing violations section"
 
             elif format_type == "text":
@@ -467,22 +453,20 @@ class TestCLIWorkflowsEndToEnd:
                 "exit_code": exit_code,
                 "file_size": len(content),
                 "execution_time_ms": execution_time * 1000,
-                "content_valid": True
+                "content_valid": True,
             }
 
             workflow_validator.add_step(f"validate_format_{format_type}", format_results[format_type])
 
         # Store comprehensive results
-        memory_coordinator.store_performance_metrics(scenario_id, {
-            "formats_tested": len(formats),
-            "format_results": format_results,
-            "all_formats_generated": True
-        })
+        memory_coordinator.store_performance_metrics(
+            scenario_id,
+            {"formats_tested": len(formats), "format_results": format_results, "all_formats_generated": True},
+        )
 
-        workflow_validator.complete_scenario(True, {
-            "formats_completed": len(formats),
-            "format_results": format_results
-        })
+        workflow_validator.complete_scenario(
+            True, {"formats_completed": len(formats), "format_results": format_results}
+        )
 
     def test_severity_filtering_workflow(self, temp_project, workflow_validator):
         """Test severity-based filtering workflow."""
@@ -499,20 +483,12 @@ class TestCLIWorkflowsEndToEnd:
             output_file = temp_project / f"report_{severity}.json"
 
             cli = ConnascenceCLI()
-            args = [
-                "scan", str(temp_project),
-                "--severity", severity,
-                "--format", "json",
-                "--output", str(output_file)
-            ]
+            args = ["scan", str(temp_project), "--severity", severity, "--format", "json", "--output", str(output_file)]
 
             # Step 2: Execute with severity filter
             exit_code = cli.run(args)
 
-            workflow_validator.add_step(f"execute_severity_{severity}", {
-                "severity": severity,
-                "exit_code": exit_code
-            })
+            workflow_validator.add_step(f"execute_severity_{severity}", {"severity": severity, "exit_code": exit_code})
 
             # Step 3: Validate filtering worked
             if output_file.exists():
@@ -529,25 +505,20 @@ class TestCLIWorkflowsEndToEnd:
                         violation_level = severity_order.get(violation.get("severity", {}).get("value", "low"), 0)
                         assert violation_level >= min_level, f"Violation below minimum severity {severity}"
 
-                    severity_results[severity] = {
-                        "violations_count": len(violations),
-                        "filtering_correct": True
-                    }
+                    severity_results[severity] = {"violations_count": len(violations), "filtering_correct": True}
 
                 except json.JSONDecodeError:
                     severity_results[severity] = {"filtering_correct": False}
 
             workflow_validator.add_step(f"validate_severity_{severity}", severity_results.get(severity, {}))
 
-        memory_coordinator.store_performance_metrics(scenario_id, {
-            "severities_tested": len(severities),
-            "severity_results": severity_results
-        })
+        memory_coordinator.store_performance_metrics(
+            scenario_id, {"severities_tested": len(severities), "severity_results": severity_results}
+        )
 
-        workflow_validator.complete_scenario(True, {
-            "severities_completed": len(severities),
-            "severity_filtering_validated": True
-        })
+        workflow_validator.complete_scenario(
+            True, {"severities_completed": len(severities), "severity_filtering_validated": True}
+        )
 
     def test_exit_code_scenarios_comprehensive(self, temp_project, workflow_validator):
         """Test all exit code scenarios comprehensively."""
@@ -562,9 +533,7 @@ class TestCLIWorkflowsEndToEnd:
 
         exit_code = cli.run(["scan", str(empty_dir)])
         memory_coordinator.store_exit_code_scenario(
-            f"{scenario_id}_no_violations",
-            0, exit_code,
-            {"scenario": "empty_directory", "expected_violations": 0}
+            f"{scenario_id}_no_violations", 0, exit_code, {"scenario": "empty_directory", "expected_violations": 0}
         )
         workflow_validator.add_step("test_exit_code_0", {"exit_code": exit_code})
 
@@ -572,17 +541,16 @@ class TestCLIWorkflowsEndToEnd:
         exit_code = cli.run(["scan", str(temp_project)])
         memory_coordinator.store_exit_code_scenario(
             f"{scenario_id}_violations_found",
-            1, exit_code,
-            {"scenario": "violations_present", "expected_violations": ">0"}
+            1,
+            exit_code,
+            {"scenario": "violations_present", "expected_violations": ">0"},
         )
         workflow_validator.add_step("test_exit_code_1", {"exit_code": exit_code})
 
         # Scenario 3: Exit code 2 - Configuration error (invalid path)
         exit_code = cli.run(["scan", "/nonexistent/path/that/does/not/exist"])
         memory_coordinator.store_exit_code_scenario(
-            f"{scenario_id}_config_error",
-            2, exit_code,
-            {"scenario": "invalid_path", "path_exists": False}
+            f"{scenario_id}_config_error", 2, exit_code, {"scenario": "invalid_path", "path_exists": False}
         )
         workflow_validator.add_step("test_exit_code_2", {"exit_code": exit_code})
 
@@ -593,10 +561,9 @@ class TestCLIWorkflowsEndToEnd:
         exit_code_summary = memory_coordinator.get_scenario_summary()
         workflow_validator.add_step("validate_all_exit_codes", exit_code_summary)
 
-        workflow_validator.complete_scenario(True, {
-            "exit_code_tests_completed": True,
-            "pass_rate": exit_code_summary.get("exit_code_pass_rate", 0)
-        })
+        workflow_validator.complete_scenario(
+            True, {"exit_code_tests_completed": True, "pass_rate": exit_code_summary.get("exit_code_pass_rate", 0)}
+        )
 
     def test_large_project_performance_workflow(self, temp_project, workflow_validator):
         """Test performance with larger project simulation."""
@@ -611,7 +578,8 @@ class TestCLIWorkflowsEndToEnd:
             module_dir = temp_project / f"module_{i}"
             module_dir.mkdir()
 
-            (module_dir / f"service_{i}.py").write_text(f"""
+            (module_dir / f"service_{i}.py").write_text(
+                f"""
 def process_data_{i}(param1, param2, param3, param4, param5):  # Parameter bomb
     threshold = {100 + i * 10}  # Magic literal
     secret_key = "key_{i}_secret"  # Magic string
@@ -643,34 +611,29 @@ class Processor_{i}:  # Multiple classes for complexity
     def method_19(self): pass
     def method_20(self): pass
     def method_21(self): pass  # God class
-""")
+"""
+            )
 
-        workflow_validator.add_step("large_project_created", {
-            "modules_created": 10,
-            "total_files": 10
-        })
+        workflow_validator.add_step("large_project_created", {"modules_created": 10, "total_files": 10})
 
         # Step 2: Execute performance scan
         cli = ConnascenceCLI()
         start_time = time.time()
-        exit_code = cli.run([
-            "scan", str(temp_project),
-            "--format", "json",
-            "--output", str(temp_project / "large_project_report.json")
-        ])
+        exit_code = cli.run(
+            ["scan", str(temp_project), "--format", "json", "--output", str(temp_project / "large_project_report.json")]
+        )
         execution_time = time.time() - start_time
 
-        workflow_validator.add_step("execute_large_scan", {
-            "exit_code": exit_code,
-            "execution_time_ms": execution_time * 1000
-        })
+        workflow_validator.add_step(
+            "execute_large_scan", {"exit_code": exit_code, "execution_time_ms": execution_time * 1000}
+        )
 
         # Step 3: Validate performance metrics
         performance_metrics = {
             "execution_time_ms": execution_time * 1000,
             "files_analyzed": 14,  # Original 4 + 10 new modules
             "performance_acceptable": execution_time < 30.0,  # Should complete in under 30 seconds
-            "exit_code": exit_code
+            "exit_code": exit_code,
         }
 
         memory_coordinator.store_performance_metrics(scenario_id, performance_metrics)
@@ -685,25 +648,16 @@ class Processor_{i}:  # Multiple classes for complexity
     def test_memory_coordination_validation(self):
         """Test memory coordination system is working properly."""
         scenario_id = "memory_coordination_test"
-        memory_coordinator.store_test_scenario(scenario_id, {
-            "test_type": "memory_validation",
-            "timestamp": time.time()
-        })
+        memory_coordinator.store_test_scenario(
+            scenario_id, {"test_type": "memory_validation", "timestamp": time.time()}
+        )
 
         # Test memory storage and retrieval
-        performance_data = {
-            "metric1": 100,
-            "metric2": 200,
-            "test_validation": True
-        }
+        performance_data = {"metric1": 100, "metric2": 200, "test_validation": True}
         memory_coordinator.store_performance_metrics(scenario_id, performance_data)
 
         # Test exit code scenario storage
-        memory_coordinator.store_exit_code_scenario(
-            f"{scenario_id}_exit_test",
-            0, 0,
-            {"test": "memory_validation"}
-        )
+        memory_coordinator.store_exit_code_scenario(f"{scenario_id}_exit_test", 0, 0, {"test": "memory_validation"})
 
         # Validate memory coordinator has stored data
         summary = memory_coordinator.get_scenario_summary()
@@ -711,10 +665,9 @@ class Processor_{i}:  # Multiple classes for complexity
         assert summary["performance_tests"] > 0, "Memory coordinator not storing performance data"
         assert summary["exit_code_tests"] > 0, "Memory coordinator not storing exit code data"
 
-        memory_coordinator.update_scenario_status(scenario_id, "completed", {
-            "memory_validation": True,
-            "summary": summary
-        })
+        memory_coordinator.update_scenario_status(
+            scenario_id, "completed", {"memory_validation": True, "summary": summary}
+        )
 
         # Validate scenario was updated
         scenario = memory_coordinator.test_scenarios[scenario_id]
@@ -748,15 +701,12 @@ def test_complete_workflow_integration():
         "cli_processing",
         "analysis_execution",
         "report_generation",
-        "memory_storage"
+        "memory_storage",
     ]
 
     assert validator.validate_step_sequence(expected_sequence)
 
-    validator.complete_scenario(True, {
-        "integration_test_passed": True,
-        "all_components_functional": True
-    })
+    validator.complete_scenario(True, {"integration_test_passed": True, "all_components_functional": True})
 
     # Final validation
     summary = memory_coordinator_instance.get_scenario_summary()
@@ -765,9 +715,4 @@ def test_complete_workflow_integration():
 
 if __name__ == "__main__":
     # Run comprehensive e2e tests
-    pytest.main([
-        __file__,
-        "-v",
-        "--tb=short",
-        "-m", "e2e"
-    ])
+    pytest.main([__file__, "-v", "--tb=short", "-m", "e2e"])

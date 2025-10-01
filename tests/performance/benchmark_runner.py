@@ -93,20 +93,20 @@ class PerformanceBenchmarker:
         logger.info("Starting comprehensive performance benchmark suite")
 
         results = {
-            'benchmark_timestamp': time.strftime('%Y-%m-%d %H:%M:%S'),
-            'system_info': self._get_system_info(),
-            'test_results': {},
-            'performance_summary': {},
-            'recommendations': []
+            "benchmark_timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
+            "system_info": self._get_system_info(),
+            "test_results": {},
+            "performance_summary": {},
+            "recommendations": [],
         }
 
         # Test suites to run
         test_suites = [
-            ('real_codebases', self._benchmark_real_codebases),
-            ('synthetic_projects', self._benchmark_synthetic_projects),
-            ('parallel_scaling', self._benchmark_parallel_scaling),
-            ('memory_stress', self._benchmark_memory_stress),
-            ('caching_effectiveness', self._benchmark_caching)
+            ("real_codebases", self._benchmark_real_codebases),
+            ("synthetic_projects", self._benchmark_synthetic_projects),
+            ("parallel_scaling", self._benchmark_parallel_scaling),
+            ("memory_stress", self._benchmark_memory_stress),
+            ("caching_effectiveness", self._benchmark_caching),
         ]
 
         for suite_name, suite_function in test_suites:
@@ -114,20 +114,20 @@ class PerformanceBenchmarker:
 
             try:
                 suite_results = suite_function()
-                results['test_results'][suite_name] = suite_results
+                results["test_results"][suite_name] = suite_results
 
                 logger.info(f"Completed {suite_name}: {len(suite_results)} tests")
 
             except Exception as e:
                 logger.error(f"Failed to run {suite_name}: {e}")
-                results['test_results'][suite_name] = {'error': str(e)}
+                results["test_results"][suite_name] = {"error": str(e)}
 
         # Generate performance summary and recommendations
-        results['performance_summary'] = self._generate_performance_summary(results['test_results'])
-        results['recommendations'] = self._generate_recommendations(results['test_results'])
+        results["performance_summary"] = self._generate_performance_summary(results["test_results"])
+        results["recommendations"] = self._generate_recommendations(results["test_results"])
 
         total_time = time.time() - benchmark_start
-        results['total_benchmark_time'] = total_time
+        results["total_benchmark_time"] = total_time
 
         # Save comprehensive results
         self._save_benchmark_results(results)
@@ -165,10 +165,7 @@ class PerformanceBenchmarker:
 
         try:
             # Run analysis
-            analysis_result = self.sequential_analyzer.analyze_path(
-                str(codebase_path),
-                policy="default"
-            )
+            analysis_result = self.sequential_analyzer.analyze_path(str(codebase_path), policy="default")
 
             execution_time = time.time() - start_time
 
@@ -176,8 +173,8 @@ class PerformanceBenchmarker:
             resource_stats = resource_monitor.stop_monitoring()
 
             # Extract analysis metrics
-            violations_found = len(analysis_result.get('violations', []))
-            files_analyzed = analysis_result.get('metrics', {}).get('files_analyzed', file_count)
+            violations_found = len(analysis_result.get("violations", []))
+            files_analyzed = analysis_result.get("metrics", {}).get("files_analyzed", file_count)
 
             # Calculate throughput metrics
             files_per_second = files_analyzed / execution_time if execution_time > 0 else 0
@@ -185,7 +182,7 @@ class PerformanceBenchmarker:
             violations_per_second = violations_found / execution_time if execution_time > 0 else 0
 
             # Calculate efficiency metrics
-            memory_per_file_kb = (resource_stats['peak_memory_mb'] * 1024) / files_analyzed if files_analyzed > 0 else 0
+            memory_per_file_kb = (resource_stats["peak_memory_mb"] * 1024) / files_analyzed if files_analyzed > 0 else 0
             cpu_time_per_file_ms = (execution_time * 1000) / files_analyzed if files_analyzed > 0 else 0
 
             result = BenchmarkResult(
@@ -193,27 +190,22 @@ class PerformanceBenchmarker:
                 codebase_path=str(codebase_path),
                 file_count=file_count,
                 total_lines=total_lines,
-
                 execution_time_seconds=execution_time,
-                memory_peak_mb=resource_stats['peak_memory_mb'],
-                memory_avg_mb=resource_stats['avg_memory_mb'],
-                cpu_usage_percent=resource_stats['avg_cpu_percent'],
-
+                memory_peak_mb=resource_stats["peak_memory_mb"],
+                memory_avg_mb=resource_stats["avg_memory_mb"],
+                cpu_usage_percent=resource_stats["avg_cpu_percent"],
                 violations_found=violations_found,
                 files_analyzed=files_analyzed,
                 analysis_accuracy=1.0,  # Assume 100% accuracy for baseline
-
                 files_per_second=files_per_second,
                 lines_per_second=lines_per_second,
                 violations_per_second=violations_per_second,
-
                 memory_per_file_kb=memory_per_file_kb,
                 cpu_time_per_file_ms=cpu_time_per_file_ms,
-
-                analyzer_mode='sequential',
+                analyzer_mode="sequential",
                 parallel_workers=1,
                 cache_enabled=False,
-                timestamp=time.strftime('%Y-%m-%d %H:%M:%S')
+                timestamp=time.strftime("%Y-%m-%d %H:%M:%S"),
             )
 
             logger.info(f"Benchmark complete: {files_per_second:.1f} files/sec, {violations_found} violations")
@@ -241,10 +233,10 @@ class PerformanceBenchmarker:
                 violations_per_second=0,
                 memory_per_file_kb=0,
                 cpu_time_per_file_ms=0,
-                analyzer_mode='failed',
+                analyzer_mode="failed",
                 parallel_workers=0,
                 cache_enabled=False,
-                timestamp=time.strftime('%Y-%m-%d %H:%M:%S')
+                timestamp=time.strftime("%Y-%m-%d %H:%M:%S"),
             )
 
     def _benchmark_real_codebases(self) -> Dict[str, BenchmarkResult]:
@@ -268,7 +260,7 @@ class PerformanceBenchmarker:
 
                 except Exception as e:
                     logger.error(f"Failed to benchmark {package_dir.name}: {e}")
-                    results[package_dir.name] = {'error': str(e)}
+                    results[package_dir.name] = {"error": str(e)}
 
         return results
 
@@ -295,7 +287,7 @@ class PerformanceBenchmarker:
 
             except Exception as e:
                 logger.error(f"Failed to benchmark synthetic_{size}: {e}")
-                results[f"synthetic_{size}"] = {'error': str(e)}
+                results[f"synthetic_{size}"] = {"error": str(e)}
 
         return results
 
@@ -321,12 +313,12 @@ class PerformanceBenchmarker:
                 execution_time = time.time() - start_time
 
                 results[f"workers_{workers}"] = {
-                    'worker_count': workers,
-                    'execution_time': execution_time,
-                    'speedup_factor': parallel_result.speedup_factor,
-                    'efficiency': parallel_result.efficiency,
-                    'files_analyzed': parallel_result.unified_result.files_analyzed,
-                    'violations_found': parallel_result.unified_result.total_violations
+                    "worker_count": workers,
+                    "execution_time": execution_time,
+                    "speedup_factor": parallel_result.speedup_factor,
+                    "efficiency": parallel_result.efficiency,
+                    "files_analyzed": parallel_result.unified_result.files_analyzed,
+                    "violations_found": parallel_result.unified_result.total_violations,
                 }
 
         finally:
@@ -359,17 +351,17 @@ class PerformanceBenchmarker:
                 resource_stats = resource_monitor.stop_monitoring()
 
                 results[f"files_{size}"] = {
-                    'file_count': size,
-                    'execution_time': execution_time,
-                    'peak_memory_mb': resource_stats['peak_memory_mb'],
-                    'avg_memory_mb': resource_stats['avg_memory_mb'],
-                    'memory_growth_mb': resource_stats['peak_memory_mb'] - resource_stats.get('initial_memory_mb', 0),
-                    'memory_efficiency_kb_per_file': (resource_stats['peak_memory_mb'] * 1024) / size
+                    "file_count": size,
+                    "execution_time": execution_time,
+                    "peak_memory_mb": resource_stats["peak_memory_mb"],
+                    "avg_memory_mb": resource_stats["avg_memory_mb"],
+                    "memory_growth_mb": resource_stats["peak_memory_mb"] - resource_stats.get("initial_memory_mb", 0),
+                    "memory_efficiency_kb_per_file": (resource_stats["peak_memory_mb"] * 1024) / size,
                 }
 
             except Exception as e:
                 logger.error(f"Memory stress test failed for {size} files: {e}")
-                results[f"files_{size}"] = {'error': str(e)}
+                results[f"files_{size}"] = {"error": str(e)}
 
             finally:
                 shutil.rmtree(project_dir, ignore_errors=True)
@@ -402,16 +394,17 @@ class PerformanceBenchmarker:
             cache_effectiveness = ((cold_time - warm_time) / cold_time) * 100 if cold_time > 0 else 0
 
             results = {
-                'cold_run_time': cold_time,
-                'warm_run_time': warm_time,
-                'cache_speedup': cache_speedup,
-                'cache_effectiveness_percent': cache_effectiveness,
-                'violations_consistent': len(result_nocache.get('violations', [])) == len(result_cache.get('violations', []))
+                "cold_run_time": cold_time,
+                "warm_run_time": warm_time,
+                "cache_speedup": cache_speedup,
+                "cache_effectiveness_percent": cache_effectiveness,
+                "violations_consistent": len(result_nocache.get("violations", []))
+                == len(result_cache.get("violations", [])),
             }
 
         except Exception as e:
             logger.error(f"Caching benchmark failed: {e}")
-            results = {'error': str(e)}
+            results = {"error": str(e)}
 
         finally:
             shutil.rmtree(test_project, ignore_errors=True)
@@ -591,13 +584,15 @@ if __name__ == "__main__":
         """Discover Python files to analyze."""
 
         files = []
-        patterns = ['**/*.py', '**/*.js', '**/*.ts', '**/*.jsx', '**/*.tsx']
+        patterns = ["**/*.py", "**/*.js", "**/*.ts", "**/*.jsx", "**/*.tsx"]
 
         for pattern in patterns:
             for file_path in directory.glob(pattern):
-                if (file_path.is_file() and
-                    not any(part.startswith('.') for part in file_path.parts) and
-                    file_path.stat().st_size < 10 * 1024 * 1024):  # Skip files > 10MB
+                if (
+                    file_path.is_file()
+                    and not any(part.startswith(".") for part in file_path.parts)
+                    and file_path.stat().st_size < 10 * 1024 * 1024
+                ):  # Skip files > 10MB
                     files.append(file_path)
 
         return sorted(files)
@@ -609,7 +604,7 @@ if __name__ == "__main__":
 
         for file_path in files:
             try:
-                with open(file_path, encoding='utf-8', errors='ignore') as f:
+                with open(file_path, encoding="utf-8", errors="ignore") as f:
                     lines = sum(1 for line in f if line.strip())
                     total_lines += lines
             except Exception:
@@ -621,86 +616,96 @@ if __name__ == "__main__":
         """Get system information for benchmark context."""
 
         return {
-            'cpu_count': os.cpu_count(),
-            'cpu_freq_mhz': psutil.cpu_freq().current if psutil.cpu_freq() else 'unknown',
-            'memory_total_gb': psutil.virtual_memory().total / (1024**3),
-            'python_version': sys.version,
-            'platform': sys.platform,
-            'architecture': os.uname().machine if hasattr(os, 'uname') else 'unknown'
+            "cpu_count": os.cpu_count(),
+            "cpu_freq_mhz": psutil.cpu_freq().current if psutil.cpu_freq() else "unknown",
+            "memory_total_gb": psutil.virtual_memory().total / (1024**3),
+            "python_version": sys.version,
+            "platform": sys.platform,
+            "architecture": os.uname().machine if hasattr(os, "uname") else "unknown",
         }
 
     def _generate_performance_summary(self, test_results: Dict[str, Any]) -> Dict[str, Any]:
         """Generate performance summary from test results."""
 
         summary = {
-            'overall_performance': 'unknown',
-            'bottlenecks_identified': [],
-            'performance_targets_met': {},
-            'scalability_assessment': 'unknown'
+            "overall_performance": "unknown",
+            "bottlenecks_identified": [],
+            "performance_targets_met": {},
+            "scalability_assessment": "unknown",
         }
 
         # Analyze real codebase performance
-        if 'real_codebases' in test_results:
-            real_results = test_results['real_codebases']
+        if "real_codebases" in test_results:
+            real_results = test_results["real_codebases"]
 
-            sum(r.get('file_count', 0) for r in real_results.values() if isinstance(r, dict) and 'file_count' in r)
-            avg_throughput = statistics.mean([
-                r.get('files_per_second', 0) for r in real_results.values()
-                if isinstance(r, dict) and r.get('files_per_second', 0) > 0
-            ]) if real_results else 0
+            sum(r.get("file_count", 0) for r in real_results.values() if isinstance(r, dict) and "file_count" in r)
+            avg_throughput = (
+                statistics.mean(
+                    [
+                        r.get("files_per_second", 0)
+                        for r in real_results.values()
+                        if isinstance(r, dict) and r.get("files_per_second", 0) > 0
+                    ]
+                )
+                if real_results
+                else 0
+            )
 
             # Check performance targets
-            summary['performance_targets_met'] = {
-                'large_codebases_under_5min': all(
-                    r.get('execution_time_seconds', float('inf')) < 300
+            summary["performance_targets_met"] = {
+                "large_codebases_under_5min": all(
+                    r.get("execution_time_seconds", float("inf")) < 300
                     for r in real_results.values()
-                    if isinstance(r, dict) and r.get('file_count', 0) > 1000
+                    if isinstance(r, dict) and r.get("file_count", 0) > 1000
                 ),
-                'medium_codebases_under_30sec': all(
-                    r.get('execution_time_seconds', float('inf')) < 30
+                "medium_codebases_under_30sec": all(
+                    r.get("execution_time_seconds", float("inf")) < 30
                     for r in real_results.values()
-                    if isinstance(r, dict) and 100 <= r.get('file_count', 0) <= 1000
+                    if isinstance(r, dict) and 100 <= r.get("file_count", 0) <= 1000
                 ),
-                'small_codebases_under_5sec': all(
-                    r.get('execution_time_seconds', float('inf')) < 5
+                "small_codebases_under_5sec": all(
+                    r.get("execution_time_seconds", float("inf")) < 5
                     for r in real_results.values()
-                    if isinstance(r, dict) and r.get('file_count', 0) < 100
+                    if isinstance(r, dict) and r.get("file_count", 0) < 100
                 ),
-                'average_throughput_acceptable': avg_throughput > 10  # files per second
+                "average_throughput_acceptable": avg_throughput > 10,  # files per second
             }
 
         # Analyze memory usage
-        if 'memory_stress' in test_results:
-            memory_results = test_results['memory_stress']
+        if "memory_stress" in test_results:
+            memory_results = test_results["memory_stress"]
 
             memory_growth_rates = [
-                r.get('memory_efficiency_kb_per_file', 0)
+                r.get("memory_efficiency_kb_per_file", 0)
                 for r in memory_results.values()
-                if isinstance(r, dict) and 'memory_efficiency_kb_per_file' in r
+                if isinstance(r, dict) and "memory_efficiency_kb_per_file" in r
             ]
 
             if memory_growth_rates:
                 avg_memory_per_file = statistics.mean(memory_growth_rates)
                 if avg_memory_per_file > 1024:  # > 1MB per file
-                    summary['bottlenecks_identified'].append('High memory usage per file')
+                    summary["bottlenecks_identified"].append("High memory usage per file")
 
         # Analyze parallel scaling
-        if 'parallel_scaling' in test_results:
-            parallel_results = test_results['parallel_scaling']
+        if "parallel_scaling" in test_results:
+            parallel_results = test_results["parallel_scaling"]
 
             speedup_factors = [
-                r.get('speedup_factor', 1.0)
+                r.get("speedup_factor", 1.0)
                 for r in parallel_results.values()
-                if isinstance(r, dict) and 'speedup_factor' in r
+                if isinstance(r, dict) and "speedup_factor" in r
             ]
 
             if speedup_factors:
                 max_speedup = max(speedup_factors)
-                summary['scalability_assessment'] = (
-                    'excellent' if max_speedup > 3.0 else
-                    'good' if max_speedup > 2.0 else
-                    'moderate' if max_speedup > 1.5 else
-                    'poor'
+                summary["scalability_assessment"] = (
+                    "excellent"
+                    if max_speedup > 3.0
+                    else "good"
+                    if max_speedup > 2.0
+                    else "moderate"
+                    if max_speedup > 1.5
+                    else "poor"
                 )
 
         return summary
@@ -711,46 +716,50 @@ if __name__ == "__main__":
         recommendations = []
 
         # Analyze results and generate specific recommendations
-        if 'real_codebases' in test_results:
-            real_results = test_results['real_codebases']
+        if "real_codebases" in test_results:
+            real_results = test_results["real_codebases"]
 
             slow_analyses = [
-                name for name, result in real_results.items()
-                if isinstance(result, dict) and result.get('files_per_second', 0) < 5
+                name
+                for name, result in real_results.items()
+                if isinstance(result, dict) and result.get("files_per_second", 0) < 5
             ]
 
             if slow_analyses:
-                recommendations.append(
-                    f"Consider parallel processing for slow analyses: {', '.join(slow_analyses)}"
-                )
+                recommendations.append(f"Consider parallel processing for slow analyses: {', '.join(slow_analyses)}")
 
-        if 'memory_stress' in test_results:
-            memory_results = test_results['memory_stress']
+        if "memory_stress" in test_results:
+            memory_results = test_results["memory_stress"]
 
             high_memory_tests = [
-                name for name, result in memory_results.items()
-                if isinstance(result, dict) and result.get('memory_efficiency_kb_per_file', 0) > 512
+                name
+                for name, result in memory_results.items()
+                if isinstance(result, dict) and result.get("memory_efficiency_kb_per_file", 0) > 512
             ]
 
             if high_memory_tests:
                 recommendations.append("Implement memory optimization for large codebases")
 
-        if 'parallel_scaling' in test_results:
-            parallel_results = test_results['parallel_scaling']
+        if "parallel_scaling" in test_results:
+            parallel_results = test_results["parallel_scaling"]
 
-            best_workers = max(
-                (int(name.split('_')[1]), result.get('efficiency', 0))
-                for name, result in parallel_results.items()
-                if isinstance(result, dict) and 'efficiency' in result
-            )[0] if parallel_results else 1
+            best_workers = (
+                max(
+                    (int(name.split("_")[1]), result.get("efficiency", 0))
+                    for name, result in parallel_results.items()
+                    if isinstance(result, dict) and "efficiency" in result
+                )[0]
+                if parallel_results
+                else 1
+            )
 
             recommendations.append(f"Optimal worker count appears to be {best_workers} for this system")
 
-        if 'caching_effectiveness' in test_results:
-            cache_result = test_results['caching_effectiveness']
+        if "caching_effectiveness" in test_results:
+            cache_result = test_results["caching_effectiveness"]
 
             if isinstance(cache_result, dict):
-                speedup = cache_result.get('cache_speedup', 1.0)
+                speedup = cache_result.get("cache_speedup", 1.0)
                 if speedup < 1.5:
                     recommendations.append("Consider implementing more aggressive caching strategies")
                 elif speedup > 3.0:
@@ -761,7 +770,7 @@ if __name__ == "__main__":
             recommendations = [
                 "Performance appears acceptable - monitor in production",
                 "Consider implementing incremental analysis for CI/CD pipelines",
-                "Add performance regression tests to prevent degradation"
+                "Add performance regression tests to prevent degradation",
             ]
 
         return recommendations
@@ -786,25 +795,25 @@ if __name__ == "__main__":
             violations_per_second=0.0,
             memory_per_file_kb=0.0,
             cpu_time_per_file_ms=0.0,
-            analyzer_mode='empty',
+            analyzer_mode="empty",
             parallel_workers=0,
             cache_enabled=False,
-            timestamp=time.strftime('%Y-%m-%d %H:%M:%S')
+            timestamp=time.strftime("%Y-%m-%d %H:%M:%S"),
         )
 
     def _save_benchmark_results(self, results: Dict[str, Any]):
         """Save benchmark results to files."""
 
-        timestamp = time.strftime('%Y%m%d_%H%M%S')
+        timestamp = time.strftime("%Y%m%d_%H%M%S")
 
         # Save detailed JSON results
         json_file = self.output_dir / f"benchmark_results_{timestamp}.json"
-        with open(json_file, 'w') as f:
+        with open(json_file, "w") as f:
             json.dump(results, f, indent=2, default=str)
 
         # Save summary report
         summary_file = self.output_dir / f"benchmark_summary_{timestamp}.txt"
-        with open(summary_file, 'w') as f:
+        with open(summary_file, "w") as f:
             f.write("Performance Benchmark Summary\n")
             f.write("=" * 50 + "\n\n")
 
@@ -812,23 +821,23 @@ if __name__ == "__main__":
             f.write(f"Total Time: {results.get('total_benchmark_time', 0):.2f} seconds\n\n")
 
             # System info
-            system_info = results.get('system_info', {})
+            system_info = results.get("system_info", {})
             f.write("System Information:\n")
             f.write(f"  CPU Cores: {system_info.get('cpu_count', 'unknown')}\n")
             f.write(f"  Memory: {system_info.get('memory_total_gb', 0):.1f} GB\n")
             f.write(f"  Python: {system_info.get('python_version', 'unknown').split()[0]}\n\n")
 
             # Performance summary
-            perf_summary = results.get('performance_summary', {})
+            perf_summary = results.get("performance_summary", {})
             f.write("Performance Targets:\n")
-            targets = perf_summary.get('performance_targets_met', {})
+            targets = perf_summary.get("performance_targets_met", {})
             for target, met in targets.items():
                 status = "✓ PASS" if met else "✗ FAIL"
                 f.write(f"  {target.replace('_', ' ').title()}: {status}\n")
             f.write("\n")
 
             # Recommendations
-            recommendations = results.get('recommendations', [])
+            recommendations = results.get("recommendations", [])
             f.write("Recommendations:\n")
             for i, rec in enumerate(recommendations, 1):
                 f.write(f"  {i}. {rec}\n")
@@ -856,6 +865,7 @@ class ResourceMonitor:
 
         # Start monitoring thread
         import threading
+
         self.monitor_thread = threading.Thread(target=self._monitor_loop)
         self.monitor_thread.daemon = True
         self.monitor_thread.start()
@@ -864,25 +874,25 @@ class ResourceMonitor:
         """Stop monitoring and return statistics."""
         self.monitoring_active = False
 
-        if hasattr(self, 'monitor_thread'):
+        if hasattr(self, "monitor_thread"):
             self.monitor_thread.join(timeout=2)
 
         if not self.resource_samples:
             return {
-                'peak_memory_mb': self.initial_memory or 0,
-                'avg_memory_mb': self.initial_memory or 0,
-                'avg_cpu_percent': 0.0,
-                'initial_memory_mb': self.initial_memory or 0
+                "peak_memory_mb": self.initial_memory or 0,
+                "avg_memory_mb": self.initial_memory or 0,
+                "avg_cpu_percent": 0.0,
+                "initial_memory_mb": self.initial_memory or 0,
             }
 
-        memory_samples = [s['memory_mb'] for s in self.resource_samples]
-        cpu_samples = [s['cpu_percent'] for s in self.resource_samples]
+        memory_samples = [s["memory_mb"] for s in self.resource_samples]
+        cpu_samples = [s["cpu_percent"] for s in self.resource_samples]
 
         return {
-            'peak_memory_mb': max(memory_samples),
-            'avg_memory_mb': sum(memory_samples) / len(memory_samples),
-            'avg_cpu_percent': sum(cpu_samples) / len(cpu_samples),
-            'initial_memory_mb': self.initial_memory or 0
+            "peak_memory_mb": max(memory_samples),
+            "avg_memory_mb": sum(memory_samples) / len(memory_samples),
+            "avg_cpu_percent": sum(cpu_samples) / len(cpu_samples),
+            "initial_memory_mb": self.initial_memory or 0,
         }
 
     def _monitor_loop(self):
@@ -895,9 +905,9 @@ class ResourceMonitor:
                 cpu_percent = process.cpu_percent()
 
                 sample = {
-                    'timestamp': time.time(),
-                    'memory_mb': memory_info.rss / 1024 / 1024,
-                    'cpu_percent': cpu_percent
+                    "timestamp": time.time(),
+                    "memory_mb": memory_info.rss / 1024 / 1024,
+                    "cpu_percent": cpu_percent,
                 }
 
                 self.resource_samples.append(sample)
@@ -913,19 +923,16 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(description="Performance Benchmark Runner")
-    parser.add_argument('--output', '-o', default='tests/performance/results',
-                       help='Output directory for results')
-    parser.add_argument('--codebase', '-c', help='Benchmark specific codebase path')
-    parser.add_argument('--comprehensive', action='store_true',
-                       help='Run comprehensive benchmark suite')
-    parser.add_argument('--verbose', '-v', action='store_true',
-                       help='Enable verbose logging')
+    parser.add_argument("--output", "-o", default="tests/performance/results", help="Output directory for results")
+    parser.add_argument("--codebase", "-c", help="Benchmark specific codebase path")
+    parser.add_argument("--comprehensive", action="store_true", help="Run comprehensive benchmark suite")
+    parser.add_argument("--verbose", "-v", action="store_true", help="Enable verbose logging")
 
     args = parser.parse_args()
 
     # Configure logging
     level = logging.DEBUG if args.verbose else logging.INFO
-    logging.basicConfig(level=level, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    logging.basicConfig(level=level, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
     benchmarker = PerformanceBenchmarker(args.output)
 
@@ -946,7 +953,7 @@ def main():
         results = benchmarker._benchmark_real_codebases()
 
         for name, result in results.items():
-            if isinstance(result, dict) and 'files_per_second' in result:
+            if isinstance(result, dict) and "files_per_second" in result:
                 print(f"{name}: {result['files_per_second']:.1f} files/sec")
             else:
                 print(f"{name}: Error or no data")

@@ -65,10 +65,10 @@ class AccuracyValidator:
 
         # Test each optimization
         optimizations_to_test = [
-            ('caching', self._validate_caching_accuracy),
-            ('parallel_processing', self._validate_parallel_accuracy),
-            ('incremental_analysis', self._validate_incremental_accuracy),
-            ('ast_optimization', self._validate_ast_optimization_accuracy)
+            ("caching", self._validate_caching_accuracy),
+            ("parallel_processing", self._validate_parallel_accuracy),
+            ("incremental_analysis", self._validate_incremental_accuracy),
+            ("ast_optimization", self._validate_ast_optimization_accuracy),
         ]
 
         for test_path in test_paths:
@@ -106,7 +106,7 @@ class AccuracyValidator:
                         false_negatives=0,
                         performance_improvement=0.0,
                         validation_passed=False,
-                        issues_found=[f"Validation error: {str(e)}"]
+                        issues_found=[f"Validation error: {e!s}"],
                     )
 
         # Generate summary report
@@ -140,15 +140,15 @@ class AccuracyValidator:
 
         return AccuracyValidationResult(
             test_name=f"{Path(test_path).name}_caching",
-            baseline_violations=len(baseline_result.get('violations', [])),
-            optimized_violations=len(warm_result.get('violations', [])),
-            matching_violations=comparison['matching_violations'],
-            accuracy_percentage=comparison['accuracy_percentage'],
-            false_positives=comparison['false_positives'],
-            false_negatives=comparison['false_negatives'],
+            baseline_violations=len(baseline_result.get("violations", [])),
+            optimized_violations=len(warm_result.get("violations", [])),
+            matching_violations=comparison["matching_violations"],
+            accuracy_percentage=comparison["accuracy_percentage"],
+            false_positives=comparison["false_positives"],
+            false_negatives=comparison["false_negatives"],
             performance_improvement=performance_improvement,
-            validation_passed=comparison['accuracy_percentage'] >= self.accuracy_threshold,
-            issues_found=comparison['issues']
+            validation_passed=comparison["accuracy_percentage"] >= self.accuracy_threshold,
+            issues_found=comparison["issues"],
         )
 
     def _validate_parallel_accuracy(self, test_path: str, baseline_result: Dict[str, Any]) -> AccuracyValidationResult:
@@ -161,15 +161,15 @@ class AccuracyValidator:
             logger.info("Skipping parallel validation for single file")
             return AccuracyValidationResult(
                 test_name=f"{Path(test_path).name}_parallel",
-                baseline_violations=len(baseline_result.get('violations', [])),
-                optimized_violations=len(baseline_result.get('violations', [])),
-                matching_violations=len(baseline_result.get('violations', [])),
+                baseline_violations=len(baseline_result.get("violations", [])),
+                optimized_violations=len(baseline_result.get("violations", [])),
+                matching_violations=len(baseline_result.get("violations", [])),
                 accuracy_percentage=100.0,
                 false_positives=0,
                 false_negatives=0,
                 performance_improvement=0.0,
                 validation_passed=True,
-                issues_found=[]
+                issues_found=[],
             )
 
         # Run parallel analysis
@@ -181,33 +181,40 @@ class AccuracyValidator:
 
         # Convert parallel result to comparison format
         parallel_violations = {
-            'violations': parallel_result.unified_result.connascence_violations,
-            'summary': {
-                'total_violations': parallel_result.unified_result.total_violations
-            }
+            "violations": parallel_result.unified_result.connascence_violations,
+            "summary": {"total_violations": parallel_result.unified_result.total_violations},
         }
 
         # Compare results
         comparison = self._compare_results(baseline_result, parallel_violations, "parallel")
 
         # Performance improvement from parallel result
-        performance_improvement = ((parallel_result.sequential_equivalent_time - parallel_result.parallel_execution_time) /
-                                 parallel_result.sequential_equivalent_time) * 100 if parallel_result.sequential_equivalent_time > 0 else 0
+        performance_improvement = (
+            (
+                (parallel_result.sequential_equivalent_time - parallel_result.parallel_execution_time)
+                / parallel_result.sequential_equivalent_time
+            )
+            * 100
+            if parallel_result.sequential_equivalent_time > 0
+            else 0
+        )
 
         return AccuracyValidationResult(
             test_name=f"{Path(test_path).name}_parallel",
-            baseline_violations=len(baseline_result.get('violations', [])),
-            optimized_violations=len(parallel_violations.get('violations', [])),
-            matching_violations=comparison['matching_violations'],
-            accuracy_percentage=comparison['accuracy_percentage'],
-            false_positives=comparison['false_positives'],
-            false_negatives=comparison['false_negatives'],
+            baseline_violations=len(baseline_result.get("violations", [])),
+            optimized_violations=len(parallel_violations.get("violations", [])),
+            matching_violations=comparison["matching_violations"],
+            accuracy_percentage=comparison["accuracy_percentage"],
+            false_positives=comparison["false_positives"],
+            false_negatives=comparison["false_negatives"],
             performance_improvement=performance_improvement,
-            validation_passed=comparison['accuracy_percentage'] >= self.accuracy_threshold,
-            issues_found=comparison['issues']
+            validation_passed=comparison["accuracy_percentage"] >= self.accuracy_threshold,
+            issues_found=comparison["issues"],
         )
 
-    def _validate_incremental_accuracy(self, test_path: str, baseline_result: Dict[str, Any]) -> AccuracyValidationResult:
+    def _validate_incremental_accuracy(
+        self, test_path: str, baseline_result: Dict[str, Any]
+    ) -> AccuracyValidationResult:
         """Validate incremental analysis maintains accuracy."""
 
         logger.info(f"Validating incremental analysis accuracy for {test_path}")
@@ -217,15 +224,15 @@ class AccuracyValidator:
             logger.info("Skipping incremental validation for non-directory")
             return AccuracyValidationResult(
                 test_name=f"{Path(test_path).name}_incremental",
-                baseline_violations=len(baseline_result.get('violations', [])),
-                optimized_violations=len(baseline_result.get('violations', [])),
-                matching_violations=len(baseline_result.get('violations', [])),
+                baseline_violations=len(baseline_result.get("violations", [])),
+                optimized_violations=len(baseline_result.get("violations", [])),
+                matching_violations=len(baseline_result.get("violations", [])),
                 accuracy_percentage=100.0,
                 false_positives=0,
                 false_negatives=0,
                 performance_improvement=0.0,
                 validation_passed=True,
-                issues_found=[]
+                issues_found=[],
             )
 
         try:
@@ -236,40 +243,40 @@ class AccuracyValidator:
             incremental_analyzer.create_baseline()
 
             # Simulate incremental analysis (analyze a subset of files)
-            python_files = list(Path(test_path).glob('**/*.py'))[:5]  # First 5 files
+            python_files = list(Path(test_path).glob("**/*.py"))[:5]  # First 5 files
 
             start_time = time.time()
-            incremental_result = incremental_analyzer.analyze_changes(
-                changed_files=[str(f) for f in python_files]
-            )
+            incremental_result = incremental_analyzer.analyze_changes(changed_files=[str(f) for f in python_files])
             time.time() - start_time
 
             # Compare with subset of baseline (same files)
             subset_baseline = self._get_subset_baseline(baseline_result, [str(f) for f in python_files])
 
             incremental_violations = {
-                'violations': incremental_result.violations,
-                'summary': {
-                    'total_violations': len(incremental_result.violations)
-                }
+                "violations": incremental_result.violations,
+                "summary": {"total_violations": len(incremental_result.violations)},
             }
 
             comparison = self._compare_results(subset_baseline, incremental_violations, "incremental")
 
             # Performance improvement
-            performance_improvement = incremental_result.time_saved_seconds / (incremental_result.analysis_time_seconds + incremental_result.time_saved_seconds) * 100
+            performance_improvement = (
+                incremental_result.time_saved_seconds
+                / (incremental_result.analysis_time_seconds + incremental_result.time_saved_seconds)
+                * 100
+            )
 
             return AccuracyValidationResult(
                 test_name=f"{Path(test_path).name}_incremental",
-                baseline_violations=len(subset_baseline.get('violations', [])),
-                optimized_violations=len(incremental_violations.get('violations', [])),
-                matching_violations=comparison['matching_violations'],
-                accuracy_percentage=comparison['accuracy_percentage'],
-                false_positives=comparison['false_positives'],
-                false_negatives=comparison['false_negatives'],
+                baseline_violations=len(subset_baseline.get("violations", [])),
+                optimized_violations=len(incremental_violations.get("violations", [])),
+                matching_violations=comparison["matching_violations"],
+                accuracy_percentage=comparison["accuracy_percentage"],
+                false_positives=comparison["false_positives"],
+                false_negatives=comparison["false_negatives"],
                 performance_improvement=performance_improvement,
-                validation_passed=comparison['accuracy_percentage'] >= self.accuracy_threshold,
-                issues_found=comparison['issues']
+                validation_passed=comparison["accuracy_percentage"] >= self.accuracy_threshold,
+                issues_found=comparison["issues"],
             )
 
         except Exception as e:
@@ -284,10 +291,12 @@ class AccuracyValidator:
                 false_negatives=0,
                 performance_improvement=0.0,
                 validation_passed=False,
-                issues_found=[f"Incremental analysis failed: {str(e)}"]
+                issues_found=[f"Incremental analysis failed: {e!s}"],
             )
 
-    def _validate_ast_optimization_accuracy(self, test_path: str, baseline_result: Dict[str, Any]) -> AccuracyValidationResult:
+    def _validate_ast_optimization_accuracy(
+        self, test_path: str, baseline_result: Dict[str, Any]
+    ) -> AccuracyValidationResult:
         """Validate AST optimization maintains accuracy."""
 
         logger.info(f"Validating AST optimization accuracy for {test_path}")
@@ -296,7 +305,7 @@ class AccuracyValidator:
             # Test on single file for AST optimization
             if Path(test_path).is_dir():
                 # Find first Python file
-                python_files = list(Path(test_path).glob('**/*.py'))
+                python_files = list(Path(test_path).glob("**/*.py"))
                 if not python_files:
                     return AccuracyValidationResult(
                         test_name=f"{Path(test_path).name}_ast_optimization",
@@ -308,17 +317,18 @@ class AccuracyValidator:
                         false_negatives=0,
                         performance_improvement=0.0,
                         validation_passed=True,
-                        issues_found=["No Python files found for AST optimization test"]
+                        issues_found=["No Python files found for AST optimization test"],
                     )
                 test_file = python_files[0]
             else:
                 test_file = Path(test_path)
 
             # Parse AST
-            with open(test_file, encoding='utf-8') as f:
+            with open(test_file, encoding="utf-8") as f:
                 content = f.read()
 
             import ast
+
             ast_tree = ast.parse(content, filename=str(test_file))
 
             # Run optimized AST analysis
@@ -335,19 +345,21 @@ class AccuracyValidator:
             comparison = self._compare_ast_results(file_baseline, optimized_result, "ast_optimization")
 
             # Performance improvement
-            performance_improvement = ((baseline_time - optimization_time) / baseline_time) * 100 if baseline_time > 0 else 0
+            performance_improvement = (
+                ((baseline_time - optimization_time) / baseline_time) * 100 if baseline_time > 0 else 0
+            )
 
             return AccuracyValidationResult(
                 test_name=f"{test_file.name}_ast_optimization",
-                baseline_violations=len(file_baseline.get('violations', [])),
-                optimized_violations=optimized_result.get('total_violations', 0),
-                matching_violations=comparison['matching_violations'],
-                accuracy_percentage=comparison['accuracy_percentage'],
-                false_positives=comparison['false_positives'],
-                false_negatives=comparison['false_negatives'],
+                baseline_violations=len(file_baseline.get("violations", [])),
+                optimized_violations=optimized_result.get("total_violations", 0),
+                matching_violations=comparison["matching_violations"],
+                accuracy_percentage=comparison["accuracy_percentage"],
+                false_positives=comparison["false_positives"],
+                false_negatives=comparison["false_negatives"],
                 performance_improvement=performance_improvement,
-                validation_passed=comparison['accuracy_percentage'] >= self.accuracy_threshold,
-                issues_found=comparison['issues']
+                validation_passed=comparison["accuracy_percentage"] >= self.accuracy_threshold,
+                issues_found=comparison["issues"],
             )
 
         except Exception as e:
@@ -362,7 +374,7 @@ class AccuracyValidator:
                 false_negatives=0,
                 performance_improvement=0.0,
                 validation_passed=False,
-                issues_found=[f"AST optimization failed: {str(e)}"]
+                issues_found=[f"AST optimization failed: {e!s}"],
             )
 
     def _get_baseline_results(self, test_path: str) -> Dict[str, Any]:
@@ -374,27 +386,29 @@ class AccuracyValidator:
         result = self.baseline_analyzer.analyze_path(test_path)
 
         # Ensure consistent format
-        if 'violations' not in result:
-            result['violations'] = []
-        if 'summary' not in result:
-            result['summary'] = {'total_violations': len(result['violations'])}
+        if "violations" not in result:
+            result["violations"] = []
+        if "summary" not in result:
+            result["summary"] = {"total_violations": len(result["violations"])}
 
         return result
 
-    def _compare_results(self, baseline: Dict[str, Any], optimized: Dict[str, Any], optimization_type: str) -> Dict[str, Any]:
+    def _compare_results(
+        self, baseline: Dict[str, Any], optimized: Dict[str, Any], optimization_type: str
+    ) -> Dict[str, Any]:
         """Compare baseline and optimized results."""
 
-        baseline_violations = baseline.get('violations', [])
-        optimized_violations = optimized.get('violations', [])
+        baseline_violations = baseline.get("violations", [])
+        optimized_violations = optimized.get("violations", [])
 
         # Create signatures for violations (for matching)
         def violation_signature(v):
             return (
-                v.get('file_path', ''),
-                v.get('line_number', 0),
-                v.get('rule_id', ''),
-                v.get('type', ''),
-                v.get('description', '')[:50]  # First 50 chars
+                v.get("file_path", ""),
+                v.get("line_number", 0),
+                v.get("rule_id", ""),
+                v.get("type", ""),
+                v.get("description", "")[:50],  # First 50 chars
             )
 
         baseline_sigs = {violation_signature(v): v for v in baseline_violations}
@@ -406,7 +420,7 @@ class AccuracyValidator:
 
         # Calculate false positives and negatives
         false_positives = len(optimized_sigs) - matching_violations  # In optimized but not baseline
-        false_negatives = len(baseline_sigs) - matching_violations   # In baseline but not optimized
+        false_negatives = len(baseline_sigs) - matching_violations  # In baseline but not optimized
 
         # Calculate accuracy
         total_baseline = len(baseline_violations)
@@ -425,8 +439,8 @@ class AccuracyValidator:
             issues.append(f"{false_negatives} false negative(s) in {optimization_type}")
 
         # Check for significant differences in violation types
-        baseline_types = {v.get('type', 'unknown') for v in baseline_violations}
-        optimized_types = {v.get('type', 'unknown') for v in optimized_violations}
+        baseline_types = {v.get("type", "unknown") for v in baseline_violations}
+        optimized_types = {v.get("type", "unknown") for v in optimized_violations}
 
         missing_types = baseline_types - optimized_types
         extra_types = optimized_types - baseline_types
@@ -438,39 +452,43 @@ class AccuracyValidator:
             issues.append(f"Extra violation types in {optimization_type}: {', '.join(extra_types)}")
 
         return {
-            'matching_violations': matching_violations,
-            'accuracy_percentage': accuracy_percentage,
-            'false_positives': false_positives,
-            'false_negatives': false_negatives,
-            'issues': issues,
-            'baseline_total': len(baseline_violations),
-            'optimized_total': len(optimized_violations)
+            "matching_violations": matching_violations,
+            "accuracy_percentage": accuracy_percentage,
+            "false_positives": false_positives,
+            "false_negatives": false_negatives,
+            "issues": issues,
+            "baseline_total": len(baseline_violations),
+            "optimized_total": len(optimized_violations),
         }
 
-    def _compare_ast_results(self, baseline: Dict[str, Any], optimized: Dict[str, Any], optimization_type: str) -> Dict[str, Any]:
+    def _compare_ast_results(
+        self, baseline: Dict[str, Any], optimized: Dict[str, Any], optimization_type: str
+    ) -> Dict[str, Any]:
         """Compare baseline and AST-optimized results."""
 
         # AST optimization returns a different format
-        baseline.get('violations', [])
+        baseline.get("violations", [])
 
         # Extract violations from optimized result
         optimized_violations = []
-        violations_by_type = optimized.get('violations', {})
+        violations_by_type = optimized.get("violations", {})
 
         for violation_type, violations in violations_by_type.items():
             for violation in violations:
                 # Convert to baseline format
-                optimized_violations.append({
-                    'type': violation.get('type', violation_type),
-                    'line_number': violation.get('line_number', 0),
-                    'description': violation.get('description', ''),
-                    'severity': violation.get('severity', 'medium')
-                })
+                optimized_violations.append(
+                    {
+                        "type": violation.get("type", violation_type),
+                        "line_number": violation.get("line_number", 0),
+                        "description": violation.get("description", ""),
+                        "severity": violation.get("severity", "medium"),
+                    }
+                )
 
         # Use standard comparison logic
         optimized_result_format = {
-            'violations': optimized_violations,
-            'summary': {'total_violations': len(optimized_violations)}
+            "violations": optimized_violations,
+            "summary": {"total_violations": len(optimized_violations)},
         }
 
         return self._compare_results(baseline, optimized_result_format, optimization_type)
@@ -479,11 +497,11 @@ class AccuracyValidator:
         """Get baseline results for a subset of files."""
 
         # Filter baseline violations to only include those from the file subset
-        all_violations = baseline.get('violations', [])
+        all_violations = baseline.get("violations", [])
 
         subset_violations = []
         for violation in all_violations:
-            violation_file = violation.get('file_path', '')
+            violation_file = violation.get("file_path", "")
 
             # Check if violation is from one of the subset files
             for file_path in file_subset:
@@ -491,10 +509,7 @@ class AccuracyValidator:
                     subset_violations.append(violation)
                     break
 
-        return {
-            'violations': subset_violations,
-            'summary': {'total_violations': len(subset_violations)}
-        }
+        return {"violations": subset_violations, "summary": {"total_violations": len(subset_violations)}}
 
     def _generate_validation_report(self, results: Dict[str, AccuracyValidationResult]):
         """Generate detailed validation report."""
@@ -502,7 +517,7 @@ class AccuracyValidator:
         report_file = Path("tests/performance/results/accuracy_validation_report.md")
         report_file.parent.mkdir(parents=True, exist_ok=True)
 
-        with open(report_file, 'w') as f:
+        with open(report_file, "w") as f:
             f.write("# Performance Optimization Accuracy Validation Report\n\n")
             f.write(f"Generated: {time.strftime('%Y-%m-%d %H:%M:%S')}\n\n")
 
@@ -524,9 +539,11 @@ class AccuracyValidator:
 
             for test_name, result in sorted(results.items()):
                 status = "✅ PASS" if result.validation_passed else "❌ FAIL"
-                f.write(f"| {result.test_name} | {result.baseline_violations} | "
-                       f"{result.optimized_violations} | {result.accuracy_percentage:.1f}% | "
-                       f"+{result.performance_improvement:.1f}% | {status} |\n")
+                f.write(
+                    f"| {result.test_name} | {result.baseline_violations} | "
+                    f"{result.optimized_violations} | {result.accuracy_percentage:.1f}% | "
+                    f"+{result.performance_improvement:.1f}% | {status} |\n"
+                )
 
             f.write("\n")
 
@@ -543,7 +560,9 @@ class AccuracyValidator:
             # Performance improvements
             f.write("## Performance Improvements\n\n")
 
-            performance_data = [(r.test_name, r.performance_improvement) for r in results.values() if r.performance_improvement > 0]
+            performance_data = [
+                (r.test_name, r.performance_improvement) for r in results.values() if r.performance_improvement > 0
+            ]
             performance_data.sort(key=lambda x: x[1], reverse=True)
 
             f.write("| Optimization | Performance Gain |\n")
@@ -590,19 +609,17 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(description="Validate optimization accuracy")
-    parser.add_argument('--test-paths', nargs='+',
-                       default=['analyzer', 'test_packages/express'],
-                       help='Paths to test for accuracy')
-    parser.add_argument('--threshold', type=float, default=95.0,
-                       help='Accuracy threshold percentage')
-    parser.add_argument('--verbose', '-v', action='store_true',
-                       help='Enable verbose logging')
+    parser.add_argument(
+        "--test-paths", nargs="+", default=["analyzer", "test_packages/express"], help="Paths to test for accuracy"
+    )
+    parser.add_argument("--threshold", type=float, default=95.0, help="Accuracy threshold percentage")
+    parser.add_argument("--verbose", "-v", action="store_true", help="Enable verbose logging")
 
     args = parser.parse_args()
 
     # Setup logging
     level = logging.DEBUG if args.verbose else logging.INFO
-    logging.basicConfig(level=level, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    logging.basicConfig(level=level, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
     # Run validation
     validator = AccuracyValidator(accuracy_threshold=args.threshold)

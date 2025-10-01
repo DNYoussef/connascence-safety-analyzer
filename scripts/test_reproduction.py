@@ -40,11 +40,7 @@ def test_reproduction_script():
         # Validate configuration
         expected_repos = ["celery", "curl", "express"]
         expected_total = 5743
-        expected_counts = {
-            "celery": 4630,
-            "curl": 1061,
-            "express": 52
-        }
+        expected_counts = {"celery": 4630, "curl": 1061, "express": 52}
 
         print("[INFO] Validating configuration...")
 
@@ -88,6 +84,7 @@ def test_reproduction_script():
         print(f"[FAIL] Validation error: {e}")
         return False
 
+
 def main():
     """Main test runner"""
     print("[TEST] Testing Enterprise Demo Reproduction Script")
@@ -105,6 +102,7 @@ def main():
     else:
         print("[FAIL] Tests failed! Check configuration.")
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

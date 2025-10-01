@@ -5,34 +5,36 @@ Tracks and calculates enterprise-grade quality metrics specifically
 for connascence violations and code quality.
 """
 
-import statistics
-import time
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enum import Enum
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Any
 import json
 import logging
+from pathlib import Path
+import statistics
+import time
+from typing import Any, Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
 
 class QualityLevel(Enum):
     """Six Sigma quality levels with DPMO thresholds"""
-    ONE_SIGMA = 1.0      # 691,462 DPMO
-    TWO_SIGMA = 2.0      # 308,537 DPMO
-    THREE_SIGMA = 3.0    # 66,807 DPMO
-    FOUR_SIGMA = 4.0     # 6,210 DPMO
-    FIVE_SIGMA = 5.0     # 233 DPMO
-    SIX_SIGMA = 6.0      # 3.4 DPMO
+
+    ONE_SIGMA = 1.0  # 691,462 DPMO
+    TWO_SIGMA = 2.0  # 308,537 DPMO
+    THREE_SIGMA = 3.0  # 66,807 DPMO
+    FOUR_SIGMA = 4.0  # 6,210 DPMO
+    FIVE_SIGMA = 5.0  # 233 DPMO
+    SIX_SIGMA = 6.0  # 3.4 DPMO
 
 
 @dataclass
 class SixSigmaMetrics:
     """Container for Six Sigma quality metrics"""
+
     dpmo: float = 0.0  # Defects Per Million Opportunities
-    rty: float = 0.0   # Rolled Throughput Yield
+    rty: float = 0.0  # Rolled Throughput Yield
     sigma_level: float = 0.0
     process_capability: float = 0.0
     quality_level: Optional[QualityLevel] = None
@@ -56,7 +58,7 @@ class SixSigmaMetrics:
             "sample_size": self.sample_size,
             "defect_count": self.defect_count,
             "opportunity_count": self.opportunity_count,
-            "connascence_metrics": self.connascence_metrics
+            "connascence_metrics": self.connascence_metrics,
         }
 
 
@@ -75,20 +77,20 @@ class SixSigmaTelemetry:
         QualityLevel.THREE_SIGMA: 66807,
         QualityLevel.FOUR_SIGMA: 6210,
         QualityLevel.FIVE_SIGMA: 233,
-        QualityLevel.SIX_SIGMA: 3.4
+        QualityLevel.SIX_SIGMA: 3.4,
     }
 
     # Connascence severity to opportunity multipliers
     CONNASCENCE_OPPORTUNITIES = {
-        'identity': 5,
-        'meaning': 4,
-        'algorithm': 6,
-        'position': 3,
-        'execution': 7,
-        'timing': 8,
-        'values': 3,
-        'type': 4,
-        'convention': 2
+        "identity": 5,
+        "meaning": 4,
+        "algorithm": 6,
+        "position": 3,
+        "execution": 7,
+        "timing": 8,
+        "values": 3,
+        "type": 4,
+        "convention": 2,
     }
 
     def __init__(self, process_name: str = "connascence_analysis"):
@@ -96,28 +98,28 @@ class SixSigmaTelemetry:
         self.process_name = process_name
         self.metrics_history: List[SixSigmaMetrics] = []
         self.current_session_data = {
-            'defects': 0,
-            'opportunities': 0,
-            'units_processed': 0,
-            'units_passed': 0,
-            'start_time': time.time(),
-            'connascence_violations': {},
-            'files_analyzed': 0,
-            'critical_violations': 0,
-            'high_violations': 0,
-            'medium_violations': 0,
-            'low_violations': 0
+            "defects": 0,
+            "opportunities": 0,
+            "units_processed": 0,
+            "units_passed": 0,
+            "start_time": time.time(),
+            "connascence_violations": {},
+            "files_analyzed": 0,
+            "critical_violations": 0,
+            "high_violations": 0,
+            "medium_violations": 0,
+            "low_violations": 0,
         }
 
     def record_connascence_violation(self, violation_type: str, severity: str):
         """Record a connascence violation as a defect"""
         # Count as defect
-        self.current_session_data['defects'] += 1
+        self.current_session_data["defects"] += 1
 
         # Track by type
-        if violation_type not in self.current_session_data['connascence_violations']:
-            self.current_session_data['connascence_violations'][violation_type] = 0
-        self.current_session_data['connascence_violations'][violation_type] += 1
+        if violation_type not in self.current_session_data["connascence_violations"]:
+            self.current_session_data["connascence_violations"][violation_type] = 0
+        self.current_session_data["connascence_violations"][violation_type] += 1
 
         # Track by severity
         severity_key = f"{severity.lower()}_violations"
@@ -128,25 +130,24 @@ class SixSigmaTelemetry:
         opportunities = self.CONNASCENCE_OPPORTUNITIES.get(violation_type.lower(), 3)
 
         # Critical violations have more impact
-        if severity.lower() == 'critical':
+        if severity.lower() == "critical":
             opportunities *= 2
 
-        self.current_session_data['opportunities'] += opportunities
+        self.current_session_data["opportunities"] += opportunities
 
         logger.debug(f"Recorded {severity} {violation_type} violation: {opportunities} opportunities")
 
     def record_file_analyzed(self, violations_found: int, total_checks: int):
         """Record analysis of a file"""
-        self.current_session_data['files_analyzed'] += 1
-        self.current_session_data['units_processed'] += 1
-        self.current_session_data['opportunities'] += total_checks
+        self.current_session_data["files_analyzed"] += 1
+        self.current_session_data["units_processed"] += 1
+        self.current_session_data["opportunities"] += total_checks
 
         # File passes if no critical/high violations
         if violations_found == 0 or (
-            self.current_session_data['critical_violations'] == 0 and
-            self.current_session_data['high_violations'] == 0
+            self.current_session_data["critical_violations"] == 0 and self.current_session_data["high_violations"] == 0
         ):
-            self.current_session_data['units_passed'] += 1
+            self.current_session_data["units_passed"] += 1
 
     def calculate_dpmo(self, defects: int = None, opportunities: int = None) -> float:
         """
@@ -155,9 +156,9 @@ class SixSigmaTelemetry:
         DPMO = (Number of Defects / Number of Opportunities) * 1,000,000
         """
         if defects is None:
-            defects = self.current_session_data['defects']
+            defects = self.current_session_data["defects"]
         if opportunities is None:
-            opportunities = self.current_session_data['opportunities']
+            opportunities = self.current_session_data["opportunities"]
 
         if opportunities == 0:
             return 0.0
@@ -172,9 +173,9 @@ class SixSigmaTelemetry:
         RTY = (Units Passed First Time / Total Units Processed) * 100
         """
         if units_processed is None:
-            units_processed = self.current_session_data['units_processed']
+            units_processed = self.current_session_data["units_processed"]
         if units_passed is None:
-            units_passed = self.current_session_data['units_passed']
+            units_passed = self.current_session_data["units_passed"]
 
         if units_processed == 0:
             return 100.0
@@ -215,15 +216,15 @@ class SixSigmaTelemetry:
         if dpmo is None:
             dpmo = self.calculate_dpmo()
 
-        for level, threshold in sorted(self.QUALITY_THRESHOLDS.items(),
-                                     key=lambda x: x[1]):
+        for level, threshold in sorted(self.QUALITY_THRESHOLDS.items(), key=lambda x: x[1]):
             if dpmo <= threshold:
                 return level
 
         return QualityLevel.ONE_SIGMA  # Default to lowest level
 
-    def calculate_process_capability(self, measurements: List[float],
-                                   lower_spec: float, upper_spec: float) -> Tuple[float, float]:
+    def calculate_process_capability(
+        self, measurements: List[float], lower_spec: float, upper_spec: float
+    ) -> Tuple[float, float]:
         """
         Calculate process capability indices (Cp, Cpk)
 
@@ -237,7 +238,7 @@ class SixSigmaTelemetry:
         std_dev = statistics.stdev(measurements)
 
         if std_dev == 0:
-            return float('inf'), float('inf')
+            return float("inf"), float("inf")
 
         # Cp - Process Capability
         cp = (upper_spec - lower_spec) / (6 * std_dev)
@@ -258,9 +259,9 @@ class SixSigmaTelemetry:
 
         # Calculate process capability if we have files analyzed
         process_capability = 0.0
-        if self.current_session_data['files_analyzed'] > 0:
+        if self.current_session_data["files_analyzed"] > 0:
             # Use violation rate as process measurement
-            violation_rate = self.current_session_data['defects'] / self.current_session_data['files_analyzed']
+            violation_rate = self.current_session_data["defects"] / self.current_session_data["files_analyzed"]
             # Target: 0 violations per file, acceptable: 5 violations per file
             cp, cpk = self.calculate_process_capability([violation_rate], 0, 5)
             process_capability = cpk
@@ -272,10 +273,10 @@ class SixSigmaTelemetry:
             process_capability=process_capability,
             quality_level=quality_level,
             process_name=self.process_name,
-            sample_size=self.current_session_data['units_processed'],
-            defect_count=self.current_session_data['defects'],
-            opportunity_count=self.current_session_data['opportunities'],
-            connascence_metrics=dict(self.current_session_data['connascence_violations'])
+            sample_size=self.current_session_data["units_processed"],
+            defect_count=self.current_session_data["defects"],
+            opportunity_count=self.current_session_data["opportunities"],
+            connascence_metrics=dict(self.current_session_data["connascence_violations"]),
         )
 
         self.metrics_history.append(metrics)
@@ -284,24 +285,23 @@ class SixSigmaTelemetry:
     def reset_session(self):
         """Reset current session data"""
         self.current_session_data = {
-            'defects': 0,
-            'opportunities': 0,
-            'units_processed': 0,
-            'units_passed': 0,
-            'start_time': time.time(),
-            'connascence_violations': {},
-            'files_analyzed': 0,
-            'critical_violations': 0,
-            'high_violations': 0,
-            'medium_violations': 0,
-            'low_violations': 0
+            "defects": 0,
+            "opportunities": 0,
+            "units_processed": 0,
+            "units_passed": 0,
+            "start_time": time.time(),
+            "connascence_violations": {},
+            "files_analyzed": 0,
+            "critical_violations": 0,
+            "high_violations": 0,
+            "medium_violations": 0,
+            "low_violations": 0,
         }
 
     def get_trend_analysis(self, days: int = 30) -> Dict[str, Any]:
         """Analyze quality trends over specified period"""
         cutoff_date = datetime.now() - timedelta(days=days)
-        recent_metrics = [m for m in self.metrics_history
-                         if m.timestamp >= cutoff_date]
+        recent_metrics = [m for m in self.metrics_history if m.timestamp >= cutoff_date]
 
         if not recent_metrics:
             return {"error": "No metrics data available for trend analysis"}
@@ -326,30 +326,30 @@ class SixSigmaTelemetry:
                 "average": round(statistics.mean(dpmo_values), 2) if dpmo_values else 0,
                 "trend": "improving" if dpmo_values and dpmo_values[-1] < dpmo_values[0] else "declining",
                 "best": min(dpmo_values) if dpmo_values else 0,
-                "worst": max(dpmo_values) if dpmo_values else 0
+                "worst": max(dpmo_values) if dpmo_values else 0,
             },
             "rty": {
                 "current": rty_values[-1] if rty_values else 100,
                 "average": round(statistics.mean(rty_values), 2) if rty_values else 100,
                 "trend": "improving" if rty_values and rty_values[-1] > rty_values[0] else "declining",
                 "best": max(rty_values) if rty_values else 100,
-                "worst": min(rty_values) if rty_values else 100
+                "worst": min(rty_values) if rty_values else 100,
             },
             "sigma_level": {
                 "current": sigma_values[-1] if sigma_values else 6.0,
                 "average": round(statistics.mean(sigma_values), 2) if sigma_values else 6.0,
                 "trend": "improving" if sigma_values and sigma_values[-1] > sigma_values[0] else "declining",
                 "best": max(sigma_values) if sigma_values else 6.0,
-                "worst": min(sigma_values) if sigma_values else 6.0
+                "worst": min(sigma_values) if sigma_values else 6.0,
             },
             "connascence_trends": {
                 conn_type: {
                     "total": sum(counts),
                     "average": round(statistics.mean(counts), 2),
-                    "trend": "increasing" if counts[-1] > counts[0] else "decreasing"
+                    "trend": "increasing" if counts[-1] > counts[0] else "decreasing",
                 }
                 for conn_type, counts in connascence_trends.items()
-            }
+            },
         }
 
     def export_metrics(self) -> Dict[str, Any]:
@@ -360,34 +360,38 @@ class SixSigmaTelemetry:
             "metrics_history": [m.to_dict() for m in self.metrics_history],
             "summary": {
                 "total_sessions": len(self.metrics_history),
-                "average_dpmo": round(statistics.mean([m.dpmo for m in self.metrics_history]), 2) if self.metrics_history else 0,
-                "average_sigma": round(statistics.mean([m.sigma_level for m in self.metrics_history]), 2) if self.metrics_history else 6.0,
-                "best_sigma": max([m.sigma_level for m in self.metrics_history]) if self.metrics_history else 6.0
-            }
+                "average_dpmo": round(statistics.mean([m.dpmo for m in self.metrics_history]), 2)
+                if self.metrics_history
+                else 0,
+                "average_sigma": round(statistics.mean([m.sigma_level for m in self.metrics_history]), 2)
+                if self.metrics_history
+                else 6.0,
+                "best_sigma": max([m.sigma_level for m in self.metrics_history]) if self.metrics_history else 6.0,
+            },
         }
 
     def save_metrics(self, filepath: Path):
         """Save metrics to file"""
-        with open(filepath, 'w') as f:
+        with open(filepath, "w") as f:
             json.dump(self.export_metrics(), f, indent=2, default=str)
 
     def load_metrics(self, filepath: Path):
         """Load metrics from file"""
-        with open(filepath, 'r') as f:
+        with open(filepath) as f:
             data = json.load(f)
             # Restore metrics history
-            for metric_data in data.get('metrics_history', []):
+            for metric_data in data.get("metrics_history", []):
                 metric = SixSigmaMetrics(
-                    dpmo=metric_data['dpmo'],
-                    rty=metric_data['rty'],
-                    sigma_level=metric_data['sigma_level'],
-                    process_capability=metric_data['process_capability'],
-                    quality_level=QualityLevel[metric_data['quality_level']] if metric_data['quality_level'] else None,
-                    timestamp=datetime.fromisoformat(metric_data['timestamp']),
-                    process_name=metric_data['process_name'],
-                    sample_size=metric_data['sample_size'],
-                    defect_count=metric_data['defect_count'],
-                    opportunity_count=metric_data['opportunity_count'],
-                    connascence_metrics=metric_data.get('connascence_metrics', {})
+                    dpmo=metric_data["dpmo"],
+                    rty=metric_data["rty"],
+                    sigma_level=metric_data["sigma_level"],
+                    process_capability=metric_data["process_capability"],
+                    quality_level=QualityLevel[metric_data["quality_level"]] if metric_data["quality_level"] else None,
+                    timestamp=datetime.fromisoformat(metric_data["timestamp"]),
+                    process_name=metric_data["process_name"],
+                    sample_size=metric_data["sample_size"],
+                    defect_count=metric_data["defect_count"],
+                    opportunity_count=metric_data["opportunity_count"],
+                    connascence_metrics=metric_data.get("connascence_metrics", {}),
                 )
                 self.metrics_history.append(metric)

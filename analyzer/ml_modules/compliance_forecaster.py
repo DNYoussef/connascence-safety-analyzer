@@ -15,17 +15,17 @@ Forecasting Capabilities:
 @compliance NASA-POT10, DFARS, NIST-SSDF
 """
 
-import json
-from typing import Dict, List, Optional, Tuple
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime, timedelta
+import json
 import logging
+from typing import Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
 try:
-    from sklearn.linear_model import LinearRegression
     import numpy as np
+    from sklearn.linear_model import LinearRegression
 
     SKLEARN_AVAILABLE = True
 except ImportError:
@@ -57,7 +57,6 @@ class ComplianceForecast:
 
 
 class ComplianceForecaster:
-
     CERTIFICATION_THRESHOLD = 0.95
     CATEGORIES = ["code", "testing", "security", "documentation"]
 
@@ -149,7 +148,7 @@ class ComplianceForecaster:
             certification_readiness=readiness,
             estimated_remediation_days=remediation_days,
             compliance_gaps=compliance_gaps,
-            recommendations=recommendations
+            recommendations=recommendations,
         )
 
     def _simple_forecast(self, target_dt: datetime) -> ComplianceForecast:
@@ -165,8 +164,9 @@ class ComplianceForecaster:
         avg_documentation = sum(s.documentation_compliance for s in recent) / len(recent)
 
         if len(recent) >= 2:
-            days_elapsed = (self._parse_timestamp(recent[-1].timestamp) -
-                          self._parse_timestamp(recent[0].timestamp)).days or 1
+            days_elapsed = (
+                self._parse_timestamp(recent[-1].timestamp) - self._parse_timestamp(recent[0].timestamp)
+            ).days or 1
             overall_trend = (recent[-1].nasa_compliance - recent[0].nasa_compliance) / days_elapsed
 
             days_to_target = (target_dt - self._parse_timestamp(recent[-1].timestamp)).days
@@ -178,7 +178,7 @@ class ComplianceForecaster:
             "code": avg_code,
             "testing": avg_testing,
             "security": avg_security,
-            "documentation": avg_documentation
+            "documentation": avg_documentation,
         }
 
         compliance_gaps = self._identify_gaps(forecasted_overall, forecasted_categories)
@@ -205,30 +205,34 @@ class ComplianceForecaster:
             certification_readiness=readiness,
             estimated_remediation_days=remediation_days,
             compliance_gaps=compliance_gaps,
-            recommendations=recommendations
+            recommendations=recommendations,
         )
 
     def _identify_gaps(self, overall: float, categories: Dict[str, float]) -> List[Dict[str, any]]:
         gaps = []
 
         if overall < self.CERTIFICATION_THRESHOLD:
-            gaps.append({
-                "category": "overall",
-                "current": overall,
-                "target": self.CERTIFICATION_THRESHOLD,
-                "gap": self.CERTIFICATION_THRESHOLD - overall,
-                "severity": "critical" if overall < 0.80 else "high"
-            })
+            gaps.append(
+                {
+                    "category": "overall",
+                    "current": overall,
+                    "target": self.CERTIFICATION_THRESHOLD,
+                    "gap": self.CERTIFICATION_THRESHOLD - overall,
+                    "severity": "critical" if overall < 0.80 else "high",
+                }
+            )
 
         for category, score in categories.items():
             if score < self.CERTIFICATION_THRESHOLD:
-                gaps.append({
-                    "category": category,
-                    "current": score,
-                    "target": self.CERTIFICATION_THRESHOLD,
-                    "gap": self.CERTIFICATION_THRESHOLD - score,
-                    "severity": "critical" if score < 0.80 else "high" if score < 0.90 else "medium"
-                })
+                gaps.append(
+                    {
+                        "category": category,
+                        "current": score,
+                        "target": self.CERTIFICATION_THRESHOLD,
+                        "gap": self.CERTIFICATION_THRESHOLD - score,
+                        "severity": "critical" if score < 0.80 else "high" if score < 0.90 else "medium",
+                    }
+                )
 
         return sorted(gaps, key=lambda x: x["gap"], reverse=True)
 
@@ -243,13 +247,12 @@ class ComplianceForecaster:
         if avg_velocity > 0:
             days_needed = int(gap / avg_velocity)
             return max(0, days_needed)
+        elif gap < 0.05:
+            return 7
+        elif gap < 0.10:
+            return 21
         else:
-            if gap < 0.05:
-                return 7
-            elif gap < 0.10:
-                return 21
-            else:
-                return 60
+            return 60
 
     def _calculate_improvement_velocity(self) -> float:
         if len(self.history) < 2:
@@ -260,14 +263,12 @@ class ComplianceForecaster:
         if len(recent) < 2:
             return 0.0
 
-        days = (self._parse_timestamp(recent[-1].timestamp) -
-               self._parse_timestamp(recent[0].timestamp)).days or 1
+        days = (self._parse_timestamp(recent[-1].timestamp) - self._parse_timestamp(recent[0].timestamp)).days or 1
         compliance_delta = recent[-1].nasa_compliance - recent[0].nasa_compliance
 
         return compliance_delta / days
 
-    def _generate_recommendations(self, categories: Dict[str, float],
-                                  gaps: List[Dict[str, any]]) -> List[str]:
+    def _generate_recommendations(self, categories: Dict[str, float], gaps: List[Dict[str, any]]) -> List[str]:
         recommendations = []
 
         for gap in gaps[:3]:
@@ -304,21 +305,16 @@ class ComplianceForecaster:
         return ComplianceForecast(
             target_date=target_dt.isoformat(),
             forecasted_overall_compliance=0.85,
-            forecasted_category_compliance={
-                "code": 0.85,
-                "testing": 0.80,
-                "security": 0.90,
-                "documentation": 0.80
-            },
+            forecasted_category_compliance={"code": 0.85, "testing": 0.80, "security": 0.90, "documentation": 0.80},
             certification_readiness="in_progress",
             estimated_remediation_days=30,
             compliance_gaps=[],
-            recommendations=["Establish compliance baseline with more snapshots"]
+            recommendations=["Establish compliance baseline with more snapshots"],
         )
 
     def _parse_timestamp(self, timestamp: str) -> datetime:
         try:
-            return datetime.fromisoformat(timestamp.replace('Z', '+00:00'))
+            return datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
         except Exception:
             return datetime.now()
 
@@ -326,15 +322,15 @@ class ComplianceForecaster:
 def main():
     import argparse
 
-    parser = argparse.ArgumentParser(description='Compliance Forecaster')
-    parser.add_argument('--history', required=True, help='Path to compliance history JSON')
-    parser.add_argument('--target-date', help='Target certification date (ISO format)')
-    parser.add_argument('--days-ahead', type=int, default=30, help='Days to forecast ahead')
-    parser.add_argument('--output', help='Output file for forecast')
+    parser = argparse.ArgumentParser(description="Compliance Forecaster")
+    parser.add_argument("--history", required=True, help="Path to compliance history JSON")
+    parser.add_argument("--target-date", help="Target certification date (ISO format)")
+    parser.add_argument("--days-ahead", type=int, default=30, help="Days to forecast ahead")
+    parser.add_argument("--output", help="Output file for forecast")
 
     args = parser.parse_args()
 
-    with open(args.history, 'r') as f:
+    with open(args.history) as f:
         history_data = json.load(f)
 
     forecaster = ComplianceForecaster()
@@ -343,32 +339,27 @@ def main():
         snapshot = ComplianceSnapshot(**snapshot_data)
         forecaster.add_snapshot(snapshot)
 
-    forecast = forecaster.forecast(
-        target_date=args.target_date,
-        days_ahead=args.days_ahead
-    )
+    forecast = forecaster.forecast(target_date=args.target_date, days_ahead=args.days_ahead)
 
     result = {
         "target_date": forecast.target_date,
         "forecasted_overall_compliance": f"{forecast.forecasted_overall_compliance:.1%}",
-        "forecasted_category_compliance": {
-            k: f"{v:.1%}" for k, v in forecast.forecasted_category_compliance.items()
-        },
+        "forecasted_category_compliance": {k: f"{v:.1%}" for k, v in forecast.forecasted_category_compliance.items()},
         "certification_readiness": forecast.certification_readiness,
         "estimated_remediation_days": forecast.estimated_remediation_days,
         "compliance_gaps": forecast.compliance_gaps,
         "recommendations": forecast.recommendations,
-        "snapshots_analyzed": len(forecaster.history)
+        "snapshots_analyzed": len(forecaster.history),
     }
 
     if args.output:
-        with open(args.output, 'w') as f:
+        with open(args.output, "w") as f:
             json.dump(result, f, indent=2)
         print(f"Forecast saved to {args.output}")
     else:
         print(json.dumps(result, indent=2))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     main()

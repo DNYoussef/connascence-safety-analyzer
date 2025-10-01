@@ -27,6 +27,7 @@ logger = logging.getLogger(__name__)
 
 class ImportStatus(Enum):
     """Status of module import."""
+
     SUCCESS = "success"
     FAILED = "failed"
     FALLBACK = "fallback"
@@ -37,6 +38,7 @@ class ImportStatus(Enum):
 @dataclass
 class ImportResult:
     """Result of a module import attempt."""
+
     module: Optional[Any]
     status: ImportStatus
     error_message: Optional[str] = None
@@ -58,6 +60,7 @@ class ImportResult:
 @dataclass
 class ImportSpec:
     """Specification for a module import."""
+
     module_name: str
     attribute_name: Optional[str] = None
     fallback_modules: List[str] = field(default_factory=list)
@@ -107,7 +110,7 @@ class UnifiedImportManager:
             base_path / "integrations",
             base_path / "autofix",
             base_path / "grammar",
-            base_path / "experimental" / "src"
+            base_path / "experimental" / "src",
         ]
 
         for path in common_paths:
@@ -122,9 +125,7 @@ class UnifiedImportManager:
             if str(path) not in sys.path:
                 sys.path.insert(0, str(path))
 
-    def register_fallback(self,
-                         primary_module: str,
-                         fallback_data: Dict[str, Any]):
+    def register_fallback(self, primary_module: str, fallback_data: Dict[str, Any]):
         """Register fallback data for when a module cannot be imported."""
         self._fallback_registry[primary_module] = fallback_data
 
@@ -163,7 +164,7 @@ class UnifiedImportManager:
                     module=None,
                     status=ImportStatus.VERSION_MISMATCH,
                     error_message=f"Version requirement not met: {spec.min_version}",
-                    import_path=spec.module_name
+                    import_path=spec.module_name,
                 )
 
             result.import_path = spec.module_name
@@ -184,10 +185,7 @@ class UnifiedImportManager:
             try:
                 module = spec.custom_loader()
                 return ImportResult(
-                    module=module,
-                    status=ImportStatus.SUCCESS,
-                    fallback_used=True,
-                    import_path="custom_loader"
+                    module=module, status=ImportStatus.SUCCESS, fallback_used=True, import_path="custom_loader"
                 )
             except Exception as e:
                 logger.warning(f"Custom loader failed: {e}")
@@ -196,10 +194,7 @@ class UnifiedImportManager:
         if spec.module_name in self._fallback_registry:
             fallback_data = self._fallback_registry[spec.module_name]
             return ImportResult(
-                module=fallback_data,
-                status=ImportStatus.FALLBACK,
-                fallback_used=True,
-                import_path="fallback_registry"
+                module=fallback_data, status=ImportStatus.FALLBACK, fallback_used=True, import_path="fallback_registry"
             )
 
         # All import attempts failed
@@ -209,12 +204,7 @@ class UnifiedImportManager:
 
         status = ImportStatus.NOT_FOUND if spec.required else ImportStatus.FAILED
 
-        return ImportResult(
-            module=None,
-            status=status,
-            error_message=error_msg,
-            import_path=spec.module_name
-        )
+        return ImportResult(module=None, status=status, error_message=error_msg, import_path=spec.module_name)
 
     def _try_import_single(self, module_name: str, attribute_name: Optional[str] = None) -> ImportResult:
         """Try to import a single module."""
@@ -230,13 +220,10 @@ class UnifiedImportManager:
                     return ImportResult(
                         module=None,
                         status=ImportStatus.FAILED,
-                        error_message=f"Attribute {attribute_name} not found in {module_name}"
+                        error_message=f"Attribute {attribute_name} not found in {module_name}",
                     )
 
-            return ImportResult(
-                module=module,
-                status=ImportStatus.SUCCESS
-            )
+            return ImportResult(module=module, status=ImportStatus.SUCCESS)
 
         except ImportError as e:
             # Try searching in additional paths
@@ -252,33 +239,26 @@ class UnifiedImportManager:
                             if attribute_name:
                                 module = getattr(module, attribute_name)
 
-                            return ImportResult(
-                                module=module,
-                                status=ImportStatus.SUCCESS
-                            )
+                            return ImportResult(module=module, status=ImportStatus.SUCCESS)
                     except Exception as path_error:
                         logger.debug(f"Failed to load {module_name} from {search_path}: {path_error}")
                         continue
 
-            return ImportResult(
-                module=None,
-                status=ImportStatus.FAILED,
-                error_message=str(e)
-            )
+            return ImportResult(module=None, status=ImportStatus.FAILED, error_message=str(e))
 
     def _check_version(self, module: Any, min_version: str) -> bool:
         """Check if module meets minimum version requirement."""
         try:
             # Try common version attributes
-            for attr in ['__version__', 'version', 'VERSION']:
+            for attr in ["__version__", "version", "VERSION"]:
                 if hasattr(module, attr):
                     version = getattr(module, attr)
                     if isinstance(version, str):
                         # Simple version comparison (for complex cases, use packaging.version)
                         return version >= min_version
-                    elif hasattr(version, '__iter__'):
+                    elif hasattr(version, "__iter__"):
                         # Handle version tuples like (1, 2, 3)
-                        version_str = '.'.join(map(str, version))
+                        version_str = ".".join(map(str, version))
                         return version_str >= min_version
 
             # If no version found, assume it's okay
@@ -293,7 +273,7 @@ class UnifiedImportManager:
         spec = ImportSpec(
             module_name="config.central_constants",
             fallback_modules=["analyzer.constants", "experimental.src.constants"],
-            required=True
+            required=True,
         )
         return self.import_module(spec)
 
@@ -303,7 +283,7 @@ class UnifiedImportManager:
             module_name="analyzer.unified_analyzer",
             attribute_name="UnifiedConnascenceAnalyzer",
             fallback_modules=["analyzer.core"],
-            required=False
+            required=False,
         )
         result = self.import_module(spec)
 
@@ -314,11 +294,7 @@ class UnifiedImportManager:
 
     def import_mcp_server(self) -> ImportResult:
         """Import MCP server components with fallbacks."""
-        spec = ImportSpec(
-            module_name="mcp.server",
-            fallback_modules=["utils.mcp_fallback"],
-            required=False
-        )
+        spec = ImportSpec(module_name="mcp.server", fallback_modules=["utils.mcp_fallback"], required=False)
         return self.import_module(spec)
 
     def import_reporting(self, reporter_type: str = "json") -> ImportResult:
@@ -326,13 +302,13 @@ class UnifiedImportManager:
         module_map = {
             "json": "analyzer.reporting.json",
             "sarif": "analyzer.reporting.sarif",
-            "markdown": "analyzer.reporting.markdown"
+            "markdown": "analyzer.reporting.markdown",
         }
 
         spec = ImportSpec(
             module_name=module_map.get(reporter_type, "analyzer.reporting.json"),
             fallback_modules=["analyzer.reporting"],
-            required=False
+            required=False,
         )
         return self.import_module(spec)
 
@@ -343,12 +319,12 @@ class UnifiedImportManager:
         for cache_key, result in self._import_cache.items():
             module_name = cache_key.split("::")[0]
             status[module_name] = {
-                'status': result.status.value,
-                'success': result.success,
-                'fallback_used': result.fallback_used,
-                'has_module': result.has_module,
-                'error': result.error_message,
-                'import_path': result.import_path
+                "status": result.status.value,
+                "success": result.success,
+                "fallback_used": result.fallback_used,
+                "has_module": result.has_module,
+                "error": result.error_message,
+                "import_path": result.import_path,
             }
 
         return status
@@ -365,9 +341,10 @@ class UnifiedImportManager:
 # Global import manager instance
 IMPORT_MANAGER = UnifiedImportManager()
 
-def import_with_fallback(module_name: str,
-                        attribute_name: Optional[str] = None,
-                        fallback_modules: Optional[List[str]] = None) -> ImportResult:
+
+def import_with_fallback(
+    module_name: str, attribute_name: Optional[str] = None, fallback_modules: Optional[List[str]] = None
+) -> ImportResult:
     """
     Convenience function for importing with fallbacks.
 
@@ -380,10 +357,7 @@ def import_with_fallback(module_name: str,
         ImportResult
     """
     spec = ImportSpec(
-        module_name=module_name,
-        attribute_name=attribute_name,
-        fallback_modules=fallback_modules or [],
-        required=False
+        module_name=module_name, attribute_name=attribute_name, fallback_modules=fallback_modules or [], required=False
     )
     return IMPORT_MANAGER.import_module(spec)
 
@@ -407,6 +381,7 @@ def safe_import(module_name: str, default=None) -> Any:
 # LEGACY COMPATIBILITY LAYER
 # =============================================================================
 
+
 def get_constants():
     """Legacy function to get constants with unified import strategy."""
     result = IMPORT_MANAGER.import_constants()
@@ -418,7 +393,7 @@ def get_constants():
         NASA_COMPLIANCE_THRESHOLD = 0.95
         MECE_QUALITY_THRESHOLD = 0.80
         OVERALL_QUALITY_THRESHOLD = 0.75
-        VIOLATION_WEIGHTS = {'critical': 10, 'high': 5, 'medium': 2, 'low': 1}
+        VIOLATION_WEIGHTS = {"critical": 10, "high": 5, "medium": 2, "low": 1}
 
     return MinimalConstants()
 
@@ -430,16 +405,21 @@ def get_unified_analyzer():
 
 
 # Register common fallbacks
-IMPORT_MANAGER.register_fallback("analyzer.core", {
-    "UNIFIED_ANALYZER_AVAILABLE": False,
-    "ConnascenceViolation": type("MockViolation", (), {})
-})
+IMPORT_MANAGER.register_fallback(
+    "analyzer.core", {"UNIFIED_ANALYZER_AVAILABLE": False, "ConnascenceViolation": type("MockViolation", (), {})}
+)
 
 # Add analyzer-specific constants
 IMPORT_MANAGER.register_fallback("constants", get_constants())
 
 __all__ = [
-    'UnifiedImportManager', 'ImportSpec', 'ImportResult', 'ImportStatus',
-    'IMPORT_MANAGER', 'import_with_fallback', 'safe_import',
-    'get_constants', 'get_unified_analyzer'
+    "IMPORT_MANAGER",
+    "ImportResult",
+    "ImportSpec",
+    "ImportStatus",
+    "UnifiedImportManager",
+    "get_constants",
+    "get_unified_analyzer",
+    "import_with_fallback",
+    "safe_import",
 ]

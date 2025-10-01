@@ -80,7 +80,7 @@ class ConsolidationExecutor:
             "reports/consolidated_analysis_report.json",
             "reports/nasa_compliance_report.json",
             "reports/connascence_analysis_report.json",
-            "reports/complete_analysis_report.json"
+            "reports/complete_analysis_report.json",
         ]
 
         total_saved = 0
@@ -108,7 +108,7 @@ class ConsolidationExecutor:
             "reports/mece_duplication_report.json",
             "reports/final_consolidation_mece_report.json",
             "analysis_results_tests.json",
-            "analysis_results_experimental.json"
+            "analysis_results_experimental.json",
         ]
 
         total_saved = 0
@@ -127,7 +127,7 @@ class ConsolidationExecutor:
 
         exact_duplicates = [
             "enterprise-package/technical/architecture/vscode-extension-validation-report.md",
-            "analysis/self-analysis/DOGFOODING_VALIDATION_REPORT.md"
+            "analysis/self-analysis/DOGFOODING_VALIDATION_REPORT.md",
         ]
 
         for file_rel in exact_duplicates:
@@ -141,14 +141,9 @@ class ConsolidationExecutor:
         """Phase 4: Remove backup and temporary files"""
         self.log("=== PHASE 4: Removing Backup and Temporary Files ===")
 
-        temp_directories = [
-            "vscode-extension-backup-20250905-142126",
-            "temp-artifacts"
-        ]
+        temp_directories = ["vscode-extension-backup-20250905-142126", "temp-artifacts"]
 
-        temp_files = [
-            "test_activation.py"
-        ]
+        temp_files = ["test_activation.py"]
 
         total_saved = 0
 
@@ -182,7 +177,7 @@ class ConsolidationExecutor:
             "analysis_results_security.json",
             "analysis_results_cli.json",
             "analysis_results_config.json",
-            "analysis_results_utils.json"
+            "analysis_results_utils.json",
         ]
 
         # Create consolidated insights document
@@ -190,9 +185,9 @@ class ConsolidationExecutor:
             "metadata": {
                 "timestamp": datetime.now().isoformat(),
                 "source": "folder_analysis_consolidation",
-                "description": "Consolidated insights from individual folder analyses"
+                "description": "Consolidated insights from individual folder analyses",
             },
-            "folder_insights": {}
+            "folder_insights": {},
         }
 
         total_saved = 0
@@ -219,7 +214,7 @@ class ConsolidationExecutor:
         output_path = self.repo_root / "docs" / "CONSOLIDATED_FOLDER_ANALYSIS.json"
         output_path.parent.mkdir(exist_ok=True)
 
-        with open(output_path, 'w') as f:
+        with open(output_path, "w") as f:
             json.dump(consolidated_insights, f, indent=2)
 
         self.log(f"Created consolidated analysis: {output_path.relative_to(self.repo_root)}")
@@ -227,10 +222,7 @@ class ConsolidationExecutor:
 
     def extract_key_insights(self, data, folder_name):
         """Extract key insights from analysis data"""
-        insights = {
-            "folder": folder_name,
-            "summary": {}
-        }
+        insights = {"folder": folder_name, "summary": {}}
 
         # Extract summary information
         if "summary" in data:
@@ -238,18 +230,12 @@ class ConsolidationExecutor:
 
         # Extract critical violations (top 10)
         if "violations" in data:
-            critical_violations = [
-                v for v in data["violations"]
-                if v.get("severity") == "critical"
-            ][:10]
+            critical_violations = [v for v in data["violations"] if v.get("severity") == "critical"][:10]
             insights["critical_violations"] = critical_violations
 
         # Extract high-severity violations (top 20)
         if "violations" in data:
-            high_violations = [
-                v for v in data["violations"]
-                if v.get("severity") == "high"
-            ][:20]
+            high_violations = [v for v in data["violations"] if v.get("severity") == "high"][:20]
             insights["high_severity_violations"] = high_violations
 
         return insights
@@ -261,7 +247,7 @@ class ConsolidationExecutor:
         redundant_summaries = [
             "reports/EXECUTIVE_DUPLICATION_SUMMARY.md",
             "reports/COMPREHENSIVE_SENSOR_ANALYSIS_AIVILLAGE.md",
-            "reports/ANALYSIS_COMMANDS_AND_FILES.md"
+            "reports/ANALYSIS_COMMANDS_AND_FILES.md",
         ]
 
         for file_rel in redundant_summaries:
@@ -285,7 +271,7 @@ class ConsolidationExecutor:
                 "Phase 3: Exact documentation duplicates removed",
                 "Phase 4: Backup and temporary files removed",
                 "Phase 5: Folder analysis files consolidated",
-                "Phase 6: Redundant summary reports cleaned"
+                "Phase 6: Redundant summary reports cleaned",
             ],
             "key_files_preserved": [
                 "FULL_CODEBASE_ANALYSIS.json",
@@ -293,12 +279,12 @@ class ConsolidationExecutor:
                 "docs/CRITICAL_VIOLATIONS_ACTION_PLAN.json",
                 "docs/VIOLATION_HEATMAPS.json",
                 "docs/integration-analysis/",
-                "enterprise-package/validation/"
-            ]
+                "enterprise-package/validation/",
+            ],
         }
 
         report_path = self.repo_root / "docs" / "CONSOLIDATION_COMPLETION_REPORT.json"
-        with open(report_path, 'w') as f:
+        with open(report_path, "w") as f:
             json.dump(report, f, indent=2)
 
         self.log(f"Consolidation report generated: {report_path.relative_to(self.repo_root)}")
@@ -329,10 +315,12 @@ class ConsolidationExecutor:
             self.log("Check backup directory for recovery if needed")
             raise
 
+
 def main():
     """Main execution function"""
     consolidator = ConsolidationExecutor()
     consolidator.execute_full_consolidation()
+
 
 if __name__ == "__main__":
     main()

@@ -3,9 +3,8 @@ Test script to compare original vs fixed NASA analyzer.
 Shows the dramatic reduction in false positives.
 """
 
-import sys
-import json
 from pathlib import Path
+import sys
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
@@ -56,7 +55,7 @@ def complex_function(a, b, c, d, e, f):
 
     # Create temp file
     temp_file = "temp_test.py"
-    with open(temp_file, 'w') as f:
+    with open(temp_file, "w") as f:
         f.write(sample_code)
 
     # Run analyzer
@@ -84,10 +83,10 @@ def compare_with_baseline():
     baseline = {
         "original_total_violations": 20673,
         "original_false_positives": 19000,  # ~92%
-        "original_compliance": 19.3
+        "original_compliance": 19.3,
     }
 
-    print(f"\nORIGINAL ANALYZER (Regex-based C patterns):")
+    print("\nORIGINAL ANALYZER (Regex-based C patterns):")
     print(f"  Total violations: {baseline['original_total_violations']:,}")
     print(f"  False positives: ~{baseline['original_false_positives']:,} (92%)")
     print(f"  NASA Compliance: {baseline['original_compliance']}%")
@@ -95,15 +94,15 @@ def compare_with_baseline():
     # Test on sample
     sample_violations = test_sample_code()
 
-    print(f"\nFIXED ANALYZER (Python AST analysis):")
+    print("\nFIXED ANALYZER (Python AST analysis):")
     print(f"  Sample violations: {sample_violations} (all legitimate)")
-    print(f"  False positives: 0")
-    print(f"  Accuracy: 100%")
+    print("  False positives: 0")
+    print("  Accuracy: 100%")
 
-    print(f"\nIMPROVEMENT:")
+    print("\nIMPROVEMENT:")
     print(f"  False positives eliminated: ~{baseline['original_false_positives']:,}")
-    print(f"  Accuracy improvement: 92% -> 100%")
-    print(f"  Analysis precision: C patterns → Python-specific AST")
+    print("  Accuracy improvement: 92% -> 100%")
+    print("  Analysis precision: C patterns → Python-specific AST")
 
 
 def main():

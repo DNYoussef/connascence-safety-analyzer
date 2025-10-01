@@ -5,24 +5,26 @@ Extracted from ConnascenceDetector to follow Single Responsibility Principle.
 """
 import ast
 from typing import List
+
 from utils.types import ConnascenceViolation
 
 
 class PositionDetector(ast.NodeVisitor):
     """Detects functions with excessive positional parameters (>3)."""
-    
+
     def __init__(self, file_path: str, source_lines: List[str]):
         self.file_path = file_path
         self.source_lines = source_lines
         self.violations: List[ConnascenceViolation] = []
         self.positional_params: List[tuple[ast.FunctionDef, int]] = []
-    
+
     # get_code_snippet method consolidated - use utility function from utils module
     def get_code_snippet(self, node: ast.AST, context_lines: int = 2) -> str:
         """Extract code snippet around the given node. Consolidated implementation."""
         from analyzer.utils.code_utils import get_code_snippet_for_node
+
         return get_code_snippet_for_node(node, self.source_lines, context_lines)
-    
+
     def visit_FunctionDef(self, node: ast.FunctionDef):
         """Detect Connascence of Position violations in function definitions."""
         # Check for Connascence of Position (>3 positional parameters)
@@ -44,7 +46,7 @@ class PositionDetector(ast.NodeVisitor):
             )
 
         self.generic_visit(node)
-    
+
     def detect(self, tree: ast.AST) -> List[ConnascenceViolation]:
         """Run position detection and return violations."""
         self.visit(tree)

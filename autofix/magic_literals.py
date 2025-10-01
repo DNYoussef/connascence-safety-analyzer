@@ -24,12 +24,14 @@ import re
 from typing import Any, List, Optional
 
 from utils.types import ConnascenceViolation
+
 from .patch_api import PatchSuggestion
 
 
 @dataclass
 class MagicLiteralContext:
     """Context information for a magic literal."""
+
     value: Any
     type_name: str
     usage_context: str  # 'condition', 'assignment', 'return', etc.
@@ -45,14 +47,15 @@ class MagicLiteralFixer:
         self.ignored_values = {0, 1, -1, 2, True, False, None, ""}
         self.ignored_containers = [[], (), {}]  # Keep unhashable types separately
         self.common_patterns = {
-            'http_status': r'[45]\d{2}',  # HTTP status codes
-            'port': r'^(80|443|8080|3000|5000)$',
-            'percentage': r'^(100|50|25|75)$',
-            'time': r'^(60|3600|86400)$'  # seconds, minute, hour, day
+            "http_status": r"[45]\d{2}",  # HTTP status codes
+            "port": r"^(80|443|8080|3000|5000)$",
+            "percentage": r"^(100|50|25|75)$",
+            "time": r"^(60|3600|86400)$",  # seconds, minute, hour, day
         }
 
-    def generate_patch(self, violation: ConnascenceViolation,
-                      tree: ast.AST, source_code: str) -> Optional[PatchSuggestion]:
+    def generate_patch(
+        self, violation: ConnascenceViolation, tree: ast.AST, source_code: str
+    ) -> Optional[PatchSuggestion]:
         """Generate patch for a magic literal violation."""
         context = self._extract_context(violation, tree, source_code)
         if not context or context.value in self.ignored_values:
@@ -76,11 +79,12 @@ class MagicLiteralFixer:
             file_path=violation.file_path,
             line_range=(violation.line_number, violation.line_number),
             safety_level=self._assess_safety(context),
-            rollback_info={}
+            rollback_info={},
         )
 
-    def _extract_context(self, violation: ConnascenceViolation,
-                        tree: ast.AST, source_code: str) -> Optional[MagicLiteralContext]:
+    def _extract_context(
+        self, violation: ConnascenceViolation, tree: ast.AST, source_code: str
+    ) -> Optional[MagicLiteralContext]:
         """Extract context information about the magic literal."""
         lines = source_code.splitlines()
         if violation.line_number > len(lines):
@@ -103,11 +107,11 @@ class MagicLiteralFixer:
         surrounding_vars = context_analyzer.get_nearby_variables(violation.line_number)
 
         return MagicLiteralContext(
-            value=node.value if hasattr(node, 'value') else node.s,
-            type_name=type(node.value).__name__ if hasattr(node, 'value') else 'str',
+            value=node.value if hasattr(node, "value") else node.s,
+            type_name=type(node.value).__name__ if hasattr(node, "value") else "str",
             usage_context=usage_context,
             surrounding_code=target_line.strip(),
-            variable_names=surrounding_vars
+            variable_names=surrounding_vars,
         )
 
     def _generate_constant_name(self, context: MagicLiteralContext) -> str:
@@ -117,12 +121,16 @@ class MagicLiteralFixer:
         # Check common patterns
         for pattern_name, pattern in self.common_patterns.items():
             if re.match(pattern, value_str):
-                return f"{pattern_name.upper()}_{value_str}".replace('.', '_')
+                return f"{pattern_name.upper()}_{value_str}".replace(".", "_")
 
         # Use context clues
-        if context.usage_context == 'condition':
+        if context.usage_context == "condition":
             if isinstance(context.value, (int, float)):
-                return f"MAX_{self._extract_concept(context)}" if context.value > 0 else f"MIN_{self._extract_concept(context)}"
+                return (
+                    f"MAX_{self._extract_concept(context)}"
+                    if context.value > 0
+                    else f"MIN_{self._extract_concept(context)}"
+                )
 
         # Use surrounding variable names
         if context.variable_names:
@@ -134,7 +142,7 @@ class MagicLiteralFixer:
 
         # Fallback based on value type and content
         if isinstance(context.value, str):
-            clean_value = re.sub(r'[^\w]', '_', context.value).upper()[:20]
+            clean_value = re.sub(r"[^\w]", "_", context.value).upper()[:20]
             return f"DEFAULT_{clean_value}" if clean_value else "DEFAULT_STRING"
         elif isinstance(context.value, (int, float)):
             return f"DEFAULT_VALUE_{abs(context.value)}"
@@ -146,12 +154,12 @@ class MagicLiteralFixer:
         code = context.surrounding_code.lower()
 
         concepts = {
-            'size': ['len', 'size', 'count', 'length'],
-            'age': ['age', 'year', 'old'],
-            'price': ['price', 'cost', 'amount', 'fee'],
-            'time': ['time', 'hour', 'minute', 'second', 'day'],
-            'score': ['score', 'rating', 'points'],
-            'id': ['id', 'identifier', 'key']
+            "size": ["len", "size", "count", "length"],
+            "age": ["age", "year", "old"],
+            "price": ["price", "cost", "amount", "fee"],
+            "time": ["time", "hour", "minute", "second", "day"],
+            "score": ["score", "rating", "points"],
+            "id": ["id", "identifier", "key"],
         }
 
         for concept, keywords in concepts.items():
@@ -176,7 +184,7 @@ class MagicLiteralFixer:
             confidence += 0.1
 
         # Context-based confidence
-        if context.usage_context in ['condition', 'assignment']:
+        if context.usage_context in ["condition", "assignment"]:
             confidence += 0.1
 
         # Reduce confidence for simple cases
@@ -189,17 +197,17 @@ class MagicLiteralFixer:
         """Assess safety level of the transformation."""
         # String literals are generally safe to extract
         if isinstance(context.value, str):
-            return 'safe'
+            return "safe"
 
         # Small integers might be algorithmic
         if isinstance(context.value, int) and abs(context.value) <= 5:
-            return 'risky'
+            return "risky"
 
         # Large numbers are usually configuration
         if isinstance(context.value, (int, float)) and abs(context.value) > 100:
-            return 'safe'
+            return "safe"
 
-        return 'moderate'
+        return "moderate"
 
     def _get_old_code(self, violation: ConnascenceViolation, source: str) -> str:
         """Extract the old code line."""
@@ -208,8 +216,7 @@ class MagicLiteralFixer:
             return lines[violation.line_number - 1]
         return ""
 
-    def _generate_new_code(self, old_code: str, context: MagicLiteralContext,
-                          constant_name: str) -> str:
+    def _generate_new_code(self, old_code: str, context: MagicLiteralContext, constant_name: str) -> str:
         """Generate new code with constant reference."""
         value_str = repr(context.value)
 
@@ -233,17 +240,17 @@ class MagicLiteralVisitor(ast.NodeVisitor):
         self.found_literal = None
 
     def visit_Constant(self, node):
-        if hasattr(node, 'lineno') and node.lineno == self.target_line:
+        if hasattr(node, "lineno") and node.lineno == self.target_line:
             self.found_literal = node
         self.generic_visit(node)
 
     def visit_Str(self, node):  # Python < 3.8 compatibility
-        if hasattr(node, 'lineno') and node.lineno == self.target_line:
+        if hasattr(node, "lineno") and node.lineno == self.target_line:
             self.found_literal = node
         self.generic_visit(node)
 
     def visit_Num(self, node):  # Python < 3.8 compatibility
-        if hasattr(node, 'lineno') and node.lineno == self.target_line:
+        if hasattr(node, "lineno") and node.lineno == self.target_line:
             self.found_literal = node
         self.generic_visit(node)
 
@@ -257,18 +264,18 @@ class ContextAnalyzer(ast.NodeVisitor):
 
     def visit_Compare(self, node):
         """Track comparison contexts."""
-        if hasattr(node, 'lineno'):
-            self.contexts[id(node)] = 'condition'
+        if hasattr(node, "lineno"):
+            self.contexts[id(node)] = "condition"
         self.generic_visit(node)
 
     def visit_Assign(self, node):
         """Track assignment contexts."""
-        if hasattr(node, 'lineno'):
-            self.contexts[id(node.value)] = 'assignment'
+        if hasattr(node, "lineno"):
+            self.contexts[id(node.value)] = "assignment"
             # Track variable names
             for target in node.targets:
                 if isinstance(target, ast.Name):
-                    line = getattr(node, 'lineno', 0)
+                    line = getattr(node, "lineno", 0)
                     if line not in self.variables_by_line:
                         self.variables_by_line[line] = []
                     self.variables_by_line[line].append(target.id)
@@ -276,13 +283,13 @@ class ContextAnalyzer(ast.NodeVisitor):
 
     def visit_Return(self, node):
         """Track return contexts."""
-        if hasattr(node, 'lineno') and node.value:
-            self.contexts[id(node.value)] = 'return'
+        if hasattr(node, "lineno") and node.value:
+            self.contexts[id(node.value)] = "return"
         self.generic_visit(node)
 
     def get_usage_context(self, node) -> str:
         """Get usage context for a node."""
-        return self.contexts.get(id(node), 'unknown')
+        return self.contexts.get(id(node), "unknown")
 
     def get_nearby_variables(self, line_number: int) -> List[str]:
         """Get variable names near the given line."""

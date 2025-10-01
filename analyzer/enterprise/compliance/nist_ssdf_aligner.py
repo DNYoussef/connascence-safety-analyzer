@@ -20,11 +20,11 @@ Focus Areas for Code Analysis:
 @compliance NIST-SSDF-1.1, EO-14028
 """
 
-import json
-from pathlib import Path
-from typing import Dict, List, Optional, Any
 from dataclasses import dataclass, field
+import json
 import logging
+from pathlib import Path
+from typing import Dict, List
 
 logger = logging.getLogger(__name__)
 
@@ -49,7 +49,6 @@ class SSDFReport:
 
 
 class NISTSSDFAligner:
-
     SSDF_PRACTICES = {
         "PO.1": "Define and use a secure software development framework",
         "PO.3": "Implement roles and responsibilities",
@@ -67,7 +66,7 @@ class NISTSSDFAligner:
         "PW.9": "Configure software to have secure settings by default",
         "RV.1": "Identify and confirm vulnerabilities",
         "RV.2": "Assess and prioritize vulnerabilities",
-        "RV.3": "Remediate vulnerabilities"
+        "RV.3": "Remediate vulnerabilities",
     }
 
     MATURITY_LEVELS = {
@@ -75,7 +74,7 @@ class NISTSSDFAligner:
         1: "Initial/Ad-hoc",
         2: "Managed",
         3: "Defined",
-        4: "Quantitatively Managed"
+        4: "Quantitatively Managed",
     }
 
     def __init__(self, project_root: str):
@@ -94,26 +93,33 @@ class NISTSSDFAligner:
         if docs_dir.exists():
             framework_docs.extend([str(f.relative_to(self.project_root)) for f in docs_dir.glob("*.md")])
 
-        practices.append(SSDFPractice(
-            practice_id="PO.1",
-            practice_name="Define and use a secure software development framework",
-            implementation_level="defined" if framework_docs else "initial",
-            evidence=framework_docs[:10],
-            gaps=[] if framework_docs else ["No documented secure development framework found"],
-            recommendations=[] if framework_docs else ["Document secure development processes and standards"]
-        ))
+        practices.append(
+            SSDFPractice(
+                practice_id="PO.1",
+                practice_name="Define and use a secure software development framework",
+                implementation_level="defined" if framework_docs else "initial",
+                evidence=framework_docs[:10],
+                gaps=[] if framework_docs else ["No documented secure development framework found"],
+                recommendations=[] if framework_docs else ["Document secure development processes and standards"],
+            )
+        )
 
-        ci_cd = list(self.project_root.glob(".github/workflows/*.yml")) + \
-               list(self.project_root.glob(".github/workflows/*.yaml"))
+        ci_cd = list(self.project_root.glob(".github/workflows/*.yml")) + list(
+            self.project_root.glob(".github/workflows/*.yaml")
+        )
 
-        practices.append(SSDFPractice(
-            practice_id="PO.5",
-            practice_name="Implement and maintain secure environments",
-            implementation_level="defined" if ci_cd else "initial",
-            evidence=[str(f.relative_to(self.project_root)) for f in ci_cd[:5]],
-            gaps=[] if ci_cd else ["No automated build/deployment environment found"],
-            recommendations=["Maintain isolated dev/test/prod environments"] if ci_cd else ["Implement CI/CD with environment isolation"]
-        ))
+        practices.append(
+            SSDFPractice(
+                practice_id="PO.5",
+                practice_name="Implement and maintain secure environments",
+                implementation_level="defined" if ci_cd else "initial",
+                evidence=[str(f.relative_to(self.project_root)) for f in ci_cd[:5]],
+                gaps=[] if ci_cd else ["No automated build/deployment environment found"],
+                recommendations=["Maintain isolated dev/test/prod environments"]
+                if ci_cd
+                else ["Implement CI/CD with environment isolation"],
+            )
+        )
 
         self.practices.extend(practices)
         return practices
@@ -125,30 +131,33 @@ class NISTSSDFAligner:
         secrets_protected = False
 
         if gitignore.exists():
-            with open(gitignore, 'r') as f:
+            with open(gitignore) as f:
                 content = f.read()
-            secrets_protected = any(p in content for p in ['*.key', '*.pem', '.env', 'credentials', 'secrets'])
+            secrets_protected = any(p in content for p in ["*.key", "*.pem", ".env", "credentials", "secrets"])
 
-        practices.append(SSDFPractice(
-            practice_id="PS.1",
-            practice_name="Protect software from unauthorized access and tampering",
-            implementation_level="defined" if secrets_protected else "initial",
-            evidence=[".gitignore"] if secrets_protected else [],
-            gaps=[] if secrets_protected else ["Credential protection incomplete"],
-            recommendations=[] if secrets_protected else ["Protect all credential types in version control"]
-        ))
+        practices.append(
+            SSDFPractice(
+                practice_id="PS.1",
+                practice_name="Protect software from unauthorized access and tampering",
+                implementation_level="defined" if secrets_protected else "initial",
+                evidence=[".gitignore"] if secrets_protected else [],
+                gaps=[] if secrets_protected else ["Credential protection incomplete"],
+                recommendations=[] if secrets_protected else ["Protect all credential types in version control"],
+            )
+        )
 
-        security_docs = list(self.project_root.glob("**/SECURITY.md")) + \
-                       list(self.project_root.glob("**/security*.md"))
+        security_docs = list(self.project_root.glob("**/SECURITY.md")) + list(self.project_root.glob("**/security*.md"))
 
-        practices.append(SSDFPractice(
-            practice_id="PS.3",
-            practice_name="Define security requirements",
-            implementation_level="defined" if security_docs else "initial",
-            evidence=[str(f.relative_to(self.project_root)) for f in security_docs],
-            gaps=[] if security_docs else ["No documented security requirements found"],
-            recommendations=[] if security_docs else ["Create SECURITY.md with security requirements and policies"]
-        ))
+        practices.append(
+            SSDFPractice(
+                practice_id="PS.3",
+                practice_name="Define security requirements",
+                implementation_level="defined" if security_docs else "initial",
+                evidence=[str(f.relative_to(self.project_root)) for f in security_docs],
+                gaps=[] if security_docs else ["No documented security requirements found"],
+                recommendations=[] if security_docs else ["Create SECURITY.md with security requirements and policies"],
+            )
+        )
 
         self.practices.extend(practices)
         return practices
@@ -162,45 +171,55 @@ class NISTSSDFAligner:
             if test_dir.exists():
                 test_files.extend(list(test_dir.glob("**/*test*.py")))
 
-        practices.append(SSDFPractice(
-            practice_id="PW.1",
-            practice_name="Design software to meet security requirements",
-            implementation_level="defined" if test_files else "initial",
-            evidence=[str(f.relative_to(self.project_root)) for f in test_files[:10]],
-            gaps=[] if test_files else ["No automated security testing found"],
-            recommendations=["Maintain comprehensive security test coverage"] if test_files else ["Implement security-focused test suite"]
-        ))
+        practices.append(
+            SSDFPractice(
+                practice_id="PW.1",
+                practice_name="Design software to meet security requirements",
+                implementation_level="defined" if test_files else "initial",
+                evidence=[str(f.relative_to(self.project_root)) for f in test_files[:10]],
+                gaps=[] if test_files else ["No automated security testing found"],
+                recommendations=["Maintain comprehensive security test coverage"]
+                if test_files
+                else ["Implement security-focused test suite"],
+            )
+        )
 
         code_review_configs = [
             self.project_root / ".github" / "CODEOWNERS",
-            self.project_root / ".github" / "pull_request_template.md"
+            self.project_root / ".github" / "pull_request_template.md",
         ]
         review_process = [c for c in code_review_configs if c.exists()]
 
-        practices.append(SSDFPractice(
-            practice_id="PW.7",
-            practice_name="Review and/or analyze code",
-            implementation_level="defined" if review_process else "initial",
-            evidence=[str(f.relative_to(self.project_root)) for f in review_process],
-            gaps=[] if review_process else ["No formal code review process configured"],
-            recommendations=[] if review_process else ["Implement CODEOWNERS and PR review requirements"]
-        ))
+        practices.append(
+            SSDFPractice(
+                practice_id="PW.7",
+                practice_name="Review and/or analyze code",
+                implementation_level="defined" if review_process else "initial",
+                evidence=[str(f.relative_to(self.project_root)) for f in review_process],
+                gaps=[] if review_process else ["No formal code review process configured"],
+                recommendations=[] if review_process else ["Implement CODEOWNERS and PR review requirements"],
+            )
+        )
 
         security_scan_configs = [
             self.project_root / ".bandit",
             self.project_root / "bandit.yml",
-            self.project_root / ".github" / "workflows" / "security.yml"
+            self.project_root / ".github" / "workflows" / "security.yml",
         ]
         security_scans = [c for c in security_scan_configs if c.exists()]
 
-        practices.append(SSDFPractice(
-            practice_id="PW.8",
-            practice_name="Test executables",
-            implementation_level="quantitatively_managed" if security_scans else "initial",
-            evidence=[str(f.relative_to(self.project_root)) for f in security_scans],
-            gaps=[] if security_scans else ["No automated security scanning found"],
-            recommendations=["Track security scan metrics over time"] if security_scans else ["Implement Bandit and dependency scanning"]
-        ))
+        practices.append(
+            SSDFPractice(
+                practice_id="PW.8",
+                practice_name="Test executables",
+                implementation_level="quantitatively_managed" if security_scans else "initial",
+                evidence=[str(f.relative_to(self.project_root)) for f in security_scans],
+                gaps=[] if security_scans else ["No automated security scanning found"],
+                recommendations=["Track security scan metrics over time"]
+                if security_scans
+                else ["Implement Bandit and dependency scanning"],
+            )
+        )
 
         self.practices.extend(practices)
         return practices
@@ -211,26 +230,30 @@ class NISTSSDFAligner:
         security_policy = self.project_root / "SECURITY.md"
         vuln_response = security_policy.exists()
 
-        practices.append(SSDFPractice(
-            practice_id="RV.1",
-            practice_name="Identify and confirm vulnerabilities",
-            implementation_level="defined" if vuln_response else "initial",
-            evidence=["SECURITY.md"] if vuln_response else [],
-            gaps=[] if vuln_response else ["No vulnerability disclosure policy found"],
-            recommendations=[] if vuln_response else ["Create SECURITY.md with vulnerability reporting process"]
-        ))
+        practices.append(
+            SSDFPractice(
+                practice_id="RV.1",
+                practice_name="Identify and confirm vulnerabilities",
+                implementation_level="defined" if vuln_response else "initial",
+                evidence=["SECURITY.md"] if vuln_response else [],
+                gaps=[] if vuln_response else ["No vulnerability disclosure policy found"],
+                recommendations=[] if vuln_response else ["Create SECURITY.md with vulnerability reporting process"],
+            )
+        )
 
         dependabot_config = self.project_root / ".github" / "dependabot.yml"
         auto_patching = dependabot_config.exists()
 
-        practices.append(SSDFPractice(
-            practice_id="RV.3",
-            practice_name="Remediate vulnerabilities",
-            implementation_level="defined" if auto_patching else "initial",
-            evidence=["dependabot.yml"] if auto_patching else [],
-            gaps=[] if auto_patching else ["No automated vulnerability remediation configured"],
-            recommendations=[] if auto_patching else ["Configure Dependabot for automated dependency updates"]
-        ))
+        practices.append(
+            SSDFPractice(
+                practice_id="RV.3",
+                practice_name="Remediate vulnerabilities",
+                implementation_level="defined" if auto_patching else "initial",
+                evidence=["dependabot.yml"] if auto_patching else [],
+                gaps=[] if auto_patching else ["No automated vulnerability remediation configured"],
+                recommendations=[] if auto_patching else ["Configure Dependabot for automated dependency updates"],
+            )
+        )
 
         self.practices.extend(practices)
         return practices
@@ -249,12 +272,7 @@ class NISTSSDFAligner:
         if not self.practices:
             return self.MATURITY_LEVELS[0]
 
-        level_counts = {
-            "quantitatively_managed": 0,
-            "defined": 0,
-            "managed": 0,
-            "initial": 0
-        }
+        level_counts = {"quantitatively_managed": 0, "defined": 0, "managed": 0, "initial": 0}
 
         for practice in self.practices:
             level = practice.implementation_level
@@ -279,18 +297,20 @@ class NISTSSDFAligner:
         if not self.practices:
             self.assess_all_practices()
 
-        implemented = len([p for p in self.practices if p.implementation_level in ["defined", "quantitatively_managed"]])
+        implemented = len(
+            [p for p in self.practices if p.implementation_level in ["defined", "quantitatively_managed"]]
+        )
 
         maturity_level = self.calculate_maturity_level()
 
         group_summary = {}
         for practice_id in self.SSDF_PRACTICES.keys():
-            group = practice_id.split('.')[0]
+            group = practice_id.split(".")[0]
             if group not in group_summary:
                 group_summary[group] = {"quantitatively_managed": 0, "defined": 0, "managed": 0, "initial": 0}
 
         for practice in self.practices:
-            group = practice.practice_id.split('.')[0]
+            group = practice.practice_id.split(".")[0]
             if group in group_summary:
                 level = practice.implementation_level
                 if level in group_summary[group]:
@@ -301,7 +321,7 @@ class NISTSSDFAligner:
             implemented_practices=implemented,
             maturity_level=maturity_level,
             practice_assessments=self.practices,
-            group_summary=group_summary
+            group_summary=group_summary,
         )
 
     def export_report(self, report: SSDFReport, output_path: str):
@@ -310,7 +330,7 @@ class NISTSSDFAligner:
             "maturity_summary": {
                 "total_practices": report.total_practices,
                 "implemented_practices": report.implemented_practices,
-                "maturity_level": report.maturity_level
+                "maturity_level": report.maturity_level,
             },
             "group_summary": report.group_summary,
             "practice_assessments": [
@@ -321,13 +341,13 @@ class NISTSSDFAligner:
                     "evidence_count": len(p.evidence),
                     "evidence": p.evidence,
                     "gaps": p.gaps,
-                    "recommendations": p.recommendations
+                    "recommendations": p.recommendations,
                 }
                 for p in report.practice_assessments
-            ]
+            ],
         }
 
-        with open(output_path, 'w') as f:
+        with open(output_path, "w") as f:
             json.dump(report_data, f, indent=2)
 
         logger.info(f"NIST SSDF report exported to {output_path}")
@@ -336,9 +356,9 @@ class NISTSSDFAligner:
 def main():
     import argparse
 
-    parser = argparse.ArgumentParser(description='NIST SSDF Alignment Checker')
-    parser.add_argument('--project', default='.', help='Project root directory')
-    parser.add_argument('--output', default='nist-ssdf-alignment.json', help='Output file')
+    parser = argparse.ArgumentParser(description="NIST SSDF Alignment Checker")
+    parser.add_argument("--project", default=".", help="Project root directory")
+    parser.add_argument("--output", default="nist-ssdf-alignment.json", help="Output file")
 
     args = parser.parse_args()
 
@@ -364,6 +384,6 @@ def main():
     print(f"\nReport saved to: {args.output}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     main()

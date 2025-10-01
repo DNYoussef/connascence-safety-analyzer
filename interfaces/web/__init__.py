@@ -32,9 +32,4 @@ except ImportError:
 from .charts import ChartGenerator
 from .metrics import DashboardMetrics
 
-__all__ = [
-    'LocalDashboard',
-    'CIDashboard',
-    'DashboardMetrics',
-    'ChartGenerator'
-]
+__all__ = ["CIDashboard", "ChartGenerator", "DashboardMetrics", "LocalDashboard"]

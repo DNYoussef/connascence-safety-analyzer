@@ -10,11 +10,11 @@ NASA Rule 4 Compliant: Functions under 60 lines.
 Handles config loading, validation, and component initialization coordination.
 """
 
+from datetime import datetime
 import json
 import logging
 from pathlib import Path
 from typing import Any, Dict, List, Optional
-from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -46,7 +46,7 @@ class ConfigurationManager:
                 config = validated_config
                 self.config_loaded_at = self._get_iso_timestamp()
                 logger.info(f"Configuration loaded from {config_path}")
-                
+
             except Exception as e:
                 logger.error(f"Failed to load config from {config_path}: {e}")
                 self.validation_errors.append(f"Config load error: {e}")
@@ -59,12 +59,8 @@ class ConfigurationManager:
         # NASA Rule 5: Input validation
         assert config is not None, "config cannot be None"
         assert isinstance(config, dict), "config must be dictionary"
-        
-        validation_result = {
-            "is_valid": True,
-            "errors": [],
-            "warnings": []
-        }
+
+        validation_result = {"is_valid": True, "errors": [], "warnings": []}
 
         # Validate required fields
         required_fields = ["enable_nasa_checks", "default_policy_preset"]
@@ -103,12 +99,12 @@ class ConfigurationManager:
 
         # Initialize each component with its specific configuration
         components = ["ast_analyzer", "mece_analyzer", "nasa_integration", "smart_engine", "failure_detector"]
-        
+
         for component in components:
             try:
                 component_settings[component] = self.get_component_configuration(component)
                 logger.debug(f"Initialized settings for {component}")
-                
+
             except Exception as e:
                 logger.warning(f"Failed to initialize {component} settings: {e}")
                 component_settings[component] = {}
@@ -118,15 +114,15 @@ class ConfigurationManager:
     def _load_config_file(self, config_path: str) -> Dict[str, Any]:
         """Load configuration from file. NASA Rule 4 compliant."""
         config_file = Path(config_path)
-        
+
         if not config_file.exists():
             raise FileNotFoundError(f"Configuration file not found: {config_path}")
-        
+
         if not config_file.is_file():
             raise ValueError(f"Configuration path is not a file: {config_path}")
 
         try:
-            with open(config_file, 'r', encoding='utf-8') as f:
+            with open(config_file, encoding="utf-8") as f:
                 return json.load(f)
         except json.JSONDecodeError as e:
             raise ValueError(f"Invalid JSON in config file: {e}")
@@ -134,14 +130,14 @@ class ConfigurationManager:
     def _validate_and_merge_config(self, default_config: Dict, loaded_config: Dict) -> Dict[str, Any]:
         """Validate and merge loaded config with defaults. NASA Rule 4 compliant."""
         merged_config = default_config.copy()
-        
+
         # Validate loaded config structure
         validation_result = self.validate_configuration(loaded_config)
-        
+
         if not validation_result["is_valid"]:
             self.validation_errors.extend(validation_result["errors"])
             logger.warning("Configuration validation failed, using defaults with valid overrides")
-        
+
         # Merge valid configuration keys
         valid_keys = set(default_config.keys())
         for key, value in loaded_config.items():
@@ -158,32 +154,36 @@ class ConfigurationManager:
             if field not in config:
                 validation_result["errors"].append(f"Missing required field: {field}")
                 validation_result["is_valid"] = False
-        
+
         return validation_result
 
     def _validate_policy_preset(self, config: Dict, validation_result: Dict) -> Dict:
         """Validate policy preset value. NASA Rule 4 compliant."""
         valid_presets = ["service-defaults", "strict-core", "experimental", "balanced", "lenient"]
         preset = config.get("default_policy_preset")
-        
+
         if preset not in valid_presets:
             validation_result["errors"].append(f"Invalid policy preset: {preset}. Valid: {valid_presets}")
             validation_result["is_valid"] = False
-        
+
         return validation_result
 
     def _validate_component_flags(self, config: Dict, validation_result: Dict) -> Dict:
         """Validate component enable/disable flags. NASA Rule 4 compliant."""
         boolean_flags = [
-            "enable_nasa_checks", "enable_mece_analysis", "enable_smart_integration",
-            "enable_failure_detection", "enable_caching", "parallel_processing"
+            "enable_nasa_checks",
+            "enable_mece_analysis",
+            "enable_smart_integration",
+            "enable_failure_detection",
+            "enable_caching",
+            "parallel_processing",
         ]
-        
+
         for flag in boolean_flags:
             value = config.get(flag)
             if value is not None and not isinstance(value, bool):
                 validation_result["warnings"].append(f"Non-boolean value for {flag}: {value}")
-        
+
         return validation_result
 
     def _validate_numerical_limits(self, config: Dict, validation_result: Dict) -> Dict:
@@ -192,9 +192,9 @@ class ConfigurationManager:
             "max_workers": (1, 16),
             "analysis_timeout_seconds": (10, 3600),
             "cache_size_mb": (10, 1000),
-            "max_violation_count": (100, 10000)
+            "max_violation_count": (100, 10000),
         }
-        
+
         for key, (min_val, max_val) in numerical_limits.items():
             value = config.get(key)
             if value is not None:
@@ -202,7 +202,7 @@ class ConfigurationManager:
                     validation_result["warnings"].append(
                         f"Invalid {key}: {value}. Should be between {min_val} and {max_val}"
                     )
-        
+
         return validation_result
 
     def _get_default_config(self) -> Dict[str, Any]:
@@ -220,7 +220,7 @@ class ConfigurationManager:
             "cache_size_mb": 100,
             "max_violation_count": 1000,
             "log_level": "INFO",
-            "output_format": "json"
+            "output_format": "json",
         }
 
     def _get_ast_analyzer_config(self) -> Dict[str, Any]:
@@ -246,9 +246,7 @@ class ConfigurationManager:
         return {
             "enabled": self.config.get("enable_nasa_checks", True),
             "strict_mode": False,
-            "rule_weights": {
-                "Rule1": 10, "Rule2": 9, "Rule3": 8, "Rule4": 7, "Rule5": 6
-            },
+            "rule_weights": {"Rule1": 10, "Rule2": 9, "Rule3": 8, "Rule4": 7, "Rule5": 6},
         }
 
     def _get_smart_engine_config(self) -> Dict[str, Any]:
@@ -283,7 +281,7 @@ class ConfigurationManager:
             temp_config = self.config.copy()
             temp_config[key] = value
             validation_result = self.validate_configuration(temp_config)
-            
+
             if validation_result["is_valid"]:
                 self.config[key] = value
                 logger.info(f"Configuration updated: {key} = {value}")
@@ -291,7 +289,7 @@ class ConfigurationManager:
             else:
                 logger.error(f"Invalid configuration update for {key}: {validation_result['errors']}")
                 return False
-                
+
         except Exception as e:
             logger.error(f"Failed to update configuration {key}: {e}")
             return False

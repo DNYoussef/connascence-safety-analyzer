@@ -25,6 +25,7 @@ from .policy_detection import PolicyDetection
 # Import the full analyzer for actual analysis
 try:
     from analyzer.core import ConnascenceAnalyzer
+
     ANALYZER_AVAILABLE = True
 except ImportError:
     ANALYZER_AVAILABLE = False
@@ -52,136 +53,79 @@ Examples:
   connascence --config=setup.cfg .  # Use specific config file
   connascence --format=sarif .      # Output SARIF format
   connascence --policy=strict .     # Use strict policy
-            """.strip()
+            """.strip(),
         )
 
         # Main positional argument - paths to analyze (like flake8)
         parser.add_argument(
-            "paths",
-            nargs="*",
-            default=["."],
-            help="Files or directories to analyze (default: current directory)"
+            "paths", nargs="*", default=["."], help="Files or directories to analyze (default: current directory)"
         )
 
         # Simple configuration options
-        parser.add_argument(
-            "--config",
-            metavar="FILE",
-            help="Configuration file path (auto-discovered by default)"
-        )
+        parser.add_argument("--config", metavar="FILE", help="Configuration file path (auto-discovered by default)")
 
         parser.add_argument(
-            "--format",
-            choices=["json", "text", "sarif"],
-            default="json",
-            help="Output format (default: json)"
+            "--format", choices=["json", "text", "sarif"], default="json", help="Output format (default: json)"
         )
 
-        parser.add_argument(
-            "--output", "-o",
-            metavar="FILE",
-            help="Write output to file instead of stdout"
-        )
+        parser.add_argument("--output", "-o", metavar="FILE", help="Write output to file instead of stdout")
 
         # Policy selection with smart defaults
         parser.add_argument(
-            "--policy",
-            help="Analysis policy (auto-detected by default: default, strict-core, nasa_jpl_pot10, lenient)"
+            "--policy", help="Analysis policy (auto-detected by default: default, strict-core, nasa_jpl_pot10, lenient)"
         )
 
         # Simple quality controls
         parser.add_argument(
             "--exit-zero",
             action="store_true",
-            help="Exit with code 0 even if violations found (like flake8 --exit-zero)"
+            help="Exit with code 0 even if violations found (like flake8 --exit-zero)",
         )
 
-        parser.add_argument(
-            "--show-source",
-            action="store_true",
-            help="Show source code excerpts for violations"
-        )
+        parser.add_argument("--show-source", action="store_true", help="Show source code excerpts for violations")
 
         # Filtering options
-        parser.add_argument(
-            "--exclude",
-            metavar="PATTERNS",
-            help="Comma-separated list of patterns to exclude"
-        )
+        parser.add_argument("--exclude", metavar="PATTERNS", help="Comma-separated list of patterns to exclude")
 
-        parser.add_argument(
-            "--include",
-            metavar="PATTERNS",
-            help="Comma-separated list of patterns to include"
-        )
+        parser.add_argument("--include", metavar="PATTERNS", help="Comma-separated list of patterns to include")
 
         # Severity filtering
         parser.add_argument(
             "--severity",
             choices=["low", "medium", "high", "critical"],
-            help="Only show violations of this severity or higher"
+            help="Only show violations of this severity or higher",
         )
 
         # Advanced options (preserve full functionality)
-        parser.add_argument(
-            "--nasa-validation",
-            action="store_true",
-            help="Enable NASA Power of Ten validation"
-        )
+        parser.add_argument("--nasa-validation", action="store_true", help="Enable NASA Power of Ten validation")
 
-        parser.add_argument(
-            "--strict-mode",
-            action="store_true",
-            help="Enable strict analysis mode"
-        )
+        parser.add_argument("--strict-mode", action="store_true", help="Enable strict analysis mode")
 
         # Quality control flags (matching full analyzer)
         parser.add_argument(
-            "--fail-on-critical",
-            action="store_true",
-            help="Exit with error code on critical violations"
+            "--fail-on-critical", action="store_true", help="Exit with error code on critical violations"
         )
 
-        parser.add_argument(
-            "--max-god-objects",
-            type=int,
-            default=5,
-            help="Maximum allowed god objects before failure"
-        )
+        parser.add_argument("--max-god-objects", type=int, default=5, help="Maximum allowed god objects before failure")
 
         parser.add_argument(
-            "--compliance-threshold",
-            type=int,
-            default=95,
-            help="Compliance threshold percentage (0-100)"
+            "--compliance-threshold", type=int, default=95, help="Compliance threshold percentage (0-100)"
         )
 
         parser.add_argument(
             "--duplication-analysis",
             action="store_true",
             default=True,
-            help="Enable duplication analysis (enabled by default)"
+            help="Enable duplication analysis (enabled by default)",
         )
 
         # Compatibility with old interface
-        parser.add_argument(
-            "--legacy-cli",
-            action="store_true",
-            help="Use the full legacy CLI interface"
-        )
+        parser.add_argument("--legacy-cli", action="store_true", help="Use the full legacy CLI interface")
 
         # Informational
-        parser.add_argument(
-            "--version",
-            action="version",
-            version="connascence-analyzer 2.0.0"
-        )
+        parser.add_argument("--version", action="version", version="connascence-analyzer 2.0.0")
 
-        parser.add_argument(
-            "--list-policies",
-            action="store_true",
-            help="List available analysis policies"
-        )
+        parser.add_argument("--list-policies", action="store_true", help="List available analysis policies")
 
         return parser
 
@@ -212,6 +156,7 @@ Examples:
             # Use SARIF reporter if available
             try:
                 from analyzer.reporting.sarif import SARIFReporter
+
                 reporter = SARIFReporter()
                 return reporter.export_results(result)
             except ImportError:
@@ -238,15 +183,15 @@ Examples:
             description = violation.get("description", "No description")
 
             # Clean up description to avoid unicode issues
-            description = description.encode('ascii', errors='replace').decode('ascii')
+            description = description.encode("ascii", errors="replace").decode("ascii")
 
             # Format like flake8: file:line:col: code message
             line = f"{file_path}:{line_number}:1: {rule_id} {description}"
             lines.append(line)
 
             if show_source and violation.get("source_code"):
-                source = violation['source_code'].strip()
-                source = source.encode('ascii', errors='replace').decode('ascii')
+                source = violation["source_code"].strip()
+                source = source.encode("ascii", errors="replace").decode("ascii")
                 lines.append(f"    {source}")
 
         # Add summary
@@ -259,8 +204,9 @@ Examples:
 
         return "\n".join(lines)
 
-    def filter_violations(self, violations: List[Dict[str, Any]],
-                         severity_filter: Optional[str] = None) -> List[Dict[str, Any]]:
+    def filter_violations(
+        self, violations: List[Dict[str, Any]], severity_filter: Optional[str] = None
+    ) -> List[Dict[str, Any]]:
         """Filter violations by severity level."""
         if not severity_filter:
             return violations
@@ -283,10 +229,7 @@ Examples:
             from analyzer.core import main as legacy_main
 
             # Convert simple args back to legacy format
-            legacy_args = [
-                "--path", " ".join(args.paths),
-                "--format", args.format
-            ]
+            legacy_args = ["--path", " ".join(args.paths), "--format", args.format]
 
             if args.policy:
                 legacy_args.extend(["--policy", args.policy])
@@ -338,7 +281,7 @@ Examples:
 
             # Use first path for analysis (simple CLI focuses on single path)
             path = args.paths[0] if args.paths else "."
-            
+
             # Run comprehensive analysis with all features included
             combined_result = analyzer.analyze_path(
                 path=path,
@@ -352,8 +295,7 @@ Examples:
             # Apply filtering
             if args.severity:
                 combined_result["violations"] = self.filter_violations(
-                    combined_result.get("violations", []),
-                    args.severity
+                    combined_result.get("violations", []), args.severity
                 )
 
             # Format output
@@ -375,11 +317,11 @@ Examples:
             critical_violations = [v for v in violations if v.get("severity") == "critical"]
             god_objects = combined_result.get("god_objects", [])
             overall_quality_score = combined_result.get("summary", {}).get("overall_quality_score", 1.0)
-            
+
             # Apply exit-zero override first
             if args.exit_zero:
                 return 0
-                
+
             # Check exit conditions based on CLI flags (same as full analyzer)
             should_exit_with_error = False
             exit_reasons = []
@@ -389,7 +331,7 @@ Examples:
                 should_exit_with_error = True
                 exit_reasons.append(f"{len(critical_violations)} critical violations found")
 
-            # Check --max-god-objects flag  
+            # Check --max-god-objects flag
             if len(god_objects) > args.max_god_objects:
                 should_exit_with_error = True
                 exit_reasons.append(f"{len(god_objects)} god objects (max: {args.max_god_objects})")
@@ -427,7 +369,7 @@ Examples:
         combined = {
             "success": all(r.get("success", False) for r in results),
             "violations": [],
-            "summary": {"total_violations": 0}
+            "summary": {"total_violations": 0},
         }
 
         for result in results:

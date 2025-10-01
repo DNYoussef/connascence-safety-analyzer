@@ -19,6 +19,7 @@ from typing import Dict, Final, List
 # LICENSE & METADATA CONSTANTS
 # =============================================================================
 
+
 class LicenseConstants:
     """License-related string literals and metadata."""
 
@@ -46,12 +47,14 @@ class LicenseConstants:
         ADVANCED_PATTERNS: True,
         ENTERPRISE_FEATURES: True,
         MCP_SERVER: True,
-        VSCODE_EXTENSION: True
+        VSCODE_EXTENSION: True,
     }
+
 
 # =============================================================================
 # ANALYSIS THRESHOLDS & QUALITY GATES
 # =============================================================================
+
 
 class AnalysisThresholds:
     """Analysis quality thresholds and limits."""
@@ -81,9 +84,11 @@ class AnalysisThresholds:
     CRITICAL_VIOLATION_LIMIT: Final[int] = 0
     HIGH_VIOLATION_LIMIT: Final[int] = 5
 
+
 # =============================================================================
 # PERFORMANCE & RESOURCE LIMITS
 # =============================================================================
+
 
 class PerformanceLimits:
     """Performance-related constants and limits."""
@@ -102,9 +107,11 @@ class PerformanceLimits:
     LONG_OPERATION_TIMEOUT: Final[int] = 300
     NETWORK_TIMEOUT: Final[int] = 10
 
+
 # =============================================================================
 # VIOLATION SEVERITY & SCORING
 # =============================================================================
+
 
 class SeverityConstants:
     """Violation severity levels and scoring weights."""
@@ -122,12 +129,7 @@ class SeverityConstants:
     NOTICE: Final[str] = "NOTICE"
 
     # Weight mapping
-    VIOLATION_WEIGHTS: Final[Dict[str, int]] = {
-        CRITICAL: 10,
-        "high": 5,
-        "medium": 2,
-        "low": 1
-    }
+    VIOLATION_WEIGHTS: Final[Dict[str, int]] = {CRITICAL: 10, "high": 5, "medium": 2, "low": 1}
 
     # NASA-compliant 10-level system
     SEVERITY_LEVELS: Final[Dict[int, str]] = {
@@ -140,55 +142,78 @@ class SeverityConstants:
         4: TRIVIAL,
         3: INFORMATIONAL,
         2: ADVISORY,
-        1: NOTICE
+        1: NOTICE,
     }
+
 
 # =============================================================================
 # FILE SYSTEM & EXTENSIONS
 # =============================================================================
 
+
 class FileSystemConstants:
     """File system patterns, extensions, and exclusions."""
 
     # Supported file extensions
-    PYTHON_EXTENSIONS: Final[List[str]] = ['.py', '.pyx', '.pyi']
-    JAVASCRIPT_EXTENSIONS: Final[List[str]] = ['.js', '.mjs', '.jsx', '.ts', '.tsx']
-    C_CPP_EXTENSIONS: Final[List[str]] = ['.c', '.cpp', '.cxx', '.cc', '.h', '.hpp', '.hxx']
+    PYTHON_EXTENSIONS: Final[List[str]] = [".py", ".pyx", ".pyi"]
+    JAVASCRIPT_EXTENSIONS: Final[List[str]] = [".js", ".mjs", ".jsx", ".ts", ".tsx"]
+    C_CPP_EXTENSIONS: Final[List[str]] = [".c", ".cpp", ".cxx", ".cc", ".h", ".hpp", ".hxx"]
 
     SUPPORTED_EXTENSIONS: Final[Dict[str, List[str]]] = {
-        'python': PYTHON_EXTENSIONS,
-        'javascript': JAVASCRIPT_EXTENSIONS,
-        'c_cpp': C_CPP_EXTENSIONS
+        "python": PYTHON_EXTENSIONS,
+        "javascript": JAVASCRIPT_EXTENSIONS,
+        "c_cpp": C_CPP_EXTENSIONS,
     }
 
     # Exclusion patterns
     DEFAULT_EXCLUSIONS: Final[List[str]] = [
-        '__pycache__', '.git', '.pytest_cache', 'node_modules',
-        '.venv', 'venv', '.env', 'build', 'dist', '.tox', 'coverage',
-        '.mypy_cache', '.coverage', '.idea', '.vscode'
+        "__pycache__",
+        ".git",
+        ".pytest_cache",
+        "node_modules",
+        ".venv",
+        "venv",
+        ".env",
+        "build",
+        "dist",
+        ".tox",
+        "coverage",
+        ".mypy_cache",
+        ".coverage",
+        ".idea",
+        ".vscode",
     ]
+
 
 # =============================================================================
 # CONNASCENCE TYPES & RULES
 # =============================================================================
 
+
 class ConnascenceConstants:
     """Connascence types and rule definitions."""
 
     # Connascence type codes
-    CON_NAME: Final[str] = "CoN"      # Name
-    CON_TYPE: Final[str] = "CoT"      # Type
-    CON_MEANING: Final[str] = "CoM"   # Meaning
+    CON_NAME: Final[str] = "CoN"  # Name
+    CON_TYPE: Final[str] = "CoT"  # Type
+    CON_MEANING: Final[str] = "CoM"  # Meaning
     CON_POSITION: Final[str] = "CoP"  # Position
-    CON_ALGORITHM: Final[str] = "CoA" # Algorithm
-    CON_EXECUTION: Final[str] = "CoE" # Execution
-    CON_TIMING: Final[str] = "CoTm"   # Timing
-    CON_VALUE: Final[str] = "CoV"     # Value
+    CON_ALGORITHM: Final[str] = "CoA"  # Algorithm
+    CON_EXECUTION: Final[str] = "CoE"  # Execution
+    CON_TIMING: Final[str] = "CoTm"  # Timing
+    CON_VALUE: Final[str] = "CoV"  # Value
     CON_IDENTITY: Final[str] = "CoI"  # Identity
 
     CONNASCENCE_TYPES: Final[List[str]] = [
-        CON_NAME, CON_TYPE, CON_MEANING, CON_POSITION, CON_ALGORITHM,
-        CON_EXECUTION, CON_TIMING, CON_VALUE, CON_IDENTITY
+        CON_NAME,
+        CON_TYPE,
+        CON_MEANING,
+        CON_POSITION,
+        CON_ALGORITHM,
+        CON_EXECUTION,
+        CON_TIMING,
+        CON_VALUE,
+        CON_IDENTITY,
     ]
 
     # Rule IDs
@@ -197,12 +222,15 @@ class ConnascenceConstants:
     RULE_GOD_OBJECTS: Final[str] = "god_object"
     RULE_ALGORITHM_DUPLICATION: Final[str] = "connascence_of_algorithm"
 
+
 # =============================================================================
 # EXIT CODES & STATUS
 # =============================================================================
 
+
 class ExitCode(IntEnum):
     """Standard exit codes for CLI operations."""
+
     SUCCESS = 0
     VIOLATIONS_FOUND = 1
     ERROR = 2
@@ -210,9 +238,11 @@ class ExitCode(IntEnum):
     CONFIGURATION_ERROR = 4
     INTERRUPTED = 130
 
+
 # =============================================================================
 # VERSION & METADATA
 # =============================================================================
+
 
 class VersionInfo:
     """Version and build information."""
@@ -223,9 +253,11 @@ class VersionInfo:
     ANALYZER_NAME: Final[str] = "connascence-safety-analyzer"
     DISPLAY_NAME: Final[str] = "Connascence Safety Analyzer"
 
+
 # =============================================================================
 # INTEGRATION CONSTANTS
 # =============================================================================
+
 
 class IntegrationConstants:
     """Constants for external tool integrations."""
@@ -248,9 +280,11 @@ class IntegrationConstants:
     INTEGRATION_FAILED: Final[str] = "Integration failed with errors"
     TOOL_NOT_FOUND: Final[str] = "Tool not found in PATH"
 
+
 # =============================================================================
 # MCP SERVER CONSTANTS
 # =============================================================================
+
 
 class MCPConstants:
     """MCP server configuration constants."""
@@ -271,9 +305,11 @@ class MCPConstants:
     DEFAULT_AUDIT_ENABLED: Final[bool] = True
     DEFAULT_MAX_FILE_SIZE: Final[int] = PerformanceLimits.MAX_FILE_SIZE_KB
 
+
 # =============================================================================
 # CONFIGURATION LOADER
 # =============================================================================
+
 
 @dataclass
 class CentralConfig:
@@ -291,7 +327,7 @@ class CentralConfig:
     version: VersionInfo = VersionInfo()
 
     @classmethod
-    def load(cls, config_path: Path = None) -> 'CentralConfig':
+    def load(cls, config_path: Path = None) -> "CentralConfig":
         """Load configuration with optional override file."""
         config = cls()
 
@@ -301,6 +337,7 @@ class CentralConfig:
             pass
 
         return config
+
 
 # Global configuration instance
 CONFIG: Final[CentralConfig] = CentralConfig.load()

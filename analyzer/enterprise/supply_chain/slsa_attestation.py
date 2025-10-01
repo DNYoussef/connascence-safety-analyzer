@@ -22,15 +22,15 @@ Supports:
 @compliance SLSA, NIST-SSDF, CISA
 """
 
-import json
-import hashlib
-import subprocess
-from datetime import datetime, timezone
-from pathlib import Path
-from typing import Dict, List, Optional, Any, Tuple
-from dataclasses import dataclass, field
-import logging
 import base64
+from dataclasses import dataclass, field
+from datetime import datetime, timezone
+import hashlib
+import json
+import logging
+from pathlib import Path
+import subprocess
+from typing import Any, Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
@@ -71,7 +71,6 @@ class SLSAProvenance:
 
 
 class SLSAAttestationGenerator:
-
     SLSA_PREDICATE_TYPE_V02 = "https://slsa.dev/provenance/v0.2"
     SLSA_PREDICATE_TYPE_V1 = "https://slsa.dev/provenance/v1"
     IN_TOTO_STATEMENT_TYPE = "https://in-toto.io/Statement/v0.1"
@@ -89,20 +88,18 @@ class SLSAAttestationGenerator:
         for source_file in source_files[:50]:
             try:
                 file_hash = self._calculate_file_hash(source_file)
-                materials.append(BuildMaterial(
-                    uri=f"file://{source_file.relative_to(self.project_root)}",
-                    digest={"sha256": file_hash}
-                ))
+                materials.append(
+                    BuildMaterial(
+                        uri=f"file://{source_file.relative_to(self.project_root)}", digest={"sha256": file_hash}
+                    )
+                )
             except Exception as e:
                 logger.warning(f"Could not hash {source_file}: {e}")
 
         requirements_file = self.project_root / "requirements.txt"
         if requirements_file.exists():
             req_hash = self._calculate_file_hash(requirements_file)
-            materials.append(BuildMaterial(
-                uri="file://requirements.txt",
-                digest={"sha256": req_hash}
-            ))
+            materials.append(BuildMaterial(uri="file://requirements.txt", digest={"sha256": req_hash}))
 
         self.materials = materials
         return materials
@@ -115,20 +112,16 @@ class SLSAAttestationGenerator:
                 artifact_file = Path(artifact_path)
                 if artifact_file.exists():
                     artifact_hash = self._calculate_file_hash(artifact_file)
-                    artifacts.append(BuildArtifact(
-                        uri=f"file://{artifact_file}",
-                        digest={"sha256": artifact_hash}
-                    ))
+                    artifacts.append(BuildArtifact(uri=f"file://{artifact_file}", digest={"sha256": artifact_hash}))
         else:
             dist_dir = self.project_root / "dist"
             if dist_dir.exists():
                 for artifact_file in dist_dir.glob("*"):
                     if artifact_file.is_file():
                         artifact_hash = self._calculate_file_hash(artifact_file)
-                        artifacts.append(BuildArtifact(
-                            uri=f"file://dist/{artifact_file.name}",
-                            digest={"sha256": artifact_hash}
-                        ))
+                        artifacts.append(
+                            BuildArtifact(uri=f"file://dist/{artifact_file.name}", digest={"sha256": artifact_hash})
+                        )
 
         self.artifacts = artifacts
         return artifacts
@@ -137,16 +130,17 @@ class SLSAAttestationGenerator:
         hasher = hashlib.new(algorithm)
 
         try:
-            with open(file_path, 'rb') as f:
-                for chunk in iter(lambda: f.read(8192), b''):
+            with open(file_path, "rb") as f:
+                for chunk in iter(lambda: f.read(8192), b""):
                     hasher.update(chunk)
             return hasher.hexdigest()
         except Exception as e:
             logger.error(f"Hash calculation failed for {file_path}: {e}")
             return ""
 
-    def generate_provenance_v02(self, builder_id: str, build_type: str,
-                               invocation_id: Optional[str] = None) -> Dict[str, Any]:
+    def generate_provenance_v02(
+        self, builder_id: str, build_type: str, invocation_id: Optional[str] = None
+    ) -> Dict[str, Any]:
         if not invocation_id:
             invocation_id = self._generate_invocation_id()
 
@@ -159,41 +153,30 @@ class SLSAAttestationGenerator:
         now = datetime.now(timezone.utc).isoformat()
 
         provenance = {
-            "builder": {
-                "id": builder_id
-            },
+            "builder": {"id": builder_id},
             "buildType": build_type,
             "invocation": {
                 "configSource": {
                     "uri": f"file://{self.project_root}",
                     "digest": {"sha256": ""},
-                    "entryPoint": "build.py"
+                    "entryPoint": "build.py",
                 }
             },
             "metadata": {
                 "buildInvocationId": invocation_id,
                 "buildStartedOn": now,
                 "buildFinishedOn": now,
-                "completeness": {
-                    "parameters": True,
-                    "environment": False,
-                    "materials": True
-                },
-                "reproducible": False
+                "completeness": {"parameters": True, "environment": False, "materials": True},
+                "reproducible": False,
             },
-            "materials": [
-                {
-                    "uri": mat.uri,
-                    "digest": mat.digest
-                }
-                for mat in self.materials
-            ]
+            "materials": [{"uri": mat.uri, "digest": mat.digest} for mat in self.materials],
         }
 
         return provenance
 
-    def generate_provenance_v1(self, builder_id: str, build_type: str,
-                              invocation_id: Optional[str] = None) -> Dict[str, Any]:
+    def generate_provenance_v1(
+        self, builder_id: str, build_type: str, invocation_id: Optional[str] = None
+    ) -> Dict[str, Any]:
         if not invocation_id:
             invocation_id = self._generate_invocation_id()
 
@@ -208,55 +191,34 @@ class SLSAAttestationGenerator:
         provenance = {
             "buildDefinition": {
                 "buildType": build_type,
-                "externalParameters": {
-                    "repository": f"file://{self.project_root}",
-                    "ref": "main"
-                },
+                "externalParameters": {"repository": f"file://{self.project_root}", "ref": "main"},
                 "internalParameters": {},
-                "resolvedDependencies": [
-                    {
-                        "uri": mat.uri,
-                        "digest": mat.digest
-                    }
-                    for mat in self.materials
-                ]
+                "resolvedDependencies": [{"uri": mat.uri, "digest": mat.digest} for mat in self.materials],
             },
             "runDetails": {
-                "builder": {
-                    "id": builder_id
-                },
-                "metadata": {
-                    "invocationId": invocation_id,
-                    "startedOn": now,
-                    "finishedOn": now
-                }
-            }
+                "builder": {"id": builder_id},
+                "metadata": {"invocationId": invocation_id, "startedOn": now, "finishedOn": now},
+            },
         }
 
         return provenance
 
-    def generate_in_toto_statement(self, provenance: Dict[str, Any],
-                                   predicate_type: str = SLSA_PREDICATE_TYPE_V1) -> Dict[str, Any]:
+    def generate_in_toto_statement(
+        self, provenance: Dict[str, Any], predicate_type: str = SLSA_PREDICATE_TYPE_V1
+    ) -> Dict[str, Any]:
         if not self.artifacts:
             self.collect_build_artifacts()
 
         statement = {
             "_type": self.IN_TOTO_STATEMENT_TYPE,
-            "subject": [
-                {
-                    "name": artifact.uri,
-                    "digest": artifact.digest
-                }
-                for artifact in self.artifacts
-            ],
+            "subject": [{"name": artifact.uri, "digest": artifact.digest} for artifact in self.artifacts],
             "predicateType": predicate_type,
-            "predicate": provenance
+            "predicate": provenance,
         }
 
         return statement
 
-    def sign_attestation(self, attestation: Dict[str, Any],
-                        signing_method: str = "mock") -> Dict[str, Any]:
+    def sign_attestation(self, attestation: Dict[str, Any], signing_method: str = "mock") -> Dict[str, Any]:
         attestation_json = json.dumps(attestation, sort_keys=True)
 
         if signing_method == "mock":
@@ -269,12 +231,7 @@ class SLSAAttestationGenerator:
         signed_attestation = {
             "payload": base64.b64encode(attestation_json.encode()).decode(),
             "payloadType": "application/vnd.in-toto+json",
-            "signatures": [
-                {
-                    "keyid": "mock-key-id",
-                    "sig": signature
-                }
-            ]
+            "signatures": [{"keyid": "mock-key-id", "sig": signature}],
         }
 
         return signed_attestation
@@ -288,10 +245,7 @@ class SLSAAttestationGenerator:
     def _gpg_sign(self, data: str) -> str:
         try:
             result = subprocess.run(
-                ['gpg', '--detach-sign', '--armor'],
-                input=data.encode(),
-                capture_output=True,
-                timeout=10
+                ["gpg", "--detach-sign", "--armor"], check=False, input=data.encode(), capture_output=True, timeout=10
             )
 
             if result.returncode == 0:
@@ -306,6 +260,7 @@ class SLSAAttestationGenerator:
 
     def _generate_invocation_id(self) -> str:
         import uuid
+
         return str(uuid.uuid4())
 
     def calculate_slsa_level(self) -> Tuple[int, Dict[str, bool]]:
@@ -316,7 +271,7 @@ class SLSAAttestationGenerator:
             "isolated_build": False,
             "ephemeral_environment": False,
             "hermetic": False,
-            "two_party_review": False
+            "two_party_review": False,
         }
 
         level = 0
@@ -336,7 +291,7 @@ class SLSAAttestationGenerator:
         return level, requirements
 
     def export_attestation(self, attestation: Dict[str, Any], output_path: str) -> str:
-        with open(output_path, 'w', encoding='utf-8') as f:
+        with open(output_path, "w", encoding="utf-8") as f:
             json.dump(attestation, f, indent=2)
 
         logger.info(f"SLSA attestation exported to {output_path}")
@@ -346,18 +301,14 @@ class SLSAAttestationGenerator:
 def main():
     import argparse
 
-    parser = argparse.ArgumentParser(description='SLSA Attestation Generator')
-    parser.add_argument('--project', default='.', help='Project root directory')
-    parser.add_argument('--builder-id', default='https://github.com/connascence/analyzer',
-                       help='Builder identifier')
-    parser.add_argument('--build-type', default='https://github.com/connascence/build-type/v1',
-                       help='Build type URI')
-    parser.add_argument('--output', default='slsa-attestation.json', help='Output file')
-    parser.add_argument('--format', choices=['v0.2', 'v1'], default='v1',
-                       help='SLSA provenance format version')
-    parser.add_argument('--sign', action='store_true', help='Sign the attestation')
-    parser.add_argument('--signing-method', choices=['mock', 'gpg'], default='mock',
-                       help='Signing method')
+    parser = argparse.ArgumentParser(description="SLSA Attestation Generator")
+    parser.add_argument("--project", default=".", help="Project root directory")
+    parser.add_argument("--builder-id", default="https://github.com/connascence/analyzer", help="Builder identifier")
+    parser.add_argument("--build-type", default="https://github.com/connascence/build-type/v1", help="Build type URI")
+    parser.add_argument("--output", default="slsa-attestation.json", help="Output file")
+    parser.add_argument("--format", choices=["v0.2", "v1"], default="v1", help="SLSA provenance format version")
+    parser.add_argument("--sign", action="store_true", help="Sign the attestation")
+    parser.add_argument("--signing-method", choices=["mock", "gpg"], default="mock", help="Signing method")
 
     args = parser.parse_args()
 
@@ -371,7 +322,7 @@ def main():
     artifacts = generator.collect_build_artifacts()
     print(f"Found {len(artifacts)} artifacts")
 
-    if args.format == 'v0.2':
+    if args.format == "v0.2":
         provenance = generator.generate_provenance_v02(args.builder_id, args.build_type)
         predicate_type = SLSAAttestationGenerator.SLSA_PREDICATE_TYPE_V02
     else:
@@ -397,6 +348,6 @@ def main():
     print(f"\nAttestation saved to: {args.output}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     main()

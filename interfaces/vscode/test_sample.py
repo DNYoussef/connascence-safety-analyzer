@@ -6,16 +6,20 @@ def calculate_area(length, width, height=1):
     else:
         return 0
 
+
 # Long parameter list example
 def process_user_data(name, email, phone, address, city, state, zip_code, country, age, gender):
     return f"{name} from {city}, {state}"
+
 
 # Duplicate code example
 def calculate_rectangle_area(l, w):
     return l * w
 
+
 def calculate_box_area(length, width):
     return length * width
+
 
 class DataProcessor:
     def __init__(self):

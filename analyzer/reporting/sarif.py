@@ -62,14 +62,14 @@ class SARIFReporter:
                 "tool": {"driver": {"name": "connascence-cli", "version": self.tool_version}},
                 "invocation": {
                     "executionSuccessful": True,
-                    "startTimeUtc": f"{result.timestamp}Z" if not result.timestamp.endswith('Z') else result.timestamp,
+                    "startTimeUtc": f"{result.timestamp}Z" if not result.timestamp.endswith("Z") else result.timestamp,
                     "endTimeUtc": f"{datetime.now().isoformat()}Z",
                 },
             },
             "invocations": [
                 {
                     "executionSuccessful": True,
-                    "startTimeUtc": f"{result.timestamp}Z" if not result.timestamp.endswith('Z') else result.timestamp,
+                    "startTimeUtc": f"{result.timestamp}Z" if not result.timestamp.endswith("Z") else result.timestamp,
                     "workingDirectory": {"uri": f"file://{result.project_root}"},
                 }
             ],
@@ -268,7 +268,10 @@ class SARIFReporter:
                     }
                 }
             ],
-            "partialFingerprints": {"primaryLocationLineHash": str(violation.id), "connascenceFingerprint": str(violation.id)},
+            "partialFingerprints": {
+                "primaryLocationLineHash": str(violation.id),
+                "connascenceFingerprint": str(violation.id),
+            },
             "properties": {
                 "connascenceType": violation.type.value,
                 "severity": violation.severity.value,

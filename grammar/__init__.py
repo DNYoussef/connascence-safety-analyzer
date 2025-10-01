@@ -30,8 +30,8 @@ from .constrained_generator import ConstrainedGenerator
 from .overlay_manager import OverlayManager
 
 __all__ = [
-    "TreeSitterBackend",
-    "OverlayManager",
-    "ConstrainedGenerator",
     "ASTSafeRefactoring",
+    "ConstrainedGenerator",
+    "OverlayManager",
+    "TreeSitterBackend",
 ]

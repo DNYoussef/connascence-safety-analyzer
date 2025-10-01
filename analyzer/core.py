@@ -146,7 +146,7 @@ class ConnascenceAnalyzer:
         except Exception as e:
             return {
                 "success": False,
-                "error": f"Path analysis error: {str(e)}",
+                "error": f"Path analysis error: {e!s}",
                 "violations": [],
                 "summary": {"total_violations": 0},
                 "nasa_compliance": {"score": 0.0, "violations": []},
@@ -248,7 +248,7 @@ class ConnascenceAnalyzer:
         except Exception as e:
             return {
                 "success": False,
-                "error": f"Unified analysis error: {str(e)}",
+                "error": f"Unified analysis error: {e!s}",
                 "violations": [],
                 "summary": {"total_violations": 0},
                 "nasa_compliance": {"score": 0.0, "violations": []},
@@ -367,13 +367,13 @@ class ConnascenceAnalyzer:
         policy_mapping = {
             # Legacy CLI policy names
             "default": "service-defaults",
-            "strict-core": "strict-core", 
+            "strict-core": "strict-core",
             "nasa_jpl_pot10": "service-defaults",  # Map to available preset
             "lenient": "lenient",
             # Unified policy names (resolved)
-            "nasa-compliance": "service-defaults",  # Map to available preset  
+            "nasa-compliance": "service-defaults",  # Map to available preset
             "strict": "strict-core",
-            "standard": "service-defaults", 
+            "standard": "service-defaults",
             # Direct preset names
             "service-defaults": "service-defaults",
             "experimental": "experimental",
@@ -412,20 +412,19 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument("--path", "-p", type=str, default=".", help="Path to analyze (default: current directory)")
 
     # Get available policies for help text
-    policy_help = "Analysis policy to use. Unified: nasa-compliance, strict, standard, lenient (legacy names also accepted)"
+    policy_help = (
+        "Analysis policy to use. Unified: nasa-compliance, strict, standard, lenient (legacy names also accepted)"
+    )
     try:
         # Try to dynamically get available policies if constants are available
-        if 'list_available_policies' in globals() and list_available_policies:
+        if "list_available_policies" in globals() and list_available_policies:
             available_policies = list_available_policies(include_legacy=True)
             policy_help = f"Analysis policy to use. Available: {', '.join(available_policies)}"
     except:
         pass
-    
+
     parser.add_argument(
-        "--policy",
-        type=str,
-        default="standard",  # Updated to use unified standard policy name
-        help=policy_help
+        "--policy", type=str, default="standard", help=policy_help  # Updated to use unified standard policy name
     )
 
     parser.add_argument(
@@ -479,21 +478,30 @@ def create_parser() -> argparse.ArgumentParser:
 
     # Enhanced Pipeline CLI Arguments
     parser.add_argument("--enable-correlations", action="store_true", help="Enable cross-phase correlation analysis")
-    
+
     parser.add_argument("--enable-audit-trail", action="store_true", help="Enable analysis audit trail tracking")
-    
-    parser.add_argument("--enable-smart-recommendations", action="store_true", help="Enable AI-powered smart recommendations")
-    
-    parser.add_argument("--correlation-threshold", type=float, default=0.7, help="Minimum correlation threshold for cross-phase analysis (0.0-1.0)")
-    
+
+    parser.add_argument(
+        "--enable-smart-recommendations", action="store_true", help="Enable AI-powered smart recommendations"
+    )
+
+    parser.add_argument(
+        "--correlation-threshold",
+        type=float,
+        default=0.7,
+        help="Minimum correlation threshold for cross-phase analysis (0.0-1.0)",
+    )
+
     parser.add_argument("--export-audit-trail", type=str, help="Export audit trail to specified file path")
-    
+
     parser.add_argument("--export-correlations", type=str, help="Export correlation data to specified file path")
-    
-    parser.add_argument("--export-recommendations", type=str, help="Export smart recommendations to specified file path")
-    
+
+    parser.add_argument(
+        "--export-recommendations", type=str, help="Export smart recommendations to specified file path"
+    )
+
     parser.add_argument("--enhanced-output", action="store_true", help="Include enhanced pipeline metadata in output")
-    
+
     parser.add_argument("--phase-timing", action="store_true", help="Display detailed phase timing information")
 
     return parser
@@ -509,7 +517,7 @@ def main():
 
     # Set policy based on flags
     policy = "nasa_jpl_pot10" if args.nasa_validation else args.policy
-    
+
     # Resolve policy name (legacy to unified mapping)
     if resolve_policy_name:
         try:
@@ -518,7 +526,7 @@ def main():
         except Exception:
             # Fallback: use original policy name if resolution fails
             pass
-    
+
     # Validate policy name (after resolution)
     if validate_policy_name:
         if not validate_policy_name(policy):
@@ -529,13 +537,18 @@ def main():
                 except Exception:
                     # Use UNIFIED_POLICY_NAMES as fallback for resolved policies
                     from analyzer.constants import UNIFIED_POLICY_NAMES
+
                     available_policies = UNIFIED_POLICY_NAMES
             else:
-                # Use UNIFIED_POLICY_NAMES as fallback for resolved policies  
+                # Use UNIFIED_POLICY_NAMES as fallback for resolved policies
                 from analyzer.constants import UNIFIED_POLICY_NAMES
+
                 available_policies = UNIFIED_POLICY_NAMES
-            
-            print(f"Error: Unknown policy '{policy}'. Available policies: {', '.join(available_policies)}", file=sys.stderr)
+
+            print(
+                f"Error: Unknown policy '{policy}'. Available policies: {', '.join(available_policies)}",
+                file=sys.stderr,
+            )
             sys.exit(1)
 
     # Handle duplication analysis options
@@ -547,17 +560,19 @@ def main():
 
     try:
         # Check if we should use enhanced unified analyzer
-        use_enhanced_analyzer = (args.enable_correlations or 
-                               args.enable_audit_trail or 
-                               args.enable_smart_recommendations or 
-                               args.enhanced_output)
-        
+        use_enhanced_analyzer = (
+            args.enable_correlations
+            or args.enable_audit_trail
+            or args.enable_smart_recommendations
+            or args.enhanced_output
+        )
+
         if use_enhanced_analyzer and UNIFIED_ANALYZER_AVAILABLE:
             print("Using enhanced unified analyzer for cross-phase analysis...")
-            
+
             # Create enhanced analyzer instance
             enhanced_analyzer = UnifiedConnascenceAnalyzer()
-            
+
             # Run enhanced analysis with new features
             result = enhanced_analyzer.analyze_path(
                 path=args.path,
@@ -571,7 +586,7 @@ def main():
                 nasa_validation=args.nasa_validation,
                 strict_mode=args.strict_mode,
                 enable_tool_correlation=args.enable_tool_correlation,
-                confidence_threshold=args.confidence_threshold
+                confidence_threshold=args.confidence_threshold,
             )
         else:
             # Use standard analyzer for backward compatibility
@@ -613,13 +628,12 @@ def main():
                     print(json_output)
                 except UnicodeEncodeError:
                     print(json_output.encode("ascii", errors="replace").decode("ascii"))
+        # Fallback to simple output
+        elif args.output:
+            with open(args.output, "w") as f:
+                f.write(str(result))
         else:
-            # Fallback to simple output
-            if args.output:
-                with open(args.output, "w") as f:
-                    f.write(str(result))
-            else:
-                print(result)
+            print(result)
 
         # Handle enhanced pipeline exports
         if use_enhanced_analyzer and UNIFIED_ANALYZER_AVAILABLE:
@@ -628,19 +642,19 @@ def main():
                 with open(args.export_audit_trail, "w") as f:
                     json.dump(result["audit_trail"], f, indent=2, default=str)
                 print(f"Audit trail exported to: {args.export_audit_trail}")
-            
+
             # Export correlations if requested
             if args.export_correlations and result.get("correlations"):
                 with open(args.export_correlations, "w") as f:
                     json.dump(result["correlations"], f, indent=2, default=str)
                 print(f"Correlations exported to: {args.export_correlations}")
-            
+
             # Export smart recommendations if requested
             if args.export_recommendations and result.get("smart_recommendations"):
                 with open(args.export_recommendations, "w") as f:
                     json.dump(result["smart_recommendations"], f, indent=2, default=str)
                 print(f"Smart recommendations exported to: {args.export_recommendations}")
-            
+
             # Display phase timing information if requested
             if args.phase_timing and result.get("audit_trail"):
                 print("\n=== Analysis Phase Timing ===")
@@ -649,19 +663,21 @@ def main():
                         start_time = datetime.fromisoformat(phase["started"].replace("Z", "+00:00"))
                         end_time = datetime.fromisoformat(phase["completed"].replace("Z", "+00:00"))
                         duration = (end_time - start_time).total_seconds() * 1000
-                        
+
                         phase_name = phase["phase"].replace("_", " ").title()
                         violations = phase.get("violations_found", 0)
                         clusters = phase.get("clusters_found", 0)
-                        
-                        print(f"{phase_name:25} | {duration:8.1f}ms | {violations:3d} violations | {clusters:3d} clusters")
-            
+
+                        print(
+                            f"{phase_name:25} | {duration:8.1f}ms | {violations:3d} violations | {clusters:3d} clusters"
+                        )
+
             # Display correlation summary if available
             if result.get("correlations") and len(result["correlations"]) > 0:
-                print(f"\n=== Cross-Phase Analysis Summary ===")
+                print("\n=== Cross-Phase Analysis Summary ===")
                 correlations = result["correlations"]
                 print(f"Found {len(correlations)} cross-phase correlations")
-                
+
                 # Show highest correlations
                 sorted_corr = sorted(correlations, key=lambda x: x.get("correlation_score", 0), reverse=True)
                 for i, corr in enumerate(sorted_corr[:3]):  # Show top 3
@@ -669,13 +685,13 @@ def main():
                     analyzer1 = corr.get("analyzer1", "Unknown")
                     analyzer2 = corr.get("analyzer2", "Unknown")
                     print(f"{i+1}. {analyzer1} <-> {analyzer2}: {score:.1f}% correlation")
-            
+
             # Display smart recommendations summary
             if result.get("smart_recommendations") and len(result["smart_recommendations"]) > 0:
-                print(f"\n=== Smart Recommendations Summary ===")
+                print("\n=== Smart Recommendations Summary ===")
                 recommendations = result["smart_recommendations"]
                 print(f"Generated {len(recommendations)} architectural recommendations")
-                
+
                 # Show high priority recommendations
                 high_priority = [r for r in recommendations if r.get("priority", "").lower() == "high"]
                 for rec in high_priority[:3]:  # Show top 3 high priority

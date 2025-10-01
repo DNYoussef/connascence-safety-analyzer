@@ -12,6 +12,7 @@ import sys
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
+
 def run_complete_analysis(codebase_path: str, output_dir: str):
     """Generate all 4 analysis types for a codebase"""
     codebase_name = Path(codebase_path).name
@@ -24,6 +25,7 @@ def run_complete_analysis(codebase_path: str, output_dir: str):
     try:
         sys.path.insert(0, str(project_root / "analyzer"))
         from duplication_unified import UnifiedDuplicationAnalyzer
+
         duplication_available = True
     except ImportError:
         print("Warning: Unified duplication analyzer not available")
@@ -39,38 +41,44 @@ def run_complete_analysis(codebase_path: str, output_dir: str):
         # Basic NASA compliance checks
         for file_path in codebase_path_obj.rglob("**/*.py"):
             try:
-                with open(file_path, encoding='utf-8') as f:
+                with open(file_path, encoding="utf-8") as f:
                     content = f.read()
-                    lines = content.split('\n')
+                    lines = content.split("\n")
 
                     for i, line in enumerate(lines, 1):
                         # NASA Rule violations
-                        if 'goto' in line.lower():
-                            nasa_violations.append({
-                                "rule": "NASA-01",
-                                "description": "Avoid goto statements",
-                                "file_path": str(file_path),
-                                "line_number": i,
-                                "severity": "high"
-                            })
+                        if "goto" in line.lower():
+                            nasa_violations.append(
+                                {
+                                    "rule": "NASA-01",
+                                    "description": "Avoid goto statements",
+                                    "file_path": str(file_path),
+                                    "line_number": i,
+                                    "severity": "high",
+                                }
+                            )
 
-                        if line.count('(') > 5:  # Complex expressions
-                            nasa_violations.append({
-                                "rule": "NASA-08",
-                                "description": "Limit expression complexity",
-                                "file_path": str(file_path),
-                                "line_number": i,
-                                "severity": "medium"
-                            })
+                        if line.count("(") > 5:  # Complex expressions
+                            nasa_violations.append(
+                                {
+                                    "rule": "NASA-08",
+                                    "description": "Limit expression complexity",
+                                    "file_path": str(file_path),
+                                    "line_number": i,
+                                    "severity": "medium",
+                                }
+                            )
 
                         if len(line) > 120:  # Long lines
-                            nasa_violations.append({
-                                "rule": "NASA-03",
-                                "description": "Keep lines under 120 characters",
-                                "file_path": str(file_path),
-                                "line_number": i,
-                                "severity": "low"
-                            })
+                            nasa_violations.append(
+                                {
+                                    "rule": "NASA-03",
+                                    "description": "Keep lines under 120 characters",
+                                    "file_path": str(file_path),
+                                    "line_number": i,
+                                    "severity": "low",
+                                }
+                            )
             except:
                 continue
 
@@ -79,10 +87,10 @@ def run_complete_analysis(codebase_path: str, output_dir: str):
             "codebase": codebase_name,
             "compliance_score": max(0, 1.0 - len(nasa_violations) / 1000),
             "total_violations": len(nasa_violations),
-            "violations": nasa_violations
+            "violations": nasa_violations,
         }
 
-        with open(output_path / f"{codebase_name}_nasa_safety.json", 'w') as f:
+        with open(output_path / f"{codebase_name}_nasa_safety.json", "w") as f:
             json.dump(nasa_data, f, indent=2)
         print(f"    SUCCESS: {len(nasa_violations)} NASA safety violations found")
 
@@ -102,9 +110,11 @@ def run_complete_analysis(codebase_path: str, output_dir: str):
                 duplication_output = analyzer.export_results(result)
                 duplication_data = json.loads(duplication_output)
 
-                with open(output_path / f"{codebase_name}_duplication.json", 'w') as f:
+                with open(output_path / f"{codebase_name}_duplication.json", "w") as f:
                     json.dump(duplication_data, f, indent=2)
-                print(f"    SUCCESS: {result.total_violations} unified duplications found (score: {result.overall_duplication_score})")
+                print(
+                    f"    SUCCESS: {result.total_violations} unified duplications found (score: {result.overall_duplication_score})"
+                )
             else:
                 raise Exception(result.error or "Analysis failed")
         else:
@@ -114,21 +124,23 @@ def run_complete_analysis(codebase_path: str, output_dir: str):
 
             for file_path in codebase_path_obj.rglob("**/*.py"):
                 try:
-                    with open(file_path, encoding='utf-8') as f:
+                    with open(file_path, encoding="utf-8") as f:
                         content = f.read()
-                        lines = [line.strip() for line in content.split('\n') if line.strip()]
+                        lines = [line.strip() for line in content.split("\n") if line.strip()]
 
                         # Look for duplicate function signatures
                         for i, line in enumerate(lines):
-                            if line.startswith('def ') and len(line) > 20:
+                            if line.startswith("def ") and len(line) > 20:
                                 signature = line[:50]  # First 50 chars
                                 if signature in function_signatures:
-                                    duplications.append({
-                                        "type": "function_signature",
-                                        "pattern": signature,
-                                        "files": [function_signatures[signature], str(file_path)],
-                                        "severity": "medium"
-                                    })
+                                    duplications.append(
+                                        {
+                                            "type": "function_signature",
+                                            "pattern": signature,
+                                            "files": [function_signatures[signature], str(file_path)],
+                                            "severity": "medium",
+                                        }
+                                    )
                                 else:
                                     function_signatures[signature] = str(file_path)
                 except:
@@ -138,10 +150,10 @@ def run_complete_analysis(codebase_path: str, output_dir: str):
                 "analysis_type": "duplication_fallback",
                 "codebase": codebase_name,
                 "total_duplications": len(duplications),
-                "duplications": duplications[:50]
+                "duplications": duplications[:50],
             }
 
-            with open(output_path / f"{codebase_name}_duplication.json", 'w') as f:
+            with open(output_path / f"{codebase_name}_duplication.json", "w") as f:
                 json.dump(duplication_data, f, indent=2)
             print(f"    SUCCESS: {len(duplications)} duplications found (fallback mode)")
 
@@ -158,7 +170,7 @@ def run_complete_analysis(codebase_path: str, output_dir: str):
             "ui_presentation": [],
             "configuration": [],
             "testing": [],
-            "utilities": []
+            "utilities": [],
         }
 
         # Categorize files by MECE principles
@@ -166,20 +178,20 @@ def run_complete_analysis(codebase_path: str, output_dir: str):
         for file_path in codebase_path_obj.rglob("**/*.py"):
             total_files += 1
             try:
-                with open(file_path, encoding='utf-8') as f:
+                with open(file_path, encoding="utf-8") as f:
                     content = f.read().lower()
                     file_name = str(file_path).lower()
 
                     # Categorize based on content and filename
-                    if 'database' in content or 'db' in content or 'sql' in content or 'mongo' in content:
+                    if "database" in content or "db" in content or "sql" in content or "mongo" in content:
                         mece_categories["data_access"].append(str(file_path))
-                    elif 'test' in file_name or 'test' in content[:500]:
+                    elif "test" in file_name or "test" in content[:500]:
                         mece_categories["testing"].append(str(file_path))
-                    elif 'config' in content or 'setting' in content or 'conf' in file_name:
+                    elif "config" in content or "setting" in content or "conf" in file_name:
                         mece_categories["configuration"].append(str(file_path))
-                    elif 'render' in content or 'template' in content or 'html' in content:
+                    elif "render" in content or "template" in content or "html" in content:
                         mece_categories["ui_presentation"].append(str(file_path))
-                    elif 'util' in file_name or 'helper' in file_name or 'common' in file_name:
+                    elif "util" in file_name or "helper" in file_name or "common" in file_name:
                         mece_categories["utilities"].append(str(file_path))
                     else:
                         mece_categories["business_logic"].append(str(file_path))
@@ -190,23 +202,19 @@ def run_complete_analysis(codebase_path: str, output_dir: str):
         overlaps = []
         for file_path in codebase_path_obj.rglob("**/*.py"):
             try:
-                with open(file_path, encoding='utf-8') as f:
+                with open(file_path, encoding="utf-8") as f:
                     content = f.read().lower()
                     violations_found = []
 
-                    if 'database' in content and 'render' in content:
+                    if "database" in content and "render" in content:
                         violations_found.append("Data access mixed with UI presentation")
-                    if 'config' in content and 'business' in content and len(content) > 2000:
+                    if "config" in content and "business" in content and len(content) > 2000:
                         violations_found.append("Configuration mixed with business logic")
-                    if 'test' in content and 'production' in content:
+                    if "test" in content and "production" in content:
                         violations_found.append("Test code mixed with production code")
 
                     for violation in violations_found:
-                        overlaps.append({
-                            "file": str(file_path),
-                            "violation": violation,
-                            "severity": "medium"
-                        })
+                        overlaps.append({"file": str(file_path), "violation": violation, "severity": "medium"})
             except:
                 continue
 
@@ -221,10 +229,10 @@ def run_complete_analysis(codebase_path: str, output_dir: str):
             "categories": {k: len(v) for k, v in mece_categories.items()},
             "category_files": mece_categories,
             "overlaps": overlaps[:50],  # Limit to first 50
-            "total_overlaps": len(overlaps)
+            "total_overlaps": len(overlaps),
         }
 
-        with open(output_path / f"{codebase_name}_mece_duplication.json", 'w') as f:
+        with open(output_path / f"{codebase_name}_mece_duplication.json", "w") as f:
             json.dump(mece_data, f, indent=2)
         print(f"    SUCCESS: {len(overlaps)} MECE violations found, score: {mece_score:.2f}")
 
@@ -237,32 +245,36 @@ def run_complete_analysis(codebase_path: str, output_dir: str):
         safety_violations = []
 
         # C/C++ safety analysis for curl
-        if codebase_name == 'curl':
+        if codebase_name == "curl":
             for file_path in codebase_path_obj.rglob("**/*.c"):
                 try:
-                    with open(file_path, encoding='utf-8', errors='ignore') as f:
+                    with open(file_path, encoding="utf-8", errors="ignore") as f:
                         content = f.read()
-                        lines = content.split('\n')
+                        lines = content.split("\n")
 
                         for i, line in enumerate(lines, 1):
                             # Buffer overflow risks
-                            if 'strcpy(' in line or 'strcat(' in line:
-                                safety_violations.append({
-                                    "rule": "SAFETY-01",
-                                    "description": "Unsafe string function (buffer overflow risk)",
-                                    "file_path": str(file_path),
-                                    "line_number": i,
-                                    "severity": "high"
-                                })
+                            if "strcpy(" in line or "strcat(" in line:
+                                safety_violations.append(
+                                    {
+                                        "rule": "SAFETY-01",
+                                        "description": "Unsafe string function (buffer overflow risk)",
+                                        "file_path": str(file_path),
+                                        "line_number": i,
+                                        "severity": "high",
+                                    }
+                                )
 
-                            if 'malloc(' in line and 'free(' not in content:
-                                safety_violations.append({
-                                    "rule": "SAFETY-02",
-                                    "description": "Memory allocation without corresponding free",
-                                    "file_path": str(file_path),
-                                    "line_number": i,
-                                    "severity": "medium"
-                                })
+                            if "malloc(" in line and "free(" not in content:
+                                safety_violations.append(
+                                    {
+                                        "rule": "SAFETY-02",
+                                        "description": "Memory allocation without corresponding free",
+                                        "file_path": str(file_path),
+                                        "line_number": i,
+                                        "severity": "medium",
+                                    }
+                                )
                 except:
                     continue
 
@@ -271,10 +283,10 @@ def run_complete_analysis(codebase_path: str, output_dir: str):
             "codebase": codebase_name,
             "language": "c" if codebase_name == "curl" else "python",
             "total_violations": len(safety_violations),
-            "violations": safety_violations[:100]  # Limit to first 100
+            "violations": safety_violations[:100],  # Limit to first 100
         }
 
-        with open(output_path / f"{codebase_name}_safety_analysis.json", 'w') as f:
+        with open(output_path / f"{codebase_name}_safety_analysis.json", "w") as f:
             json.dump(safety_data, f, indent=2)
         print(f"    SUCCESS: {len(safety_violations)} safety violations found")
 
@@ -292,14 +304,14 @@ def run_complete_analysis(codebase_path: str, output_dir: str):
         connascence_data = {
             "analysis_type": "connascence",
             "codebase": codebase_name,
-            "total_violations": len(results.get('violations', [])),
-            "violations": results.get('violations', []),
-            "coupling_types": results.get('coupling_types', {}),
-            "severity_breakdown": results.get('severity_breakdown', {}),
-            "files_analyzed": results.get('files_analyzed', 0)
+            "total_violations": len(results.get("violations", [])),
+            "violations": results.get("violations", []),
+            "coupling_types": results.get("coupling_types", {}),
+            "severity_breakdown": results.get("severity_breakdown", {}),
+            "files_analyzed": results.get("files_analyzed", 0),
         }
 
-        with open(output_path / f"{codebase_name}_connascence.json", 'w') as f:
+        with open(output_path / f"{codebase_name}_connascence.json", "w") as f:
             json.dump(connascence_data, f, indent=2)
         print(f"    SUCCESS: {len(results.get('violations', []))} connascence violations found")
 
@@ -311,6 +323,7 @@ def run_complete_analysis(codebase_path: str, output_dir: str):
     for analysis_file in output_path.glob(f"{codebase_name}_*.json"):
         file_size = analysis_file.stat().st_size
         print(f"  - {analysis_file.name} ({file_size:,} bytes)")
+
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:

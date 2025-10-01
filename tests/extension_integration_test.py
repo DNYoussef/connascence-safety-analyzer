@@ -18,6 +18,7 @@ def test_analyzer_accessibility():
         print(f"❌ Analyzer module import: FAILED - {e}")
         return False
 
+
 def test_analyzer_execution():
     """Test if the analyzer can be executed via subprocess (as extension would do)"""
     try:
@@ -27,18 +28,23 @@ def test_analyzer_execution():
         # Create a simple test file if it doesn't exist
         test_file.parent.mkdir(parents=True, exist_ok=True)
         if not test_file.exists():
-            test_file.write_text("""
+            test_file.write_text(
+                """
 def function_with_connascence():
     x = 1
     y = 1  # Position connascence
     return x + y
-""")
+"""
+            )
 
         # Execute analyzer subprocess
-        result = subprocess.run([
-            sys.executable, str(analyzer_path),
-            str(test_file), "--format", "json"
-        ], capture_output=True, text=True, timeout=30)
+        result = subprocess.run(
+            [sys.executable, str(analyzer_path), str(test_file), "--format", "json"],
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
 
         if result.returncode == 0:
             print("✅ Analyzer subprocess execution: SUCCESS")
@@ -52,6 +58,7 @@ def function_with_connascence():
         print(f"❌ Analyzer subprocess execution: FAILED - {e}")
         return False
 
+
 def test_extension_structure():
     """Test if extension files are properly updated"""
     extension_path = Path("C:/Users/17175/.vscode/extensions/connascence-systems.connascence-safety-analyzer-2.0.0/out")
@@ -61,7 +68,7 @@ def test_extension_structure():
         "services/connascenceApiClient.js",
         "utils/cache.js",
         "utils/errorHandler.js",
-        "core/ConnascenceExtension.js"
+        "core/ConnascenceExtension.js",
     ]
 
     all_found = True
@@ -75,6 +82,7 @@ def test_extension_structure():
 
     return all_found
 
+
 def main():
     """Run all integration tests"""
     print("🧪 VSCode Extension Integration Tests")
@@ -83,7 +91,7 @@ def main():
     tests = [
         ("Analyzer Accessibility", test_analyzer_accessibility),
         ("Analyzer Execution", test_analyzer_execution),
-        ("Extension Structure", test_extension_structure)
+        ("Extension Structure", test_extension_structure),
     ]
 
     passed = 0
@@ -106,6 +114,7 @@ def main():
     else:
         print("⚠️ Some tests failed - Check the output above")
         return 1
+
 
 if __name__ == "__main__":
     sys.exit(main())

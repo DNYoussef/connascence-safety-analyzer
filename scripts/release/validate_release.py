@@ -29,12 +29,7 @@ class ReleaseValidator:
         if self.verbose:
             print(f"Running: {' '.join(command)}")
 
-        result = subprocess.run(
-            command,
-            capture_output=True,
-            text=True,
-            cwd=cwd or Path.cwd()
-        )
+        result = subprocess.run(command, check=False, capture_output=True, text=True, cwd=cwd or Path.cwd())
 
         return result.returncode, result.stdout, result.stderr
 
@@ -72,14 +67,18 @@ class ReleaseValidator:
         print("Running test suite...")
 
         # Run pytest with coverage
-        returncode, stdout, stderr = self.run_command([
-            "python", "-m", "pytest",
-            "tests/",
-            "--cov=.",
-            "--cov-report=json",
-            "--cov-report=term-missing",
-            "--tb=short"
-        ])
+        returncode, stdout, stderr = self.run_command(
+            [
+                "python",
+                "-m",
+                "pytest",
+                "tests/",
+                "--cov=.",
+                "--cov-report=json",
+                "--cov-report=term-missing",
+                "--tb=short",
+            ]
+        )
 
         if returncode != 0:
             print("❌ Test suite failed")
@@ -116,9 +115,7 @@ class ReleaseValidator:
         print("Checking code quality...")
 
         # Run ruff
-        returncode, stdout, stderr = self.run_command([
-            "python", "-m", "ruff", "check", ".", "--format=json"
-        ])
+        returncode, stdout, stderr = self.run_command(["python", "-m", "ruff", "check", ".", "--format=json"])
 
         if returncode != 0:
             print("❌ Ruff linting failed")
@@ -135,9 +132,7 @@ class ReleaseValidator:
         print("  ✅ Ruff linting passed")
 
         # Run mypy type checking
-        returncode, stdout, stderr = self.run_command([
-            "python", "-m", "mypy", ".", "--ignore-missing-imports"
-        ])
+        returncode, stdout, stderr = self.run_command(["python", "-m", "mypy", ".", "--ignore-missing-imports"])
 
         if returncode != 0:
             print("❌ MyPy type checking failed")
@@ -153,12 +148,9 @@ class ReleaseValidator:
         print("Running security analysis...")
 
         # Run connascence self-analysis with NASA policy
-        returncode, stdout, stderr = self.run_command([
-            "python", "-m", "connascence", ".",
-            "--policy=nasa_jpl_pot10",
-            "--format=json",
-            "--exit-zero"
-        ])
+        returncode, stdout, stderr = self.run_command(
+            ["python", "-m", "connascence", ".", "--policy=nasa_jpl_pot10", "--format=json", "--exit-zero"]
+        )
 
         if returncode != 0:
             print("❌ Security analysis failed to run")
@@ -204,12 +196,7 @@ class ReleaseValidator:
         """Check documentation completeness."""
         print("Checking documentation...")
 
-        required_files = [
-            "README.md",
-            "CHANGELOG.md",
-            "docs/README.md",
-            "docs/deployment/INSTALLATION.md"
-        ]
+        required_files = ["README.md", "CHANGELOG.md", "docs/README.md", "docs/deployment/INSTALLATION.md"]
 
         for file_path in required_files:
             if not Path(file_path).exists():
@@ -235,9 +222,7 @@ class ReleaseValidator:
             path.unlink()
 
         # Build package
-        returncode, stdout, stderr = self.run_command([
-            "python", "-m", "build"
-        ])
+        returncode, stdout, stderr = self.run_command(["python", "-m", "build"])
 
         if returncode != 0:
             print("❌ Package build failed")
@@ -259,9 +244,7 @@ class ReleaseValidator:
         """Ensure git working directory is clean."""
         print("Checking git status...")
 
-        returncode, stdout, stderr = self.run_command([
-            "git", "status", "--porcelain"
-        ])
+        returncode, stdout, stderr = self.run_command(["git", "status", "--porcelain"])
 
         if returncode != 0:
             print("❌ Git status check failed")
@@ -318,18 +301,10 @@ class ReleaseValidator:
 def main():
     """Main function."""
     parser = argparse.ArgumentParser(
-        description="Validate release readiness",
-        formatter_class=argparse.RawDescriptionHelpFormatter
+        description="Validate release readiness", formatter_class=argparse.RawDescriptionHelpFormatter
     )
-    parser.add_argument(
-        "--verbose", "-v",
-        action="store_true",
-        help="Show detailed output"
-    )
-    parser.add_argument(
-        "--version",
-        help="Expected version (optional)"
-    )
+    parser.add_argument("--verbose", "-v", action="store_true", help="Show detailed output")
+    parser.add_argument("--version", help="Expected version (optional)")
 
     args = parser.parse_args()
 

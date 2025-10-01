@@ -7,10 +7,4 @@ from .detector import TheaterDetector, TheaterPattern, ValidationResult
 from .patterns import TheaterPatternLibrary
 from .validator import EvidenceValidator
 
-__all__ = [
-    'TheaterDetector',
-    'TheaterPattern',
-    'ValidationResult',
-    'TheaterPatternLibrary',
-    'EvidenceValidator'
-]
+__all__ = ["EvidenceValidator", "TheaterDetector", "TheaterPattern", "TheaterPatternLibrary", "ValidationResult"]

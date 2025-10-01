@@ -27,15 +27,12 @@ def setup_logging(verbose: bool = False):
     """Setup logging configuration."""
 
     level = logging.DEBUG if verbose else logging.INFO
-    format_str = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    format_str = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 
     logging.basicConfig(
         level=level,
         format=format_str,
-        handlers=[
-            logging.StreamHandler(sys.stdout),
-            logging.FileHandler('tests/performance/benchmark.log')
-        ]
+        handlers=[logging.StreamHandler(sys.stdout), logging.FileHandler("tests/performance/benchmark.log")],
     )
 
 
@@ -78,7 +75,7 @@ def benchmark_test_packages(output_dir: str, verbose: bool = False) -> dict:
 
             except Exception as e:
                 print(f"  ERROR: {e}")
-                results[package_dir.name] = {'error': str(e)}
+                results[package_dir.name] = {"error": str(e)}
 
     return results
 
@@ -103,7 +100,7 @@ def benchmark_parallel_scaling(output_dir: str) -> dict:
         # Create 100 test files
         for i in range(100):
             test_file = temp_dir / f"test_{i:03d}.py"
-            content = f'''
+            content = f"""
 def function_{i}():
     magic_number = {42 + i}
     return magic_number * 2
@@ -117,7 +114,7 @@ class TestClass_{i}:
     def method_c(self): pass
     def method_d(self): pass
     def method_e(self): pass
-'''
+"""
             test_file.write_text(content)
 
         # Test different worker counts
@@ -134,13 +131,13 @@ class TestClass_{i}:
             execution_time = time.time() - start_time
 
             results[f"workers_{workers}"] = {
-                'worker_count': workers,
-                'execution_time': execution_time,
-                'speedup_factor': parallel_result.speedup_factor,
-                'efficiency': parallel_result.efficiency,
-                'files_analyzed': parallel_result.unified_result.files_analyzed,
-                'violations_found': parallel_result.unified_result.total_violations,
-                'memory_peak_mb': parallel_result.peak_memory_mb
+                "worker_count": workers,
+                "execution_time": execution_time,
+                "speedup_factor": parallel_result.speedup_factor,
+                "efficiency": parallel_result.efficiency,
+                "files_analyzed": parallel_result.unified_result.files_analyzed,
+                "violations_found": parallel_result.unified_result.total_violations,
+                "memory_peak_mb": parallel_result.peak_memory_mb,
             }
 
             print(f"  Time: {execution_time:.2f}s")
@@ -173,6 +170,7 @@ def benchmark_caching_effectiveness(verbose: bool = False) -> dict:
         return results
 
     from analyzer.core import ConnascenceAnalyzer
+
     analyzer = ConnascenceAnalyzer()
 
     # Cold run (no cache)
@@ -196,13 +194,13 @@ def benchmark_caching_effectiveness(verbose: bool = False) -> dict:
     cache_stats = ast_cache.get_cache_statistics()
 
     results = {
-        'cold_run_time_seconds': cold_time,
-        'warm_run_time_seconds': warm_time,
-        'time_saved_seconds': time_saved,
-        'cache_speedup_factor': cache_speedup,
-        'effectiveness_percent': effectiveness_percent,
-        'violations_consistent': len(result1.get('violations', [])) == len(result2.get('violations', [])),
-        'cache_statistics': cache_stats
+        "cold_run_time_seconds": cold_time,
+        "warm_run_time_seconds": warm_time,
+        "time_saved_seconds": time_saved,
+        "cache_speedup_factor": cache_speedup,
+        "effectiveness_percent": effectiveness_percent,
+        "violations_consistent": len(result1.get("violations", [])) == len(result2.get("violations", [])),
+        "cache_statistics": cache_stats,
     }
 
     print(f"  Cold run: {cold_time:.2f}s")
@@ -243,9 +241,7 @@ def benchmark_incremental_analysis(output_dir: str, verbose: bool = False) -> di
 
         print("Running incremental analysis...")
         incremental_start = time.time()
-        incremental_result = incremental_analyzer.analyze_changes(
-            changed_files=[str(f) for f in test_files]
-        )
+        incremental_result = incremental_analyzer.analyze_changes(changed_files=[str(f) for f in test_files])
         incremental_time = time.time() - incremental_start
 
         # Calculate performance improvement
@@ -254,16 +250,17 @@ def benchmark_incremental_analysis(output_dir: str, verbose: bool = False) -> di
         speedup = full_analysis_estimate / max(incremental_time, 0.001)
 
         results = {
-            'baseline_time_seconds': baseline_time,
-            'baseline_violations': len(baseline.get('violations', [])),
-            'incremental_time_seconds': incremental_time,
-            'incremental_speedup': speedup,
-            'time_saved_seconds': time_saved,
-            'files_in_scope': incremental_result.analyzed_files_count,
-            'files_skipped': incremental_result.skipped_files_count,
-            'skip_percentage': (incremental_result.skipped_files_count / incremental_result.total_files_in_project) * 100,
-            'new_violations': len(incremental_result.new_violations),
-            'resolved_violations': len(incremental_result.resolved_violations)
+            "baseline_time_seconds": baseline_time,
+            "baseline_violations": len(baseline.get("violations", [])),
+            "incremental_time_seconds": incremental_time,
+            "incremental_speedup": speedup,
+            "time_saved_seconds": time_saved,
+            "files_in_scope": incremental_result.analyzed_files_count,
+            "files_skipped": incremental_result.skipped_files_count,
+            "skip_percentage": (incremental_result.skipped_files_count / incremental_result.total_files_in_project)
+            * 100,
+            "new_violations": len(incremental_result.new_violations),
+            "resolved_violations": len(incremental_result.resolved_violations),
         }
 
         print(f"  Baseline time: {baseline_time:.2f}s")
@@ -280,7 +277,7 @@ def benchmark_incremental_analysis(output_dir: str, verbose: bool = False) -> di
 
     except Exception as e:
         print(f"  ERROR: {e}")
-        results = {'error': str(e)}
+        results = {"error": str(e)}
 
     return results
 
@@ -290,7 +287,7 @@ def generate_performance_report(all_results: dict, output_dir: str):
 
     report_file = Path(output_dir) / f"performance_report_{time.strftime('%Y%m%d_%H%M%S')}.md"
 
-    with open(report_file, 'w') as f:
+    with open(report_file, "w") as f:
         f.write("# Connascence Analyzer Performance Report\n\n")
         f.write(f"Generated: {time.strftime('%Y-%m-%d %H:%M:%S')}\n\n")
 
@@ -307,49 +304,55 @@ def generate_performance_report(all_results: dict, output_dir: str):
         f.write(f"- **Python**: {platform.python_version()}\n\n")
 
         # Test package results
-        if 'test_packages' in all_results:
+        if "test_packages" in all_results:
             f.write("## Test Package Benchmarks\n\n")
             f.write("| Package | Files | Lines | Time (s) | Throughput (files/s) | Memory (MB) | Violations |\n")
             f.write("|---------|-------|-------|----------|---------------------|-------------|------------|\n")
 
-            for name, result in all_results['test_packages'].items():
-                if isinstance(result, dict) and 'error' not in result:
-                    f.write(f"| {name} | {result.file_count} | {result.total_lines:,} | "
-                           f"{result.execution_time_seconds:.2f} | {result.files_per_second:.1f} | "
-                           f"{result.memory_peak_mb:.1f} | {result.violations_found} |\n")
+            for name, result in all_results["test_packages"].items():
+                if isinstance(result, dict) and "error" not in result:
+                    f.write(
+                        f"| {name} | {result.file_count} | {result.total_lines:,} | "
+                        f"{result.execution_time_seconds:.2f} | {result.files_per_second:.1f} | "
+                        f"{result.memory_peak_mb:.1f} | {result.violations_found} |\n"
+                    )
                 else:
                     f.write(f"| {name} | - | - | ERROR | - | - | - |\n")
             f.write("\n")
 
         # Parallel scaling results
-        if 'parallel_scaling' in all_results:
+        if "parallel_scaling" in all_results:
             f.write("## Parallel Processing Scaling\n\n")
             f.write("| Workers | Time (s) | Speedup | Efficiency | Memory (MB) |\n")
             f.write("|---------|----------|---------|------------|-------------|\n")
 
-            for workers_key, result in all_results['parallel_scaling'].items():
-                if isinstance(result, dict) and 'error' not in result:
-                    workers = result['worker_count']
-                    f.write(f"| {workers} | {result['execution_time']:.2f} | "
-                           f"{result['speedup_factor']:.2f}x | {result['efficiency']:.2f} | "
-                           f"{result.get('memory_peak_mb', 0):.1f} |\n")
+            for workers_key, result in all_results["parallel_scaling"].items():
+                if isinstance(result, dict) and "error" not in result:
+                    workers = result["worker_count"]
+                    f.write(
+                        f"| {workers} | {result['execution_time']:.2f} | "
+                        f"{result['speedup_factor']:.2f}x | {result['efficiency']:.2f} | "
+                        f"{result.get('memory_peak_mb', 0):.1f} |\n"
+                    )
             f.write("\n")
 
         # Caching effectiveness
-        if 'caching' in all_results:
-            cache_result = all_results['caching']
-            if 'error' not in cache_result:
+        if "caching" in all_results:
+            cache_result = all_results["caching"]
+            if "error" not in cache_result:
                 f.write("## Caching Effectiveness\n\n")
                 f.write(f"- **Cold run time**: {cache_result['cold_run_time_seconds']:.2f}s\n")
                 f.write(f"- **Warm run time**: {cache_result['warm_run_time_seconds']:.2f}s\n")
                 f.write(f"- **Speedup**: {cache_result['cache_speedup_factor']:.2f}x\n")
-                f.write(f"- **Time saved**: {cache_result['time_saved_seconds']:.2f}s ({cache_result['effectiveness_percent']:.1f}%)\n")
+                f.write(
+                    f"- **Time saved**: {cache_result['time_saved_seconds']:.2f}s ({cache_result['effectiveness_percent']:.1f}%)\n"
+                )
                 f.write(f"- **Results consistent**: {cache_result['violations_consistent']}\n\n")
 
         # Incremental analysis
-        if 'incremental' in all_results:
-            inc_result = all_results['incremental']
-            if 'error' not in inc_result:
+        if "incremental" in all_results:
+            inc_result = all_results["incremental"]
+            if "error" not in inc_result:
                 f.write("## Incremental Analysis Performance\n\n")
                 f.write(f"- **Baseline time**: {inc_result['baseline_time_seconds']:.2f}s\n")
                 f.write(f"- **Incremental time**: {inc_result['incremental_time_seconds']:.2f}s\n")
@@ -361,20 +364,26 @@ def generate_performance_report(all_results: dict, output_dir: str):
         f.write("## Performance Target Assessment\n\n")
 
         # Check if targets are met based on test package results
-        if 'test_packages' in all_results:
+        if "test_packages" in all_results:
             targets_met = []
 
-            for name, result in all_results['test_packages'].items():
-                if isinstance(result, dict) and 'error' not in result:
+            for name, result in all_results["test_packages"].items():
+                if isinstance(result, dict) and "error" not in result:
                     if result.file_count > 1000:  # Large codebase
                         target_met = result.execution_time_seconds < 300  # 5 minutes
-                        targets_met.append(f"Large codebase ({name}): {'✅ PASS' if target_met else '❌ FAIL'} ({result.execution_time_seconds:.1f}s)")
+                        targets_met.append(
+                            f"Large codebase ({name}): {'✅ PASS' if target_met else '❌ FAIL'} ({result.execution_time_seconds:.1f}s)"
+                        )
                     elif result.file_count > 100:  # Medium codebase
                         target_met = result.execution_time_seconds < 30  # 30 seconds
-                        targets_met.append(f"Medium codebase ({name}): {'✅ PASS' if target_met else '❌ FAIL'} ({result.execution_time_seconds:.1f}s)")
+                        targets_met.append(
+                            f"Medium codebase ({name}): {'✅ PASS' if target_met else '❌ FAIL'} ({result.execution_time_seconds:.1f}s)"
+                        )
                     else:  # Small codebase
                         target_met = result.execution_time_seconds < 5  # 5 seconds
-                        targets_met.append(f"Small codebase ({name}): {'✅ PASS' if target_met else '❌ FAIL'} ({result.execution_time_seconds:.1f}s)")
+                        targets_met.append(
+                            f"Small codebase ({name}): {'✅ PASS' if target_met else '❌ FAIL'} ({result.execution_time_seconds:.1f}s)"
+                        )
 
             for target in targets_met:
                 f.write(f"- {target}\n")
@@ -386,30 +395,30 @@ def generate_performance_report(all_results: dict, output_dir: str):
         recommendations = []
 
         # Analyze results and generate recommendations
-        if 'parallel_scaling' in all_results:
-            parallel_results = all_results['parallel_scaling']
+        if "parallel_scaling" in all_results:
+            parallel_results = all_results["parallel_scaling"]
             best_efficiency = 0
             best_workers = 1
 
             for workers_key, result in parallel_results.items():
-                if isinstance(result, dict) and 'efficiency' in result and result['efficiency'] > best_efficiency:
-                    best_efficiency = result['efficiency']
-                    best_workers = result['worker_count']
+                if isinstance(result, dict) and "efficiency" in result and result["efficiency"] > best_efficiency:
+                    best_efficiency = result["efficiency"]
+                    best_workers = result["worker_count"]
 
             recommendations.append(f"Optimal worker count: {best_workers} (efficiency: {best_efficiency:.2f})")
 
-        if 'caching' in all_results and 'error' not in all_results['caching']:
-            cache_result = all_results['caching']
-            if cache_result['cache_speedup_factor'] > 2.0:
+        if "caching" in all_results and "error" not in all_results["caching"]:
+            cache_result = all_results["caching"]
+            if cache_result["cache_speedup_factor"] > 2.0:
                 recommendations.append("Caching is highly effective - ensure it's enabled in production")
-            elif cache_result['cache_speedup_factor'] < 1.5:
+            elif cache_result["cache_speedup_factor"] < 1.5:
                 recommendations.append("Consider implementing more aggressive caching strategies")
 
-        if 'incremental' in all_results and 'error' not in all_results['incremental']:
-            inc_result = all_results['incremental']
-            if inc_result['skip_percentage'] > 80:
+        if "incremental" in all_results and "error" not in all_results["incremental"]:
+            inc_result = all_results["incremental"]
+            if inc_result["skip_percentage"] > 80:
                 recommendations.append("Incremental analysis is highly effective for CI/CD pipelines")
-            elif inc_result['skip_percentage'] < 50:
+            elif inc_result["skip_percentage"] < 50:
                 recommendations.append("Consider improving dependency analysis for better incremental performance")
 
         # Default recommendations
@@ -417,7 +426,7 @@ def generate_performance_report(all_results: dict, output_dir: str):
             recommendations = [
                 "Performance appears acceptable for current workloads",
                 "Consider implementing incremental analysis for CI/CD pipelines",
-                "Monitor performance trends over time"
+                "Monitor performance trends over time",
             ]
 
         for i, rec in enumerate(recommendations, 1):
@@ -432,22 +441,14 @@ def main():
     """Main entry point."""
 
     parser = argparse.ArgumentParser(description="Run performance benchmarks")
-    parser.add_argument('--output', '-o', default='tests/performance/results',
-                       help='Output directory for results')
-    parser.add_argument('--test-packages', action='store_true',
-                       help='Benchmark test packages')
-    parser.add_argument('--parallel', action='store_true',
-                       help='Benchmark parallel processing')
-    parser.add_argument('--caching', action='store_true',
-                       help='Benchmark caching effectiveness')
-    parser.add_argument('--incremental', action='store_true',
-                       help='Benchmark incremental analysis')
-    parser.add_argument('--comprehensive', action='store_true',
-                       help='Run all benchmarks')
-    parser.add_argument('--verbose', '-v', action='store_true',
-                       help='Enable verbose output')
-    parser.add_argument('--optimize-cache', action='store_true',
-                       help='Optimize cache before benchmarks')
+    parser.add_argument("--output", "-o", default="tests/performance/results", help="Output directory for results")
+    parser.add_argument("--test-packages", action="store_true", help="Benchmark test packages")
+    parser.add_argument("--parallel", action="store_true", help="Benchmark parallel processing")
+    parser.add_argument("--caching", action="store_true", help="Benchmark caching effectiveness")
+    parser.add_argument("--incremental", action="store_true", help="Benchmark incremental analysis")
+    parser.add_argument("--comprehensive", action="store_true", help="Run all benchmarks")
+    parser.add_argument("--verbose", "-v", action="store_true", help="Enable verbose output")
+    parser.add_argument("--optimize-cache", action="store_true", help="Optimize cache before benchmarks")
 
     args = parser.parse_args()
 
@@ -467,19 +468,19 @@ def main():
     # Run selected benchmarks
     if args.comprehensive or args.test_packages:
         print("Running test package benchmarks...")
-        all_results['test_packages'] = benchmark_test_packages(str(output_dir), args.verbose)
+        all_results["test_packages"] = benchmark_test_packages(str(output_dir), args.verbose)
 
     if args.comprehensive or args.parallel:
         print("Running parallel scaling benchmarks...")
-        all_results['parallel_scaling'] = benchmark_parallel_scaling(str(output_dir))
+        all_results["parallel_scaling"] = benchmark_parallel_scaling(str(output_dir))
 
     if args.comprehensive or args.caching:
         print("Running caching effectiveness benchmark...")
-        all_results['caching'] = benchmark_caching_effectiveness(args.verbose)
+        all_results["caching"] = benchmark_caching_effectiveness(args.verbose)
 
     if args.comprehensive or args.incremental:
         print("Running incremental analysis benchmark...")
-        all_results['incremental'] = benchmark_incremental_analysis(str(output_dir), args.verbose)
+        all_results["incremental"] = benchmark_incremental_analysis(str(output_dir), args.verbose)
 
     # Generate comprehensive report
     if all_results:

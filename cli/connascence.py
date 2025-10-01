@@ -5,4 +5,4 @@ from interfaces.cli.connascence import ConnascenceCLI
 from interfaces.cli.main_python import main
 
 # Export for backward compatibility
-__all__ = ['ConnascenceCLI', 'main']
+__all__ = ["ConnascenceCLI", "main"]

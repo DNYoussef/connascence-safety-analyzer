@@ -77,7 +77,7 @@ ENTERPRISE_CONFIG = {
             "exclude": "tests/,docs/,vendor/",
             "path": None,  # Full repo except exclusions
             "expected_violations": 4630,
-            "description": "Python async framework - complex codebase analysis"
+            "description": "Python async framework - complex codebase analysis",
         },
         "curl": {
             "url": "https://github.com/curl/curl",
@@ -86,7 +86,7 @@ ENTERPRISE_CONFIG = {
             "exclude": None,
             "path": "lib/",  # lib/ only
             "expected_violations": 1061,
-            "description": "C networking library - mature codebase analysis"
+            "description": "C networking library - mature codebase analysis",
         },
         "express": {
             "url": "https://github.com/expressjs/express",
@@ -95,15 +95,17 @@ ENTERPRISE_CONFIG = {
             "exclude": None,
             "path": "lib/",  # lib/ only
             "expected_violations": 52,
-            "description": "JavaScript framework - precision on well-architected code"
-        }
+            "description": "JavaScript framework - precision on well-architected code",
+        },
     },
-    "expected_total": 5743
+    "expected_total": 5743,
 }
+
 
 @dataclass
 class AnalysisResult:
     """Result of connascence analysis"""
+
     repository: str
     sha: str
     violations_found: int
@@ -125,9 +127,11 @@ class AnalysisResult:
         else:
             return "MISMATCH"
 
+
 @dataclass
 class ReproductionSession:
     """Complete reproduction session data"""
+
     session_id: str
     timestamp: str
     tool_version: str
@@ -138,6 +142,7 @@ class ReproductionSession:
     session_success: bool
     execution_time: float
     output_directory: str
+
 
 class EnterpriseReproducer:
     """
@@ -205,21 +210,12 @@ class EnterpriseReproducer:
 
         try:
             # Clone repository
-            clone_cmd = [
-                "git", "clone", "--single-branch",
-                config["url"], str(repo_dir)
-            ]
+            clone_cmd = ["git", "clone", "--single-branch", config["url"], str(repo_dir)]
             subprocess.run(clone_cmd, capture_output=True, text=True, check=True)
 
             # Checkout exact SHA
             checkout_cmd = ["git", "checkout", config["sha"]]
-            subprocess.run(
-                checkout_cmd,
-                cwd=repo_dir,
-                capture_output=True,
-                text=True,
-                check=True
-            )
+            subprocess.run(checkout_cmd, cwd=repo_dir, capture_output=True, text=True, check=True)
 
             self.log(f"Successfully cloned {repo_name} at SHA {config['sha']}")
             return repo_dir
@@ -264,7 +260,7 @@ class EnterpriseReproducer:
                     analysis_time=0,
                     success=False,
                     output_files=[],
-                    error_message=f"Target path {config['path']} not found in repository"
+                    error_message=f"Target path {config['path']} not found in repository",
                 )
 
         # Setup output directory for this repository
@@ -275,27 +271,35 @@ class EnterpriseReproducer:
         # Try CLI first, fallback to direct Python if CLI not available
         try:
             # Check if CLI is available
-            result = subprocess.run(["connascence", "--version"], 
-                                  capture_output=True, timeout=10)
+            result = subprocess.run(["connascence", "--version"], check=False, capture_output=True, timeout=10)
             cli_available = result.returncode == 0
         except (subprocess.SubprocessError, FileNotFoundError):
             cli_available = False
-            
+
         if cli_available:
             cmd = [
-                "connascence", "analyze",
-                "--path", str(target_path),
-                "--profile", config["profile"],
-                "--format", "sarif,json,md",
-                "--output", str(repo_output_dir)
+                "connascence",
+                "analyze",
+                "--path",
+                str(target_path),
+                "--profile",
+                config["profile"],
+                "--format",
+                "sarif,json,md",
+                "--output",
+                str(repo_output_dir),
             ]
         else:
             # Fallback to direct Python module execution
             cmd = [
-                "python", "-m", "analyzer.check_connascence",
+                "python",
+                "-m",
+                "analyzer.check_connascence",
                 str(target_path),
-                "--format", "json",
-                "--output", str(repo_output_dir / f"{repo_name}_analysis.json")
+                "--format",
+                "json",
+                "--output",
+                str(repo_output_dir / f"{repo_name}_analysis.json"),
             ]
 
         # Add exclusions if specified
@@ -314,7 +318,7 @@ class EnterpriseReproducer:
                 capture_output=True,
                 text=True,
                 timeout=1800,  # 30 minute timeout
-                check=False  # Don't raise on non-zero exit
+                check=False,  # Don't raise on non-zero exit
             )
 
             execution_time = time.time() - start_time
@@ -342,7 +346,7 @@ class EnterpriseReproducer:
                 analysis_time=execution_time,
                 success=success,
                 output_files=output_files,
-                error_message=result.stderr if not success else None
+                error_message=result.stderr if not success else None,
             )
 
         except subprocess.TimeoutExpired:
@@ -355,7 +359,7 @@ class EnterpriseReproducer:
                 analysis_time=execution_time,
                 success=False,
                 output_files=[],
-                error_message="Analysis timed out after 30 minutes"
+                error_message="Analysis timed out after 30 minutes",
             )
         except Exception as e:
             execution_time = time.time() - start_time
@@ -367,7 +371,7 @@ class EnterpriseReproducer:
                 analysis_time=execution_time,
                 success=False,
                 output_files=[],
-                error_message=str(e)
+                error_message=str(e),
             )
 
     def parse_violation_count(self, output_dir: Path) -> int:
@@ -383,7 +387,7 @@ class EnterpriseReproducer:
         sarif_file = output_dir / "report.sarif"
         if sarif_file.exists():
             try:
-                with open(sarif_file, encoding='utf-8') as f:
+                with open(sarif_file, encoding="utf-8") as f:
                     sarif_data = json.load(f)
                 # Count results across all runs
                 total_violations = 0
@@ -398,7 +402,7 @@ class EnterpriseReproducer:
         json_file = output_dir / "report.json"
         if json_file.exists():
             try:
-                with open(json_file, encoding='utf-8') as f:
+                with open(json_file, encoding="utf-8") as f:
                     json_data = json.load(f)
                 total_violations = json_data.get("summary", {}).get("total_violations", -1)
                 if total_violations >= 0:
@@ -411,11 +415,12 @@ class EnterpriseReproducer:
         md_file = output_dir / "report.md"
         if md_file.exists():
             try:
-                with open(md_file, encoding='utf-8') as f:
+                with open(md_file, encoding="utf-8") as f:
                     content = f.read()
                 # Look for "Total violations: X" pattern
                 import re
-                match = re.search(r'Total violations:\s*(\d+)', content)
+
+                match = re.search(r"Total violations:\s*(\d+)", content)
                 if match:
                     total_violations = int(match.group(1))
                     self.log(f"Parsed {total_violations} violations from Markdown")
@@ -441,12 +446,7 @@ class EnterpriseReproducer:
             "total_expected": ENTERPRISE_CONFIG["expected_total"],
             "total_found": sum(r.violations_found for r in results if r.success),
             "individual_results": {},
-            "validation_summary": {
-                "exact_matches": 0,
-                "close_matches": 0,
-                "mismatches": 0,
-                "errors": 0
-            }
+            "validation_summary": {"exact_matches": 0, "close_matches": 0, "mismatches": 0, "errors": 0},
         }
 
         # Validate each repository
@@ -459,9 +459,10 @@ class EnterpriseReproducer:
                 "variance": result.violations_found - result.expected_violations if result.success else None,
                 "variance_percent": (
                     ((result.violations_found - result.expected_violations) / result.expected_violations * 100)
-                    if result.success and result.expected_violations > 0 else None
+                    if result.success and result.expected_violations > 0
+                    else None
                 ),
-                "error_message": result.error_message
+                "error_message": result.error_message,
             }
 
             validation_report["individual_results"][result.repository] = repo_validation
@@ -482,17 +483,18 @@ class EnterpriseReproducer:
             "variance": total_variance,
             "variance_percent": (total_variance / validation_report["total_expected"] * 100),
             "status": (
-                "EXACT_MATCH" if total_variance == 0 else
-                "CLOSE_MATCH" if abs(total_variance) <= 20 else  # Allow some variance
-                "MISMATCH"
-            )
+                "EXACT_MATCH"
+                if total_variance == 0
+                else "CLOSE_MATCH"
+                if abs(total_variance) <= 20
+                else "MISMATCH"  # Allow some variance
+            ),
         }
 
         # Overall validation success
-        validation_report["overall_success"] = (
-            validation_report["validation_summary"]["errors"] == 0 and
-            validation_report["total_validation"]["status"] in ["EXACT_MATCH", "CLOSE_MATCH"]
-        )
+        validation_report["overall_success"] = validation_report["validation_summary"][
+            "errors"
+        ] == 0 and validation_report["total_validation"]["status"] in ["EXACT_MATCH", "CLOSE_MATCH"]
 
         return validation_report
 
@@ -528,12 +530,9 @@ class EnterpriseReproducer:
 """
 
         for result in session.results:
-            status_icon = {
-                "EXACT_MATCH": "✅",
-                "CLOSE_MATCH": "🟡",
-                "MISMATCH": "❌",
-                "ERROR": "💥"
-            }.get(result.validation_status, "❓")
+            status_icon = {"EXACT_MATCH": "✅", "CLOSE_MATCH": "🟡", "MISMATCH": "❌", "ERROR": "💥"}.get(
+                result.validation_status, "❓"
+            )
 
             variance_text = ""
             if result.success:
@@ -639,12 +638,12 @@ For questions or issues with reproduction:
 
         # Write report file
         report_path = self.output_dir / "reproduction_report.md"
-        with open(report_path, 'w', encoding='utf-8') as f:
+        with open(report_path, "w", encoding="utf-8") as f:
             f.write(report_content)
 
         # Write machine-readable session data
         session_path = self.output_dir / "reproduction_session.json"
-        with open(session_path, 'w', encoding='utf-8') as f:
+        with open(session_path, "w", encoding="utf-8") as f:
             json.dump(asdict(session), f, indent=2, default=str)
 
         self.log(f"Reproduction report generated: {report_path}")
@@ -678,7 +677,7 @@ For questions or issues with reproduction:
                 analysis_time=0,
                 success=False,
                 output_files=[],
-                error_message="Failed to clone repository"
+                error_message="Failed to clone repository",
             )
 
         # Run analysis
@@ -747,7 +746,7 @@ For questions or issues with reproduction:
             expected_total=ENTERPRISE_CONFIG["expected_total"],
             session_success=session_success,
             execution_time=time.time() - session_start_time,
-            output_directory=str(self.output_dir)
+            output_directory=str(self.output_dir),
         )
 
         # Validate results
@@ -755,7 +754,7 @@ For questions or issues with reproduction:
 
         # Save validation report
         validation_path = self.output_dir / "validation_results.json"
-        with open(validation_path, 'w', encoding='utf-8') as f:
+        with open(validation_path, "w", encoding="utf-8") as f:
             json.dump(validation_report, f, indent=2)
 
         # Generate comprehensive report
@@ -764,7 +763,10 @@ For questions or issues with reproduction:
         # Final summary
         if session.session_success and validation_report["overall_success"]:
             self.log("🎯 ENTERPRISE DEMO REPRODUCTION SUCCESSFUL!", "SUCCESS")
-            self.log(f"📊 Total violations found: {total_violations:,} (Expected: {ENTERPRISE_CONFIG['expected_total']:,})", "SUCCESS")
+            self.log(
+                f"📊 Total violations found: {total_violations:,} (Expected: {ENTERPRISE_CONFIG['expected_total']:,})",
+                "SUCCESS",
+            )
         else:
             self.log("❌ Enterprise demo reproduction had issues", "ERROR")
 
@@ -785,62 +787,46 @@ Examples:
   python scripts/reproduce_enterprise_demo.py --repo celery --verbose
   python scripts/reproduce_enterprise_demo.py --output-dir ./my_reproduction
   python scripts/reproduce_enterprise_demo.py --quick --generate-report
-        """
+        """,
     )
 
     parser.add_argument(
-        "--validate-all",
-        action="store_true",
-        help="Run full reproduction validation for all repositories"
+        "--validate-all", action="store_true", help="Run full reproduction validation for all repositories"
     )
 
     parser.add_argument(
-        "--repo",
-        choices=["celery", "curl", "express"],
-        help="Reproduce analysis for specific repository only"
+        "--repo", choices=["celery", "curl", "express"], help="Reproduce analysis for specific repository only"
     )
 
     parser.add_argument(
         "--output-dir",
         type=Path,
-        help="Output directory for reproduction results (default: ./enterprise_reproduction_output)"
+        help="Output directory for reproduction results (default: ./enterprise_reproduction_output)",
     )
 
     parser.add_argument(
         "--base-path",
         type=Path,
         default=Path.cwd(),
-        help="Base path for connascence analyzer (default: current directory)"
+        help="Base path for connascence analyzer (default: current directory)",
+    )
+
+    parser.add_argument("--verbose", action="store_true", help="Enable verbose logging")
+
+    parser.add_argument("--quick", action="store_true", help="Run with reduced timeouts for quick validation")
+
+    parser.add_argument(
+        "--generate-report", action="store_true", help="Generate report from existing results (no re-analysis)"
     )
 
     parser.add_argument(
-        "--verbose",
-        action="store_true",
-        help="Enable verbose logging"
+        "--quick-mode", action="store_true", help="Run with reduced timeouts for quick validation (alias for --quick)"
     )
 
-    parser.add_argument(
-        "--quick",
-        action="store_true",
-        help="Run with reduced timeouts for quick validation"
-    )
-
-    parser.add_argument(
-        "--generate-report",
-        action="store_true",
-        help="Generate report from existing results (no re-analysis)"
-    )
-    
-    parser.add_argument(
-        "--quick-mode",
-        action="store_true",
-        help="Run with reduced timeouts for quick validation (alias for --quick)"
-    )
-    
     parser.add_argument(
         "--validate-performance",
         action="store_true",
-        help="Validate performance characteristics and generate detailed report (alias for --generate-report with enhanced metrics)"
+        help="Validate performance characteristics and generate detailed report (alias for --generate-report with enhanced metrics)",
     )
 
     args = parser.parse_args()
@@ -857,13 +843,9 @@ Examples:
     # Handle argument aliases
     quick_mode = args.quick or args.quick_mode
     generate_report_mode = args.generate_report or args.validate_performance
-    
+
     # Initialize reproducer
-    reproducer = EnterpriseReproducer(
-        base_path=args.base_path,
-        output_dir=args.output_dir,
-        verbose=args.verbose
-    )
+    reproducer = EnterpriseReproducer(base_path=args.base_path, output_dir=args.output_dir, verbose=args.verbose)
 
     try:
         if generate_report_mode:
@@ -888,7 +870,11 @@ Examples:
                 print(f"   Found: {result.violations_found:,} violations")
                 print(f"   Status: {result.validation_status}")
                 print(f"   Time: {result.analysis_time:.2f}s")
-                sys.exit(EXIT_SUCCESS if result.validation_status in ["EXACT_MATCH", "CLOSE_MATCH"] else EXIT_VALIDATION_FAILED)
+                sys.exit(
+                    EXIT_SUCCESS
+                    if result.validation_status in ["EXACT_MATCH", "CLOSE_MATCH"]
+                    else EXIT_VALIDATION_FAILED
+                )
             else:
                 print(f"❌ {args.repo.upper()} Analysis Failed!")
                 if result and result.error_message:
@@ -927,6 +913,7 @@ Examples:
         print(f"❌ Unexpected error: {e}", file=sys.stderr)
         if args.verbose:
             import traceback
+
             traceback.print_exc()
         sys.exit(EXIT_RUNTIME_ERROR)
 

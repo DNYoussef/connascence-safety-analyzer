@@ -36,15 +36,18 @@ from .tier_classifier import AutofixTierClassifier, SafetyTier
 
 class PatchType(Enum):
     """Types of patches that can be generated"""
+
     SINGLE_FILE = "single_file"
     MULTI_FILE = "multi_file"
     REFACTOR = "refactor"
     EXTRACT = "extract"
     RENAME = "rename"
 
+
 @dataclass
 class PatchOperation:
     """Individual operation within a patch"""
+
     operation_type: str  # "replace", "insert", "delete", "create_file", "rename_file"
     file_path: str
     old_content: Optional[str] = None
@@ -53,9 +56,11 @@ class PatchOperation:
     line_end: Optional[int] = None
     new_file_path: Optional[str] = None  # For renames/moves
 
+
 @dataclass
 class GeneratedPatch:
     """Complete patch with metadata and operations"""
+
     patch_id: str
     patch_type: PatchType
     description: str
@@ -69,6 +74,7 @@ class GeneratedPatch:
     fix_examples: Dict[str, str]  # before/after examples
     nasa_rules_preserved: List[int]
 
+
 class PatchGenerator:
     """
     Multi-file aware patch generator with safety validation.
@@ -81,9 +87,9 @@ class PatchGenerator:
         self.tier_classifier = AutofixTierClassifier()
         self.patch_counter = 0
 
-    def generate_patch(self, violation: Dict[str, Any],
-                      context_data: Dict[str, Any],
-                      fix_strategy: Optional[str] = None) -> GeneratedPatch:
+    def generate_patch(
+        self, violation: Dict[str, Any], context_data: Dict[str, Any], fix_strategy: Optional[str] = None
+    ) -> GeneratedPatch:
         """
         Generate a patch for a specific violation.
 
@@ -99,10 +105,7 @@ class PatchGenerator:
         # Classify the fix safety level
         proposed_fix = self._generate_proposed_fix(violation, context_data, fix_strategy)
         classification = self.tier_classifier.classify_autofix(
-            violation['type'],
-            context_data.get('code_context', ''),
-            violation['file_path'],
-            proposed_fix['description']
+            violation["type"], context_data.get("code_context", ""), violation["file_path"], proposed_fix["description"]
         )
 
         # Generate patch operations based on violation type
@@ -112,7 +115,7 @@ class PatchGenerator:
         rollback_data = self._create_rollback_data(operations)
 
         # Generate fix examples for AI context
-        fix_examples = self._generate_fix_examples(violation['type'], context_data)
+        fix_examples = self._generate_fix_examples(violation["type"], context_data)
 
         # Check NASA rules preservation
         nasa_rules_preserved = self._check_nasa_rules_preservation(operations, context_data)
@@ -121,7 +124,7 @@ class PatchGenerator:
         patch = GeneratedPatch(
             patch_id=f"patch_{self.patch_counter}_{hashlib.md5(str(violation).encode()).hexdigest()[:8]}",
             patch_type=self._determine_patch_type(operations),
-            description=proposed_fix['description'],
+            description=proposed_fix["description"],
             operations=operations,
             safety_tier=classification.tier,
             nasa_compliant=classification.nasa_compliance,
@@ -130,27 +133,27 @@ class PatchGenerator:
             rollback_data=rollback_data,
             confidence_score=classification.confidence,
             fix_examples=fix_examples,
-            nasa_rules_preserved=nasa_rules_preserved
+            nasa_rules_preserved=nasa_rules_preserved,
         )
 
         return patch
 
-    def _generate_proposed_fix(self, violation: Dict[str, Any],
-                              context_data: Dict[str, Any],
-                              fix_strategy: Optional[str]) -> Dict[str, Any]:
+    def _generate_proposed_fix(
+        self, violation: Dict[str, Any], context_data: Dict[str, Any], fix_strategy: Optional[str]
+    ) -> Dict[str, Any]:
         """Generate proposed fix based on violation type"""
 
-        violation_type = violation['type']
+        violation_type = violation["type"]
 
-        if violation_type == 'magic_literal':
+        if violation_type == "magic_literal":
             return self._propose_magic_literal_fix(violation, context_data)
-        elif violation_type == 'god_object':
+        elif violation_type == "god_object":
             return self._propose_god_object_fix(violation, context_data)
-        elif violation_type == 'parameter_position':
+        elif violation_type == "parameter_position":
             return self._propose_parameter_fix(violation, context_data)
-        elif violation_type == 'connascence_of_name':
+        elif violation_type == "connascence_of_name":
             return self._propose_naming_fix(violation, context_data)
-        elif violation_type == 'connascence_of_type':
+        elif violation_type == "connascence_of_type":
             return self._propose_type_fix(violation, context_data)
         else:
             return self._propose_generic_fix(violation, context_data)
@@ -159,7 +162,7 @@ class PatchGenerator:
         """Propose fix for magic literal violations"""
 
         # Extract the literal value and suggest a constant name
-        code_context = context_data.get('code_context', '')
+        code_context = context_data.get("code_context", "")
         literal_match = re.search(r'([0-9]+|"[^"]*"|\'[^\']*\')', code_context)
 
         if literal_match:
@@ -168,107 +171,104 @@ class PatchGenerator:
             if literal_value.isdigit():
                 const_name = f"CONST_{literal_value}" if len(literal_value) < 4 else "DEFAULT_VALUE"
             else:
-                clean_value = re.sub(r'[^a-zA-Z0-9]', '_', literal_value.strip('\'"'))
+                clean_value = re.sub(r"[^a-zA-Z0-9]", "_", literal_value.strip("'\""))
                 const_name = f"DEFAULT_{clean_value.upper()}"
 
             return {
-                'description': f'Extract magic literal {literal_value} to constant {const_name}',
-                'literal_value': literal_value,
-                'constant_name': const_name,
-                'strategy': 'extract_constant'
+                "description": f"Extract magic literal {literal_value} to constant {const_name}",
+                "literal_value": literal_value,
+                "constant_name": const_name,
+                "strategy": "extract_constant",
             }
 
-        return {
-            'description': 'Extract magic literal to named constant',
-            'strategy': 'extract_constant'
-        }
+        return {"description": "Extract magic literal to named constant", "strategy": "extract_constant"}
 
     def _propose_god_object_fix(self, violation: Dict[str, Any], context_data: Dict[str, Any]) -> Dict[str, Any]:
         """Propose fix for god object violations"""
 
         return {
-            'description': 'Break down god object into smaller, focused classes using Single Responsibility Principle',
-            'strategy': 'extract_classes',
-            'requires_human_review': True,
-            'complexity': 'high'
+            "description": "Break down god object into smaller, focused classes using Single Responsibility Principle",
+            "strategy": "extract_classes",
+            "requires_human_review": True,
+            "complexity": "high",
         }
 
     def _propose_parameter_fix(self, violation: Dict[str, Any], context_data: Dict[str, Any]) -> Dict[str, Any]:
         """Propose fix for parameter position violations"""
 
         return {
-            'description': 'Replace parameter list with parameter object or named parameters',
-            'strategy': 'parameter_object',
-            'complexity': 'medium'
+            "description": "Replace parameter list with parameter object or named parameters",
+            "strategy": "parameter_object",
+            "complexity": "medium",
         }
 
     def _propose_naming_fix(self, violation: Dict[str, Any], context_data: Dict[str, Any]) -> Dict[str, Any]:
         """Propose fix for naming connascence"""
 
         return {
-            'description': 'Improve naming consistency and reduce name coupling',
-            'strategy': 'rename_refactor',
-            'complexity': 'low'
+            "description": "Improve naming consistency and reduce name coupling",
+            "strategy": "rename_refactor",
+            "complexity": "low",
         }
 
     def _propose_type_fix(self, violation: Dict[str, Any], context_data: Dict[str, Any]) -> Dict[str, Any]:
         """Propose fix for type connascence"""
 
         return {
-            'description': 'Reduce type coupling through interfaces or generic types',
-            'strategy': 'type_abstraction',
-            'complexity': 'medium'
+            "description": "Reduce type coupling through interfaces or generic types",
+            "strategy": "type_abstraction",
+            "complexity": "medium",
         }
 
     def _propose_generic_fix(self, violation: Dict[str, Any], context_data: Dict[str, Any]) -> Dict[str, Any]:
         """Generic fix proposal"""
 
         return {
-            'description': f'Reduce {violation["type"]} coupling through appropriate refactoring',
-            'strategy': 'generic_refactor',
-            'complexity': 'medium'
+            "description": f'Reduce {violation["type"]} coupling through appropriate refactoring',
+            "strategy": "generic_refactor",
+            "complexity": "medium",
         }
 
-    def _generate_operations(self, violation: Dict[str, Any],
-                           context_data: Dict[str, Any],
-                           proposed_fix: Dict[str, Any]) -> List[PatchOperation]:
+    def _generate_operations(
+        self, violation: Dict[str, Any], context_data: Dict[str, Any], proposed_fix: Dict[str, Any]
+    ) -> List[PatchOperation]:
         """Generate specific patch operations"""
 
         operations = []
 
-        if proposed_fix['strategy'] == 'extract_constant':
+        if proposed_fix["strategy"] == "extract_constant":
             operations.extend(self._generate_constant_extraction_ops(violation, context_data, proposed_fix))
-        elif proposed_fix['strategy'] == 'extract_classes':
+        elif proposed_fix["strategy"] == "extract_classes":
             operations.extend(self._generate_class_extraction_ops(violation, context_data, proposed_fix))
-        elif proposed_fix['strategy'] == 'parameter_object':
+        elif proposed_fix["strategy"] == "parameter_object":
             operations.extend(self._generate_parameter_object_ops(violation, context_data, proposed_fix))
         else:
             operations.extend(self._generate_generic_ops(violation, context_data, proposed_fix))
 
         return operations
 
-    def _generate_constant_extraction_ops(self, violation: Dict[str, Any],
-                                        context_data: Dict[str, Any],
-                                        proposed_fix: Dict[str, Any]) -> List[PatchOperation]:
+    def _generate_constant_extraction_ops(
+        self, violation: Dict[str, Any], context_data: Dict[str, Any], proposed_fix: Dict[str, Any]
+    ) -> List[PatchOperation]:
         """Generate operations for extracting magic literals to constants"""
 
         operations = []
-        file_path = violation['file_path']
+        file_path = violation["file_path"]
 
         # Read current file content
         with open(file_path) as f:
             current_content = f.read()
 
-        lines = current_content.split('\n')
+        lines = current_content.split("\n")
 
         # Find the line with the magic literal
-        violation_line = violation.get('line_number', 1) - 1  # Convert to 0-based
+        violation_line = violation.get("line_number", 1) - 1  # Convert to 0-based
         if violation_line < len(lines):
             line_content = lines[violation_line]
 
             # Replace literal with constant reference
-            literal_value = proposed_fix.get('literal_value', '')
-            constant_name = proposed_fix.get('constant_name', 'EXTRACTED_CONSTANT')
+            literal_value = proposed_fix.get("literal_value", "")
+            constant_name = proposed_fix.get("constant_name", "EXTRACTED_CONSTANT")
 
             if literal_value:
                 new_line = line_content.replace(literal_value, constant_name)
@@ -279,73 +279,79 @@ class PatchGenerator:
                 # Find appropriate place to add constant (after imports)
                 insert_line = 0
                 for i, line in enumerate(lines):
-                    if line.strip().startswith(('import ', 'from ')) or line.strip().startswith('#'):
+                    if line.strip().startswith(("import ", "from ")) or line.strip().startswith("#"):
                         insert_line = i + 1
                     else:
                         break
 
                 # Operation 1: Add constant definition
-                operations.append(PatchOperation(
-                    operation_type="insert",
-                    file_path=file_path,
-                    new_content=constant_definition + "\n",
-                    line_start=insert_line
-                ))
+                operations.append(
+                    PatchOperation(
+                        operation_type="insert",
+                        file_path=file_path,
+                        new_content=constant_definition + "\n",
+                        line_start=insert_line,
+                    )
+                )
 
                 # Operation 2: Replace literal usage
-                operations.append(PatchOperation(
-                    operation_type="replace",
-                    file_path=file_path,
-                    old_content=line_content,
-                    new_content=new_line,
-                    line_start=violation_line,
-                    line_end=violation_line
-                ))
+                operations.append(
+                    PatchOperation(
+                        operation_type="replace",
+                        file_path=file_path,
+                        old_content=line_content,
+                        new_content=new_line,
+                        line_start=violation_line,
+                        line_end=violation_line,
+                    )
+                )
 
         return operations
 
-    def _generate_class_extraction_ops(self, violation: Dict[str, Any],
-                                     context_data: Dict[str, Any],
-                                     proposed_fix: Dict[str, Any]) -> List[PatchOperation]:
+    def _generate_class_extraction_ops(
+        self, violation: Dict[str, Any], context_data: Dict[str, Any], proposed_fix: Dict[str, Any]
+    ) -> List[PatchOperation]:
         """Generate operations for god object refactoring (requires human review)"""
 
         # For god objects, we generate a high-level plan rather than specific operations
         # since this requires architectural decisions
 
         operations = []
-        file_path = violation['file_path']
+        file_path = violation["file_path"]
 
         # Create a comment with refactoring suggestions
-        refactor_comment = '''
+        refactor_comment = """
 # TODO: Refactor this class to follow Single Responsibility Principle
 # Suggested approach:
 # 1. Extract data access methods to a Repository class
 # 2. Extract business logic to Service classes
 # 3. Extract validation logic to Validator classes
 # 4. Keep only coordination logic in this class
-'''
+"""
 
-        operations.append(PatchOperation(
-            operation_type="insert",
-            file_path=file_path,
-            new_content=refactor_comment,
-            line_start=violation.get('line_number', 1)
-        ))
+        operations.append(
+            PatchOperation(
+                operation_type="insert",
+                file_path=file_path,
+                new_content=refactor_comment,
+                line_start=violation.get("line_number", 1),
+            )
+        )
 
         return operations
 
-    def _generate_parameter_object_ops(self, violation: Dict[str, Any],
-                                     context_data: Dict[str, Any],
-                                     proposed_fix: Dict[str, Any]) -> List[PatchOperation]:
+    def _generate_parameter_object_ops(
+        self, violation: Dict[str, Any], context_data: Dict[str, Any], proposed_fix: Dict[str, Any]
+    ) -> List[PatchOperation]:
         """Generate operations for parameter object refactoring"""
 
         operations = []
-        file_path = violation['file_path']
+        file_path = violation["file_path"]
 
         # This is a simplified implementation - in practice would need
         # more sophisticated AST analysis to properly refactor parameters
 
-        refactor_comment = '''
+        refactor_comment = """
 # TODO: Replace parameter list with parameter object
 # Example:
 # @dataclass
@@ -356,33 +362,37 @@ class PatchGenerator:
 #
 # def function_name(config: ConfigParams):
 #     # Use config.param1, config.param2, etc.
-'''
+"""
 
-        operations.append(PatchOperation(
-            operation_type="insert",
-            file_path=file_path,
-            new_content=refactor_comment,
-            line_start=violation.get('line_number', 1)
-        ))
+        operations.append(
+            PatchOperation(
+                operation_type="insert",
+                file_path=file_path,
+                new_content=refactor_comment,
+                line_start=violation.get("line_number", 1),
+            )
+        )
 
         return operations
 
-    def _generate_generic_ops(self, violation: Dict[str, Any],
-                            context_data: Dict[str, Any],
-                            proposed_fix: Dict[str, Any]) -> List[PatchOperation]:
+    def _generate_generic_ops(
+        self, violation: Dict[str, Any], context_data: Dict[str, Any], proposed_fix: Dict[str, Any]
+    ) -> List[PatchOperation]:
         """Generate generic refactoring operations"""
 
         operations = []
-        file_path = violation['file_path']
+        file_path = violation["file_path"]
 
         comment = f"# TODO: Address {violation['type']} violation - {proposed_fix['description']}"
 
-        operations.append(PatchOperation(
-            operation_type="insert",
-            file_path=file_path,
-            new_content=comment + "\n",
-            line_start=violation.get('line_number', 1)
-        ))
+        operations.append(
+            PatchOperation(
+                operation_type="insert",
+                file_path=file_path,
+                new_content=comment + "\n",
+                line_start=violation.get("line_number", 1),
+            )
+        )
 
         return operations
 
@@ -393,7 +403,7 @@ class PatchGenerator:
 
         if len(affected_files) > 1:
             return PatchType.MULTI_FILE
-        elif any(op.operation_type in ['create_file', 'rename_file'] for op in operations):
+        elif any(op.operation_type in ["create_file", "rename_file"] for op in operations):
             return PatchType.REFACTOR
         else:
             return PatchType.SINGLE_FILE
@@ -401,25 +411,23 @@ class PatchGenerator:
     def _create_rollback_data(self, operations: List[PatchOperation]) -> Dict[str, Any]:
         """Create rollback information for the patch"""
 
-        rollback_data = {
-            'timestamp': str(datetime.now()),
-            'file_backups': {},
-            'operation_order': []
-        }
+        rollback_data = {"timestamp": str(datetime.now()), "file_backups": {}, "operation_order": []}
 
         # Create backups of all affected files
         for op in operations:
             file_path = op.file_path
-            if file_path not in rollback_data['file_backups'] and Path(file_path).exists():
+            if file_path not in rollback_data["file_backups"] and Path(file_path).exists():
                 with open(file_path) as f:
-                    rollback_data['file_backups'][file_path] = f.read()
+                    rollback_data["file_backups"][file_path] = f.read()
 
-            rollback_data['operation_order'].append({
-                'operation_type': op.operation_type,
-                'file_path': op.file_path,
-                'line_start': op.line_start,
-                'line_end': op.line_end
-            })
+            rollback_data["operation_order"].append(
+                {
+                    "operation_type": op.operation_type,
+                    "file_path": op.file_path,
+                    "line_start": op.line_start,
+                    "line_end": op.line_end,
+                }
+            )
 
         return rollback_data
 
@@ -431,21 +439,22 @@ class PatchGenerator:
             return examples
 
         # Default examples for common cases
-        if violation_type == 'magic_literal':
+        if violation_type == "magic_literal":
             return {
-                'before': 'if status_code == 404:\n    return "Not found"',
-                'after': 'HTTP_NOT_FOUND = 404\nif status_code == HTTP_NOT_FOUND:\n    return "Not found"',
-                'explanation': 'Extract magic literal to named constant for better readability'
+                "before": 'if status_code == 404:\n    return "Not found"',
+                "after": 'HTTP_NOT_FOUND = 404\nif status_code == HTTP_NOT_FOUND:\n    return "Not found"',
+                "explanation": "Extract magic literal to named constant for better readability",
             }
 
         return {
-            'before': '# Original code with violation',
-            'after': '# Refactored code addressing violation',
-            'explanation': f'Fix {violation_type} through appropriate refactoring'
+            "before": "# Original code with violation",
+            "after": "# Refactored code addressing violation",
+            "explanation": f"Fix {violation_type} through appropriate refactoring",
         }
 
-    def _check_nasa_rules_preservation(self, operations: List[PatchOperation],
-                                     context_data: Dict[str, Any]) -> List[int]:
+    def _check_nasa_rules_preservation(
+        self, operations: List[PatchOperation], context_data: Dict[str, Any]
+    ) -> List[int]:
         """Check which NASA Power of Ten rules are preserved by this patch"""
 
         preserved_rules = []
@@ -456,7 +465,7 @@ class PatchGenerator:
         # Rule 2: Bounded loops - check if patch doesn't introduce unbounded loops
         has_unbounded_loops = False
         for op in operations:
-            if op.new_content and 'while' in op.new_content and 'break' not in op.new_content:
+            if op.new_content and "while" in op.new_content and "break" not in op.new_content:
                 has_unbounded_loops = True
                 break
         if not has_unbounded_loops:
@@ -465,7 +474,7 @@ class PatchGenerator:
         # Rule 4: Function size limits - check if operations don't create huge functions
         creates_large_functions = False
         for op in operations:
-            if op.new_content and op.new_content.count('\n') > 50:
+            if op.new_content and op.new_content.count("\n") > 50:
                 creates_large_functions = True
                 break
         if not creates_large_functions:
@@ -474,7 +483,7 @@ class PatchGenerator:
         # Rule 6: Data scope - check if patch doesn't introduce global variables
         introduces_globals = False
         for op in operations:
-            if op.new_content and 'global ' in op.new_content.lower():
+            if op.new_content and "global " in op.new_content.lower():
                 introduces_globals = True
                 break
         if not introduces_globals:
@@ -498,19 +507,15 @@ class PatchGenerator:
         """
 
         if patch.safety_tier == SafetyTier.UNSAFE:
-            return {
-                'success': False,
-                'error': 'Patch marked as unsafe - cannot apply',
-                'patch_id': patch.patch_id
-            }
+            return {"success": False, "error": "Patch marked as unsafe - cannot apply", "patch_id": patch.patch_id}
 
         if dry_run:
             return {
-                'success': True,
-                'dry_run': True,
-                'patch_id': patch.patch_id,
-                'operations_count': len(patch.operations),
-                'affected_files': list(patch.affected_files)
+                "success": True,
+                "dry_run": True,
+                "patch_id": patch.patch_id,
+                "operations_count": len(patch.operations),
+                "affected_files": list(patch.affected_files),
             }
 
         try:
@@ -519,21 +524,16 @@ class PatchGenerator:
                 self._apply_operation(operation)
 
             return {
-                'success': True,
-                'patch_id': patch.patch_id,
-                'operations_applied': len(patch.operations),
-                'affected_files': list(patch.affected_files)
+                "success": True,
+                "patch_id": patch.patch_id,
+                "operations_applied": len(patch.operations),
+                "affected_files": list(patch.affected_files),
             }
 
         except Exception as e:
             # Rollback on error
             self.rollback_patch(patch)
-            return {
-                'success': False,
-                'error': str(e),
-                'patch_id': patch.patch_id,
-                'rollback_performed': True
-            }
+            return {"success": False, "error": str(e), "patch_id": patch.patch_id, "rollback_performed": True}
 
     def _apply_operation(self, operation: PatchOperation) -> None:
         """Apply a single patch operation"""
@@ -545,7 +545,7 @@ class PatchGenerator:
             insert_pos = operation.line_start or 0
             lines.insert(insert_pos, operation.new_content)
 
-            with open(operation.file_path, 'w') as f:
+            with open(operation.file_path, "w") as f:
                 f.writelines(lines)
 
         elif operation.operation_type == "replace":
@@ -555,18 +555,18 @@ class PatchGenerator:
             if operation.old_content:
                 new_content = content.replace(operation.old_content, operation.new_content)
             else:
-                lines = content.split('\n')
+                lines = content.split("\n")
                 if operation.line_start is not None:
-                    lines[operation.line_start] = operation.new_content.rstrip('\n')
-                new_content = '\n'.join(lines)
+                    lines[operation.line_start] = operation.new_content.rstrip("\n")
+                new_content = "\n".join(lines)
 
-            with open(operation.file_path, 'w') as f:
+            with open(operation.file_path, "w") as f:
                 f.write(new_content)
 
         elif operation.operation_type == "create_file":
             Path(operation.file_path).parent.mkdir(parents=True, exist_ok=True)
-            with open(operation.file_path, 'w') as f:
-                f.write(operation.new_content or '')
+            with open(operation.file_path, "w") as f:
+                f.write(operation.new_content or "")
 
     def rollback_patch(self, patch: GeneratedPatch) -> Dict[str, Any]:
         """Rollback a previously applied patch"""
@@ -575,28 +575,24 @@ class PatchGenerator:
             rollback_data = patch.rollback_data
 
             # Restore file backups
-            for file_path, backup_content in rollback_data.get('file_backups', {}).items():
-                with open(file_path, 'w') as f:
+            for file_path, backup_content in rollback_data.get("file_backups", {}).items():
+                with open(file_path, "w") as f:
                     f.write(backup_content)
 
             return {
-                'success': True,
-                'patch_id': patch.patch_id,
-                'files_restored': len(rollback_data.get('file_backups', {}))
+                "success": True,
+                "patch_id": patch.patch_id,
+                "files_restored": len(rollback_data.get("file_backups", {})),
             }
 
         except Exception as e:
-            return {
-                'success': False,
-                'error': str(e),
-                'patch_id': patch.patch_id
-            }
+            return {"success": False, "error": str(e), "patch_id": patch.patch_id}
 
 
 # Convenience function for external use
-def generate_patch_for_violation(violation: Dict[str, Any],
-                               context_data: Dict[str, Any],
-                               fix_strategy: Optional[str] = None) -> GeneratedPatch:
+def generate_patch_for_violation(
+    violation: Dict[str, Any], context_data: Dict[str, Any], fix_strategy: Optional[str] = None
+) -> GeneratedPatch:
     """
     Generate a patch for a connascence violation.
 
@@ -618,16 +614,16 @@ if __name__ == "__main__":
 
     # Test magic literal patch generation
     violation = {
-        'type': 'magic_literal',
-        'file_path': 'test_file.py',
-        'line_number': 10,
-        'severity': 'medium',
-        'message': 'Magic literal found: 404'
+        "type": "magic_literal",
+        "file_path": "test_file.py",
+        "line_number": 10,
+        "severity": "medium",
+        "message": "Magic literal found: 404",
     }
 
     context_data = {
-        'code_context': 'if response.status_code == 404:\n    return None',
-        'file_content': 'def handle_response():\n    if response.status_code == 404:\n        return None\n    return response.json()'
+        "code_context": "if response.status_code == 404:\n    return None",
+        "file_content": "def handle_response():\n    if response.status_code == 404:\n        return None\n    return response.json()",
     }
 
     generator = PatchGenerator()

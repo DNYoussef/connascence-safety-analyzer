@@ -24,7 +24,6 @@ This module provides parallel analysis capabilities while maintaining compatibil
 with the existing single-threaded analyzer infrastructure.
 """
 
-from fixes.phase0.production_safe_assertions import ProductionAssert
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
 import logging
@@ -36,6 +35,8 @@ import time
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import psutil
+
+from fixes.phase0.production_safe_assertions import ProductionAssert
 
 # Add parent directories to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
@@ -55,7 +56,7 @@ except ImportError:
     class DashboardMetrics:
         def record_performance(self, **kwargs):
             if kwargs:
-                ProductionAssert.not_none(kwargs, 'kwargs')
+                ProductionAssert.not_none(kwargs, "kwargs")
 
             pass
 

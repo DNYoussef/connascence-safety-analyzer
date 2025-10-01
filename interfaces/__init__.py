@@ -19,11 +19,7 @@ class InterfaceManager:
     """Central manager for all interface types."""
 
     def __init__(self):
-        self.available_interfaces = {
-            'cli': 'interfaces.cli',
-            'web': 'interfaces.web',
-            'vscode': 'interfaces.vscode'
-        }
+        self.available_interfaces = {"cli": "interfaces.cli", "web": "interfaces.web", "vscode": "interfaces.vscode"}
 
     def get_interface(self, interface_type: str):
         """Get specific interface implementation."""

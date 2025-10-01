@@ -154,13 +154,15 @@ def utility_function_{i}(param1, param2, param3, param4):  # Missing types, many
         code_parts = []
 
         # Large class with many methods (god class)
-        code_parts.append("""
+        code_parts.append(
+            """
 class LargeProcessor:
     def __init__(self):
         self.data = {}
         self.config = {"max_items": 1000}  # Magic literal
         self.status = "ready"
-""")
+"""
+        )
 
         # Generate many methods
         for i in range(50):
@@ -197,7 +199,7 @@ def process_batch_{i}(items, config, options, timeout, retries, flags):  # Too m
             code_parts.append(func_code)
 
         large_code = "\\n".join(code_parts)
-        lines = large_code.count('\\n') + 1
+        lines = large_code.count("\\n") + 1
 
         # Measure analysis time
         start_time = time.time()
@@ -248,7 +250,7 @@ def sample_function(a, b, c, d, e):  # Too many params
         second_analysis_time = time.time() - start_time
 
         # Cache should make second analysis much faster
-        speedup = first_analysis_time / second_analysis_time if second_analysis_time > 0 else float('inf')
+        speedup = first_analysis_time / second_analysis_time if second_analysis_time > 0 else float("inf")
 
         # Results should be identical
         assert len(violations1) == len(violations2), "Cached results should match original"
@@ -283,7 +285,7 @@ def function_{i}(param1, param2, param3):
         # Analyze files and measure memory after each batch
         batch_size = 10
         for i in range(0, len(code_samples), batch_size):
-            batch = code_samples[i:i+batch_size]
+            batch = code_samples[i : i + batch_size]
 
             for code, filename in batch:
                 analyzer.analyze_string(code, filename)
@@ -342,7 +344,7 @@ def function_{i}(param1, param2, param3):
         assert len(violations) > 5, "Should detect multiple violations in complex code"
 
         # Should detect high cyclomatic complexity
-        complexity_violations = [v for v in violations if 'complexity' in v.description.lower()]
+        complexity_violations = [v for v in violations if "complexity" in v.description.lower()]
         assert len(complexity_violations) > 0, "Should detect complexity violations"
 
         print("\\nComplexity analysis performance:")
@@ -368,12 +370,14 @@ class TestScalabilityBenchmarks:
             # Generate code of specific size
             code_parts = []
             for i in range(size):
-                code_parts.append(f"""
+                code_parts.append(
+                    f"""
 def function_{i}(a, b, c):
     if a > {i * 10}:  # Magic literal
         return b + c + {i * 100}  # Magic literal
     return a
-""")
+"""
+                )
 
             code = "\\n".join(code_parts)
 
@@ -389,11 +393,13 @@ def function_{i}(a, b, c):
         # Check that time scaling is reasonable (not exponential)
         # Time should not more than double when size doubles
         for i in range(1, len(times)):
-            size_ratio = sizes[i] / sizes[i-1]
-            time_ratio = times[i] / times[i-1] if times[i-1] > 0 else 1
+            size_ratio = sizes[i] / sizes[i - 1]
+            time_ratio = times[i] / times[i - 1] if times[i - 1] > 0 else 1
 
             # Allow some variance, but time scaling should be reasonable
-            assert time_ratio <= size_ratio * 1.5, f"Time scaling {time_ratio:.2f}x too high for size scaling {size_ratio:.2f}x"
+            assert (
+                time_ratio <= size_ratio * 1.5
+            ), f"Time scaling {time_ratio:.2f}x too high for size scaling {size_ratio:.2f}x"
 
         print("\\nScaling analysis:")
         for i in range(len(sizes)):
@@ -420,11 +426,9 @@ def function_in_thread_{thread_id}(a, b, c, d):
             violations = analyzer.analyze_string(code, f"thread_{thread_id}.py")
             end_time = time.time()
 
-            results_queue.put({
-                'thread_id': thread_id,
-                'analysis_time': end_time - start_time,
-                'violation_count': len(violations)
-            })
+            results_queue.put(
+                {"thread_id": thread_id, "analysis_time": end_time - start_time, "violation_count": len(violations)}
+            )
 
         # Start multiple threads
         num_threads = 5
@@ -451,7 +455,7 @@ def function_in_thread_{thread_id}(a, b, c, d):
         assert len(results) == num_threads, "All threads should complete"
 
         # Calculate average analysis time per thread
-        avg_thread_time = sum(r['analysis_time'] for r in results) / len(results)
+        avg_thread_time = sum(r["analysis_time"] for r in results) / len(results)
 
         print("\\nConcurrent analysis performance:")
         print(f"  Threads: {num_threads}")

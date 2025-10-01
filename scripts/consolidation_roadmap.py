@@ -26,6 +26,7 @@ from constants import OVERALL_QUALITY_THRESHOLD
 @dataclass
 class ConsolidationMetrics:
     """Metrics tracking consolidation progress."""
+
     timestamp: str
     phase: str
     violations_before: int
@@ -46,9 +47,11 @@ class ConsolidationMetrics:
             return 0.0
         return ((self.quality_score_after - self.quality_score_before) / self.quality_score_before) * 100
 
+
 @dataclass
 class DuplicationPattern:
     """Represents a identified duplication pattern."""
+
     pattern_type: str  # magic_literal, algorithm, policy, config
     pattern_id: str
     locations: List[str]  # File paths where pattern occurs
@@ -79,10 +82,13 @@ class ConsolidationRoadmap:
 
         # Run analysis to get current violation count
         try:
-            result = subprocess.run([
-                sys.executable, "-m", "analyzer.check_connascence",
-                str(self.project_root), "--json"
-            ], capture_output=True, text=True, cwd=self.project_root)
+            result = subprocess.run(
+                [sys.executable, "-m", "analyzer.check_connascence", str(self.project_root), "--json"],
+                check=False,
+                capture_output=True,
+                text=True,
+                cwd=self.project_root,
+            )
 
             if result.returncode == 0:
                 analysis_data = json.loads(result.stdout)
@@ -105,7 +111,7 @@ class ConsolidationRoadmap:
             violations_after=total_violations,
             files_modified=0,
             quality_score_before=quality_score,
-            quality_score_after=quality_score
+            quality_score_after=quality_score,
         )
 
         self.metrics_history.append(baseline)
@@ -120,55 +126,63 @@ class ConsolidationRoadmap:
 
         # P0: Magic Literals (Critical Impact, High Effort)
         magic_literal_files = self._find_files_with_magic_literals()
-        patterns.append(DuplicationPattern(
-            pattern_type="magic_literal",
-            pattern_id="magic_literals_all",
-            locations=magic_literal_files,
-            consolidation_target="shared/constants.py",
-            priority="P0",
-            effort_estimate="HIGH",
-            impact_estimate="CRITICAL",
-            violation_count=92086
-        ))
+        patterns.append(
+            DuplicationPattern(
+                pattern_type="magic_literal",
+                pattern_id="magic_literals_all",
+                locations=magic_literal_files,
+                consolidation_target="shared/constants.py",
+                priority="P0",
+                effort_estimate="HIGH",
+                impact_estimate="CRITICAL",
+                violation_count=92086,
+            )
+        )
 
         # P1: Algorithm Duplication (High Impact, Medium Effort)
         algorithm_files = self._find_algorithm_duplication()
-        patterns.append(DuplicationPattern(
-            pattern_type="algorithm",
-            pattern_id="detection_algorithms",
-            locations=algorithm_files,
-            consolidation_target="shared/detection_algorithms.py",
-            priority="P1",
-            effort_estimate="MEDIUM",
-            impact_estimate="HIGH",
-            violation_count=2395
-        ))
+        patterns.append(
+            DuplicationPattern(
+                pattern_type="algorithm",
+                pattern_id="detection_algorithms",
+                locations=algorithm_files,
+                consolidation_target="shared/detection_algorithms.py",
+                priority="P1",
+                effort_estimate="MEDIUM",
+                impact_estimate="HIGH",
+                violation_count=2395,
+            )
+        )
 
         # P2: Policy Resolution (Medium Impact, Medium Effort)
         policy_files = self._find_policy_duplication()
-        patterns.append(DuplicationPattern(
-            pattern_type="policy",
-            pattern_id="policy_resolution",
-            locations=policy_files,
-            consolidation_target="shared/policies.py",
-            priority="P2",
-            effort_estimate="MEDIUM",
-            impact_estimate="MEDIUM",
-            violation_count=150  # Estimated
-        ))
+        patterns.append(
+            DuplicationPattern(
+                pattern_type="policy",
+                pattern_id="policy_resolution",
+                locations=policy_files,
+                consolidation_target="shared/policies.py",
+                priority="P2",
+                effort_estimate="MEDIUM",
+                impact_estimate="MEDIUM",
+                violation_count=150,  # Estimated
+            )
+        )
 
         # P3: Configuration Logic (Medium Impact, Medium Effort)
         config_files = self._find_config_duplication()
-        patterns.append(DuplicationPattern(
-            pattern_type="config",
-            pattern_id="config_management",
-            locations=config_files,
-            consolidation_target="shared/config_management.py",
-            priority="P3",
-            effort_estimate="MEDIUM",
-            impact_estimate="MEDIUM",
-            violation_count=100  # Estimated
-        ))
+        patterns.append(
+            DuplicationPattern(
+                pattern_type="config",
+                pattern_id="config_management",
+                locations=config_files,
+                consolidation_target="shared/config_management.py",
+                priority="P3",
+                effort_estimate="MEDIUM",
+                impact_estimate="MEDIUM",
+                violation_count=100,  # Estimated
+            )
+        )
 
         print(f"✅ Identified {len(patterns)} duplication patterns")
         return patterns
@@ -184,13 +198,13 @@ class ConsolidationRoadmap:
     def _file_has_magic_literals(self, file_path: Path) -> bool:
         """Check if file contains magic literals."""
         try:
-            content = file_path.read_text(encoding='utf-8', errors='ignore')
+            content = file_path.read_text(encoding="utf-8", errors="ignore")
             # Look for common magic literal patterns
             patterns = [
-                r'Magic literal.*should be a named constant',
+                r"Magic literal.*should be a named constant",
                 r'"\w+".*appears.*duplicate',
-                r'\d+\s*#.*threshold',
-                r'["\'][\w\-_\.]+["\'].*magic'
+                r"\d+\s*#.*threshold",
+                r'["\'][\w\-_\.]+["\'].*magic',
             ]
             for pattern in patterns:
                 if re.search(pattern, content, re.IGNORECASE):
@@ -201,22 +215,25 @@ class ConsolidationRoadmap:
 
     def _find_algorithm_duplication(self) -> List[str]:
         """Find files with algorithm duplication."""
-        return [
-            "analyzer/check_connascence.py",
-            "analyzer/language_strategies.py",
-            "analyzer/core.py"
-        ]
+        return ["analyzer/check_connascence.py", "analyzer/language_strategies.py", "analyzer/core.py"]
 
     def _find_policy_duplication(self) -> List[str]:
         """Find files with policy resolution duplication."""
         files = []
         for py_file in self.project_root.rglob("*.py"):
             try:
-                content = py_file.read_text(encoding='utf-8', errors='ignore')
-                if any(policy in content for policy in [
-                    "nasa_jpl_pot10", "strict-core", "service-defaults",
-                    "safety_level_1", "general_safety_strict", "experimental"
-                ]):
+                content = py_file.read_text(encoding="utf-8", errors="ignore")
+                if any(
+                    policy in content
+                    for policy in [
+                        "nasa_jpl_pot10",
+                        "strict-core",
+                        "service-defaults",
+                        "safety_level_1",
+                        "general_safety_strict",
+                        "experimental",
+                    ]
+                ):
                     files.append(str(py_file.relative_to(self.project_root)))
             except Exception:
                 pass
@@ -252,7 +269,7 @@ class ConsolidationRoadmap:
             violations_after=max(0, phase_start_metrics.violations_before - 85000),  # Simulate 92% reduction
             files_modified=files_modified,
             quality_score_before=phase_start_metrics.quality_score_before,
-            quality_score_after=0.85  # Target quality score after magic literal cleanup
+            quality_score_after=0.85,  # Target quality score after magic literal cleanup
         )
 
         self.metrics_history.append(consolidation_metrics)
@@ -281,7 +298,7 @@ class ConsolidationRoadmap:
             violations_after=max(0, phase_start_metrics.violations_before - 2000),  # Simulate CoA reduction
             files_modified=files_modified,
             quality_score_before=phase_start_metrics.quality_score_before,
-            quality_score_after=min(0.95, phase_start_metrics.quality_score_before + 0.05)
+            quality_score_after=min(0.95, phase_start_metrics.quality_score_before + 0.05),
         )
 
         self.metrics_history.append(consolidation_metrics)
@@ -717,7 +734,7 @@ print("🎯 Target: Eliminate 2,395 algorithm duplication (CoA) violations")
                 violations_after=last_metrics.violations_after,
                 files_modified=0,
                 quality_score_before=last_metrics.quality_score_after,
-                quality_score_after=last_metrics.quality_score_after
+                quality_score_after=last_metrics.quality_score_after,
             )
         else:
             return ConsolidationMetrics(
@@ -727,7 +744,7 @@ print("🎯 Target: Eliminate 2,395 algorithm duplication (CoA) violations")
                 violations_after=95395,
                 files_modified=0,
                 quality_score_before=0.48,
-                quality_score_after=0.48
+                quality_score_after=0.48,
             )
 
     def generate_consolidation_report(self) -> str:
@@ -783,8 +800,8 @@ print("🎯 Target: Eliminate 2,395 algorithm duplication (CoA) violations")
                 "total_phases_executed": len(self.metrics_history) - 1,
                 "baseline_violations": self.metrics_history[0].violations_before if self.metrics_history else 0,
                 "current_violations": self.metrics_history[-1].violations_after if self.metrics_history else 0,
-                "total_files_modified": sum(m.files_modified for m in self.metrics_history)
-            }
+                "total_files_modified": sum(m.files_modified for m in self.metrics_history),
+            },
         }
 
         output_file.write_text(json.dumps(metrics_data, indent=2))
@@ -803,19 +820,14 @@ Examples:
   python consolidation_roadmap.py --execute-phase=1          # Execute algorithms phase
   python consolidation_roadmap.py --report                   # Generate progress report
   python consolidation_roadmap.py --export-metrics output.json  # Export metrics
-        """
+        """,
     )
 
-    parser.add_argument("--project-root", type=Path, default=Path.cwd(),
-                       help="Root directory of project")
-    parser.add_argument("--analyze", action="store_true",
-                       help="Analyze current duplication patterns")
-    parser.add_argument("--execute-phase", type=int, choices=[0, 1, 2, 3],
-                       help="Execute specific consolidation phase")
-    parser.add_argument("--report", action="store_true",
-                       help="Generate consolidation progress report")
-    parser.add_argument("--export-metrics", type=Path,
-                       help="Export metrics to JSON file")
+    parser.add_argument("--project-root", type=Path, default=Path.cwd(), help="Root directory of project")
+    parser.add_argument("--analyze", action="store_true", help="Analyze current duplication patterns")
+    parser.add_argument("--execute-phase", type=int, choices=[0, 1, 2, 3], help="Execute specific consolidation phase")
+    parser.add_argument("--report", action="store_true", help="Generate consolidation progress report")
+    parser.add_argument("--export-metrics", type=Path, help="Export metrics to JSON file")
 
     args = parser.parse_args()
 

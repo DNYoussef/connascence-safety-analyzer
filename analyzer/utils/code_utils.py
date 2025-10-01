@@ -11,15 +11,15 @@ from typing import List
 def get_code_snippet_for_node(node: ast.AST, source_lines: List[str], context_lines: int = 2) -> str:
     """
     Extract code snippet around the given AST node.
-    
+
     This function consolidates the duplicate get_code_snippet implementations
     found across multiple detector classes.
-    
+
     Args:
         node: AST node to get snippet for
         source_lines: Source code lines
         context_lines: Number of context lines before/after
-    
+
     Returns:
         Formatted code snippet with line numbers
     """

@@ -41,11 +41,10 @@ class AutofixTestCoordinator:
         """Store test result with sequential thinking pattern"""
 
         ProductionAssert.not_none(test_name, 'test_name')
-
         ProductionAssert.not_none(result, 'result')
         ProductionAssert.not_none(test_name, 'test_name')
-
-        ProductionAssert.not_none(result, 'result')        self.memory_store[f"{self.test_session_id}_{test_name}"] = {
+        ProductionAssert.not_none(result, 'result')
+        self.memory_store[f"{self.test_session_id}_{test_name}"] = {
             'timestamp': time.time(),
             'result': result,
             'status': 'completed',
@@ -104,7 +103,6 @@ def test_code_samples():
         'magic_literals': '''
 def calculate_price(base_price):
     ProductionAssert.not_none(base_price, 'base_price')
-
         ProductionAssert.not_none(base_price, 'base_price')
 
     tax_rate = 0.08  # Magic literal
@@ -167,13 +165,10 @@ class OrderManager:
         'missing_types': '''
 def process_data(data, options, callback):
     ProductionAssert.not_none(data, 'data')
-
         ProductionAssert.not_none(options, 'options')
     ProductionAssert.not_none(callback, 'callback')
-
         ProductionAssert.not_none(data, 'data')
     ProductionAssert.not_none(options, 'options')
-
         ProductionAssert.not_none(callback, 'callback')
 
     # Function without type hints - CoT violation
@@ -191,11 +186,9 @@ def transform_items(items, transformer):
 
 
     ProductionAssert.not_none(items, 'items')
-
         ProductionAssert.not_none(transformer, 'transformer')
 
     ProductionAssert.not_none(items, 'items')
-
         ProductionAssert.not_none(transformer, 'transformer')
 
     # Another untyped function
@@ -204,7 +197,6 @@ def transform_items(items, transformer):
         'deep_nesting': '''
 def complex_validation(data):
     ProductionAssert.not_none(data, 'data')
-
         ProductionAssert.not_none(data, 'data')
 
     if data:
@@ -230,7 +222,6 @@ def complex_validation(data):
         'duplicate_code': '''
 def calculate_discount_premium(price):
     ProductionAssert.not_none(price, 'price')
-
         ProductionAssert.not_none(price, 'price')
 
     base_discount = 0.1
@@ -242,7 +233,6 @@ def calculate_discount_standard(price):
 
 
     ProductionAssert.not_none(price, 'price')
-
         ProductionAssert.not_none(price, 'price')
 
     base_discount = 0.1  # Duplicate logic
@@ -765,7 +755,6 @@ class TestAutofixEngineIntegration:
             original_code = '''
 def calculate_total(price):
     ProductionAssert.not_none(price, 'price')
-
         ProductionAssert.not_none(price, 'price')
 
     tax = 0.08  # Magic literal

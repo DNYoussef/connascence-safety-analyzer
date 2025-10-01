@@ -191,10 +191,10 @@ class UnifiedReportingCoordinator:
         """Generate data optimized for dashboard display with enhanced cross-phase integration."""
 
         # Extract enhanced metadata if available
-        audit_trail = getattr(analysis_result, 'audit_trail', [])
-        correlations = getattr(analysis_result, 'correlations', [])
-        smart_recommendations = getattr(analysis_result, 'smart_recommendations', [])
-        cross_phase_analysis = getattr(analysis_result, 'cross_phase_analysis', False)
+        audit_trail = getattr(analysis_result, "audit_trail", [])
+        correlations = getattr(analysis_result, "correlations", [])
+        smart_recommendations = getattr(analysis_result, "smart_recommendations", [])
+        cross_phase_analysis = getattr(analysis_result, "cross_phase_analysis", False)
 
         dashboard_data = {
             "project_info": {
@@ -580,14 +580,16 @@ PRIORITY ACTIONS:
         # Create edges for correlations
         edges = []
         for i, correlation in enumerate(correlations):
-            edges.append({
-                "id": f"correlation_{i}",
-                "source": correlation.get("analyzer1", "unknown"),
-                "target": correlation.get("analyzer2", "unknown"),
-                "weight": correlation.get("correlation_score", 0.5),
-                "label": f"{correlation.get('correlation_score', 0):.2f}",
-                "description": correlation.get("description", "")
-            })
+            edges.append(
+                {
+                    "id": f"correlation_{i}",
+                    "source": correlation.get("analyzer1", "unknown"),
+                    "target": correlation.get("analyzer2", "unknown"),
+                    "weight": correlation.get("correlation_score", 0.5),
+                    "label": f"{correlation.get('correlation_score', 0):.2f}",
+                    "description": correlation.get("description", ""),
+                }
+            )
 
         return {"nodes": nodes, "edges": edges}
 
@@ -621,7 +623,7 @@ PRIORITY ACTIONS:
             "total": len(correlations),
             "high_impact": len(high_impact_correlations),
             "categories": categories,
-            "average_score": sum(c.get("correlation_score", 0) for c in correlations) / len(correlations)
+            "average_score": sum(c.get("correlation_score", 0) for c in correlations) / len(correlations),
         }
 
     def _create_hotspot_analysis(self, correlations: List) -> Dict:
@@ -638,20 +640,16 @@ PRIORITY ACTIONS:
                         hotspots[file_path] = {
                             "violations": hotspot_details[file_path],
                             "priority": correlation.get("priority", "medium"),
-                            "remediation_impact": correlation.get("remediation_impact", "unknown")
+                            "remediation_impact": correlation.get("remediation_impact", "unknown"),
                         }
 
         # Sort by total violation count
-        sorted_hotspots = dict(sorted(
-            hotspots.items(),
-            key=lambda x: sum(x[1]["violations"].values()),
-            reverse=True
-        ))
+        sorted_hotspots = dict(sorted(hotspots.items(), key=lambda x: sum(x[1]["violations"].values()), reverse=True))
 
         return {
             "count": len(sorted_hotspots),
             "files": sorted_hotspots,
-            "top_hotspot": list(sorted_hotspots.keys())[0] if sorted_hotspots else None
+            "top_hotspot": list(sorted_hotspots.keys())[0] if sorted_hotspots else None,
         }
 
     def _convert_to_legacy_format(self, analysis_result: UnifiedAnalysisResult) -> Any:

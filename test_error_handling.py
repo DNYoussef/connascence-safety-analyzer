@@ -10,16 +10,22 @@ import sys
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent))
 
+
 def test_error_constants():
     """Test that error constants are properly defined."""
     try:
         from analyzer.constants import ERROR_CODE_MAPPING
+
         print("PASS - Error constants imported successfully")
 
         # Verify key error codes exist
         required_codes = [
-            'ANALYSIS_FAILED', 'FILE_NOT_FOUND', 'MCP_RATE_LIMIT_EXCEEDED',
-            'CLI_ARGUMENT_INVALID', 'PATH_NOT_ACCESSIBLE', 'INTERNAL_ERROR'
+            "ANALYSIS_FAILED",
+            "FILE_NOT_FOUND",
+            "MCP_RATE_LIMIT_EXCEEDED",
+            "CLI_ARGUMENT_INVALID",
+            "PATH_NOT_ACCESSIBLE",
+            "INTERNAL_ERROR",
         ]
 
         for code in required_codes:
@@ -33,23 +39,19 @@ def test_error_constants():
         print(f"❌ Failed to import error constants: {e}")
         return False
 
+
 def test_unified_analyzer_errors():
     """Test unified analyzer error handling."""
     try:
         from analyzer.unified_analyzer import ErrorHandler
 
         # Test error creation
-        handler = ErrorHandler('test')
-        error = handler.create_error(
-            'ANALYSIS_FAILED',
-            'Test error message',
-            'high',
-            {'test_context': 'value'}
-        )
+        handler = ErrorHandler("test")
+        error = handler.create_error("ANALYSIS_FAILED", "Test error message", "high", {"test_context": "value"})
 
         # Verify error structure
         error_dict = error.to_dict()
-        required_fields = ['code', 'message', 'severity', 'timestamp', 'integration']
+        required_fields = ["code", "message", "severity", "timestamp", "integration"]
 
         for field in required_fields:
             if field in error_dict:
@@ -62,6 +64,7 @@ def test_unified_analyzer_errors():
     except Exception as e:
         print(f"❌ Unified analyzer error test failed: {e}")
         return False
+
 
 def test_cli_error_handling():
     """Test CLI error handling."""
@@ -95,6 +98,7 @@ def test_cli_error_handling():
         print(f"❌ CLI error test failed: {e}")
         return False
 
+
 def test_mcp_error_handling():
     """Test MCP server error handling."""
     try:
@@ -104,22 +108,19 @@ def test_mcp_error_handling():
         server = ConnascenceMCPServer()
 
         # Test error response creation
-        error = server.error_handler.create_error(
-            'MCP_RATE_LIMIT_EXCEEDED',
-            'Test rate limit error'
-        )
+        error = server.error_handler.create_error("MCP_RATE_LIMIT_EXCEEDED", "Test rate limit error")
 
         error_response = server._create_error_response(error)
 
         # Verify response structure
-        required_fields = ['success', 'error', 'timestamp', 'server_version']
+        required_fields = ["success", "error", "timestamp", "server_version"]
         for field in required_fields:
             if field in error_response:
                 print(f"✅ MCP error response has field '{field}'")
             else:
                 print(f"❌ MCP error response missing field: {field}")
 
-        if not error_response['success']:
+        if not error_response["success"]:
             print("✅ MCP error response properly indicates failure")
 
         print("✅ MCP server error handling works")
@@ -127,6 +128,7 @@ def test_mcp_error_handling():
     except Exception as e:
         print(f"❌ MCP server error test failed: {e}")
         return False
+
 
 def test_error_consistency():
     """Test error format consistency across integrations."""
@@ -138,38 +140,35 @@ def test_error_consistency():
         from analyzer.unified_analyzer import ErrorHandler
 
         handlers = {
-            'analyzer': ErrorHandler('analyzer'),
-            'mcp': ErrorHandler('mcp'),
-            'cli': ErrorHandler('cli'),
-            'vscode': ErrorHandler('vscode')
+            "analyzer": ErrorHandler("analyzer"),
+            "mcp": ErrorHandler("mcp"),
+            "cli": ErrorHandler("cli"),
+            "vscode": ErrorHandler("vscode"),
         }
 
         # Create same error type from different integrations
-        test_error_type = 'FILE_NOT_FOUND'
-        test_message = 'Test file not found'
+        test_error_type = "FILE_NOT_FOUND"
+        test_message = "Test file not found"
 
         errors = {}
         for integration, handler in handlers.items():
             error = handler.create_error(
-                test_error_type,
-                test_message,
-                ERROR_SEVERITY['HIGH'],
-                {'integration_test': True}
+                test_error_type, test_message, ERROR_SEVERITY["HIGH"], {"integration_test": True}
             )
             errors[integration] = error.to_dict()
 
         # Check consistency
-        base_error = errors['analyzer']
+        base_error = errors["analyzer"]
         consistent = True
 
         for integration, error in errors.items():
-            for field in ['code', 'message', 'severity']:
+            for field in ["code", "message", "severity"]:
                 if error.get(field) != base_error.get(field):
                     print(f"❌ Inconsistency in {integration}: {field}")
                     consistent = False
 
             # Check integration field is correct
-            if error.get('integration') != integration:
+            if error.get("integration") != integration:
                 print(f"❌ Wrong integration field in {integration}")
                 consistent = False
 
@@ -181,6 +180,7 @@ def test_error_consistency():
         print(f"❌ Error consistency test failed: {e}")
         return False
 
+
 def main():
     """Run all error handling tests."""
     print("Testing PHASE 4: Standardized Error Handling")
@@ -191,7 +191,7 @@ def main():
         ("Unified Analyzer", test_unified_analyzer_errors),
         ("CLI Error Handling", test_cli_error_handling),
         ("MCP Error Handling", test_mcp_error_handling),
-        ("Error Consistency", test_error_consistency)
+        ("Error Consistency", test_error_consistency),
     ]
 
     results = []
@@ -223,6 +223,7 @@ def main():
     else:
         print("⚠️  Some tests failed. Error handling needs attention.")
         return 1
+
 
 if __name__ == "__main__":
     sys.exit(main())

@@ -30,12 +30,13 @@ def run_connascence_checks():
 
     # Run analysis on staged Python files using unified CLI
     try:
-        result = subprocess.run([
-            "connascence", "analyze",
-            ".",
-            "--severity", "high",
-            "--format", "json"
-        ], capture_output=True, text=True, timeout=60)
+        result = subprocess.run(
+            ["connascence", "analyze", ".", "--severity", "high", "--format", "json"],
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=60,
+        )
 
         if result.returncode == 0:
             print("[DONE] No high-severity connascence violations found!")
@@ -58,12 +59,21 @@ def run_magic_literal_checks():
     print("Running magic literal detection...")
 
     try:
-        result = subprocess.run([
-            "connascence", "detect-literals",
-            ".",
-            "--threshold", "25.0",  # Allow up to 25% magic literals
-            "--severity", "medium"
-        ], capture_output=True, text=True, timeout=30)
+        result = subprocess.run(
+            [
+                "connascence",
+                "detect-literals",
+                ".",
+                "--threshold",
+                "25.0",  # Allow up to 25% magic literals
+                "--severity",
+                "medium",
+            ],
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
 
         if result.returncode == 0:
             print("[DONE] Magic literal usage within acceptable limits!")

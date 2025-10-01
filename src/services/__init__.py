@@ -2,4 +2,4 @@
 
 from .connascence_analyzer import ConnascenceAnalyzer
 
-__all__ = ['ConnascenceAnalyzer']
+__all__ = ["ConnascenceAnalyzer"]

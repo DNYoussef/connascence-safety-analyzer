@@ -7,7 +7,6 @@ Optimized incremental analysis for CI/CD pipelines that only
 analyzes changed files and their dependencies.
 """
 
-from fixes.phase0.production_safe_assertions import ProductionAssert
 from dataclasses import dataclass, field
 import hashlib
 import json
@@ -17,6 +16,8 @@ import subprocess
 import sys
 import time
 from typing import Any, Dict, List, Optional, Union
+
+from fixes.phase0.production_safe_assertions import ProductionAssert
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
@@ -346,7 +347,7 @@ class IncrementalAnalyzer:
 
             # Get list of changed files
             cmd = ["git", "diff", "--name-status", commit_range]
-            result = subprocess.run(cmd, cwd=self.project_root, capture_output=True, text=True)
+            result = subprocess.run(cmd, check=False, cwd=self.project_root, capture_output=True, text=True)
 
             if result.returncode != 0:
                 logger.warning(f"Git command failed: {result.stderr}")
@@ -452,9 +453,9 @@ class IncrementalAnalyzer:
 
         # Create violation signatures for comparison
         def violation_signature(v):
-            ProductionAssert.not_none(v, 'v')
+            ProductionAssert.not_none(v, "v")
 
-            ProductionAssert.not_none(v, 'v')
+            ProductionAssert.not_none(v, "v")
 
             return (v.get("file_path", ""), v.get("line_number", 0), v.get("rule_id", ""), v.get("description", ""))
 
@@ -621,7 +622,7 @@ class IncrementalAnalyzer:
 
         try:
             cmd = ["git", "rev-parse", "HEAD"]
-            result = subprocess.run(cmd, cwd=self.project_root, capture_output=True, text=True)
+            result = subprocess.run(cmd, check=False, cwd=self.project_root, capture_output=True, text=True)
 
             if result.returncode == 0:
                 return result.stdout.strip()

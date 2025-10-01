@@ -42,29 +42,26 @@ class TestRealWorldScenarios:
 
         # Run analysis
         start_time = time.time()
-        result = self.analyzer.analyze_path(
-            path=str(express_dir),
-            policy="standard"
-        )
+        result = self.analyzer.analyze_path(path=str(express_dir), policy="standard")
         analysis_time = time.time() - start_time
 
         # Validate result structure
-        assert result['success'] is True, f"Analysis failed: {result.get('error', 'Unknown error')}"
-        assert 'violations' in result
-        assert 'summary' in result
-        assert 'metrics' in result
+        assert result["success"] is True, f"Analysis failed: {result.get('error', 'Unknown error')}"
+        assert "violations" in result
+        assert "summary" in result
+        assert "metrics" in result
 
         # Performance check - should complete within reasonable time
         assert analysis_time < 30.0, f"Analysis took too long: {analysis_time}s"
 
         # Check violation types found
-        violations = result['violations']
-        violation_types = [v.get('type', v.get('connascence_type')) for v in violations]
+        violations = result["violations"]
+        violation_types = [v.get("type", v.get("connascence_type")) for v in violations]
 
         # Should find typical JavaScript violations
         expected_types = [
-            'connascence_of_meaning',  # Magic numbers/strings
-            'connascence_of_position', # Parameter coupling
+            "connascence_of_meaning",  # Magic numbers/strings
+            "connascence_of_position",  # Parameter coupling
         ]
 
         found_types = set(violation_types)
@@ -87,22 +84,19 @@ class TestRealWorldScenarios:
 
         # Run analysis
         start_time = time.time()
-        result = self.analyzer.analyze_path(
-            path=str(curl_dir),
-            policy="standard"
-        )
+        result = self.analyzer.analyze_path(path=str(curl_dir), policy="standard")
         analysis_time = time.time() - start_time
 
         # Validate result structure
-        assert result['success'] is True, f"Analysis failed: {result.get('error', 'Unknown error')}"
-        assert 'violations' in result
-        assert 'summary' in result
+        assert result["success"] is True, f"Analysis failed: {result.get('error', 'Unknown error')}"
+        assert "violations" in result
+        assert "summary" in result
 
         # Performance check
         assert analysis_time < 60.0, f"Analysis took too long: {analysis_time}s"
 
         # Check for C-specific violations
-        violations = result['violations']
+        violations = result["violations"]
 
         # Log results
         print(f"cURL analysis completed in {analysis_time:.2f}s")
@@ -117,28 +111,24 @@ class TestRealWorldScenarios:
 
         # Run analysis on our own code
         start_time = time.time()
-        result = self.analyzer.analyze_path(
-            path=str(analyzer_dir),
-            policy="strict-core",
-            strict_mode=True
-        )
+        result = self.analyzer.analyze_path(path=str(analyzer_dir), policy="strict-core", strict_mode=True)
         analysis_time = time.time() - start_time
 
         # Validate result
-        assert result['success'] is True
+        assert result["success"] is True
 
         # Check metrics
-        metrics = result.get('metrics', {})
-        assert metrics.get('files_analyzed', 0) > 0
-        assert metrics.get('analysis_time', 0) > 0
+        metrics = result.get("metrics", {})
+        assert metrics.get("files_analyzed", 0) > 0
+        assert metrics.get("analysis_time", 0) > 0
 
         # Performance check
         assert analysis_time < 45.0, f"Self-analysis took too long: {analysis_time}s"
 
         # Check quality gates
-        result.get('quality_gates', {})
-        nasa_score = result.get('nasa_compliance', {}).get('score', 0)
-        overall_score = result.get('summary', {}).get('overall_quality_score', 0)
+        result.get("quality_gates", {})
+        nasa_score = result.get("nasa_compliance", {}).get("score", 0)
+        overall_score = result.get("summary", {}).get("overall_quality_score", 0)
 
         print("Self-analysis results:")
         print(f"  Analysis time: {analysis_time:.2f}s")
@@ -157,16 +147,7 @@ class TestRealWorldScenarios:
         result = self.analyzer.analyze_path(
             path=str(project_root),
             policy="lenient",  # Use lenient for performance test
-            exclude=[
-                "test_*",
-                "__pycache__",
-                ".git",
-                "node_modules",
-                "*.egg-info",
-                ".pytest_cache",
-                "dist",
-                "build"
-            ]
+            exclude=["test_*", "__pycache__", ".git", "node_modules", "*.egg-info", ".pytest_cache", "dist", "build"],
         )
         analysis_time = time.time() - start_time
 
@@ -174,11 +155,11 @@ class TestRealWorldScenarios:
         assert analysis_time < 120.0, f"Large codebase analysis took too long: {analysis_time}s"
 
         # Check that analysis succeeded
-        assert result['success'] is True
+        assert result["success"] is True
 
         # Check metrics for reasonableness
-        metrics = result.get('metrics', {})
-        files_analyzed = metrics.get('files_analyzed', 0)
+        metrics = result.get("metrics", {})
+        files_analyzed = metrics.get("files_analyzed", 0)
         assert files_analyzed > 20, f"Expected to analyze more files, got {files_analyzed}"
 
         # Calculate performance metrics
@@ -199,24 +180,21 @@ class TestRealWorldScenarios:
 
         # Analyze entire test packages directory (multi-language)
         start_time = time.time()
-        result = self.analyzer.analyze_path(
-            path=str(self.test_packages_dir),
-            policy="standard"
-        )
+        result = self.analyzer.analyze_path(path=str(self.test_packages_dir), policy="standard")
         analysis_time = time.time() - start_time
 
         # Should handle multiple languages
-        assert result['success'] is True
+        assert result["success"] is True
 
         # Check that multiple file types were processed
-        violations = result.get('violations', [])
-        file_paths = [v.get('file_path', '') for v in violations]
+        violations = result.get("violations", [])
+        file_paths = [v.get("file_path", "") for v in violations]
 
         # Should have violations from different file types
         extensions = set()
         for path in file_paths:
-            if '.' in path:
-                ext = path.split('.')[-1].lower()
+            if "." in path:
+                ext = path.split(".")[-1].lower()
                 extensions.add(ext)
 
         print("Multi-language analysis:")
@@ -232,22 +210,18 @@ class TestRealWorldScenarios:
             pytest.skip("Analyzer directory not found")
 
         # Run NASA compliance analysis
-        result = self.analyzer.analyze_path(
-            path=str(analyzer_dir),
-            policy="nasa_jpl_pot10",
-            nasa_validation=True
-        )
+        result = self.analyzer.analyze_path(path=str(analyzer_dir), policy="nasa_jpl_pot10", nasa_validation=True)
 
         # Validate NASA compliance structure
-        assert 'nasa_compliance' in result
-        nasa_compliance = result['nasa_compliance']
+        assert "nasa_compliance" in result
+        nasa_compliance = result["nasa_compliance"]
 
-        assert 'score' in nasa_compliance
-        assert 'violations' in nasa_compliance
-        assert 'passing' in nasa_compliance
+        assert "score" in nasa_compliance
+        assert "violations" in nasa_compliance
+        assert "passing" in nasa_compliance
 
         # Score should be between 0 and 1
-        score = nasa_compliance['score']
+        score = nasa_compliance["score"]
         assert 0.0 <= score <= 1.0, f"NASA compliance score out of range: {score}"
 
         print("NASA compliance validation:")
@@ -258,17 +232,15 @@ class TestRealWorldScenarios:
     def test_god_object_detection_real_code(self):
         """Test god object detection on real codebase."""
         result = self.analyzer.analyze_path(
-            path=str(self.project_root / "analyzer"),
-            policy="strict-core",
-            include_god_objects=True
+            path=str(self.project_root / "analyzer"), policy="strict-core", include_god_objects=True
         )
 
         # Check for god object analysis
-        god_objects = result.get('god_objects', [])
-        violations = result.get('violations', [])
+        god_objects = result.get("god_objects", [])
+        violations = result.get("violations", [])
 
         # Find god object violations
-        god_object_violations = [v for v in violations if v.get('type') == 'god_object']
+        god_object_violations = [v for v in violations if v.get("type") == "god_object"]
 
         print("God object detection:")
         print(f"  God objects found: {len(god_objects)}")
@@ -276,28 +248,26 @@ class TestRealWorldScenarios:
 
         # If god objects found, validate their structure
         for god_obj in god_object_violations[:3]:  # Check first 3
-            assert 'file_path' in god_obj
-            assert 'description' in god_obj
-            assert 'severity' in god_obj
-            assert god_obj['severity'] in ['critical', 'high', 'medium']
+            assert "file_path" in god_obj
+            assert "description" in god_obj
+            assert "severity" in god_obj
+            assert god_obj["severity"] in ["critical", "high", "medium"]
 
     def test_mece_analysis_real_code(self):
         """Test MECE duplication analysis on real code."""
         result = self.analyzer.analyze_path(
-            path=str(self.project_root / "analyzer"),
-            policy="standard",
-            include_mece_analysis=True
+            path=str(self.project_root / "analyzer"), policy="standard", include_mece_analysis=True
         )
 
         # Check MECE analysis results
-        mece_analysis = result.get('mece_analysis', {})
-        assert 'score' in mece_analysis
-        assert 'duplications' in mece_analysis
+        mece_analysis = result.get("mece_analysis", {})
+        assert "score" in mece_analysis
+        assert "duplications" in mece_analysis
 
-        score = mece_analysis['score']
+        score = mece_analysis["score"]
         assert 0.0 <= score <= 1.0, f"MECE score out of range: {score}"
 
-        duplications = mece_analysis['duplications']
+        duplications = mece_analysis["duplications"]
 
         print("MECE analysis:")
         print(f"  Score: {score:.3f}")
@@ -315,27 +285,24 @@ class TestRealWorldScenarios:
             pytest.skip("Analyzer directory not found")
 
         # Run standard analysis
-        result = self.analyzer.analyze_path(
-            path=str(analyzer_dir),
-            policy="standard"
-        )
+        result = self.analyzer.analyze_path(path=str(analyzer_dir), policy="standard")
 
         # Basic regression checks
-        assert result['success'] is True
+        assert result["success"] is True
 
-        result.get('violations', [])
-        summary = result.get('summary', {})
+        result.get("violations", [])
+        summary = result.get("summary", {})
 
         # Should find some violations but not be overwhelmed
-        total_violations = summary.get('total_violations', 0)
+        total_violations = summary.get("total_violations", 0)
         assert total_violations >= 0  # At least some issues in any real codebase
 
         # Critical violations should be limited
-        critical_violations = summary.get('critical_violations', 0)
+        critical_violations = summary.get("critical_violations", 0)
         assert critical_violations < 10, f"Too many critical violations: {critical_violations}"
 
         # Quality score should be reasonable
-        quality_score = summary.get('overall_quality_score', 0)
+        quality_score = summary.get("overall_quality_score", 0)
         assert quality_score >= 0.3, f"Quality score too low: {quality_score}"
 
         print("Regression baseline check:")
@@ -355,31 +322,30 @@ class TestRealWorldScenarios:
 
             # Syntax error file
             syntax_error_file = temp_path / "syntax_error.py"
-            syntax_error_file.write_text('''
+            syntax_error_file.write_text(
+                """
 def broken_function(
     # Missing closing parenthesis and body
-''')
+"""
+            )
 
             # Binary file with .py extension
             binary_file = temp_path / "binary.py"
-            binary_file.write_bytes(b'\x00\x01\x02\x03\x04\x05')
+            binary_file.write_bytes(b"\x00\x01\x02\x03\x04\x05")
 
             # Empty file
             empty_file = temp_path / "empty.py"
             empty_file.touch()
 
             # Run analysis
-            result = self.analyzer.analyze_path(
-                path=str(temp_path),
-                policy="standard"
-            )
+            result = self.analyzer.analyze_path(path=str(temp_path), policy="standard")
 
             # Analysis should succeed despite problematic files
-            assert result['success'] is True
+            assert result["success"] is True
 
             # Should have some error violations
-            violations = result.get('violations', [])
-            error_violations = [v for v in violations if 'error' in v.get('type', '').lower()]
+            violations = result.get("violations", [])
+            error_violations = [v for v in violations if "error" in v.get("type", "").lower()]
 
             print("Error handling test:")
             print(f"  Total violations: {len(violations)}")

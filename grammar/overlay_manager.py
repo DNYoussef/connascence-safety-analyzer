@@ -32,6 +32,7 @@ from .backends.tree_sitter_backend import LanguageSupport
 @dataclass
 class OverlayRule:
     """A single overlay rule that restricts or requires language features."""
+
     id: str
     name: str
     description: str
@@ -48,6 +49,7 @@ class OverlayRule:
 @dataclass
 class GrammarOverlay:
     """A collection of rules that define a grammar subset."""
+
     id: str
     name: str
     description: str
@@ -87,10 +89,7 @@ class OverlayManager:
         if language is None:
             return list(self._overlays.keys())
 
-        return [
-            overlay_id for overlay_id, overlay in self._overlays.items()
-            if overlay.language == language
-        ]
+        return [overlay_id for overlay_id, overlay in self._overlays.items() if overlay.language == language]
 
     def get_rules_for_overlay(self, overlay_id: str) -> List[OverlayRule]:
         """Get all rules for an overlay, including inherited rules."""
@@ -123,7 +122,7 @@ class OverlayManager:
         banned = set()
 
         for rule in rules:
-            if rule.rule_type == 'ban':
+            if rule.rule_type == "ban":
                 banned.add(rule.target)
 
         return banned
@@ -134,8 +133,8 @@ class OverlayManager:
         limits = {}
 
         for rule in rules:
-            if rule.rule_type == 'limit' and 'max_value' in rule.parameters:
-                limits[rule.target] = rule.parameters['max_value']
+            if rule.rule_type == "limit" and "max_value" in rule.parameters:
+                limits[rule.target] = rule.parameters["max_value"]
 
         return limits
 
@@ -182,7 +181,7 @@ class OverlayManager:
         overlay_data = self._overlay_to_dict(overlay)
 
         try:
-            with open(file_path, 'w') as f:
+            with open(file_path, "w") as f:
                 yaml.dump(overlay_data, f, default_flow_style=False, indent=2)
             return True
         except Exception:
@@ -203,7 +202,7 @@ class OverlayManager:
                     description="General Safety Rule 1: Avoid complex flow constructs like goto",
                     severity="critical",
                     rule_type="ban",
-                    target="goto_statement"
+                    target="goto_statement",
                 ),
                 OverlayRule(
                     id="nasa_rule_1_recursion",
@@ -211,7 +210,7 @@ class OverlayManager:
                     description="General Safety Rule 1: Avoid recursion in safety-critical code",
                     severity="critical",
                     rule_type="ban",
-                    target="recursive_function_call"
+                    target="recursive_function_call",
                 ),
                 OverlayRule(
                     id="nasa_rule_4_function_size",
@@ -220,7 +219,7 @@ class OverlayManager:
                     severity="high",
                     rule_type="limit",
                     target="function_lines",
-                    parameters={"max_value": 60}
+                    parameters={"max_value": 60},
                 ),
                 OverlayRule(
                     id="nasa_rule_9_pointer_indirection",
@@ -229,7 +228,7 @@ class OverlayManager:
                     severity="high",
                     rule_type="limit",
                     target="pointer_indirection",
-                    parameters={"max_value": 1}
+                    parameters={"max_value": 1},
                 ),
                 OverlayRule(
                     id="nasa_rule_9_function_pointers",
@@ -237,9 +236,9 @@ class OverlayManager:
                     description="General Safety Rule 9: Avoid function pointers",
                     severity="high",
                     rule_type="ban",
-                    target="function_pointer"
-                )
-            ]
+                    target="function_pointer",
+                ),
+            ],
         )
         self._overlays["nasa_c_safety"] = nasa_c_overlay
 
@@ -256,7 +255,7 @@ class OverlayManager:
                     description="Python adaptation of General Safety Rule 1: No dynamic execution",
                     severity="critical",
                     rule_type="ban",
-                    target="dynamic_execution"
+                    target="dynamic_execution",
                 ),
                 OverlayRule(
                     id="nasa_python_function_size",
@@ -265,7 +264,7 @@ class OverlayManager:
                     severity="high",
                     rule_type="limit",
                     target="function_lines",
-                    parameters={"max_value": 60}
+                    parameters={"max_value": 60},
                 ),
                 OverlayRule(
                     id="nasa_python_recursion_bounded",
@@ -273,9 +272,9 @@ class OverlayManager:
                     description="Python adaptation: Allow recursion only with depth guards",
                     severity="medium",
                     rule_type="require",
-                    target="recursion_depth_guard"
-                )
-            ]
+                    target="recursion_depth_guard",
+                ),
+            ],
         )
         self._overlays["nasa_python_safety"] = nasa_python_overlay
 
@@ -292,7 +291,7 @@ class OverlayManager:
                     description="Ban macros with variable argument lists",
                     severity="medium",
                     rule_type="ban",
-                    target="variadic_macro"
+                    target="variadic_macro",
                 ),
                 OverlayRule(
                     id="ban_token_pasting",
@@ -300,7 +299,7 @@ class OverlayManager:
                     description="Ban ## token pasting in macros",
                     severity="medium",
                     rule_type="ban",
-                    target="token_pasting"
+                    target="token_pasting",
                 ),
                 OverlayRule(
                     id="macro_complexity_limit",
@@ -309,9 +308,9 @@ class OverlayManager:
                     severity="medium",
                     rule_type="limit",
                     target="macro_complexity",
-                    parameters={"max_value": 3}
-                )
-            ]
+                    parameters={"max_value": 3},
+                ),
+            ],
         )
         self._overlays["c_macro_restrictions"] = c_macro_overlay
 
@@ -350,26 +349,26 @@ class OverlayManager:
     def _dict_to_overlay(self, data: Dict[str, Any]) -> GrammarOverlay:
         """Convert dictionary to GrammarOverlay object."""
         rules = []
-        for rule_data in data.get('rules', []):
+        for rule_data in data.get("rules", []):
             rule = OverlayRule(
-                id=rule_data['id'],
-                name=rule_data['name'],
-                description=rule_data['description'],
-                severity=rule_data['severity'],
-                rule_type=rule_data['rule_type'],
-                target=rule_data['target'],
-                parameters=rule_data.get('parameters', {})
+                id=rule_data["id"],
+                name=rule_data["name"],
+                description=rule_data["description"],
+                severity=rule_data["severity"],
+                rule_type=rule_data["rule_type"],
+                target=rule_data["target"],
+                parameters=rule_data.get("parameters", {}),
             )
             rules.append(rule)
 
         return GrammarOverlay(
-            id=data['id'],
-            name=data['name'],
-            description=data['description'],
-            language=LanguageSupport(data['language']),
+            id=data["id"],
+            name=data["name"],
+            description=data["description"],
+            language=LanguageSupport(data["language"]),
             rules=rules,
-            inherits=data.get('inherits', []),
-            metadata=data.get('metadata', {})
+            inherits=data.get("inherits", []),
+            metadata=data.get("metadata", {}),
         )
 
     def _overlay_to_dict(self, overlay: GrammarOverlay) -> Dict[str, Any]:
@@ -377,24 +376,24 @@ class OverlayManager:
         rules_data = []
         for rule in overlay.rules:
             rule_data = {
-                'id': rule.id,
-                'name': rule.name,
-                'description': rule.description,
-                'severity': rule.severity,
-                'rule_type': rule.rule_type,
-                'target': rule.target,
-                'parameters': rule.parameters
+                "id": rule.id,
+                "name": rule.name,
+                "description": rule.description,
+                "severity": rule.severity,
+                "rule_type": rule.rule_type,
+                "target": rule.target,
+                "parameters": rule.parameters,
             }
             rules_data.append(rule_data)
 
         return {
-            'id': overlay.id,
-            'name': overlay.name,
-            'description': overlay.description,
-            'language': overlay.language.value,
-            'rules': rules_data,
-            'inherits': overlay.inherits,
-            'metadata': overlay.metadata
+            "id": overlay.id,
+            "name": overlay.name,
+            "description": overlay.description,
+            "language": overlay.language.value,
+            "rules": rules_data,
+            "inherits": overlay.inherits,
+            "metadata": overlay.metadata,
         }
 
     def _check_rule_against_nodes(self, rule: OverlayRule, ast_nodes: List[Any]) -> List[Dict[str, Any]]:
@@ -413,18 +412,18 @@ class OverlayManager:
         # This would implement specific rule checking logic
         # For now, we'll do basic pattern matching
 
-        if not hasattr(node, 'type'):
+        if not hasattr(node, "type"):
             return None
 
-        if rule.rule_type == 'ban' and node.type == rule.target:
+        if rule.rule_type == "ban" and node.type == rule.target:
             return {
                 "rule_id": rule.id,
                 "rule_name": rule.name,
                 "severity": rule.severity,
                 "message": f"Banned construct: {rule.target}",
-                "line": getattr(node, 'start_point', (0, 0))[0] + 1,
-                "column": getattr(node, 'start_point', (0, 0))[1],
-                "type": "overlay_violation"
+                "line": getattr(node, "start_point", (0, 0))[0] + 1,
+                "column": getattr(node, "start_point", (0, 0))[1],
+                "type": "overlay_violation",
             }
 
         # Add more rule checking logic here

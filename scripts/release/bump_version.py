@@ -57,12 +57,7 @@ def update_pyproject_toml(new_version: str, dry_run: bool = False) -> None:
     content = pyproject_path.read_text(encoding="utf-8")
 
     # Update version line
-    new_content = re.sub(
-        r'^version = "[^"]+"',
-        f'version = "{new_version}"',
-        content,
-        flags=re.MULTILINE
-    )
+    new_content = re.sub(r'^version = "[^"]+"', f'version = "{new_version}"', content, flags=re.MULTILINE)
 
     if dry_run:
         print(f"Would update pyproject.toml version to {new_version}")
@@ -86,7 +81,7 @@ def update_changelog(new_version: str, dry_run: bool = False) -> None:
         r"## \[Unreleased\]",
         f"## [Unreleased]\n\n### Added\n### Changed\n### Fixed\n### Removed\n\n## [{new_version}] - {today}",
         content,
-        count=1
+        count=1,
     )
 
     # Update comparison links
@@ -95,9 +90,7 @@ def update_changelog(new_version: str, dry_run: bool = False) -> None:
     # Add new comparison link
     if "[Unreleased]:" in new_content:
         new_content = re.sub(
-            r"\[Unreleased\]: .+",
-            f"[Unreleased]: {repo_url}/compare/v{new_version}...HEAD",
-            new_content
+            r"\[Unreleased\]: .+", f"[Unreleased]: {repo_url}/compare/v{new_version}...HEAD", new_content
         )
 
         # Add version comparison link before the last line
@@ -124,18 +117,10 @@ Examples:
   python scripts/release/bump_version.py patch
   python scripts/release/bump_version.py minor --dry-run
   python scripts/release/bump_version.py major
-        """
+        """,
     )
-    parser.add_argument(
-        "bump_type",
-        choices=["major", "minor", "patch"],
-        help="Type of version bump to perform"
-    )
-    parser.add_argument(
-        "--dry-run",
-        action="store_true",
-        help="Show what would be changed without making changes"
-    )
+    parser.add_argument("bump_type", choices=["major", "minor", "patch"], help="Type of version bump to perform")
+    parser.add_argument("--dry-run", action="store_true", help="Show what would be changed without making changes")
 
     args = parser.parse_args()
 

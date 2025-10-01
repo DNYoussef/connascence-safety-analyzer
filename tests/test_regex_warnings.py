@@ -17,12 +17,12 @@ def test_no_syntax_warnings_on_import():
 
     # Modules to test for regex warnings
     modules_to_test = [
-        'analyzer.language_strategies',
-        'analyzer.smart_integration_engine',
-        'analyzer.check_connascence',
-        'analyzer.ast_engine.connascence_detector',
-        'analyzer.ast_engine.god_object_detector',
-        'analyzer.ast_engine.parameter_analyzer'
+        "analyzer.language_strategies",
+        "analyzer.smart_integration_engine",
+        "analyzer.check_connascence",
+        "analyzer.ast_engine.connascence_detector",
+        "analyzer.ast_engine.god_object_detector",
+        "analyzer.ast_engine.parameter_analyzer",
     ]
 
     for module_name in modules_to_test:
@@ -53,23 +53,26 @@ def test_regex_patterns_use_raw_strings():
 
     for py_file in python_files:
         try:
-            with open(py_file, encoding='utf-8') as f:
+            with open(py_file, encoding="utf-8") as f:
                 content = f.read()
 
             # Parse AST to find re.compile calls
             tree = ast.parse(content, filename=str(py_file))
 
             for node in ast.walk(tree):
-                if (isinstance(node, ast.Call) and
-                    hasattr(node.func, 'attr') and node.func.attr == 'compile' and
-                    hasattr(node.func.value, 'id') and node.func.value.id == 're'):
-
+                if (
+                    isinstance(node, ast.Call)
+                    and hasattr(node.func, "attr")
+                    and node.func.attr == "compile"
+                    and hasattr(node.func.value, "id")
+                    and node.func.value.id == "re"
+                ):
                     # Check if the first argument is a raw string
                     if node.args and isinstance(node.args[0], ast.Constant):
                         pattern_str = node.args[0].value
                         if isinstance(pattern_str, str):
                             # Check if it contains escape sequences that should be raw
-                            if '\\' in pattern_str and not _is_likely_raw_string(content, node.lineno):
+                            if "\\" in pattern_str and not _is_likely_raw_string(content, node.lineno):
                                 issues.append(f"{py_file}:{node.lineno} - Regex pattern should use raw string")
 
         except (SyntaxError, UnicodeDecodeError):
@@ -82,7 +85,7 @@ def test_regex_patterns_use_raw_strings():
 
 def _is_likely_raw_string(content: str, line_no: int) -> bool:
     """Check if a string on given line is likely a raw string."""
-    lines = content.split('\n')
+    lines = content.split("\n")
     if line_no > len(lines):
         return False
 
@@ -97,11 +100,11 @@ def test_specific_patterns_compile_without_warnings():
 
     # Test patterns that were problematic before
     test_patterns = [
-        r'\\w+\\s*\\([^)]*\\)',  # Function detection
-        r'''["'][^"']{3,}["']''',  # String literals with mixed quotes
-        r'\\b(?!0\\b|1\\b|-1\\b)\\d+\\.?\\d*\\b',  # Magic numbers
-        r'^\\s*(?:function\\s+\\w+|(?:const|let|var)\\s+\\w+\\s*=)',  # JS functions
-        r'interface\\s*\\{',  # Interface detection
+        r"\\w+\\s*\\([^)]*\\)",  # Function detection
+        r"""["'][^"']{3,}["']""",  # String literals with mixed quotes
+        r"\\b(?!0\\b|1\\b|-1\\b)\\d+\\.?\\d*\\b",  # Magic numbers
+        r"^\\s*(?:function\\s+\\w+|(?:const|let|var)\\s+\\w+\\s*=)",  # JS functions
+        r"interface\\s*\\{",  # Interface detection
     ]
 
     for pattern_str in test_patterns:
@@ -163,7 +166,7 @@ def test_ruff_catches_invalid_escape_sequences():
     """Test that our ruff configuration catches invalid escape sequences."""
 
     # Create a temporary file with bad regex patterns
-    bad_pattern_code = '''
+    bad_pattern_code = """
 import re
 
 # This should be caught by ruff W605
@@ -171,7 +174,7 @@ bad_pattern = re.compile('["\'][^"\']{3,}["\']')
 
 # This should be flagged for non-raw string
 another_bad = re.compile('\\\\w+\\\\s*\\\\(')
-'''
+"""
 
     test_file = Path(__file__).parent / "temp_bad_regex.py"
 
@@ -180,16 +183,18 @@ another_bad = re.compile('\\\\w+\\\\s*\\\\(')
 
         # Run ruff on the bad file (this is informational)
         import subprocess
+
         result = subprocess.run(
-            ['ruff', 'check', str(test_file), '--select=W605'],
+            ["ruff", "check", str(test_file), "--select=W605"],
+            check=False,
             capture_output=True,
             text=True,
-            cwd=Path(__file__).parent.parent
+            cwd=Path(__file__).parent.parent,
         )
 
         # If ruff found issues, that's good (it means our config is working)
         # If ruff is not available, skip this test
-        if result.returncode != 0 and 'W605' in result.stdout:
+        if result.returncode != 0 and "W605" in result.stdout:
             # Good - ruff caught the issue
             pass
         elif result.returncode == 127:  # Command not found

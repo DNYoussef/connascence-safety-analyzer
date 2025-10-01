@@ -35,15 +35,11 @@ logger = logging.getLogger(__name__)
 class SecureMCPServer:
     """MCP Server with integrated enterprise security controls."""
 
-    def __init__(self, base_mcp_server, security_config_path: Optional[Path] = None,
-                 air_gapped: bool = False):
+    def __init__(self, base_mcp_server, security_config_path: Optional[Path] = None, air_gapped: bool = False):
         """Initialize secure MCP server wrapper."""
 
         self.base_server = base_mcp_server
-        self.security_manager = SecurityManager(
-            config_path=security_config_path,
-            air_gapped=air_gapped
-        )
+        self.security_manager = SecurityManager(config_path=security_config_path, air_gapped=air_gapped)
 
         # Wrap all MCP tools with security
         self._secure_tools = {}
@@ -63,23 +59,16 @@ class SecureMCPServer:
                 "user_id": context.user_id,
                 "username": context.username,
                 "roles": [role.value for role in context.roles],
-                "security_clearance": context.security_clearance.value
+                "security_clearance": context.security_clearance.value,
             }
 
-        return {
-            "success": False,
-            "error": "Invalid credentials",
-            "code": "AUTHENTICATION_FAILED"
-        }
+        return {"success": False, "error": "Invalid credentials", "code": "AUTHENTICATION_FAILED"}
 
     def logout(self, session_token: str) -> Dict[str, Any]:
         """Logout user and invalidate session."""
         success = self.security_manager.invalidate_session(session_token)
 
-        return {
-            "success": success,
-            "message": "Logged out successfully" if success else "Session not found"
-        }
+        return {"success": success, "message": "Logged out successfully" if success else "Session not found"}
 
     def get_tools(self, session_token: str, ip_address: str) -> List[Dict[str, Any]]:
         """Get available tools based on user permissions."""
@@ -97,58 +86,48 @@ class SecureMCPServer:
                 available_tools.append(tool_config["definition"])
                 continue
 
-            resource, action = required_permission.split(':') if ':' in required_permission else (required_permission, 'execute')
+            resource, action = (
+                required_permission.split(":") if ":" in required_permission else (required_permission, "execute")
+            )
 
             if self.security_manager.check_permission(context, resource, action):
                 available_tools.append(tool_config["definition"])
 
         return available_tools
 
-    def execute_tool(self, tool_name: str, arguments: Dict[str, Any],
-                    session_token: str, ip_address: str) -> Dict[str, Any]:
+    def execute_tool(
+        self, tool_name: str, arguments: Dict[str, Any], session_token: str, ip_address: str
+    ) -> Dict[str, Any]:
         """Execute tool with security checks."""
 
         # Validate session
         context = self.security_manager.validate_session(session_token, ip_address)
         if not context:
-            return {
-                "error": "Invalid or expired session",
-                "code": "AUTHENTICATION_REQUIRED"
-            }
+            return {"error": "Invalid or expired session", "code": "AUTHENTICATION_REQUIRED"}
 
         # Check if tool exists
         if tool_name not in self._secure_tools:
-            return {
-                "error": f"Unknown tool: {tool_name}",
-                "code": "UNKNOWN_TOOL"
-            }
+            return {"error": f"Unknown tool: {tool_name}", "code": "UNKNOWN_TOOL"}
 
         tool_config = self._secure_tools[tool_name]
 
         # Check permissions
         required_permission = tool_config.get("permission", "")
         if required_permission:
-            resource, action = required_permission.split(':') if ':' in required_permission else (required_permission, 'execute')
+            resource, action = (
+                required_permission.split(":") if ":" in required_permission else (required_permission, "execute")
+            )
 
             if not self.security_manager.check_permission(context, resource, action):
-                return {
-                    "error": f"Permission denied for {tool_name}",
-                    "code": "PERMISSION_DENIED"
-                }
+                return {"error": f"Permission denied for {tool_name}", "code": "PERMISSION_DENIED"}
 
         # Check rate limiting
         if not self.security_manager.check_rate_limit(context, tool_name):
-            return {
-                "error": "Rate limit exceeded",
-                "code": "RATE_LIMITED"
-            }
+            return {"error": "Rate limit exceeded", "code": "RATE_LIMITED"}
 
         # Log tool execution start
         self.security_manager.log_analysis_event(
-            context,
-            AuditEventType.ANALYSIS_START,
-            tool_name,
-            {"arguments": self._sanitize_arguments(arguments)}
+            context, AuditEventType.ANALYSIS_START, tool_name, {"arguments": self._sanitize_arguments(arguments)}
         )
 
         try:
@@ -156,11 +135,7 @@ class SecureMCPServer:
             start_time = datetime.now(datetime.UTC)
 
             # Add security context to arguments for tools that need it
-            secure_arguments = {
-                **arguments,
-                "security_context": context,
-                "security_manager": self.security_manager
-            }
+            secure_arguments = {**arguments, "security_context": context, "security_manager": self.security_manager}
 
             result = self.base_server.get_tool_result(tool_name, secure_arguments)
 
@@ -171,10 +146,7 @@ class SecureMCPServer:
                 context,
                 AuditEventType.ANALYSIS_COMPLETE,
                 tool_name,
-                {
-                    "execution_time_seconds": execution_time,
-                    "result_size": len(json.dumps(result)) if result else 0
-                }
+                {"execution_time_seconds": execution_time, "result_size": len(json.dumps(result)) if result else 0},
             )
 
             # Filter sensitive data from results
@@ -187,87 +159,66 @@ class SecureMCPServer:
 
             # Log failure
             self.security_manager.log_analysis_event(
-                context,
-                AuditEventType.ANALYSIS_COMPLETE,
-                tool_name,
-                {"error": str(e), "result": "failure"}
+                context, AuditEventType.ANALYSIS_COMPLETE, tool_name, {"error": str(e), "result": "failure"}
             )
 
-            return {
-                "error": f"Tool execution failed: {str(e)}",
-                "code": "EXECUTION_ERROR"
-            }
+            return {"error": f"Tool execution failed: {e!s}", "code": "EXECUTION_ERROR"}
 
-    def get_audit_trail(self, session_token: str, ip_address: str,
-                       start_time: Optional[str] = None,
-                       end_time: Optional[str] = None,
-                       user_id: Optional[str] = None) -> Dict[str, Any]:
+    def get_audit_trail(
+        self,
+        session_token: str,
+        ip_address: str,
+        start_time: Optional[str] = None,
+        end_time: Optional[str] = None,
+        user_id: Optional[str] = None,
+    ) -> Dict[str, Any]:
         """Get audit trail for compliance reporting."""
 
         context = self.security_manager.validate_session(session_token, ip_address)
         if not context:
-            return {
-                "error": "Invalid or expired session",
-                "code": "AUTHENTICATION_REQUIRED"
-            }
+            return {"error": "Invalid or expired session", "code": "AUTHENTICATION_REQUIRED"}
 
         try:
             # Parse timestamps
             start_dt = datetime.fromisoformat(start_time) if start_time else None
             end_dt = datetime.fromisoformat(end_time) if end_time else None
 
-            events = self.security_manager.get_audit_trail(
-                context, start_dt, end_dt, user_id
-            )
+            events = self.security_manager.get_audit_trail(context, start_dt, end_dt, user_id)
 
             # Convert events to JSON-serializable format
             audit_data = []
             for event in events:
-                audit_data.append({
-                    "timestamp": event.timestamp.isoformat(),
-                    "event_type": event.event_type.value,
-                    "user_id": event.user_id,
-                    "ip_address": event.ip_address,
-                    "resource": event.resource,
-                    "action": event.action,
-                    "result": event.result,
-                    "details": event.details,
-                    "integrity_verified": event.verify_integrity()
-                })
+                audit_data.append(
+                    {
+                        "timestamp": event.timestamp.isoformat(),
+                        "event_type": event.event_type.value,
+                        "user_id": event.user_id,
+                        "ip_address": event.ip_address,
+                        "resource": event.resource,
+                        "action": event.action,
+                        "result": event.result,
+                        "details": event.details,
+                        "integrity_verified": event.verify_integrity(),
+                    }
+                )
 
-            return {
-                "success": True,
-                "events": audit_data,
-                "total_events": len(audit_data)
-            }
+            return {"success": True, "events": audit_data, "total_events": len(audit_data)}
 
         except PermissionError:
-            return {
-                "error": "Insufficient permissions to access audit logs",
-                "code": "PERMISSION_DENIED"
-            }
+            return {"error": "Insufficient permissions to access audit logs", "code": "PERMISSION_DENIED"}
         except Exception as e:
-            return {
-                "error": f"Failed to retrieve audit trail: {str(e)}",
-                "code": "AUDIT_ERROR"
-            }
+            return {"error": f"Failed to retrieve audit trail: {e!s}", "code": "AUDIT_ERROR"}
 
     def get_security_status(self, session_token: str, ip_address: str) -> Dict[str, Any]:
         """Get security status and metrics."""
 
         context = self.security_manager.validate_session(session_token, ip_address)
         if not context:
-            return {
-                "error": "Invalid or expired session",
-                "code": "AUTHENTICATION_REQUIRED"
-            }
+            return {"error": "Invalid or expired session", "code": "AUTHENTICATION_REQUIRED"}
 
         # Only security officers and admins can view security status
         if not (context.has_role(UserRole.SECURITY_OFFICER) or context.has_role(UserRole.ADMIN)):
-            return {
-                "error": "Insufficient permissions to view security status",
-                "code": "PERMISSION_DENIED"
-            }
+            return {"error": "Insufficient permissions to view security status", "code": "PERMISSION_DENIED"}
 
         # Calculate security metrics
         active_sessions = len(self.security_manager.sessions)
@@ -280,15 +231,15 @@ class SecureMCPServer:
                 "audit_logging_enabled": True,
                 "encryption_enabled": self.security_manager.config.get("encryption_enabled", True),
                 "rate_limiting_enabled": True,
-                "session_timeout_hours": self.security_manager.config.get("session_timeout_hours", 8)
+                "session_timeout_hours": self.security_manager.config.get("session_timeout_hours", 8),
             },
             "user_context": {
                 "user_id": context.user_id,
                 "username": context.username,
                 "roles": [role.value for role in context.roles],
                 "security_clearance": context.security_clearance.value,
-                "session_expires_at": context.expires_at.isoformat()
-            }
+                "session_expires_at": context.expires_at.isoformat(),
+            },
         }
 
     def _setup_secure_tools(self):
@@ -315,7 +266,7 @@ class SecureMCPServer:
             "get_quality_score": "analysis:read",
             "suggest_grammar_fixes": "code:suggest_fixes",
             "validate_safety_profile": "compliance:validate",
-            "compare_quality_trends": "analysis:read"
+            "compare_quality_trends": "analysis:read",
         }
 
         # Security clearance requirements for sensitive tools
@@ -323,7 +274,7 @@ class SecureMCPServer:
             "verify_build_flags": SecurityLevel.CONFIDENTIAL,
             "validate_safety_profile": SecurityLevel.CONFIDENTIAL,
             "evidence_report": SecurityLevel.INTERNAL,
-            "baseline_snapshot": SecurityLevel.INTERNAL
+            "baseline_snapshot": SecurityLevel.INTERNAL,
         }
 
         for tool in original_tools:
@@ -333,7 +284,7 @@ class SecureMCPServer:
                 "definition": tool,
                 "permission": tool_permissions.get(tool_name, ""),
                 "clearance": clearance_requirements.get(tool_name, SecurityLevel.PUBLIC),
-                "rate_limit_weight": self._get_tool_rate_limit_weight(tool_name)
+                "rate_limit_weight": self._get_tool_rate_limit_weight(tool_name),
             }
 
     def _get_tool_rate_limit_weight(self, tool_name: str) -> int:
@@ -344,7 +295,7 @@ class SecureMCPServer:
             "analyze_with_grammar": 10,
             "suggest_grammar_fixes": 5,
             "validate_safety_profile": 8,
-            "compare_quality_trends": 6
+            "compare_quality_trends": 6,
         }
 
         return heavy_tools.get(tool_name, 1)
@@ -367,8 +318,7 @@ class SecureMCPServer:
 
         return sanitized
 
-    def _filter_sensitive_data(self, result: Dict[str, Any],
-                              context: SecurityContext) -> Dict[str, Any]:
+    def _filter_sensitive_data(self, result: Dict[str, Any], context: SecurityContext) -> Dict[str, Any]:
         """Filter sensitive data from results based on user clearance."""
         if not result:
             return result
@@ -418,7 +368,9 @@ class SecureMCPServer:
             for key, value in data.items():
                 if isinstance(value, str):
                     # Redact potential API keys, tokens, etc.
-                    if len(value) > 20 and any(pattern in key.lower() for pattern in ['key', 'token', 'secret', 'password']):
+                    if len(value) > 20 and any(
+                        pattern in key.lower() for pattern in ["key", "token", "secret", "password"]
+                    ):
                         data[key] = "[REDACTED]"
                 elif isinstance(value, (dict, list)):
                     self._redact_sensitive_patterns(value, depth + 1)
@@ -435,11 +387,7 @@ def create_secure_mcp_server(base_server, security_config: Optional[Dict[str, An
     config_path = Path(security_config.get("config_path", ".connascence_security")) if security_config else None
     air_gapped = security_config.get("air_gapped", False) if security_config else False
 
-    return SecureMCPServer(
-        base_mcp_server=base_server,
-        security_config_path=config_path,
-        air_gapped=air_gapped
-    )
+    return SecureMCPServer(base_mcp_server=base_server, security_config_path=config_path, air_gapped=air_gapped)
 
 
 # Security middleware for additional protection
@@ -451,8 +399,7 @@ class SecurityMiddleware:
         self.suspicious_activity_threshold = 10  # Suspicious requests per minute
         self.activity_tracking: Dict[str, List[float]] = {}
 
-    def pre_request_check(self, context: SecurityContext, tool_name: str,
-                         arguments: Dict[str, Any]) -> bool:
+    def pre_request_check(self, context: SecurityContext, tool_name: str, arguments: Dict[str, Any]) -> bool:
         """Perform pre-request security checks."""
 
         # Track activity for anomaly detection
@@ -474,15 +421,14 @@ class SecurityMiddleware:
                 "activity_monitoring",
                 "suspicious_activity_detected",
                 "blocked",
-                {"requests_per_minute": len(user_activity)}
+                {"requests_per_minute": len(user_activity)},
             )
             return False
 
         # Additional security checks can be added here
         return True
 
-    def post_request_check(self, context: SecurityContext, tool_name: str,
-                          result: Dict[str, Any]) -> bool:
+    def post_request_check(self, context: SecurityContext, tool_name: str, result: Dict[str, Any]) -> bool:
         """Perform post-request security checks."""
 
         # Check for data exfiltration attempts
@@ -496,7 +442,7 @@ class SecurityMiddleware:
                 tool_name,
                 "large_data_export",
                 "flagged",
-                {"result_size_bytes": result_size}
+                {"result_size_bytes": result_size},
             )
 
         return True

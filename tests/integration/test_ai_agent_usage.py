@@ -41,10 +41,7 @@ class AIAgentConnascenceClient:
         print(f"AI Agent: Analyzing codebase at '{path}' with preset '{preset}'")
 
         try:
-            result = await self.server.scan_path({
-                'path': path,
-                'policy_preset': preset
-            })
+            result = await self.server.scan_path({"path": path, "policy_preset": preset})
 
             self.analysis_cache[path] = result
             return result
@@ -58,9 +55,7 @@ class AIAgentConnascenceClient:
         print(f"AI Agent: Requesting explanation for violation '{violation_id}'")
 
         try:
-            result = await self.server.explain_finding({
-                'finding_id': violation_id
-            })
+            result = await self.server.explain_finding({"finding_id": violation_id})
             return result
 
         except Exception as e:
@@ -72,10 +67,7 @@ class AIAgentConnascenceClient:
         print(f"AI Agent: Requesting fix suggestion for violation '{violation.get('id', 'unknown')}'")
 
         try:
-            result = await self.server.propose_autofix({
-                'violation': violation,
-                'include_diff': True
-            })
+            result = await self.server.propose_autofix({"violation": violation, "include_diff": True})
             return result
 
         except Exception as e:
@@ -102,7 +94,7 @@ class AIAgentConnascenceClient:
         policies = await self.get_available_policies()
         if policies:
             print(f"\nAvailable Analysis Policies: {len(policies.get('presets', []))}")
-            for preset in policies.get('presets', []):
+            for preset in policies.get("presets", []):
                 print(f"  - {preset['id']}: {preset['description']}")
 
         # Step 2: Analyze the codebase
@@ -111,8 +103,8 @@ class AIAgentConnascenceClient:
             print("Analysis failed, cannot generate report.")
             return
 
-        summary = analysis.get('summary', {})
-        violations = analysis.get('violations', [])
+        summary = analysis.get("summary", {})
+        violations = analysis.get("violations", [])
 
         print("\n=== Analysis Summary ===")
         print(f"Total Violations: {summary.get('total_violations', 0)}")
@@ -133,7 +125,7 @@ class AIAgentConnascenceClient:
                 print(f"  Description: {violation.get('description', 'No description')}")
 
                 # Get explanation
-                explanation = await self.explain_violation(violation.get('rule_id', ''))
+                explanation = await self.explain_violation(violation.get("rule_id", ""))
                 if explanation:
                     print(f"  Explanation: {explanation.get('explanation', 'Not available')}")
 
@@ -144,9 +136,9 @@ class AIAgentConnascenceClient:
                     print(f"  Fix Description: {fix_suggestion.get('patch_description', 'Not available')}")
                     print(f"  Confidence: {fix_suggestion.get('confidence_score', 0)}")
 
-                    if fix_suggestion.get('diff'):
+                    if fix_suggestion.get("diff"):
                         print("  Proposed Diff:")
-                        for line in fix_suggestion['diff'].split('\\n'):
+                        for line in fix_suggestion["diff"].split("\\n"):
                             print(f"    {line}")
 
         # Step 4: Get server metrics
@@ -185,6 +177,7 @@ async def main():
     print("4. Receive automated fix suggestions")
     print("5. Generate comprehensive improvement reports")
     print("\nThe MCP server is fully functional for AI agent integration!")
+
 
 if __name__ == "__main__":
     asyncio.run(main())

@@ -24,43 +24,49 @@ This backend enables:
 - Grammar overlay enforcement
 """
 
-from fixes.phase0.production_safe_assertions import ProductionAssert
 from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Dict, List, Optional
+
+from fixes.phase0.production_safe_assertions import ProductionAssert
 
 # tree-sitter imports with improved error handling
 try:
     import tree_sitter
     from tree_sitter import Language, Node, Parser
+
     TREE_SITTER_AVAILABLE = True
 except ImportError as e:
     # Mock classes for development/testing with better logging
     import sys
+
     print(f"[INFO] Tree-sitter not available: {e}. Using mock backend.", file=sys.stderr)
-    
+
     class Language:
-        def __init__(self, library, name): 
+        def __init__(self, library, name):
             self.name = name
+
         def __str__(self):
             return f"MockLanguage({self.name})"
-    
+
     class Parser:
         def __init__(self):
             self.language = None
-        def set_language(self, lang): 
-            ProductionAssert.not_none(lang, 'lang')
 
-            ProductionAssert.not_none(lang, 'lang')
+        def set_language(self, lang):
+            ProductionAssert.not_none(lang, "lang")
+
+            ProductionAssert.not_none(lang, "lang")
 
             self.language = lang
-        def parse(self, code): 
-            ProductionAssert.not_none(code, 'code')
 
-            ProductionAssert.not_none(code, 'code')
+        def parse(self, code):
+            ProductionAssert.not_none(code, "code")
+
+            ProductionAssert.not_none(code, "code")
 
             return MockTree()
-    
+
     class Node:
         def __init__(self, node_type="mock"):
             self.type = node_type
@@ -68,20 +74,23 @@ except ImportError as e:
             self.start_point = (0, 0)
             self.end_point = (0, 0)
             self.text = b""
+
         def __str__(self):
             return f"MockNode({self.type})"
-    
+
     class MockTree:
         def __init__(self):
             self.root_node = Node("program")
+
         def __str__(self):
             return "MockTree"
-    
+
     TREE_SITTER_AVAILABLE = False
 
 
 class LanguageSupport(Enum):
     """Supported languages for grammar parsing."""
+
     C = "c"
     CPP = "cpp"
     PYTHON = "python"
@@ -94,8 +103,9 @@ class LanguageSupport(Enum):
 @dataclass
 class ParseResult:
     """Result of parsing code with tree-sitter."""
+
     success: bool
-    ast: Optional['Node'] = None
+    ast: Optional["Node"] = None
     errors: List[Dict[str, Any]] = None
     language: Optional[LanguageSupport] = None
     parsing_time_ms: float = 0.0
@@ -108,6 +118,7 @@ class ParseResult:
 @dataclass
 class ValidationResult:
     """Result of validating code against grammar."""
+
     valid: bool
     violations: List[Dict[str, Any]] = None
     overlay_violations: List[Dict[str, Any]] = None
@@ -122,13 +133,14 @@ class ValidationResult:
 @dataclass
 class NodeInfo:
     """Normalized information about an AST node."""
+
     type: str
     text: str
     start_line: int
     start_column: int
     end_line: int
     end_column: int
-    children: List['NodeInfo'] = None
+    children: List["NodeInfo"] = None
 
     def __post_init__(self):
         if self.children is None:
@@ -154,8 +166,8 @@ class TreeSitterBackend:
     def get_version(self) -> str:
         """Get tree-sitter version."""
         if TREE_SITTER_AVAILABLE:
-            return getattr(tree_sitter, '__version__', 'unknown')
-        return 'mock-1.0.0'
+            return getattr(tree_sitter, "__version__", "unknown")
+        return "mock-1.0.0"
 
     def supported_languages(self) -> List[LanguageSupport]:
         """Get list of supported languages."""
@@ -164,12 +176,10 @@ class TreeSitterBackend:
     def parse(self, code: str, language: LanguageSupport) -> ParseResult:
         """Parse code using tree-sitter."""
         if language not in self._parsers:
-            return ParseResult(
-                success=False,
-                errors=[{"message": f"Language {language.value} not supported"}]
-            )
+            return ParseResult(success=False, errors=[{"message": f"Language {language.value} not supported"}])
 
         import time
+
         start_time = time.time()
 
         try:
@@ -177,7 +187,7 @@ class TreeSitterBackend:
 
             if TREE_SITTER_AVAILABLE:
                 # Use tree-sitter-languages parser directly
-                tree = parser.parse(bytes(code, 'utf8'))
+                tree = parser.parse(bytes(code, "utf8"))
                 ast = tree.root_node
 
                 # Check for syntax errors
@@ -191,52 +201,39 @@ class TreeSitterBackend:
 
             parsing_time = (time.time() - start_time) * 1000
 
-            return ParseResult(
-                success=success,
-                ast=ast,
-                errors=errors,
-                language=language,
-                parsing_time_ms=parsing_time
-            )
+            return ParseResult(success=success, ast=ast, errors=errors, language=language, parsing_time_ms=parsing_time)
 
         except Exception as e:
             return ParseResult(
                 success=False,
-                errors=[{"message": f"Parse error: {str(e)}"}],
+                errors=[{"message": f"Parse error: {e!s}"}],
                 language=language,
-                parsing_time_ms=(time.time() - start_time) * 1000
+                parsing_time_ms=(time.time() - start_time) * 1000,
             )
 
-    def validate(self, code: str, language: LanguageSupport,
-                overlay: Optional[str] = None) -> ValidationResult:
+    def validate(self, code: str, language: LanguageSupport, overlay: Optional[str] = None) -> ValidationResult:
         """Validate code against grammar and optional overlay."""
         parse_result = self.parse(code, language)
 
         if not parse_result.success:
-            return ValidationResult(
-                valid=False,
-                violations=[{"type": "parse_error", "errors": parse_result.errors}]
-            )
+            return ValidationResult(valid=False, violations=[{"type": "parse_error", "errors": parse_result.errors}])
 
         violations = []
         overlay_violations = []
 
         # Check for overlay violations if specified
         if overlay and parse_result.ast:
-            overlay_violations = self._check_overlay_violations(
-                parse_result.ast, language, overlay
-            )
+            overlay_violations = self._check_overlay_violations(parse_result.ast, language, overlay)
 
         # Additional validation rules can be added here
 
         return ValidationResult(
             valid=len(violations) == 0 and len(overlay_violations) == 0,
             violations=violations,
-            overlay_violations=overlay_violations
+            overlay_violations=overlay_violations,
         )
 
-    def get_next_tokens(self, prefix: str, language: LanguageSupport,
-                       overlay: Optional[str] = None) -> List[str]:
+    def get_next_tokens(self, prefix: str, language: LanguageSupport, overlay: Optional[str] = None) -> List[str]:
         """Get valid next tokens for constrained generation."""
         # This would implement constrained decoding by:
         # 1. Parsing the prefix
@@ -248,20 +245,20 @@ class TreeSitterBackend:
         tokens = []
 
         if language == LanguageSupport.C:
-            if prefix.strip().endswith('{'):
-                tokens = ['int', 'char', 'float', 'double', 'if', 'for', 'while', 'return']
-            elif prefix.strip().endswith('('):
-                tokens = [')', 'void', 'int', 'char', 'float']
+            if prefix.strip().endswith("{"):
+                tokens = ["int", "char", "float", "double", "if", "for", "while", "return"]
+            elif prefix.strip().endswith("("):
+                tokens = [")", "void", "int", "char", "float"]
             else:
-                tokens = [';', '{', '}', '(', ')', 'if', 'for', 'while', 'int', 'char']
+                tokens = [";", "{", "}", "(", ")", "if", "for", "while", "int", "char"]
 
         elif language == LanguageSupport.PYTHON:
-            if prefix.strip().endswith(':'):
-                tokens = ['\\n    ', 'pass', 'return', 'if', 'for', 'while']
-            elif prefix.strip().endswith('('):
-                tokens = [')', 'self', 'str', 'int', 'list', 'dict']
+            if prefix.strip().endswith(":"):
+                tokens = ["\\n    ", "pass", "return", "if", "for", "while"]
+            elif prefix.strip().endswith("("):
+                tokens = [")", "self", "str", "int", "list", "dict"]
             else:
-                tokens = [':', '(', ')', '[', ']', 'def', 'class', 'if', 'for', 'import']
+                tokens = [":", "(", ")", "[", "]", "def", "class", "if", "for", "import"]
 
         # Filter by overlay constraints
         if overlay:
@@ -269,7 +266,7 @@ class TreeSitterBackend:
 
         return tokens
 
-    def normalize_ast(self, ast: 'Node', language: LanguageSupport) -> NodeInfo:
+    def normalize_ast(self, ast: "Node", language: LanguageSupport) -> NodeInfo:
         """Convert tree-sitter AST to normalized format."""
         if not ast:
             return NodeInfo("empty", "", 0, 0, 0, 0)
@@ -277,7 +274,7 @@ class TreeSitterBackend:
         # Extract node information
         if TREE_SITTER_AVAILABLE:
             node_type = ast.type
-            node_text = ast.text.decode('utf8') if hasattr(ast.text, 'decode') else str(ast.text)
+            node_text = ast.text.decode("utf8") if hasattr(ast.text, "decode") else str(ast.text)
             start_line, start_column = ast.start_point
             end_line, end_column = ast.end_point
 
@@ -301,7 +298,7 @@ class TreeSitterBackend:
             start_column=start_column,
             end_line=end_line,
             end_column=end_column,
-            children=children
+            children=children,
         )
 
     def apply_overlay(self, language: LanguageSupport, overlay_id: str) -> bool:
@@ -331,16 +328,14 @@ class TreeSitterBackend:
         overlays_key = f"{language.value}_overlays"
         return self.config.get(overlays_key, [])
 
-    def find_nodes_by_type(self, ast: 'Node', node_types: List[str]) -> List['Node']:
+    def find_nodes_by_type(self, ast: "Node", node_types: List[str]) -> List["Node"]:
         """Find all nodes of specified types in AST."""
         nodes = []
 
         def traverse(node):
+            ProductionAssert.not_none(node, "node")
 
-
-            ProductionAssert.not_none(node, 'node')
-
-            ProductionAssert.not_none(node, 'node')
+            ProductionAssert.not_none(node, "node")
 
             if node.type in node_types:
                 nodes.append(node)
@@ -352,16 +347,14 @@ class TreeSitterBackend:
 
         return nodes
 
-    def extract_functions(self, ast: 'Node', language: LanguageSupport) -> List[Dict[str, Any]]:
+    def extract_functions(self, ast: "Node", language: LanguageSupport) -> List[Dict[str, Any]]:
         """Extract function definitions from AST."""
         functions = []
 
-        if language == LanguageSupport.C:
-            function_nodes = self.find_nodes_by_type(ast, ['function_definition'])
-        elif language == LanguageSupport.PYTHON:
-            function_nodes = self.find_nodes_by_type(ast, ['function_definition'])
+        if language == LanguageSupport.C or language == LanguageSupport.PYTHON:
+            function_nodes = self.find_nodes_by_type(ast, ["function_definition"])
         elif language == LanguageSupport.JAVASCRIPT:
-            function_nodes = self.find_nodes_by_type(ast, ['function_declaration', 'function_expression'])
+            function_nodes = self.find_nodes_by_type(ast, ["function_declaration", "function_expression"])
         else:
             function_nodes = []
 
@@ -381,22 +374,22 @@ class TreeSitterBackend:
                 if TREE_SITTER_AVAILABLE:
                     # Load actual language parsers using tree-sitter-languages
                     from tree_sitter_languages import get_parser
-                    
+
                     # Map our enum to tree-sitter-languages names
                     lang_map = {
-                        LanguageSupport.C: 'c',
-                        LanguageSupport.PYTHON: 'python',
-                        LanguageSupport.JAVASCRIPT: 'javascript',
-                        LanguageSupport.TYPESCRIPT: 'typescript',
-                        LanguageSupport.CPP: 'cpp',
-                        LanguageSupport.GO: 'go',
-                        LanguageSupport.RUST: 'rust'
+                        LanguageSupport.C: "c",
+                        LanguageSupport.PYTHON: "python",
+                        LanguageSupport.JAVASCRIPT: "javascript",
+                        LanguageSupport.TYPESCRIPT: "typescript",
+                        LanguageSupport.CPP: "cpp",
+                        LanguageSupport.GO: "go",
+                        LanguageSupport.RUST: "rust",
                     }
-                    
+
                     parser = get_parser(lang_map[lang])
                     # Create a mock Language object since we use the parser directly
-                    language = type('Language', (), {'name': lang.value})()
-                    
+                    language = type("Language", (), {"name": lang.value})()
+
                     self._parsers[lang] = parser
                     self._languages[lang] = language
                 else:
@@ -409,29 +402,29 @@ class TreeSitterBackend:
 
             except Exception as e:
                 # Skip languages that fail to load, but don't fail silently in development
-                if self.config.get('debug', False):
+                if self.config.get("debug", False):
                     print(f"Warning: Failed to load {lang.value} parser: {e}")
                 continue
 
-    def _extract_errors(self, ast: 'Node') -> List[Dict[str, Any]]:
+    def _extract_errors(self, ast: "Node") -> List[Dict[str, Any]]:
         """Extract syntax errors from AST."""
         errors = []
 
         def find_errors(node):
+            ProductionAssert.not_none(node, "node")
 
+            ProductionAssert.not_none(node, "node")
 
-            ProductionAssert.not_none(node, 'node')
-
-            ProductionAssert.not_none(node, 'node')
-
-            if node.type == 'ERROR':
-                errors.append({
-                    "type": "syntax_error",
-                    "message": f"Syntax error at line {node.start_point[0] + 1}",
-                    "line": node.start_point[0] + 1,
-                    "column": node.start_point[1],
-                    "text": node.text.decode('utf8') if hasattr(node.text, 'decode') else str(node.text)
-                })
+            if node.type == "ERROR":
+                errors.append(
+                    {
+                        "type": "syntax_error",
+                        "message": f"Syntax error at line {node.start_point[0] + 1}",
+                        "line": node.start_point[0] + 1,
+                        "column": node.start_point[1],
+                        "text": node.text.decode("utf8") if hasattr(node.text, "decode") else str(node.text),
+                    }
+                )
 
             for child in node.children:
                 find_errors(child)
@@ -441,101 +434,105 @@ class TreeSitterBackend:
 
         return errors
 
-    def _check_overlay_violations(self, ast: 'Node', language: LanguageSupport,
-                                 overlay: str) -> List[Dict[str, Any]]:
+    def _check_overlay_violations(self, ast: "Node", language: LanguageSupport, overlay: str) -> List[Dict[str, Any]]:
         """Check for violations of grammar overlay constraints."""
         violations = []
 
         # General Safety safety overlay checks
-        if overlay == 'nasa_c_safety':
+        if overlay == "nasa_c_safety":
             violations.extend(self._check_nasa_c_violations(ast))
-        elif overlay == 'nasa_python_safety':
+        elif overlay == "nasa_python_safety":
             violations.extend(self._check_nasa_python_violations(ast))
 
         return violations
 
-    def _check_nasa_c_violations(self, ast: 'Node') -> List[Dict[str, Any]]:
+    def _check_nasa_c_violations(self, ast: "Node") -> List[Dict[str, Any]]:
         """Check for General Safety C safety violations."""
         violations = []
 
         # Rule 1: No goto statements
-        goto_nodes = self.find_nodes_by_type(ast, ['goto_statement'])
+        goto_nodes = self.find_nodes_by_type(ast, ["goto_statement"])
         for node in goto_nodes:
-            violations.append({
-                "rule": "nasa_rule_1",
-                "type": "goto_forbidden",
-                "message": "General Safety Rule 1: goto statements are forbidden",
-                "line": node.start_point[0] + 1,
-                "column": node.start_point[1],
-                "severity": "critical"
-            })
+            violations.append(
+                {
+                    "rule": "nasa_rule_1",
+                    "type": "goto_forbidden",
+                    "message": "General Safety Rule 1: goto statements are forbidden",
+                    "line": node.start_point[0] + 1,
+                    "column": node.start_point[1],
+                    "severity": "critical",
+                }
+            )
 
         # Rule 9: Function pointers
-        func_ptr_nodes = self.find_nodes_by_type(ast, ['function_pointer'])
+        func_ptr_nodes = self.find_nodes_by_type(ast, ["function_pointer"])
         for node in func_ptr_nodes:
-            violations.append({
-                "rule": "nasa_rule_9",
-                "type": "function_pointer_forbidden",
-                "message": "General Safety Rule 9: function pointers should be avoided",
-                "line": node.start_point[0] + 1,
-                "column": node.start_point[1],
-                "severity": "high"
-            })
+            violations.append(
+                {
+                    "rule": "nasa_rule_9",
+                    "type": "function_pointer_forbidden",
+                    "message": "General Safety Rule 9: function pointers should be avoided",
+                    "line": node.start_point[0] + 1,
+                    "column": node.start_point[1],
+                    "severity": "high",
+                }
+            )
 
         return violations
 
-    def _check_nasa_python_violations(self, ast: 'Node') -> List[Dict[str, Any]]:
+    def _check_nasa_python_violations(self, ast: "Node") -> List[Dict[str, Any]]:
         """Check for General Safety Python safety violations (adapted rules)."""
         violations = []
 
         # Python adaptation: exec/eval forbidden (similar to C goto)
-        exec_nodes = self.find_nodes_by_type(ast, ['call'])
+        exec_nodes = self.find_nodes_by_type(ast, ["call"])
         for node in exec_nodes:
-            if TREE_SITTER_AVAILABLE and hasattr(node, 'text'):
-                text = node.text.decode('utf8') if hasattr(node.text, 'decode') else str(node.text)
-                if text.startswith('exec(') or text.startswith('eval('):
-                    violations.append({
-                        "rule": "nasa_rule_1_python",
-                        "type": "dynamic_execution_forbidden",
-                        "message": "General Safety Rule 1 (Python): exec/eval statements are forbidden",
-                        "line": node.start_point[0] + 1,
-                        "column": node.start_point[1],
-                        "severity": "critical"
-                    })
+            if TREE_SITTER_AVAILABLE and hasattr(node, "text"):
+                text = node.text.decode("utf8") if hasattr(node.text, "decode") else str(node.text)
+                if text.startswith("exec(") or text.startswith("eval("):
+                    violations.append(
+                        {
+                            "rule": "nasa_rule_1_python",
+                            "type": "dynamic_execution_forbidden",
+                            "message": "General Safety Rule 1 (Python): exec/eval statements are forbidden",
+                            "line": node.start_point[0] + 1,
+                            "column": node.start_point[1],
+                            "severity": "critical",
+                        }
+                    )
 
         return violations
 
-    def _filter_tokens_by_overlay(self, tokens: List[str], language: LanguageSupport,
-                                 overlay: str) -> List[str]:
+    def _filter_tokens_by_overlay(self, tokens: List[str], language: LanguageSupport, overlay: str) -> List[str]:
         """Filter token list based on overlay constraints."""
-        if overlay == 'nasa_c_safety':
+        if overlay == "nasa_c_safety":
             # Remove forbidden constructs
-            forbidden = ['goto', 'setjmp', 'longjmp']
+            forbidden = ["goto", "setjmp", "longjmp"]
             tokens = [t for t in tokens if t not in forbidden]
 
         return tokens
 
-    def _extract_function_info(self, node: 'Node', language: LanguageSupport) -> Dict[str, Any]:
+    def _extract_function_info(self, node: "Node", language: LanguageSupport) -> Dict[str, Any]:
         """Extract information about a function from its AST node."""
         info = {
             "name": "unknown",
             "line_start": node.start_point[0] + 1 if TREE_SITTER_AVAILABLE else 1,
             "line_end": node.end_point[0] + 1 if TREE_SITTER_AVAILABLE else 1,
             "parameters": [],
-            "body_lines": 0
+            "body_lines": 0,
         }
 
         if TREE_SITTER_AVAILABLE:
             # Extract function name (language-specific parsing)
-            if language == LanguageSupport.PYTHON:
-                name_node = next((child for child in node.children if child.type == 'identifier'), None)
-            elif language == LanguageSupport.C:
-                name_node = next((child for child in node.children if child.type == 'identifier'), None)
+            if language == LanguageSupport.PYTHON or language == LanguageSupport.C:
+                name_node = next((child for child in node.children if child.type == "identifier"), None)
             else:
                 name_node = None
 
             if name_node:
-                info["name"] = name_node.text.decode('utf8') if hasattr(name_node.text, 'decode') else str(name_node.text)
+                info["name"] = (
+                    name_node.text.decode("utf8") if hasattr(name_node.text, "decode") else str(name_node.text)
+                )
 
             # Calculate body lines
             info["body_lines"] = info["line_end"] - info["line_start"] + 1
@@ -557,15 +554,13 @@ class TreeSitterBackend:
         return hashlib.md5(content.encode()).hexdigest()[:8]
 
     def parse_file(self, file_path, language):
+        ProductionAssert.not_none(file_path, "file_path")
 
+        ProductionAssert.not_none(language, "language")
 
-        ProductionAssert.not_none(file_path, 'file_path')
+        ProductionAssert.not_none(file_path, "file_path")
 
-        ProductionAssert.not_none(language, 'language')
-
-        ProductionAssert.not_none(file_path, 'file_path')
-
-        ProductionAssert.not_none(language, 'language')
+        ProductionAssert.not_none(language, "language")
 
         # Mock implementation for testing
         try:

@@ -5,24 +5,26 @@ Extracted from ConnascenceDetector to follow Single Responsibility Principle.
 """
 import ast
 import collections
-from typing import List, Dict
+from typing import Dict, List
+
 from utils.types import ConnascenceViolation
 
 
 class AlgorithmDetector(ast.NodeVisitor):
     """Detects duplicate algorithms across functions."""
-    
+
     def __init__(self, file_path: str, source_lines: List[str]):
         self.file_path = file_path
         self.source_lines = source_lines
         self.violations: List[ConnascenceViolation] = []
         self.function_hashes: Dict[str, List[tuple[str, ast.FunctionDef]]] = collections.defaultdict(list)
-    
+
     def get_code_snippet(self, node: ast.AST, context_lines: int = 2) -> str:
         """Extract code snippet around the given node. Consolidated implementation."""
         from analyzer.utils.code_utils import get_code_snippet_for_node
+
         return get_code_snippet_for_node(node, self.source_lines, context_lines)
-    
+
     def _normalize_function_body(self, node: ast.FunctionDef) -> str:
         """Create normalized hash of function body for duplicate detection."""
         # Extract just the structure, not variable names
@@ -48,7 +50,7 @@ class AlgorithmDetector(ast.NodeVisitor):
                     body_parts.append("expr")
 
         return "|".join(body_parts)
-    
+
     def visit_FunctionDef(self, node: ast.FunctionDef):
         """Check for algorithm duplication."""
         # Check for algorithm duplication
@@ -57,11 +59,11 @@ class AlgorithmDetector(ast.NodeVisitor):
             self.function_hashes[body_hash].append((self.file_path, node))
 
         self.generic_visit(node)
-    
+
     def detect(self, tree: ast.AST) -> List[ConnascenceViolation]:
         """Run algorithm detection and return violations."""
         self.visit(tree)
-        
+
         # Create violations for duplicates
         for body_hash, functions in self.function_hashes.items():
             if len(functions) > 1:
@@ -82,5 +84,5 @@ class AlgorithmDetector(ast.NodeVisitor):
                                 context={"function_name": func_node.name, "duplicates": duplicate_names},
                             )
                         )
-        
+
         return self.violations

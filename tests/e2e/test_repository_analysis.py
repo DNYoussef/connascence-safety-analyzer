@@ -48,23 +48,20 @@ class RepositoryAnalysisCoordinator:
 
     def store_repository_profile(self, repo_id: str, profile: Dict[str, Any]):
         """Store repository analysis profile."""
-        self.repository_profiles[repo_id] = {
-            'profile': profile,
-            'timestamp': time.time(),
-            'analysis_completed': False
-        }
+        self.repository_profiles[repo_id] = {"profile": profile, "timestamp": time.time(), "analysis_completed": False}
 
     def store_analysis_pattern(self, repo_id: str, patterns: Dict[str, Any]):
         """Store detected connascence patterns for repository."""
         self.analysis_patterns[repo_id] = patterns
 
-    def store_framework_detection(self, repo_id: str, frameworks: List[str],
-                                 framework_specific_violations: Dict[str, List]):
+    def store_framework_detection(
+        self, repo_id: str, frameworks: List[str], framework_specific_violations: Dict[str, List]
+    ):
         """Store framework detection results."""
         self.framework_detections[repo_id] = {
-            'detected_frameworks': frameworks,
-            'framework_violations': framework_specific_violations,
-            'timestamp': time.time()
+            "detected_frameworks": frameworks,
+            "framework_violations": framework_specific_violations,
+            "timestamp": time.time(),
         }
 
     def store_violation_density(self, repo_id: str, density_metrics: Dict[str, float]):
@@ -77,19 +74,15 @@ class RepositoryAnalysisCoordinator:
 
     def compare_repositories(self, repo_ids: List[str]) -> Dict[str, Any]:
         """Compare multiple repository analysis results."""
-        comparison = {
-            'repositories': repo_ids,
-            'comparison_timestamp': time.time(),
-            'metrics': {}
-        }
+        comparison = {"repositories": repo_ids, "comparison_timestamp": time.time(), "metrics": {}}
 
-        for metric_type in ['violation_density', 'complexity', 'patterns']:
-            comparison['metrics'][metric_type] = {}
+        for metric_type in ["violation_density", "complexity", "patterns"]:
+            comparison["metrics"][metric_type] = {}
             for repo_id in repo_ids:
                 if repo_id in self.violation_densities:
-                    comparison['metrics'][metric_type][repo_id] = getattr(
-                        self, f'{metric_type.replace("_", "_")}'
-                    ).get(repo_id, {})
+                    comparison["metrics"][metric_type][repo_id] = getattr(self, f'{metric_type.replace("_", "_")}').get(
+                        repo_id, {}
+                    )
 
         self.repository_comparisons[f"comparison_{len(self.repository_comparisons)}"] = comparison
         return comparison
@@ -115,7 +108,8 @@ def django_project_template():
     (project_path / "myproject" / "templates").mkdir()
 
     # Django settings with violations
-    (project_path / "myproject" / "myproject" / "settings.py").write_text("""
+    (project_path / "myproject" / "myproject" / "settings.py").write_text(
+        """
 import os
 from pathlib import Path
 
@@ -211,10 +205,12 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 SESSION_COOKIE_SECURE = False  # Should be True in production
 CSRF_COOKIE_SECURE = False    # Should be True in production
 SESSION_COOKIE_AGE = 1209600  # Magic literal - 2 weeks in seconds
-""")
+"""
+    )
 
     # Django models with violations
-    (project_path / "myproject" / "apps" / "users" / "models.py").write_text("""
+    (project_path / "myproject" / "apps" / "users" / "models.py").write_text(
+        """
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -269,10 +265,12 @@ class UserProfile(models.Model):
         db_table = 'users_userprofile'
         verbose_name = 'User Profile'
         verbose_name_plural = 'User Profiles'
-""")
+"""
+    )
 
     # Django views with parameter bombs and violations
-    (project_path / "myproject" / "apps" / "users" / "views.py").write_text("""
+    (project_path / "myproject" / "apps" / "users" / "views.py").write_text(
+        """
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
@@ -510,10 +508,12 @@ class UserManagementView:
 
     def calculate_user_score(self, user_id):  # Missing type hints
         pass
-""")
+"""
+    )
 
     # Additional files for comprehensive analysis
-    (project_path / "myproject" / "apps" / "orders" / "models.py").write_text("""
+    (project_path / "myproject" / "apps" / "orders" / "models.py").write_text(
+        """
 from django.db import models
 from django.contrib.auth import get_user_model
 
@@ -554,12 +554,14 @@ class Order(models.Model):
         ordering = ['-created_at']
         verbose_name = 'Order'
         verbose_name_plural = 'Orders'
-""")
+"""
+    )
 
     yield project_path
 
     # Cleanup
     import shutil
+
     shutil.rmtree(temp_dir)
 
 
@@ -578,7 +580,8 @@ def flask_api_project():
     (project_path / "config").mkdir()
 
     # Flask app with violations
-    (project_path / "app" / "__init__.py").write_text("""
+    (project_path / "app" / "__init__.py").write_text(
+        """
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -609,18 +612,22 @@ def create_app(config_name='development'):  # Magic string
     app.register_blueprint(api_bp, url_prefix='/api')
 
     return app
-""")
+"""
+    )
 
     # Flask API routes with violations
-    (project_path / "app" / "api" / "__init__.py").write_text("""
+    (project_path / "app" / "api" / "__init__.py").write_text(
+        """
 from flask import Blueprint
 
 api_bp = Blueprint('api', __name__)
 
 from . import auth, users, products
-""")
+"""
+    )
 
-    (project_path / "app" / "api" / "users.py").write_text("""
+    (project_path / "app" / "api" / "users.py").write_text(
+        """
 from flask import request, jsonify, current_app
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 import hashlib
@@ -849,12 +856,14 @@ class UserManager:
 
     def process_gdpr_request(self, user_id, request_type):  # Missing type hints
         pass
-""")
+"""
+    )
 
     yield project_path
 
     # Cleanup
     import shutil
+
     shutil.rmtree(temp_dir)
 
 
@@ -874,47 +883,52 @@ class TestRepositoryAnalysisWorkflows:
 
         # Step 1: Repository profiling
         repo_profile = {
-            'project_type': 'django_web_app',
-            'estimated_size': 'medium',
-            'framework_indicators': ['django', 'python'],
-            'file_count': len(list(django_project_template.rglob("*.py"))),
-            'structure_complexity': 'moderate'
+            "project_type": "django_web_app",
+            "estimated_size": "medium",
+            "framework_indicators": ["django", "python"],
+            "file_count": len(list(django_project_template.rglob("*.py"))),
+            "structure_complexity": "moderate",
         }
 
         repo_coordinator.store_repository_profile(scenario_id, repo_profile)
         repo_workflow_validator.add_step("repository_profiling", repo_profile)
 
         # Step 2: Framework detection
-        detected_frameworks = ['django', 'python']
+        detected_frameworks = ["django", "python"]
         framework_violations = {
-            'django': ['SECRET_KEY', 'magic_literals', 'settings_violations'],
-            'python': ['parameter_bombs', 'god_classes', 'type_hints']
+            "django": ["SECRET_KEY", "magic_literals", "settings_violations"],
+            "python": ["parameter_bombs", "god_classes", "type_hints"],
         }
 
         repo_coordinator.store_framework_detection(scenario_id, detected_frameworks, framework_violations)
-        repo_workflow_validator.add_step("framework_detection", {
-            'frameworks': detected_frameworks,
-            'framework_specific_patterns': framework_violations
-        })
+        repo_workflow_validator.add_step(
+            "framework_detection",
+            {"frameworks": detected_frameworks, "framework_specific_patterns": framework_violations},
+        )
 
         # Step 3: Execute comprehensive analysis
         cli = ConnascenceCLI()
         output_file = django_project_template / "django_analysis.json"
 
         start_time = time.time()
-        exit_code = cli.run([
-            "scan", str(django_project_template),
-            "--policy", "service-defaults",
-            "--format", "json",
-            "--output", str(output_file)
-        ])
+        exit_code = cli.run(
+            [
+                "scan",
+                str(django_project_template),
+                "--policy",
+                "service-defaults",
+                "--format",
+                "json",
+                "--output",
+                str(output_file),
+            ]
+        )
         execution_time = time.time() - start_time
 
-        repo_workflow_validator.add_step("execute_analysis", {
-            'exit_code': exit_code,
-            'execution_time_ms': execution_time * 1000,
-            'output_file': str(output_file)
-        })
+        repo_workflow_validator.add_step(
+            "execute_analysis",
+            {"exit_code": exit_code, "execution_time_ms": execution_time * 1000, "output_file": str(output_file)},
+        )
 
         # Step 4: Analyze results for patterns
         assert output_file.exists(), "Analysis output file not created"
@@ -922,27 +936,64 @@ class TestRepositoryAnalysisWorkflows:
         with open(output_file) as f:
             analysis_results = json.load(f)
 
-        violations = analysis_results.get('violations', [])
+        violations = analysis_results.get("violations", [])
 
         # Pattern analysis
         patterns = {
-            'magic_string_count': len([v for v in violations if 'magic' in v.get('description', '').lower() and 'string' in v.get('description', '').lower()]),
-            'magic_literal_count': len([v for v in violations if 'magic' in v.get('description', '').lower() and 'literal' in v.get('description', '').lower()]),
-            'parameter_bomb_count': len([v for v in violations if 'parameter' in v.get('description', '').lower()]),
-            'god_class_count': len([v for v in violations if 'class' in v.get('description', '').lower() and ('methods' in v.get('description', '').lower() or 'god' in v.get('description', '').lower())]),
-            'type_hint_count': len([v for v in violations if 'type' in v.get('description', '').lower() and 'hint' in v.get('description', '').lower()]),
-            'security_violation_count': len([v for v in violations if 'secret' in v.get('description', '').lower() or 'key' in v.get('description', '').lower()])
+            "magic_string_count": len(
+                [
+                    v
+                    for v in violations
+                    if "magic" in v.get("description", "").lower() and "string" in v.get("description", "").lower()
+                ]
+            ),
+            "magic_literal_count": len(
+                [
+                    v
+                    for v in violations
+                    if "magic" in v.get("description", "").lower() and "literal" in v.get("description", "").lower()
+                ]
+            ),
+            "parameter_bomb_count": len([v for v in violations if "parameter" in v.get("description", "").lower()]),
+            "god_class_count": len(
+                [
+                    v
+                    for v in violations
+                    if "class" in v.get("description", "").lower()
+                    and ("methods" in v.get("description", "").lower() or "god" in v.get("description", "").lower())
+                ]
+            ),
+            "type_hint_count": len(
+                [
+                    v
+                    for v in violations
+                    if "type" in v.get("description", "").lower() and "hint" in v.get("description", "").lower()
+                ]
+            ),
+            "security_violation_count": len(
+                [
+                    v
+                    for v in violations
+                    if "secret" in v.get("description", "").lower() or "key" in v.get("description", "").lower()
+                ]
+            ),
         }
 
         repo_coordinator.store_analysis_pattern(scenario_id, patterns)
         repo_workflow_validator.add_step("pattern_analysis", patterns)
 
         # Step 5: Calculate violation density
-        total_lines = sum(1 for py_file in django_project_template.rglob("*.py") for line in py_file.read_text().splitlines())
+        total_lines = sum(
+            1 for py_file in django_project_template.rglob("*.py") for line in py_file.read_text().splitlines()
+        )
         density_metrics = {
-            'violations_per_file': len(violations) / max(repo_profile['file_count'], 1),
-            'violations_per_100_lines': (len(violations) / max(total_lines, 1)) * 100,
-            'high_severity_density': len([v for v in violations if v.get('severity', {}).get('value') in ['high', 'critical']]) / max(total_lines, 1) * 100
+            "violations_per_file": len(violations) / max(repo_profile["file_count"], 1),
+            "violations_per_100_lines": (len(violations) / max(total_lines, 1)) * 100,
+            "high_severity_density": len(
+                [v for v in violations if v.get("severity", {}).get("value") in ["high", "critical"]]
+            )
+            / max(total_lines, 1)
+            * 100,
         }
 
         repo_coordinator.store_violation_density(scenario_id, density_metrics)
@@ -950,13 +1001,13 @@ class TestRepositoryAnalysisWorkflows:
 
         # Step 6: Django-specific validation
         # Should find Django-specific violations like SECRET_KEY issues
-        security_violations = [v for v in violations if 'secret' in v.get('description', '').lower()]
-        settings_violations = [v for v in violations if 'settings.py' in v.get('file_path', '')]
+        security_violations = [v for v in violations if "secret" in v.get("description", "").lower()]
+        settings_violations = [v for v in violations if "settings.py" in v.get("file_path", "")]
 
         django_specific_metrics = {
-            'security_violations_found': len(security_violations) > 0,
-            'settings_violations_found': len(settings_violations) > 0,
-            'django_patterns_detected': len(security_violations) + len(settings_violations) > 0
+            "security_violations_found": len(security_violations) > 0,
+            "settings_violations_found": len(settings_violations) > 0,
+            "django_patterns_detected": len(security_violations) + len(settings_violations) > 0,
         }
 
         repo_workflow_validator.add_step("django_specific_validation", django_specific_metrics)
@@ -964,16 +1015,19 @@ class TestRepositoryAnalysisWorkflows:
         # Assertions
         assert exit_code == 1, "Should find violations in Django project"
         assert len(violations) > 0, "Should detect violations in Django project"
-        assert patterns['magic_string_count'] > 0, "Should detect magic strings in Django settings"
-        assert patterns['parameter_bomb_count'] > 0, "Should detect parameter bombs in views"
-        assert patterns['god_class_count'] > 0, "Should detect god classes"
+        assert patterns["magic_string_count"] > 0, "Should detect magic strings in Django settings"
+        assert patterns["parameter_bomb_count"] > 0, "Should detect parameter bombs in views"
+        assert patterns["god_class_count"] > 0, "Should detect god classes"
 
-        repo_workflow_validator.complete_scenario(True, {
-            'total_violations': len(violations),
-            'patterns': patterns,
-            'density_metrics': density_metrics,
-            'django_specific_findings': django_specific_metrics
-        })
+        repo_workflow_validator.complete_scenario(
+            True,
+            {
+                "total_violations": len(violations),
+                "patterns": patterns,
+                "density_metrics": density_metrics,
+                "django_specific_findings": django_specific_metrics,
+            },
+        )
 
     def test_flask_api_analysis_workflow(self, flask_api_project, repo_workflow_validator):
         """Test Flask API project analysis with framework-specific patterns."""
@@ -982,11 +1036,11 @@ class TestRepositoryAnalysisWorkflows:
 
         # Repository profiling
         repo_profile = {
-            'project_type': 'flask_api',
-            'estimated_size': 'small',
-            'framework_indicators': ['flask', 'api', 'python'],
-            'file_count': len(list(flask_api_project.rglob("*.py"))),
-            'api_specific': True
+            "project_type": "flask_api",
+            "estimated_size": "small",
+            "framework_indicators": ["flask", "api", "python"],
+            "file_count": len(list(flask_api_project.rglob("*.py"))),
+            "api_specific": True,
         }
 
         repo_coordinator.store_repository_profile(scenario_id, repo_profile)
@@ -996,26 +1050,47 @@ class TestRepositoryAnalysisWorkflows:
         cli = ConnascenceCLI()
         output_file = flask_api_project / "flask_analysis.json"
 
-        exit_code = cli.run([
-            "scan", str(flask_api_project),
-            "--policy", "strict-core",
-            "--format", "json",
-            "--output", str(output_file)
-        ])
+        exit_code = cli.run(
+            [
+                "scan",
+                str(flask_api_project),
+                "--policy",
+                "strict-core",
+                "--format",
+                "json",
+                "--output",
+                str(output_file),
+            ]
+        )
 
-        repo_workflow_validator.add_step("execute_analysis", {'exit_code': exit_code})
+        repo_workflow_validator.add_step("execute_analysis", {"exit_code": exit_code})
 
         # Analyze Flask-specific patterns
         with open(output_file) as f:
             analysis_results = json.load(f)
 
-        violations = analysis_results.get('violations', [])
+        violations = analysis_results.get("violations", [])
 
         flask_patterns = {
-            'api_parameter_bombs': len([v for v in violations if 'parameter' in v.get('description', '').lower() and any(keyword in v.get('file_path', '') for keyword in ['api', 'users', 'routes'])]),
-            'security_violations': len([v for v in violations if any(keyword in v.get('description', '').lower() for keyword in ['secret', 'key', 'token'])]),
-            'api_specific_violations': len([v for v in violations if any(keyword in v.get('file_path', '') for keyword in ['api', 'routes'])]),
-            'flask_config_violations': len([v for v in violations if '__init__.py' in v.get('file_path', '')])
+            "api_parameter_bombs": len(
+                [
+                    v
+                    for v in violations
+                    if "parameter" in v.get("description", "").lower()
+                    and any(keyword in v.get("file_path", "") for keyword in ["api", "users", "routes"])
+                ]
+            ),
+            "security_violations": len(
+                [
+                    v
+                    for v in violations
+                    if any(keyword in v.get("description", "").lower() for keyword in ["secret", "key", "token"])
+                ]
+            ),
+            "api_specific_violations": len(
+                [v for v in violations if any(keyword in v.get("file_path", "") for keyword in ["api", "routes"])]
+            ),
+            "flask_config_violations": len([v for v in violations if "__init__.py" in v.get("file_path", "")]),
         }
 
         repo_coordinator.store_analysis_pattern(scenario_id, flask_patterns)
@@ -1023,13 +1098,10 @@ class TestRepositoryAnalysisWorkflows:
 
         # Flask-specific assertions
         assert exit_code == 1, "Should find violations in Flask project"
-        assert flask_patterns['security_violations'] > 0, "Should detect security violations in Flask config"
-        assert flask_patterns['api_parameter_bombs'] > 0, "Should detect API parameter bombs"
+        assert flask_patterns["security_violations"] > 0, "Should detect security violations in Flask config"
+        assert flask_patterns["api_parameter_bombs"] > 0, "Should detect API parameter bombs"
 
-        repo_workflow_validator.complete_scenario(True, {
-            'flask_analysis_completed': True,
-            'patterns': flask_patterns
-        })
+        repo_workflow_validator.complete_scenario(True, {"flask_analysis_completed": True, "patterns": flask_patterns})
 
     def test_repository_comparison_workflow(self, django_project_template, flask_api_project, repo_workflow_validator):
         """Test repository comparison and benchmarking."""
@@ -1038,77 +1110,98 @@ class TestRepositoryAnalysisWorkflows:
 
         # Analyze both projects
         projects = [
-            ('django_comparison', django_project_template, 'Django'),
-            ('flask_comparison', flask_api_project, 'Flask')
+            ("django_comparison", django_project_template, "Django"),
+            ("flask_comparison", flask_api_project, "Flask"),
         ]
 
         comparison_results = {}
 
         for proj_id, project_path, framework in projects:
-            repo_workflow_validator.add_step(f"analyze_{proj_id}", {'framework': framework})
+            repo_workflow_validator.add_step(f"analyze_{proj_id}", {"framework": framework})
 
             cli = ConnascenceCLI()
             output_file = project_path / f"{proj_id}_comparison.json"
 
             start_time = time.time()
-            exit_code = cli.run([
-                "scan", str(project_path),
-                "--format", "json",
-                "--output", str(output_file)
-            ])
+            exit_code = cli.run(["scan", str(project_path), "--format", "json", "--output", str(output_file)])
             execution_time = time.time() - start_time
 
             with open(output_file) as f:
                 analysis_results = json.load(f)
 
-            violations = analysis_results.get('violations', [])
+            violations = analysis_results.get("violations", [])
             file_count = len(list(project_path.rglob("*.py")))
 
             comparison_results[proj_id] = {
-                'framework': framework,
-                'total_violations': len(violations),
-                'violations_per_file': len(violations) / max(file_count, 1),
-                'execution_time_ms': execution_time * 1000,
-                'exit_code': exit_code,
-                'file_count': file_count,
-                'violation_types': {
-                    'magic_literals': len([v for v in violations if 'magic' in v.get('description', '').lower() and 'literal' in v.get('description', '').lower()]),
-                    'magic_strings': len([v for v in violations if 'magic' in v.get('description', '').lower() and 'string' in v.get('description', '').lower()]),
-                    'parameter_bombs': len([v for v in violations if 'parameter' in v.get('description', '').lower()]),
-                    'god_classes': len([v for v in violations if 'class' in v.get('description', '').lower() and 'methods' in v.get('description', '').lower()]),
-                    'type_violations': len([v for v in violations if 'type' in v.get('description', '').lower()])
-                }
+                "framework": framework,
+                "total_violations": len(violations),
+                "violations_per_file": len(violations) / max(file_count, 1),
+                "execution_time_ms": execution_time * 1000,
+                "exit_code": exit_code,
+                "file_count": file_count,
+                "violation_types": {
+                    "magic_literals": len(
+                        [
+                            v
+                            for v in violations
+                            if "magic" in v.get("description", "").lower()
+                            and "literal" in v.get("description", "").lower()
+                        ]
+                    ),
+                    "magic_strings": len(
+                        [
+                            v
+                            for v in violations
+                            if "magic" in v.get("description", "").lower()
+                            and "string" in v.get("description", "").lower()
+                        ]
+                    ),
+                    "parameter_bombs": len([v for v in violations if "parameter" in v.get("description", "").lower()]),
+                    "god_classes": len(
+                        [
+                            v
+                            for v in violations
+                            if "class" in v.get("description", "").lower()
+                            and "methods" in v.get("description", "").lower()
+                        ]
+                    ),
+                    "type_violations": len([v for v in violations if "type" in v.get("description", "").lower()]),
+                },
             }
 
         # Store comparison
-        comparison_summary = repo_coordinator.compare_repositories(['django_comparison', 'flask_comparison'])
+        comparison_summary = repo_coordinator.compare_repositories(["django_comparison", "flask_comparison"])
         repo_workflow_validator.add_step("repository_comparison", comparison_summary)
 
         # Analysis insights
         insights = {
-            'django_has_more_violations': comparison_results['django_comparison']['total_violations'] > comparison_results['flask_comparison']['total_violations'],
-            'performance_comparison': {
-                'django_time': comparison_results['django_comparison']['execution_time_ms'],
-                'flask_time': comparison_results['flask_comparison']['execution_time_ms']
+            "django_has_more_violations": comparison_results["django_comparison"]["total_violations"]
+            > comparison_results["flask_comparison"]["total_violations"],
+            "performance_comparison": {
+                "django_time": comparison_results["django_comparison"]["execution_time_ms"],
+                "flask_time": comparison_results["flask_comparison"]["execution_time_ms"],
             },
-            'violation_density_comparison': {
-                'django_density': comparison_results['django_comparison']['violations_per_file'],
-                'flask_density': comparison_results['flask_comparison']['violations_per_file']
-            }
+            "violation_density_comparison": {
+                "django_density": comparison_results["django_comparison"]["violations_per_file"],
+                "flask_density": comparison_results["flask_comparison"]["violations_per_file"],
+            },
         }
 
         repo_workflow_validator.add_step("comparison_insights", insights)
 
         # Assertions
         assert len(comparison_results) == 2, "Should analyze both projects"
-        assert all(r['exit_code'] == 1 for r in comparison_results.values()), "Both projects should have violations"
+        assert all(r["exit_code"] == 1 for r in comparison_results.values()), "Both projects should have violations"
 
-        repo_workflow_validator.complete_scenario(True, {
-            'comparison_completed': True,
-            'projects_analyzed': len(projects),
-            'comparison_results': comparison_results,
-            'insights': insights
-        })
+        repo_workflow_validator.complete_scenario(
+            True,
+            {
+                "comparison_completed": True,
+                "projects_analyzed": len(projects),
+                "comparison_results": comparison_results,
+                "insights": insights,
+            },
+        )
 
     def test_large_repository_performance(self, repo_workflow_validator):
         """Test performance with large repository simulation."""
@@ -1119,7 +1212,7 @@ class TestRepositoryAnalysisWorkflows:
         temp_dir = tempfile.mkdtemp()
         large_project = Path(temp_dir)
 
-        repo_workflow_validator.add_step("create_large_project", {'action': 'generating_structure'})
+        repo_workflow_validator.add_step("create_large_project", {"action": "generating_structure"})
 
         # Generate 50 modules with violations
         for i in range(50):
@@ -1128,7 +1221,8 @@ class TestRepositoryAnalysisWorkflows:
 
             # Create multiple files per module
             for j in range(3):
-                (module_dir / f"component_{j}.py").write_text(f"""
+                (module_dir / f"component_{j}.py").write_text(
+                    f"""
 # Module {i} Component {j} with violations
 
 def process_function_{i}_{j}(param1, param2, param3, param4, param5, param6):  # Parameter bomb
@@ -1170,46 +1264,41 @@ class ProcessorClass_{i}_{j}:
     def method_19(self): pass
     def method_20(self): pass
     def method_21(self): pass  # God class threshold
-""")
+"""
+                )
 
         total_files = 50 * 3  # 150 files
-        repo_workflow_validator.add_step("large_project_generated", {
-            'modules': 50,
-            'total_files': total_files,
-            'estimated_violations': total_files * 10  # Rough estimate
-        })
+        repo_workflow_validator.add_step(
+            "large_project_generated",
+            {"modules": 50, "total_files": total_files, "estimated_violations": total_files * 10},  # Rough estimate
+        )
 
         # Execute performance analysis
         cli = ConnascenceCLI()
         output_file = large_project / "large_repo_analysis.json"
 
         start_time = time.time()
-        exit_code = cli.run([
-            "scan", str(large_project),
-            "--format", "json",
-            "--output", str(output_file)
-        ])
+        exit_code = cli.run(["scan", str(large_project), "--format", "json", "--output", str(output_file)])
         execution_time = time.time() - start_time
 
-        repo_workflow_validator.add_step("execute_large_analysis", {
-            'execution_time_ms': execution_time * 1000,
-            'exit_code': exit_code
-        })
+        repo_workflow_validator.add_step(
+            "execute_large_analysis", {"execution_time_ms": execution_time * 1000, "exit_code": exit_code}
+        )
 
         # Analyze performance metrics
         with open(output_file) as f:
             results = json.load(f)
 
-        violations = results.get('violations', [])
+        violations = results.get("violations", [])
 
         performance_metrics = {
-            'execution_time_ms': execution_time * 1000,
-            'files_analyzed': results.get('total_files_analyzed', 0),
-            'violations_found': len(violations),
-            'violations_per_second': len(violations) / max(execution_time, 0.001),
-            'files_per_second': results.get('total_files_analyzed', 0) / max(execution_time, 0.001),
-            'performance_acceptable': execution_time < 60.0,  # Should complete in under 1 minute
-            'memory_efficient': True  # Assuming no memory issues
+            "execution_time_ms": execution_time * 1000,
+            "files_analyzed": results.get("total_files_analyzed", 0),
+            "violations_found": len(violations),
+            "violations_per_second": len(violations) / max(execution_time, 0.001),
+            "files_per_second": results.get("total_files_analyzed", 0) / max(execution_time, 0.001),
+            "performance_acceptable": execution_time < 60.0,  # Should complete in under 1 minute
+            "memory_efficient": True,  # Assuming no memory issues
         }
 
         repo_coordinator.store_complexity_metrics(scenario_id, performance_metrics)
@@ -1220,18 +1309,18 @@ class ProcessorClass_{i}_{j}:
 
         # Cleanup
         import shutil
+
         shutil.rmtree(temp_dir)
 
         # Performance assertions
         assert execution_time < 60.0, f"Large project analysis took too long: {execution_time}s"
         assert exit_code == 1, "Should find violations in large project"
         assert len(violations) > 100, "Should find many violations in large project"
-        assert performance_metrics['files_per_second'] > 1.0, "Should process at least 1 file per second"
+        assert performance_metrics["files_per_second"] > 1.0, "Should process at least 1 file per second"
 
-        repo_workflow_validator.complete_scenario(True, {
-            'performance_test_passed': True,
-            'metrics': performance_metrics
-        })
+        repo_workflow_validator.complete_scenario(
+            True, {"performance_test_passed": True, "metrics": performance_metrics}
+        )
 
     def test_memory_coordination_repository_tracking(self):
         """Test memory coordination for repository analysis tracking."""
@@ -1239,22 +1328,15 @@ class ProcessorClass_{i}_{j}:
         test_repo_id = "memory_test_repo"
 
         # Store test data
-        repo_coordinator.store_repository_profile(test_repo_id, {
-            'type': 'test_project',
-            'size': 'small',
-            'complexity': 'low'
-        })
+        repo_coordinator.store_repository_profile(
+            test_repo_id, {"type": "test_project", "size": "small", "complexity": "low"}
+        )
 
-        repo_coordinator.store_analysis_pattern(test_repo_id, {
-            'pattern_1': 10,
-            'pattern_2': 5,
-            'pattern_3': 2
-        })
+        repo_coordinator.store_analysis_pattern(test_repo_id, {"pattern_1": 10, "pattern_2": 5, "pattern_3": 2})
 
-        repo_coordinator.store_violation_density(test_repo_id, {
-            'violations_per_file': 2.5,
-            'high_severity_density': 0.1
-        })
+        repo_coordinator.store_violation_density(
+            test_repo_id, {"violations_per_file": 2.5, "high_severity_density": 0.1}
+        )
 
         # Validate data storage
         assert test_repo_id in repo_coordinator.repository_profiles
@@ -1263,15 +1345,14 @@ class ProcessorClass_{i}_{j}:
 
         # Test comparison functionality
         test_repo_2 = "memory_test_repo_2"
-        repo_coordinator.store_violation_density(test_repo_2, {
-            'violations_per_file': 1.8,
-            'high_severity_density': 0.05
-        })
+        repo_coordinator.store_violation_density(
+            test_repo_2, {"violations_per_file": 1.8, "high_severity_density": 0.05}
+        )
 
         comparison = repo_coordinator.compare_repositories([test_repo_id, test_repo_2])
-        assert 'repositories' in comparison
-        assert len(comparison['repositories']) == 2
-        assert 'metrics' in comparison
+        assert "repositories" in comparison
+        assert len(comparison["repositories"]) == 2
+        assert "metrics" in comparison
 
 
 @pytest.mark.e2e
@@ -1285,14 +1366,9 @@ def test_repository_analysis_integration():
     scenario_id = "repo_integration_test"
 
     # Mock repository analysis
-    coordinator.store_repository_profile(scenario_id, {
-        'integration_test': True,
-        'timestamp': time.time()
-    })
+    coordinator.store_repository_profile(scenario_id, {"integration_test": True, "timestamp": time.time()})
 
-    coordinator.store_analysis_pattern(scenario_id, {
-        'test_pattern': True
-    })
+    coordinator.store_analysis_pattern(scenario_id, {"test_pattern": True})
 
     # Validate integration
     assert scenario_id in coordinator.repository_profiles
@@ -1302,9 +1378,4 @@ def test_repository_analysis_integration():
 
 
 if __name__ == "__main__":
-    pytest.main([
-        __file__,
-        "-v",
-        "--tb=short",
-        "-m", "e2e"
-    ])
+    pytest.main([__file__, "-v", "--tb=short", "-m", "e2e"])

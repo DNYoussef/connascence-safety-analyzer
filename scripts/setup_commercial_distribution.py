@@ -23,35 +23,39 @@ class CommercialDistributionBuilder:
         self.build_date = datetime.now().strftime("%Y%m%d")
 
         self.packages = {
-            'connascence-analyzer-core': {
-                'description': 'Core Connascence Analysis Engine',
-                'includes': [
-                    'analyzer/', 'policy/', 'integrations/', 'cli/',
-                    'autofix/', 'reporting/', 'grammar/', 'mcp/'
+            "connascence-analyzer-core": {
+                "description": "Core Connascence Analysis Engine",
+                "includes": [
+                    "analyzer/",
+                    "policy/",
+                    "integrations/",
+                    "cli/",
+                    "autofix/",
+                    "reporting/",
+                    "grammar/",
+                    "mcp/",
                 ],
-                'dependencies': ['tree-sitter', 'click', 'pyyaml', 'jinja2'],
-                'target': 'python'
+                "dependencies": ["tree-sitter", "click", "pyyaml", "jinja2"],
+                "target": "python",
             },
-            'connascence-analyzer-enterprise': {
-                'description': 'Enterprise Security and Compliance Features',
-                'includes': [
-                    'security/', 'demo/', 'dashboard/'
-                ],
-                'dependencies': ['cryptography', 'pyjwt', 'ldap3', 'psycopg2'],
-                'target': 'python'
+            "connascence-analyzer-enterprise": {
+                "description": "Enterprise Security and Compliance Features",
+                "includes": ["security/", "demo/", "dashboard/"],
+                "dependencies": ["cryptography", "pyjwt", "ldap3", "psycopg2"],
+                "target": "python",
             },
-            'connascence-vscode-extension': {
-                'description': 'VS Code Integration Extension',
-                'includes': ['vscode-extension/'],
-                'dependencies': ['vscode-engine'],
-                'target': 'vscode'
+            "connascence-vscode-extension": {
+                "description": "VS Code Integration Extension",
+                "includes": ["vscode-extension/"],
+                "dependencies": ["vscode-engine"],
+                "target": "vscode",
             },
-            'connascence-sales-demo': {
-                'description': 'Sales Demo and Proof Points',
-                'includes': ['sales/'],
-                'dependencies': [],
-                'target': 'demo'
-            }
+            "connascence-sales-demo": {
+                "description": "Sales Demo and Proof Points",
+                "includes": ["sales/"],
+                "dependencies": [],
+                "target": "demo",
+            },
         }
 
     def create_python_package(self, package_name, package_config):
@@ -63,7 +67,7 @@ class CommercialDistributionBuilder:
         package_dir.mkdir(exist_ok=True)
 
         # Copy source files
-        for include_path in package_config['includes']:
+        for include_path in package_config["includes"]:
             src_path = self.base_dir / include_path
             if src_path.exists():
                 if src_path.is_dir():
@@ -72,7 +76,7 @@ class CommercialDistributionBuilder:
                     shutil.copy2(src_path, package_dir)
 
         # Create setup.py
-        setup_py_content = f'''
+        setup_py_content = f"""
 from setuptools import setup, find_packages
 
 setup(
@@ -111,12 +115,12 @@ setup(
     }},
     include_package_data=True,
 )
-'''
+"""
 
         (package_dir / "setup.py").write_text(setup_py_content.strip())
 
         # Create requirements.txt
-        requirements_content = "\n".join(package_config['dependencies'])
+        requirements_content = "\n".join(package_config["dependencies"])
         (package_dir / "requirements.txt").write_text(requirements_content)
 
         # Create README.md
@@ -176,7 +180,7 @@ recursive-include security/templates *.yml
             package_json["version"] = self.version
             package_json["displayName"] = "Connascence Safety Analyzer Enterprise"
 
-            with open(package_json_path, 'w') as f:
+            with open(package_json_path, "w") as f:
                 json.dump(package_json, f, indent=2)
 
         # Create build script
@@ -258,7 +262,7 @@ if __name__ == "__main__":
     sys.exit(main())
 """
 
-        (demo_dir / "run_demo.py").write_text(demo_script_content, encoding='utf-8')
+        (demo_dir / "run_demo.py").write_text(demo_script_content, encoding="utf-8")
 
         # Create demo documentation
         demo_readme_content = f"""# Connascence Sales Demo Package v{self.version}
@@ -377,7 +381,7 @@ echo "Enterprise support: support@connascence.com"
 """
 
         install_script = installer_dir / "install_enterprise.sh"
-        install_script.write_text(install_script_content, encoding='utf-8')
+        install_script.write_text(install_script_content, encoding="utf-8")
         install_script.chmod(0o755)
 
         # Create uninstall script
@@ -535,7 +539,6 @@ Copyright  2024 Connascence Systems. All rights reserved.
         for package_name, package_config in self.packages.items():
             package_dir = self.dist_dir / package_name
             if package_dir.exists():
-
                 # Create tar.gz archive
                 archive_name = f"{package_name}-{self.version}"
                 tar_path = archives_dir / f"{archive_name}.tar.gz"
@@ -546,8 +549,8 @@ Copyright  2024 Connascence Systems. All rights reserved.
                 # Create zip archive
                 zip_path = archives_dir / f"{archive_name}.zip"
 
-                with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
-                    for file_path in package_dir.rglob('*'):
+                with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
+                    for file_path in package_dir.rglob("*"):
                         if file_path.is_file():
                             arcname = archive_name / file_path.relative_to(package_dir)
                             zipf.write(file_path, arcname)
@@ -660,10 +663,10 @@ Full license texts available in the licenses/ directory.
         """Build complete commercial distribution"""
 
         print("BUILDING COMMERCIAL DISTRIBUTION")
-        print("="*50)
+        print("=" * 50)
         print(f"Version: {self.version}")
         print(f"Build Date: {self.build_date}")
-        print("="*50)
+        print("=" * 50)
 
         # Clean existing distribution
         if self.dist_dir.exists():
@@ -674,11 +677,11 @@ Full license texts available in the licenses/ directory.
 
         # Build each package
         for package_name, package_config in self.packages.items():
-            if package_config['target'] == 'python':
+            if package_config["target"] == "python":
                 package_dir = self.create_python_package(package_name, package_config)
-            elif package_config['target'] == 'vscode':
+            elif package_config["target"] == "vscode":
                 package_dir = self.create_vscode_extension_package(package_name, package_config)
-            elif package_config['target'] == 'demo':
+            elif package_config["target"] == "demo":
                 package_dir = self.create_demo_package(package_name, package_config)
 
             created_packages.append(package_dir)
@@ -707,46 +710,46 @@ Full license texts available in the licenses/ directory.
         """Create manifest of all distribution components"""
 
         manifest = {
-            'version': self.version,
-            'build_date': self.build_date,
-            'build_timestamp': datetime.now().isoformat(),
-            'packages': {},
-            'enterprise_features': [
-                'Role-Based Access Control (RBAC)',
-                'Multi-Factor Authentication',
-                'Tamper-resistant audit logging',
-                'Data encryption (AES-256)',
-                'Air-gapped deployment mode',
-                'Enterprise SSO integration',
-                'SIEM integration',
-                'SOC 2 compliance controls',
-                'General Safety safety profiles'
+            "version": self.version,
+            "build_date": self.build_date,
+            "build_timestamp": datetime.now().isoformat(),
+            "packages": {},
+            "enterprise_features": [
+                "Role-Based Access Control (RBAC)",
+                "Multi-Factor Authentication",
+                "Tamper-resistant audit logging",
+                "Data encryption (AES-256)",
+                "Air-gapped deployment mode",
+                "Enterprise SSO integration",
+                "SIEM integration",
+                "SOC 2 compliance controls",
+                "General Safety safety profiles",
             ],
-            'supported_platforms': [
-                'Linux (Ubuntu 20.04+)',
-                'Linux (RHEL 8+)',
-                'Linux (CentOS 8+)',
-                'macOS (via Docker)',
-                'Windows (via WSL2)'
+            "supported_platforms": [
+                "Linux (Ubuntu 20.04+)",
+                "Linux (RHEL 8+)",
+                "Linux (CentOS 8+)",
+                "macOS (via Docker)",
+                "Windows (via WSL2)",
             ],
-            'proof_points': {
-                'false_positive_rate': '<5% (validated on Celery, curl, Express)',
-                'autofix_acceptance_rate': '>=60% (production-safe transformations)',
-                'nasa_compliance': 'Power of Ten rules automated',
-                'enterprise_security': 'Full RBAC, audit, air-gap ready'
-            }
+            "proof_points": {
+                "false_positive_rate": "<5% (validated on Celery, curl, Express)",
+                "autofix_acceptance_rate": ">=60% (production-safe transformations)",
+                "nasa_compliance": "Power of Ten rules automated",
+                "enterprise_security": "Full RBAC, audit, air-gap ready",
+            },
         }
 
         # Add package details
         for package_name, package_config in self.packages.items():
-            manifest['packages'][package_name] = {
-                'description': package_config['description'],
-                'target': package_config['target'],
-                'includes': package_config['includes'],
-                'dependencies': package_config['dependencies']
+            manifest["packages"][package_name] = {
+                "description": package_config["description"],
+                "target": package_config["target"],
+                "includes": package_config["includes"],
+                "dependencies": package_config["dependencies"],
             }
 
-        with open(self.dist_dir / 'DISTRIBUTION_MANIFEST.json', 'w') as f:
+        with open(self.dist_dir / "DISTRIBUTION_MANIFEST.json", "w") as f:
             json.dump(manifest, f, indent=2)
 
         # Create human-readable manifest
@@ -760,7 +763,7 @@ Full license texts available in the licenses/ directory.
 
 """
 
-        for package_name, package_info in manifest['packages'].items():
+        for package_name, package_info in manifest["packages"].items():
             manifest_md += f"""### {package_name}
 - **Description**: {package_info['description']}
 - **Target**: {package_info['target']}
@@ -771,7 +774,7 @@ Full license texts available in the licenses/ directory.
         manifest_md += """## Enterprise Features
 
 """
-        for feature in manifest['enterprise_features']:
+        for feature in manifest["enterprise_features"]:
             manifest_md += f"- [DONE] {feature}\n"
 
         manifest_md += f"""
@@ -785,7 +788,7 @@ Full license texts available in the licenses/ directory.
 ## Supported Platforms
 
 """
-        for platform in manifest['supported_platforms']:
+        for platform in manifest["supported_platforms"]:
             manifest_md += f"- {platform}\n"
 
         manifest_md += """
@@ -813,14 +816,16 @@ python connascence-sales-demo/run_demo.py
 *Copyright  2024 Connascence Systems. All rights reserved.*
 """
 
-        (self.dist_dir / 'DISTRIBUTION_MANIFEST.md').write_text(manifest_md)
+        (self.dist_dir / "DISTRIBUTION_MANIFEST.md").write_text(manifest_md)
 
         print("[DONE] Distribution manifest created")
+
 
 def main():
     builder = CommercialDistributionBuilder()
     success = builder.build_complete_distribution()
     sys.exit(0 if success else 1)
+
 
 if __name__ == "__main__":
     main()

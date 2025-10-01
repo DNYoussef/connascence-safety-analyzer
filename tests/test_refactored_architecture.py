@@ -48,7 +48,7 @@ class TestViolationReporter:
             "def test_function(a, b, c, d, e):",
             "    if a > 100:",
             "        return b * 0.2",
-            "    return c + d + e"
+            "    return c + d + e",
         ]
         self.reporter = ViolationReporter(self.file_path, self.source_lines)
 
@@ -102,14 +102,7 @@ class TestASTAnalysisHelper:
 
     def setup_method(self):
         """Set up test fixtures."""
-        self.source_lines = [
-            "def func1():",
-            "    return 1",
-            "def func2():",
-            "    return 1",
-            "x = 42",
-            "global y"
-        ]
+        self.source_lines = ["def func1():", "    return 1", "def func2():", "    return 1", "x = 42", "global y"]
         self.helper = ASTAnalysisHelper(self.source_lines)
 
     def test_normalize_function_body(self):
@@ -183,7 +176,7 @@ class TestContextAnalyzer:
             "def complex_function(x, y, z):",
             "    if x > 100:",
             "        return y * 0.2",
-            "    return z"
+            "    return z",
         ]
         self.analyzer = ContextAnalyzer(self.file_path, self.source_lines)
 
@@ -239,12 +232,7 @@ class TestMagicLiteralAnalyzer:
     def setup_method(self):
         """Set up test fixtures."""
         self.file_path = "test.py"
-        self.source_lines = [
-            "def calculate(x):",
-            "    if x > 100:",
-            "        return x * 0.2",
-            "    return x"
-        ]
+        self.source_lines = ["def calculate(x):", "    if x > 100:", "        return x * 0.2", "    return x"]
         self.analyzer = MagicLiteralAnalyzer(self.file_path, self.source_lines)
 
     def test_magic_number_detection(self):
@@ -269,10 +257,7 @@ def calculate_price(base):
 
     def test_security_related_detection(self):
         """Test security-related magic literal detection."""
-        self.source_lines = [
-            "password = 'secret123'",
-            "api_key = 'abc-def-ghi'"
-        ]
+        self.source_lines = ["password = 'secret123'", "api_key = 'abc-def-ghi'"]
         self.analyzer = MagicLiteralAnalyzer(self.file_path, self.source_lines)
 
         code = """
@@ -388,12 +373,7 @@ class TestRefactoredConnascenceDetector:
 
     def test_composition_works(self):
         """Test that the refactored detector works with composition."""
-        source_lines = [
-            "def bad_function(a, b, c, d, e):",
-            "    if a > 100:",
-            "        return b * 0.2",
-            "    return c"
-        ]
+        source_lines = ["def bad_function(a, b, c, d, e):", "    if a > 100:", "        return b * 0.2", "    return c"]
 
         detector = ConnascenceDetector("test.py", source_lines)
         tree = ast.parse("\n".join(source_lines))
@@ -429,11 +409,14 @@ def complex_function(a, b, c, d, e, f):
 
 class GodClass:
     def __init__(self): pass
-""" + "\n".join([f"    def method_{i}(self): pass" for i in range(25)])
+""" + "\n".join(
+            [f"    def method_{i}(self): pass" for i in range(25)]
+        )
 
         # Create temporary file for testing
         import tempfile
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as f:
+
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f:
             f.write(code)
             temp_path = Path(f.name)
 
@@ -517,7 +500,8 @@ class TestIntegrationRefactoredVsOriginal:
 
         # Create temporary file
         import tempfile
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as f:
+
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f:
             f.write(sample_code_with_issues)
             temp_path = Path(f.name)
 
@@ -532,11 +516,15 @@ class TestIntegrationRefactoredVsOriginal:
             assert len(param_issues) >= 1
 
             # Should find complexity issues
-            complexity_issues = [v for v in violations if "complexity" in v.description.lower() or "god" in v.description.lower()]
+            complexity_issues = [
+                v for v in violations if "complexity" in v.description.lower() or "god" in v.description.lower()
+            ]
             assert len(complexity_issues) >= 1
 
             # Should find magic literal issues
-            magic_issues = [v for v in violations if "magic" in v.description.lower() or "literal" in v.description.lower()]
+            magic_issues = [
+                v for v in violations if "magic" in v.description.lower() or "literal" in v.description.lower()
+            ]
             assert len(magic_issues) >= 1
 
         finally:

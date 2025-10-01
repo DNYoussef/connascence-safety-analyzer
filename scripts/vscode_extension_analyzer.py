@@ -25,7 +25,7 @@ class VSCodeExtensionAnalyzer:
         """Extract import statements from TypeScript/JavaScript files."""
         imports = []
         try:
-            with open(file_path, encoding='utf-8') as f:
+            with open(file_path, encoding="utf-8") as f:
                 content = f.read()
 
             # TypeScript/JavaScript import patterns
@@ -39,13 +39,13 @@ class VSCodeExtensionAnalyzer:
                 # const something = require('module')
                 r"(?:const|let|var)\s+.*?\s*=\s*require\(['\"]([^'\"]+)['\"]\)",
                 # require('module')
-                r"require\(['\"]([^'\"]+)['\"]\)"
+                r"require\(['\"]([^'\"]+)['\"]\)",
             ]
 
             for pattern in import_patterns:
                 matches = re.findall(pattern, content, re.MULTILINE)
                 for match in matches:
-                    imports.append(('import', match))
+                    imports.append(("import", match))
 
         except Exception as e:
             print(f"Error reading {file_path}: {e}")
@@ -54,35 +54,35 @@ class VSCodeExtensionAnalyzer:
 
     def categorize_import(self, import_name: str) -> str:
         """Categorize import by type."""
-        if import_name.startswith('./') or import_name.startswith('../'):
-            return 'internal'
-        elif import_name.startswith('@types/'):
-            return 'types'
-        elif import_name in ['vscode', '@vscode/test-electron']:
-            return 'vscode-api'
-        elif import_name.startswith('@') or import_name in ['typescript', 'esbuild']:
-            return 'external'
+        if import_name.startswith("./") or import_name.startswith("../"):
+            return "internal"
+        elif import_name.startswith("@types/"):
+            return "types"
+        elif import_name in ["vscode", "@vscode/test-electron"]:
+            return "vscode-api"
+        elif import_name.startswith("@") or import_name in ["typescript", "esbuild"]:
+            return "external"
         else:
-            return 'node-builtin' if import_name in ['fs', 'path', 'os', 'util'] else 'external'
+            return "node-builtin" if import_name in ["fs", "path", "os", "util"] else "external"
 
     def get_module_category(self, file_path: Path) -> str:
         """Determine the module category for a file."""
         relative_path = file_path.relative_to(self.extension_path)
         parts = relative_path.parts
 
-        if 'src' in parts:
-            src_index = parts.index('src')
+        if "src" in parts:
+            src_index = parts.index("src")
             if len(parts) > src_index + 1:
                 return parts[src_index + 1]
 
-        if parts[0] in ['test', 'tests']:
-            return 'test'
-        elif parts[0] in ['out', 'dist']:
-            return 'build'
-        elif file_path.name in ['webpack.config.js', 'tsconfig.json', 'package.json']:
-            return 'config'
+        if parts[0] in ["test", "tests"]:
+            return "test"
+        elif parts[0] in ["out", "dist"]:
+            return "build"
+        elif file_path.name in ["webpack.config.js", "tsconfig.json", "package.json"]:
+            return "config"
 
-        return 'root'
+        return "root"
 
     def analyze_extension_structure(self):
         """Analyze the VS Code extension structure."""
@@ -103,9 +103,9 @@ class VSCodeExtensionAnalyzer:
             module_category = self.get_module_category(file_path)
 
             self.file_analysis[relative_path] = {
-                'category': module_category,
-                'imports': imports,
-                'import_count': len(imports)
+                "category": module_category,
+                "imports": imports,
+                "import_count": len(imports),
             }
 
             # Count category-to-category dependencies
@@ -124,9 +124,9 @@ class VSCodeExtensionAnalyzer:
             module_category = self.get_module_category(file_path)
 
             self.file_analysis[relative_path] = {
-                'category': module_category,
-                'imports': imports,
-                'import_count': len(imports)
+                "category": module_category,
+                "imports": imports,
+                "import_count": len(imports),
             }
 
     def analyze_package_json(self) -> Dict[str, Any]:
@@ -137,18 +137,18 @@ class VSCodeExtensionAnalyzer:
             return {}
 
         try:
-            with open(package_json_path, encoding='utf-8') as f:
+            with open(package_json_path, encoding="utf-8") as f:
                 package_data = json.load(f)
 
-            dependencies = package_data.get('dependencies', {})
-            dev_dependencies = package_data.get('devDependencies', {})
+            dependencies = package_data.get("dependencies", {})
+            dev_dependencies = package_data.get("devDependencies", {})
 
             return {
-                'dependencies': dependencies,
-                'devDependencies': dev_dependencies,
-                'total_deps': len(dependencies) + len(dev_dependencies),
-                'prod_deps': len(dependencies),
-                'dev_deps': len(dev_dependencies)
+                "dependencies": dependencies,
+                "devDependencies": dev_dependencies,
+                "total_deps": len(dependencies) + len(dev_dependencies),
+                "prod_deps": len(dependencies),
+                "dev_deps": len(dev_dependencies),
             }
         except Exception as e:
             print(f"Error reading package.json: {e}")
@@ -164,20 +164,20 @@ class VSCodeExtensionAnalyzer:
         import_stats = defaultdict(int)
 
         for file_info in self.file_analysis.values():
-            categories[file_info['category']] += 1
-            for _, import_name in file_info['imports']:
+            categories[file_info["category"]] += 1
+            for _, import_name in file_info["imports"]:
                 import_category = self.categorize_import(import_name)
                 import_stats[import_category] += 1
 
         report = {
-            'summary': {
-                'total_files_analyzed': total_files,
-                'file_categories': dict(categories),
-                'import_statistics': dict(import_stats),
-                'package_dependencies': package_info
+            "summary": {
+                "total_files_analyzed": total_files,
+                "file_categories": dict(categories),
+                "import_statistics": dict(import_stats),
+                "package_dependencies": package_info,
             },
-            'module_dependencies': dict(self.import_graph),
-            'detailed_analysis': self.file_analysis
+            "module_dependencies": dict(self.import_graph),
+            "detailed_analysis": self.file_analysis,
         }
 
         return report
@@ -187,8 +187,7 @@ class VSCodeExtensionAnalyzer:
         matrix = "VS CODE EXTENSION - MODULE COUPLING MATRIX\n"
         matrix += "=" * 50 + "\n"
 
-        categories = sorted({cat for file_info in self.file_analysis.values()
-                               for cat in [file_info['category']]})
+        categories = sorted({cat for file_info in self.file_analysis.values() for cat in [file_info["category"]]})
 
         if not categories:
             matrix += "No module categories found.\n"
@@ -203,7 +202,7 @@ class VSCodeExtensionAnalyzer:
         for source in categories[:8]:
             matrix += f"{source:>12} | "
             for target in categories[:8]:
-                count = self.import_graph[source].get('internal', 0) if source != target else 0
+                count = self.import_graph[source].get("internal", 0) if source != target else 0
                 if source == target:
                     matrix += f"{'--':>8} "
                 elif count > 0:
@@ -217,7 +216,7 @@ class VSCodeExtensionAnalyzer:
     def generate_extension_summary(self) -> str:
         """Generate extension analysis summary."""
         report_data = self.generate_extension_report()
-        summary = report_data['summary']
+        summary = report_data["summary"]
 
         summary_text = "VS CODE EXTENSION ANALYSIS SUMMARY\n"
         summary_text += "=" * 40 + "\n\n"
@@ -226,16 +225,16 @@ class VSCodeExtensionAnalyzer:
 
         summary_text += "FILE CATEGORIES:\n"
         summary_text += "-" * 16 + "\n"
-        for category, count in summary['file_categories'].items():
+        for category, count in summary["file_categories"].items():
             summary_text += f"- {category:>12}: {count} files\n"
 
         summary_text += "\nIMPORT ANALYSIS:\n"
         summary_text += "-" * 16 + "\n"
-        for import_type, count in summary['import_statistics'].items():
+        for import_type, count in summary["import_statistics"].items():
             summary_text += f"- {import_type:>12}: {count} imports\n"
 
-        if summary['package_dependencies']:
-            pkg_info = summary['package_dependencies']
+        if summary["package_dependencies"]:
+            pkg_info = summary["package_dependencies"]
             summary_text += "\nPACKAGE DEPENDENCIES:\n"
             summary_text += "-" * 20 + "\n"
             summary_text += f"- Production: {pkg_info.get('prod_deps', 0)} dependencies\n"
@@ -245,6 +244,7 @@ class VSCodeExtensionAnalyzer:
         summary_text += "\n" + self.generate_extension_coupling_matrix()
 
         return summary_text
+
 
 def main():
     """Analyze VS Code extension architecture."""
@@ -264,15 +264,16 @@ def main():
     output_dir.mkdir(exist_ok=True)
 
     report_file = output_dir / "vscode_extension_analysis.json"
-    with open(report_file, 'w', encoding='utf-8') as f:
+    with open(report_file, "w", encoding="utf-8") as f:
         json.dump(report, f, indent=2)
 
     summary_file = output_dir / "vscode_extension_summary.md"
-    with open(summary_file, 'w', encoding='utf-8') as f:
+    with open(summary_file, "w", encoding="utf-8") as f:
         f.write(summary)
 
     print(f"\nDetailed report saved to: {report_file}")
     print(f"Summary saved to: {summary_file}")
+
 
 if __name__ == "__main__":
     main()

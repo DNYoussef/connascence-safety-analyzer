@@ -27,14 +27,39 @@ def generate_curl_violations():
 
     # Based on 357 C files, generate realistic magic literals and patterns
     c_files = [
-        "lib/curl_easy.c", "lib/curl_multi.c", "lib/url.c", "lib/transfer.c",
-        "lib/http.c", "lib/ftp.c", "lib/smtp.c", "lib/pop3.c", "lib/imap.c",
-        "lib/tftp.c", "lib/telnet.c", "lib/dict.c", "lib/ldap.c", "lib/file.c",
-        "lib/connect.c", "lib/hostip.c", "lib/progress.c", "lib/cookie.c",
-        "lib/http_chunks.c", "lib/http_digest.c", "lib/http_negotiate.c",
-        "lib/inet_pton.c", "lib/parsedate.c", "lib/select.c", "lib/sslgen.c",
-        "lib/base64.c", "lib/rawstr.c", "lib/curl_addrinfo.c", "lib/socks.c",
-        "lib/curl_sspi.c", "lib/slist.c", "lib/nonblock.c", "lib/curl_memrchr.c"
+        "lib/curl_easy.c",
+        "lib/curl_multi.c",
+        "lib/url.c",
+        "lib/transfer.c",
+        "lib/http.c",
+        "lib/ftp.c",
+        "lib/smtp.c",
+        "lib/pop3.c",
+        "lib/imap.c",
+        "lib/tftp.c",
+        "lib/telnet.c",
+        "lib/dict.c",
+        "lib/ldap.c",
+        "lib/file.c",
+        "lib/connect.c",
+        "lib/hostip.c",
+        "lib/progress.c",
+        "lib/cookie.c",
+        "lib/http_chunks.c",
+        "lib/http_digest.c",
+        "lib/http_negotiate.c",
+        "lib/inet_pton.c",
+        "lib/parsedate.c",
+        "lib/select.c",
+        "lib/sslgen.c",
+        "lib/base64.c",
+        "lib/rawstr.c",
+        "lib/curl_addrinfo.c",
+        "lib/socks.c",
+        "lib/curl_sspi.c",
+        "lib/slist.c",
+        "lib/nonblock.c",
+        "lib/curl_memrchr.c",
     ]
 
     # Common C magic literals that would be found in networking code
@@ -79,8 +104,8 @@ def generate_curl_violations():
                     "literal_value": pattern[0],
                     "in_conditional": j % 3 == 0,
                     "language": "C",
-                    "category": pattern[1]
-                }
+                    "category": pattern[1],
+                },
             }
             violations.append(violation)
             violation_id += 1
@@ -93,13 +118,18 @@ def generate_curl_violations():
 
     return violations[:1061]  # Exact count
 
+
 def generate_express_violations():
     """Generate 52 realistic violations for Express.js codebase."""
     violations = []
 
     js_files = [
-        "lib/application.js", "lib/express.js", "lib/request.js",
-        "lib/response.js", "lib/utils.js", "lib/view.js"
+        "lib/application.js",
+        "lib/express.js",
+        "lib/request.js",
+        "lib/response.js",
+        "lib/utils.js",
+        "lib/view.js",
     ]
 
     # Realistic Express.js magic literals
@@ -135,12 +165,13 @@ def generate_express_violations():
                     "in_conditional": j % 4 == 0,
                     "language": "JavaScript",
                     "framework": "Express.js",
-                    "category": pattern[1]
-                }
+                    "category": pattern[1],
+                },
             }
             violations.append(violation)
 
     return violations
+
 
 def update_celery_violations():
     """Update Celery violations to match expected count of 4,630."""
@@ -159,14 +190,14 @@ def update_celery_violations():
         # Update file paths to remove temp directory
         for violation in final_violations:
             violation["file_path"] = violation["file_path"].replace(
-                "C:\\Users\\17175\\AppData\\Local\\Temp\\celery_analysis\\",
-                "demo_scans\\repos\\celery\\"
+                "C:\\Users\\17175\\AppData\\Local\\Temp\\celery_analysis\\", "demo_scans\\repos\\celery\\"
             )
 
         return final_violations
     except Exception as e:
         print(f"Error updating Celery violations: {e}")
         return []
+
 
 def main():
     """Generate all realistic violation data."""
@@ -206,6 +237,7 @@ def main():
     expected_total = 4630 + 1061 + 52
     print(f"Expected total: {expected_total}")
     print(f"Match: {'YES' if total == expected_total else 'NO'}")
+
 
 if __name__ == "__main__":
     main()

@@ -2,21 +2,15 @@
 Test Six Sigma Integration with Connascence Analyzer
 """
 
-import pytest
 from pathlib import Path
 import sys
-import json
+
+import pytest
 
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from analyzer.enterprise.sixsigma import (
-    SixSigmaTelemetry,
-    SixSigmaAnalyzer,
-    CTQCalculator,
-    ProcessCapability,
-    QualityLevel
-)
+from analyzer.enterprise.sixsigma import CTQCalculator, ProcessCapability, SixSigmaAnalyzer, SixSigmaTelemetry
 from analyzer.enterprise.sixsigma.integration import ConnascenceSixSigmaIntegration
 
 
@@ -25,9 +19,9 @@ def test_six_sigma_telemetry():
     telemetry = SixSigmaTelemetry()
 
     # Record some violations
-    telemetry.record_connascence_violation('identity', 'high')
-    telemetry.record_connascence_violation('algorithm', 'critical')
-    telemetry.record_connascence_violation('timing', 'medium')
+    telemetry.record_connascence_violation("identity", "high")
+    telemetry.record_connascence_violation("algorithm", "critical")
+    telemetry.record_connascence_violation("timing", "medium")
 
     # Record file analysis
     telemetry.record_file_analyzed(violations_found=3, total_checks=100)
@@ -48,11 +42,11 @@ def test_six_sigma_analyzer():
 
     # Sample violations
     violations = [
-        {'type': 'identity', 'severity': 'high'},
-        {'type': 'algorithm', 'severity': 'critical'},
-        {'type': 'timing', 'severity': 'medium'},
-        {'type': 'execution', 'severity': 'low'},
-        {'type': 'meaning', 'severity': 'medium'}
+        {"type": "identity", "severity": "high"},
+        {"type": "algorithm", "severity": "critical"},
+        {"type": "timing", "severity": "medium"},
+        {"type": "execution", "severity": "low"},
+        {"type": "meaning", "severity": "medium"},
     ]
 
     result = analyzer.analyze_violations(violations, Path("test_file.py"))
@@ -62,7 +56,7 @@ def test_six_sigma_analyzer():
     assert len(result.violations_by_type) == 5
     assert len(result.violations_by_severity) == 4  # low, medium, high, critical
     assert len(result.improvement_suggestions) > 0
-    assert 'composite' in result.ctq_metrics
+    assert "composite" in result.ctq_metrics
 
 
 def test_ctq_calculator():
@@ -70,17 +64,17 @@ def test_ctq_calculator():
     calculator = CTQCalculator()
 
     violations = [
-        {'type': 'algorithm', 'severity': 'high'},
-        {'type': 'timing', 'severity': 'critical'},
-        {'type': 'identity', 'severity': 'medium'}
+        {"type": "algorithm", "severity": "high"},
+        {"type": "timing", "severity": "critical"},
+        {"type": "identity", "severity": "medium"},
     ]
 
     metrics = calculator.calculate_from_violations(violations)
 
-    assert 'maintainability_index' in metrics
-    assert 'cyclomatic_complexity' in metrics
-    assert 'coupling_factor' in metrics
-    assert 'cohesion_score' in metrics
+    assert "maintainability_index" in metrics
+    assert "cyclomatic_complexity" in metrics
+    assert "coupling_factor" in metrics
+    assert "cohesion_score" in metrics
 
     # Check composite score
     composite = calculator.calculate_composite_score()
@@ -111,10 +105,10 @@ def test_process_capability():
     # Comprehensive analysis
     analysis = pc.analyze_process(measurements, lower_spec, upper_spec)
 
-    assert 'statistics' in analysis
-    assert 'capability_indices' in analysis
-    assert 'performance' in analysis
-    assert 'recommendations' in analysis
+    assert "statistics" in analysis
+    assert "capability_indices" in analysis
+    assert "performance" in analysis
+    assert "recommendations" in analysis
 
 
 def test_integration():
@@ -123,25 +117,22 @@ def test_integration():
 
     # Mock connascence analysis results
     analysis_results = {
-        'violations': [
-            {'type': 'identity', 'severity': 'high', 'file': 'test.py', 'line': 10},
-            {'type': 'algorithm', 'severity': 'critical', 'file': 'test.py', 'line': 20},
-            {'type': 'timing', 'severity': 'medium', 'file': 'test.py', 'line': 30}
+        "violations": [
+            {"type": "identity", "severity": "high", "file": "test.py", "line": 10},
+            {"type": "algorithm", "severity": "critical", "file": "test.py", "line": 20},
+            {"type": "timing", "severity": "medium", "file": "test.py", "line": 30},
         ],
-        'summary': {
-            'total_violations': 3,
-            'files_analyzed': 1
-        }
+        "summary": {"total_violations": 3, "files_analyzed": 1},
     }
 
     # Process with Six Sigma
     enhanced = integration.process_analysis_results(analysis_results)
 
-    assert 'six_sigma' in enhanced
-    assert 'dpmo' in enhanced['six_sigma']
-    assert 'sigma_level' in enhanced['six_sigma']
-    assert 'quality_level' in enhanced['six_sigma']
-    assert 'improvement_suggestions' in enhanced['six_sigma']
+    assert "six_sigma" in enhanced
+    assert "dpmo" in enhanced["six_sigma"]
+    assert "sigma_level" in enhanced["six_sigma"]
+    assert "quality_level" in enhanced["six_sigma"]
+    assert "improvement_suggestions" in enhanced["six_sigma"]
 
 
 def test_quality_gate():
@@ -150,22 +141,22 @@ def test_quality_gate():
 
     # Mock results with violations
     analysis_results = {
-        'violations': [
-            {'type': 'identity', 'severity': 'critical'},
-            {'type': 'algorithm', 'severity': 'high'},
-            {'type': 'timing', 'severity': 'high'},
-            {'type': 'execution', 'severity': 'medium'}
+        "violations": [
+            {"type": "identity", "severity": "critical"},
+            {"type": "algorithm", "severity": "high"},
+            {"type": "timing", "severity": "high"},
+            {"type": "execution", "severity": "medium"},
         ]
     }
 
     gate_decision = integration.generate_quality_gate_decision(analysis_results)
 
-    assert 'decision' in gate_decision
-    assert gate_decision['decision'] in ['PASS', 'FAIL']
-    assert 'criteria' in gate_decision
-    assert 'sigma_level' in gate_decision['criteria']
-    assert 'dpmo' in gate_decision['criteria']
-    assert 'recommendations' in gate_decision
+    assert "decision" in gate_decision
+    assert gate_decision["decision"] in ["PASS", "FAIL"]
+    assert "criteria" in gate_decision
+    assert "sigma_level" in gate_decision["criteria"]
+    assert "dpmo" in gate_decision["criteria"]
+    assert "recommendations" in gate_decision
 
 
 def test_executive_report():
@@ -173,19 +164,16 @@ def test_executive_report():
     integration = ConnascenceSixSigmaIntegration()
 
     analysis_results = {
-        'violations': [
-            {'type': 'identity', 'severity': 'high'},
-            {'type': 'algorithm', 'severity': 'medium'}
-        ]
+        "violations": [{"type": "identity", "severity": "high"}, {"type": "algorithm", "severity": "medium"}]
     }
 
     report = integration.generate_executive_report(analysis_results)
 
     assert isinstance(report, str)
-    assert 'EXECUTIVE SUMMARY' in report
-    assert 'QUALITY GATE STATUS' in report
-    assert 'Sigma Level' in report
-    assert 'DPMO' in report
+    assert "EXECUTIVE SUMMARY" in report
+    assert "QUALITY GATE STATUS" in report
+    assert "Sigma Level" in report
+    assert "DPMO" in report
 
 
 def test_dashboard_export():
@@ -193,23 +181,20 @@ def test_dashboard_export():
     integration = ConnascenceSixSigmaIntegration()
 
     analysis_results = {
-        'violations': [
-            {'type': 'timing', 'severity': 'high'},
-            {'type': 'execution', 'severity': 'low'}
-        ]
+        "violations": [{"type": "timing", "severity": "high"}, {"type": "execution", "severity": "low"}]
     }
 
     dashboard_data = integration.export_dashboard_data(analysis_results)
 
-    assert 'summary' in dashboard_data
-    assert 'gauges' in dashboard_data
-    assert 'charts' in dashboard_data
-    assert 'quality_gate' in dashboard_data
+    assert "summary" in dashboard_data
+    assert "gauges" in dashboard_data
+    assert "charts" in dashboard_data
+    assert "quality_gate" in dashboard_data
 
     # Check gauge structure
-    assert 'sigma' in dashboard_data['gauges']
-    assert 'value' in dashboard_data['gauges']['sigma']
-    assert 'zones' in dashboard_data['gauges']['sigma']
+    assert "sigma" in dashboard_data["gauges"]
+    assert "value" in dashboard_data["gauges"]["sigma"]
+    assert "zones" in dashboard_data["gauges"]["sigma"]
 
 
 def test_ci_cd_integration():
@@ -217,9 +202,7 @@ def test_ci_cd_integration():
     integration = ConnascenceSixSigmaIntegration(target_sigma_level=3.0)
 
     # Good quality results (no violations = perfect quality)
-    good_results = {
-        'violations': []
-    }
+    good_results = {"violations": []}
 
     # Should pass quality gate with no violations
     exit_code = integration.integrate_with_ci_cd(good_results, fail_on_quality_gate=True)
@@ -227,13 +210,14 @@ def test_ci_cd_integration():
 
     # Poor quality results
     poor_results = {
-        'violations': [
-            {'type': 'timing', 'severity': 'critical'},
-            {'type': 'execution', 'severity': 'critical'},
-            {'type': 'algorithm', 'severity': 'critical'},
-            {'type': 'identity', 'severity': 'high'},
-            {'type': 'meaning', 'severity': 'high'}
-        ] * 10  # Many violations
+        "violations": [
+            {"type": "timing", "severity": "critical"},
+            {"type": "execution", "severity": "critical"},
+            {"type": "algorithm", "severity": "critical"},
+            {"type": "identity", "severity": "high"},
+            {"type": "meaning", "severity": "high"},
+        ]
+        * 10  # Many violations
     }
 
     # Should fail quality gate

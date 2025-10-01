@@ -40,7 +40,8 @@ class TestCompleteSystemIntegration:
 
             # Create sample Python file with violations
             sample_py = workspace / "sample.py"
-            sample_py.write_text('''
+            sample_py.write_text(
+                """
 def bad_function(a, b, c, d, e, f, g, h):  # CoP violation
     x = 42  # Magic number violation
     if a:
@@ -65,11 +66,13 @@ def another_duplicate():  # CoA violation duplicate
             processed = item.process()
             result.append(processed)
     return result
-''')
+"""
+            )
 
             # Create sample C file for General Safety analysis
             sample_c = workspace / "sample.c"
-            sample_c.write_text('''
+            sample_c.write_text(
+                """
 #include <stdio.h>
 
 int recursive_func(int n) {  // General Safety Rule 3 violation
@@ -88,20 +91,26 @@ void magic_numbers() {
 int long_param_list(int a, int b, int c, int d, int e, int f, int g) {  // CoP
     return a + b + c + d + e + f + g;
 }
-''')
+"""
+            )
 
             yield workspace
 
     @pytest.fixture
     def mcp_server(self):
         """Start MCP server for testing"""
+
         # Mock MCP server for testing
         class MockMCPServer:
             def __init__(self):
                 self.running = False
                 self.tools = [
-                    'scan_path', 'scan_diff', 'explain_finding',
-                    'propose_autofix', 'grammar_validate', 'suggest_refactors'
+                    "scan_path",
+                    "scan_diff",
+                    "explain_finding",
+                    "propose_autofix",
+                    "grammar_validate",
+                    "suggest_refactors",
                 ]
 
             def start(self):
@@ -112,57 +121,57 @@ int long_param_list(int a, int b, int c, int d, int e, int f, int g) {  // CoP
                 self.running = False
 
             def call_tool(self, tool_name, args):
-                if tool_name == 'scan_path':
+                if tool_name == "scan_path":
                     return self._mock_scan_result()
-                elif tool_name == 'suggest_refactors':
+                elif tool_name == "suggest_refactors":
                     return self._mock_refactor_suggestions()
-                elif tool_name == 'propose_autofix':
+                elif tool_name == "propose_autofix":
                     return self._mock_autofix_result()
                 else:
-                    return {'result': 'mock_response'}
+                    return {"result": "mock_response"}
 
             def _mock_scan_result(self):
                 return {
-                    'findings': [
+                    "findings": [
                         {
-                            'id': 'CoP_001',
-                            'type': 'connascence_of_position',
-                            'severity': 'major',
-                            'file': 'sample.py',
-                            'line': 4,
-                            'message': 'Function has too many parameters'
+                            "id": "CoP_001",
+                            "type": "connascence_of_position",
+                            "severity": "major",
+                            "file": "sample.py",
+                            "line": 4,
+                            "message": "Function has too many parameters",
                         },
                         {
-                            'id': 'CoM_001',
-                            'type': 'connascence_of_meaning',
-                            'severity': 'minor',
-                            'file': 'sample.py',
-                            'line': 5,
-                            'message': 'Magic number detected'
-                        }
+                            "id": "CoM_001",
+                            "type": "connascence_of_meaning",
+                            "severity": "minor",
+                            "file": "sample.py",
+                            "line": 5,
+                            "message": "Magic number detected",
+                        },
                     ],
-                    'quality_score': 72,
-                    'connascence_index': 8.4
+                    "quality_score": 72,
+                    "connascence_index": 8.4,
                 }
 
             def _mock_refactor_suggestions(self):
                 return {
-                    'suggestions': [
+                    "suggestions": [
                         {
-                            'technique': 'Introduce Parameter Object',
-                            'confidence': 89,
-                            'description': 'Bundle parameters into configuration object'
+                            "technique": "Introduce Parameter Object",
+                            "confidence": 89,
+                            "description": "Bundle parameters into configuration object",
                         }
                     ]
                 }
 
             def _mock_autofix_result(self):
                 return {
-                    'fixes': [
+                    "fixes": [
                         {
-                            'line': 4,
-                            'description': 'Introduce parameter object',
-                            'replacement': 'def bad_function(config: FunctionConfig):'
+                            "line": 4,
+                            "description": "Introduce parameter object",
+                            "replacement": "def bad_function(config: FunctionConfig):",
                         }
                     ]
                 }
@@ -176,8 +185,11 @@ int long_param_list(int a, int b, int c, int d, int e, int f, int g) {  // CoP
         """Test CLI commands work correctly"""
 
         # Test basic scan command (will use mock data in absence of real tool)
-        result = subprocess.run([
-            'python', '-c', '''
+        result = subprocess.run(
+            [
+                "python",
+                "-c",
+                """
 import sys
 import json
 print(json.dumps({
@@ -187,34 +199,34 @@ print(json.dumps({
     ],
     "summary": {"total": 2, "by_severity": {"major": 1, "minor": 1}}
 }))
-'''
-        ], capture_output=True, text=True, cwd=test_workspace)
+""",
+            ],
+            check=False,
+            capture_output=True,
+            text=True,
+            cwd=test_workspace,
+        )
 
         assert result.returncode == 0
         output = json.loads(result.stdout)
-        assert 'findings' in output
-        assert len(output['findings']) >= 1
+        assert "findings" in output
+        assert len(output["findings"]) >= 1
 
     def test_mcp_server_integration(self, mcp_server, test_workspace):
         """Test MCP server integration with tools"""
 
         # Test scan_path tool
-        scan_result = mcp_server.call_tool('scan_path', {
-            'path': str(test_workspace),
-            'profile': 'modern_general'
-        })
+        scan_result = mcp_server.call_tool("scan_path", {"path": str(test_workspace), "profile": "modern_general"})
 
-        assert 'findings' in scan_result
-        assert len(scan_result['findings']) >= 2
-        assert scan_result['quality_score'] > 0
+        assert "findings" in scan_result
+        assert len(scan_result["findings"]) >= 2
+        assert scan_result["quality_score"] > 0
 
         # Test refactoring suggestions
-        refactor_result = mcp_server.call_tool('suggest_refactors', {
-            'findings': scan_result['findings']
-        })
+        refactor_result = mcp_server.call_tool("suggest_refactors", {"findings": scan_result["findings"]})
 
-        assert 'suggestions' in refactor_result
-        assert len(refactor_result['suggestions']) >= 1
+        assert "suggestions" in refactor_result
+        assert len(refactor_result["suggestions"]) >= 1
 
     def test_grammar_layer_integration(self, test_workspace):
         """Test grammar layer with tree-sitter backend"""
@@ -227,22 +239,18 @@ print(json.dumps({
         sample_py = test_workspace / "sample.py"
 
         # Parse file
-        ast = backend.parse_file(sample_py, 'python')
+        ast = backend.parse_file(sample_py, "python")
         assert ast is not None
 
         # Test constrained generation
         generator = ConstrainedGenerator(backend)
 
         # Test that banned constructs are detected
-        violations = generator.check_safety_violations(
-            sample_py.read_text(),
-            'python',
-            'general_safety_strict'
-        )
+        violations = generator.check_safety_violations(sample_py.read_text(), "python", "general_safety_strict")
 
         # Should find magic numbers and deep nesting
         assert len(violations) >= 2
-        magic_number_found = any('magic' in v.get('message', '').lower() for v in violations)
+        magic_number_found = any("magic" in v.get("message", "").lower() for v in violations)
         assert magic_number_found
 
     def test_security_integration(self):
@@ -255,27 +263,21 @@ print(json.dumps({
         assert security_manager.air_gapped is True
 
         # Test user authentication (mock)
-        with patch.object(security_manager, '_verify_credentials') as mock_verify:
+        with patch.object(security_manager, "_verify_credentials") as mock_verify:
             mock_verify.return_value = True
 
-            context = security_manager.authenticate_user(
-                'test_user', 'password', '127.0.0.1'
-            )
+            context = security_manager.authenticate_user("test_user", "password", "127.0.0.1")
 
             assert context is not None
-            assert context.username == 'test_user'
+            assert context.username == "test_user"
 
         # Test permission checking
         context.roles = [UserRole.ANALYST]
 
-        has_analysis_perm = security_manager.check_permission(
-            context, 'analysis', 'execute'
-        )
+        has_analysis_perm = security_manager.check_permission(context, "analysis", "execute")
         assert has_analysis_perm is True
 
-        has_admin_perm = security_manager.check_permission(
-            context, 'admin', 'manage'
-        )
+        has_admin_perm = security_manager.check_permission(context, "admin", "manage")
         assert has_admin_perm is False
 
     def test_nasa_safety_profile(self, test_workspace):
@@ -284,8 +286,8 @@ print(json.dumps({
         from policy.presets.general_safety_rules import GENERAL_SAFETY_PROFILE
 
         # Test profile loading
-        assert 'recursion_banned' in GENERAL_SAFETY_PROFILE['rules']
-        assert 'max_function_params' in GENERAL_SAFETY_PROFILE['rules']
+        assert "recursion_banned" in GENERAL_SAFETY_PROFILE["rules"]
+        assert "max_function_params" in GENERAL_SAFETY_PROFILE["rules"]
 
         # Test C file analysis with General Safety profile
         sample_c = test_workspace / "sample.c"
@@ -293,22 +295,22 @@ print(json.dumps({
         # Mock analysis that would detect General Safety violations
         violations = [
             {
-                'rule': 'nasa_rule_3_no_recursion',
-                'file': str(sample_c),
-                'line': 4,
-                'message': 'Recursion detected - violates General Safety Rule 3'
+                "rule": "nasa_rule_3_no_recursion",
+                "file": str(sample_c),
+                "line": 4,
+                "message": "Recursion detected - violates General Safety Rule 3",
             },
             {
-                'rule': 'nasa_rule_8_no_magic_numbers',
-                'file': str(sample_c),
-                'line': 10,
-                'message': 'Magic number 5000 - violates General Safety Rule 8'
-            }
+                "rule": "nasa_rule_8_no_magic_numbers",
+                "file": str(sample_c),
+                "line": 10,
+                "message": "Magic number 5000 - violates General Safety Rule 8",
+            },
         ]
 
         assert len(violations) >= 2
-        assert any('recursion' in v['message'].lower() for v in violations)
-        assert any('magic' in v['message'].lower() for v in violations)
+        assert any("recursion" in v["message"].lower() for v in violations)
+        assert any("magic" in v["message"].lower() for v in violations)
 
     def test_vs_code_extension_integration(self):
         """Test VS Code extension components integration"""
@@ -322,62 +324,58 @@ print(json.dumps({
 
         # Test configuration
         assert config_service.getSafetyProfile() in [
-            'none', 'general_safety_strict', 'nasa_loc_1', 'nasa_loc_3', 'modern_general'
+            "none",
+            "general_safety_strict",
+            "nasa_loc_1",
+            "nasa_loc_3",
+            "modern_general",
         ]
 
         # Mock file analysis
-        with patch.object(connascence_service, 'analyzeCLI') as mock_analyze:
+        with patch.object(connascence_service, "analyzeCLI") as mock_analyze:
             mock_analyze.return_value = {
-                'findings': [
+                "findings": [
                     {
-                        'id': 'test_001',
-                        'type': 'magic_number',
-                        'severity': 'minor',
-                        'message': 'Test finding',
-                        'file': 'test.py',
-                        'line': 1
+                        "id": "test_001",
+                        "type": "magic_number",
+                        "severity": "minor",
+                        "message": "Test finding",
+                        "file": "test.py",
+                        "line": 1,
                     }
                 ],
-                'qualityScore': 85
+                "qualityScore": 85,
             }
 
-            result = asyncio.run(connascence_service.analyzeFile('test.py'))
-            assert 'findings' in result
-            assert result['qualityScore'] > 0
+            result = asyncio.run(connascence_service.analyzeFile("test.py"))
+            assert "findings" in result
+            assert result["qualityScore"] > 0
 
     def test_end_to_end_workflow(self, test_workspace, mcp_server):
         """Test complete end-to-end workflow"""
 
         # Step 1: Scan codebase
-        scan_result = mcp_server.call_tool('scan_path', {
-            'path': str(test_workspace)
-        })
+        scan_result = mcp_server.call_tool("scan_path", {"path": str(test_workspace)})
 
-        assert len(scan_result['findings']) >= 2
+        assert len(scan_result["findings"]) >= 2
 
         # Step 2: Get refactoring suggestions
-        refactor_result = mcp_server.call_tool('suggest_refactors', {
-            'findings': scan_result['findings']
-        })
+        refactor_result = mcp_server.call_tool("suggest_refactors", {"findings": scan_result["findings"]})
 
-        assert len(refactor_result['suggestions']) >= 1
+        assert len(refactor_result["suggestions"]) >= 1
 
         # Step 3: Apply autofixes
-        autofix_result = mcp_server.call_tool('propose_autofix', {
-            'suggestions': refactor_result['suggestions']
-        })
+        autofix_result = mcp_server.call_tool("propose_autofix", {"suggestions": refactor_result["suggestions"]})
 
-        assert len(autofix_result['fixes']) >= 1
+        assert len(autofix_result["fixes"]) >= 1
 
         # Step 4: Verify improvement (mock re-scan)
         # In real system, this would show improved quality score
-        improved_scan = mcp_server.call_tool('scan_path', {
-            'path': str(test_workspace)
-        })
+        improved_scan = mcp_server.call_tool("scan_path", {"path": str(test_workspace)})
 
         # Mock improved quality score
-        improved_scan['quality_score'] = scan_result['quality_score'] + 10
-        assert improved_scan['quality_score'] > scan_result['quality_score']
+        improved_scan["quality_score"] = scan_result["quality_score"] + 10
+        assert improved_scan["quality_score"] > scan_result["quality_score"]
 
     def test_performance_requirements(self, test_workspace):
         """Test system meets performance requirements"""
@@ -387,19 +385,19 @@ print(json.dumps({
 
         # Mock fast analysis
         analysis_result = {
-            'files_analyzed': 2,
-            'findings': [
-                {'type': 'magic_number', 'severity': 'minor'},
-                {'type': 'long_param_list', 'severity': 'major'}
+            "files_analyzed": 2,
+            "findings": [
+                {"type": "magic_number", "severity": "minor"},
+                {"type": "long_param_list", "severity": "major"},
             ],
-            'analysis_time': time.time() - start_time
+            "analysis_time": time.time() - start_time,
         }
 
         # Analysis should complete in under 5 seconds for small workspace
-        assert analysis_result['analysis_time'] < 5.0
+        assert analysis_result["analysis_time"] < 5.0
 
         # Should find expected number of issues
-        assert len(analysis_result['findings']) >= 2
+        assert len(analysis_result["findings"]) >= 2
 
     def test_error_handling_and_recovery(self, test_workspace):
         """Test system handles errors gracefully"""
@@ -411,40 +409,29 @@ print(json.dumps({
         # System should handle syntax errors gracefully
         try:
             from connascence.grammar.backends.tree_sitter_backend import TreeSitterBackend
+
             backend = TreeSitterBackend()
-            ast = backend.parse_file(invalid_file, 'python')
+            ast = backend.parse_file(invalid_file, "python")
             # Should return None or handle error gracefully
-            assert ast is None or hasattr(ast, 'error')
+            assert ast is None or hasattr(ast, "error")
         except Exception as e:
             # Should not crash the entire system
-            assert 'syntax' in str(e).lower()
+            assert "syntax" in str(e).lower()
 
     def test_demo_scenarios_integration(self, test_workspace):
         """Test the three demo scenarios work in integration"""
 
         # Mock the three demo scenarios
         demo_results = {
-            'celery': {
-                'fp_rate': 4.5,
-                'autofix_rate': 62.9,
-                'files_analyzed': 347
-            },
-            'curl': {
-                'nasa_compliance': 96,
-                'safety_violations_fixed': 6,
-                'recursion_eliminated': True
-            },
-            'express': {
-                'connascence_improvement': 28.7,
-                'mcp_loop_successful': True,
-                'semgrep_integration': True
-            }
+            "celery": {"fp_rate": 4.5, "autofix_rate": 62.9, "files_analyzed": 347},
+            "curl": {"nasa_compliance": 96, "safety_violations_fixed": 6, "recursion_eliminated": True},
+            "express": {"connascence_improvement": 28.7, "mcp_loop_successful": True, "semgrep_integration": True},
         }
 
         # Verify proof points
-        assert demo_results['celery']['fp_rate'] < 5.0  # FP < 5%
-        assert demo_results['celery']['autofix_rate'] >= 60.0  # Autofix 60%
-        assert demo_results['curl']['nasa_compliance'] >= 90  # General Safety compliance high
+        assert demo_results["celery"]["fp_rate"] < 5.0  # FP < 5%
+        assert demo_results["celery"]["autofix_rate"] >= 60.0  # Autofix 60%
+        assert demo_results["curl"]["nasa_compliance"] >= 90  # General Safety compliance high
         assert demo_results["express"]["mcp_loop_successful"] is True  # MCP works
 
     def test_sales_artifact_generation(self):
@@ -461,8 +448,9 @@ print(json.dumps({
 
         # Test proof points are defined
         for demo_name, demo_config in runner.demos.items():
-            assert 'proof_points' in demo_config
-            assert len(demo_config['proof_points']) >= 2
+            assert "proof_points" in demo_config
+            assert len(demo_config["proof_points"]) >= 2
+
 
 @pytest.mark.asyncio
 class TestAsyncIntegration:
@@ -474,18 +462,18 @@ class TestAsyncIntegration:
         # Mock async MCP call
         async def mock_mcp_call(tool, args):
             await asyncio.sleep(0.1)  # Simulate network delay
-            return {'result': f'mock_response_for_{tool}'}
+            return {"result": f"mock_response_for_{tool}"}
 
         # Test multiple concurrent calls
         tasks = [
-            mock_mcp_call('scan_path', {}),
-            mock_mcp_call('suggest_refactors', {}),
-            mock_mcp_call('propose_autofix', {})
+            mock_mcp_call("scan_path", {}),
+            mock_mcp_call("suggest_refactors", {}),
+            mock_mcp_call("propose_autofix", {}),
         ]
 
         results = await asyncio.gather(*tasks)
         assert len(results) == 3
-        assert all('mock_response' in str(result) for result in results)
+        assert all("mock_response" in str(result) for result in results)
 
     async def test_vs_code_extension_async(self):
         """Test VS Code extension async operations"""
@@ -493,19 +481,17 @@ class TestAsyncIntegration:
         # Mock VS Code extension service calls
         async def mock_analyze_file(file_path):
             await asyncio.sleep(0.2)  # Simulate analysis time
-            return {
-                'findings': [{'type': 'test', 'severity': 'minor'}],
-                'quality_score': 80
-            }
+            return {"findings": [{"type": "test", "severity": "minor"}], "quality_score": 80}
 
         # Test concurrent file analysis
-        files = ['file1.py', 'file2.py', 'file3.py']
+        files = ["file1.py", "file2.py", "file3.py"]
         tasks = [mock_analyze_file(f) for f in files]
 
         results = await asyncio.gather(*tasks)
         assert len(results) == 3
-        assert all(r['quality_score'] > 0 for r in results)
+        assert all(r["quality_score"] > 0 for r in results)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     # Run integration tests
-    pytest.main([__file__, '-v', '--tb=short'])
+    pytest.main([__file__, "-v", "--tb=short"])

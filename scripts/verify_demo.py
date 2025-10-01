@@ -40,10 +40,7 @@ try:
         print("=" * 60)
 
         # Initialize validator
-        validator = SequentialThinkingValidator(
-            base_path=Path.cwd(),
-            verbose=True
-        )
+        validator = SequentialThinkingValidator(base_path=Path.cwd(), verbose=True)
 
         print("\n🎯 KEY VALIDATION REQUIREMENTS:")
         print("   README total: 5,743 violations")

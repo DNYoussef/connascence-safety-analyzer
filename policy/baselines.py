@@ -11,7 +11,6 @@
 # The above copyright notice and this permission notice shall be included in
 # all copies or substantial portions of the Software.
 
-from fixes.phase0.production_safe_assertions import ProductionAssert
 from dataclasses import dataclass, field
 from datetime import datetime
 import hashlib
@@ -21,6 +20,7 @@ import subprocess
 import time
 from typing import Any, Dict, List, Optional
 
+from fixes.phase0.production_safe_assertions import ProductionAssert
 from utils.types import ConnascenceViolation
 
 # Need to create a mock ConnascenceViolation since analyzer.core was removed
@@ -33,9 +33,11 @@ DEFAULT_BASELINE_CLEANUP_KEEP_COUNT = 5
 DEFAULT_BASELINE_FILE = ".connascence/baseline.json"
 DEFAULT_FINGERPRINT_VERSION = "2.0.0"
 
+
 @dataclass
 class FindingFingerprint:
     """Stable fingerprint for a finding that persists across code changes."""
+
     rule_id: str
     fingerprint: str  # SHA256 hash of finding context
     file_path: str
@@ -54,11 +56,11 @@ class FindingFingerprint:
             "column": self.column,
             "severity": self.severity,
             "context_hash": self.context_hash,
-            "created_at": self.created_at
+            "created_at": self.created_at,
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> 'FindingFingerprint':
+    def from_dict(cls, data: Dict[str, Any]) -> "FindingFingerprint":
         return cls(
             rule_id=data["rule_id"],
             fingerprint=data["fingerprint"],
@@ -67,12 +69,14 @@ class FindingFingerprint:
             column=data["column"],
             severity=data["severity"],
             context_hash=data["context_hash"],
-            created_at=data["created_at"]
+            created_at=data["created_at"],
         )
+
 
 @dataclass
 class BaselineSnapshot:
     """Complete baseline snapshot with metadata and git integration."""
+
     created_at: str
     description: str
     fingerprints: List[FindingFingerprint]
@@ -89,11 +93,11 @@ class BaselineSnapshot:
             "description": self.description,
             "version": self.version,
             "fingerprints": [fp.to_dict() for fp in self.fingerprints],
-            "metadata": self.metadata
+            "metadata": self.metadata,
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> 'BaselineSnapshot':
+    def from_dict(cls, data: Dict[str, Any]) -> "BaselineSnapshot":
         return cls(
             created_at=data["created_at"],
             commit_hash=data.get("commit_hash"),
@@ -101,31 +105,34 @@ class BaselineSnapshot:
             description=data["description"],
             version=data.get("version", DEFAULT_FINGERPRINT_VERSION),
             fingerprints=[FindingFingerprint.from_dict(fp) for fp in data["fingerprints"]],
-            metadata=data.get("metadata", {})
+            metadata=data.get("metadata", {}),
         )
+
 
 class EnhancedFingerprintGenerator:
     """Advanced fingerprinting system for stable finding identification."""
 
     @staticmethod
-    def generate_finding_fingerprint(violation: ConnascenceViolation, source_lines: List[str] = None) -> FindingFingerprint:
+    def generate_finding_fingerprint(
+        violation: ConnascenceViolation, source_lines: List[str] = None
+    ) -> FindingFingerprint:
         """Generate stable fingerprint for a violation."""
 
         # Basic violation info
-        file_path = getattr(violation, 'file_path', '')
-        line_number = getattr(violation, 'line_number', 0)
-        column = getattr(violation, 'column', 0)
-        severity = str(getattr(violation, 'severity', 'medium'))
-        rule_id = getattr(violation, 'id', f"{getattr(violation, 'type', 'unknown')}")
+        file_path = getattr(violation, "file_path", "")
+        line_number = getattr(violation, "line_number", 0)
+        column = getattr(violation, "column", 0)
+        severity = str(getattr(violation, "severity", "medium"))
+        rule_id = getattr(violation, "id", f"{getattr(violation, 'type', 'unknown')}")
 
         # Create stable context for fingerprinting
         context_elements = [
             rule_id,
             file_path,
             str(line_number),
-            getattr(violation, 'description', ''),
-            getattr(violation, 'connascence_type', ''),
-            severity
+            getattr(violation, "description", ""),
+            getattr(violation, "connascence_type", ""),
+            severity,
         ]
 
         # Add surrounding code context if available
@@ -137,12 +144,12 @@ class EnhancedFingerprintGenerator:
             context_lines = source_lines[context_start:context_end]
 
             # Normalize whitespace for stable hashing
-            normalized_context = '\n'.join(line.strip() for line in context_lines)
-            context_hash = hashlib.sha256(normalized_context.encode('utf-8')).hexdigest()[:16]
+            normalized_context = "\n".join(line.strip() for line in context_lines)
+            context_hash = hashlib.sha256(normalized_context.encode("utf-8")).hexdigest()[:16]
 
         # Generate primary fingerprint
-        fingerprint_content = '|'.join(context_elements) + f"|{context_hash}"
-        fingerprint = hashlib.sha256(fingerprint_content.encode('utf-8')).hexdigest()
+        fingerprint_content = "|".join(context_elements) + f"|{context_hash}"
+        fingerprint = hashlib.sha256(fingerprint_content.encode("utf-8")).hexdigest()
 
         return FindingFingerprint(
             rule_id=rule_id,
@@ -152,8 +159,9 @@ class EnhancedFingerprintGenerator:
             column=column,
             severity=severity,
             context_hash=context_hash,
-            created_at=datetime.now().isoformat()
+            created_at=datetime.now().isoformat(),
         )
+
 
 class EnhancedBaselineManager:
     """Enterprise-grade baseline management with Git integration and fingerprinting."""
@@ -170,8 +178,12 @@ class EnhancedBaselineManager:
         # Ensure baseline directory exists
         self.baseline_dir.mkdir(parents=True, exist_ok=True)
 
-    def create_snapshot(self, violations: List[ConnascenceViolation],
-                       description: str = "", source_lines_map: Optional[Dict[str, List[str]]] = None) -> BaselineSnapshot:
+    def create_snapshot(
+        self,
+        violations: List[ConnascenceViolation],
+        description: str = "",
+        source_lines_map: Optional[Dict[str, List[str]]] = None,
+    ) -> BaselineSnapshot:
         """Create a comprehensive baseline snapshot."""
 
         # Get git information
@@ -181,12 +193,10 @@ class EnhancedBaselineManager:
         # Generate fingerprints for all violations
         fingerprints = []
         for violation in violations:
-            file_path = getattr(violation, 'file_path', '')
+            file_path = getattr(violation, "file_path", "")
             source_lines = source_lines_map.get(file_path) if source_lines_map else None
 
-            fingerprint = self.fingerprint_generator.generate_finding_fingerprint(
-                violation, source_lines
-            )
+            fingerprint = self.fingerprint_generator.generate_finding_fingerprint(violation, source_lines)
             fingerprints.append(fingerprint)
 
         # Create snapshot
@@ -200,15 +210,15 @@ class EnhancedBaselineManager:
                 "total_violations": len(violations),
                 "severity_counts": self._count_by_severity(violations),
                 "rule_counts": self._count_by_rule(violations),
-                "files_affected": len({getattr(v, 'file_path', '') for v in violations})
-            }
+                "files_affected": len({getattr(v, "file_path", "") for v in violations}),
+            },
         )
 
         return snapshot
 
     def save_baseline(self, snapshot: BaselineSnapshot) -> None:
         """Save baseline snapshot to disk."""
-        with open(self.baseline_file, 'w', encoding='utf-8') as f:
+        with open(self.baseline_file, "w", encoding="utf-8") as f:
             json.dump(snapshot.to_dict(), f, indent=2)
 
     def load_baseline(self) -> Optional[BaselineSnapshot]:
@@ -217,15 +227,16 @@ class EnhancedBaselineManager:
             return None
 
         try:
-            with open(self.baseline_file, encoding='utf-8') as f:
+            with open(self.baseline_file, encoding="utf-8") as f:
                 data = json.load(f)
                 return BaselineSnapshot.from_dict(data)
         except (json.JSONDecodeError, KeyError, ValueError) as e:
             print(f"Warning: Could not load baseline from {self.baseline_file}: {e}")
             return None
 
-    def compare_with_baseline(self, current_violations: List[ConnascenceViolation],
-                             source_lines_map: Optional[Dict[str, List[str]]] = None) -> Dict[str, Any]:
+    def compare_with_baseline(
+        self, current_violations: List[ConnascenceViolation], source_lines_map: Optional[Dict[str, List[str]]] = None
+    ) -> Dict[str, Any]:
         """Compare current violations with stored baseline."""
         baseline = self.load_baseline()
         if not baseline:
@@ -235,22 +246,17 @@ class EnhancedBaselineManager:
                 "all_violations_new": True,
                 "new_violations": len(current_violations),
                 "resolved_violations": 0,
-                "baseline_violations": 0
+                "baseline_violations": 0,
             }
 
         # Generate fingerprints for current violations
         current_fingerprints = {}
         for violation in current_violations:
-            file_path = getattr(violation, 'file_path', '')
+            file_path = getattr(violation, "file_path", "")
             source_lines = source_lines_map.get(file_path) if source_lines_map else None
 
-            fingerprint = self.fingerprint_generator.generate_finding_fingerprint(
-                violation, source_lines
-            )
-            current_fingerprints[fingerprint.fingerprint] = {
-                "fingerprint_obj": fingerprint,
-                "violation": violation
-            }
+            fingerprint = self.fingerprint_generator.generate_finding_fingerprint(violation, source_lines)
+            current_fingerprints[fingerprint.fingerprint] = {"fingerprint_obj": fingerprint, "violation": violation}
 
         # Create baseline fingerprint lookup
         baseline_fingerprints = {fp.fingerprint: fp for fp in baseline.fingerprints}
@@ -279,11 +285,14 @@ class EnhancedBaselineManager:
             "new_violation_details": [self._violation_summary(v) for v in new_violations],
             "resolved_violation_details": [fp.to_dict() for fp in resolved_violations],
             "net_change": len(current_violations) - len(baseline.fingerprints),
-            "improvement_percentage": (len(resolved_violations) / len(baseline.fingerprints) * 100) if baseline.fingerprints else 0
+            "improvement_percentage": (len(resolved_violations) / len(baseline.fingerprints) * 100)
+            if baseline.fingerprints
+            else 0,
         }
 
-    def filter_new_violations_only(self, violations: List[ConnascenceViolation],
-                                  source_lines_map: Optional[Dict[str, List[str]]] = None) -> List[ConnascenceViolation]:
+    def filter_new_violations_only(
+        self, violations: List[ConnascenceViolation], source_lines_map: Optional[Dict[str, List[str]]] = None
+    ) -> List[ConnascenceViolation]:
         """Filter violations to only return those not in the baseline."""
         comparison = self.compare_with_baseline(violations, source_lines_map)
 
@@ -300,12 +309,10 @@ class EnhancedBaselineManager:
         violation_by_fp = {}
 
         for violation in violations:
-            file_path = getattr(violation, 'file_path', '')
+            file_path = getattr(violation, "file_path", "")
             source_lines = source_lines_map.get(file_path) if source_lines_map else None
 
-            fingerprint = self.fingerprint_generator.generate_finding_fingerprint(
-                violation, source_lines
-            )
+            fingerprint = self.fingerprint_generator.generate_finding_fingerprint(violation, source_lines)
             current_fps.add(fingerprint.fingerprint)
             violation_by_fp[fingerprint.fingerprint] = violation
 
@@ -320,8 +327,7 @@ class EnhancedBaselineManager:
         """Get current git commit hash."""
         try:
             result = subprocess.run(
-                ["git", "rev-parse", "HEAD"],
-                capture_output=True, text=True, cwd=self.baseline_dir
+                ["git", "rev-parse", "HEAD"], check=False, capture_output=True, text=True, cwd=self.baseline_dir
             )
             if result.returncode == 0:
                 return result.stdout.strip()
@@ -333,8 +339,7 @@ class EnhancedBaselineManager:
         """Get current git branch."""
         try:
             result = subprocess.run(
-                ["git", "branch", "--show-current"],
-                capture_output=True, text=True, cwd=self.baseline_dir
+                ["git", "branch", "--show-current"], check=False, capture_output=True, text=True, cwd=self.baseline_dir
             )
             if result.returncode == 0:
                 return result.stdout.strip()
@@ -346,7 +351,7 @@ class EnhancedBaselineManager:
         """Count violations by severity."""
         counts = {"critical": 0, "high": 0, "medium": 0, "low": 0}
         for v in violations:
-            severity = str(getattr(v, 'severity', 'medium')).lower()
+            severity = str(getattr(v, "severity", "medium")).lower()
             if severity in counts:
                 counts[severity] += 1
         return counts
@@ -355,19 +360,19 @@ class EnhancedBaselineManager:
         """Count violations by rule."""
         counts = {}
         for v in violations:
-            rule = getattr(v, 'connascence_type', 'unknown')
+            rule = getattr(v, "connascence_type", "unknown")
             counts[rule] = counts.get(rule, 0) + 1
         return counts
 
     def _violation_summary(self, violation: ConnascenceViolation) -> Dict[str, Any]:
         """Create summary of violation for reporting."""
         return {
-            "rule_id": getattr(violation, 'id', ''),
-            "type": getattr(violation, 'connascence_type', ''),
-            "severity": str(getattr(violation, 'severity', 'medium')),
-            "file": getattr(violation, 'file_path', ''),
-            "line": getattr(violation, 'line_number', 0),
-            "description": getattr(violation, 'description', '')
+            "rule_id": getattr(violation, "id", ""),
+            "type": getattr(violation, "connascence_type", ""),
+            "severity": str(getattr(violation, "severity", "medium")),
+            "file": getattr(violation, "file_path", ""),
+            "line": getattr(violation, "line_number", 0),
+            "description": getattr(violation, "description", ""),
         }
 
     def get_baseline_info(self) -> Dict[str, Any]:
@@ -385,7 +390,7 @@ class EnhancedBaselineManager:
             "version": baseline.version,
             "total_violations": len(baseline.fingerprints),
             "metadata": baseline.metadata,
-            "file_path": str(self.baseline_file)
+            "file_path": str(self.baseline_file),
         }
 
     def list_baseline_history(self) -> List[Dict[str, Any]]:
@@ -398,6 +403,7 @@ class EnhancedBaselineManager:
 
         return [self.get_baseline_info()]
 
+
 # Legacy BaselineManager for backward compatibility
 class BaselineManager:
     """Simple BaselineManager for test compatibility."""
@@ -406,8 +412,9 @@ class BaselineManager:
         self.baselines = {}  # In-memory storage for tests
         self.active_baseline = None
 
-    def create_baseline(self, violations: List[ConnascenceViolation],
-                       description: str = "", version: str = DEFAULT_BASELINE_VERSION) -> str:
+    def create_baseline(
+        self, violations: List[ConnascenceViolation], description: str = "", version: str = DEFAULT_BASELINE_VERSION
+    ) -> str:
         """Create a new quality baseline."""
         # Use unique ID to avoid collisions
         timestamp = time.time()
@@ -415,12 +422,12 @@ class BaselineManager:
         baseline_id = f"baseline_{int(timestamp)}_{baseline_counter}_{len(violations)}"
 
         baseline_data = {
-            'id': baseline_id,
-            'description': description,
-            'created_at': datetime.fromtimestamp(timestamp).isoformat(),
-            'violations': [self._violation_to_dict(v) for v in violations],
-            'version': version or "1.0.0",
-            '_sort_key': timestamp + baseline_counter * 0.001  # Add slight offset for uniqueness
+            "id": baseline_id,
+            "description": description,
+            "created_at": datetime.fromtimestamp(timestamp).isoformat(),
+            "violations": [self._violation_to_dict(v) for v in violations],
+            "version": version or "1.0.0",
+            "_sort_key": timestamp + baseline_counter * 0.001,  # Add slight offset for uniqueness
         }
 
         # Store in memory for tests
@@ -434,63 +441,65 @@ class BaselineManager:
     def _violation_to_dict(self, violation: ConnascenceViolation) -> Dict[str, Any]:
         """Convert violation object to dictionary."""
         return {
-            'id': getattr(violation, 'id', ''),
-            'rule_id': getattr(violation, 'rule_id', ''),
-            'connascence_type': getattr(violation, 'connascence_type', ''),
-            'severity': getattr(violation, 'severity', 'medium'),
-            'description': getattr(violation, 'description', ''),
-            'file_path': getattr(violation, 'file_path', ''),
-            'line_number': getattr(violation, 'line_number', 0),
-            'weight': getattr(violation, 'weight', 1.0)
+            "id": getattr(violation, "id", ""),
+            "rule_id": getattr(violation, "rule_id", ""),
+            "connascence_type": getattr(violation, "connascence_type", ""),
+            "severity": getattr(violation, "severity", "medium"),
+            "description": getattr(violation, "description", ""),
+            "file_path": getattr(violation, "file_path", ""),
+            "line_number": getattr(violation, "line_number", 0),
+            "weight": getattr(violation, "weight", 1.0),
         }
 
     def get_baseline(self, baseline_id: str) -> Optional[Dict[str, Any]]:
         """Get baseline by ID."""
         return self.baselines.get(baseline_id)
 
-    def compare_against_baseline(self, current_violations: List[ConnascenceViolation],
-                               baseline_id: str) -> Dict[str, Any]:
+    def compare_against_baseline(
+        self, current_violations: List[ConnascenceViolation], baseline_id: str
+    ) -> Dict[str, Any]:
         """Compare current violations against baseline."""
         baseline_data = self.get_baseline(baseline_id)
         if not baseline_data:
             raise ValueError(f"Baseline not found: {baseline_id}")
 
         # Get baseline violations
-        baseline_violations = baseline_data.get('violations', [])
-        baseline_ids = {v.get('id', '') for v in baseline_violations}
+        baseline_violations = baseline_data.get("violations", [])
+        baseline_ids = {v.get("id", "") for v in baseline_violations}
 
         # Categorize current violations
-        current_ids = {getattr(v, 'id', '') for v in current_violations}
+        current_ids = {getattr(v, "id", "") for v in current_violations}
 
         new_violation_ids = current_ids - baseline_ids
         resolved_violation_ids = baseline_ids - current_ids
         unchanged_violation_ids = current_ids & baseline_ids
 
         # Map back to violations
-        current_by_id = {getattr(v, 'id', ''): v for v in current_violations}
-        baseline_by_id = {v.get('id', ''): v for v in baseline_violations}
+        current_by_id = {getattr(v, "id", ""): v for v in current_violations}
+        baseline_by_id = {v.get("id", ""): v for v in baseline_violations}
 
         new_violations = [current_by_id[vid] for vid in new_violation_ids if vid in current_by_id]
         resolved_violations = [baseline_by_id[vid] for vid in resolved_violation_ids if vid in baseline_by_id]
         unchanged_violations = [current_by_id[vid] for vid in unchanged_violation_ids if vid in current_by_id]
 
         return {
-            'new_violations': [self._violation_to_dict(v) for v in new_violations],
-            'resolved_violations': resolved_violations,
-            'unchanged_violations': [self._violation_to_dict(v) for v in unchanged_violations],
-            'summary': {
-                'total_new': len(new_violations),
-                'total_resolved': len(resolved_violations),
-                'total_unchanged': len(unchanged_violations),
-                'net_change': len(new_violations) - len(resolved_violations)
-            }
+            "new_violations": [self._violation_to_dict(v) for v in new_violations],
+            "resolved_violations": resolved_violations,
+            "unchanged_violations": [self._violation_to_dict(v) for v in unchanged_violations],
+            "summary": {
+                "total_new": len(new_violations),
+                "total_resolved": len(resolved_violations),
+                "total_unchanged": len(unchanged_violations),
+                "net_change": len(new_violations) - len(resolved_violations),
+            },
         }
 
-    def filter_new_violations(self, current_violations: List[ConnascenceViolation],
-                            baseline_id: str) -> List[Dict[str, Any]]:
+    def filter_new_violations(
+        self, current_violations: List[ConnascenceViolation], baseline_id: str
+    ) -> List[Dict[str, Any]]:
         """Filter violations to only return new ones not in baseline."""
         comparison = self.compare_against_baseline(current_violations, baseline_id)
-        return comparison['new_violations']
+        return comparison["new_violations"]
 
     def list_baselines(self) -> List[Dict[str, Any]]:
         """List all baselines with metadata."""
@@ -498,36 +507,31 @@ class BaselineManager:
 
         for baseline_id, baseline_data in self.baselines.items():
             summary = {
-                'id': baseline_id,
-                'description': baseline_data.get('description', ''),
-                'created_at': baseline_data.get('created_at', ''),
-                'version': baseline_data.get('version', DEFAULT_BASELINE_VERSION),
-                'violation_count': len(baseline_data.get('violations', [])),
-                'violations': baseline_data.get('violations', [])
+                "id": baseline_id,
+                "description": baseline_data.get("description", ""),
+                "created_at": baseline_data.get("created_at", ""),
+                "version": baseline_data.get("version", DEFAULT_BASELINE_VERSION),
+                "violation_count": len(baseline_data.get("violations", [])),
+                "violations": baseline_data.get("violations", []),
             }
             baseline_list.append(summary)
 
         # Sort by creation time (newest first)
-        baseline_list.sort(key=lambda x: x['created_at'], reverse=True)
+        baseline_list.sort(key=lambda x: x["created_at"], reverse=True)
         return baseline_list
 
     def cleanup_old_baselines(self, keep_count: int = DEFAULT_BASELINE_CLEANUP_KEEP_COUNT):
         """Clean up old baselines, keeping only the most recent ones."""
 
-        ProductionAssert.not_none(keep_count, 'keep_count')
+        ProductionAssert.not_none(keep_count, "keep_count")
 
-
-        ProductionAssert.not_none(keep_count, 'keep_count')
+        ProductionAssert.not_none(keep_count, "keep_count")
 
         if len(self.baselines) <= keep_count:
             return
 
         # Get sorted list of baselines by sort key or creation time (newest first)
-        sorted_baselines = sorted(
-            self.baselines.items(),
-            key=lambda x: x[1].get('_sort_key', 0),
-            reverse=True
-        )
+        sorted_baselines = sorted(self.baselines.items(), key=lambda x: x[1].get("_sort_key", 0), reverse=True)
 
         # Keep only the most recent ones
         baselines_to_keep = dict(sorted_baselines[:keep_count])
@@ -535,8 +539,7 @@ class BaselineManager:
 
 
 class BaselineComparison:
-    def __init__(self, baseline_violations: List[ConnascenceViolation],
-                 current_violations: List[ConnascenceViolation]):
+    def __init__(self, baseline_violations: List[ConnascenceViolation], current_violations: List[ConnascenceViolation]):
         self.baseline_violations = baseline_violations
         self.current_violations = current_violations
 
@@ -575,32 +578,30 @@ class BaselineComparison:
 
         # Calculate improvement metrics
         self.improvement_ratio = (
-            len(self.resolved_violations) / len(self.baseline_violations)
-            if self.baseline_violations else 0
+            len(self.resolved_violations) / len(self.baseline_violations) if self.baseline_violations else 0
         )
 
         self.regression_ratio = (
-            len(self.new_violations) / len(self.baseline_violations)
-            if self.baseline_violations else 0
+            len(self.new_violations) / len(self.baseline_violations) if self.baseline_violations else 0
         )
 
     def _get_violation_signature(self, violation: ConnascenceViolation) -> str:
         """Generate a unique signature for a violation."""
-        file_path = getattr(violation, 'file_path', '')
-        line_number = getattr(violation, 'line_number', 0)
-        conn_type = getattr(violation, 'connascence_type', '')
-        description = getattr(violation, 'description', '')
+        file_path = getattr(violation, "file_path", "")
+        line_number = getattr(violation, "line_number", 0)
+        conn_type = getattr(violation, "connascence_type", "")
+        description = getattr(violation, "description", "")
 
         return f"{file_path}:{line_number}:{conn_type}:{description}"
 
     def get_summary(self) -> Dict[str, Any]:
         """Get comparison summary."""
         return {
-            'baseline_count': len(self.baseline_violations),
-            'current_count': len(self.current_violations),
-            'new_violations': len(self.new_violations),
-            'resolved_violations': len(self.resolved_violations),
-            'improvement_ratio': self.improvement_ratio,
-            'regression_ratio': self.regression_ratio,
-            'net_change': len(self.current_violations) - len(self.baseline_violations)
+            "baseline_count": len(self.baseline_violations),
+            "current_count": len(self.current_violations),
+            "new_violations": len(self.new_violations),
+            "resolved_violations": len(self.resolved_violations),
+            "improvement_ratio": self.improvement_ratio,
+            "regression_ratio": self.regression_ratio,
+            "net_change": len(self.current_violations) - len(self.baseline_violations),
         }

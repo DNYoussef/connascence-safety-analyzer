@@ -44,11 +44,7 @@ class ReleaseNotesGenerator:
         else:
             version_content = content[start_pos:]
 
-        return {
-            "version": version,
-            "date": release_date,
-            "content": version_content.strip()
-        }
+        return {"version": version, "date": release_date, "content": version_content.strip()}
 
     def parse_sections(self, content: str) -> Dict[str, List[str]]:
         """Parse changelog sections into categories."""
@@ -69,7 +65,7 @@ class ReleaseNotesGenerator:
                 # Remove markdown formatting from items
                 item = line[2:].strip()
                 # Remove **bold** formatting
-                item = re.sub(r'\*\*(.*?)\*\*', r'\1', item)
+                item = re.sub(r"\*\*(.*?)\*\*", r"\1", item)
                 sections[current_section].append(item)
 
         return sections
@@ -94,7 +90,9 @@ class ReleaseNotesGenerator:
         repo_url = "https://github.com/connascence/connascence-analyzer"
         notes.append(f"* [Download from PyPI]({self._get_pypi_url()})")
         notes.append(f"* [View on GitHub]({repo_url}/releases/tag/v{version})")
-        notes.append(f"* [Compare with previous version]({repo_url}/compare/v{self._get_previous_version(version)}...v{version})")
+        notes.append(
+            f"* [Compare with previous version]({repo_url}/compare/v{self._get_previous_version(version)}...v{version})"
+        )
         notes.append("")
 
         # Add sections in order of importance
@@ -104,11 +102,11 @@ class ReleaseNotesGenerator:
             ("Fixed", "Bug Fixes"),
             ("Security", "Security Improvements"),
             ("Deprecated", "Deprecations"),
-            ("Removed", "Removals")
+            ("Removed", "Removals"),
         ]
 
         for section_key, section_title in section_order:
-            if section_key in sections and sections[section_key]:
+            if sections.get(section_key):
                 notes.append(f"## {section_title}")
                 notes.append("")
                 for item in sections[section_key]:
@@ -182,14 +180,10 @@ def main():
 Examples:
   python scripts/release/generate_release_notes.py 1.0.0
   python scripts/release/generate_release_notes.py 1.0.0 --output docs/release-notes/1.0.0.md
-        """
+        """,
     )
     parser.add_argument("version", help="Version to generate release notes for")
-    parser.add_argument(
-        "--output", "-o",
-        type=Path,
-        help="Output file for release notes (default: print to stdout)"
-    )
+    parser.add_argument("--output", "-o", type=Path, help="Output file for release notes (default: print to stdout)")
 
     args = parser.parse_args()
 

@@ -46,7 +46,7 @@ class TestCLIExitCodes:
             cli = ConnascenceCLI()
 
             # Test help command returns success
-            cli.run(['--help'])
+            cli.run(["--help"])
             # Help might print and exit, so we catch SystemExit
 
         except SystemExit as e:
@@ -79,7 +79,7 @@ class TestCLIExitCodes:
 
             # Test with invalid command
             with pytest.raises(SystemExit) as exc_info:
-                cli.run(['invalid-command'])
+                cli.run(["invalid-command"])
 
             # ArgumentParser exits with code 2 for invalid arguments
             assert exc_info.value.code == 2
@@ -96,8 +96,8 @@ class TestCLIExitCodes:
             cli = ConnascenceCLI()
 
             # Mock a scan operation that raises KeyboardInterrupt
-            with patch.object(cli.scan_handler, 'handle', side_effect=KeyboardInterrupt()):
-                exit_code = cli.run(['scan', '.'])
+            with patch.object(cli.scan_handler, "handle", side_effect=KeyboardInterrupt()):
+                exit_code = cli.run(["scan", "."])
                 assert exit_code == ExitCode.USER_INTERRUPTED
 
         except ImportError as e:
@@ -112,8 +112,8 @@ class TestCLIExitCodes:
             cli = ConnascenceCLI()
 
             # Mock a scan operation that raises a general exception
-            with patch.object(cli.scan_handler, 'handle', side_effect=Exception("Test error")):
-                exit_code = cli.run(['scan', '.'])
+            with patch.object(cli.scan_handler, "handle", side_effect=Exception("Test error")):
+                exit_code = cli.run(["scan", "."])
                 assert exit_code == ExitCode.RUNTIME_ERROR
 
         except ImportError as e:
@@ -140,8 +140,8 @@ class TestCLIExitCodes:
             cli.license_validator = mock_validator
 
             # Enable license validation for this test
-            with patch('cli.connascence.LICENSE_VALIDATION_AVAILABLE', True):
-                exit_code = cli.run(['scan', '.'])
+            with patch("cli.connascence.LICENSE_VALIDATION_AVAILABLE", True):
+                exit_code = cli.run(["scan", "."])
                 assert exit_code == ExitCode.LICENSE_ERROR
 
         except ImportError as e:
@@ -165,15 +165,17 @@ class TestCLIExitCodes:
         try:
             # Try to run the console script
             subprocess.run(
-                [sys.executable, '-m', 'pip', 'show', 'connascence-analyzer'],
+                [sys.executable, "-m", "pip", "show", "connascence-analyzer"],
+                check=False,
                 capture_output=True,
                 text=True,
-                timeout=10
+                timeout=10,
             )
 
             # If package is not installed, that's OK for development
             # Just test that we can import the main function
             from interfaces.cli.connascence import main
+
             assert callable(main)
 
         except subprocess.TimeoutExpired:
@@ -190,7 +192,7 @@ class TestCLIExitCodes:
 
             # Version command should exit with code 0
             with pytest.raises(SystemExit) as exc_info:
-                cli.run(['--version'])
+                cli.run(["--version"])
 
             assert exc_info.value.code == 0
 
@@ -210,13 +212,13 @@ class TestCLIExitCodes:
 
             # Test parsing some basic commands
             test_commands = [
-                ['scan', '.'],
-                ['scan-diff', '--base', 'HEAD~1'],
-                ['baseline', 'status'],
-                ['autofix', '--dry-run'],
-                ['explain', 'test-id'],
-                ['mcp', 'serve'],
-                ['license', 'validate']
+                ["scan", "."],
+                ["scan-diff", "--base", "HEAD~1"],
+                ["baseline", "status"],
+                ["autofix", "--dry-run"],
+                ["explain", "test-id"],
+                ["mcp", "serve"],
+                ["license", "validate"],
             ]
 
             for cmd in test_commands:
@@ -239,8 +241,8 @@ class TestCLIExitCodes:
             cli = ConnascenceCLI()
 
             # Mock the scan handler to avoid actual scanning
-            with patch.object(cli.scan_handler, 'handle', return_value=0):
-                exit_code = cli.run(['--verbose', 'scan', '.'])
+            with patch.object(cli.scan_handler, "handle", return_value=0):
+                exit_code = cli.run(["--verbose", "scan", "."])
                 assert exit_code == 0
 
         except ImportError as e:
@@ -255,8 +257,8 @@ class TestCLIExitCodes:
             parser = cli.create_parser()
 
             # Test parsing with config file
-            args = parser.parse_args(['--config', 'test.yml', 'scan', '.'])
-            assert args.config == 'test.yml'
+            args = parser.parse_args(["--config", "test.yml", "scan", "."])
+            assert args.config == "test.yml"
 
         except ImportError as e:
             pytest.skip(f"CLI not available: {e}")
@@ -269,8 +271,8 @@ class TestCLIExitCodes:
             cli = ConnascenceCLI()
 
             # Mock the scan handler
-            with patch.object(cli.scan_handler, 'handle', return_value=0):
-                exit_code = cli.run(['--skip-license-check', 'scan', '.'])
+            with patch.object(cli.scan_handler, "handle", return_value=0):
+                exit_code = cli.run(["--skip-license-check", "scan", "."])
                 assert exit_code == 0
 
         except ImportError as e:
@@ -287,7 +289,7 @@ class TestCommandHandlerIntegration:
 
             cli = ConnascenceCLI()
             assert cli.scan_handler is not None
-            assert hasattr(cli.scan_handler, 'handle')
+            assert hasattr(cli.scan_handler, "handle")
             assert callable(cli.scan_handler.handle)
 
         except ImportError as e:
@@ -300,7 +302,7 @@ class TestCommandHandlerIntegration:
 
             cli = ConnascenceCLI()
             assert cli.baseline_handler is not None
-            assert hasattr(cli.baseline_handler, 'handle')
+            assert hasattr(cli.baseline_handler, "handle")
             assert callable(cli.baseline_handler.handle)
 
         except ImportError as e:
@@ -313,7 +315,7 @@ class TestCommandHandlerIntegration:
 
             cli = ConnascenceCLI()
             assert cli.autofix_handler is not None
-            assert hasattr(cli.autofix_handler, 'handle')
+            assert hasattr(cli.autofix_handler, "handle")
             assert callable(cli.autofix_handler.handle)
 
         except ImportError as e:
@@ -326,7 +328,7 @@ class TestCommandHandlerIntegration:
 
             cli = ConnascenceCLI()
             assert cli.mcp_handler is not None
-            assert hasattr(cli.mcp_handler, 'handle')
+            assert hasattr(cli.mcp_handler, "handle")
             assert callable(cli.mcp_handler.handle)
 
         except ImportError as e:
@@ -343,11 +345,11 @@ class TestExitCodeConstants:
 
             # Test all expected exit codes
             expected_codes = {
-                'SUCCESS': 0,
-                'GENERAL_ERROR': 1,
-                'CONFIGURATION_ERROR': 2,
-                'LICENSE_ERROR': 4,
-                'USER_INTERRUPTED': 130
+                "SUCCESS": 0,
+                "GENERAL_ERROR": 1,
+                "CONFIGURATION_ERROR": 2,
+                "LICENSE_ERROR": 4,
+                "USER_INTERRUPTED": 130,
             }
 
             for name, value in expected_codes.items():
@@ -363,11 +365,11 @@ class TestExitCodeConstants:
             from src.constants import EXIT_CODES, ExitCode
 
             # Test that mapping exists and is correct
-            assert EXIT_CODES['success'] == ExitCode.SUCCESS
-            assert EXIT_CODES['error'] == ExitCode.GENERAL_ERROR
-            assert EXIT_CODES['config_error'] == ExitCode.CONFIGURATION_ERROR
-            assert EXIT_CODES['license_error'] == ExitCode.LICENSE_ERROR
-            assert EXIT_CODES['interrupted'] == ExitCode.USER_INTERRUPTED
+            assert EXIT_CODES["success"] == ExitCode.SUCCESS
+            assert EXIT_CODES["error"] == ExitCode.GENERAL_ERROR
+            assert EXIT_CODES["config_error"] == ExitCode.CONFIGURATION_ERROR
+            assert EXIT_CODES["license_error"] == ExitCode.LICENSE_ERROR
+            assert EXIT_CODES["interrupted"] == ExitCode.USER_INTERRUPTED
 
         except ImportError as e:
             pytest.fail(f"Cannot import exit code mappings: {e}")

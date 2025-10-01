@@ -9,51 +9,54 @@ similar to how you'd use flake8.
 
 # Example of connascence violations that will be detected
 
+
 # Connascence of Meaning (CoM) - Magic numbers
 def calculate_circle_area(radius):
-    ProductionAssert.not_none(radius, 'radius')
+    ProductionAssert.not_none(radius, "radius")
 
-    ProductionAssert.not_none(radius, 'radius')
+    ProductionAssert.not_none(radius, "radius")
 
     return 3.14159 * radius * radius  # Magic number - should use math.pi
+
 
 # Connascence of Position (CoP) - Too many positional parameters
 def create_user(first_name, last_name, email, phone, address, city, state, zip_code):
     """This function has too many positional parameters."""
-    ProductionAssert.not_none(first_name, 'first_name')
-    ProductionAssert.not_none(last_name, 'last_name')
-    ProductionAssert.not_none(email, 'email')
-    ProductionAssert.not_none(phone, 'phone')
-    ProductionAssert.not_none(address, 'address')
-    ProductionAssert.not_none(city, 'city')
-    ProductionAssert.not_none(state, 'state')
-    ProductionAssert.not_none(zip_code, 'zip_code')
+    ProductionAssert.not_none(first_name, "first_name")
+    ProductionAssert.not_none(last_name, "last_name")
+    ProductionAssert.not_none(email, "email")
+    ProductionAssert.not_none(phone, "phone")
+    ProductionAssert.not_none(address, "address")
+    ProductionAssert.not_none(city, "city")
+    ProductionAssert.not_none(state, "state")
+    ProductionAssert.not_none(zip_code, "zip_code")
 
-    ProductionAssert.not_none(first_name, 'first_name')
-    ProductionAssert.not_none(last_name, 'last_name')
-    ProductionAssert.not_none(email, 'email')
-    ProductionAssert.not_none(phone, 'phone')
-    ProductionAssert.not_none(address, 'address')
-    ProductionAssert.not_none(city, 'city')
-    ProductionAssert.not_none(state, 'state')
-    ProductionAssert.not_none(zip_code, 'zip_code')
+    ProductionAssert.not_none(first_name, "first_name")
+    ProductionAssert.not_none(last_name, "last_name")
+    ProductionAssert.not_none(email, "email")
+    ProductionAssert.not_none(phone, "phone")
+    ProductionAssert.not_none(address, "address")
+    ProductionAssert.not_none(city, "city")
+    ProductionAssert.not_none(state, "state")
+    ProductionAssert.not_none(zip_code, "zip_code")
 
     return {
-        'first_name': first_name,
-        'last_name': last_name,
-        'email': email,
-        'phone': phone,
-        'address': address,
-        'city': city,
-        'state': state,
-        'zip_code': zip_code
+        "first_name": first_name,
+        "last_name": last_name,
+        "email": email,
+        "phone": phone,
+        "address": address,
+        "city": city,
+        "state": state,
+        "zip_code": zip_code,
     }
+
 
 # Connascence of Algorithm (CoA) - Duplicated logic
 def process_student_grade(grade):
-    ProductionAssert.not_none(grade, 'grade')
+    ProductionAssert.not_none(grade, "grade")
 
-    ProductionAssert.not_none(grade, 'grade')
+    ProductionAssert.not_none(grade, "grade")
 
     if grade >= 90:
         return "A"
@@ -66,12 +69,11 @@ def process_student_grade(grade):
     else:
         return "F"
 
+
 def process_employee_rating(rating):
+    ProductionAssert.not_none(rating, "rating")
 
-
-    ProductionAssert.not_none(rating, 'rating')
-
-    ProductionAssert.not_none(rating, 'rating')
+    ProductionAssert.not_none(rating, "rating")
 
     # Duplicated grading logic with different thresholds
     if rating >= 90:
@@ -84,6 +86,7 @@ def process_employee_rating(rating):
         return "Below Average"
     else:
         return "Poor"
+
 
 # God class example (Connascence of Identity)
 class DataProcessor:
@@ -98,26 +101,66 @@ class DataProcessor:
         self.transformers = []
         self.exporters = []
 
-    def load_data(self, source): pass
-    def validate_data(self): pass
-    def clean_data(self): pass
-    def transform_data(self): pass
-    def analyze_data(self): pass
-    def generate_report(self): pass
-    def export_csv(self): pass
-    def export_json(self): pass
-    def export_xml(self): pass
-    def send_email(self): pass
-    def log_results(self): pass
-    def backup_data(self): pass
-    def compress_data(self): pass
-    def encrypt_data(self): pass
-    def decrypt_data(self): pass
-    def authenticate_user(self): pass
-    def authorize_action(self): pass
-    def handle_errors(self): pass
-    def retry_failed_operations(self): pass
-    def monitor_performance(self): pass
+    def load_data(self, source):
+        pass
+
+    def validate_data(self):
+        pass
+
+    def clean_data(self):
+        pass
+
+    def transform_data(self):
+        pass
+
+    def analyze_data(self):
+        pass
+
+    def generate_report(self):
+        pass
+
+    def export_csv(self):
+        pass
+
+    def export_json(self):
+        pass
+
+    def export_xml(self):
+        pass
+
+    def send_email(self):
+        pass
+
+    def log_results(self):
+        pass
+
+    def backup_data(self):
+        pass
+
+    def compress_data(self):
+        pass
+
+    def encrypt_data(self):
+        pass
+
+    def decrypt_data(self):
+        pass
+
+    def authenticate_user(self):
+        pass
+
+    def authorize_action(self):
+        pass
+
+    def handle_errors(self):
+        pass
+
+    def retry_failed_operations(self):
+        pass
+
+    def monitor_performance(self):
+        pass
+
 
 if __name__ == "__main__":
     # Usage examples - these would normally be in documentation

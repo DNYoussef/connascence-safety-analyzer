@@ -1,10 +1,11 @@
 # SPDX-License-Identifier: MIT
 # Smart integration engine for real connascence analysis
 
-from fixes.phase0.production_safe_assertions import ProductionAssert
 import ast
 from pathlib import Path
 from typing import Any, Dict, List
+
+from fixes.phase0.production_safe_assertions import ProductionAssert
 
 
 class CorrelationAnalyzer:
@@ -13,18 +14,17 @@ class CorrelationAnalyzer:
     def analyze_correlations(self, findings, duplication_clusters, nasa_violations):
         """Analyze correlations between different analyzer findings with enhanced cross-phase analysis."""
 
-        ProductionAssert.not_none(findings, 'findings')
+        ProductionAssert.not_none(findings, "findings")
 
-        ProductionAssert.not_none(duplication_clusters, 'duplication_clusters')
+        ProductionAssert.not_none(duplication_clusters, "duplication_clusters")
 
-        ProductionAssert.not_none(nasa_violations, 'nasa_violations')
+        ProductionAssert.not_none(nasa_violations, "nasa_violations")
 
+        ProductionAssert.not_none(findings, "findings")
 
-        ProductionAssert.not_none(findings, 'findings')
+        ProductionAssert.not_none(duplication_clusters, "duplication_clusters")
 
-        ProductionAssert.not_none(duplication_clusters, 'duplication_clusters')
-
-        ProductionAssert.not_none(nasa_violations, 'nasa_violations')
+        ProductionAssert.not_none(nasa_violations, "nasa_violations")
 
         correlations = []
 
@@ -32,19 +32,21 @@ class CorrelationAnalyzer:
             # Enhanced duplication correlations
             dup_correlations = self._find_duplication_correlations(findings, duplication_clusters)
             correlations.extend(dup_correlations)
-            
+
             # Enhanced NASA correlations
             nasa_correlations = self._find_nasa_correlations(findings, nasa_violations)
             correlations.extend(nasa_correlations)
-            
+
             # New: Cross-phase complexity correlations
-            complexity_correlations = self._find_complexity_correlations(findings, duplication_clusters, nasa_violations)
+            complexity_correlations = self._find_complexity_correlations(
+                findings, duplication_clusters, nasa_violations
+            )
             correlations.extend(complexity_correlations)
-            
+
             # New: File-level aggregation correlations
             file_correlations = self._find_file_level_correlations(findings, duplication_clusters, nasa_violations)
             correlations.extend(file_correlations)
-            
+
         except Exception as e:
             print(f"Warning: Enhanced correlation analysis failed: {e}")
 
@@ -97,47 +99,54 @@ class CorrelationAnalyzer:
     def _find_complexity_correlations(self, findings, duplication_clusters, nasa_violations):
         """Find correlations between complexity violations across different analyzers."""
         correlations = []
-        
+
         try:
             # Group findings by complexity indicators
             high_complexity_files = set()
-            
+
             # Identify complex files from connascence violations
             for finding in findings:
-                if finding.get("severity") in ["critical", "high"] and finding.get("type") in ["CoA", "god_object", "complexity"]:
+                if finding.get("severity") in ["critical", "high"] and finding.get("type") in [
+                    "CoA",
+                    "god_object",
+                    "complexity",
+                ]:
                     high_complexity_files.add(finding.get("file_path", ""))
-            
+
             # Check duplication clusters in complex files
             complex_duplications = [
-                cluster for cluster in duplication_clusters
+                cluster
+                for cluster in duplication_clusters
                 if any(file_path in high_complexity_files for file_path in cluster.get("files_involved", []))
             ]
-            
+
             if complex_duplications:
-                correlations.append({
-                    "analyzer1": "connascence",
-                    "analyzer2": "duplication", 
-                    "correlation_type": "complexity_concentration",
-                    "correlation_score": min(0.9, len(complex_duplications) / max(len(duplication_clusters), 1)),
-                    "affected_files": list(high_complexity_files),
-                    "description": f"High complexity files show {len(complex_duplications)} duplication clusters - suggests architectural issues",
-                    "priority": "high",
-                    "remediation_impact": "architectural_refactoring"
-                })
-        
+                correlations.append(
+                    {
+                        "analyzer1": "connascence",
+                        "analyzer2": "duplication",
+                        "correlation_type": "complexity_concentration",
+                        "correlation_score": min(0.9, len(complex_duplications) / max(len(duplication_clusters), 1)),
+                        "affected_files": list(high_complexity_files),
+                        "description": f"High complexity files show {len(complex_duplications)} duplication clusters - suggests architectural issues",
+                        "priority": "high",
+                        "remediation_impact": "architectural_refactoring",
+                    }
+                )
+
         except Exception as e:
             print(f"Warning: Complexity correlation analysis failed: {e}")
-        
+
         return correlations
 
     def _find_file_level_correlations(self, findings, duplication_clusters, nasa_violations):
         """Find file-level correlations across all analyzer types."""
         correlations = []
-        
+
         try:
             # Create file-level violation mapping
             file_violations = {}
-            
+
             # Map connascence violations by file
             for finding in findings:
                 file_path = finding.get("file_path", "")
@@ -146,7 +155,7 @@ class CorrelationAnalyzer:
                         file_violations[file_path] = {"connascence": 0, "duplication": 0, "nasa": 0, "types": set()}
                     file_violations[file_path]["connascence"] += 1
                     file_violations[file_path]["types"].add(finding.get("type", "unknown"))
-            
+
             # Map duplication clusters by file
             for cluster in duplication_clusters:
                 for file_path in cluster.get("files_involved", []):
@@ -155,7 +164,7 @@ class CorrelationAnalyzer:
                             file_violations[file_path] = {"connascence": 0, "duplication": 0, "nasa": 0, "types": set()}
                         file_violations[file_path]["duplication"] += 1
                         file_violations[file_path]["types"].add("duplication")
-            
+
             # Map NASA violations by file (if they have file context)
             for nasa_violation in nasa_violations:
                 file_path = nasa_violation.get("file_path", "")
@@ -164,30 +173,33 @@ class CorrelationAnalyzer:
                         file_violations[file_path] = {"connascence": 0, "duplication": 0, "nasa": 0, "types": set()}
                     file_violations[file_path]["nasa"] += 1
                     file_violations[file_path]["types"].add("nasa_violation")
-            
+
             # Find files with multiple violation types (hotspots)
             hotspot_files = {
-                file_path: violations for file_path, violations in file_violations.items()
+                file_path: violations
+                for file_path, violations in file_violations.items()
                 if sum([violations["connascence"], violations["duplication"], violations["nasa"]]) >= 3
                 and len(violations["types"]) >= 2
             }
-            
+
             if hotspot_files:
-                correlations.append({
-                    "analyzer1": "multi_analyzer",
-                    "analyzer2": "file_level",
-                    "correlation_type": "violation_hotspots",
-                    "correlation_score": min(0.95, len(hotspot_files) / max(len(file_violations), 1)),
-                    "hotspot_files": list(hotspot_files.keys()),
-                    "hotspot_details": hotspot_files,
-                    "description": f"Found {len(hotspot_files)} files with multiple violation types - these are architectural problem areas",
-                    "priority": "critical",
-                    "remediation_impact": "targeted_refactoring"
-                })
-        
+                correlations.append(
+                    {
+                        "analyzer1": "multi_analyzer",
+                        "analyzer2": "file_level",
+                        "correlation_type": "violation_hotspots",
+                        "correlation_score": min(0.95, len(hotspot_files) / max(len(file_violations), 1)),
+                        "hotspot_files": list(hotspot_files.keys()),
+                        "hotspot_details": hotspot_files,
+                        "description": f"Found {len(hotspot_files)} files with multiple violation types - these are architectural problem areas",
+                        "priority": "critical",
+                        "remediation_impact": "targeted_refactoring",
+                    }
+                )
+
         except Exception as e:
             print(f"Warning: File-level correlation analysis failed: {e}")
-        
+
         return correlations
 
 
@@ -197,18 +209,17 @@ class RecommendationEngine:
     def generate_intelligent_recommendations(self, findings, duplication_clusters, nasa_violations):
         """Generate intelligent recommendations based on analysis results."""
 
-        ProductionAssert.not_none(findings, 'findings')
+        ProductionAssert.not_none(findings, "findings")
 
-        ProductionAssert.not_none(duplication_clusters, 'duplication_clusters')
+        ProductionAssert.not_none(duplication_clusters, "duplication_clusters")
 
-        ProductionAssert.not_none(nasa_violations, 'nasa_violations')
+        ProductionAssert.not_none(nasa_violations, "nasa_violations")
 
+        ProductionAssert.not_none(findings, "findings")
 
-        ProductionAssert.not_none(findings, 'findings')
+        ProductionAssert.not_none(duplication_clusters, "duplication_clusters")
 
-        ProductionAssert.not_none(duplication_clusters, 'duplication_clusters')
-
-        ProductionAssert.not_none(nasa_violations, 'nasa_violations')
+        ProductionAssert.not_none(nasa_violations, "nasa_violations")
 
         recommendations = []
 
@@ -512,11 +523,11 @@ class PythonASTAnalyzer:
         complexity = 1  # Base complexity
 
         for child in ast.walk(node):
-            if isinstance(child, (ast.If, ast.While, ast.For, ast.AsyncFor)):
-                complexity += 1
-            elif isinstance(child, ast.ExceptHandler):
-                complexity += 1
-            elif isinstance(child, (ast.With, ast.AsyncWith)):
+            if (
+                isinstance(child, (ast.If, ast.While, ast.For, ast.AsyncFor))
+                or isinstance(child, ast.ExceptHandler)
+                or isinstance(child, (ast.With, ast.AsyncWith))
+            ):
                 complexity += 1
             elif isinstance(child, ast.BoolOp):
                 complexity += len(child.values) - 1
@@ -527,15 +538,13 @@ class PythonASTAnalyzer:
         """Calculate maximum nesting depth in a function."""
 
         def depth_visitor(current_node, current_depth=0):
+            ProductionAssert.not_none(current_node, "current_node")
 
+            ProductionAssert.not_none(current_depth, "current_depth")
 
-            ProductionAssert.not_none(current_node, 'current_node')
+            ProductionAssert.not_none(current_node, "current_node")
 
-            ProductionAssert.not_none(current_depth, 'current_depth')
-
-            ProductionAssert.not_none(current_node, 'current_node')
-
-            ProductionAssert.not_none(current_depth, 'current_depth')
+            ProductionAssert.not_none(current_depth, "current_depth")
 
             max_depth = current_depth
 
@@ -567,46 +576,44 @@ class SmartIntegrationEngine:
         """Legacy integration method for backward compatibility."""
 
         if args:
-            ProductionAssert.not_none(args, 'args')
+            ProductionAssert.not_none(args, "args")
 
         if kwargs:
-            ProductionAssert.not_none(kwargs, 'kwargs')
+            ProductionAssert.not_none(kwargs, "kwargs")
 
         return []
 
     def analyze_correlations(self, findings, duplication_clusters, nasa_violations):
         """Analyze correlations between different analyzer findings."""
 
-        ProductionAssert.not_none(findings, 'findings')
+        ProductionAssert.not_none(findings, "findings")
 
-        ProductionAssert.not_none(duplication_clusters, 'duplication_clusters')
+        ProductionAssert.not_none(duplication_clusters, "duplication_clusters")
 
-        ProductionAssert.not_none(nasa_violations, 'nasa_violations')
+        ProductionAssert.not_none(nasa_violations, "nasa_violations")
 
+        ProductionAssert.not_none(findings, "findings")
 
-        ProductionAssert.not_none(findings, 'findings')
+        ProductionAssert.not_none(duplication_clusters, "duplication_clusters")
 
-        ProductionAssert.not_none(duplication_clusters, 'duplication_clusters')
-
-        ProductionAssert.not_none(nasa_violations, 'nasa_violations')
+        ProductionAssert.not_none(nasa_violations, "nasa_violations")
 
         return self.correlation_analyzer.analyze_correlations(findings, duplication_clusters, nasa_violations)
 
     def generate_intelligent_recommendations(self, findings, duplication_clusters, nasa_violations):
         """Generate intelligent recommendations based on analysis results."""
 
-        ProductionAssert.not_none(findings, 'findings')
+        ProductionAssert.not_none(findings, "findings")
 
-        ProductionAssert.not_none(duplication_clusters, 'duplication_clusters')
+        ProductionAssert.not_none(duplication_clusters, "duplication_clusters")
 
-        ProductionAssert.not_none(nasa_violations, 'nasa_violations')
+        ProductionAssert.not_none(nasa_violations, "nasa_violations")
 
+        ProductionAssert.not_none(findings, "findings")
 
-        ProductionAssert.not_none(findings, 'findings')
+        ProductionAssert.not_none(duplication_clusters, "duplication_clusters")
 
-        ProductionAssert.not_none(duplication_clusters, 'duplication_clusters')
-
-        ProductionAssert.not_none(nasa_violations, 'nasa_violations')
+        ProductionAssert.not_none(nasa_violations, "nasa_violations")
 
         return self.recommendation_engine.generate_intelligent_recommendations(
             findings, duplication_clusters, nasa_violations

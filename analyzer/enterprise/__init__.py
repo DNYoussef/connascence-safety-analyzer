@@ -12,17 +12,17 @@ This module provides defense industry and enterprise compliance features:
 """
 
 from .nasa_pot10_enhanced import (
-    EnhancedNASAPowerOfTenAnalyzer,
     EnhancedComplianceMetrics,
+    EnhancedNASAPowerOfTenAnalyzer,
     MultiCategoryCompliance,
-    WeightedScoringEngine
+    WeightedScoringEngine,
 )
 
 __all__ = [
-    'EnhancedNASAPowerOfTenAnalyzer',
-    'EnhancedComplianceMetrics',
-    'MultiCategoryCompliance',
-    'WeightedScoringEngine'
+    "EnhancedComplianceMetrics",
+    "EnhancedNASAPowerOfTenAnalyzer",
+    "MultiCategoryCompliance",
+    "WeightedScoringEngine",
 ]
 
-__version__ = '2.0.0'
+__version__ = "2.0.0"

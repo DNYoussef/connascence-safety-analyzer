@@ -1,8 +1,3 @@
-from .realtime_auditor import RealtimeDiagnosticAuditor, DiagnosticEvent, AuditViolation, AuditReport
+from .realtime_auditor import AuditReport, AuditViolation, DiagnosticEvent, RealtimeDiagnosticAuditor
 
-__all__ = [
-    'RealtimeDiagnosticAuditor',
-    'DiagnosticEvent',
-    'AuditViolation',
-    'AuditReport'
-]
+__all__ = ["AuditReport", "AuditViolation", "DiagnosticEvent", "RealtimeDiagnosticAuditor"]

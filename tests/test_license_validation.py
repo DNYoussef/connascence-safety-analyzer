@@ -71,7 +71,7 @@ class TestMemoryCoordinator:
             warnings=[],
             memory_storage_key="test_key",
             sequential_steps=["step1", "step2"],
-            exit_code=0
+            exit_code=0,
         )
 
         # Store and retrieve
@@ -85,10 +85,7 @@ class TestMemoryCoordinator:
 
     def test_license_rules_storage(self):
         """Test license rules storage and retrieval."""
-        test_rules = {
-            "BSL-1.1": {"test": "value"},
-            "Enterprise": {"test2": "value2"}
-        }
+        test_rules = {"BSL-1.1": {"test": "value"}, "Enterprise": {"test2": "value2"}}
 
         self.coordinator.store_license_rules(test_rules)
         retrieved_rules = self.coordinator.get_license_rules()
@@ -229,11 +226,11 @@ class TestLicenseValidator:
             commercial_use=True,
             distribution_allowed=False,
             modification_allowed=False,
-            patent_grant=False
+            patent_grant=False,
         )
 
         # Mock the license discovery to return expired license
-        with patch.object(self.validator, '_discover_license_info', return_value=expired_license):
+        with patch.object(self.validator, "_discover_license_info", return_value=expired_license):
             report = self.validator.validate_license(project_root)
 
         assert report.exit_code == 4
@@ -260,10 +257,10 @@ class TestLicenseValidator:
             commercial_use=False,
             distribution_allowed=False,  # Distribution not allowed
             modification_allowed=True,
-            patent_grant=False
+            patent_grant=False,
         )
 
-        with patch.object(self.validator, '_discover_license_info', return_value=restricted_license):
+        with patch.object(self.validator, "_discover_license_info", return_value=restricted_license):
             report = self.validator.validate_license(project_root)
 
         # Should detect distribution restriction violation
@@ -335,7 +332,7 @@ class TestCLIIntegration:
         # Should not perform license validation
         assert result >= 0
 
-    @patch('sys.stderr')
+    @patch("sys.stderr")
     def test_automatic_license_validation(self, mock_stderr):
         """Test automatic license validation on CLI commands."""
         from interfaces.cli.connascence import ConnascenceCLI
@@ -350,6 +347,7 @@ class TestCLIIntegration:
         original_cwd = Path.cwd()
         try:
             import os
+
             os.chdir(project_root)
 
             # Run scan command (should trigger license validation)
@@ -399,10 +397,10 @@ class TestExitCodePathways:
             commercial_use=True,  # Violates BSL restrictions
             distribution_allowed=False,
             modification_allowed=True,
-            patent_grant=False
+            patent_grant=False,
         )
 
-        with patch.object(self.validator, '_discover_license_info', return_value=violating_license):
+        with patch.object(self.validator, "_discover_license_info", return_value=violating_license):
             report = self.validator.validate_license(project_root)
 
         assert report.exit_code == 4
@@ -478,6 +476,7 @@ class TestLicenseMemoryPersistence:
 
         # Create old cache entry
         from src.licensing.license_validator import LicenseValidationReport
+
         old_report = LicenseValidationReport(
             timestamp=datetime.now() - timedelta(hours=25),  # Older than 24 hours
             system_info={},
@@ -487,7 +486,7 @@ class TestLicenseMemoryPersistence:
             warnings=[],
             memory_storage_key="test_key",
             sequential_steps=[],
-            exit_code=0
+            exit_code=0,
         )
 
         # Cache should be considered invalid
@@ -503,7 +502,7 @@ class TestLicenseMemoryPersistence:
             warnings=[],
             memory_storage_key="test_key",
             sequential_steps=[],
-            exit_code=0
+            exit_code=0,
         )
 
         assert validator._is_cache_valid(fresh_report)
@@ -514,7 +513,7 @@ def test_license_validation_main_function():
     from src.licensing.license_validator import main
 
     # Test with minimal args
-    with patch('sys.argv', ['license_validator.py', '--help']):
+    with patch("sys.argv", ["license_validator.py", "--help"]):
         try:
             main()
         except SystemExit as e:

@@ -3,6 +3,7 @@ Test file for real-time analysis validation.
 This file intentionally contains duplicate code to trigger violations.
 """
 
+
 def calculate_area(length, width):
     """Calculate area of rectangle."""
     result = length * width

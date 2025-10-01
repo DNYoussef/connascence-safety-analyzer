@@ -20,66 +20,65 @@ def load_baseline(filepath: str) -> Dict[str, Any]:
             content = f.read()
 
         baseline = {
-            'total_violations': 0,
-            'critical_violations': 0,
-            'nasa_score': 0.85,
-            'mece_score': 0.8,
-            'god_objects': 0,
-            'timestamp': None
+            "total_violations": 0,
+            "critical_violations": 0,
+            "nasa_score": 0.85,
+            "mece_score": 0.8,
+            "god_objects": 0,
+            "timestamp": None,
         }
 
         # Parse metrics from markdown
-        lines = content.split('\n')
+        lines = content.split("\n")
         for line in lines:
-            if 'Total Violations:' in line:
+            if "Total Violations:" in line:
                 with contextlib.suppress(ValueError, IndexError):
-                    baseline['total_violations'] = int(line.split(':')[1].strip())
+                    baseline["total_violations"] = int(line.split(":")[1].strip())
 
-            elif 'Critical Violations:' in line:
+            elif "Critical Violations:" in line:
                 with contextlib.suppress(ValueError, IndexError):
-                    baseline['critical_violations'] = int(line.split(':')[1].strip())
+                    baseline["critical_violations"] = int(line.split(":")[1].strip())
 
-            elif 'NASA Score:' in line:
+            elif "NASA Score:" in line:
                 with contextlib.suppress(ValueError, IndexError):
-                    baseline['nasa_score'] = float(line.split(':')[1].strip())
+                    baseline["nasa_score"] = float(line.split(":")[1].strip())
 
-            elif 'MECE Score:' in line:
+            elif "MECE Score:" in line:
                 with contextlib.suppress(ValueError, IndexError):
-                    baseline['mece_score'] = float(line.split(':')[1].strip())
+                    baseline["mece_score"] = float(line.split(":")[1].strip())
 
-            elif 'God Objects:' in line:
+            elif "God Objects:" in line:
                 with contextlib.suppress(ValueError, IndexError):
-                    baseline['god_objects'] = int(line.split(':')[1].strip())
+                    baseline["god_objects"] = int(line.split(":")[1].strip())
 
-            elif 'Timestamp:' in line:
+            elif "Timestamp:" in line:
                 with contextlib.suppress(IndexError):
-                    baseline['timestamp'] = line.split(':', 1)[1].strip()
-
+                    baseline["timestamp"] = line.split(":", 1)[1].strip()
 
         return baseline
     except FileNotFoundError:
         print(f"Warning: Baseline file not found: {filepath}")
         return {
-            'total_violations': 0,
-            'critical_violations': 0,
-            'nasa_score': 0.85,
-            'mece_score': 0.8,
-            'god_objects': 0,
-            'timestamp': None
+            "total_violations": 0,
+            "critical_violations": 0,
+            "nasa_score": 0.85,
+            "mece_score": 0.8,
+            "god_objects": 0,
+            "timestamp": None,
         }
 
 
 def compare_baselines(current: Dict[str, Any], previous: Dict[str, Any]) -> Dict[str, Any]:
     """Compare two baseline reports."""
     trends = {
-        'analysis_date': datetime.utcnow().isoformat(),
-        'trend_analysis': {},
-        'significant_changes': [],
-        'overall_direction': 'stable'
+        "analysis_date": datetime.utcnow().isoformat(),
+        "trend_analysis": {},
+        "significant_changes": [],
+        "overall_direction": "stable",
     }
 
     # Calculate trends for each metric
-    metrics = ['total_violations', 'critical_violations', 'nasa_score', 'mece_score', 'god_objects']
+    metrics = ["total_violations", "critical_violations", "nasa_score", "mece_score", "god_objects"]
 
     for metric in metrics:
         current_val = current.get(metric, 0)
@@ -88,34 +87,39 @@ def compare_baselines(current: Dict[str, Any], previous: Dict[str, Any]) -> Dict
 
         change_percent = change / previous_val * 100 if previous_val > 0 else 0
 
-        trends['trend_analysis'][metric] = {
-            'current': current_val,
-            'previous': previous_val,
-            'absolute_change': change,
-            'percent_change': change_percent,
-            'direction': 'improving' if (metric in ['nasa_score', 'mece_score'] and change > 0) or
-                        (metric in ['total_violations', 'critical_violations', 'god_objects'] and change < 0) else
-                        'declining' if change != 0 else 'stable'
+        trends["trend_analysis"][metric] = {
+            "current": current_val,
+            "previous": previous_val,
+            "absolute_change": change,
+            "percent_change": change_percent,
+            "direction": "improving"
+            if (metric in ["nasa_score", "mece_score"] and change > 0)
+            or (metric in ["total_violations", "critical_violations", "god_objects"] and change < 0)
+            else "declining"
+            if change != 0
+            else "stable",
         }
 
         # Mark significant changes (>10% change)
         if abs(change_percent) > 10:
-            trends['significant_changes'].append({
-                'metric': metric,
-                'change_percent': change_percent,
-                'description': f"{metric} changed by {change_percent:.1f}%"
-            })
+            trends["significant_changes"].append(
+                {
+                    "metric": metric,
+                    "change_percent": change_percent,
+                    "description": f"{metric} changed by {change_percent:.1f}%",
+                }
+            )
 
     # Determine overall direction
-    improving_count = sum(1 for m in trends['trend_analysis'].values() if m['direction'] == 'improving')
-    declining_count = sum(1 for m in trends['trend_analysis'].values() if m['direction'] == 'declining')
+    improving_count = sum(1 for m in trends["trend_analysis"].values() if m["direction"] == "improving")
+    declining_count = sum(1 for m in trends["trend_analysis"].values() if m["direction"] == "declining")
 
     if improving_count > declining_count:
-        trends['overall_direction'] = 'improving'
+        trends["overall_direction"] = "improving"
     elif declining_count > improving_count:
-        trends['overall_direction'] = 'declining'
+        trends["overall_direction"] = "declining"
     else:
-        trends['overall_direction'] = 'stable'
+        trends["overall_direction"] = "stable"
 
     return trends
 
@@ -123,9 +127,9 @@ def compare_baselines(current: Dict[str, Any], previous: Dict[str, Any]) -> Dict
 def main():
     """Main entry point."""
     parser = argparse.ArgumentParser(description="Compare baseline reports for trend analysis")
-    parser.add_argument('--current', required=True, help='Current baseline report')
-    parser.add_argument('--previous', required=True, help='Previous baseline report')
-    parser.add_argument('--output', required=True, help='Output trends JSON file')
+    parser.add_argument("--current", required=True, help="Current baseline report")
+    parser.add_argument("--previous", required=True, help="Previous baseline report")
+    parser.add_argument("--output", required=True, help="Output trends JSON file")
 
     args = parser.parse_args()
 
@@ -137,7 +141,7 @@ def main():
     trends = compare_baselines(current_baseline, previous_baseline)
 
     # Save trends
-    with open(args.output, 'w') as f:
+    with open(args.output, "w") as f:
         json.dump(trends, f, indent=2)
 
     # Print summary
@@ -145,11 +149,11 @@ def main():
     print(f"Overall Direction: {trends['overall_direction']}")
     print(f"Significant Changes: {len(trends['significant_changes'])}")
 
-    for change in trends['significant_changes']:
+    for change in trends["significant_changes"]:
         print(f"  - {change['description']}")
 
     return 0
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

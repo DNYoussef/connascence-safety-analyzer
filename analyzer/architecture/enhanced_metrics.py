@@ -10,10 +10,10 @@ NASA Rule 4 Compliant: Functions under 60 lines.
 Handles quality score calculations, performance tracking, and compliance scoring.
 """
 
+from datetime import datetime
 import logging
 import time
-from typing import Any, Dict, List, Optional
-from datetime import datetime
+from typing import Any, Dict, List
 
 logger = logging.getLogger(__name__)
 
@@ -44,46 +44,51 @@ class EnhancedMetricsCalculator:
         assert nasa_violations is not None, "nasa_violations cannot be None"
 
         start_time = time.time()
-        
+
         # Calculate base metrics
         all_violations = connascence_violations + duplication_clusters
         severity_counts = self._count_by_severity(all_violations)
-        
+
         # Calculate individual scores with performance tracking
         connascence_index = self._calculate_connascence_index_enhanced(connascence_violations)
         nasa_compliance_score = self._calculate_nasa_score_enhanced(nasa_violations, nasa_integration)
         duplication_score = self._calculate_duplication_score_enhanced(duplication_clusters)
-        
+
         # Calculate overall quality with weighting
         overall_quality_score = self._calculate_weighted_quality_score(
             connascence_index, nasa_compliance_score, duplication_score
         )
-        
+
         # Performance and trend analysis
         performance_score = self._calculate_performance_score(start_time)
         trend_analysis = self._analyze_metrics_trends(severity_counts)
-        
+
         metrics = self._build_metrics_result(
-            severity_counts, connascence_index, nasa_compliance_score, 
-            duplication_score, overall_quality_score, performance_score, trend_analysis
+            severity_counts,
+            connascence_index,
+            nasa_compliance_score,
+            duplication_score,
+            overall_quality_score,
+            performance_score,
+            trend_analysis,
         )
-        
+
         self._record_calculation_history(metrics, time.time() - start_time)
         return metrics
 
     def _count_by_severity(self, violations: List[Dict]) -> Dict[str, int]:
         """Count violations by severity with enhanced categorization. NASA Rule 4 compliant."""
         severity_counts = {"critical": 0, "high": 0, "medium": 0, "low": 0, "info": 0}
-        
+
         for violation in violations:
             severity = self._normalize_severity(violation.get("severity", "medium"))
             if severity in severity_counts:
                 severity_counts[severity] += 1
-        
+
         # Add derived metrics
         severity_counts["total"] = sum(severity_counts.values())
         severity_counts["high_priority"] = severity_counts["critical"] + severity_counts["high"]
-        
+
         return severity_counts
 
     def _calculate_connascence_index_enhanced(self, connascence_violations: List[Dict]) -> float:
@@ -109,7 +114,7 @@ class EnhancedMetricsCalculator:
             severity_weight = severity_weights.get(violation.get("severity", "medium"), 2)
             type_multiplier = type_multipliers.get(violation.get("type", "CoN"), 1.0)
             violation_weight = violation.get("weight", 1.0)
-            
+
             total_weighted_score += severity_weight * type_multiplier * violation_weight
 
         return round(total_weighted_score, 2)
@@ -134,7 +139,7 @@ class EnhancedMetricsCalculator:
         # Apply penalties for critical NASA rules
         critical_rule_penalty = 0.0
         critical_rules = ["Rule1", "Rule2", "Rule3", "Rule4"]  # Most critical rules
-        
+
         for violation in nasa_violations:
             nasa_rule = violation.get("context", {}).get("nasa_rule", "")
             if nasa_rule in critical_rules and violation.get("severity") == "critical":
@@ -161,12 +166,12 @@ class EnhancedMetricsCalculator:
         for violation in nasa_violations:
             nasa_rule = violation.get("context", {}).get("nasa_rule", "Rule10")
             penalty = rule_weights.get(nasa_rule, 0.05)  # Default penalty
-            
+
             # Adjust penalty by severity
             severity_multiplier = {"critical": 2.0, "high": 1.5, "medium": 1.0, "low": 0.5}.get(
                 violation.get("severity", "medium"), 1.0
             )
-            
+
             total_penalty += penalty * severity_multiplier
 
         score = max(0.0, 1.0 - total_penalty)
@@ -181,15 +186,15 @@ class EnhancedMetricsCalculator:
         for cluster in duplication_clusters:
             # Base penalty
             base_penalty = 0.05
-            
+
             # Adjust by similarity score
             similarity_score = cluster.get("similarity_score", 0.5)
             similarity_multiplier = similarity_score  # Higher similarity = higher penalty
-            
+
             # Adjust by cluster size
             functions = cluster.get("functions", [])
             size_multiplier = min(len(functions) / 5.0, 2.0)  # Cap at 2x penalty
-            
+
             cluster_penalty = base_penalty * similarity_multiplier * size_multiplier
             total_penalty += cluster_penalty
 
@@ -202,16 +207,16 @@ class EnhancedMetricsCalculator:
         """Calculate weighted overall quality score. NASA Rule 4 compliant."""
         # Dynamic weights based on project characteristics
         weights = self._calculate_dynamic_weights(connascence_index, nasa_compliance_score, duplication_score)
-        
+
         # Convert connascence index to score (0-1 range)
         connascence_score = max(0.0, 1.0 - (connascence_index * 0.01))
-        
+
         overall_score = (
-            connascence_score * weights["connascence"] +
-            nasa_compliance_score * weights["nasa"] +
-            duplication_score * weights["duplication"]
+            connascence_score * weights["connascence"]
+            + nasa_compliance_score * weights["nasa"]
+            + duplication_score * weights["duplication"]
         )
-        
+
         return round(overall_score, 3)
 
     def _calculate_dynamic_weights(
@@ -219,33 +224,33 @@ class EnhancedMetricsCalculator:
     ) -> Dict[str, float]:
         """Calculate dynamic weights based on current metrics. NASA Rule 4 compliant."""
         base_weights = {"connascence": 0.4, "nasa": 0.3, "duplication": 0.3}
-        
+
         # Adjust weights based on problem areas
         if nasa_score < 0.5:  # Poor NASA compliance
             base_weights["nasa"] += 0.1
             base_weights["connascence"] -= 0.05
             base_weights["duplication"] -= 0.05
-        
+
         if duplication_score < 0.5:  # High duplication
             base_weights["duplication"] += 0.1
             base_weights["connascence"] -= 0.05
             base_weights["nasa"] -= 0.05
-        
+
         return base_weights
 
     def _calculate_performance_score(self, start_time: float) -> Dict[str, Any]:
         """Calculate performance metrics for this calculation. NASA Rule 4 compliant."""
         calculation_time = time.time() - start_time
-        
+
         performance_score = {
             "calculation_time_ms": round(calculation_time * 1000, 2),
             "performance_rating": self._get_performance_rating(calculation_time),
             "timestamp": self._get_iso_timestamp(),
         }
-        
+
         # Track performance trends
         self.performance_metrics[self._get_iso_timestamp()] = calculation_time
-        
+
         return performance_score
 
     def _analyze_metrics_trends(self, current_severity_counts: Dict[str, int]) -> Dict[str, Any]:
@@ -256,24 +261,30 @@ class EnhancedMetricsCalculator:
         # Compare with last calculation
         last_calculation = self.calculation_history[-1]
         last_counts = last_calculation.get("severity_counts", {})
-        
+
         trend_analysis = {
             "total_change": current_severity_counts.get("total", 0) - last_counts.get("total", 0),
             "critical_change": current_severity_counts.get("critical", 0) - last_counts.get("critical", 0),
-            "trend_direction": "stable"
+            "trend_direction": "stable",
         }
-        
+
         # Determine trend direction
         if trend_analysis["total_change"] > 5:
             trend_analysis["trend_direction"] = "worsening"
         elif trend_analysis["total_change"] < -5:
             trend_analysis["trend_direction"] = "improving"
-        
+
         return trend_analysis
 
     def _build_metrics_result(
-        self, severity_counts: Dict, connascence_index: float, nasa_score: float,
-        duplication_score: float, overall_score: float, performance: Dict, trends: Dict
+        self,
+        severity_counts: Dict,
+        connascence_index: float,
+        nasa_score: float,
+        duplication_score: float,
+        overall_score: float,
+        performance: Dict,
+        trends: Dict,
     ) -> Dict[str, Any]:
         """Build comprehensive metrics result. NASA Rule 4 compliant."""
         return {
@@ -307,11 +318,11 @@ class EnhancedMetricsCalculator:
                 "overall": metrics["overall_quality_score"],
                 "nasa": metrics["nasa_compliance_score"],
                 "duplication": metrics["duplication_score"],
-            }
+            },
         }
-        
+
         self.calculation_history.append(history_record)
-        
+
         # Keep only last 10 calculations for trend analysis
         if len(self.calculation_history) > 10:
             self.calculation_history.pop(0)
@@ -358,14 +369,14 @@ class EnhancedMetricsCalculator:
         """Get performance trend analysis."""
         if not self.performance_metrics:
             return {"trend": "no_data"}
-        
+
         times = list(self.performance_metrics.values())
         if len(times) < 2:
             return {"trend": "insufficient_data", "average_time": times[0] if times else 0}
-        
+
         recent_avg = sum(times[-3:]) / min(3, len(times))  # Last 3 calculations
         overall_avg = sum(times) / len(times)
-        
+
         return {
             "trend": "improving" if recent_avg < overall_avg else "stable",
             "recent_average_ms": round(recent_avg * 1000, 2),

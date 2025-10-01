@@ -30,15 +30,17 @@ from .overlay_manager import OverlayManager
 
 class GenerationMode(Enum):
     """Code generation modes with different constraint levels."""
+
     PERMISSIVE = "permissive"  # Allow most constructs, warn on violations
-    GUIDED = "guided"         # Guide towards safe patterns, soft constraints
-    STRICT = "strict"         # Hard constraints, refuse unsafe generation
+    GUIDED = "guided"  # Guide towards safe patterns, soft constraints
+    STRICT = "strict"  # Hard constraints, refuse unsafe generation
     SAFETY_CRITICAL = "safety_critical"  # Maximum constraints for safety code
 
 
 @dataclass
 class GenerationConstraints:
     """Constraints for code generation."""
+
     language: LanguageSupport
     overlays: List[str] = None
     mode: GenerationMode = GenerationMode.GUIDED
@@ -61,6 +63,7 @@ class GenerationConstraints:
 @dataclass
 class GenerationResult:
     """Result of constrained code generation."""
+
     success: bool
     code: str = ""
     violations: List[Dict[str, Any]] = None
@@ -92,26 +95,21 @@ class ConstrainedGenerator:
     def get_next_tokens(self, prefix: str, constraints: GenerationConstraints) -> List[str]:
         """Get valid next tokens given current prefix and constraints."""
         # Get base tokens from grammar
-        base_tokens = self.backend.get_next_tokens(
-            prefix, constraints.language
-        )
+        base_tokens = self.backend.get_next_tokens(prefix, constraints.language)
 
         # Apply overlay constraints
         filtered_tokens = base_tokens
         for overlay_id in constraints.overlays:
-            filtered_tokens = self._apply_overlay_filter(
-                filtered_tokens, overlay_id, prefix
-            )
+            filtered_tokens = self._apply_overlay_filter(filtered_tokens, overlay_id, prefix)
 
         # Apply mode-specific filtering
-        filtered_tokens = self._apply_mode_filter(
-            filtered_tokens, constraints.mode, prefix
-        )
+        filtered_tokens = self._apply_mode_filter(filtered_tokens, constraints.mode, prefix)
 
         # Apply banned constructs filter
         if constraints.banned_constructs:
             filtered_tokens = [
-                token for token in filtered_tokens
+                token
+                for token in filtered_tokens
                 if not any(banned in token for banned in constraints.banned_constructs)
             ]
 
@@ -126,11 +124,13 @@ class ConstrainedGenerator:
             return GenerationResult(
                 success=False,
                 code=code,
-                violations=[{
-                    "type": "parse_error",
-                    "message": "Generated code has syntax errors",
-                    "errors": parse_result.errors
-                }]
+                violations=[
+                    {
+                        "type": "parse_error",
+                        "message": "Generated code has syntax errors",
+                        "errors": parse_result.errors,
+                    }
+                ],
             )
 
         violations = []
@@ -141,25 +141,19 @@ class ConstrainedGenerator:
         for overlay_id in constraints.overlays:
             overlay = self.overlay_manager.get_overlay(overlay_id)
             if overlay:
-                overlay_violations = self.overlay_manager.validate_code_against_overlay(
-                    [parse_result.ast], overlay_id
-                )
+                overlay_violations = self.overlay_manager.validate_code_against_overlay([parse_result.ast], overlay_id)
                 violations.extend(overlay_violations)
                 constraints_applied.append(f"overlay:{overlay_id}")
 
         # Check complexity limits
         if constraints.complexity_limits:
-            complexity_violations = self._check_complexity_limits(
-                parse_result.ast, constraints.complexity_limits
-            )
+            complexity_violations = self._check_complexity_limits(parse_result.ast, constraints.complexity_limits)
             violations.extend(complexity_violations)
             constraints_applied.append("complexity_limits")
 
         # Check required patterns
         if constraints.required_patterns:
-            pattern_violations = self._check_required_patterns(
-                code, constraints.required_patterns
-            )
+            pattern_violations = self._check_required_patterns(code, constraints.required_patterns)
             violations.extend(pattern_violations)
             constraints_applied.append("required_patterns")
 
@@ -172,11 +166,10 @@ class ConstrainedGenerator:
             violations=violations,
             warnings=warnings,
             tokens_used=len(code.split()),
-            constraints_applied=constraints_applied
+            constraints_applied=constraints_applied,
         )
 
-    def suggest_fixes(self, result: GenerationResult,
-                     constraints: GenerationConstraints) -> List[str]:
+    def suggest_fixes(self, result: GenerationResult, constraints: GenerationConstraints) -> List[str]:
         """Suggest fixes for constraint violations."""
         suggestions = []
 
@@ -199,8 +192,7 @@ class ConstrainedGenerator:
 
         return suggestions
 
-    def auto_repair(self, code: str, constraints: GenerationConstraints,
-                   max_attempts: int = 3) -> GenerationResult:
+    def auto_repair(self, code: str, constraints: GenerationConstraints, max_attempts: int = 3) -> GenerationResult:
         """Attempt to automatically repair constraint violations."""
         current_code = code
 
@@ -211,9 +203,7 @@ class ConstrainedGenerator:
                 return result
 
             # Try simple repairs
-            repaired_code = self._attempt_simple_repairs(
-                current_code, result.violations, constraints
-            )
+            repaired_code = self._attempt_simple_repairs(current_code, result.violations, constraints)
 
             if repaired_code == current_code:
                 # No repairs possible
@@ -227,13 +217,12 @@ class ConstrainedGenerator:
     def _initialize_filters(self):
         """Initialize built-in token filters."""
         # General Safety C safety filters
-        self._token_filters['nasa_c_safety'] = self._nasa_c_token_filter
+        self._token_filters["nasa_c_safety"] = self._nasa_c_token_filter
 
         # Python safety filters
-        self._token_filters['nasa_python_safety'] = self._python_safety_token_filter
+        self._token_filters["nasa_python_safety"] = self._python_safety_token_filter
 
-    def _apply_overlay_filter(self, tokens: List[str], overlay_id: str,
-                             prefix: str) -> List[str]:
+    def _apply_overlay_filter(self, tokens: List[str], overlay_id: str, prefix: str) -> List[str]:
         """Apply overlay-specific token filtering."""
         overlay = self.overlay_manager.get_overlay(overlay_id)
         if not overlay:
@@ -253,8 +242,7 @@ class ConstrainedGenerator:
 
         return filtered
 
-    def _apply_mode_filter(self, tokens: List[str], mode: GenerationMode,
-                          prefix: str) -> List[str]:
+    def _apply_mode_filter(self, tokens: List[str], mode: GenerationMode, prefix: str) -> List[str]:
         """Apply mode-specific token filtering."""
         if mode == GenerationMode.PERMISSIVE:
             return tokens  # Allow everything
@@ -276,13 +264,13 @@ class ConstrainedGenerator:
     def _nasa_c_token_filter(self, tokens: List[str], prefix: str) -> List[str]:
         """General Safety C safety-specific token filtering."""
         # Remove dangerous keywords
-        dangerous = {'goto', 'setjmp', 'longjmp'}
+        dangerous = {"goto", "setjmp", "longjmp"}
         filtered = [t for t in tokens if t.lower() not in dangerous]
 
         # If we're in a function context, prefer simple constructs
         if self._is_in_function_context(prefix):
             # Prefer simple control flow
-            safe_control = {'if', 'else', 'for', 'while', 'return'}
+            safe_control = {"if", "else", "for", "while", "return"}
             if any(t in safe_control for t in filtered):
                 filtered = [t for t in filtered if t in safe_control or not t.isalpha()]
 
@@ -291,12 +279,12 @@ class ConstrainedGenerator:
     def _python_safety_token_filter(self, tokens: List[str], prefix: str) -> List[str]:
         """Python safety-specific token filtering."""
         # Remove dangerous functions
-        dangerous = {'exec', 'eval', 'compile', '__import__'}
+        dangerous = {"exec", "eval", "compile", "__import__"}
         filtered = [t for t in tokens if t not in dangerous]
 
         # Discourage wildcard imports
-        if prefix.strip().endswith('import'):
-            filtered = [t for t in filtered if t != '*']
+        if prefix.strip().endswith("import"):
+            filtered = [t for t in filtered if t != "*"]
 
         return filtered
 
@@ -305,17 +293,28 @@ class ConstrainedGenerator:
         # Sort tokens by safety (safer tokens first)
         safe_order = {
             # Control flow - safest first
-            'if': 1, 'else': 1, 'elif': 1,
-            'for': 2, 'while': 3,
-            'return': 1, 'break': 2, 'continue': 2,
-
+            "if": 1,
+            "else": 1,
+            "elif": 1,
+            "for": 2,
+            "while": 3,
+            "return": 1,
+            "break": 2,
+            "continue": 2,
             # Data types - safest first
-            'int': 1, 'float': 1, 'str': 1, 'bool': 1,
-            'list': 2, 'dict': 2, 'set': 3,
-
+            "int": 1,
+            "float": 1,
+            "str": 1,
+            "bool": 1,
+            "list": 2,
+            "dict": 2,
+            "set": 3,
             # Functions
-            'def': 1, 'class': 1,
-            'print': 1, 'len': 1, 'range': 1,
+            "def": 1,
+            "class": 1,
+            "print": 1,
+            "len": 1,
+            "range": 1,
         }
 
         return sorted(tokens, key=lambda t: safe_order.get(t, 10))
@@ -323,9 +322,14 @@ class ConstrainedGenerator:
     def _remove_risky_tokens(self, tokens: List[str], prefix: str) -> List[str]:
         """Remove risky tokens in strict mode."""
         risky = {
-            'exec', 'eval', 'compile', '__import__',
-            'goto', 'setjmp', 'longjmp',
-            '*',  # Wildcard import
+            "exec",
+            "eval",
+            "compile",
+            "__import__",
+            "goto",
+            "setjmp",
+            "longjmp",
+            "*",  # Wildcard import
         }
 
         return [t for t in tokens if t not in risky]
@@ -335,18 +339,48 @@ class ConstrainedGenerator:
         # Very conservative - only allow basic, safe constructs
         safe_tokens = {
             # Basic control flow
-            'if', 'else', 'elif', 'for', 'while', 'return',
-            'break', 'continue',
-
+            "if",
+            "else",
+            "elif",
+            "for",
+            "while",
+            "return",
+            "break",
+            "continue",
             # Basic data types
-            'int', 'float', 'str', 'bool', 'None', 'True', 'False',
-
+            "int",
+            "float",
+            "str",
+            "bool",
+            "None",
+            "True",
+            "False",
             # Basic operators
-            '+', '-', '*', '/', '%', '==', '!=', '<', '>', '<=', '>=',
-            'and', 'or', 'not',
-
+            "+",
+            "-",
+            "*",
+            "/",
+            "%",
+            "==",
+            "!=",
+            "<",
+            ">",
+            "<=",
+            ">=",
+            "and",
+            "or",
+            "not",
             # Basic punctuation
-            '(', ')', '[', ']', '{', '}', ':', ';', ',', '.',
+            "(",
+            ")",
+            "[",
+            "]",
+            "{",
+            "}",
+            ":",
+            ";",
+            ",",
+            ".",
         }
 
         return [t for t in tokens if t in safe_tokens or not t.isalpha()]
@@ -355,20 +389,22 @@ class ConstrainedGenerator:
         """Check code against complexity limits."""
         violations = []
 
-        if 'cyclomatic_complexity' in limits:
+        if "cyclomatic_complexity" in limits:
             functions = self.backend.extract_functions(ast, LanguageSupport.PYTHON)
             for func in functions:
                 # Simple complexity estimate (would use real calculator)
                 estimated_complexity = self._estimate_complexity(func)
-                if estimated_complexity > limits['cyclomatic_complexity']:
-                    violations.append({
-                        "type": "complexity_limit",
-                        "target": "cyclomatic_complexity",
-                        "function": func.get('name', 'unknown'),
-                        "actual": estimated_complexity,
-                        "limit": limits['cyclomatic_complexity'],
-                        "message": f"Function complexity {estimated_complexity} exceeds limit {limits['cyclomatic_complexity']}"
-                    })
+                if estimated_complexity > limits["cyclomatic_complexity"]:
+                    violations.append(
+                        {
+                            "type": "complexity_limit",
+                            "target": "cyclomatic_complexity",
+                            "function": func.get("name", "unknown"),
+                            "actual": estimated_complexity,
+                            "limit": limits["cyclomatic_complexity"],
+                            "message": f"Function complexity {estimated_complexity} exceeds limit {limits['cyclomatic_complexity']}",
+                        }
+                    )
 
         return violations
 
@@ -379,38 +415,34 @@ class ConstrainedGenerator:
         for pattern in patterns:
             if pattern == "type_hints" and "def " in code:
                 # Check if functions have type hints
-                if not re.search(r'def \w+\([^)]*:[^)]+\)', code):
-                    violations.append({
-                        "type": "missing_pattern",
-                        "pattern": pattern,
-                        "message": "Functions should have type hints"
-                    })
+                if not re.search(r"def \w+\([^)]*:[^)]+\)", code):
+                    violations.append(
+                        {"type": "missing_pattern", "pattern": pattern, "message": "Functions should have type hints"}
+                    )
 
             elif pattern == "docstrings" and ("def " in code or "class " in code):
                 # Check for docstrings
                 if '"""' not in code and "'''" not in code:
-                    violations.append({
-                        "type": "missing_pattern",
-                        "pattern": pattern,
-                        "message": "Functions and classes should have docstrings"
-                    })
+                    violations.append(
+                        {
+                            "type": "missing_pattern",
+                            "pattern": pattern,
+                            "message": "Functions and classes should have docstrings",
+                        }
+                    )
 
         return violations
 
-    def _determine_success(self, violations: List[Dict], warnings: List[str],
-                          mode: GenerationMode) -> bool:
+    def _determine_success(self, violations: List[Dict], warnings: List[str], mode: GenerationMode) -> bool:
         """Determine if generation was successful based on mode."""
         if mode == GenerationMode.PERMISSIVE:
             # Only fail on critical violations
-            critical_violations = [v for v in violations if v.get('severity') == 'critical']
+            critical_violations = [v for v in violations if v.get("severity") == "critical"]
             return len(critical_violations) == 0
 
         elif mode == GenerationMode.GUIDED:
             # Fail on critical and high violations
-            serious_violations = [
-                v for v in violations
-                if v.get('severity') in ['critical', 'high']
-            ]
+            serious_violations = [v for v in violations if v.get("severity") in ["critical", "high"]]
             return len(serious_violations) == 0
 
         elif mode in [GenerationMode.STRICT, GenerationMode.SAFETY_CRITICAL]:
@@ -419,35 +451,30 @@ class ConstrainedGenerator:
 
         return len(violations) == 0
 
-    def _attempt_simple_repairs(self, code: str, violations: List[Dict],
-                               constraints: GenerationConstraints) -> str:
+    def _attempt_simple_repairs(self, code: str, violations: List[Dict], constraints: GenerationConstraints) -> str:
         """Attempt simple automatic repairs."""
         repaired = code
 
         for violation in violations:
-            if violation.get('type') == 'banned_construct':
+            if violation.get("type") == "banned_construct":
                 # Try to replace banned constructs
-                if 'goto' in violation.get('message', '').lower():
+                if "goto" in violation.get("message", "").lower():
                     # This would implement goto removal (complex)
                     pass
 
-            elif violation.get('type') == 'missing_pattern' and violation.get('pattern') == 'type_hints':
+            elif violation.get("type") == "missing_pattern" and violation.get("pattern") == "type_hints":
                 # Add basic type hints
-                repaired = re.sub(
-                    r'def (\w+)\(([^)]*)\):',
-                    r'def \1(\2) -> None:',
-                    repaired
-                )
+                repaired = re.sub(r"def (\w+)\(([^)]*)\):", r"def \1(\2) -> None:", repaired)
 
         return repaired
 
     def _is_in_function_context(self, prefix: str) -> bool:
         """Check if we're currently inside a function."""
         # Simple heuristic - count braces/indentation
-        return 'def ' in prefix or '{' in prefix
+        return "def " in prefix or "{" in prefix
 
     def _estimate_complexity(self, func: Dict[str, Any]) -> int:
         """Rough estimate of cyclomatic complexity."""
         # This would implement real complexity calculation
         # For now, use line count as proxy
-        return max(1, func.get('body_lines', 1) // 10)
+        return max(1, func.get("body_lines", 1) // 10)

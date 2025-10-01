@@ -40,17 +40,17 @@ class TestSmokeImports:
     def test_core_analyzer_modules(self):
         """Test that all core analyzer modules can be imported."""
         analyzer_modules = [
-            'analyzer',
-            'analyzer.core',
-            'analyzer.ast_engine',
-            'analyzer.ast_engine.core_analyzer',
-            'analyzer.ast_engine.visitors',
-            'analyzer.check_connascence',
-            'analyzer.cohesion_analyzer',
-            'analyzer.architectural_analysis',
-            'analyzer.grammar_enhanced_analyzer',
-            'analyzer.magic_literal_analyzer',
-            'analyzer.thresholds'
+            "analyzer",
+            "analyzer.core",
+            "analyzer.ast_engine",
+            "analyzer.ast_engine.core_analyzer",
+            "analyzer.ast_engine.visitors",
+            "analyzer.check_connascence",
+            "analyzer.cohesion_analyzer",
+            "analyzer.architectural_analysis",
+            "analyzer.grammar_enhanced_analyzer",
+            "analyzer.magic_literal_analyzer",
+            "analyzer.thresholds",
         ]
 
         for module_name in analyzer_modules:
@@ -63,12 +63,12 @@ class TestSmokeImports:
     def test_autofix_modules(self):
         """Test that all autofix modules can be imported."""
         autofix_modules = [
-            'autofix',
-            'autofix.core',
-            'autofix.class_splits',
-            'autofix.god_objects',
-            'autofix.magic_literals',
-            'autofix.param_bombs'
+            "autofix",
+            "autofix.core",
+            "autofix.class_splits",
+            "autofix.god_objects",
+            "autofix.magic_literals",
+            "autofix.param_bombs",
         ]
 
         for module_name in autofix_modules:
@@ -80,11 +80,7 @@ class TestSmokeImports:
 
     def test_policy_modules(self):
         """Test that policy management modules can be imported."""
-        policy_modules = [
-            'policy.manager',
-            'policy.budgets',
-            'policy.baselines'
-        ]
+        policy_modules = ["policy.manager", "policy.budgets", "policy.baselines"]
 
         for module_name in policy_modules:
             try:
@@ -97,19 +93,19 @@ class TestSmokeImports:
         """Test that reporting modules can be imported."""
         try:
             import reporting
+
             assert reporting is not None
         except ImportError as e:
             pytest.fail(f"Failed to import reporting module: {e}")
 
     def test_cli_modules(self):
         """Test that CLI modules can be imported."""
-        cli_modules = [
-            'cli.connascence'
-        ]
+        cli_modules = ["cli.connascence"]
 
         # Also test the constants module that CLI depends on
         try:
             from src.constants import ExitCode, ValidationMessages
+
             assert ExitCode is not None
             assert ValidationMessages is not None
         except ImportError as e:
@@ -126,6 +122,7 @@ class TestSmokeImports:
         """Test that MCP server modules can be imported."""
         try:
             import mcp
+
             assert mcp is not None
         except ImportError as e:
             # MCP might not be installed, so this is not a hard failure
@@ -135,6 +132,7 @@ class TestSmokeImports:
         """Test that dashboard modules can be imported."""
         try:
             import dashboard
+
             assert dashboard is not None
         except ImportError as e:
             pytest.skip(f"Dashboard module not available: {e}")
@@ -168,7 +166,7 @@ class TestSmokeImports:
             assert analyzer is not None
 
             # Test that analyze method exists and is callable
-            assert hasattr(analyzer, 'analyze')
+            assert hasattr(analyzer, "analyze")
             assert callable(analyzer.analyze)
 
         except ImportError as e:
@@ -241,8 +239,9 @@ class TestSmokeImports:
         """Test that package metadata is accessible."""
         try:
             import analyzer
+
             # Check if version info is available
-            getattr(analyzer, '__version__', None)
+            getattr(analyzer, "__version__", None)
             # Version might not be set in development, so this is informational
             # Just ensure we can access the module without errors
             assert analyzer is not None
@@ -259,18 +258,28 @@ class TestSmokeImports:
         # Find all Python files
         for path in project_root.rglob("*.py"):
             # Skip test files, __pycache__, and other non-importable files
-            if any(skip in str(path) for skip in [
-                '__pycache__', 'test_', '_test.py', 'conftest.py',
-                'setup.py', 'build/', 'dist/', '.git/', 'deprecated/'
-            ]):
+            if any(
+                skip in str(path)
+                for skip in [
+                    "__pycache__",
+                    "test_",
+                    "_test.py",
+                    "conftest.py",
+                    "setup.py",
+                    "build/",
+                    "dist/",
+                    ".git/",
+                    "deprecated/",
+                ]
+            ):
                 continue
 
             # Convert file path to module name
             relative_path = path.relative_to(project_root)
-            module_name = str(relative_path.with_suffix('')).replace('/', '.').replace('\\', '.')
+            module_name = str(relative_path.with_suffix("")).replace("/", ".").replace("\\", ".")
 
             # Skip if it starts with numbers or invalid module names
-            if module_name[0].isdigit() or any(part.startswith('.') for part in module_name.split('.')):
+            if module_name[0].isdigit() or any(part.startswith(".") for part in module_name.split(".")):
                 continue
 
             python_files.append(module_name)
@@ -289,6 +298,7 @@ class TestSmokeImports:
         # Report failed imports (but don't fail the test entirely)
         if failed_imports:
             import warnings
+
             warnings.warn(f"Some modules failed to import: {failed_imports[:5]}")
 
 
@@ -299,6 +309,7 @@ class TestCriticalFunctionality:
         """Test that the main CLI function exists and is callable."""
         try:
             from interfaces.cli.connascence import main
+
             assert callable(main)
         except ImportError as e:
             pytest.fail(f"Failed to import main CLI function: {e}")
@@ -307,9 +318,10 @@ class TestCriticalFunctionality:
         """Test that ConnascenceCLI class can be instantiated."""
         try:
             from interfaces.cli.connascence import ConnascenceCLI
+
             cli = ConnascenceCLI()
             assert cli is not None
-            assert hasattr(cli, 'run')
+            assert hasattr(cli, "run")
             assert callable(cli.run)
         except ImportError as e:
             pytest.fail(f"Failed to import ConnascenceCLI: {e}")

@@ -21,11 +21,11 @@ Focus: Technological Controls (most relevant for code analysis)
 @compliance ISO27001:2022, ISMS
 """
 
-import json
-from pathlib import Path
-from typing import Dict, List, Optional, Any
 from dataclasses import dataclass, field
+import json
 import logging
+from pathlib import Path
+from typing import Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -52,7 +52,6 @@ class ISO27001Report:
 
 
 class ISO27001Mapper:
-
     TECHNOLOGICAL_CONTROLS = {
         "A.5.15": "Access control",
         "A.5.16": "Identity management",
@@ -91,7 +90,7 @@ class ISO27001Mapper:
         "A.8.31": "Separation of development, test and production environments",
         "A.8.32": "Change management",
         "A.8.33": "Test information",
-        "A.8.34": "Protection of information systems during audit testing"
+        "A.8.34": "Protection of information systems during audit testing",
     }
 
     def __init__(self, project_root: str):
@@ -102,32 +101,35 @@ class ISO27001Mapper:
         mappings = []
 
         gitignore = self.project_root / ".gitignore"
-        auth_files = list(self.project_root.glob("**/auth*.py")) + \
-                    list(self.project_root.glob("**/authentication*.py"))
+        auth_files = list(self.project_root.glob("**/auth*.py")) + list(self.project_root.glob("**/authentication*.py"))
 
         if gitignore.exists():
-            with open(gitignore, 'r') as f:
+            with open(gitignore) as f:
                 content = f.read()
 
-            secrets_protected = any(p in content for p in ['*.key', '*.pem', '.env', 'credentials'])
+            secrets_protected = any(p in content for p in ["*.key", "*.pem", ".env", "credentials"])
 
-            mappings.append(ControlMapping(
-                control_id="A.5.17",
-                control_name="Authentication information",
-                implementation_status="implemented" if secrets_protected else "partial",
-                evidence_files=[str(gitignore.relative_to(self.project_root))],
-                gap_analysis=None if secrets_protected else "Some credential types may not be protected",
-                recommendations=[] if secrets_protected else ["Add all credential file patterns to .gitignore"]
-            ))
+            mappings.append(
+                ControlMapping(
+                    control_id="A.5.17",
+                    control_name="Authentication information",
+                    implementation_status="implemented" if secrets_protected else "partial",
+                    evidence_files=[str(gitignore.relative_to(self.project_root))],
+                    gap_analysis=None if secrets_protected else "Some credential types may not be protected",
+                    recommendations=[] if secrets_protected else ["Add all credential file patterns to .gitignore"],
+                )
+            )
 
         if auth_files:
-            mappings.append(ControlMapping(
-                control_id="A.8.5",
-                control_name="Secure authentication",
-                implementation_status="implemented",
-                evidence_files=[str(f.relative_to(self.project_root)) for f in auth_files[:5]],
-                recommendations=["Review authentication implementation for password hashing and MFA support"]
-            ))
+            mappings.append(
+                ControlMapping(
+                    control_id="A.8.5",
+                    control_name="Secure authentication",
+                    implementation_status="implemented",
+                    evidence_files=[str(f.relative_to(self.project_root)) for f in auth_files[:5]],
+                    recommendations=["Review authentication implementation for password hashing and MFA support"],
+                )
+            )
 
         self.mappings.extend(mappings)
         return mappings
@@ -135,13 +137,11 @@ class ISO27001Mapper:
     def map_secure_development(self) -> List[ControlMapping]:
         mappings = []
 
-        ci_cd_configs = list(self.project_root.glob(".github/workflows/*.yml")) + \
-                       list(self.project_root.glob(".github/workflows/*.yaml"))
+        ci_cd_configs = list(self.project_root.glob(".github/workflows/*.yml")) + list(
+            self.project_root.glob(".github/workflows/*.yaml")
+        )
 
-        test_dirs = [
-            self.project_root / "tests",
-            self.project_root / "test"
-        ]
+        test_dirs = [self.project_root / "tests", self.project_root / "test"]
         test_files = []
         for test_dir in test_dirs:
             if test_dir.exists():
@@ -150,44 +150,49 @@ class ISO27001Mapper:
         if ci_cd_configs or test_files:
             status = "implemented" if ci_cd_configs and test_files else "partial"
 
-            mappings.append(ControlMapping(
-                control_id="A.8.25",
-                control_name="Secure development life cycle",
-                implementation_status=status,
-                evidence_files=[str(f.relative_to(self.project_root)) for f in (ci_cd_configs + test_files)[:10]],
-                gap_analysis=None if status == "implemented" else "CI/CD or testing infrastructure incomplete",
-                recommendations=["Maintain comprehensive test coverage"] if status == "implemented" else ["Implement CI/CD and testing infrastructure"]
-            ))
+            mappings.append(
+                ControlMapping(
+                    control_id="A.8.25",
+                    control_name="Secure development life cycle",
+                    implementation_status=status,
+                    evidence_files=[str(f.relative_to(self.project_root)) for f in (ci_cd_configs + test_files)[:10]],
+                    gap_analysis=None if status == "implemented" else "CI/CD or testing infrastructure incomplete",
+                    recommendations=["Maintain comprehensive test coverage"]
+                    if status == "implemented"
+                    else ["Implement CI/CD and testing infrastructure"],
+                )
+            )
 
         security_configs = [
             self.project_root / ".bandit",
             self.project_root / "bandit.yml",
-            self.project_root / ".github" / "workflows" / "security.yml"
+            self.project_root / ".github" / "workflows" / "security.yml",
         ]
         security_found = [c for c in security_configs if c.exists()]
 
-        mappings.append(ControlMapping(
-            control_id="A.8.29",
-            control_name="Security testing in development and acceptance",
-            implementation_status="implemented" if security_found else "missing",
-            evidence_files=[str(f.relative_to(self.project_root)) for f in security_found],
-            gap_analysis=None if security_found else "No automated security testing found",
-            recommendations=[] if security_found else ["Implement Bandit or similar security scanning tools"]
-        ))
+        mappings.append(
+            ControlMapping(
+                control_id="A.8.29",
+                control_name="Security testing in development and acceptance",
+                implementation_status="implemented" if security_found else "missing",
+                evidence_files=[str(f.relative_to(self.project_root)) for f in security_found],
+                gap_analysis=None if security_found else "No automated security testing found",
+                recommendations=[] if security_found else ["Implement Bandit or similar security scanning tools"],
+            )
+        )
 
-        requirements = [
-            self.project_root / "requirements.txt",
-            self.project_root / "Pipfile"
-        ]
+        requirements = [self.project_root / "requirements.txt", self.project_root / "Pipfile"]
         dep_mgmt = [r for r in requirements if r.exists()]
 
-        mappings.append(ControlMapping(
-            control_id="A.8.30",
-            control_name="Outsourced development",
-            implementation_status="implemented" if dep_mgmt else "partial",
-            evidence_files=[str(f.relative_to(self.project_root)) for f in dep_mgmt],
-            recommendations=["Maintain SBOM and dependency vulnerability scanning"]
-        ))
+        mappings.append(
+            ControlMapping(
+                control_id="A.8.30",
+                control_name="Outsourced development",
+                implementation_status="implemented" if dep_mgmt else "partial",
+                evidence_files=[str(f.relative_to(self.project_root)) for f in dep_mgmt],
+                recommendations=["Maintain SBOM and dependency vulnerability scanning"],
+            )
+        )
 
         self.mappings.extend(mappings)
         return mappings
@@ -195,26 +200,32 @@ class ISO27001Mapper:
     def map_cryptography(self) -> List[ControlMapping]:
         mappings = []
 
-        crypto_files = list(self.project_root.glob("**/crypto*.py")) + \
-                      list(self.project_root.glob("**/encryption*.py")) + \
-                      list(self.project_root.glob("**/hash*.py"))
+        crypto_files = (
+            list(self.project_root.glob("**/crypto*.py"))
+            + list(self.project_root.glob("**/encryption*.py"))
+            + list(self.project_root.glob("**/hash*.py"))
+        )
 
         if crypto_files:
-            mappings.append(ControlMapping(
-                control_id="A.8.24",
-                control_name="Use of cryptography",
-                implementation_status="implemented",
-                evidence_files=[str(f.relative_to(self.project_root)) for f in crypto_files[:5]],
-                recommendations=["Ensure cryptography uses approved algorithms (AES-256, SHA-256+, RSA-2048+)"]
-            ))
+            mappings.append(
+                ControlMapping(
+                    control_id="A.8.24",
+                    control_name="Use of cryptography",
+                    implementation_status="implemented",
+                    evidence_files=[str(f.relative_to(self.project_root)) for f in crypto_files[:5]],
+                    recommendations=["Ensure cryptography uses approved algorithms (AES-256, SHA-256+, RSA-2048+)"],
+                )
+            )
         else:
-            mappings.append(ControlMapping(
-                control_id="A.8.24",
-                control_name="Use of cryptography",
-                implementation_status="not_applicable",
-                evidence_files=[],
-                gap_analysis="No cryptographic operations detected in codebase"
-            ))
+            mappings.append(
+                ControlMapping(
+                    control_id="A.8.24",
+                    control_name="Use of cryptography",
+                    implementation_status="not_applicable",
+                    evidence_files=[],
+                    gap_analysis="No cryptographic operations detected in codebase",
+                )
+            )
 
         self.mappings.extend(mappings)
         return mappings
@@ -222,29 +233,33 @@ class ISO27001Mapper:
     def map_logging_monitoring(self) -> List[ControlMapping]:
         mappings = []
 
-        log_files = list(self.project_root.glob("**/log*.py")) + \
-                   list(self.project_root.glob("**/logger*.py"))
+        log_files = list(self.project_root.glob("**/log*.py")) + list(self.project_root.glob("**/logger*.py"))
 
         if log_files:
-            mappings.append(ControlMapping(
-                control_id="A.8.15",
-                control_name="Logging",
-                implementation_status="implemented",
-                evidence_files=[str(f.relative_to(self.project_root)) for f in log_files[:5]],
-                recommendations=["Ensure logs include security events and access attempts"]
-            ))
+            mappings.append(
+                ControlMapping(
+                    control_id="A.8.15",
+                    control_name="Logging",
+                    implementation_status="implemented",
+                    evidence_files=[str(f.relative_to(self.project_root)) for f in log_files[:5]],
+                    recommendations=["Ensure logs include security events and access attempts"],
+                )
+            )
 
-        monitoring_files = list(self.project_root.glob("**/monitor*.py")) + \
-                          list(self.project_root.glob("**/metrics*.py"))
+        monitoring_files = list(self.project_root.glob("**/monitor*.py")) + list(
+            self.project_root.glob("**/metrics*.py")
+        )
 
         if monitoring_files:
-            mappings.append(ControlMapping(
-                control_id="A.8.16",
-                control_name="Monitoring activities",
-                implementation_status="implemented",
-                evidence_files=[str(f.relative_to(self.project_root)) for f in monitoring_files[:5]],
-                recommendations=["Configure alerting for security-relevant events"]
-            ))
+            mappings.append(
+                ControlMapping(
+                    control_id="A.8.16",
+                    control_name="Monitoring activities",
+                    implementation_status="implemented",
+                    evidence_files=[str(f.relative_to(self.project_root)) for f in monitoring_files[:5]],
+                    recommendations=["Configure alerting for security-relevant events"],
+                )
+            )
 
         self.mappings.extend(mappings)
         return mappings
@@ -273,12 +288,12 @@ class ISO27001Mapper:
 
         domain_summary = {}
         for control_id in self.TECHNOLOGICAL_CONTROLS.keys():
-            domain = control_id.split('.')[0]
+            domain = control_id.split(".")[0]
             if domain not in domain_summary:
                 domain_summary[domain] = {"implemented": 0, "partial": 0, "missing": 0, "not_applicable": 0}
 
         for mapping in self.mappings:
-            domain = mapping.control_id.split('.')[0]
+            domain = mapping.control_id.split(".")[0]
             if domain in domain_summary:
                 status = mapping.implementation_status
                 if status in domain_summary[domain]:
@@ -291,7 +306,7 @@ class ISO27001Mapper:
             missing_controls=missing,
             compliance_percentage=compliance_percentage,
             control_mappings=self.mappings,
-            domain_summary=domain_summary
+            domain_summary=domain_summary,
         )
 
     def export_report(self, report: ISO27001Report, output_path: str):
@@ -303,7 +318,7 @@ class ISO27001Mapper:
                 "implemented": report.implemented_controls,
                 "partial": report.partial_controls,
                 "missing": report.missing_controls,
-                "compliance_percentage": report.compliance_percentage
+                "compliance_percentage": report.compliance_percentage,
             },
             "domain_summary": report.domain_summary,
             "control_mappings": [
@@ -314,13 +329,13 @@ class ISO27001Mapper:
                     "evidence_count": len(m.evidence_files),
                     "evidence_files": m.evidence_files,
                     "gap_analysis": m.gap_analysis,
-                    "recommendations": m.recommendations
+                    "recommendations": m.recommendations,
                 }
                 for m in report.control_mappings
-            ]
+            ],
         }
 
-        with open(output_path, 'w') as f:
+        with open(output_path, "w") as f:
             json.dump(report_data, f, indent=2)
 
         logger.info(f"ISO 27001 report exported to {output_path}")
@@ -329,9 +344,9 @@ class ISO27001Mapper:
 def main():
     import argparse
 
-    parser = argparse.ArgumentParser(description='ISO 27001:2022 Control Mapper')
-    parser.add_argument('--project', default='.', help='Project root directory')
-    parser.add_argument('--output', default='iso27001-mapping.json', help='Output file')
+    parser = argparse.ArgumentParser(description="ISO 27001:2022 Control Mapper")
+    parser.add_argument("--project", default=".", help="Project root directory")
+    parser.add_argument("--output", default="iso27001-mapping.json", help="Output file")
 
     args = parser.parse_args()
 
@@ -357,6 +372,6 @@ def main():
     print(f"\nReport saved to: {args.output}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     main()

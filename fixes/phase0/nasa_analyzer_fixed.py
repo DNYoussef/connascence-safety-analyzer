@@ -1,13 +1,16 @@
 from fixes.phase0.production_safe_assertions import ProductionAssert
+
 '\nNASA Power of Ten Rule Analyzer - Fixed for Python\nReplaces regex-based C pattern detection with proper Python AST analysis.\nEliminates ~19,000 false positives from incorrect language detection.\n'
 import ast
-import sys
 from collections import defaultdict
-from pathlib import Path
-from typing import Dict, List, Optional, Set, Tuple, Any
 import json
+from pathlib import Path
+import sys
+from typing import Dict, List, Optional, Set
+
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from utils.types import ConnascenceViolation
+
 
 class PythonNASAAnalyzer:
     """
@@ -37,7 +40,7 @@ class PythonNASAAnalyzer:
         self.violations.clear()
         if source_code is None:
             try:
-                with open(file_path, 'r', encoding='utf-8') as f:
+                with open(file_path, encoding='utf-8') as f:
                     source_code = f.read()
             except Exception as e:
                 print(f'Error reading {file_path}: {e}')
@@ -83,7 +86,7 @@ class PythonNASAAnalyzer:
         for node in ast.walk(self.current_tree):
             if isinstance(node, ast.While):
                 if isinstance(node.test, ast.Constant) and node.test.value is True:
-                    has_break = any((isinstance(n, ast.Break) for n in ast.walk(node)))
+                    has_break = any(isinstance(n, ast.Break) for n in ast.walk(node))
                     if not has_break:
                         self._add_violation(rule='nasa_rule_2', node=node, message='Unbounded while True loop without break', severity='critical')
                 elif not self._has_clear_bound(node):
@@ -185,9 +188,7 @@ class PythonNASAAnalyzer:
         """Calculate cyclomatic complexity for a function."""
         complexity = 1
         for child in ast.walk(node):
-            if isinstance(child, (ast.If, ast.While, ast.For)):
-                complexity += 1
-            elif isinstance(child, ast.ExceptHandler):
+            if isinstance(child, (ast.If, ast.While, ast.For)) or isinstance(child, ast.ExceptHandler):
                 complexity += 1
             elif isinstance(child, ast.BoolOp):
                 complexity += len(child.values) - 1
@@ -323,7 +324,7 @@ class PythonNASAAnalyzer:
         """Generate comprehensive NASA compliance report."""
         ProductionAssert.type_check(output_file, str, 'output_file')
         ProductionAssert.not_none(output_file, 'output_file')
-        report = {'analyzer': 'PythonNASAAnalyzer', 'version': '2.0.0', 'description': 'Python-specific NASA POT10 analyzer with AST analysis', 'total_violations': sum((len(v) for v in self.violations.values())), 'violations_by_rule': {rule: len(violations) for rule, violations in self.violations.items()}, 'compliance_score': self._calculate_compliance_score(), 'fixes_applied': {'false_positives_eliminated': True, 'regex_patterns_removed': True, 'ast_analysis_enabled': True}}
+        report = {'analyzer': 'PythonNASAAnalyzer', 'version': '2.0.0', 'description': 'Python-specific NASA POT10 analyzer with AST analysis', 'total_violations': sum(len(v) for v in self.violations.values()), 'violations_by_rule': {rule: len(violations) for rule, violations in self.violations.items()}, 'compliance_score': self._calculate_compliance_score(), 'fixes_applied': {'false_positives_eliminated': True, 'regex_patterns_removed': True, 'ast_analysis_enabled': True}}
         if output_file:
             with open(output_file, 'w') as f:
                 json.dump(report, f, indent=2)
@@ -366,12 +367,12 @@ def main():
             violations = analyzer.analyze_file(str(py_file))
             total_violations += len(violations)
         report = analyzer.generate_report('nasa_compliance_fixed.json')
-        print(f'\nNASA POT10 Compliance Report (Fixed)')
-        print(f'=====================================')
+        print('\nNASA POT10 Compliance Report (Fixed)')
+        print('=====================================')
         print(f'Total Violations: {total_violations}')
         print(f'Compliance Score: {report['compliance_score']}%')
-        print(f'False Positives Eliminated: ~19,000')
-        print(f'\nViolations by Rule:')
+        print('False Positives Eliminated: ~19,000')
+        print('\nViolations by Rule:')
         for rule, count in report['violations_by_rule'].items():
             print(f'  {rule}: {count}')
 if __name__ == '__main__':

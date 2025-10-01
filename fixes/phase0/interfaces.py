@@ -1,9 +1,11 @@
 from fixes.phase0.production_safe_assertions import ProductionAssert
+
 '\nInterface Definitions to Break Circular Dependencies\nProvides abstract base classes and protocols to decouple modules.\n'
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Optional, Protocol, runtime_checkable
 from dataclasses import dataclass
 from enum import Enum
+from typing import Any, Dict, List, Optional, Protocol, runtime_checkable
+
 
 class ViolationType(Enum):
     """Types of violations that can be detected."""

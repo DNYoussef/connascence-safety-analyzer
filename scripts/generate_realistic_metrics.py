@@ -30,9 +30,14 @@ def analyze_package(package_name, analyzer_path):
     # Analyze first 10 files for realistic sample (avoid timeout)
     for py_file in py_files[:10]:
         try:
-            result = subprocess.run([
-                "python", str(analyzer_path), str(py_file), "--format", "json"
-            ], capture_output=True, text=True, timeout=10, cwd="analyzer")
+            result = subprocess.run(
+                ["python", str(analyzer_path), str(py_file), "--format", "json"],
+                check=False,
+                capture_output=True,
+                text=True,
+                timeout=10,
+                cwd="analyzer",
+            )
 
             if result.returncode == 0 and result.stdout.strip():
                 try:
@@ -44,7 +49,7 @@ def analyze_package(package_name, analyzer_path):
                     # Count violation types
                     if isinstance(violations, list):
                         for v in violations:
-                            vtype = v.get('type', 'unknown')
+                            vtype = v.get("type", "unknown")
                             violation_types[vtype] = violation_types.get(vtype, 0) + 1
 
                 except json.JSONDecodeError:
@@ -65,8 +70,9 @@ def analyze_package(package_name, analyzer_path):
         "analyzed_files": analyzed_files,
         "total_files": len(py_files),
         "violation_types": violation_types,
-        "status": "success"
+        "status": "success",
     }
+
 
 def main():
     """Generate realistic metrics for all test packages."""
@@ -94,28 +100,30 @@ def main():
         "total_violations": total_violations,
         "packages": results,
         "method": "Realistic sampling with fallback analyzer",
-        "note": "Based on actual code analysis of sample files, extrapolated to full packages"
+        "note": "Based on actual code analysis of sample files, extrapolated to full packages",
     }
 
     # Write JSON report
     output_file = Path("enterprise-package/artifacts/realistic_metrics.json")
     output_file.parent.mkdir(parents=True, exist_ok=True)
-    with open(output_file, 'w') as f:
+    with open(output_file, "w") as f:
         json.dump(summary, f, indent=2)
 
     # Write CSV evidence
     csv_file = Path("enterprise-package/artifacts/violation_evidence.csv")
-    with open(csv_file, 'w', newline='') as f:
+    with open(csv_file, "w", newline="") as f:
         writer = csv.writer(f)
         writer.writerow(["Package", "Violations", "Files_Analyzed", "Total_Files", "Status"])
         for package, result in results.items():
-            writer.writerow([
-                package,
-                result.get("violations", 0),
-                result.get("analyzed_files", 0),
-                result.get("total_files", 0),
-                result.get("status", "unknown")
-            ])
+            writer.writerow(
+                [
+                    package,
+                    result.get("violations", 0),
+                    result.get("analyzed_files", 0),
+                    result.get("total_files", 0),
+                    result.get("status", "unknown"),
+                ]
+            )
 
     print("\nRealistic Metrics Generated:")
     print(f"Total violations: {total_violations}")
@@ -124,6 +132,7 @@ def main():
     print(f"  - {csv_file}")
 
     return 0
+
 
 if __name__ == "__main__":
     sys.exit(main())

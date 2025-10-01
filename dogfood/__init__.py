@@ -23,9 +23,4 @@ from .controller import DogfoodController
 from .metrics_tracker import MetricsTracker
 from .safety_validator import SafetyValidator
 
-__all__ = [
-    'DogfoodController',
-    'SafetyValidator',
-    'BranchManager',
-    'MetricsTracker'
-]
+__all__ = ["BranchManager", "DogfoodController", "MetricsTracker", "SafetyValidator"]

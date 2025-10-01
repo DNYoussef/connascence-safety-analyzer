@@ -29,6 +29,7 @@ from typing import Any, Dict, List, Optional
 @dataclass
 class TestResult:
     """Result from running a single test suite"""
+
     name: str
     passed: bool
     test_count: int
@@ -36,9 +37,11 @@ class TestResult:
     execution_time: float
     coverage_percent: Optional[float] = None
 
+
 @dataclass
 class ComprehensiveTestResults:
     """Complete test execution results"""
+
     all_passed: bool
     total_tests: int
     total_failures: int
@@ -47,6 +50,7 @@ class ComprehensiveTestResults:
     performance_regressions: List[Dict[str, Any]]
     execution_summary: Dict[str, Any]
     timestamp: datetime
+
 
 class SafetyValidator:
     """Validates safety of dogfood changes through comprehensive testing"""
@@ -57,8 +61,8 @@ class SafetyValidator:
         self.project_root = Path.cwd()
 
         # Test configuration
-        self.test_timeout = self.config.get('test_timeout', 300)  # 5 minutes default
-        self.parallel_execution = self.config.get('parallel_execution', True)
+        self.test_timeout = self.config.get("test_timeout", 300)  # 5 minutes default
+        self.parallel_execution = self.config.get("parallel_execution", True)
         self.performance_baseline = {}
 
     async def run_all_tests(self) -> ComprehensiveTestResults:
@@ -78,7 +82,7 @@ class SafetyValidator:
                 ("integration_tests", "tests/integration/", "test_*.py"),
                 ("mcp_server_tests", "tests/", "test_mcp_server.py"),
                 ("analyzer_tests", "tests/", "test_ast_analyzer.py"),
-                ("autofix_tests", "tests/", "test_autofix.py")
+                ("autofix_tests", "tests/", "test_autofix.py"),
             ]
 
             # Run all test suites
@@ -111,9 +115,9 @@ class SafetyValidator:
                 execution_summary={
                     "execution_time": execution_time,
                     "suites_run": len(suite_results),
-                    "parallel_execution": self.parallel_execution
+                    "parallel_execution": self.parallel_execution,
                 },
-                timestamp=execution_start
+                timestamp=execution_start,
             )
 
         except Exception as e:
@@ -124,10 +128,10 @@ class SafetyValidator:
                 total_tests=0,
                 total_failures=1,
                 test_suites=[],
-                functional_regressions=[f"Test execution failed: {str(e)}"],
+                functional_regressions=[f"Test execution failed: {e!s}"],
                 performance_regressions=[],
                 execution_summary={"error": str(e)},
-                timestamp=execution_start
+                timestamp=execution_start,
             )
 
     async def _run_tests_parallel(self, test_suites: List[tuple]) -> List[TestResult]:
@@ -136,9 +140,7 @@ class SafetyValidator:
 
         tasks = []
         for suite_name, path, pattern in test_suites:
-            task = asyncio.create_task(
-                self._run_single_test_suite(suite_name, path, pattern)
-            )
+            task = asyncio.create_task(self._run_single_test_suite(suite_name, path, pattern))
             tasks.append(task)
 
         results = await asyncio.gather(*tasks, return_exceptions=True)
@@ -151,13 +153,11 @@ class SafetyValidator:
             elif isinstance(result, Exception):
                 self.logger.error(f"Test suite failed: {result}")
                 # Add failed test result
-                valid_results.append(TestResult(
-                    name="failed_suite",
-                    passed=False,
-                    test_count=0,
-                    failures=[str(result)],
-                    execution_time=0.0
-                ))
+                valid_results.append(
+                    TestResult(
+                        name="failed_suite", passed=False, test_count=0, failures=[str(result)], execution_time=0.0
+                    )
+                )
 
         return valid_results
 
@@ -172,12 +172,7 @@ class SafetyValidator:
 
         return results
 
-    async def _run_single_test_suite(
-        self,
-        suite_name: str,
-        path: str,
-        pattern: str
-    ) -> TestResult:
+    async def _run_single_test_suite(self, suite_name: str, path: str, pattern: str) -> TestResult:
         """Run a single test suite using pytest"""
         start_time = datetime.now()
         self.logger.info(f"🧪 Running {suite_name}...")
@@ -186,21 +181,21 @@ class SafetyValidator:
             # Build pytest command
             test_path = self.project_root / path
             cmd = [
-                "python", "-m", "pytest",
+                "python",
+                "-m",
+                "pytest",
                 str(test_path),
-                "-k", pattern.replace("*.py", "").replace("test_", ""),
+                "-k",
+                pattern.replace("*.py", "").replace("test_", ""),
                 "--tb=short",
                 "--json-report",
                 "--json-report-file=/tmp/pytest_report.json",
-                f"--timeout={self.test_timeout}"
+                f"--timeout={self.test_timeout}",
             ]
 
             # Run tests
             process = await asyncio.create_subprocess_exec(
-                *cmd,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE,
-                cwd=self.project_root
+                *cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE, cwd=self.project_root
             )
 
             stdout, stderr = await process.communicate()
@@ -214,7 +209,7 @@ class SafetyValidator:
                     passed=True,
                     test_count=self._count_tests_from_output(stdout.decode()),
                     failures=[],
-                    execution_time=execution_time
+                    execution_time=execution_time,
                 )
             else:
                 # Tests failed
@@ -224,7 +219,7 @@ class SafetyValidator:
                     passed=False,
                     test_count=self._count_tests_from_output(stdout.decode()),
                     failures=failures,
-                    execution_time=execution_time
+                    execution_time=execution_time,
                 )
 
         except asyncio.TimeoutError:
@@ -233,27 +228,23 @@ class SafetyValidator:
                 passed=False,
                 test_count=0,
                 failures=[f"Test suite timed out after {self.test_timeout}s"],
-                execution_time=self.test_timeout
+                execution_time=self.test_timeout,
             )
         except Exception as e:
             return TestResult(
                 name=suite_name,
                 passed=False,
                 test_count=0,
-                failures=[f"Test execution error: {str(e)}"],
-                execution_time=(datetime.now() - start_time).total_seconds()
+                failures=[f"Test execution error: {e!s}"],
+                execution_time=(datetime.now() - start_time).total_seconds(),
             )
 
     def _count_tests_from_output(self, output: str) -> int:
         """Extract test count from pytest output"""
         # Look for patterns like "3 passed", "5 failed", etc.
         import re
-        patterns = [
-            r'(\d+) passed',
-            r'(\d+) failed',
-            r'(\d+) error',
-            r'(\d+) skipped'
-        ]
+
+        patterns = [r"(\d+) passed", r"(\d+) failed", r"(\d+) error", r"(\d+) skipped"]
 
         total_count = 0
         for pattern in patterns:
@@ -267,7 +258,8 @@ class SafetyValidator:
         """Extract failure messages from pytest output"""
         # Simple extraction - look for FAILED lines
         import re
-        failures = re.findall(r'FAILED (.+)', output)
+
+        failures = re.findall(r"FAILED (.+)", output)
         return failures[:10]  # Limit to first 10 failures
 
     def _detect_functional_regressions(self, suite_results: List[TestResult]) -> List[str]:
@@ -279,7 +271,7 @@ class SafetyValidator:
             "test_analyzer_core",
             "test_mcp_server_integration",
             "test_violation_detection",
-            "test_autofix_application"
+            "test_autofix_application",
         ]
 
         for suite in suite_results:
@@ -300,13 +292,15 @@ class SafetyValidator:
             baseline_time = self.performance_baseline.get(suite.name, suite.execution_time)
 
             if suite.execution_time > baseline_time * 1.5:  # 50% slower
-                regressions.append({
-                    "suite": suite.name,
-                    "baseline_time": baseline_time,
-                    "current_time": suite.execution_time,
-                    "slowdown_factor": suite.execution_time / baseline_time,
-                    "issue": "Test suite execution significantly slower"
-                })
+                regressions.append(
+                    {
+                        "suite": suite.name,
+                        "baseline_time": baseline_time,
+                        "current_time": suite.execution_time,
+                        "slowdown_factor": suite.execution_time / baseline_time,
+                        "issue": "Test suite execution significantly slower",
+                    }
+                )
 
         return regressions
 
@@ -323,7 +317,7 @@ class SafetyValidator:
         # Test just the critical components
         core_tests = [
             ("analyzer_core", "tests/", "test_ast_analyzer.py"),
-            ("mcp_server", "tests/", "test_mcp_server.py")
+            ("mcp_server", "tests/", "test_mcp_server.py"),
         ]
 
         results = await self._run_tests_sequential(core_tests)
@@ -331,9 +325,5 @@ class SafetyValidator:
         return {
             "core_functionality_intact": all(r.passed for r in results),
             "test_results": results,
-            "critical_failures": [
-                f for result in results
-                for f in result.failures
-                if not result.passed
-            ]
+            "critical_failures": [f for result in results for f in result.failures if not result.passed],
         }

@@ -30,6 +30,7 @@ from .overlay_manager import OverlayManager
 
 class RefactoringTechnique(Enum):
     """Canonical refactoring techniques from Refactoring.Guru."""
+
     # Composing Methods
     EXTRACT_METHOD = "extract_method"
     INLINE_METHOD = "inline_method"
@@ -75,6 +76,7 @@ class RefactoringTechnique(Enum):
 @dataclass
 class RefactoringCandidate:
     """A candidate location for refactoring."""
+
     technique: RefactoringTechnique
     file_path: str
     start_line: int
@@ -82,7 +84,7 @@ class RefactoringCandidate:
     description: str
     rationale: str
     estimated_effort: str  # "low", "medium", "high"
-    safety_impact: str     # "none", "low", "medium", "high"
+    safety_impact: str  # "none", "low", "medium", "high"
     connascence_improvement: str  # CoM -> CoN, etc.
     ast_nodes: List[NodeInfo] = None
 
@@ -94,6 +96,7 @@ class RefactoringCandidate:
 @dataclass
 class RefactoringResult:
     """Result of applying a refactoring."""
+
     success: bool
     technique: RefactoringTechnique
     original_code: str
@@ -122,8 +125,9 @@ class ASTSafeRefactoring:
         # Initialize technique handlers
         self._initialize_handlers()
 
-    def find_refactoring_opportunities(self, code: str, language: LanguageSupport,
-                                     target_connascence: Optional[List[str]] = None) -> List[RefactoringCandidate]:
+    def find_refactoring_opportunities(
+        self, code: str, language: LanguageSupport, target_connascence: Optional[List[str]] = None
+    ) -> List[RefactoringCandidate]:
         """Find opportunities for refactoring in code."""
         parse_result = self.backend.parse(code, language)
         if not parse_result.success:
@@ -157,15 +161,14 @@ class ASTSafeRefactoring:
         # Filter by target connascence types if specified
         if target_connascence:
             opportunities = [
-                opp for opp in opportunities
-                if any(conn in opp.connascence_improvement for conn in target_connascence)
+                opp for opp in opportunities if any(conn in opp.connascence_improvement for conn in target_connascence)
             ]
 
         return opportunities
 
-    def apply_refactoring(self, candidate: RefactoringCandidate,
-                         code: str, language: LanguageSupport,
-                         validate_safety: bool = True) -> RefactoringResult:
+    def apply_refactoring(
+        self, candidate: RefactoringCandidate, code: str, language: LanguageSupport, validate_safety: bool = True
+    ) -> RefactoringResult:
         """Apply a refactoring technique to code."""
         if candidate.technique not in self._technique_handlers:
             return RefactoringResult(
@@ -173,7 +176,7 @@ class ASTSafeRefactoring:
                 technique=candidate.technique,
                 original_code=code,
                 refactored_code=code,
-                validation_errors=[f"Technique {candidate.technique.value} not implemented"]
+                validation_errors=[f"Technique {candidate.technique.value} not implemented"],
             )
 
         # Apply the refactoring
@@ -186,13 +189,11 @@ class ASTSafeRefactoring:
                 technique=candidate.technique,
                 original_code=code,
                 refactored_code=code,
-                validation_errors=[f"Refactoring failed: {str(e)}"]
+                validation_errors=[f"Refactoring failed: {e!s}"],
             )
 
         # Validate the result
-        validation_result = self._validate_refactoring_result(
-            code, refactored_code, language, validate_safety
-        )
+        validation_result = self._validate_refactoring_result(code, refactored_code, language, validate_safety)
 
         return RefactoringResult(
             success=validation_result["success"],
@@ -201,11 +202,10 @@ class ASTSafeRefactoring:
             refactored_code=refactored_code if validation_result["success"] else code,
             changes_applied=validation_result.get("changes", []),
             validation_errors=validation_result.get("errors", []),
-            warnings=validation_result.get("warnings", [])
+            warnings=validation_result.get("warnings", []),
         )
 
-    def preview_refactoring(self, candidate: RefactoringCandidate,
-                          code: str, language: LanguageSupport) -> str:
+    def preview_refactoring(self, candidate: RefactoringCandidate, code: str, language: LanguageSupport) -> str:
         """Generate a preview of what the refactoring would look like."""
         # Apply refactoring without validation for preview
         if candidate.technique not in self._technique_handlers:
@@ -217,8 +217,9 @@ class ASTSafeRefactoring:
         except Exception:
             return code
 
-    def batch_apply_refactorings(self, candidates: List[RefactoringCandidate],
-                               code: str, language: LanguageSupport) -> RefactoringResult:
+    def batch_apply_refactorings(
+        self, candidates: List[RefactoringCandidate], code: str, language: LanguageSupport
+    ) -> RefactoringResult:
         """Apply multiple refactorings in dependency order."""
         current_code = code
         all_changes = []
@@ -243,7 +244,7 @@ class ASTSafeRefactoring:
                     refactored_code=current_code,
                     changes_applied=all_changes,
                     validation_errors=result.validation_errors,
-                    warnings=all_warnings
+                    warnings=all_warnings,
                 )
 
         return RefactoringResult(
@@ -252,7 +253,7 @@ class ASTSafeRefactoring:
             original_code=code,
             refactored_code=current_code,
             changes_applied=all_changes,
-            warnings=all_warnings
+            warnings=all_warnings,
         )
 
     def _initialize_handlers(self):
@@ -271,17 +272,17 @@ class ASTSafeRefactoring:
         candidates = []
 
         # Look for numeric literals that appear multiple times
-        numeric_pattern = r'\b(\d+(?:\.\d+)?)\b'
+        numeric_pattern = r"\b(\d+(?:\.\d+)?)\b"
         matches = re.finditer(numeric_pattern, code)
 
         number_locations = {}
         for match in matches:
             number = match.group(1)
             # Skip common numbers that are rarely magic
-            if number in ['0', '1', '2', '10', '100']:
+            if number in ["0", "1", "2", "10", "100"]:
                 continue
 
-            line_num = code[:match.start()].count('\n') + 1
+            line_num = code[: match.start()].count("\n") + 1
             if number not in number_locations:
                 number_locations[number] = []
             number_locations[number].append(line_num)
@@ -289,17 +290,19 @@ class ASTSafeRefactoring:
         # Create candidates for numbers that appear multiple times
         for number, locations in number_locations.items():
             if len(locations) >= 2:
-                candidates.append(RefactoringCandidate(
-                    technique=RefactoringTechnique.REPLACE_MAGIC_NUMBER_WITH_SYMBOLIC_CONSTANT,
-                    file_path="current_file",
-                    start_line=min(locations),
-                    end_line=max(locations),
-                    description=f"Replace magic number {number} with named constant",
-                    rationale=f"Number {number} appears {len(locations)} times, should be a named constant",
-                    estimated_effort="low",
-                    safety_impact="low",
-                    connascence_improvement="CoM -> CoN"
-                ))
+                candidates.append(
+                    RefactoringCandidate(
+                        technique=RefactoringTechnique.REPLACE_MAGIC_NUMBER_WITH_SYMBOLIC_CONSTANT,
+                        file_path="current_file",
+                        start_line=min(locations),
+                        end_line=max(locations),
+                        description=f"Replace magic number {number} with named constant",
+                        rationale=f"Number {number} appears {len(locations)} times, should be a named constant",
+                        estimated_effort="low",
+                        safety_impact="low",
+                        connascence_improvement="CoM -> CoN",
+                    )
+                )
 
         return candidates
 
@@ -309,20 +312,22 @@ class ASTSafeRefactoring:
 
         for func in functions:
             # This is a simplified check - real implementation would analyze parameter patterns
-            param_count = len(func.get('parameters', []))
+            param_count = len(func.get("parameters", []))
 
             if param_count >= 4:  # General Safety/connascence threshold
-                candidates.append(RefactoringCandidate(
-                    technique=RefactoringTechnique.INTRODUCE_PARAMETER_OBJECT,
-                    file_path="current_file",
-                    start_line=func.get('line_start', 1),
-                    end_line=func.get('line_end', 1),
-                    description=f"Introduce parameter object for {func['name']}",
-                    rationale=f"Function {func['name']} has {param_count} parameters",
-                    estimated_effort="medium",
-                    safety_impact="low",
-                    connascence_improvement="CoP -> CoN"
-                ))
+                candidates.append(
+                    RefactoringCandidate(
+                        technique=RefactoringTechnique.INTRODUCE_PARAMETER_OBJECT,
+                        file_path="current_file",
+                        start_line=func.get("line_start", 1),
+                        end_line=func.get("line_end", 1),
+                        description=f"Introduce parameter object for {func['name']}",
+                        rationale=f"Function {func['name']} has {param_count} parameters",
+                        estimated_effort="medium",
+                        safety_impact="low",
+                        connascence_improvement="CoP -> CoN",
+                    )
+                )
 
         return candidates
 
@@ -331,18 +336,20 @@ class ASTSafeRefactoring:
         candidates = []
 
         for func in functions:
-            if func.get('body_lines', 0) > 60:  # General Safety Rule 4
-                candidates.append(RefactoringCandidate(
-                    technique=RefactoringTechnique.EXTRACT_METHOD,
-                    file_path="current_file",
-                    start_line=func.get('line_start', 1),
-                    end_line=func.get('line_end', 1),
-                    description=f"Extract methods from large function {func['name']}",
-                    rationale=f"Function {func['name']} has {func['body_lines']} lines, exceeds General Safety Rule 4 limit",
-                    estimated_effort="high",
-                    safety_impact="medium",
-                    connascence_improvement="CoA -> CoN"
-                ))
+            if func.get("body_lines", 0) > 60:  # General Safety Rule 4
+                candidates.append(
+                    RefactoringCandidate(
+                        technique=RefactoringTechnique.EXTRACT_METHOD,
+                        file_path="current_file",
+                        start_line=func.get("line_start", 1),
+                        end_line=func.get("line_end", 1),
+                        description=f"Extract methods from large function {func['name']}",
+                        rationale=f"Function {func['name']} has {func['body_lines']} lines, exceeds General Safety Rule 4 limit",
+                        estimated_effort="high",
+                        safety_impact="medium",
+                        connascence_improvement="CoA -> CoN",
+                    )
+                )
 
         return candidates
 
@@ -365,17 +372,19 @@ class ASTSafeRefactoring:
         # Find patterns with multiple instances
         for pattern, funcs in function_patterns.items():
             if len(funcs) >= 2:
-                candidates.append(RefactoringCandidate(
-                    technique=RefactoringTechnique.SUBSTITUTE_ALGORITHM,
-                    file_path="current_file",
-                    start_line=min(f.get('line_start', 1) for f in funcs),
-                    end_line=max(f.get('line_end', 1) for f in funcs),
-                    description=f"Extract common algorithm from {len(funcs)} similar functions",
-                    rationale=f"Functions {[f['name'] for f in funcs]} have similar patterns",
-                    estimated_effort="medium",
-                    safety_impact="medium",
-                    connascence_improvement="CoA -> CoN"
-                ))
+                candidates.append(
+                    RefactoringCandidate(
+                        technique=RefactoringTechnique.SUBSTITUTE_ALGORITHM,
+                        file_path="current_file",
+                        start_line=min(f.get("line_start", 1) for f in funcs),
+                        end_line=max(f.get("line_end", 1) for f in funcs),
+                        description=f"Extract common algorithm from {len(funcs)} similar functions",
+                        rationale=f"Functions {[f['name'] for f in funcs]} have similar patterns",
+                        estimated_effort="medium",
+                        safety_impact="medium",
+                        connascence_improvement="CoA -> CoN",
+                    )
+                )
 
         return candidates
 
@@ -389,40 +398,45 @@ class ASTSafeRefactoring:
             functions = self.backend.extract_functions(ast, language)
             for func in functions:
                 if self._contains_recursion(func, code):
-                    candidates.append(RefactoringCandidate(
-                        technique=RefactoringTechnique.REPLACE_RECURSION_WITH_ITERATION,
-                        file_path="current_file",
-                        start_line=func.get('line_start', 1),
-                        end_line=func.get('line_end', 1),
-                        description=f"Replace recursion in {func['name']} with iteration",
-                        rationale="General Safety Rule 1: Avoid recursion in safety-critical code",
-                        estimated_effort="high",
-                        safety_impact="high",
-                        connascence_improvement="CoE -> CoN"
-                    ))
+                    candidates.append(
+                        RefactoringCandidate(
+                            technique=RefactoringTechnique.REPLACE_RECURSION_WITH_ITERATION,
+                            file_path="current_file",
+                            start_line=func.get("line_start", 1),
+                            end_line=func.get("line_end", 1),
+                            description=f"Replace recursion in {func['name']} with iteration",
+                            rationale="General Safety Rule 1: Avoid recursion in safety-critical code",
+                            estimated_effort="high",
+                            safety_impact="high",
+                            connascence_improvement="CoE -> CoN",
+                        )
+                    )
 
         # Look for assertion opportunities
         for func in functions:
             if self._needs_more_assertions(func, code):
-                candidates.append(RefactoringCandidate(
-                    technique=RefactoringTechnique.INTRODUCE_ASSERTION,
-                    file_path="current_file",
-                    start_line=func.get('line_start', 1),
-                    end_line=func.get('line_end', 1),
-                    description=f"Add runtime assertions to {func['name']}",
-                    rationale="General Safety Rule 5: Use at least 2 runtime assertions per function",
-                    estimated_effort="low",
-                    safety_impact="high",
-                    connascence_improvement="CoE -> Explicit Contracts"
-                ))
+                candidates.append(
+                    RefactoringCandidate(
+                        technique=RefactoringTechnique.INTRODUCE_ASSERTION,
+                        file_path="current_file",
+                        start_line=func.get("line_start", 1),
+                        end_line=func.get("line_end", 1),
+                        description=f"Add runtime assertions to {func['name']}",
+                        rationale="General Safety Rule 5: Use at least 2 runtime assertions per function",
+                        estimated_effort="low",
+                        safety_impact="high",
+                        connascence_improvement="CoE -> Explicit Contracts",
+                    )
+                )
 
         return candidates
 
-    def _handle_replace_magic_number(self, code: str, candidate: RefactoringCandidate,
-                                   language: LanguageSupport) -> str:
+    def _handle_replace_magic_number(
+        self, code: str, candidate: RefactoringCandidate, language: LanguageSupport
+    ) -> str:
         """Handle replace magic number with symbolic constant refactoring."""
         # Extract the magic number from the candidate description
-        match = re.search(r'Replace magic number (\d+(?:\.\d+)?)', candidate.description)
+        match = re.search(r"Replace magic number (\d+(?:\.\d+)?)", candidate.description)
         if not match:
             return code
 
@@ -441,33 +455,32 @@ class ASTSafeRefactoring:
 
         # Replace all occurrences of the magic number
         # Use word boundaries to avoid partial replacements
-        pattern = r'\b' + re.escape(magic_number) + r'\b'
+        pattern = r"\b" + re.escape(magic_number) + r"\b"
         refactored_code = re.sub(pattern, constant_name, code)
 
         # Add the constant declaration
         if language == LanguageSupport.C:
             # Add after includes or at the beginning
-            if '#include' in refactored_code:
-                last_include = refactored_code.rfind('#include')
-                end_of_line = refactored_code.find('\n', last_include)
-                refactored_code = (refactored_code[:end_of_line+1] +
-                                 constant_declaration +
-                                 refactored_code[end_of_line+1:])
+            if "#include" in refactored_code:
+                last_include = refactored_code.rfind("#include")
+                end_of_line = refactored_code.find("\n", last_include)
+                refactored_code = (
+                    refactored_code[: end_of_line + 1] + constant_declaration + refactored_code[end_of_line + 1 :]
+                )
             else:
                 refactored_code = constant_declaration + refactored_code
         else:
             # Python and others - add at the beginning
-            refactored_code = constant_declaration + '\n' + refactored_code
+            refactored_code = constant_declaration + "\n" + refactored_code
 
         return refactored_code
 
-    def _handle_extract_method(self, code: str, candidate: RefactoringCandidate,
-                             language: LanguageSupport) -> str:
+    def _handle_extract_method(self, code: str, candidate: RefactoringCandidate, language: LanguageSupport) -> str:
         """Handle extract method refactoring."""
         # This is a simplified implementation
         # Real implementation would analyze AST to find good extraction points
 
-        lines = code.split('\n')
+        lines = code.split("\n")
         start_idx = candidate.start_line - 1
         end_idx = candidate.end_line
 
@@ -508,55 +521,51 @@ class ASTSafeRefactoring:
             call_line = f"    {new_method_name}();"
 
         # Reconstruct the code
-        new_lines = (lines[:start_idx + extract_start] +
-                    [call_line] +
-                    lines[start_idx + extract_end:])
+        new_lines = lines[: start_idx + extract_start] + [call_line] + lines[start_idx + extract_end :]
 
         # Add the extracted method before the original function
-        method_lines = extracted_method.split('\n')
-        new_lines = (lines[:start_idx] +
-                    method_lines +
-                    [''] +
-                    new_lines[start_idx:])
+        method_lines = extracted_method.split("\n")
+        new_lines = lines[:start_idx] + method_lines + [""] + new_lines[start_idx:]
 
-        return '\n'.join(new_lines)
+        return "\n".join(new_lines)
 
-    def _handle_introduce_parameter_object(self, code: str, candidate: RefactoringCandidate,
-                                         language: LanguageSupport) -> str:
+    def _handle_introduce_parameter_object(
+        self, code: str, candidate: RefactoringCandidate, language: LanguageSupport
+    ) -> str:
         """Handle introduce parameter object refactoring."""
         # This is a simplified implementation
         # Real implementation would analyze parameter usage patterns
 
         if language == LanguageSupport.PYTHON:
             # Add a simple dataclass for parameters
-            parameter_class = '''@dataclass
+            parameter_class = """@dataclass
 class FunctionParameters:
     param1: Any
     param2: Any
     param3: Any
     param4: Any
 
-'''
+"""
             return parameter_class + code
 
         return code  # Not fully implemented for other languages
 
-    def _handle_substitute_algorithm(self, code: str, candidate: RefactoringCandidate,
-                                   language: LanguageSupport) -> str:
+    def _handle_substitute_algorithm(
+        self, code: str, candidate: RefactoringCandidate, language: LanguageSupport
+    ) -> str:
         """Handle substitute algorithm refactoring."""
         # This would implement algorithm substitution
         # For now, just return original code
         return code
 
-    def _handle_introduce_assertion(self, code: str, candidate: RefactoringCandidate,
-                                  language: LanguageSupport) -> str:
+    def _handle_introduce_assertion(self, code: str, candidate: RefactoringCandidate, language: LanguageSupport) -> str:
         """Handle introduce assertion refactoring."""
-        lines = code.split('\n')
+        lines = code.split("\n")
         start_idx = candidate.start_line - 1
 
         # Find function definition
         for i in range(start_idx, min(len(lines), start_idx + 10)):
-            if 'def ' in lines[i] or 'function' in lines[i]:
+            if "def " in lines[i] or "function" in lines[i]:
                 # Add assertions after function definition
                 if language == LanguageSupport.PYTHON:
                     assertion = "    assert param is not None, 'Parameter must not be None'"
@@ -568,24 +577,26 @@ class FunctionParameters:
                 lines.insert(i + 1, assertion)
                 break
 
-        return '\n'.join(lines)
+        return "\n".join(lines)
 
-    def _handle_replace_recursion_with_iteration(self, code: str, candidate: RefactoringCandidate,
-                                               language: LanguageSupport) -> str:
+    def _handle_replace_recursion_with_iteration(
+        self, code: str, candidate: RefactoringCandidate, language: LanguageSupport
+    ) -> str:
         """Handle replace recursion with iteration refactoring."""
         # This is a complex transformation that would require
         # sophisticated analysis. For now, add a TODO comment.
 
-        lines = code.split('\n')
+        lines = code.split("\n")
         start_idx = candidate.start_line - 1
 
         if start_idx < len(lines):
             lines.insert(start_idx, "// TODO: Convert recursion to iteration for General Safety Rule 1 compliance")
 
-        return '\n'.join(lines)
+        return "\n".join(lines)
 
-    def _validate_refactoring_result(self, original: str, refactored: str,
-                                   language: LanguageSupport, validate_safety: bool) -> Dict[str, Any]:
+    def _validate_refactoring_result(
+        self, original: str, refactored: str, language: LanguageSupport, validate_safety: bool
+    ) -> Dict[str, Any]:
         """Validate that refactoring maintained syntactic correctness."""
         # Parse both versions
         original_parse = self.backend.parse(original, language)
@@ -598,12 +609,7 @@ class FunctionParameters:
         # Check if refactored code parses correctly
         if not refactored_parse.success:
             errors.extend([f"Syntax error: {err['message']}" for err in refactored_parse.errors])
-            return {
-                "success": False,
-                "errors": errors,
-                "warnings": warnings,
-                "changes": changes
-            }
+            return {"success": False, "errors": errors, "warnings": warnings, "changes": changes}
 
         # Check for major structural changes (simplified)
         original_functions = self.backend.extract_functions(original_parse.ast, language)
@@ -615,29 +621,25 @@ class FunctionParameters:
         # Safety validation if requested
         if validate_safety and self.overlay_manager:
             # Check against safety overlays
-            for overlay_id in ['nasa_c_safety', 'nasa_python_safety']:
+            for overlay_id in ["nasa_c_safety", "nasa_python_safety"]:
                 overlay = self.overlay_manager.get_overlay(overlay_id)
                 if overlay and overlay.language == language:
-                    violations = self.overlay_manager.validate_code_against_overlay(
-                        [refactored_parse.ast], overlay_id
-                    )
+                    violations = self.overlay_manager.validate_code_against_overlay([refactored_parse.ast], overlay_id)
                     if violations:
                         warnings.extend([f"Safety warning: {v.get('message', '')}" for v in violations])
 
-        return {
-            "success": True,
-            "errors": errors,
-            "warnings": warnings,
-            "changes": changes
-        }
+        return {"success": True, "errors": errors, "warnings": warnings, "changes": changes}
 
     def _sort_candidates_by_dependency(self, candidates: List[RefactoringCandidate]) -> List[RefactoringCandidate]:
         """Sort refactoring candidates by dependency order."""
         # Simple sorting by safety impact and effort
-        return sorted(candidates, key=lambda c: (
-            {"high": 3, "medium": 2, "low": 1, "none": 0}.get(c.safety_impact, 0),
-            {"low": 1, "medium": 2, "high": 3}.get(c.estimated_effort, 2)
-        ))
+        return sorted(
+            candidates,
+            key=lambda c: (
+                {"high": 3, "medium": 2, "low": 1, "none": 0}.get(c.safety_impact, 0),
+                {"low": 1, "medium": 2, "high": 3}.get(c.estimated_effort, 2),
+            ),
+        )
 
     def _create_function_pattern(self, func: Dict) -> str:
         """Create a simple pattern representation of a function."""
@@ -647,15 +649,15 @@ class FunctionParameters:
     def _contains_recursion(self, func: Dict, code: str) -> bool:
         """Check if function contains recursive calls."""
         # Simplified check - look for function calling itself
-        func_name = func.get('name', '')
+        func_name = func.get("name", "")
         if not func_name:
             return False
 
         # Extract function body (very simplified)
-        start_line = func.get('line_start', 1)
-        end_line = func.get('line_end', 1)
-        lines = code.split('\n')[start_line:end_line]
-        func_body = '\n'.join(lines)
+        start_line = func.get("line_start", 1)
+        end_line = func.get("line_end", 1)
+        lines = code.split("\n")[start_line:end_line]
+        func_body = "\n".join(lines)
 
         # Look for self-calls
         return f"{func_name}(" in func_body
@@ -663,12 +665,12 @@ class FunctionParameters:
     def _needs_more_assertions(self, func: Dict, code: str) -> bool:
         """Check if function needs more assertions (General Safety Rule 5)."""
         # Extract function body and count assertions
-        start_line = func.get('line_start', 1)
-        end_line = func.get('line_end', 1)
-        lines = code.split('\n')[start_line:end_line]
-        func_body = '\n'.join(lines)
+        start_line = func.get("line_start", 1)
+        end_line = func.get("line_end", 1)
+        lines = code.split("\n")[start_line:end_line]
+        func_body = "\n".join(lines)
 
         # Count existing assertions
-        assertion_count = func_body.count('assert') + func_body.count('ASSERT')
+        assertion_count = func_body.count("assert") + func_body.count("ASSERT")
 
         return assertion_count < 2  # General Safety Rule 5

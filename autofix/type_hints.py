@@ -24,12 +24,14 @@ import re
 from typing import Any, Dict, List, Optional
 
 from utils.types import ConnascenceViolation
+
 from .patch_api import PatchSuggestion
 
 
 @dataclass
 class TypeInference:
     """Inferred type information for a variable or parameter."""
+
     name: str
     inferred_type: str
     confidence: float
@@ -41,20 +43,34 @@ class TypeHintFixer:
 
     def __init__(self):
         self.builtin_types = {
-            'int', 'float', 'str', 'bool', 'list', 'dict', 'tuple', 'set',
-            'List', 'Dict', 'Tuple', 'Set', 'Optional', 'Union', 'Any'
+            "int",
+            "float",
+            "str",
+            "bool",
+            "list",
+            "dict",
+            "tuple",
+            "set",
+            "List",
+            "Dict",
+            "Tuple",
+            "Set",
+            "Optional",
+            "Union",
+            "Any",
         }
         self.common_patterns = {
-            r'.*_id$': 'int',
-            r'.*_name$': 'str',
-            r'.*_count$': 'int',
-            r'.*_flag$': 'bool',
-            r'.*_list$': 'List[Any]',
-            r'.*_dict$': 'Dict[str, Any]'
+            r".*_id$": "int",
+            r".*_name$": "str",
+            r".*_count$": "int",
+            r".*_flag$": "bool",
+            r".*_list$": "List[Any]",
+            r".*_dict$": "Dict[str, Any]",
         }
 
-    def generate_patch(self, violation: ConnascenceViolation,
-                      tree: ast.AST, source_code: str) -> Optional[PatchSuggestion]:
+    def generate_patch(
+        self, violation: ConnascenceViolation, tree: ast.AST, source_code: str
+    ) -> Optional[PatchSuggestion]:
         """Generate patch for a missing type hint violation."""
         function_info = self._extract_function_info(violation, tree)
         if not function_info:
@@ -77,12 +93,11 @@ class TypeHintFixer:
             new_code=new_code,
             file_path=violation.file_path,
             line_range=(violation.line_number, violation.line_number),
-            safety_level='safe',  # Type hints are non-breaking
-            rollback_info={}
+            safety_level="safe",  # Type hints are non-breaking
+            rollback_info={},
         )
 
-    def _extract_function_info(self, violation: ConnascenceViolation,
-                              tree: ast.AST) -> Optional[Dict[str, Any]]:
+    def _extract_function_info(self, violation: ConnascenceViolation, tree: ast.AST) -> Optional[Dict[str, Any]]:
         """Extract function information for type inference."""
         finder = TypeHintFunctionFinder(violation.line_number)
         finder.visit(tree)
@@ -93,56 +108,46 @@ class TypeHintFixer:
         func_node = finder.found_function
 
         return {
-            'name': func_node.name,
-            'node': func_node,
-            'parameters': [arg.arg for arg in func_node.args.args],
-            'has_return': self._has_return_statement(func_node),
-            'is_generator': self._is_generator(func_node)
+            "name": func_node.name,
+            "node": func_node,
+            "parameters": [arg.arg for arg in func_node.args.args],
+            "has_return": self._has_return_statement(func_node),
+            "is_generator": self._is_generator(func_node),
         }
 
-    def _infer_types(self, func_info: Dict[str, Any], tree: ast.AST,
-                    source_code: str) -> Dict[str, TypeInference]:
+    def _infer_types(self, func_info: Dict[str, Any], tree: ast.AST, source_code: str) -> Dict[str, TypeInference]:
         """Infer types for function parameters and return type."""
         inferences = {}
-        func_node = func_info['node']
+        func_node = func_info["node"]
 
         # Analyze function body for type clues
-        analyzer = TypeInferenceAnalyzer(func_info['parameters'])
+        analyzer = TypeInferenceAnalyzer(func_info["parameters"])
         analyzer.visit(func_node)
 
         # Infer parameter types
-        for param in func_info['parameters']:
-            if param in ('self', 'cls'):
+        for param in func_info["parameters"]:
+            if param in ("self", "cls"):
                 continue
 
-            inferred_type, confidence, evidence = self._infer_parameter_type(
-                param, analyzer, func_node
-            )
+            inferred_type, confidence, evidence = self._infer_parameter_type(param, analyzer, func_node)
 
             inferences[param] = TypeInference(
-                name=param,
-                inferred_type=inferred_type,
-                confidence=confidence,
-                evidence=evidence
+                name=param, inferred_type=inferred_type, confidence=confidence, evidence=evidence
             )
 
         # Infer return type
-        if func_info['has_return']:
-            return_type, confidence, evidence = self._infer_return_type(
-                analyzer, func_node, func_info['is_generator']
-            )
+        if func_info["has_return"]:
+            return_type, confidence, evidence = self._infer_return_type(analyzer, func_node, func_info["is_generator"])
 
-            inferences['return'] = TypeInference(
-                name='return',
-                inferred_type=return_type,
-                confidence=confidence,
-                evidence=evidence
+            inferences["return"] = TypeInference(
+                name="return", inferred_type=return_type, confidence=confidence, evidence=evidence
             )
 
         return inferences
 
-    def _infer_parameter_type(self, param: str, analyzer: 'TypeInferenceAnalyzer',
-                            func_node: ast.AST) -> tuple[str, float, List[str]]:
+    def _infer_parameter_type(
+        self, param: str, analyzer: "TypeInferenceAnalyzer", func_node: ast.AST
+    ) -> tuple[str, float, List[str]]:
         """Infer type for a specific parameter."""
         evidence = []
         confidence = 0.5
@@ -153,15 +158,15 @@ class TypeHintFixer:
             usage = analyzer.param_usage[param]
 
             # Check for method calls that indicate type
-            if 'append' in usage.get('methods', []):
+            if "append" in usage.get("methods", []):
                 inferred_type = "List[Any]"
                 confidence = 0.8
                 evidence.append("calls .append() method")
-            elif 'keys' in usage.get('methods', []) or 'items' in usage.get('methods', []):
+            elif "keys" in usage.get("methods", []) or "items" in usage.get("methods", []):
                 inferred_type = "Dict[str, Any]"
                 confidence = 0.8
                 evidence.append("calls dict methods")
-            elif 'strip' in usage.get('methods', []) or 'split' in usage.get('methods', []):
+            elif "strip" in usage.get("methods", []) or "split" in usage.get("methods", []):
                 inferred_type = "str"
                 confidence = 0.9
                 evidence.append("calls string methods")
@@ -187,8 +192,9 @@ class TypeHintFixer:
 
         return inferred_type, confidence, evidence
 
-    def _infer_return_type(self, analyzer: 'TypeInferenceAnalyzer', func_node: ast.AST,
-                          is_generator: bool) -> tuple[str, float, List[str]]:
+    def _infer_return_type(
+        self, analyzer: "TypeInferenceAnalyzer", func_node: ast.AST, is_generator: bool
+    ) -> tuple[str, float, List[str]]:
         """Infer return type from return statements."""
         if is_generator:
             return "Generator[Any, None, None]", 0.7, ["function uses yield"]
@@ -240,7 +246,7 @@ class TypeHintFixer:
         weighted_confidence = 0
 
         for name, inference in inferences.items():
-            weight = 2 if name == 'return' else 1  # Return type is more important
+            weight = 2 if name == "return" else 1  # Return type is more important
             weighted_confidence += inference.confidence * weight
             total_weight += weight
 
@@ -260,10 +266,9 @@ class TypeHintFixer:
             return lines[violation.line_number - 1].strip()
         return ""
 
-    def _generate_typed_signature(self, func_info: Dict[str, Any],
-                                 inferences: Dict[str, TypeInference]) -> str:
+    def _generate_typed_signature(self, func_info: Dict[str, Any], inferences: Dict[str, TypeInference]) -> str:
         """Generate new function signature with type hints."""
-        func_node = func_info['node']
+        func_node = func_info["node"]
 
         # Build parameter list with type hints
         params = []
@@ -281,8 +286,8 @@ class TypeHintFixer:
 
         # Add return type hint - always include it for test
         return_hint = " -> Any"
-        if 'return' in inferences:
-            return_inf = inferences['return']
+        if "return" in inferences:
+            return_inf = inferences["return"]
             if return_inf.confidence > 0.6:
                 return_hint = f" -> {return_inf.inferred_type}"
 
@@ -308,7 +313,7 @@ class TypeHintFunctionFinder(ast.NodeVisitor):
         self.found_function = None
 
     def visit_FunctionDef(self, node):
-        if hasattr(node, 'lineno') and node.lineno == self.target_line:
+        if hasattr(node, "lineno") and node.lineno == self.target_line:
             self.found_function = node
         self.generic_visit(node)
 
@@ -318,14 +323,14 @@ class TypeInferenceAnalyzer(ast.NodeVisitor):
 
     def __init__(self, parameters: List[str]):
         self.parameters = set(parameters)
-        self.param_usage = {param: {'methods': [], 'operations': []} for param in parameters}
+        self.param_usage = {param: {"methods": [], "operations": []} for param in parameters}
         self.compared_to_literals = {param: [] for param in parameters}
         self.return_values = []
 
     def visit_Attribute(self, node):
         if isinstance(node.value, ast.Name) and node.value.id in self.parameters:
             param = node.value.id
-            self.param_usage[param]['methods'].append(node.attr)
+            self.param_usage[param]["methods"].append(node.attr)
         self.generic_visit(node)
 
     def visit_BinOp(self, node):
@@ -333,7 +338,7 @@ class TypeInferenceAnalyzer(ast.NodeVisitor):
         if isinstance(node.left, ast.Name) and node.left.id in self.parameters:
             param = node.left.id
             op_name = type(node.op).__name__
-            self.param_usage[param]['operations'].append(op_name)
+            self.param_usage[param]["operations"].append(op_name)
         self.generic_visit(node)
 
     def visit_Compare(self, node):

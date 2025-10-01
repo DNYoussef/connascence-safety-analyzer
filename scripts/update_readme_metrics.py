@@ -14,7 +14,7 @@ import sys
 
 def read_readme() -> str:
     """Read README.md content."""
-    readme_path = Path('README.md')
+    readme_path = Path("README.md")
     if readme_path.exists():
         return readme_path.read_text()
     return ""
@@ -24,10 +24,10 @@ def update_metric_in_readme(content: str, metric_name: str, new_value: str) -> s
     """Update a specific metric in README content."""
     # Pattern to match metrics like "1,234+ violations detected"
     patterns = [
-        rf'(\d+,?\d*\+?\s*{metric_name})',
-        rf'({metric_name}:\s*\d+,?\d*)',
-        rf'(\d+,?\d*\s*{metric_name})',
-        rf'({metric_name}\s*\d+,?\d*)',
+        rf"(\d+,?\d*\+?\s*{metric_name})",
+        rf"({metric_name}:\s*\d+,?\d*)",
+        rf"(\d+,?\d*\s*{metric_name})",
+        rf"({metric_name}\s*\d+,?\d*)",
     ]
 
     updated = content
@@ -43,9 +43,9 @@ def update_nasa_score_in_readme(content: str, nasa_score: float) -> str:
     """Update NASA compliance score in README."""
     # Pattern to match NASA score like "85.4% NASA compliant"
     patterns = [
-        r'(\d+\.?\d*%?\s*NASA\s*complia\w*)',
-        r'(NASA\s*complia\w*:\s*\d+\.?\d*%?)',
-        r'(\d+\.?\d*%?\s*Power\s*of\s*Ten)',
+        r"(\d+\.?\d*%?\s*NASA\s*complia\w*)",
+        r"(NASA\s*complia\w*:\s*\d+\.?\d*%?)",
+        r"(\d+\.?\d*%?\s*Power\s*of\s*Ten)",
     ]
 
     nasa_percent = f"{nasa_score * 100:.1f}%"
@@ -67,21 +67,19 @@ def should_update_readme(current_violations: int, current_nasa: float) -> bool:
         return False
 
     # Extract current metrics from README
-    violation_match = re.search(r'(\d+,?\d*)\+?\s*violations?', readme_content, re.IGNORECASE)
-    nasa_match = re.search(r'(\d+\.?\d*)%?\s*NASA\s*complia', readme_content, re.IGNORECASE)
+    violation_match = re.search(r"(\d+,?\d*)\+?\s*violations?", readme_content, re.IGNORECASE)
+    nasa_match = re.search(r"(\d+\.?\d*)%?\s*NASA\s*complia", readme_content, re.IGNORECASE)
 
     current_readme_violations = 0
     current_readme_nasa = 85.0
 
     if violation_match:
         with contextlib.suppress(ValueError):
-            current_readme_violations = int(violation_match.group(1).replace(',', ''))
-
+            current_readme_violations = int(violation_match.group(1).replace(",", ""))
 
     if nasa_match:
         with contextlib.suppress(ValueError):
             current_readme_nasa = float(nasa_match.group(1))
-
 
     # Check for significant changes (>20% for violations, >5% for NASA score)
     violation_change = abs(current_violations - current_readme_violations)
@@ -96,9 +94,9 @@ def should_update_readme(current_violations: int, current_nasa: float) -> bool:
 def main():
     """Main entry point."""
     parser = argparse.ArgumentParser(description="Update README metrics if significantly changed")
-    parser.add_argument('--current-violations', type=int, required=True, help='Current violation count')
-    parser.add_argument('--nasa-score', type=float, required=True, help='Current NASA score (0-1)')
-    parser.add_argument('--update-if-changed', action='store_true', help='Only update if significantly changed')
+    parser.add_argument("--current-violations", type=int, required=True, help="Current violation count")
+    parser.add_argument("--nasa-score", type=float, required=True, help="Current NASA score (0-1)")
+    parser.add_argument("--update-if-changed", action="store_true", help="Only update if significantly changed")
 
     args = parser.parse_args()
 
@@ -119,7 +117,7 @@ def main():
 
     # Write updated README
     if updated_content != readme_content:
-        Path('README.md').write_text(updated_content)
+        Path("README.md").write_text(updated_content)
         print(f"Updated README.md with {args.current_violations} violations and {args.nasa_score:.1%} NASA score")
         return 0
     else:
@@ -127,5 +125,5 @@ def main():
         return 0
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

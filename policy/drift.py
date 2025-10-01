@@ -40,6 +40,7 @@ from typing import Any, Dict, List, Optional
 @dataclass
 class DriftMetric:
     """Individual drift measurement."""
+
     timestamp: str
     total_violations: int
     violations_by_type: Dict[str, int]
@@ -51,9 +52,11 @@ class DriftMetric:
     author: Optional[str] = None
     metadata: Optional[Dict[str, Any]] = None
 
+
 @dataclass
 class TrendAnalysis:
     """Trend analysis results."""
+
     trend_direction: str  # "improving", "degrading", "stable"
     trend_strength: float  # 0.0 to 1.0
     rate_of_change: float  # violations per day
@@ -62,9 +65,11 @@ class TrendAnalysis:
     forecast_30d: int  # predicted violations in 30 days
     analysis_period_days: int
 
+
 @dataclass
 class AnomalyDetection:
     """Anomaly detection results."""
+
     is_anomaly: bool
     anomaly_score: float  # 0.0 to 1.0
     baseline_mean: float
@@ -72,13 +77,16 @@ class AnomalyDetection:
     current_z_score: float
     threshold_exceeded: bool
 
+
 class DriftSeverity(Enum):
     """Drift severity levels."""
+
     NONE = "none"
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
     CRITICAL = "critical"
+
 
 class EnhancedDriftTracker:
     """Enterprise-grade drift tracking system."""
@@ -101,14 +109,14 @@ class EnhancedDriftTracker:
             return []
 
         try:
-            with open(self.drift_file, encoding='utf-8') as f:
+            with open(self.drift_file, encoding="utf-8") as f:
                 data = json.load(f)
 
-            if not data or 'drift_history' not in data:
+            if not data or "drift_history" not in data:
                 return []
 
             history = []
-            for metric_data in data['drift_history']:
+            for metric_data in data["drift_history"]:
                 history.append(DriftMetric(**metric_data))
 
             return history
@@ -124,13 +132,13 @@ class EnhancedDriftTracker:
             drift_data = [asdict(metric) for metric in self.drift_history]
 
             config = {
-                'version': '1.0',
-                'updated_at': datetime.now().isoformat(),
-                'total_measurements': len(self.drift_history),
-                'drift_history': drift_data
+                "version": "1.0",
+                "updated_at": datetime.now().isoformat(),
+                "total_measurements": len(self.drift_history),
+                "drift_history": drift_data,
             }
 
-            with open(self.drift_file, 'w', encoding='utf-8') as f:
+            with open(self.drift_file, "w", encoding="utf-8") as f:
                 json.dump(config, f, indent=2)
 
             return True
@@ -142,41 +150,42 @@ class EnhancedDriftTracker:
     def _create_default_drift_file(self):
         """Create default drift.json configuration."""
         default_config = {
-            'version': '1.0',
-            'description': 'Connascence Safety Analyzer - Drift Tracking Configuration',
-            'created_at': datetime.now().isoformat(),
-            'total_measurements': 0,
-            'drift_history': []
+            "version": "1.0",
+            "description": "Connascence Safety Analyzer - Drift Tracking Configuration",
+            "created_at": datetime.now().isoformat(),
+            "total_measurements": 0,
+            "drift_history": [],
         }
 
         try:
-            with open(self.drift_file, 'w', encoding='utf-8') as f:
+            with open(self.drift_file, "w", encoding="utf-8") as f:
                 json.dump(default_config, f, indent=2)
         except Exception as e:
             self.logger.error(f"Failed to create default drift config: {e}")
 
-    def record_measurement(self,
-                          violations: List[Any],
-                          files_analyzed: int,
-                          analysis_duration_ms: float,
-                          commit_hash: Optional[str] = None,
-                          branch: str = "main",
-                          author: Optional[str] = None,
-                          metadata: Optional[Dict[str, Any]] = None) -> DriftMetric:
+    def record_measurement(
+        self,
+        violations: List[Any],
+        files_analyzed: int,
+        analysis_duration_ms: float,
+        commit_hash: Optional[str] = None,
+        branch: str = "main",
+        author: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
+    ) -> DriftMetric:
         """Record a new drift measurement."""
 
         # Count violations by type and severity
         violations_by_type = {}
-        violations_by_severity = {'critical': 0, 'high': 0, 'medium': 0, 'low': 0}
+        violations_by_severity = {"critical": 0, "high": 0, "medium": 0, "low": 0}
 
         for violation in violations:
             # Count by type
-            violation_type = getattr(violation, 'connascence_type',
-                                   getattr(violation, 'type', 'unknown'))
+            violation_type = getattr(violation, "connascence_type", getattr(violation, "type", "unknown"))
             violations_by_type[violation_type] = violations_by_type.get(violation_type, 0) + 1
 
             # Count by severity
-            severity = str(getattr(violation, 'severity', 'medium')).lower()
+            severity = str(getattr(violation, "severity", "medium")).lower()
             if severity in violations_by_severity:
                 violations_by_severity[severity] += 1
 
@@ -191,7 +200,7 @@ class EnhancedDriftTracker:
             commit_hash=commit_hash,
             branch=branch,
             author=author,
-            metadata=metadata or {}
+            metadata=metadata or {},
         )
 
         # Add to history
@@ -211,10 +220,7 @@ class EnhancedDriftTracker:
         cutoff_date = datetime.now() - timedelta(days=days)
 
         # Filter recent measurements
-        recent_metrics = [
-            m for m in self.drift_history
-            if datetime.fromisoformat(m.timestamp) >= cutoff_date
-        ]
+        recent_metrics = [m for m in self.drift_history if datetime.fromisoformat(m.timestamp) >= cutoff_date]
 
         if len(recent_metrics) < 2:
             return TrendAnalysis(
@@ -224,7 +230,7 @@ class EnhancedDriftTracker:
                 confidence_score=0.0,
                 forecast_7d=0,
                 forecast_30d=0,
-                analysis_period_days=days
+                analysis_period_days=days,
             )
 
         # Extract violation counts and timestamps
@@ -279,7 +285,7 @@ class EnhancedDriftTracker:
             confidence_score=confidence_score,
             forecast_7d=forecast_7d,
             forecast_30d=forecast_30d,
-            analysis_period_days=days
+            analysis_period_days=days,
         )
 
     def detect_anomalies(self, current_violations: int, lookback_days: int = 30) -> AnomalyDetection:
@@ -287,10 +293,7 @@ class EnhancedDriftTracker:
         cutoff_date = datetime.now() - timedelta(days=lookback_days)
 
         # Get baseline measurements
-        baseline_metrics = [
-            m for m in self.drift_history
-            if datetime.fromisoformat(m.timestamp) >= cutoff_date
-        ]
+        baseline_metrics = [m for m in self.drift_history if datetime.fromisoformat(m.timestamp) >= cutoff_date]
 
         if len(baseline_metrics) < 5:
             return AnomalyDetection(
@@ -299,7 +302,7 @@ class EnhancedDriftTracker:
                 baseline_mean=0.0,
                 baseline_stddev=0.0,
                 current_z_score=0.0,
-                threshold_exceeded=False
+                threshold_exceeded=False,
             )
 
         # Calculate baseline statistics
@@ -321,7 +324,7 @@ class EnhancedDriftTracker:
             baseline_mean=baseline_mean,
             baseline_stddev=baseline_stddev,
             current_z_score=current_z_score,
-            threshold_exceeded=is_anomaly
+            threshold_exceeded=is_anomaly,
         )
 
     def get_drift_severity(self, trend_analysis: TrendAnalysis) -> DriftSeverity:
@@ -351,23 +354,15 @@ class EnhancedDriftTracker:
         branch_b_metrics = [m for m in self.drift_history if m.branch == branch_b]
 
         if not branch_a_metrics or not branch_b_metrics:
-            return {
-                'comparison_available': False,
-                'error': f'Insufficient data for branches: {branch_a}, {branch_b}'
-            }
+            return {"comparison_available": False, "error": f"Insufficient data for branches: {branch_a}, {branch_b}"}
 
         # Get recent metrics (last 7 days)
         recent_cutoff = datetime.now() - timedelta(days=7)
-        recent_a = [m for m in branch_a_metrics
-                   if datetime.fromisoformat(m.timestamp) >= recent_cutoff]
-        recent_b = [m for m in branch_b_metrics
-                   if datetime.fromisoformat(m.timestamp) >= recent_cutoff]
+        recent_a = [m for m in branch_a_metrics if datetime.fromisoformat(m.timestamp) >= recent_cutoff]
+        recent_b = [m for m in branch_b_metrics if datetime.fromisoformat(m.timestamp) >= recent_cutoff]
 
         if not recent_a or not recent_b:
-            return {
-                'comparison_available': False,
-                'error': 'No recent measurements for comparison'
-            }
+            return {"comparison_available": False, "error": "No recent measurements for comparison"}
 
         # Calculate averages
         avg_violations_a = statistics.mean([m.total_violations for m in recent_a])
@@ -378,27 +373,19 @@ class EnhancedDriftTracker:
         percentage_diff = (difference / avg_violations_a * 100) if avg_violations_a > 0 else 0
 
         return {
-            'comparison_available': True,
-            'branch_a': {
-                'name': branch_a,
-                'avg_violations': avg_violations_a,
-                'measurement_count': len(recent_a)
-            },
-            'branch_b': {
-                'name': branch_b,
-                'avg_violations': avg_violations_b,
-                'measurement_count': len(recent_b)
-            },
-            'difference': difference,
-            'percentage_difference': percentage_diff,
-            'better_performing_branch': branch_a if difference > 0 else branch_b,
-            'analysis_period': '7 days'
+            "comparison_available": True,
+            "branch_a": {"name": branch_a, "avg_violations": avg_violations_a, "measurement_count": len(recent_a)},
+            "branch_b": {"name": branch_b, "avg_violations": avg_violations_b, "measurement_count": len(recent_b)},
+            "difference": difference,
+            "percentage_difference": percentage_diff,
+            "better_performing_branch": branch_a if difference > 0 else branch_b,
+            "analysis_period": "7 days",
         }
 
     def get_performance_benchmarks(self) -> Dict[str, Any]:
         """Get performance benchmarks from historical data."""
         if not self.drift_history:
-            return {'benchmarks_available': False}
+            return {"benchmarks_available": False}
 
         # Calculate various benchmarks
         all_violations = [m.total_violations for m in self.drift_history]
@@ -406,30 +393,30 @@ class EnhancedDriftTracker:
         all_files = [m.files_analyzed for m in self.drift_history]
 
         benchmarks = {
-            'benchmarks_available': True,
-            'violation_statistics': {
-                'min': min(all_violations),
-                'max': max(all_violations),
-                'mean': statistics.mean(all_violations),
-                'median': statistics.median(all_violations),
-                'stdev': statistics.stdev(all_violations) if len(all_violations) > 1 else 0
+            "benchmarks_available": True,
+            "violation_statistics": {
+                "min": min(all_violations),
+                "max": max(all_violations),
+                "mean": statistics.mean(all_violations),
+                "median": statistics.median(all_violations),
+                "stdev": statistics.stdev(all_violations) if len(all_violations) > 1 else 0,
             },
-            'performance_statistics': {
-                'min_duration_ms': min(all_durations),
-                'max_duration_ms': max(all_durations),
-                'avg_duration_ms': statistics.mean(all_durations),
-                'median_duration_ms': statistics.median(all_durations)
+            "performance_statistics": {
+                "min_duration_ms": min(all_durations),
+                "max_duration_ms": max(all_durations),
+                "avg_duration_ms": statistics.mean(all_durations),
+                "median_duration_ms": statistics.median(all_durations),
             },
-            'analysis_scope': {
-                'min_files': min(all_files),
-                'max_files': max(all_files),
-                'avg_files': statistics.mean(all_files)
+            "analysis_scope": {
+                "min_files": min(all_files),
+                "max_files": max(all_files),
+                "avg_files": statistics.mean(all_files),
             },
-            'measurement_count': len(self.drift_history),
-            'date_range': {
-                'earliest': self.drift_history[0].timestamp if self.drift_history else None,
-                'latest': self.drift_history[-1].timestamp if self.drift_history else None
-            }
+            "measurement_count": len(self.drift_history),
+            "date_range": {
+                "earliest": self.drift_history[0].timestamp if self.drift_history else None,
+                "latest": self.drift_history[-1].timestamp if self.drift_history else None,
+            },
         }
 
         return benchmarks
@@ -437,25 +424,25 @@ class EnhancedDriftTracker:
     def export_drift_report(self, days: int = 30) -> Dict[str, Any]:
         """Export comprehensive drift analysis report."""
         trend = self.analyze_trend(days)
-        anomaly = self.detect_anomalies(
-            self.drift_history[-1].total_violations if self.drift_history else 0,
-            days
-        )
+        anomaly = self.detect_anomalies(self.drift_history[-1].total_violations if self.drift_history else 0, days)
         severity = self.get_drift_severity(trend)
         benchmarks = self.get_performance_benchmarks()
 
         return {
-            'report_generated_at': datetime.now().isoformat(),
-            'analysis_period_days': days,
-            'trend_analysis': asdict(trend),
-            'anomaly_detection': asdict(anomaly),
-            'drift_severity': severity.value,
-            'performance_benchmarks': benchmarks,
-            'total_measurements': len(self.drift_history),
-            'recent_measurements': len([
-                m for m in self.drift_history
-                if datetime.fromisoformat(m.timestamp) >= datetime.now() - timedelta(days=days)
-            ])
+            "report_generated_at": datetime.now().isoformat(),
+            "analysis_period_days": days,
+            "trend_analysis": asdict(trend),
+            "anomaly_detection": asdict(anomaly),
+            "drift_severity": severity.value,
+            "performance_benchmarks": benchmarks,
+            "total_measurements": len(self.drift_history),
+            "recent_measurements": len(
+                [
+                    m
+                    for m in self.drift_history
+                    if datetime.fromisoformat(m.timestamp) >= datetime.now() - timedelta(days=days)
+                ]
+            ),
         }
 
     def cleanup_old_measurements(self, keep_days: int = 90) -> int:
@@ -463,10 +450,7 @@ class EnhancedDriftTracker:
         cutoff_date = datetime.now() - timedelta(days=keep_days)
 
         initial_count = len(self.drift_history)
-        self.drift_history = [
-            m for m in self.drift_history
-            if datetime.fromisoformat(m.timestamp) >= cutoff_date
-        ]
+        self.drift_history = [m for m in self.drift_history if datetime.fromisoformat(m.timestamp) >= cutoff_date]
 
         cleaned_count = initial_count - len(self.drift_history)
         if cleaned_count > 0:

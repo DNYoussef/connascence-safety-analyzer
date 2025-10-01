@@ -57,6 +57,7 @@ import time
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+
 def main():
     """Main unified entry point."""
     parser = argparse.ArgumentParser(
@@ -91,31 +92,24 @@ EXAMPLES:
 
   # MECE duplication analysis
   python scripts/unified_connascence_analyzer.py . --mece-analysis --consolidation-recommendations
-        """
+        """,
     )
 
     # Core arguments
     parser.add_argument("path", help="Path to analyze (file or directory)")
     parser.add_argument("--output", "-o", help="Output file (default: stdout)")
-    parser.add_argument("--format", "-f", choices=["text", "json", "sarif"],
-                       default="text", help="Output format")
-    parser.add_argument("--severity", "-s",
-                       choices=["low", "medium", "high", "critical"],
-                       help="Minimum severity level to report")
-    parser.add_argument("--exclude", "-e", action="append",
-                       help="Additional exclusion patterns")
-    parser.add_argument("--verbose", "-v", action="store_true",
-                       help="Verbose output")
+    parser.add_argument("--format", "-f", choices=["text", "json", "sarif"], default="text", help="Output format")
+    parser.add_argument(
+        "--severity", "-s", choices=["low", "medium", "high", "critical"], help="Minimum severity level to report"
+    )
+    parser.add_argument("--exclude", "-e", action="append", help="Additional exclusion patterns")
+    parser.add_argument("--verbose", "-v", action="store_true", help="Verbose output")
 
     # Enhanced analysis options
-    parser.add_argument("--nasa-compliance", action="store_true",
-                       help="Focus on NASA Power of Ten rules compliance")
-    parser.add_argument("--mece-analysis", action="store_true",
-                       help="Include MECE duplication analysis")
-    parser.add_argument("--enable-tools", action="store_true",
-                       help="Enable multi-tool integration (Ruff, MyPy, etc.)")
-    parser.add_argument("--comprehensive", action="store_true",
-                       help="Run comprehensive analysis with all features")
+    parser.add_argument("--nasa-compliance", action="store_true", help="Focus on NASA Power of Ten rules compliance")
+    parser.add_argument("--mece-analysis", action="store_true", help="Include MECE duplication analysis")
+    parser.add_argument("--enable-tools", action="store_true", help="Enable multi-tool integration (Ruff, MyPy, etc.)")
+    parser.add_argument("--comprehensive", action="store_true", help="Run comprehensive analysis with all features")
 
     # CI/CD integration
     parser.add_argument("--fail-on", help="Comma-separated severities to fail on (e.g., critical,high)")
@@ -123,10 +117,10 @@ EXAMPLES:
     parser.add_argument("--baseline-file", help="Path to baseline file for comparison")
 
     # Output options
-    parser.add_argument("--consolidation-recommendations", action="store_true",
-                       help="Include MECE consolidation recommendations")
-    parser.add_argument("--failure-predictions", action="store_true",
-                       help="Include failure prediction analysis")
+    parser.add_argument(
+        "--consolidation-recommendations", action="store_true", help="Include MECE consolidation recommendations"
+    )
+    parser.add_argument("--failure-predictions", action="store_true", help="Include failure prediction analysis")
 
     args = parser.parse_args()
 
@@ -219,10 +213,11 @@ EXAMPLES:
         # Execute the enhanced analyzer
         result = subprocess.run(
             cmd,
+            check=False,
             capture_output=not args.output,  # Capture only if not writing to file
             text=True,
             cwd=str(Path(__file__).parent.parent),
-            env={**os.environ, 'PYTHONPATH': str(Path(__file__).parent.parent)}
+            env={**os.environ, "PYTHONPATH": str(Path(__file__).parent.parent)},
         )
 
         # Handle output
@@ -256,6 +251,7 @@ EXAMPLES:
         print(f"[ERROR] Runtime error: {e}", file=sys.stderr)
         if args.verbose:
             import traceback
+
             traceback.print_exc()
         return 3  # Runtime error
 
@@ -273,17 +269,17 @@ def check_dependencies():
 
     # Check Ruff
     try:
-        result = subprocess.run(['ruff', '--version'], capture_output=True, text=True)
-        tools_status['ruff'] = 'available' if result.returncode == 0 else 'not available'
+        result = subprocess.run(["ruff", "--version"], check=False, capture_output=True, text=True)
+        tools_status["ruff"] = "available" if result.returncode == 0 else "not available"
     except FileNotFoundError:
-        tools_status['ruff'] = 'not available'
+        tools_status["ruff"] = "not available"
 
     # Check MyPy
     try:
-        result = subprocess.run(['mypy', '--version'], capture_output=True, text=True)
-        tools_status['mypy'] = 'available' if result.returncode == 0 else 'not available'
+        result = subprocess.run(["mypy", "--version"], check=False, capture_output=True, text=True)
+        tools_status["mypy"] = "available" if result.returncode == 0 else "not available"
     except FileNotFoundError:
-        tools_status['mypy'] = 'not available'
+        tools_status["mypy"] = "not available"
 
     # Check if enhanced analyzer exists
     analyzer_path = Path(__file__).parent.parent / "analyzer" / "check_connascence.py"

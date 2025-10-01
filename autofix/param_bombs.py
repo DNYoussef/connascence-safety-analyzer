@@ -23,12 +23,14 @@ from dataclasses import dataclass
 from typing import List, Optional, Tuple
 
 from utils.types import ConnascenceViolation
+
 from .patch_api import PatchSuggestion
 
 
 @dataclass
 class ParameterInfo:
     """Information about a function parameter."""
+
     name: str
     type_hint: Optional[str]
     default_value: Optional[str]
@@ -38,6 +40,7 @@ class ParameterInfo:
 @dataclass
 class FunctionSignature:
     """Information about a function signature."""
+
     name: str
     parameters: List[ParameterInfo]
     return_type: Optional[str]
@@ -53,8 +56,9 @@ class ParameterBombFixer:
         self.max_positional_params = 3
         self.dataclass_threshold = 5  # Use dataclass if more than this many params
 
-    def generate_patch(self, violation: ConnascenceViolation,
-                      tree: ast.AST, source_code: str) -> Optional[PatchSuggestion]:
+    def generate_patch(
+        self, violation: ConnascenceViolation, tree: ast.AST, source_code: str
+    ) -> Optional[PatchSuggestion]:
         """Generate patch for a parameter bomb violation."""
         function_info = self._extract_function_info(violation, tree)
         if not function_info:
@@ -78,11 +82,10 @@ class ParameterBombFixer:
             file_path=violation.file_path,
             line_range=self._get_function_line_range(violation, tree),
             safety_level=self._assess_safety(function_info, strategy),
-            rollback_info={}
+            rollback_info={},
         )
 
-    def _extract_function_info(self, violation: ConnascenceViolation,
-                              tree: ast.AST) -> Optional[FunctionSignature]:
+    def _extract_function_info(self, violation: ConnascenceViolation, tree: ast.AST) -> Optional[FunctionSignature]:
         """Extract function signature information."""
         finder = FunctionFinder(violation.line_number)
         finder.visit(tree)
@@ -99,12 +102,12 @@ class ParameterBombFixer:
                 name=arg.arg,
                 type_hint=self._get_type_annotation(arg),
                 default_value=None,  # TODO: Extract defaults
-                position=i
+                position=i,
             )
             parameters.append(param_info)
 
         # Check if it's a method
-        is_method = len(parameters) > 0 and parameters[0].name in ('self', 'cls')
+        is_method = len(parameters) > 0 and parameters[0].name in ("self", "cls")
 
         return FunctionSignature(
             name=func_node.name,
@@ -112,7 +115,7 @@ class ParameterBombFixer:
             return_type=self._get_type_annotation(func_node, is_return=True),
             docstring=ast.get_docstring(func_node),
             is_method=is_method,
-            class_name=finder.class_context
+            class_name=finder.class_context,
         )
 
     def _choose_refactoring_strategy(self, func_info: FunctionSignature) -> str:
@@ -124,11 +127,11 @@ class ParameterBombFixer:
             param_count -= 1
 
         if param_count >= self.dataclass_threshold:
-            return 'dataclass'
+            return "dataclass"
         elif param_count >= 4:
-            return 'keyword_only'
+            return "keyword_only"
         else:
-            return 'typed_params'
+            return "typed_params"
 
     def _calculate_confidence(self, func_info: FunctionSignature, strategy: str) -> float:
         """Calculate confidence score for the refactoring."""
@@ -150,9 +153,9 @@ class ParameterBombFixer:
             confidence += 0.1
 
         # Strategy-specific confidence adjustments
-        if strategy == 'dataclass' and param_count >= self.dataclass_threshold:
-            confidence += 0.1
-        elif strategy == 'keyword_only' and 4 <= param_count < self.dataclass_threshold:
+        if (strategy == "dataclass" and param_count >= self.dataclass_threshold) or (
+            strategy == "keyword_only" and 4 <= param_count < self.dataclass_threshold
+        ):
             confidence += 0.1
 
         return min(confidence, 0.9)
@@ -160,18 +163,18 @@ class ParameterBombFixer:
     def _assess_safety(self, func_info: FunctionSignature, strategy: str) -> str:
         """Assess safety level of the refactoring."""
         # Dataclass refactoring is more invasive
-        if strategy == 'dataclass':
-            return 'moderate'
+        if strategy == "dataclass":
+            return "moderate"
 
         # Keyword-only is generally safe
-        if strategy == 'keyword_only':
-            return 'safe'
+        if strategy == "keyword_only":
+            return "safe"
 
         # Adding type hints is very safe
-        if strategy == 'typed_params':
-            return 'safe'
+        if strategy == "typed_params":
+            return "safe"
 
-        return 'moderate'
+        return "moderate"
 
     def _get_function_code(self, violation: ConnascenceViolation, source: str) -> str:
         """Extract the function code."""
@@ -188,10 +191,9 @@ class ParameterBombFixer:
                 break
             end_line += 1
 
-        return '\n'.join(lines[start_line:end_line])
+        return "\n".join(lines[start_line:end_line])
 
-    def _get_function_line_range(self, violation: ConnascenceViolation,
-                                tree: ast.AST) -> Tuple[int, int]:
+    def _get_function_line_range(self, violation: ConnascenceViolation, tree: ast.AST) -> Tuple[int, int]:
         """Get the line range of the function."""
         finder = FunctionFinder(violation.line_number)
         finder.visit(tree)
@@ -199,19 +201,18 @@ class ParameterBombFixer:
         if finder.found_function:
             func = finder.found_function
             start = func.lineno
-            end = getattr(func, 'end_lineno', start + 10)  # Fallback
+            end = getattr(func, "end_lineno", start + 10)  # Fallback
             return (start, end)
 
         return (violation.line_number, violation.line_number + 5)
 
-    def _generate_refactored_code(self, func_info: FunctionSignature,
-                                 strategy: str, source_code: str) -> str:
+    def _generate_refactored_code(self, func_info: FunctionSignature, strategy: str, source_code: str) -> str:
         """Generate refactored function code."""
-        if strategy == 'dataclass':
+        if strategy == "dataclass":
             return self._generate_dataclass_refactor(func_info)
-        elif strategy == 'keyword_only':
+        elif strategy == "keyword_only":
             return self._generate_keyword_only_refactor(func_info)
-        elif strategy == 'typed_params':
+        elif strategy == "typed_params":
             return self._generate_typed_params_refactor(func_info)
         else:
             return source_code
@@ -295,12 +296,12 @@ class ParameterBombFixer:
     def _get_type_annotation(self, node, is_return: bool = False) -> Optional[str]:
         """Extract type annotation from AST node."""
         if is_return:
-            if hasattr(node, 'returns') and node.returns:
-                return ast.unparse(node.returns) if hasattr(ast, 'unparse') else 'Any'
+            if hasattr(node, "returns") and node.returns:
+                return ast.unparse(node.returns) if hasattr(ast, "unparse") else "Any"
             return None
 
-        if hasattr(node, 'annotation') and node.annotation:
-            return ast.unparse(node.annotation) if hasattr(ast, 'unparse') else 'Any'
+        if hasattr(node, "annotation") and node.annotation:
+            return ast.unparse(node.annotation) if hasattr(ast, "unparse") else "Any"
         return None
 
 
@@ -319,9 +320,9 @@ class FunctionFinder(ast.NodeVisitor):
         self._class_stack.pop()
 
     def visit_FunctionDef(self, node):
-        if hasattr(node, 'lineno') and node.lineno <= self.target_line:
+        if hasattr(node, "lineno") and node.lineno <= self.target_line:
             # Check if target line is within function
-            end_line = getattr(node, 'end_lineno', node.lineno + 10)
+            end_line = getattr(node, "end_lineno", node.lineno + 10)
             if self.target_line <= end_line:
                 self.found_function = node
                 self.class_context = self._class_stack[-1] if self._class_stack else None

@@ -33,12 +33,14 @@ script_dir = Path(__file__).parent
 project_root = script_dir.parent
 sys.path.insert(0, str(project_root))
 
+
 @dataclass
 class QualityMetric:
     name: str
     value: Union[int, float]
     source: str
     timestamp: datetime
+
 
 @dataclass
 class GateResult:
@@ -48,6 +50,7 @@ class GateResult:
     threshold: Optional[Union[int, float]] = None
     actual_value: Optional[Union[int, float]] = None
     details: Dict[str, Any] = None
+
 
 class QualityGateEvaluator:
     """Main quality gate evaluation system"""
@@ -69,18 +72,15 @@ class QualityGateEvaluator:
 
     def _setup_logging(self) -> logging.Logger:
         """Setup logging configuration"""
-        logging.basicConfig(
-            level=logging.INFO,
-            format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-        )
+        logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
         return logging.getLogger(__name__)
 
     def _load_config(self, config_path: Union[str, Path]) -> Dict[str, Any]:
         """Load quality gates configuration"""
         try:
-            with open(config_path, encoding='utf-8') as f:
+            with open(config_path, encoding="utf-8") as f:
                 config = yaml.safe_load(f)
-            return config.get('quality_gates', {})
+            return config.get("quality_gates", {})
         except Exception as e:
             self.logger.error(f"Failed to load config from {config_path}: {e}")
             return {}
@@ -91,41 +91,41 @@ class QualityGateEvaluator:
 
         try:
             # Extract core metrics from analysis results
-            violations = analysis_results.get('violations', [])
+            violations = analysis_results.get("violations", [])
 
             # Count violations by severity
-            critical_count = sum(1 for v in violations if v.get('severity') == 'critical')
-            high_count = sum(1 for v in violations if v.get('severity') == 'high')
-            sum(1 for v in violations if v.get('severity') == 'medium')
+            critical_count = sum(1 for v in violations if v.get("severity") == "critical")
+            high_count = sum(1 for v in violations if v.get("severity") == "high")
+            sum(1 for v in violations if v.get("severity") == "medium")
             total_count = len(violations)
 
-            metrics['critical_violations_count'] = QualityMetric(
-                'critical_violations_count', critical_count, 'unified_analyzer', datetime.now()
+            metrics["critical_violations_count"] = QualityMetric(
+                "critical_violations_count", critical_count, "unified_analyzer", datetime.now()
             )
-            metrics['high_violations_count'] = QualityMetric(
-                'high_violations_count', high_count, 'unified_analyzer', datetime.now()
+            metrics["high_violations_count"] = QualityMetric(
+                "high_violations_count", high_count, "unified_analyzer", datetime.now()
             )
 
             # NASA compliance score
-            nasa_violations = [v for v in violations if 'nasa' in v.get('message', '').lower()]
+            nasa_violations = [v for v in violations if "nasa" in v.get("message", "").lower()]
             nasa_score = max(0, 100 - (len(nasa_violations) * 5))
-            metrics['nasa_compliance_score'] = QualityMetric(
-                'nasa_compliance_score', nasa_score, 'nasa_analyzer', datetime.now()
+            metrics["nasa_compliance_score"] = QualityMetric(
+                "nasa_compliance_score", nasa_score, "nasa_analyzer", datetime.now()
             )
 
             # Overall compliance score
             penalty_score = (critical_count * 10) + (high_count * 5) + (total_count * 1)
             overall_score = max(0, 100 - penalty_score)
-            metrics['overall_compliance_score'] = QualityMetric(
-                'overall_compliance_score', overall_score, 'severity_classifier', datetime.now()
+            metrics["overall_compliance_score"] = QualityMetric(
+                "overall_compliance_score", overall_score, "severity_classifier", datetime.now()
             )
 
             # MECE analysis metrics
-            mece_results = analysis_results.get('mece_analysis', {})
-            duplication_clusters = mece_results.get('duplication_clusters', [])
+            mece_results = analysis_results.get("mece_analysis", {})
+            duplication_clusters = mece_results.get("duplication_clusters", [])
             duplication_percentage = min(len(duplication_clusters) * 5, 100)  # Rough estimate
-            metrics['code_duplication_percentage'] = QualityMetric(
-                'code_duplication_percentage', duplication_percentage, 'mece_analyzer', datetime.now()
+            metrics["code_duplication_percentage"] = QualityMetric(
+                "code_duplication_percentage", duplication_percentage, "mece_analyzer", datetime.now()
             )
 
             # Store metrics for evaluation
@@ -143,7 +143,7 @@ class QualityGateEvaluator:
         results = []
 
         try:
-            gates_config = self.config.get('gates', {})
+            gates_config = self.config.get("gates", {})
 
             for gate_name, gate_config in gates_config.items():
                 result = self._evaluate_single_gate(gate_name, gate_config)
@@ -160,60 +160,57 @@ class QualityGateEvaluator:
     def _evaluate_single_gate(self, gate_name: str, gate_config: Dict[str, Any]) -> GateResult:
         """Evaluate a single quality gate"""
         try:
-            gate_type = gate_config.get('type', 'threshold')
-            metric_name = gate_config.get('metric')
-            threshold = gate_config.get('threshold')
-            operator = gate_config.get('operator', 'lte')
-            action = gate_config.get('action', 'warn')
-            message = gate_config.get('message', f"Gate {gate_name} evaluation")
+            gate_type = gate_config.get("type", "threshold")
+            metric_name = gate_config.get("metric")
+            threshold = gate_config.get("threshold")
+            operator = gate_config.get("operator", "lte")
+            action = gate_config.get("action", "warn")
+            message = gate_config.get("message", f"Gate {gate_name} evaluation")
 
             # Get metric value
             if metric_name in self.metrics:
                 actual_value = self.metrics[metric_name].value
             else:
                 return GateResult(
-                    gate_name=gate_name,
-                    status='ERROR',
-                    message=f"Metric {metric_name} not found",
-                    threshold=threshold
+                    gate_name=gate_name, status="ERROR", message=f"Metric {metric_name} not found", threshold=threshold
                 )
 
             # Evaluate condition
-            if gate_type == 'threshold':
+            if gate_type == "threshold":
                 passed = self._evaluate_threshold_condition(actual_value, threshold, operator)
-            elif gate_type == 'score':
+            elif gate_type == "score":
                 passed = self._evaluate_score_condition(actual_value, threshold, operator)
                 # Check warning threshold
-                warning_threshold = gate_config.get('warning_threshold')
+                warning_threshold = gate_config.get("warning_threshold")
                 if passed and warning_threshold:
                     warning_passed = self._evaluate_threshold_condition(actual_value, warning_threshold, operator)
                     if not warning_passed:
                         return GateResult(
                             gate_name=gate_name,
-                            status='WARNING',
-                            message=gate_config.get('warning_message', f"Warning: {gate_name}"),
+                            status="WARNING",
+                            message=gate_config.get("warning_message", f"Warning: {gate_name}"),
                             threshold=warning_threshold,
-                            actual_value=actual_value
+                            actual_value=actual_value,
                         )
-            elif gate_type == 'composite':
+            elif gate_type == "composite":
                 passed = self._evaluate_composite_gate(gate_config)
-            elif gate_type == 'trend':
+            elif gate_type == "trend":
                 passed = self._evaluate_trend_gate(gate_config)
             else:
                 return GateResult(
                     gate_name=gate_name,
-                    status='ERROR',
+                    status="ERROR",
                     message=f"Unknown gate type: {gate_type}",
                     threshold=threshold,
-                    actual_value=actual_value
+                    actual_value=actual_value,
                 )
 
             # Determine status
             if passed:
-                status = 'PASSED'
+                status = "PASSED"
                 result_message = f"Gate passed: {message}"
             else:
-                status = 'FAILED' if action == 'fail' else 'WARNING'
+                status = "FAILED" if action == "fail" else "WARNING"
                 result_message = message
 
             return GateResult(
@@ -221,29 +218,31 @@ class QualityGateEvaluator:
                 status=status,
                 message=result_message,
                 threshold=threshold,
-                actual_value=actual_value
+                actual_value=actual_value,
             )
 
         except Exception as e:
             self.logger.error(f"Error evaluating gate {gate_name}: {e}")
             return GateResult(
                 gate_name=gate_name,
-                status='ERROR',
+                status="ERROR",
                 message=f"Evaluation error: {e}",
-                threshold=threshold if 'threshold' in locals() else None
+                threshold=threshold if "threshold" in locals() else None,
             )
 
-    def _evaluate_threshold_condition(self, value: Union[int, float], threshold: Union[int, float], operator: str) -> bool:
+    def _evaluate_threshold_condition(
+        self, value: Union[int, float], threshold: Union[int, float], operator: str
+    ) -> bool:
         """Evaluate threshold condition"""
-        if operator == 'lte':
+        if operator == "lte":
             return value <= threshold
-        elif operator == 'gte':
+        elif operator == "gte":
             return value >= threshold
-        elif operator == 'lt':
+        elif operator == "lt":
             return value < threshold
-        elif operator == 'gt':
+        elif operator == "gt":
             return value > threshold
-        elif operator == 'eq':
+        elif operator == "eq":
             return value == threshold
         else:
             raise ValueError(f"Unknown operator: {operator}")
@@ -255,17 +254,17 @@ class QualityGateEvaluator:
     def _evaluate_composite_gate(self, gate_config: Dict[str, Any]) -> bool:
         """Evaluate composite gate with multiple metrics"""
         try:
-            metrics_config = gate_config.get('metrics', [])
-            composite_threshold = gate_config.get('composite_threshold', 0.8)
+            metrics_config = gate_config.get("metrics", [])
+            composite_threshold = gate_config.get("composite_threshold", 0.8)
 
             weighted_score = 0.0
             total_weight = 0.0
 
             for metric_config in metrics_config:
-                metric_name = metric_config.get('name')
-                threshold = metric_config.get('threshold')
-                operator = metric_config.get('operator', 'lte')
-                weight = metric_config.get('weight', 1.0)
+                metric_name = metric_config.get("name")
+                threshold = metric_config.get("threshold")
+                operator = metric_config.get("operator", "lte")
+                weight = metric_config.get("weight", 1.0)
 
                 if metric_name in self.metrics:
                     value = self.metrics[metric_name].value
@@ -292,10 +291,14 @@ class QualityGateEvaluator:
         """Predict likelihood of build failure using heuristics"""
         try:
             # Simple failure prediction based on current metrics
-            critical_count = self.metrics.get('critical_violations_count', QualityMetric('', 0, '', datetime.now())).value
-            high_count = self.metrics.get('high_violations_count', QualityMetric('', 0, '', datetime.now())).value
-            nasa_score = self.metrics.get('nasa_compliance_score', QualityMetric('', 100, '', datetime.now())).value
-            overall_score = self.metrics.get('overall_compliance_score', QualityMetric('', 100, '', datetime.now())).value
+            critical_count = self.metrics.get(
+                "critical_violations_count", QualityMetric("", 0, "", datetime.now())
+            ).value
+            high_count = self.metrics.get("high_violations_count", QualityMetric("", 0, "", datetime.now())).value
+            nasa_score = self.metrics.get("nasa_compliance_score", QualityMetric("", 100, "", datetime.now())).value
+            overall_score = self.metrics.get(
+                "overall_compliance_score", QualityMetric("", 100, "", datetime.now())
+            ).value
 
             # Simple scoring algorithm
             failure_score = 0.0
@@ -330,15 +333,15 @@ class QualityGateEvaluator:
         decisions = []
 
         try:
-            routing_config = self.config.get('intelligent_routing', {})
-            if not routing_config.get('enabled', False):
+            routing_config = self.config.get("intelligent_routing", {})
+            if not routing_config.get("enabled", False):
                 return decisions
 
-            rules = routing_config.get('routing_rules', {})
+            rules = routing_config.get("routing_rules", {})
 
             for rule_name, rule_config in rules.items():
-                conditions = rule_config.get('conditions', [])
-                actions = rule_config.get('actions', [])
+                conditions = rule_config.get("conditions", [])
+                actions = rule_config.get("actions", [])
 
                 # Evaluate conditions
                 all_conditions_met = True
@@ -361,16 +364,16 @@ class QualityGateEvaluator:
         """Evaluate a routing condition"""
         try:
             # Simple condition parser - could be enhanced
-            if '<' in condition:
-                metric_name, threshold_str = condition.split('<')
+            if "<" in condition:
+                metric_name, threshold_str = condition.split("<")
                 metric_name = metric_name.strip()
                 threshold = float(threshold_str.strip())
 
                 if metric_name in self.metrics:
                     return self.metrics[metric_name].value < threshold
 
-            elif '>' in condition:
-                metric_name, threshold_str = condition.split('>')
+            elif ">" in condition:
+                metric_name, threshold_str = condition.split(">")
                 metric_name = metric_name.strip()
                 threshold = float(threshold_str.strip())
 
@@ -386,30 +389,26 @@ class QualityGateEvaluator:
     def generate_report(self) -> Dict[str, Any]:
         """Generate comprehensive quality gates report"""
         report = {
-            'timestamp': datetime.now().isoformat(),
-            'quality_gates_version': '2.0.0',
-            'metrics': {
-                name: {
-                    'value': metric.value,
-                    'source': metric.source,
-                    'timestamp': metric.timestamp.isoformat()
-                }
+            "timestamp": datetime.now().isoformat(),
+            "quality_gates_version": "2.0.0",
+            "metrics": {
+                name: {"value": metric.value, "source": metric.source, "timestamp": metric.timestamp.isoformat()}
                 for name, metric in self.metrics.items()
             },
-            'gate_results': [
+            "gate_results": [
                 {
-                    'gate_name': result.gate_name,
-                    'status': result.status,
-                    'message': result.message,
-                    'threshold': result.threshold,
-                    'actual_value': result.actual_value,
-                    'details': result.details or {}
+                    "gate_name": result.gate_name,
+                    "status": result.status,
+                    "message": result.message,
+                    "threshold": result.threshold,
+                    "actual_value": result.actual_value,
+                    "details": result.details or {},
                 }
                 for result in self.gate_results
             ],
-            'failure_prediction_score': self.failure_prediction_score,
-            'routing_decisions': self.make_routing_decisions(),
-            'summary': self._generate_summary()
+            "failure_prediction_score": self.failure_prediction_score,
+            "routing_decisions": self.make_routing_decisions(),
+            "summary": self._generate_summary(),
         }
 
         return report
@@ -417,40 +416,41 @@ class QualityGateEvaluator:
     def _generate_summary(self) -> Dict[str, Any]:
         """Generate summary of quality gates evaluation"""
         total_gates = len(self.gate_results)
-        passed_gates = sum(1 for r in self.gate_results if r.status == 'PASSED')
-        failed_gates = sum(1 for r in self.gate_results if r.status == 'FAILED')
-        warning_gates = sum(1 for r in self.gate_results if r.status == 'WARNING')
-        error_gates = sum(1 for r in self.gate_results if r.status == 'ERROR')
+        passed_gates = sum(1 for r in self.gate_results if r.status == "PASSED")
+        failed_gates = sum(1 for r in self.gate_results if r.status == "FAILED")
+        warning_gates = sum(1 for r in self.gate_results if r.status == "WARNING")
+        error_gates = sum(1 for r in self.gate_results if r.status == "ERROR")
 
         # Determine overall status
         if error_gates > 0:
-            overall_status = 'ERROR'
+            overall_status = "ERROR"
         elif failed_gates > 0:
-            overall_status = 'FAILED'
+            overall_status = "FAILED"
         elif warning_gates > 0:
-            overall_status = 'WARNING'
+            overall_status = "WARNING"
         else:
-            overall_status = 'PASSED'
+            overall_status = "PASSED"
 
         return {
-            'total_gates': total_gates,
-            'passed_gates': passed_gates,
-            'failed_gates': failed_gates,
-            'warning_gates': warning_gates,
-            'error_gates': error_gates,
-            'overall_status': overall_status,
-            'pass_rate': (passed_gates / total_gates * 100) if total_gates > 0 else 0
+            "total_gates": total_gates,
+            "passed_gates": passed_gates,
+            "failed_gates": failed_gates,
+            "warning_gates": warning_gates,
+            "error_gates": error_gates,
+            "overall_status": overall_status,
+            "pass_rate": (passed_gates / total_gates * 100) if total_gates > 0 else 0,
         }
+
 
 def main():
     """Main entry point for quality gate evaluation"""
     import argparse
 
-    parser = argparse.ArgumentParser(description='Quality Gate Evaluator')
-    parser.add_argument('--config', help='Path to quality gates configuration file')
-    parser.add_argument('--input', help='Path to analysis results JSON file')
-    parser.add_argument('--output', help='Path to output quality gates report')
-    parser.add_argument('--verbose', action='store_true', help='Enable verbose logging')
+    parser = argparse.ArgumentParser(description="Quality Gate Evaluator")
+    parser.add_argument("--config", help="Path to quality gates configuration file")
+    parser.add_argument("--input", help="Path to analysis results JSON file")
+    parser.add_argument("--output", help="Path to output quality gates report")
+    parser.add_argument("--verbose", action="store_true", help="Enable verbose logging")
 
     args = parser.parse_args()
 
@@ -463,19 +463,17 @@ def main():
 
         # Load analysis results
         if args.input:
-            with open(args.input, encoding='utf-8') as f:
+            with open(args.input, encoding="utf-8") as f:
                 analysis_results = json.load(f)
         else:
             # Mock data for testing
             analysis_results = {
-                'violations': [
-                    {'severity': 'critical', 'message': 'Critical issue'},
-                    {'severity': 'high', 'message': 'High priority issue'},
-                    {'severity': 'medium', 'message': 'Medium issue'}
+                "violations": [
+                    {"severity": "critical", "message": "Critical issue"},
+                    {"severity": "high", "message": "High priority issue"},
+                    {"severity": "medium", "message": "Medium issue"},
                 ],
-                'mece_analysis': {
-                    'duplication_clusters': []
-                }
+                "mece_analysis": {"duplication_clusters": []},
             }
 
         # Collect metrics and evaluate gates
@@ -488,17 +486,17 @@ def main():
 
         # Output results
         if args.output:
-            with open(args.output, 'w', encoding='utf-8') as f:
+            with open(args.output, "w", encoding="utf-8") as f:
                 json.dump(report, f, indent=2)
             print(f"Quality gates report saved to: {args.output}")
         else:
             print(json.dumps(report, indent=2))
 
         # Set exit code based on overall status
-        summary = report['summary']
-        if summary['overall_status'] in ['ERROR', 'FAILED']:
+        summary = report["summary"]
+        if summary["overall_status"] in ["ERROR", "FAILED"]:
             sys.exit(1)
-        elif summary['overall_status'] == 'WARNING':
+        elif summary["overall_status"] == "WARNING":
             sys.exit(2)
         else:
             sys.exit(0)
@@ -507,5 +505,6 @@ def main():
         print(f"Error running quality gate evaluation: {e}", file=sys.stderr)
         sys.exit(3)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

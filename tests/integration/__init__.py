@@ -57,8 +57,6 @@ class IntegrationTestMemoryCoordinator:
         """Store test result with memory coordination"""
 
         ProductionAssert.not_none(test_result, 'test_result')
-
-
         ProductionAssert.not_none(test_result, 'test_result')
 
         result_key = f"{self.session_id}_{test_result.test_name}"
@@ -114,8 +112,6 @@ class IntegrationTestMemoryCoordinator:
         """Export test results to file for CI/CD integration"""
 
         ProductionAssert.not_none(output_path, 'output_path')
-
-
         ProductionAssert.not_none(output_path, 'output_path')
 
         metrics = self.calculate_coverage_metrics()
@@ -138,12 +134,10 @@ class IntegrationTestMemoryCoordinator:
         """Create integration test chain for dependency tracking"""
 
         ProductionAssert.not_none(chain_name, 'chain_name')
-
         ProductionAssert.not_none(components, 'components')
 
 
         ProductionAssert.not_none(chain_name, 'chain_name')
-
         ProductionAssert.not_none(components, 'components')
 
         self.integration_chains[chain_name] = {
@@ -157,12 +151,10 @@ class IntegrationTestMemoryCoordinator:
         """Add test result to integration chain"""
 
         ProductionAssert.not_none(chain_name, 'chain_name')
-
         ProductionAssert.not_none(test_result, 'test_result')
 
 
         ProductionAssert.not_none(chain_name, 'chain_name')
-
         ProductionAssert.not_none(test_result, 'test_result')
 
         if chain_name in self.integration_chains:
@@ -318,8 +310,6 @@ class IntegrationPerformanceBenchmark:
         """Start performance benchmark"""
 
         ProductionAssert.not_none(benchmark_name, 'benchmark_name')
-
-
         ProductionAssert.not_none(benchmark_name, 'benchmark_name')
 
         self.benchmarks[benchmark_name] = {
@@ -332,8 +322,6 @@ class IntegrationPerformanceBenchmark:
         """End performance benchmark"""
 
         ProductionAssert.not_none(benchmark_name, 'benchmark_name')
-
-
         ProductionAssert.not_none(benchmark_name, 'benchmark_name')
 
         if benchmark_name in self.benchmarks:
@@ -354,24 +342,20 @@ def benchmark_integration_test(test_name: str):
     """Decorator for benchmarking integration tests"""
 
     ProductionAssert.not_none(test_name, 'test_name')
-
-
-    ProductionAssert.not_none(test_name, 'test_name')
+        ProductionAssert.not_none(test_name, 'test_name')
 
     def decorator(func):
 
         ProductionAssert.not_none(func, 'func')
-
         ProductionAssert.not_none(func, 'func')
 
         def wrapper(*args, **kwargs):
 
             ProductionAssert.not_none(*args, '*args')
-
-            ProductionAssert.not_none(**kwargs, '**kwargs')
+        ProductionAssert.not_none(**kwargs, '**kwargs')
 
             ProductionAssert.not_none(*args, '*args')
-            ProductionAssert.not_none(**kwargs, '**kwargs')
+        ProductionAssert.not_none(**kwargs, '**kwargs')
 
             INTEGRATION_BENCHMARK.start_benchmark(test_name)
             try:

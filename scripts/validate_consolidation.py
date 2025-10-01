@@ -20,7 +20,7 @@ class ConsolidationValidator:
             "critical_files_status": {},
             "content_preservation": {},
             "warnings": [],
-            "errors": []
+            "errors": [],
         }
 
     def log_check(self, check_name, status, details=""):
@@ -28,7 +28,7 @@ class ConsolidationValidator:
         self.validation_report["checks"][check_name] = {
             "status": status,
             "details": details,
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat(),
         }
         print(f"✓ {check_name}: {status}" + (f" - {details}" if details else ""))
 
@@ -52,7 +52,7 @@ class ConsolidationValidator:
             "docs/integration-analysis/implementation-roadmap.md",
             "docs/integration-analysis/architecture-diagram.md",
             "docs/integration-analysis/gap-analysis-report.md",
-            "enterprise-package/validation/ACCURACY_REPORT.md"
+            "enterprise-package/validation/ACCURACY_REPORT.md",
         ]
 
         missing_files = []
@@ -65,14 +65,11 @@ class ConsolidationValidator:
                 size_mb = os.path.getsize(file_path) / (1024 * 1024)
                 self.validation_report["critical_files_status"][file_rel] = {
                     "exists": True,
-                    "size_mb": round(size_mb, 2)
+                    "size_mb": round(size_mb, 2),
                 }
             else:
                 missing_files.append(file_rel)
-                self.validation_report["critical_files_status"][file_rel] = {
-                    "exists": False,
-                    "size_mb": 0
-                }
+                self.validation_report["critical_files_status"][file_rel] = {"exists": False, "size_mb": 0}
 
         if missing_files:
             for file_rel in missing_files:
@@ -116,11 +113,14 @@ class ConsolidationValidator:
                 "total_violations": total_violations,
                 "violations_in_data": violations_count,
                 "critical_violations": data["summary"].get("critical_violations", 0),
-                "quality_score": data["summary"].get("overall_quality_score", 0)
+                "quality_score": data["summary"].get("overall_quality_score", 0),
             }
 
-            self.log_check("master_analysis_integrity", "PASSED",
-                         f"Contains {total_violations} violations, quality score: {data['summary'].get('overall_quality_score', 0)}")
+            self.log_check(
+                "master_analysis_integrity",
+                "PASSED",
+                f"Contains {total_violations} violations, quality score: {data['summary'].get('overall_quality_score', 0)}",
+            )
             return True
 
         except json.JSONDecodeError as e:
@@ -149,7 +149,7 @@ class ConsolidationValidator:
             if "metadata" in data and "nasa" in str(data).lower():
                 self.validation_report["content_preservation"]["nasa_validation"] = {
                     "file_size_mb": round(os.path.getsize(nasa_file) / (1024 * 1024), 2),
-                    "contains_nasa_content": True
+                    "contains_nasa_content": True,
                 }
                 self.log_check("nasa_validation_integrity", "PASSED", "NASA validation data preserved")
                 return True
@@ -169,12 +169,7 @@ class ConsolidationValidator:
 
     def check_documentation_structure(self):
         """Verify documentation structure is maintained"""
-        required_docs = [
-            "docs/integration-analysis",
-            "docs/analysis",
-            "docs/reports",
-            "enterprise-package/validation"
-        ]
+        required_docs = ["docs/integration-analysis", "docs/analysis", "docs/reports", "enterprise-package/validation"]
 
         missing_dirs = []
         existing_dirs = []
@@ -187,7 +182,7 @@ class ConsolidationValidator:
                 file_count = sum(1 for f in dir_path.rglob("*") if f.is_file())
                 self.validation_report["content_preservation"][f"dir_{dir_rel.replace('/', '_')}"] = {
                     "exists": True,
-                    "file_count": file_count
+                    "file_count": file_count,
                 }
             else:
                 missing_dirs.append(dir_rel)
@@ -211,7 +206,7 @@ class ConsolidationValidator:
             "analysis/self-analysis/DOGFOODING_VALIDATION_REPORT.md",
             "vscode-extension-backup-20250905-142126",
             "temp-artifacts",
-            "test_activation.py"
+            "test_activation.py",
         ]
 
         still_exists = []
@@ -244,15 +239,14 @@ class ConsolidationValidator:
                 if json_file.is_file():
                     size_mb = os.path.getsize(json_file) / (1024 * 1024)
                     total_size += size_mb
-                    current_analysis_files.append({
-                        "file": str(json_file.relative_to(self.repo_root)),
-                        "size_mb": round(size_mb, 2)
-                    })
+                    current_analysis_files.append(
+                        {"file": str(json_file.relative_to(self.repo_root)), "size_mb": round(size_mb, 2)}
+                    )
 
         self.validation_report["content_preservation"]["storage_analysis"] = {
             "remaining_analysis_files": len(current_analysis_files),
             "total_size_mb": round(total_size, 2),
-            "files": current_analysis_files[:10]  # Top 10 by discovery order
+            "files": current_analysis_files[:10],  # Top 10 by discovery order
         }
 
         if total_size < 100:  # Expected significant reduction
@@ -269,7 +263,7 @@ class ConsolidationValidator:
             "docs/FILE_CONSOLIDATION_EXECUTION_PLAN.md",
             "docs/CONSOLIDATION_DECISION_MATRIX.md",
             "scripts/execute_consolidation.py",
-            "scripts/validate_consolidation.py"
+            "scripts/validate_consolidation.py",
         ]
 
         missing_artifacts = []
@@ -306,14 +300,14 @@ class ConsolidationValidator:
         self.validation_report["summary"] = {
             "total_checks": len(self.validation_report["checks"]),
             "errors": error_count,
-            "warnings": warning_count
+            "warnings": warning_count,
         }
 
         # Save validation report
         report_path = self.repo_root / "docs" / "CONSOLIDATION_VALIDATION_REPORT.json"
         report_path.parent.mkdir(exist_ok=True)
 
-        with open(report_path, 'w') as f:
+        with open(report_path, "w") as f:
             json.dump(self.validation_report, f, indent=2)
 
         print(f"\n{'='*60}")
@@ -339,7 +333,7 @@ class ConsolidationValidator:
             self.check_documentation_structure,
             self.check_duplicate_removal,
             self.check_storage_savings,
-            self.check_consolidation_artifacts
+            self.check_consolidation_artifacts,
         ]
 
         for check in checks:
@@ -350,6 +344,7 @@ class ConsolidationValidator:
 
         return self.generate_validation_report()
 
+
 def main():
     """Main validation execution"""
     validator = ConsolidationValidator()
@@ -357,6 +352,7 @@ def main():
 
     if not success:
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

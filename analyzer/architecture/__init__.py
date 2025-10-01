@@ -12,21 +12,21 @@ Includes performance optimization components like DetectorPool.
 """
 
 # Import detector pool for performance optimization
+from .aggregator import ViolationAggregator
+from .configuration_manager import ConfigurationManager
 from .detector_pool import DetectorPool, get_detector_pool
+from .enhanced_metrics import EnhancedMetricsCalculator
 
 # Import existing architecture components
 from .orchestrator import AnalysisOrchestrator
-from .aggregator import ViolationAggregator  
 from .recommendation_engine import RecommendationEngine
-from .configuration_manager import ConfigurationManager
-from .enhanced_metrics import EnhancedMetricsCalculator
 
 __all__ = [
-    "DetectorPool", 
-    "get_detector_pool",
     "AnalysisOrchestrator",
-    "ViolationAggregator", 
-    "RecommendationEngine",
     "ConfigurationManager",
+    "DetectorPool",
     "EnhancedMetricsCalculator",
+    "RecommendationEngine",
+    "ViolationAggregator",
+    "get_detector_pool",
 ]

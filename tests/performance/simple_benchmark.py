@@ -35,7 +35,7 @@ def benchmark_codebase(path: str, name: str = None):
     if path.is_file():
         files = [path]
     else:
-        files = list(path.glob('**/*.py')) + list(path.glob('**/*.js')) + list(path.glob('**/*.ts'))
+        files = list(path.glob("**/*.py")) + list(path.glob("**/*.js")) + list(path.glob("**/*.ts"))
 
     file_count = len(files)
 
@@ -43,7 +43,7 @@ def benchmark_codebase(path: str, name: str = None):
     total_lines = 0
     for file_path in files:
         try:
-            with open(file_path, encoding='utf-8', errors='ignore') as f:
+            with open(file_path, encoding="utf-8", errors="ignore") as f:
                 lines = sum(1 for line in f if line.strip())
                 total_lines += lines
         except Exception:
@@ -65,7 +65,7 @@ def benchmark_codebase(path: str, name: str = None):
         execution_time = time.time() - start_time
 
         # Extract results
-        violations = result.get('violations', [])
+        violations = result.get("violations", [])
         violation_count = len(violations)
 
         # Calculate metrics
@@ -93,14 +93,14 @@ def benchmark_codebase(path: str, name: str = None):
             print(f"Small codebase target (<5sec): {status}")
 
         return {
-            'name': name,
-            'file_count': file_count,
-            'total_lines': total_lines,
-            'execution_time': execution_time,
-            'violation_count': violation_count,
-            'files_per_second': files_per_second,
-            'lines_per_second': lines_per_second,
-            'success': True
+            "name": name,
+            "file_count": file_count,
+            "total_lines": total_lines,
+            "execution_time": execution_time,
+            "violation_count": violation_count,
+            "files_per_second": files_per_second,
+            "lines_per_second": lines_per_second,
+            "success": True,
         }
 
     except Exception as e:
@@ -109,12 +109,12 @@ def benchmark_codebase(path: str, name: str = None):
         print(f"Time before failure: {execution_time:.2f} seconds")
 
         return {
-            'name': name,
-            'file_count': file_count,
-            'total_lines': total_lines,
-            'execution_time': execution_time,
-            'error': str(e),
-            'success': False
+            "name": name,
+            "file_count": file_count,
+            "total_lines": total_lines,
+            "execution_time": execution_time,
+            "error": str(e),
+            "success": False,
         }
 
 
@@ -125,12 +125,7 @@ def main():
     print("=" * 50)
 
     # Test paths to benchmark
-    test_paths = [
-        "test_packages/curl",
-        "test_packages/express",
-        "analyzer",
-        "tests"
-    ]
+    test_paths = ["test_packages/curl", "test_packages/express", "analyzer", "tests"]
 
     results = []
 
@@ -143,9 +138,9 @@ def main():
             print(f"\nSkipping {test_path} (not found)")
 
     # Summary
-    print("\n" + "="*50)
+    print("\n" + "=" * 50)
     print("BENCHMARK SUMMARY")
-    print("="*50)
+    print("=" * 50)
 
     if not results:
         print("No benchmarks completed successfully")
@@ -156,17 +151,15 @@ def main():
     print("-" * 65)
 
     for result in results:
-        if result['success']:
-            name = result['name'][:14]
-            files = result['file_count']
-            lines = result['total_lines']
-            time_s = result['execution_time']
-            throughput = result['files_per_second']
+        if result["success"]:
+            name = result["name"][:14]
+            files = result["file_count"]
+            lines = result["total_lines"]
+            time_s = result["execution_time"]
+            throughput = result["files_per_second"]
 
             # Determine status based on performance
-            if files > 100 and time_s > 30:
-                status = "SLOW"
-            elif files <= 100 and time_s > 5:
+            if (files > 100 and time_s > 30) or (files <= 100 and time_s > 5):
                 status = "SLOW"
             else:
                 status = "OK"
@@ -176,12 +169,12 @@ def main():
             print(f"{result['name'][:14]:<15} {'ERROR':<40}")
 
     # Calculate totals
-    successful_results = [r for r in results if r['success']]
+    successful_results = [r for r in results if r["success"]]
     if successful_results:
-        total_files = sum(r['file_count'] for r in successful_results)
-        total_lines = sum(r['total_lines'] for r in successful_results)
-        total_time = sum(r['execution_time'] for r in successful_results)
-        avg_throughput = sum(r['files_per_second'] for r in successful_results) / len(successful_results)
+        total_files = sum(r["file_count"] for r in successful_results)
+        total_lines = sum(r["total_lines"] for r in successful_results)
+        total_time = sum(r["execution_time"] for r in successful_results)
+        avg_throughput = sum(r["files_per_second"] for r in successful_results) / len(successful_results)
 
         print("-" * 65)
         print(f"{'TOTAL':<15} {total_files:<8} {total_lines:<10} {total_time:<8.2f} {avg_throughput:<8.1f}")

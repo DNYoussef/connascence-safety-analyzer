@@ -2,22 +2,17 @@
 Test Theater Detection System
 """
 
-import pytest
-import time
+import json
 from pathlib import Path
 import sys
-import json
+import time
+
+import pytest
 
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from analyzer.theater_detection import (
-    TheaterDetector,
-    TheaterPattern,
-    ValidationResult,
-    TheaterPatternLibrary,
-    EvidenceValidator
-)
+from analyzer.theater_detection import EvidenceValidator, TheaterDetector, TheaterPatternLibrary, ValidationResult
 from analyzer.theater_detection.detector import QualityClaim
 
 
@@ -27,7 +22,7 @@ def test_theater_detector_initialization():
 
     assert len(detector.theater_patterns) > 0
     assert len(detector.connascence_weights) == 9
-    assert detector.validation_thresholds['confidence_threshold'] == 0.65
+    assert detector.validation_thresholds["confidence_threshold"] == 0.65
 
 
 def test_validate_quality_claim_genuine():
@@ -44,7 +39,7 @@ def test_validate_quality_claim_genuine():
         improvement_percent=47.3,
         measurement_method="Analyzed 150 files before and after refactoring, measured violations using AST analysis with 10 repeated runs",
         evidence_files=["baseline_report.json", "improved_report.json", "diff_analysis.txt"],
-        timestamp=time.time()
+        timestamp=time.time(),
     )
 
     result = detector.validate_quality_claim(claim)
@@ -69,7 +64,7 @@ def test_validate_quality_claim_theater():
         improvement_percent=100.0,
         measurement_method="Quick check",
         evidence_files=[],
-        timestamp=time.time()
+        timestamp=time.time(),
     )
 
     result = detector.validate_quality_claim(claim)
@@ -95,7 +90,7 @@ def test_statistical_plausibility():
         improvement_percent=50.0,  # Suspicious round number
         measurement_method="Test",
         evidence_files=[],
-        timestamp=time.time()
+        timestamp=time.time(),
     )
 
     score = detector._validate_statistical_plausibility(claim)
@@ -107,17 +102,17 @@ def test_pattern_library():
     library = TheaterPatternLibrary()
 
     # Test round number detection
-    data = {'improvement_percent': 50.0}
+    data = {"improvement_percent": 50.0}
     patterns = library.detect_patterns(data)
-    assert 'metric_manipulation' in patterns
+    assert "metric_manipulation" in patterns
 
     # Test missing baseline detection
-    data = {'baseline_value': None}
+    data = {"baseline_value": None}
     patterns = library.detect_patterns(data)
-    assert 'evidence_fabrication' in patterns
+    assert "evidence_fabrication" in patterns
 
     # Calculate theater score
-    detected = {'metric_manipulation': ['MM001', 'MM002']}
+    detected = {"metric_manipulation": ["MM001", "MM002"]}
     score = library.calculate_theater_score(detected)
     assert 0.0 <= score <= 1.0
 
@@ -139,9 +134,7 @@ def test_evidence_validator():
 
     # Test improvement claim validation
     is_valid, message, score = validator.validate_improvement_claim(
-        baseline=100.0,
-        improved=60.0,
-        claim_type='violations'
+        baseline=100.0, improved=60.0, claim_type="violations"
     )
     assert is_valid
     assert score > 0.5
@@ -162,16 +155,16 @@ def test_systemic_theater_detection():
             improvement_percent=50.0,  # All same improvement
             measurement_method="Quick check",
             evidence_files=[f"report_{i}.json"],
-            timestamp=time.time() + i * 60  # Regular intervals
+            timestamp=time.time() + i * 60,  # Regular intervals
         )
         for i in range(3)
     ]
 
     systemic_result = detector.detect_systemic_theater(claims)
 
-    assert 'systemic_theater_indicators' in systemic_result
-    assert len(systemic_result['systemic_theater_indicators']) > 0
-    assert systemic_result['risk_assessment'] in ['medium', 'high']
+    assert "systemic_theater_indicators" in systemic_result
+    assert len(systemic_result["systemic_theater_indicators"]) > 0
+    assert systemic_result["risk_assessment"] in ["medium", "high"]
 
 
 def test_connascence_specific_validation():
@@ -188,7 +181,7 @@ def test_connascence_specific_validation():
         improvement_percent=75.0,
         measurement_method="Comprehensive analysis of all files in codebase",
         evidence_files=["timing_analysis.json"],
-        timestamp=time.time()
+        timestamp=time.time(),
     )
 
     score = detector._validate_connascence_claim(claim)
@@ -225,7 +218,7 @@ def test_recommendation_generation():
         improvement_percent=20.0,
         measurement_method="Detailed analysis with repeated measurements",
         evidence_files=["report1.json", "report2.json"],
-        timestamp=time.time()
+        timestamp=time.time(),
     )
 
     # Validate to get all scores
@@ -249,7 +242,7 @@ def test_export_validation_report():
             improvement_percent=40.0,
             measurement_method="Standard analysis",
             evidence_files=["test.json"],
-            timestamp=time.time()
+            timestamp=time.time(),
         )
     ]
 
@@ -262,13 +255,13 @@ def test_export_validation_report():
     assert Path(report_path).exists()
 
     # Load and verify report structure
-    with open(report_path, 'r') as f:
+    with open(report_path) as f:
         report = json.load(f)
 
-    assert 'metadata' in report
-    assert 'summary' in report
-    assert 'systemic_analysis' in report
-    assert 'individual_results' in report
+    assert "metadata" in report
+    assert "summary" in report
+    assert "systemic_analysis" in report
+    assert "individual_results" in report
 
 
 if __name__ == "__main__":

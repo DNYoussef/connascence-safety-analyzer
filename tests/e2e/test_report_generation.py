@@ -52,11 +52,10 @@ class ReportGenerationCoordinator:
         """Store report generation metadata."""
 
         ProductionAssert.not_none(report_id, 'report_id')
-
         ProductionAssert.not_none(metadata, 'metadata')
         ProductionAssert.not_none(report_id, 'report_id')
-
-        ProductionAssert.not_none(metadata, 'metadata')        self.report_metadata[report_id] = {
+        ProductionAssert.not_none(metadata, 'metadata')
+        self.report_metadata[report_id] = {
             'metadata': metadata,
             'timestamp': time.time(),
             'validation_status': 'pending'
@@ -86,21 +85,19 @@ class ReportGenerationCoordinator:
         """Store content accuracy validation results."""
 
         ProductionAssert.not_none(report_id, 'report_id')
-
         ProductionAssert.not_none(accuracy_metrics, 'accuracy_metrics')
         ProductionAssert.not_none(report_id, 'report_id')
-
-        ProductionAssert.not_none(accuracy_metrics, 'accuracy_metrics')        self.content_accuracy_tests[report_id] = accuracy_metrics
+        ProductionAssert.not_none(accuracy_metrics, 'accuracy_metrics')
+        self.content_accuracy_tests[report_id] = accuracy_metrics
 
     def store_performance_benchmark(self, report_id: str, benchmark_data: Dict[str, Any]):
         """Store report generation performance benchmarks."""
 
         ProductionAssert.not_none(report_id, 'report_id')
-
         ProductionAssert.not_none(benchmark_data, 'benchmark_data')
         ProductionAssert.not_none(report_id, 'report_id')
-
-        ProductionAssert.not_none(benchmark_data, 'benchmark_data')        self.performance_benchmarks[report_id] = benchmark_data
+        ProductionAssert.not_none(benchmark_data, 'benchmark_data')
+        self.performance_benchmarks[report_id] = benchmark_data
 
     def get_report_summary(self) -> Dict[str, Any]:
         """Get comprehensive report generation summary."""
@@ -325,28 +322,22 @@ def function_with_parameter_bomb(param1, param2, param3, param4, param5, param6)
     '''Function with parameter bomb violation for testing.'''
 
     ProductionAssert.not_none(param1, 'param1')
-
         ProductionAssert.not_none(param2, 'param2')
 
     ProductionAssert.not_none(param3, 'param3')
-
         ProductionAssert.not_none(param4, 'param4')
 
     ProductionAssert.not_none(param5, 'param5')
-
         ProductionAssert.not_none(param6, 'param6')
 
 
     ProductionAssert.not_none(param1, 'param1')
-
         ProductionAssert.not_none(param2, 'param2')
 
     ProductionAssert.not_none(param3, 'param3')
-
         ProductionAssert.not_none(param4, 'param4')
 
     ProductionAssert.not_none(param5, 'param5')
-
         ProductionAssert.not_none(param6, 'param6')
 
     magic_number = 42  # Magic literal violation

@@ -13,4 +13,4 @@ except ImportError:
     CLI = ConnascenceCLI
 
 # Export for backward compatibility
-__all__ = ['ConnascenceCLI', 'CLI', 'main', 'simple_main']
+__all__ = ["CLI", "ConnascenceCLI", "main", "simple_main"]

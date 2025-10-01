@@ -32,43 +32,43 @@ class MasterTestRunner:
         self.test_results_dir.mkdir(exist_ok=True)
 
         self.test_suites = {
-            'unit_tests': {
-                'path': self.base_dir / 'tests',
-                'pattern': 'test_*.py',
-                'description': 'Unit tests for individual components',
-                'critical': True
+            "unit_tests": {
+                "path": self.base_dir / "tests",
+                "pattern": "test_*.py",
+                "description": "Unit tests for individual components",
+                "critical": True,
             },
-            'integration_tests': {
-                'path': self.base_dir / 'tests' / 'integration',
-                'pattern': 'test_*.py',
-                'description': 'Integration tests: MCP server, autofix engine, workflow validation, cross-component testing',
-                'critical': True,
-                'test_modules': [
-                    'test_mcp_server_integration.py',
-                    'test_autofix_engine_integration.py',
-                    'test_workflow_integration.py',
-                    'test_cross_component_validation.py'
-                ]
+            "integration_tests": {
+                "path": self.base_dir / "tests" / "integration",
+                "pattern": "test_*.py",
+                "description": "Integration tests: MCP server, autofix engine, workflow validation, cross-component testing",
+                "critical": True,
+                "test_modules": [
+                    "test_mcp_server_integration.py",
+                    "test_autofix_engine_integration.py",
+                    "test_workflow_integration.py",
+                    "test_cross_component_validation.py",
+                ],
             },
-            'e2e_tests': {
-                'path': self.base_dir / 'tests' / 'e2e',
-                'pattern': 'test_*.py',
-                'description': 'End-to-end tests for sales scenarios',
-                'critical': True
+            "e2e_tests": {
+                "path": self.base_dir / "tests" / "e2e",
+                "pattern": "test_*.py",
+                "description": "End-to-end tests for sales scenarios",
+                "critical": True,
             },
-            'vscode_extension_tests': {
-                'path': self.base_dir / 'vscode-extension',
-                'pattern': '*.test.ts',
-                'description': 'VS Code extension tests',
-                'critical': False,
-                'test_command': 'npm test'
+            "vscode_extension_tests": {
+                "path": self.base_dir / "vscode-extension",
+                "pattern": "*.test.ts",
+                "description": "VS Code extension tests",
+                "critical": False,
+                "test_command": "npm test",
             },
-            'security_tests': {
-                'path': self.base_dir / 'security',
-                'pattern': 'test_*.py',
-                'description': 'Security component tests',
-                'critical': True
-            }
+            "security_tests": {
+                "path": self.base_dir / "security",
+                "pattern": "test_*.py",
+                "description": "Security component tests",
+                "critical": True,
+            },
         }
 
     def run_python_test_suite(self, suite_name, suite_config):
@@ -76,7 +76,7 @@ class MasterTestRunner:
         print(f"\n{'='*60}")
         print(f"Running {suite_name.upper()}")
         print(f"{suite_config['description']}")
-        print('='*60)
+        print("=" * 60)
 
         start_time = time.time()
 
@@ -87,19 +87,9 @@ class MasterTestRunner:
 
             # Run pytest with detailed output
             # Basic pytest command without optional plugins
-            cmd = [
-                sys.executable, '-m', 'pytest',
-                str(suite_config['path']),
-                '-v',
-                '--tb=short'
-            ]
+            cmd = [sys.executable, "-m", "pytest", str(suite_config["path"]), "-v", "--tb=short"]
 
-            result = subprocess.run(
-                cmd,
-                capture_output=True,
-                text=True,
-                cwd=suite_config['path']
-            )
+            result = subprocess.run(cmd, check=False, capture_output=True, text=True, cwd=suite_config["path"])
 
             execution_time = time.time() - start_time
 
@@ -108,26 +98,26 @@ class MasterTestRunner:
 
             # Save execution log
             execution_log = {
-                'suite': suite_name,
-                'description': suite_config['description'],
-                'execution_time': f"{execution_time:.2f}s",
-                'exit_code': result.returncode,
-                'success': success,
-                'stdout': result.stdout,
-                'stderr': result.stderr,
-                'timestamp': time.strftime('%Y-%m-%d %H:%M:%S'),
-                'critical': suite_config.get('critical', True)
+                "suite": suite_name,
+                "description": suite_config["description"],
+                "execution_time": f"{execution_time:.2f}s",
+                "exit_code": result.returncode,
+                "success": success,
+                "stdout": result.stdout,
+                "stderr": result.stderr,
+                "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
+                "critical": suite_config.get("critical", True),
             }
 
-            with open(suite_output_dir / 'execution_log.json', 'w') as f:
+            with open(suite_output_dir / "execution_log.json", "w") as f:
                 json.dump(execution_log, f, indent=2)
 
             # Parse test results if available
-            results_file = suite_output_dir / 'results.json'
+            results_file = suite_output_dir / "results.json"
             if results_file.exists():
                 with open(results_file) as f:
                     test_results = json.load(f)
-                    execution_log['test_summary'] = test_results.get('summary', {})
+                    execution_log["test_summary"] = test_results.get("summary", {})
 
             status = "PASSED" if success else "FAILED"
             print(f"[{status}] {suite_name} completed in {execution_time:.2f}s")
@@ -138,13 +128,13 @@ class MasterTestRunner:
             return execution_log
 
         except Exception as e:
-            print(f"FAILED {suite_name} failed with exception: {str(e)}")
+            print(f"FAILED {suite_name} failed with exception: {e!s}")
             return {
-                'suite': suite_name,
-                'success': False,
-                'error': str(e),
-                'execution_time': time.time() - start_time,
-                'critical': suite_config.get('critical', True)
+                "suite": suite_name,
+                "success": False,
+                "error": str(e),
+                "execution_time": time.time() - start_time,
+                "critical": suite_config.get("critical", True),
             }
 
     def run_npm_test_suite(self, suite_name, suite_config):
@@ -152,7 +142,7 @@ class MasterTestRunner:
         print(f"\n{'='*60}")
         print(f"Running {suite_name.upper()}")
         print(f"{suite_config['description']}")
-        print('='*60)
+        print("=" * 60)
 
         start_time = time.time()
 
@@ -161,53 +151,42 @@ class MasterTestRunner:
             suite_output_dir.mkdir(exist_ok=True)
 
             # Check if package.json exists
-            package_json = suite_config['path'] / 'package.json'
+            package_json = suite_config["path"] / "package.json"
             if not package_json.exists():
                 print(f"[WARNING]  No package.json found in {suite_config['path']}, skipping")
-                return {
-                    'suite': suite_name,
-                    'success': True,
-                    'skipped': True,
-                    'reason': 'No package.json found'
-                }
+                return {"suite": suite_name, "success": True, "skipped": True, "reason": "No package.json found"}
 
             # Install dependencies first
             print("[PACKAGE] Installing dependencies...")
             install_result = subprocess.run(
-                ['npm', 'install'],
-                capture_output=True,
-                text=True,
-                cwd=suite_config['path']
+                ["npm", "install"], check=False, capture_output=True, text=True, cwd=suite_config["path"]
             )
 
             if install_result.returncode != 0:
                 print("[WARNING]  npm install failed, attempting with mock dependencies")
 
             # Run tests
-            test_cmd = suite_config.get('test_command', 'npm test')
+            test_cmd = suite_config.get("test_command", "npm test")
             result = subprocess.run(
-                test_cmd.split(),
-                capture_output=True,
-                text=True,
-                cwd=suite_config['path']
+                test_cmd.split(), check=False, capture_output=True, text=True, cwd=suite_config["path"]
             )
 
             execution_time = time.time() - start_time
             success = result.returncode == 0
 
             execution_log = {
-                'suite': suite_name,
-                'description': suite_config['description'],
-                'execution_time': f"{execution_time:.2f}s",
-                'exit_code': result.returncode,
-                'success': success,
-                'stdout': result.stdout,
-                'stderr': result.stderr,
-                'timestamp': time.strftime('%Y-%m-%d %H:%M:%S'),
-                'critical': suite_config.get('critical', True)
+                "suite": suite_name,
+                "description": suite_config["description"],
+                "execution_time": f"{execution_time:.2f}s",
+                "exit_code": result.returncode,
+                "success": success,
+                "stdout": result.stdout,
+                "stderr": result.stderr,
+                "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
+                "critical": suite_config.get("critical", True),
             }
 
-            with open(suite_output_dir / 'execution_log.json', 'w') as f:
+            with open(suite_output_dir / "execution_log.json", "w") as f:
                 json.dump(execution_log, f, indent=2)
 
             status = "PASSED" if success else "FAILED"
@@ -216,33 +195,33 @@ class MasterTestRunner:
             return execution_log
 
         except Exception as e:
-            print(f"FAILED {suite_name} failed with exception: {str(e)}")
+            print(f"FAILED {suite_name} failed with exception: {e!s}")
             return {
-                'suite': suite_name,
-                'success': False,
-                'error': str(e),
-                'execution_time': time.time() - start_time,
-                'critical': suite_config.get('critical', True)
+                "suite": suite_name,
+                "success": False,
+                "error": str(e),
+                "execution_time": time.time() - start_time,
+                "critical": suite_config.get("critical", True),
             }
 
     def run_all_tests(self):
         """Run all test suites"""
         print("CONNASCENCE COMPLETE TEST SUITE")
-        print("="*60)
+        print("=" * 60)
         print("Validating system components:")
         print("   * Unit tests for individual modules")
         print("   * Integration tests for component interaction")
         print("   * End-to-end tests for sales scenarios")
         print("   * VS Code extension functionality")
         print("   * Security component validation")
-        print("="*60)
+        print("=" * 60)
 
         suite_start_time = time.time()
         results = []
 
         # Run test suites sequentially for better output control
         for suite_name, suite_config in self.test_suites.items():
-            if suite_name == 'vscode_extension_tests':
+            if suite_name == "vscode_extension_tests":
                 result = self.run_npm_test_suite(suite_name, suite_config)
             else:
                 result = self.run_python_test_suite(suite_name, suite_config)
@@ -250,7 +229,7 @@ class MasterTestRunner:
             results.append(result)
 
             # Stop if critical test fails
-            if not result.get('success', False) and result.get('critical', True):
+            if not result.get("success", False) and result.get("critical", True):
                 print(f"\nCritical test suite {suite_name} failed, stopping execution")
                 break
 
@@ -264,9 +243,9 @@ class MasterTestRunner:
     def generate_test_report(self, results, total_time):
         """Generate consolidated test report"""
 
-        passed_suites = [r for r in results if r.get('success', False)]
-        failed_suites = [r for r in results if not r.get('success', False)]
-        critical_failures = [r for r in failed_suites if r.get('critical', True)]
+        passed_suites = [r for r in results if r.get("success", False)]
+        failed_suites = [r for r in results if not r.get("success", False)]
+        critical_failures = [r for r in failed_suites if r.get("critical", True)]
 
         report = f"""# Complete System Test Report
 
@@ -287,8 +266,8 @@ class MasterTestRunner:
 """
 
         for result in results:
-            status_icon = 'PASS' if result.get('success', False) else 'FAIL'
-            critical_text = ' (CRITICAL)' if result.get('critical', False) else ''
+            status_icon = "PASS" if result.get("success", False) else "FAIL"
+            critical_text = " (CRITICAL)" if result.get("critical", False) else ""
 
             report += f"""### {status_icon} {result['suite'].upper()}{critical_text}
 
@@ -298,7 +277,7 @@ class MasterTestRunner:
 
 """
 
-            if not result.get('success', False) and 'error' in result:
+            if not result.get("success", False) and "error" in result:
                 report += f"**Error**: {result['error']}\n\n"
 
         # Add system readiness assessment
@@ -384,8 +363,8 @@ All test results, coverage reports, and execution logs available in:
 """
 
         # Save consolidated report
-        report_file = self.test_results_dir / 'MASTER_TEST_REPORT.md'
-        with open(report_file, 'w', encoding='utf-8') as f:
+        report_file = self.test_results_dir / "MASTER_TEST_REPORT.md"
+        with open(report_file, "w", encoding="utf-8") as f:
             f.write(report)
 
         print("\n Master Test Report Generated!")
@@ -393,17 +372,17 @@ All test results, coverage reports, and execution logs available in:
 
         # Create summary JSON for CI/CD integration
         summary = {
-            'test_execution_complete': True,
-            'total_execution_time': f"{total_time:.2f}s",
-            'suites_passed': len(passed_suites),
-            'suites_failed': len(failed_suites),
-            'critical_failures': len(critical_failures),
-            'production_ready': len(critical_failures) == 0,
-            'proof_points_validated': proof_points_status,
-            'next_steps': 'Commercial release ready' if len(critical_failures) == 0 else 'Fix critical failures'
+            "test_execution_complete": True,
+            "total_execution_time": f"{total_time:.2f}s",
+            "suites_passed": len(passed_suites),
+            "suites_failed": len(failed_suites),
+            "critical_failures": len(critical_failures),
+            "production_ready": len(critical_failures) == 0,
+            "proof_points_validated": proof_points_status,
+            "next_steps": "Commercial release ready" if len(critical_failures) == 0 else "Fix critical failures",
         }
 
-        with open(self.test_results_dir / 'summary.json', 'w') as f:
+        with open(self.test_results_dir / "summary.json", "w") as f:
             json.dump(summary, f, indent=2)
 
         return len(critical_failures) == 0
@@ -412,39 +391,29 @@ All test results, coverage reports, and execution logs available in:
         """Validate sales proof points from test results"""
 
         # Check if sales scenarios test passed
-        sales_test_passed = any(
-            r.get('suite') == 'e2e_tests' and r.get('success', False)
-            for r in results
-        )
+        sales_test_passed = any(r.get("suite") == "e2e_tests" and r.get("success", False) for r in results)
 
         # Check if integration tests passed
-        integration_passed = any(
-            r.get('suite') == 'integration_tests' and r.get('success', False)
-            for r in results
-        )
+        integration_passed = any(r.get("suite") == "integration_tests" and r.get("success", False) for r in results)
 
         # Check if security tests passed
-        security_passed = any(
-            r.get('suite') == 'security_tests' and r.get('success', False)
-            for r in results
-        )
+        security_passed = any(r.get("suite") == "security_tests" and r.get("success", False) for r in results)
 
         # Check VS Code extension
         vscode_passed = any(
-            r.get('suite') == 'vscode_extension_tests' and
-            (r.get('success', False) or r.get('skipped', False))
+            r.get("suite") == "vscode_extension_tests" and (r.get("success", False) or r.get("skipped", False))
             for r in results
         )
 
         return {
-            'fp_rate': sales_test_passed,  # E2E tests validate <5% FP rate
-            'autofix_rate': sales_test_passed,  # E2E tests validate 60% autofix
-            'nasa_compliance': integration_passed,  # Integration tests validate General Safety
-            'enterprise_security': security_passed,  # Security tests validate enterprise features
-            'mcp_integration': integration_passed,  # Integration tests validate MCP
-            'vscode_extension': vscode_passed,  # VS Code extension tests
-            'grammar_layer': integration_passed,  # Integration tests validate grammar
-            'security_framework': security_passed  # Security framework tests
+            "fp_rate": sales_test_passed,  # E2E tests validate <5% FP rate
+            "autofix_rate": sales_test_passed,  # E2E tests validate 60% autofix
+            "nasa_compliance": integration_passed,  # Integration tests validate General Safety
+            "enterprise_security": security_passed,  # Security tests validate enterprise features
+            "mcp_integration": integration_passed,  # Integration tests validate MCP
+            "vscode_extension": vscode_passed,  # VS Code extension tests
+            "grammar_layer": integration_passed,  # Integration tests validate grammar
+            "security_framework": security_passed,  # Security framework tests
         }
 
     def run_quick_validation(self):
@@ -453,7 +422,7 @@ All test results, coverage reports, and execution logs available in:
         print("Running essential tests only for development validation...")
 
         # Run only critical integration and e2e tests
-        essential_suites = ['integration_tests', 'e2e_tests']
+        essential_suites = ["integration_tests", "e2e_tests"]
 
         results = []
         for suite_name in essential_suites:
@@ -462,21 +431,20 @@ All test results, coverage reports, and execution logs available in:
                 result = self.run_python_test_suite(suite_name, suite_config)
                 results.append(result)
 
-                if not result.get('success', False):
+                if not result.get("success", False):
                     print(f"Quick validation failed at {suite_name}")
                     return False
 
         print("Quick validation passed - system appears functional")
         return True
 
+
 def main():
     import argparse
 
-    parser = argparse.ArgumentParser(description='Connascence System Test Runner')
-    parser.add_argument('--quick', action='store_true',
-                       help='Run quick validation (essential tests only)')
-    parser.add_argument('--suite', type=str,
-                       help='Run specific test suite only')
+    parser = argparse.ArgumentParser(description="Connascence System Test Runner")
+    parser.add_argument("--quick", action="store_true", help="Run quick validation (essential tests only)")
+    parser.add_argument("--suite", type=str, help="Run specific test suite only")
 
     args = parser.parse_args()
 
@@ -487,23 +455,21 @@ def main():
     elif args.suite:
         if args.suite in runner.test_suites:
             suite_config = runner.test_suites[args.suite]
-            if args.suite == 'vscode_extension_tests':
+            if args.suite == "vscode_extension_tests":
                 result = runner.run_npm_test_suite(args.suite, suite_config)
             else:
                 result = runner.run_python_test_suite(args.suite, suite_config)
-            success = result.get('success', False)
+            success = result.get("success", False)
         else:
             print(f"FAILED Unknown test suite: {args.suite}")
             print(f"Available suites: {', '.join(runner.test_suites.keys())}")
             sys.exit(1)
     else:
         results = runner.run_all_tests()
-        success = all(
-            r.get('success', False) or not r.get('critical', True)
-            for r in results
-        )
+        success = all(r.get("success", False) or not r.get("critical", True) for r in results)
 
     sys.exit(0 if success else 1)
+
 
 if __name__ == "__main__":
     main()

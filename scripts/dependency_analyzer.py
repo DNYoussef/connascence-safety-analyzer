@@ -19,9 +19,20 @@ class DependencyAnalyzer:
     def __init__(self, root_path: str):
         self.root_path = Path(root_path)
         self.folders_to_analyze = [
-            'analyzer', 'cli', 'mcp', 'config', 'policy', 'utils',
-            'integrations', 'security', 'tests', 'experimental',
-            'core', 'reporting', 'dashboard', 'autofix'
+            "analyzer",
+            "cli",
+            "mcp",
+            "config",
+            "policy",
+            "utils",
+            "integrations",
+            "security",
+            "tests",
+            "experimental",
+            "core",
+            "reporting",
+            "dashboard",
+            "autofix",
         ]
 
         # Dependency tracking
@@ -39,7 +50,7 @@ class DependencyAnalyzer:
         """Extract import statements from a Python file."""
         imports = []
         try:
-            with open(file_path, encoding='utf-8') as f:
+            with open(file_path, encoding="utf-8") as f:
                 content = f.read()
 
             # Parse AST to extract imports
@@ -48,28 +59,28 @@ class DependencyAnalyzer:
                 for node in ast.walk(tree):
                     if isinstance(node, ast.Import):
                         for alias in node.names:
-                            imports.append(('import', alias.name))
+                            imports.append(("import", alias.name))
                     elif isinstance(node, ast.ImportFrom):
-                        module = node.module or ''
+                        module = node.module or ""
                         for alias in node.names:
-                            imports.append(('from', f"{module}.{alias.name}" if module else alias.name))
+                            imports.append(("from", f"{module}.{alias.name}" if module else alias.name))
             except SyntaxError:
                 # Fallback to regex parsing for problematic files
                 import_patterns = [
-                    r'^import\s+([a-zA-Z_][a-zA-Z0-9_.]*)',
-                    r'^from\s+([a-zA-Z_][a-zA-Z0-9_.]*)\s+import\s+([a-zA-Z_][a-zA-Z0-9_.*,\s]*)'
+                    r"^import\s+([a-zA-Z_][a-zA-Z0-9_.]*)",
+                    r"^from\s+([a-zA-Z_][a-zA-Z0-9_.]*)\s+import\s+([a-zA-Z_][a-zA-Z0-9_.*,\s]*)",
                 ]
 
-                for line in content.split('\n'):
+                for line in content.split("\n"):
                     line = line.strip()
-                    if line.startswith('import '):
+                    if line.startswith("import "):
                         match = re.match(import_patterns[0], line)
                         if match:
-                            imports.append(('import', match.group(1)))
-                    elif line.startswith('from '):
+                            imports.append(("import", match.group(1)))
+                    elif line.startswith("from "):
                         match = re.match(import_patterns[1], line)
                         if match:
-                            imports.append(('from', f"{match.group(1)}.{match.group(2)}"))
+                            imports.append(("from", f"{match.group(1)}.{match.group(2)}"))
 
         except Exception as e:
             print(f"Error reading {file_path}: {e}")
@@ -79,25 +90,25 @@ class DependencyAnalyzer:
     def get_folder_from_import(self, import_name: str) -> Optional[str]:
         """Determine which folder an import refers to."""
         # Handle relative imports
-        if import_name.startswith('.'):
+        if import_name.startswith("."):
             return None
 
         # Check if import refers to one of our analyzed folders
-        first_part = import_name.split('.')[0]
+        first_part = import_name.split(".")[0]
 
         # Direct folder references
         if first_part in self.folders_to_analyze:
             return first_part
 
         # Handle special cases
-        if first_part in ['mcp', 'analyzer', 'cli']:
+        if first_part in ["mcp", "analyzer", "cli"]:
             return first_part
-        if import_name.startswith('utils.'):
-            return 'utils'
-        if import_name.startswith('config.'):
-            return 'config'
-        if import_name.startswith('core.'):
-            return 'core'
+        if import_name.startswith("utils."):
+            return "utils"
+        if import_name.startswith("config."):
+            return "config"
+        if import_name.startswith("core."):
+            return "core"
 
         return None
 
@@ -185,16 +196,16 @@ class DependencyAnalyzer:
 
         for source_folder in self.folders_to_analyze:
             self.interface_analysis[source_folder] = {
-                'exports_to': list(self.import_graph[source_folder].keys()),
-                'imports_from': [],
-                'shared_modules': [],
-                'coupling_strength': self.fan_out.get(source_folder, 0)
+                "exports_to": list(self.import_graph[source_folder].keys()),
+                "imports_from": [],
+                "shared_modules": [],
+                "coupling_strength": self.fan_out.get(source_folder, 0),
             }
 
             # Find what imports from this folder
             for other_folder in self.folders_to_analyze:
                 if self.import_graph[other_folder][source_folder] > 0:
-                    self.interface_analysis[source_folder]['imports_from'].append(other_folder)
+                    self.interface_analysis[source_folder]["imports_from"].append(other_folder)
 
     def identify_architectural_violations(self) -> List[Dict[str, Any]]:
         """Identify potential architectural violations."""
@@ -204,40 +215,46 @@ class DependencyAnalyzer:
         for source, targets in self.coupling_matrix.items():
             for target, strength in targets.items():
                 if strength > 0.3:  # High coupling threshold
-                    violations.append({
-                        'type': 'high_coupling',
-                        'source': source,
-                        'target': target,
-                        'strength': strength,
-                        'description': f"High coupling between {source} and {target} ({strength:.2%})"
-                    })
+                    violations.append(
+                        {
+                            "type": "high_coupling",
+                            "source": source,
+                            "target": target,
+                            "strength": strength,
+                            "description": f"High coupling between {source} and {target} ({strength:.2%})",
+                        }
+                    )
 
         # Circular dependency violations
         for cycle in self.circular_dependencies:
-            violations.append({
-                'type': 'circular_dependency',
-                'cycle': cycle,
-                'description': f"Circular dependency detected: {' -> '.join(cycle)}"
-            })
+            violations.append(
+                {
+                    "type": "circular_dependency",
+                    "cycle": cycle,
+                    "description": f"Circular dependency detected: {' -> '.join(cycle)}",
+                }
+            )
 
         # Architectural layering violations
         layering_rules = {
-            'cli': ['analyzer', 'mcp', 'utils', 'config'],
-            'mcp': ['analyzer', 'utils', 'config'],
-            'analyzer': ['utils', 'config', 'core'],
-            'tests': ['analyzer', 'cli', 'mcp', 'utils', 'config'],
+            "cli": ["analyzer", "mcp", "utils", "config"],
+            "mcp": ["analyzer", "utils", "config"],
+            "analyzer": ["utils", "config", "core"],
+            "tests": ["analyzer", "cli", "mcp", "utils", "config"],
         }
 
         for source, allowed_deps in layering_rules.items():
             if source in self.import_graph:
                 for target in self.import_graph[source]:
                     if target not in allowed_deps and self.import_graph[source][target] > 0:
-                        violations.append({
-                            'type': 'layering_violation',
-                            'source': source,
-                            'target': target,
-                            'description': f"Layering violation: {source} should not depend on {target}"
-                        })
+                        violations.append(
+                            {
+                                "type": "layering_violation",
+                                "source": source,
+                                "target": target,
+                                "description": f"Layering violation: {source} should not depend on {target}",
+                            }
+                        )
 
         return violations
 
@@ -306,30 +323,30 @@ class DependencyAnalyzer:
         # Group violations by type
         violation_groups = defaultdict(list)
         for violation in violations:
-            violation_groups[violation['type']].append(violation)
+            violation_groups[violation["type"]].append(violation)
 
         priority = 1
 
         # High coupling recommendations
-        if 'high_coupling' in violation_groups:
+        if "high_coupling" in violation_groups:
             recommendations += f"\n{priority}. HIGH PRIORITY - Reduce Coupling:\n"
-            for violation in violation_groups['high_coupling'][:5]:
+            for violation in violation_groups["high_coupling"][:5]:
                 recommendations += f"   - Decouple {violation['source']} from {violation['target']} "
                 recommendations += f"(current: {violation['strength']:.2%})\n"
             priority += 1
 
         # Circular dependency recommendations
-        if 'circular_dependency' in violation_groups:
+        if "circular_dependency" in violation_groups:
             recommendations += f"\n{priority}. CRITICAL - Break Circular Dependencies:\n"
-            for violation in violation_groups['circular_dependency']:
-                cycle = ' -> '.join(violation['cycle'])
+            for violation in violation_groups["circular_dependency"]:
+                cycle = " -> ".join(violation["cycle"])
                 recommendations += f"   - Break cycle: {cycle}\n"
             priority += 1
 
         # Layering violation recommendations
-        if 'layering_violation' in violation_groups:
+        if "layering_violation" in violation_groups:
             recommendations += f"\n{priority}. MEDIUM - Fix Layering Violations:\n"
-            for violation in violation_groups['layering_violation'][:5]:
+            for violation in violation_groups["layering_violation"][:5]:
                 recommendations += f"   - Move dependency from {violation['source']} to {violation['target']} "
                 recommendations += "through proper abstraction layer\n"
             priority += 1
@@ -365,28 +382,29 @@ class DependencyAnalyzer:
 
         # Create summary report
         report = {
-            'summary': {
-                'total_folders_analyzed': len(self.folders_to_analyze),
-                'total_files_analyzed': len(self.file_imports),
-                'total_dependencies': sum(sum(targets.values()) for targets in self.import_graph.values()),
-                'circular_dependencies_found': len(self.circular_dependencies),
-                'total_violations': len(violations)
+            "summary": {
+                "total_folders_analyzed": len(self.folders_to_analyze),
+                "total_files_analyzed": len(self.file_imports),
+                "total_dependencies": sum(sum(targets.values()) for targets in self.import_graph.values()),
+                "circular_dependencies_found": len(self.circular_dependencies),
+                "total_violations": len(violations),
             },
-            'dependency_matrix': dependency_matrix,
-            'coupling_analysis': coupling_analysis,
-            'circular_dependencies': self.circular_dependencies,
-            'violations': violations,
-            'recommendations': recommendations,
-            'detailed_metrics': {
-                'import_graph': dict(self.import_graph),
-                'coupling_matrix': self.coupling_matrix,
-                'fan_in': dict(self.fan_in),
-                'fan_out': dict(self.fan_out),
-                'interface_analysis': self.interface_analysis
-            }
+            "dependency_matrix": dependency_matrix,
+            "coupling_analysis": coupling_analysis,
+            "circular_dependencies": self.circular_dependencies,
+            "violations": violations,
+            "recommendations": recommendations,
+            "detailed_metrics": {
+                "import_graph": dict(self.import_graph),
+                "coupling_matrix": self.coupling_matrix,
+                "fan_in": dict(self.fan_in),
+                "fan_out": dict(self.fan_out),
+                "interface_analysis": self.interface_analysis,
+            },
         }
 
         return report
+
 
 def main():
     """Main entry point for dependency analysis."""
@@ -407,20 +425,21 @@ def main():
     print(f"- Circular dependencies: {report['summary']['circular_dependencies_found']}")
     print(f"- Total violations: {report['summary']['total_violations']}")
 
-    print(report['dependency_matrix'])
-    print(report['coupling_analysis'])
-    print(report['recommendations'])
+    print(report["dependency_matrix"])
+    print(report["coupling_analysis"])
+    print(report["recommendations"])
 
     # Save detailed report
     output_file = root_path / "analysis" / "dependency_analysis_report.json"
     output_file.parent.mkdir(exist_ok=True)
 
-    with open(output_file, 'w') as f:
+    with open(output_file, "w") as f:
         json.dump(report, f, indent=2, default=str)
 
     print(f"\nDetailed analysis saved to: {output_file}")
 
     return report
+
 
 if __name__ == "__main__":
     main()

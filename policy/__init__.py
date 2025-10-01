@@ -37,17 +37,14 @@ __all__ = [
     # Core policy management
     "PolicyManager",
     "PolicyViolation",
-
     # Budget management
     "BudgetTracker",
     "BudgetStatus",
     "BudgetExceededException",
-
     # Baseline management
     "BaselineManager",
     "BaselineSnapshot",
     "BaselineComparison",
-
     # Waiver system
     "WaiverSystem",
     "Waiver",

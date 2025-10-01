@@ -11,6 +11,7 @@
 # The above copyright notice and this permission notice shall be included in
 # all copies or substantial portions of the Software.
 
+
 class ConstrainedGenerator:
     def __init__(self, backend):
         self.backend = backend
@@ -18,6 +19,6 @@ class ConstrainedGenerator:
     def check_safety_violations(self, code, language, profile):
         # Mock safety violations
         return [
-            {'message': 'Magic number detected', 'type': 'magic_literal'},
-            {'message': 'Deep nesting found', 'type': 'nesting'}
+            {"message": "Magic number detected", "type": "magic_literal"},
+            {"message": "Deep nesting found", "type": "nesting"},
         ]

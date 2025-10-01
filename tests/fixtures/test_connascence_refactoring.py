@@ -31,22 +31,28 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 # Constants not available in current architecture, using fallback values
 # from src.constants.system_constants import HotspotThresholds, SystemLimits, TensorDimensions, TimeConstants
 
+
 # Fallback constants for tests
 class HotspotThresholds:
     COMPLEXITY_THRESHOLD = 10
     COUPLING_THRESHOLD = 0.8
 
+
 class SystemLimits:
     MAX_FILE_SIZE = 1000000
     MAX_LINES = 10000
+
 
 class TensorDimensions:
     VECTOR_SIZE = 512
     MATRIX_SIZE = (100, 100)
 
+
 class TimeConstants:
     DEFAULT_TIMEOUT = 30
     CACHE_TTL = 300
+
+
 # These modules are not available in current architecture
 # from src.utils.parameter_objects import (
 #     MCPConnectionParams,
@@ -363,7 +369,9 @@ class TestParameterObjects:
 
     def test_factory_functions(self):
         """Test factory functions for backward compatibility"""
-        params = create_mcp_connection_params(uri="http://test.com", agent_id="agent1", api_key="key123")  # pragma: allowlist secret - test API key
+        params = create_mcp_connection_params(
+            uri="http://test.com", agent_id="agent1", api_key="key123"
+        )  # pragma: allowlist secret - test API key
 
         assert isinstance(params, MCPConnectionParams)
         assert params.uri == "http://test.com"

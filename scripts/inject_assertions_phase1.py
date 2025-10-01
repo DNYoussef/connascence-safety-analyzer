@@ -19,11 +19,12 @@ Features:
 Target: Improve Rule 4 compliance from 0% to 70-80%
 """
 
+import argparse
 import ast
 import json
 from pathlib import Path
-from typing import List, Dict
-import argparse
+from typing import Dict, List
+
 
 class AssertionInjector(ast.NodeTransformer):
     """AST transformer that injects assertions into functions"""
@@ -44,7 +45,7 @@ class AssertionInjector(ast.NodeTransformer):
                 arg_name = arg.arg
 
                 # Skip 'self' and 'cls'
-                if arg_name in ('self', 'cls'):
+                if arg_name in ("self", "cls"):
                     continue
 
                 # Basic None check
@@ -53,9 +54,9 @@ class AssertionInjector(ast.NodeTransformer):
                         test=ast.Compare(
                             left=ast.Name(id=arg_name, ctx=ast.Load()),
                             ops=[ast.IsNot()],
-                            comparators=[ast.Constant(value=None)]
+                            comparators=[ast.Constant(value=None)],
                         ),
-                        msg=ast.Constant(value=f"{arg_name} must not be None")
+                        msg=ast.Constant(value=f"{arg_name} must not be None"),
                     )
                 )
 
@@ -66,14 +67,14 @@ class AssertionInjector(ast.NodeTransformer):
                         assertions.append(
                             ast.Assert(
                                 test=ast.Call(
-                                    func=ast.Name(id='isinstance', ctx=ast.Load()),
+                                    func=ast.Name(id="isinstance", ctx=ast.Load()),
                                     args=[
                                         ast.Name(id=arg_name, ctx=ast.Load()),
-                                        ast.Name(id=type_name, ctx=ast.Load())
+                                        ast.Name(id=type_name, ctx=ast.Load()),
                                     ],
-                                    keywords=[]
+                                    keywords=[],
                                 ),
-                                msg=ast.Constant(value=f"{arg_name} must be of type {type_name}")
+                                msg=ast.Constant(value=f"{arg_name} must be of type {type_name}"),
                             )
                         )
 
@@ -81,19 +82,16 @@ class AssertionInjector(ast.NodeTransformer):
                 # Insert assertions at the beginning of the function
                 # Preserve docstring if it exists
                 insert_index = 0
-                if (node.body and isinstance(node.body[0], ast.Expr) and
-                        isinstance(node.body[0].value, ast.Constant)):
+                if node.body and isinstance(node.body[0], ast.Expr) and isinstance(node.body[0].value, ast.Constant):
                     insert_index = 1  # After docstring
 
                 for assertion in reversed(assertions):
                     node.body.insert(insert_index, assertion)
 
                 self.injected_count += len(assertions)
-                self.injection_log.append({
-                    'function': node.name,
-                    'line': node.lineno,
-                    'assertions_added': len(assertions)
-                })
+                self.injection_log.append(
+                    {"function": node.name, "line": node.lineno, "assertions_added": len(assertions)}
+                )
 
         return node
 
@@ -110,7 +108,7 @@ class AssertionInjector(ast.NodeTransformer):
 def inject_assertions_in_file(filepath: Path, dry_run: bool = False) -> Dict:
     """Inject assertions into a single file"""
     try:
-        with open(filepath, 'r', encoding='utf-8') as f:
+        with open(filepath, encoding="utf-8") as f:
             source = f.read()
             tree = ast.parse(source, filename=str(filepath))
 
@@ -120,39 +118,35 @@ def inject_assertions_in_file(filepath: Path, dry_run: bool = False) -> Dict:
         ast.fix_missing_locations(new_tree)
 
         result = {
-            'file': str(filepath),
-            'injected_count': injector.injected_count,
-            'injection_log': injector.injection_log,
-            'success': True
+            "file": str(filepath),
+            "injected_count": injector.injected_count,
+            "injection_log": injector.injection_log,
+            "success": True,
         }
 
         if not dry_run and injector.injected_count > 0:
             # Write back modified code
             new_source = ast.unparse(new_tree)
-            with open(filepath, 'w', encoding='utf-8') as f:
+            with open(filepath, "w", encoding="utf-8") as f:
                 f.write(new_source)
 
         return result
 
     except Exception as e:
-        return {
-            'file': str(filepath),
-            'success': False,
-            'error': str(e)
-        }
+        return {"file": str(filepath), "success": False, "error": str(e)}
 
 
 def load_top_files(n: int = 20) -> List[Path]:
     """Load top N files from violation report"""
-    report_path = Path('docs/enhancement/nasa-violations-detailed.json')
+    report_path = Path("docs/enhancement/nasa-violations-detailed.json")
 
-    with open(report_path, 'r') as f:
+    with open(report_path) as f:
         report = json.load(f)
 
     top_files = []
-    for file_data in report['top_100_files'][:n]:
-        if file_data['violations']['rule_4'] > 0:  # Only files with Rule 4 violations
-            filepath = Path('analyzer') / file_data['file']
+    for file_data in report["top_100_files"][:n]:
+        if file_data["violations"]["rule_4"] > 0:  # Only files with Rule 4 violations
+            filepath = Path("analyzer") / file_data["file"]
             if filepath.exists():
                 top_files.append(filepath)
 
@@ -160,9 +154,9 @@ def load_top_files(n: int = 20) -> List[Path]:
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Inject assertions for Rule 4 compliance')
-    parser.add_argument('--dry-run', action='store_true', help='Preview changes without modifying files')
-    parser.add_argument('--top-n', type=int, default=20, help='Number of top files to process')
+    parser = argparse.ArgumentParser(description="Inject assertions for Rule 4 compliance")
+    parser.add_argument("--dry-run", action="store_true", help="Preview changes without modifying files")
+    parser.add_argument("--top-n", type=int, default=20, help="Number of top files to process")
     args = parser.parse_args()
 
     print("=" * 60)
@@ -184,8 +178,8 @@ def main():
         result = inject_assertions_in_file(filepath, dry_run=args.dry_run)
         results.append(result)
 
-        if result['success']:
-            total_injected += result['injected_count']
+        if result["success"]:
+            total_injected += result["injected_count"]
             print(f"  ✅ Injected {result['injected_count']} assertions")
         else:
             print(f"  ❌ Error: {result['error']}")
@@ -199,16 +193,16 @@ def main():
     print(f"Success rate: {sum(1 for r in results if r['success'])}/{len(results)}")
 
     # Save detailed report
-    report_path = Path('docs/enhancement/assertion-injection-report.json')
-    with open(report_path, 'w', encoding='utf-8') as f:
-        json.dump({
-            'metadata': {
-                'dry_run': args.dry_run,
-                'top_n': args.top_n,
-                'total_injected': total_injected
+    report_path = Path("docs/enhancement/assertion-injection-report.json")
+    with open(report_path, "w", encoding="utf-8") as f:
+        json.dump(
+            {
+                "metadata": {"dry_run": args.dry_run, "top_n": args.top_n, "total_injected": total_injected},
+                "results": results,
             },
-            'results': results
-        }, f, indent=2)
+            f,
+            indent=2,
+        )
 
     print(f"\nDetailed report saved: {report_path}")
 
@@ -216,8 +210,8 @@ def main():
     baseline_violations = 1312  # From analysis
     expected_compliance = ((total_injected / baseline_violations) * 100) if baseline_violations > 0 else 0
 
-    print(f"\nEstimated Rule 4 Compliance Improvement:")
-    print(f"  Before: 0%")
+    print("\nEstimated Rule 4 Compliance Improvement:")
+    print("  Before: 0%")
     print(f"  After:  ~{expected_compliance:.1f}%")
 
     if not args.dry_run:
@@ -227,5 +221,5 @@ def main():
         print("  3. Re-run NASA compliance analysis")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

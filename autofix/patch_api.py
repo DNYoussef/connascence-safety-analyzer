@@ -24,7 +24,7 @@ class PatchSuggestion:
     new_code: str
     file_path: str
     line_range: Tuple[int, int]
-    safety_level: str = 'moderate'
+    safety_level: str = "moderate"
     rollback_info: Optional[Dict[str, Any]] = None
 
     def __post_init__(self):
@@ -34,28 +34,29 @@ class PatchSuggestion:
 
 # Import the real implementations from core module
 
+
 class PatchGenerator:
     """Mock patch generator for backward compatibility."""
-    
+
     def generate_patch(self, violation):
         return None
 
 
 class AutofixEngine:
     """Mock autofix engine for backward compatibility."""
-    
+
     def __init__(self):
         pass
-        
+
     def fix_violations(self, violations):
         return []
 
 
 class SafeAutofixer:
     """Mock safe autofixer for backward compatibility."""
-    
+
     def __init__(self):
         pass
-        
+
     def apply_fixes(self, fixes):
         return []

@@ -4,11 +4,11 @@ Critical To Quality (CTQ) Calculator and Process Capability Analysis
 Provides advanced Six Sigma calculations for connascence analysis.
 """
 
-import statistics
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Tuple, Any
-import math
 import logging
+import math
+import statistics
+from typing import Any, Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
@@ -16,6 +16,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class CTQMetric:
     """Critical To Quality metric"""
+
     name: str
     value: float
     target: float
@@ -35,42 +36,12 @@ class CTQCalculator:
 
     # Default CTQ metrics for software quality
     DEFAULT_METRICS = {
-        "maintainability_index": {
-            "target": 80.0,
-            "lower_spec": 60.0,
-            "upper_spec": 100.0,
-            "weight": 0.20
-        },
-        "cyclomatic_complexity": {
-            "target": 5.0,
-            "lower_spec": 1.0,
-            "upper_spec": 10.0,
-            "weight": 0.15
-        },
-        "coupling_factor": {
-            "target": 0.2,
-            "lower_spec": 0.0,
-            "upper_spec": 0.5,
-            "weight": 0.25
-        },
-        "cohesion_score": {
-            "target": 0.8,
-            "lower_spec": 0.5,
-            "upper_spec": 1.0,
-            "weight": 0.15
-        },
-        "duplication_ratio": {
-            "target": 0.05,
-            "lower_spec": 0.0,
-            "upper_spec": 0.15,
-            "weight": 0.10
-        },
-        "test_coverage": {
-            "target": 85.0,
-            "lower_spec": 70.0,
-            "upper_spec": 100.0,
-            "weight": 0.15
-        }
+        "maintainability_index": {"target": 80.0, "lower_spec": 60.0, "upper_spec": 100.0, "weight": 0.20},
+        "cyclomatic_complexity": {"target": 5.0, "lower_spec": 1.0, "upper_spec": 10.0, "weight": 0.15},
+        "coupling_factor": {"target": 0.2, "lower_spec": 0.0, "upper_spec": 0.5, "weight": 0.25},
+        "cohesion_score": {"target": 0.8, "lower_spec": 0.5, "upper_spec": 1.0, "weight": 0.15},
+        "duplication_ratio": {"target": 0.05, "lower_spec": 0.0, "upper_spec": 0.15, "weight": 0.10},
+        "test_coverage": {"target": 85.0, "lower_spec": 70.0, "upper_spec": 100.0, "weight": 0.15},
     }
 
     def __init__(self, custom_metrics: Optional[Dict[str, Dict]] = None):
@@ -97,39 +68,27 @@ class CTQCalculator:
 
         # Calculate maintainability index based on violations
         maintainability = self._calculate_maintainability(violations)
-        metrics['maintainability_index'] = self._create_metric(
-            'maintainability_index', maintainability
-        )
+        metrics["maintainability_index"] = self._create_metric("maintainability_index", maintainability)
 
         # Calculate complexity from algorithm/execution violations
         complexity = self._calculate_complexity(violations)
-        metrics['cyclomatic_complexity'] = self._create_metric(
-            'cyclomatic_complexity', complexity
-        )
+        metrics["cyclomatic_complexity"] = self._create_metric("cyclomatic_complexity", complexity)
 
         # Calculate coupling from identity/type violations
         coupling = self._calculate_coupling(violations)
-        metrics['coupling_factor'] = self._create_metric(
-            'coupling_factor', coupling
-        )
+        metrics["coupling_factor"] = self._create_metric("coupling_factor", coupling)
 
         # Calculate cohesion from meaning/convention violations
         cohesion = self._calculate_cohesion(violations)
-        metrics['cohesion_score'] = self._create_metric(
-            'cohesion_score', cohesion
-        )
+        metrics["cohesion_score"] = self._create_metric("cohesion_score", cohesion)
 
         # Calculate duplication from algorithm violations
         duplication = self._calculate_duplication(violations)
-        metrics['duplication_ratio'] = self._create_metric(
-            'duplication_ratio', duplication
-        )
+        metrics["duplication_ratio"] = self._create_metric("duplication_ratio", duplication)
 
         # Placeholder for test coverage (would need actual test data)
         test_coverage = 75.0  # Default assumption
-        metrics['test_coverage'] = self._create_metric(
-            'test_coverage', test_coverage
-        )
+        metrics["test_coverage"] = self._create_metric("test_coverage", test_coverage)
 
         self.calculated_metrics = list(metrics.values())
         return metrics
@@ -139,22 +98,22 @@ class CTQCalculator:
         config = self.metrics_config[name]
 
         # Determine status
-        if config['lower_spec'] <= value <= config['upper_spec']:
-            if abs(value - config['target']) / (config['upper_spec'] - config['lower_spec']) < 0.1:
-                status = 'pass'
+        if config["lower_spec"] <= value <= config["upper_spec"]:
+            if abs(value - config["target"]) / (config["upper_spec"] - config["lower_spec"]) < 0.1:
+                status = "pass"
             else:
-                status = 'warning'
+                status = "warning"
         else:
-            status = 'fail'
+            status = "fail"
 
         return CTQMetric(
             name=name,
             value=round(value, 2),
-            target=config['target'],
-            lower_spec=config['lower_spec'],
-            upper_spec=config['upper_spec'],
-            weight=config['weight'],
-            status=status
+            target=config["target"],
+            lower_spec=config["lower_spec"],
+            upper_spec=config["upper_spec"],
+            weight=config["weight"],
+            status=status,
         )
 
     def _calculate_maintainability(self, violations: List[Dict]) -> float:
@@ -165,15 +124,10 @@ class CTQCalculator:
         # Base score of 100, reduced by violations
         score = 100.0
 
-        severity_impact = {
-            'critical': 10.0,
-            'high': 5.0,
-            'medium': 2.0,
-            'low': 0.5
-        }
+        severity_impact = {"critical": 10.0, "high": 5.0, "medium": 2.0, "low": 0.5}
 
         for violation in violations:
-            severity = violation.get('severity', 'low').lower()
+            severity = violation.get("severity", "low").lower()
             score -= severity_impact.get(severity, 1.0)
 
         return max(0.0, score)
@@ -181,10 +135,7 @@ class CTQCalculator:
     def _calculate_complexity(self, violations: List[Dict]) -> float:
         """Calculate complexity metric from violations"""
         # Count algorithm and execution violations as complexity indicators
-        complexity_violations = [
-            v for v in violations
-            if v.get('type') in ['algorithm', 'execution', 'timing']
-        ]
+        complexity_violations = [v for v in violations if v.get("type") in ["algorithm", "execution", "timing"]]
 
         # Estimate cyclomatic complexity
         base_complexity = 5.0
@@ -194,10 +145,7 @@ class CTQCalculator:
     def _calculate_coupling(self, violations: List[Dict]) -> float:
         """Calculate coupling factor from violations"""
         # Count identity and type violations as coupling indicators
-        coupling_violations = [
-            v for v in violations
-            if v.get('type') in ['identity', 'type', 'position']
-        ]
+        coupling_violations = [v for v in violations if v.get("type") in ["identity", "type", "position"]]
 
         if not violations:
             return 0.0
@@ -208,10 +156,7 @@ class CTQCalculator:
     def _calculate_cohesion(self, violations: List[Dict]) -> float:
         """Calculate cohesion score from violations"""
         # Meaning and convention violations indicate poor cohesion
-        cohesion_violations = [
-            v for v in violations
-            if v.get('type') in ['meaning', 'convention', 'values']
-        ]
+        cohesion_violations = [v for v in violations if v.get("type") in ["meaning", "convention", "values"]]
 
         if not violations:
             return 1.0  # Perfect cohesion
@@ -223,10 +168,7 @@ class CTQCalculator:
     def _calculate_duplication(self, violations: List[Dict]) -> float:
         """Calculate duplication ratio from violations"""
         # Algorithm violations often indicate duplication
-        duplication_violations = [
-            v for v in violations
-            if v.get('type') == 'algorithm'
-        ]
+        duplication_violations = [v for v in violations if v.get("type") == "algorithm"]
 
         if not violations:
             return 0.0
@@ -248,7 +190,7 @@ class CTQCalculator:
             if range_size > 0:
                 normalized = (metric.value - metric.lower_spec) / range_size
                 # Invert if lower is better (like complexity)
-                if metric.name in ['cyclomatic_complexity', 'coupling_factor', 'duplication_ratio']:
+                if metric.name in ["cyclomatic_complexity", "coupling_factor", "duplication_ratio"]:
                     normalized = 1.0 - normalized
 
                 normalized = max(0.0, min(1.0, normalized))
@@ -264,7 +206,7 @@ class CTQCalculator:
         priorities = []
 
         for metric in self.calculated_metrics:
-            if metric.status != 'pass':
+            if metric.status != "pass":
                 # Calculate distance from target
                 distance = abs(metric.value - metric.target)
                 range_size = metric.upper_spec - metric.lower_spec
@@ -285,8 +227,7 @@ class ProcessCapability:
     """
 
     @staticmethod
-    def calculate_cp(measurements: List[float], lower_spec: float,
-                     upper_spec: float) -> float:
+    def calculate_cp(measurements: List[float], lower_spec: float, upper_spec: float) -> float:
         """
         Calculate Process Capability (Cp)
 
@@ -298,14 +239,13 @@ class ProcessCapability:
 
         std_dev = statistics.stdev(measurements)
         if std_dev == 0:
-            return float('inf')
+            return float("inf")
 
         cp = (upper_spec - lower_spec) / (6 * std_dev)
         return round(cp, 3)
 
     @staticmethod
-    def calculate_cpk(measurements: List[float], lower_spec: float,
-                      upper_spec: float) -> float:
+    def calculate_cpk(measurements: List[float], lower_spec: float, upper_spec: float) -> float:
         """
         Calculate Process Capability Index (Cpk)
 
@@ -319,7 +259,7 @@ class ProcessCapability:
         std_dev = statistics.stdev(measurements)
 
         if std_dev == 0:
-            return float('inf')
+            return float("inf")
 
         cpu = (upper_spec - mean_val) / (3 * std_dev)
         cpl = (mean_val - lower_spec) / (3 * std_dev)
@@ -328,8 +268,7 @@ class ProcessCapability:
         return round(cpk, 3)
 
     @staticmethod
-    def calculate_pp(measurements: List[float], lower_spec: float,
-                     upper_spec: float) -> float:
+    def calculate_pp(measurements: List[float], lower_spec: float, upper_spec: float) -> float:
         """
         Calculate Process Performance (Pp)
 
@@ -344,14 +283,13 @@ class ProcessCapability:
         std_dev = math.sqrt(variance)
 
         if std_dev == 0:
-            return float('inf')
+            return float("inf")
 
         pp = (upper_spec - lower_spec) / (6 * std_dev)
         return round(pp, 3)
 
     @staticmethod
-    def calculate_ppk(measurements: List[float], lower_spec: float,
-                      upper_spec: float) -> float:
+    def calculate_ppk(measurements: List[float], lower_spec: float, upper_spec: float) -> float:
         """
         Calculate Process Performance Index (Ppk)
 
@@ -366,7 +304,7 @@ class ProcessCapability:
         std_dev = math.sqrt(variance)
 
         if std_dev == 0:
-            return float('inf')
+            return float("inf")
 
         ppu = (upper_spec - mean_val) / (3 * std_dev)
         ppl = (mean_val - lower_spec) / (3 * std_dev)
@@ -383,8 +321,9 @@ class ProcessCapability:
         """
         return round(3 * cpk, 1)
 
-    def analyze_process(self, measurements: List[float], lower_spec: float,
-                       upper_spec: float, target: Optional[float] = None) -> Dict[str, Any]:
+    def analyze_process(
+        self, measurements: List[float], lower_spec: float, upper_spec: float, target: Optional[float] = None
+    ) -> Dict[str, Any]:
         """
         Comprehensive process capability analysis
 
@@ -439,22 +378,22 @@ class ProcessCapability:
                 "median": round(median_val, 3),
                 "std_dev": round(std_dev, 3),
                 "min": round(min(measurements), 3),
-                "max": round(max(measurements), 3)
+                "max": round(max(measurements), 3),
             },
             "capability_indices": {
                 "cp": cp,
                 "cpk": cpk,
                 "pp": pp,
                 "ppk": ppk,
-                "cpm": round(cpk * centering, 3)  # Taguchi capability index
+                "cpm": round(cpk * centering, 3),  # Taguchi capability index
             },
             "performance": {
                 "sigma_level": sigma_level,
                 "process_centering": round(centering * 100, 1),
                 "capability_rating": capability_rating,
-                "predicted_dpmo": round(defect_rate * 1_000_000, 2)
+                "predicted_dpmo": round(defect_rate * 1_000_000, 2),
             },
-            "recommendations": self._generate_recommendations(cp, cpk, centering)
+            "recommendations": self._generate_recommendations(cp, cpk, centering),
         }
 
     def _interpret_capability(self, cpk: float) -> str:

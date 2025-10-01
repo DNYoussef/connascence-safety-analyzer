@@ -44,9 +44,11 @@ EXIT_VALIDATION_FAILED = 1
 EXIT_CONFIG_ERROR = 2
 EXIT_RUNTIME_ERROR = 3
 
+
 @dataclass
 class ValidationResult:
     """Stores validation result for memory coordination"""
+
     test_name: str
     status: str  # 'PASS', 'FAIL', 'ERROR'
     expected: Any
@@ -54,9 +56,11 @@ class ValidationResult:
     message: str
     error_details: Optional[str] = None
 
+
 @dataclass
 class MemoryCoordination:
     """Memory coordination system for validation tracking"""
+
     session_id: str
     validation_results: List[ValidationResult]
     sequential_steps: Dict[str, str]
@@ -70,7 +74,7 @@ class MemoryCoordination:
             "expected": result.expected,
             "actual": result.actual,
             "message": result.message,
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat(),
         }
 
     def get_summary(self) -> Dict[str, int]:
@@ -79,6 +83,7 @@ class MemoryCoordination:
         for result in self.validation_results:
             summary[result.status] += 1
         return summary
+
 
 class SequentialThinkingValidator:
     """
@@ -103,33 +108,30 @@ class SequentialThinkingValidator:
                 "step_3": "Validate individual artifact files exist and parse correctly",
                 "step_4": "Cross-reference all counts for consistency",
                 "step_5": "Generate comprehensive validation report",
-                "step_6": "Store results in memory for CI coordination"
+                "step_6": "Store results in memory for CI coordination",
             },
-            memory_storage={}
+            memory_storage={},
         )
 
         # Expected counts from requirements - ENTERPRISE VERIFIED
-        self.expected_counts = {
-            "celery": 4630,
-            "curl": 1061,
-            "express": 52,
-            "total": 5743
-        }
+        self.expected_counts = {"celery": 4630, "curl": 1061, "express": 52, "total": 5743}
 
     def log(self, message: str, level: str = "INFO"):
         """Logging with memory coordination"""
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         # Replace Unicode emojis with ASCII equivalents for Windows compatibility
-        message_clean = (message.replace("🔍", "[SEARCH]")
-                              .replace("✅", "[PASS]")
-                              .replace("❌", "[FAIL]")
-                              .replace("🚀", "[START]")
-                              .replace("📄", "[REPORT]")
-                              .replace("💾", "[MEMORY]")
-                              .replace("🎯", "[TARGET]")
-                              .replace("📊", "[STATS]")
-                              .replace("💥", "[ERROR]")
-                              .replace("🛑", "[STOP]"))
+        message_clean = (
+            message.replace("🔍", "[SEARCH]")
+            .replace("✅", "[PASS]")
+            .replace("❌", "[FAIL]")
+            .replace("🚀", "[START]")
+            .replace("📄", "[REPORT]")
+            .replace("💾", "[MEMORY]")
+            .replace("🎯", "[TARGET]")
+            .replace("📊", "[STATS]")
+            .replace("💥", "[ERROR]")
+            .replace("🛑", "[STOP]")
+        )
 
         log_entry = f"[{timestamp}] [{level}] {message_clean}"
         if self.verbose or level in ["ERROR", "FAIL"]:
@@ -137,16 +139,12 @@ class SequentialThinkingValidator:
                 print(log_entry)
             except UnicodeEncodeError:
                 # Fallback to ASCII-only logging
-                print(log_entry.encode('ascii', errors='replace').decode('ascii'))
+                print(log_entry.encode("ascii", errors="replace").decode("ascii"))
 
         # Store in memory
         if "logs" not in self.memory.memory_storage:
             self.memory.memory_storage["logs"] = []
-        self.memory.memory_storage["logs"].append({
-            "timestamp": timestamp,
-            "level": level,
-            "message": message
-        })
+        self.memory.memory_storage["logs"].append({"timestamp": timestamp, "level": level, "message": message})
 
     def step_1_parse_readme(self) -> Dict[str, int]:
         """
@@ -162,37 +160,37 @@ class SequentialThinkingValidator:
                 status="FAIL",
                 expected="README.md exists",
                 actual="File not found",
-                message="README.md file not found"
+                message="README.md file not found",
             )
             self.memory.store_result(result)
             return {}
 
         try:
-            with open(readme_path, encoding='utf-8') as f:
+            with open(readme_path, encoding="utf-8") as f:
                 content = f.read()
 
             # Parse violation counts using regex patterns
             counts = {}
 
             # Pattern 1: "4,630 violations detected" in complete Celery codebase
-            celery_match = re.search(r'(\d{1,3}(?:,\d{3})*)\s+violations.*?Celery', content, re.IGNORECASE)
+            celery_match = re.search(r"(\d{1,3}(?:,\d{3})*)\s+violations.*?Celery", content, re.IGNORECASE)
             if celery_match:
-                counts['celery'] = int(celery_match.group(1).replace(',', ''))
+                counts["celery"] = int(celery_match.group(1).replace(",", ""))
 
             # Pattern 2: "1,061 violations in curl"
-            curl_match = re.search(r'(\d{1,3}(?:,\d{3})*)\s+violations.*?curl', content, re.IGNORECASE)
+            curl_match = re.search(r"(\d{1,3}(?:,\d{3})*)\s+violations.*?curl", content, re.IGNORECASE)
             if curl_match:
-                counts['curl'] = int(curl_match.group(1).replace(',', ''))
+                counts["curl"] = int(curl_match.group(1).replace(",", ""))
 
             # Pattern 3: "52 violations in Express.js"
-            express_match = re.search(r'(\d{1,3}(?:,\d{3})*)\s+violations.*?Express', content, re.IGNORECASE)
+            express_match = re.search(r"(\d{1,3}(?:,\d{3})*)\s+violations.*?Express", content, re.IGNORECASE)
             if express_match:
-                counts['express'] = int(express_match.group(1).replace(',', ''))
+                counts["express"] = int(express_match.group(1).replace(",", ""))
 
             # Pattern 4: "5,743 violations" total
-            total_match = re.search(r'Successfully detected \*\*(\d{1,3}(?:,\d{3})*) violations\*\*', content)
+            total_match = re.search(r"Successfully detected \*\*(\d{1,3}(?:,\d{3})*) violations\*\*", content)
             if total_match:
-                counts['total'] = int(total_match.group(1).replace(',', ''))
+                counts["total"] = int(total_match.group(1).replace(",", ""))
 
             self.memory.memory_storage["readme_parsed_counts"] = counts
             self.log(f"[PASS] STEP 1 COMPLETE: Parsed README counts: {counts}")
@@ -202,7 +200,7 @@ class SequentialThinkingValidator:
                 status="PASS",
                 expected="Parse violation counts from README",
                 actual=counts,
-                message=f"Successfully parsed {len(counts)} counts from README"
+                message=f"Successfully parsed {len(counts)} counts from README",
             )
             self.memory.store_result(result)
 
@@ -215,7 +213,7 @@ class SequentialThinkingValidator:
                 expected="Parse README successfully",
                 actual=str(e),
                 message="Failed to parse README.md",
-                error_details=str(e)
+                error_details=str(e),
             )
             self.memory.store_result(result)
             return {}
@@ -233,24 +231,24 @@ class SequentialThinkingValidator:
                 status="FAIL",
                 expected="index.json exists",
                 actual="File not found",
-                message="DEMO_ARTIFACTS/index.json not found"
+                message="DEMO_ARTIFACTS/index.json not found",
             )
             self.memory.store_result(result)
             return {}
 
         try:
-            with open(index_path, encoding='utf-8') as f:
+            with open(index_path, encoding="utf-8") as f:
                 index_data = json.load(f)
 
             # Extract counts from index.json structure
-            validation_results = index_data.get('validation_results', {})
-            totals = index_data.get('totals', {})
+            validation_results = index_data.get("validation_results", {})
+            totals = index_data.get("totals", {})
 
             counts = {
-                'celery': validation_results.get('celery', {}).get('violations', 0),
-                'curl': validation_results.get('curl', {}).get('violations', 0),
-                'express': validation_results.get('express', {}).get('violations', 0),
-                'total': totals.get('violations', 0)
+                "celery": validation_results.get("celery", {}).get("violations", 0),
+                "curl": validation_results.get("curl", {}).get("violations", 0),
+                "express": validation_results.get("express", {}).get("violations", 0),
+                "total": totals.get("violations", 0),
             }
 
             self.memory.memory_storage["index_json_counts"] = counts
@@ -263,7 +261,7 @@ class SequentialThinkingValidator:
                 status="PASS",
                 expected="Parse index.json successfully",
                 actual=counts,
-                message=f"Successfully parsed index.json with {len(counts)} counts"
+                message=f"Successfully parsed index.json with {len(counts)} counts",
             )
             self.memory.store_result(result)
 
@@ -276,7 +274,7 @@ class SequentialThinkingValidator:
                 expected="Parse index.json successfully",
                 actual=str(e),
                 message="Failed to parse index.json",
-                error_details=str(e)
+                error_details=str(e),
             )
             self.memory.store_result(result)
             return {}
@@ -288,7 +286,7 @@ class SequentialThinkingValidator:
         self.log("[SEARCH] STEP 3: Validating individual artifact files exist and parse correctly")
 
         artifacts_dir = self.base_path / "DEMO_ARTIFACTS"
-        artifact_files = index_data.get('artifacts', [])
+        artifact_files = index_data.get("artifacts", [])
         validation_status = {}
 
         for artifact_file in artifact_files:
@@ -301,7 +299,7 @@ class SequentialThinkingValidator:
                     status="FAIL",
                     expected=f"{artifact_file} exists",
                     actual="File not found",
-                    message=f"Artifact file {artifact_file} not found"
+                    message=f"Artifact file {artifact_file} not found",
                 )
                 self.memory.store_result(result)
                 validation_status[artifact_file] = False
@@ -309,14 +307,14 @@ class SequentialThinkingValidator:
 
             # Validate JSON parsing
             try:
-                with open(file_path, encoding='utf-8') as f:
+                with open(file_path, encoding="utf-8") as f:
                     artifact_data = json.load(f)
 
                 # Store artifact data in memory
                 self.memory.memory_storage[f"artifact_data_{artifact_file}"] = artifact_data
 
                 # Validate required fields
-                required_fields = ['tool_version', 'timestamp', 'repository', 'analysis']
+                required_fields = ["tool_version", "timestamp", "repository", "analysis"]
                 missing_fields = [field for field in required_fields if field not in artifact_data]
 
                 if missing_fields:
@@ -325,7 +323,7 @@ class SequentialThinkingValidator:
                         status="FAIL",
                         expected=f"Required fields: {required_fields}",
                         actual=f"Missing fields: {missing_fields}",
-                        message=f"Artifact {artifact_file} missing required fields"
+                        message=f"Artifact {artifact_file} missing required fields",
                     )
                     self.memory.store_result(result)
                     validation_status[artifact_file] = False
@@ -335,7 +333,7 @@ class SequentialThinkingValidator:
                         status="PASS",
                         expected="Valid JSON with required fields",
                         actual="All fields present",
-                        message=f"Artifact {artifact_file} is valid"
+                        message=f"Artifact {artifact_file} is valid",
                     )
                     self.memory.store_result(result)
                     validation_status[artifact_file] = True
@@ -347,7 +345,7 @@ class SequentialThinkingValidator:
                     expected="Valid JSON file",
                     actual=str(e),
                     message=f"Failed to parse {artifact_file}",
-                    error_details=str(e)
+                    error_details=str(e),
                 )
                 self.memory.store_result(result)
                 validation_status[artifact_file] = False
@@ -380,7 +378,7 @@ class SequentialThinkingValidator:
                     status="PASS",
                     expected=expected_value,
                     actual=readme_value,
-                    message=f"README {key} count matches expected value"
+                    message=f"README {key} count matches expected value",
                 )
                 consistency_check[f"readme_{key}"] = True
             else:
@@ -389,7 +387,7 @@ class SequentialThinkingValidator:
                     status="FAIL",
                     expected=expected_value,
                     actual=readme_value,
-                    message=f"README {key} count mismatch"
+                    message=f"README {key} count mismatch",
                 )
                 consistency_check[f"readme_{key}"] = False
             self.memory.store_result(result)
@@ -401,7 +399,7 @@ class SequentialThinkingValidator:
                     status="PASS",
                     expected=expected_value,
                     actual=index_value,
-                    message=f"Index.json {key} count matches expected value"
+                    message=f"Index.json {key} count matches expected value",
                 )
                 consistency_check[f"index_{key}"] = True
             else:
@@ -410,7 +408,7 @@ class SequentialThinkingValidator:
                     status="FAIL",
                     expected=expected_value,
                     actual=index_value,
-                    message=f"Index.json {key} count mismatch"
+                    message=f"Index.json {key} count mismatch",
                 )
                 consistency_check[f"index_{key}"] = False
             self.memory.store_result(result)
@@ -422,7 +420,7 @@ class SequentialThinkingValidator:
                     status="PASS",
                     expected="README and index counts match",
                     actual=f"Both show {readme_value}",
-                    message=f"{key} counts are consistent between sources"
+                    message=f"{key} counts are consistent between sources",
                 )
                 consistency_check[f"consistency_{key}"] = True
             else:
@@ -431,7 +429,7 @@ class SequentialThinkingValidator:
                     status="FAIL",
                     expected="README and index counts match",
                     actual=f"README: {readme_value}, Index: {index_value}",
-                    message=f"{key} counts are inconsistent between sources"
+                    message=f"{key} counts are inconsistent between sources",
                 )
                 consistency_check[f"consistency_{key}"] = False
             self.memory.store_result(result)
@@ -454,19 +452,19 @@ class SequentialThinkingValidator:
             "validation_session": {
                 "session_id": self.memory.session_id,
                 "timestamp": datetime.now().isoformat(),
-                "base_path": str(self.base_path)
+                "base_path": str(self.base_path),
             },
             "summary": {
                 "total_tests": total_tests,
                 "passed": summary["PASS"],
                 "failed": summary["FAIL"],
                 "errors": summary["ERROR"],
-                "success_rate": round((summary["PASS"] / total_tests * 100), 2) if total_tests > 0 else 0
+                "success_rate": round((summary["PASS"] / total_tests * 100), 2) if total_tests > 0 else 0,
             },
             "expected_counts": self.expected_counts,
             "actual_counts": {
                 "readme": self.memory.memory_storage.get("readme_parsed_counts", {}),
-                "index_json": self.memory.memory_storage.get("index_json_counts", {})
+                "index_json": self.memory.memory_storage.get("index_json_counts", {}),
             },
             "sequential_steps": self.memory.sequential_steps,
             "detailed_results": [
@@ -476,16 +474,16 @@ class SequentialThinkingValidator:
                     "expected": r.expected,
                     "actual": r.actual,
                     "message": r.message,
-                    "error_details": r.error_details
+                    "error_details": r.error_details,
                 }
                 for r in self.memory.validation_results
-            ]
+            ],
         }
 
         # Write report to file
         report_path = self.base_path / "DEMO_ARTIFACTS" / "validation_reports" / "validation_report.json"
         try:
-            with open(report_path, 'w', encoding='utf-8') as f:
+            with open(report_path, "w", encoding="utf-8") as f:
                 json.dump(report, f, indent=2, ensure_ascii=False)
             self.log(f"[REPORT] Validation report written to {report_path}")
         except Exception as e:
@@ -512,11 +510,11 @@ class SequentialThinkingValidator:
                 "validation_session": {
                     "session_id": self.memory.session_id,
                     "start_time": datetime.now().isoformat(),
-                    "memory_keys": list(self.memory.memory_storage.keys())
+                    "memory_keys": list(self.memory.memory_storage.keys()),
                 },
                 "sequential_thinking": self.memory.sequential_steps,
                 "memory_storage": self.memory.memory_storage,
-                "validation_summary": self.memory.get_summary()
+                "validation_summary": self.memory.get_summary(),
             }
 
             # Remove circular references before JSON serialization
@@ -531,7 +529,7 @@ class SequentialThinkingValidator:
 
             memory_data["memory_storage"] = clean_memory_storage
 
-            with open(memory_path, 'w', encoding='utf-8') as f:
+            with open(memory_path, "w", encoding="utf-8") as f:
                 json.dump(memory_data, f, indent=2, ensure_ascii=False)
 
             self.log(f"[MEMORY] Memory coordination data stored to {memory_path}")
@@ -578,46 +576,31 @@ class SequentialThinkingValidator:
                 expected="Complete validation successfully",
                 actual=str(e),
                 message="Critical error in validation process",
-                error_details=str(e)
+                error_details=str(e),
             )
             self.memory.store_result(result)
 
             return False, {"error": str(e)}
 
+
 def main():
     """Main entry point for CI/CD integration"""
-    parser = argparse.ArgumentParser(
-        description="Connascence Safety Analyzer - Verification Script"
-    )
+    parser = argparse.ArgumentParser(description="Connascence Safety Analyzer - Verification Script")
     parser.add_argument(
-        "--base-path",
-        type=Path,
-        default=Path.cwd(),
-        help="Base path for the project (default: current directory)"
+        "--base-path", type=Path, default=Path.cwd(), help="Base path for the project (default: current directory)"
     )
-    parser.add_argument(
-        "--verbose",
-        action="store_true",
-        help="Enable verbose logging"
-    )
-    parser.add_argument(
-        "--report-only",
-        action="store_true",
-        help="Generate report without validation (for testing)"
-    )
+    parser.add_argument("--verbose", action="store_true", help="Enable verbose logging")
+    parser.add_argument("--report-only", action="store_true", help="Generate report without validation (for testing)")
     parser.add_argument(
         "--generate-validation-report",
         action="store_true",
-        help="Generate detailed validation report (alias for --report-only with enhanced output)"
+        help="Generate detailed validation report (alias for --report-only with enhanced output)",
     )
 
     args = parser.parse_args()
 
     # Initialize validator
-    validator = SequentialThinkingValidator(
-        base_path=args.base_path,
-        verbose=args.verbose
-    )
+    validator = SequentialThinkingValidator(base_path=args.base_path, verbose=args.verbose)
 
     try:
         if args.report_only or args.generate_validation_report:
@@ -631,7 +614,7 @@ def main():
                     "mode": "validation-report",
                     "timestamp": datetime.now().isoformat(),
                     "session_id": validator.memory.session_id,
-                    "enhanced_output": True
+                    "enhanced_output": True,
                 }
             print(json.dumps(report, indent=2))
             sys.exit(EXIT_SUCCESS)
@@ -662,6 +645,7 @@ def main():
     except Exception as e:
         validator.log(f"[ERROR] Unexpected error: {e}", "ERROR")
         sys.exit(EXIT_RUNTIME_ERROR)
+
 
 if __name__ == "__main__":
     main()

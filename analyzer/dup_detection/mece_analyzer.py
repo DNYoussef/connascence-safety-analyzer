@@ -27,10 +27,11 @@ except ImportError:
     except ImportError:
         # Emergency fallback
         from dataclasses import dataclass
-        
-        @dataclass 
+
+        @dataclass
         class ConnascenceViolation:
             """Emergency fallback ConnascenceViolation for MECE analysis."""
+
             type: str = ""
             severity: str = "medium"
             description: str = ""
@@ -110,7 +111,7 @@ class MECEAnalyzer:
             }
 
         except Exception as e:
-            return {"success": False, "error": f"Analysis error: {str(e)}", "mece_score": 0.0, "duplications": []}
+            return {"success": False, "error": f"Analysis error: {e!s}", "mece_score": 0.0, "duplications": []}
 
     def _extract_code_blocks(self, path_obj: Path) -> List[CodeBlock]:
         """Extract code blocks from Python files."""

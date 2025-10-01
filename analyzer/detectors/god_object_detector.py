@@ -8,65 +8,66 @@ import ast
 from typing import List
 
 from utils.types import ConnascenceViolation
+
 from .base import DetectorBase
 
 
 class GodObjectDetector(DetectorBase):
     """Detects classes that violate Single Responsibility Principle."""
-    
+
     DEFAULT_METHOD_THRESHOLD = 18
     DEFAULT_LOC_THRESHOLD = 700
-    
+
     def detect_violations(self, tree: ast.AST) -> List[ConnascenceViolation]:
         """
         Detect god objects in the AST tree.
         NASA Rule 5 compliant: Added input validation assertions.
-        
+
         Args:
             tree: AST tree to analyze
-            
+
         Returns:
             List of god object violations
         """
         # NASA Rule 5: Input validation assertions
         assert tree is not None, "AST tree cannot be None"
         assert isinstance(tree, ast.AST), "Input must be valid AST object"
-        
+
         self.violations.clear()
-        
+
         for node in ast.walk(tree):
             if isinstance(node, ast.ClassDef):
                 self._analyze_class(node)
-        
+
         # NASA Rule 7: Validate return value
         assert isinstance(self.violations, list), "violations must be a list"
         return self.violations
-    
+
     def _analyze_class(self, node: ast.ClassDef) -> None:
         """Analyze a class for god object patterns."""
         # NASA Rule 5: Input validation assertions
         assert node is not None, "Class node cannot be None"
         assert isinstance(node, ast.ClassDef), "Node must be a class definition"
-        
+
         # Try context-aware analysis first
         try:
             from analyzer.context_analyzer import ContextAnalyzer
-            
+
             context_analyzer = ContextAnalyzer()
             class_analysis = context_analyzer.analyze_class_context(node, self.source_lines, self.file_path)
-            
+
             # NASA Rule 1: Use guard clause to reduce nesting
             if context_analyzer.is_god_object_with_context(class_analysis):
                 self._create_context_aware_violation(node, class_analysis)
                 return
-                
+
         except ImportError:
             # Fallback to basic analysis
             pass
-        
+
         # Basic analysis fallback
         self._basic_god_object_analysis(node)
-    
+
     def _create_context_aware_violation(self, node: ast.ClassDef, class_analysis) -> None:
         """Create violation using context-aware analysis."""
         self.violations.append(
@@ -94,17 +95,17 @@ class GodObjectDetector(DetectorBase):
                 },
             )
         )
-    
+
     def _basic_god_object_analysis(self, node: ast.ClassDef) -> None:
         """Basic god object analysis when context analyzer is unavailable."""
         method_count = sum(1 for n in node.body if isinstance(n, ast.FunctionDef))
-        
+
         # Estimate lines of code
         if hasattr(node, "end_lineno") and node.end_lineno:
             loc = node.end_lineno - node.lineno
         else:
             loc = len(node.body) * 5  # Rough estimate
-        
+
         # Check thresholds
         if method_count > self.DEFAULT_METHOD_THRESHOLD or loc > self.DEFAULT_LOC_THRESHOLD:
             self.violations.append(
@@ -123,7 +124,7 @@ class GodObjectDetector(DetectorBase):
                         "class_name": node.name,
                         "analysis_type": "basic",
                         "method_threshold": self.DEFAULT_METHOD_THRESHOLD,
-                        "loc_threshold": self.DEFAULT_LOC_THRESHOLD
+                        "loc_threshold": self.DEFAULT_LOC_THRESHOLD,
                     },
                 )
             )

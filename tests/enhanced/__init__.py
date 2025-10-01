@@ -27,22 +27,22 @@ __author__ = "Connascence Safety Analyzer Contributors"
 # Import key test infrastructure for easy access
 from .test_infrastructure import (
     EnhancedTestDatasets,
-    MockEnhancedAnalyzer, 
     EnhancedTestUtilities,
-    MockCorrelation,
-    MockSmartRecommendation,
     MockAuditTrailEntry,
+    MockCorrelation,
+    MockEnhancedAnalyzer,
+    MockSmartRecommendation,
     integration_test,
-    performance_test
+    performance_test,
 )
 
 __all__ = [
     "EnhancedTestDatasets",
-    "MockEnhancedAnalyzer",
-    "EnhancedTestUtilities", 
-    "MockCorrelation",
-    "MockSmartRecommendation",
+    "EnhancedTestUtilities",
     "MockAuditTrailEntry",
+    "MockCorrelation",
+    "MockEnhancedAnalyzer",
+    "MockSmartRecommendation",
     "integration_test",
-    "performance_test"
+    "performance_test",
 ]

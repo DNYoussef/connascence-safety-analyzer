@@ -1,11 +1,12 @@
 """Quick test script to verify file discovery and analysis."""
-import sys
 from pathlib import Path
+import sys
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from analyzer.unified_analyzer import UnifiedConnascenceAnalyzer
+
 
 def test_file_discovery():
     """Test file discovery for celery package."""
@@ -28,13 +29,14 @@ def test_file_discovery():
 
     # Test 4: Show which files are skipped
     if skipped_files > 0:
-        print(f"\nFirst 10 skipped files:")
+        print("\nFirst 10 skipped files:")
         for f in python_files:
             if not analyzer._should_analyze_file(f):
                 print(f"  SKIPPED: {f}")
                 if skipped_files <= 0:
                     break
                 skipped_files -= 1
+
 
 if __name__ == "__main__":
     test_file_discovery()

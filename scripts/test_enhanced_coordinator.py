@@ -38,13 +38,9 @@ async def main():
 
     # Initialize enhanced coordinator
     config = {
-        'enhancements': {
-            'ai_recommendations': True,
-            'confidence_threshold': 0.75,
-            'severity_weight': 0.8
-        },
-        'ruff': {'enabled': True},
-        'mypy': {'enabled': True}
+        "enhancements": {"ai_recommendations": True, "confidence_threshold": 0.75, "severity_weight": 0.8},
+        "ruff": {"enabled": True},
+        "mypy": {"enabled": True},
     }
 
     coordinator = EnhancedToolCoordinator(config)
@@ -66,10 +62,10 @@ async def main():
         # Run enhanced analysis
         result = await coordinator.enhanced_analyze_project(
             project_path=test_path,
-            enabled_tools={'ruff', 'mypy'},  # Limit to available tools for testing
+            enabled_tools={"ruff", "mypy"},  # Limit to available tools for testing
             include_connascence=True,
             enable_nasa_correlation=True,
-            enable_mece_analysis=True
+            enable_mece_analysis=True,
         )
 
         print("ENHANCED ANALYSIS RESULTS")
@@ -116,7 +112,7 @@ async def main():
         print("-" * 40)
 
         report = coordinator.generate_enhanced_report(result, format_type="text")
-        report_lines = report.split('\n')
+        report_lines = report.split("\n")
 
         # Show first 20 lines of report
         print("Preview (first 20 lines):")
@@ -133,13 +129,14 @@ async def main():
 
         # Save detailed report for inspection
         report_file = Path(__file__).parent.parent / "enhanced_analysis_report.txt"
-        with open(report_file, 'w') as f:
+        with open(report_file, "w") as f:
             f.write(report)
         print(f"   - Detailed report saved: {report_file}")
 
     except Exception as e:
         print(f"[ERROR] Enhanced analysis failed: {e}")
         import traceback
+
         traceback.print_exc()
         return 1
 

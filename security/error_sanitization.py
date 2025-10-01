@@ -33,61 +33,55 @@ class ErrorSanitizer:
     # Sensitive patterns that should be redacted
     SENSITIVE_PATTERNS = [
         # File paths
-        (r'[A-Z]:\\[^\\]+(?:\\[^\\]+)*', '[REDACTED_PATH]'),
-        (r'/[^/\s]+(?:/[^/\s]+)*', '[REDACTED_PATH]'),
-
+        (r"[A-Z]:\\[^\\]+(?:\\[^\\]+)*", "[REDACTED_PATH]"),
+        (r"/[^/\s]+(?:/[^/\s]+)*", "[REDACTED_PATH]"),
         # Database connections
-        (r'postgresql://[^@]+@[^/]+/\w+', 'postgresql://[REDACTED]'),
-        (r'mysql://[^@]+@[^/]+/\w+', 'mysql://[REDACTED]'),
-        (r'sqlite:///[^\s]+', 'sqlite:///[REDACTED]'),
-
+        (r"postgresql://[^@]+@[^/]+/\w+", "postgresql://[REDACTED]"),
+        (r"mysql://[^@]+@[^/]+/\w+", "mysql://[REDACTED]"),
+        (r"sqlite:///[^\s]+", "sqlite:///[REDACTED]"),
         # API keys and tokens
-        (r'\b[A-Za-z0-9]{20,}\b', '[REDACTED_TOKEN]'),
-        (r'Bearer\s+[A-Za-z0-9\-_=.]+', 'Bearer [REDACTED]'),
-        (r'token["\']?\s*[:=]\s*["\']?[A-Za-z0-9\-_=.]+', 'token=[REDACTED]'),
-
+        (r"\b[A-Za-z0-9]{20,}\b", "[REDACTED_TOKEN]"),
+        (r"Bearer\s+[A-Za-z0-9\-_=.]+", "Bearer [REDACTED]"),
+        (r'token["\']?\s*[:=]\s*["\']?[A-Za-z0-9\-_=.]+', "token=[REDACTED]"),
         # IP addresses (internal ranges)
-        (r'\b192\.168\.\d{1,3}\.\d{1,3}\b', '[REDACTED_IP]'),
-        (r'\b10\.\d{1,3}\.\d{1,3}\.\d{1,3}\b', '[REDACTED_IP]'),
-        (r'\b172\.(?:1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3}\b', '[REDACTED_IP]'),
-
+        (r"\b192\.168\.\d{1,3}\.\d{1,3}\b", "[REDACTED_IP]"),
+        (r"\b10\.\d{1,3}\.\d{1,3}\.\d{1,3}\b", "[REDACTED_IP]"),
+        (r"\b172\.(?:1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3}\b", "[REDACTED_IP]"),
         # Usernames in paths
-        (r'/home/[^/\s]+', '/home/[REDACTED_USER]'),
-        (r'C:\\Users\\[^\\]+', 'C:\\Users\\[REDACTED_USER]'),
-
+        (r"/home/[^/\s]+", "/home/[REDACTED_USER]"),
+        (r"C:\\Users\\[^\\]+", "C:\\Users\\[REDACTED_USER]"),
         # Email addresses
-        (r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b', '[REDACTED_EMAIL]'),
-
+        (r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b", "[REDACTED_EMAIL]"),
         # Version information that might be sensitive
-        (r'Python \d+\.\d+\.\d+', 'Python [VERSION]'),
-        (r'version \d+\.\d+(?:\.\d+)?', 'version [VERSION]'),
-
+        (r"Python \d+\.\d+\.\d+", "Python [VERSION]"),
+        (r"version \d+\.\d+(?:\.\d+)?", "version [VERSION]"),
         # Stack trace file references (keep only filename)
         (r'File "([^"]+[/\\])([^/\\]+)"', r'File "\2"'),
     ]
 
     # Common error categories with user-friendly messages
     ERROR_CATEGORIES = {
-        'FileNotFoundError': 'The requested file could not be found.',
-        'PermissionError': 'Access denied. Insufficient permissions.',
-        'ConnectionError': 'Unable to establish connection to the service.',
-        'TimeoutError': 'The operation timed out. Please try again.',
-        'ValueError': 'Invalid input provided. Please check your data.',
-        'KeyError': 'Required information is missing.',
-        'ImportError': 'A required component is not available.',
-        'ModuleNotFoundError': 'A required component is not available.',
-        'AttributeError': 'The requested operation is not supported.',
-        'TypeError': 'Invalid data type provided.',
-        'IndexError': 'The requested item is not available.',
-        'OSError': 'A system error occurred.',
-        'RuntimeError': 'An unexpected error occurred during processing.',
-        'IOError': 'Input/output error occurred.',
-        'MemoryError': 'Insufficient memory to complete the operation.',
+        "FileNotFoundError": "The requested file could not be found.",
+        "PermissionError": "Access denied. Insufficient permissions.",
+        "ConnectionError": "Unable to establish connection to the service.",
+        "TimeoutError": "The operation timed out. Please try again.",
+        "ValueError": "Invalid input provided. Please check your data.",
+        "KeyError": "Required information is missing.",
+        "ImportError": "A required component is not available.",
+        "ModuleNotFoundError": "A required component is not available.",
+        "AttributeError": "The requested operation is not supported.",
+        "TypeError": "Invalid data type provided.",
+        "IndexError": "The requested item is not available.",
+        "OSError": "A system error occurred.",
+        "RuntimeError": "An unexpected error occurred during processing.",
+        "IOError": "Input/output error occurred.",
+        "MemoryError": "Insufficient memory to complete the operation.",
     }
 
     @classmethod
-    def sanitize_error_message(cls, error: Exception, include_type: bool = False,
-                             development_mode: bool = False) -> str:
+    def sanitize_error_message(
+        cls, error: Exception, include_type: bool = False, development_mode: bool = False
+    ) -> str:
         """
         Sanitize error message for safe display to users.
 
@@ -111,7 +105,7 @@ class ErrorSanitizer:
             return sanitized_message
         else:
             # In production, use generic user-friendly messages
-            user_message = cls.ERROR_CATEGORIES.get(error_type, 'An error occurred while processing your request.')
+            user_message = cls.ERROR_CATEGORIES.get(error_type, "An error occurred while processing your request.")
 
             if include_type:
                 return f"{error_type}: {user_message}"
@@ -128,8 +122,9 @@ class ErrorSanitizer:
         return sanitized
 
     @classmethod
-    def create_safe_error_response(cls, error: Exception, error_id: Optional[str] = None,
-                                 development_mode: bool = False) -> Dict[str, Any]:
+    def create_safe_error_response(
+        cls, error: Exception, error_id: Optional[str] = None, development_mode: bool = False
+    ) -> Dict[str, Any]:
         """
         Create a safe error response dictionary.
 
@@ -144,22 +139,21 @@ class ErrorSanitizer:
         error_type = type(error).__name__
 
         response = {
-            'error': True,
-            'error_type': error_type,
-            'message': cls.sanitize_error_message(error, development_mode=development_mode),
-            'timestamp': None  # Will be set by caller
+            "error": True,
+            "error_type": error_type,
+            "message": cls.sanitize_error_message(error, development_mode=development_mode),
+            "timestamp": None,  # Will be set by caller
         }
 
         if error_id:
-            response['error_id'] = error_id
+            response["error_id"] = error_id
 
         if development_mode:
             # Include sanitized details for development
-            response['details'] = cls._sanitize_sensitive_data(str(error))
+            response["details"] = cls._sanitize_sensitive_data(str(error))
 
         # Log the full error details securely (for debugging)
-        logger.error(f"Error {error_id or 'UNKNOWN'}: {error_type}: {error}",
-                    exc_info=bool(development_mode))
+        logger.error(f"Error {error_id or 'UNKNOWN'}: {error_type}: {error}", exc_info=bool(development_mode))
 
         return response
 
@@ -175,14 +169,13 @@ class ErrorSanitizer:
         Returns:
             Wrapped function that returns safe error responses
         """
+
         def wrapper(*args, **kwargs):
             try:
                 return func(*args, **kwargs)
             except Exception as e:
                 return cls.create_safe_error_response(
-                    e,
-                    error_id=f"{func.__name__}_{id(e)}",
-                    development_mode=development_mode
+                    e, error_id=f"{func.__name__}_{id(e)}", development_mode=development_mode
                 )
 
         return wrapper
@@ -217,9 +210,7 @@ class SafeErrorContext:
         if exc_type is not None:
             # Log the error securely
             error_response = ErrorSanitizer.create_safe_error_response(
-                exc_val,
-                error_id=f"{self.operation_name}_{id(exc_val)}",
-                development_mode=self.development_mode
+                exc_val, error_id=f"{self.operation_name}_{id(exc_val)}", development_mode=self.development_mode
             )
 
             logger.error(f"Error in {self.operation_name}: {error_response['message']}")
@@ -245,8 +236,7 @@ def safe_str_representation(obj: Any, max_length: int = 100) -> str:
         return f"<{type(obj).__name__} object>"
 
 
-def log_security_event(event_type: str, details: Dict[str, Any],
-                      severity: str = 'warning') -> None:
+def log_security_event(event_type: str, details: Dict[str, Any], severity: str = "warning") -> None:
     """Log security-related events with sanitized details."""
     # Sanitize all details
     sanitized_details = {}
@@ -257,31 +247,34 @@ def log_security_event(event_type: str, details: Dict[str, Any],
             sanitized_details[key] = safe_str_representation(value)
 
     log_level = getattr(logging, severity.upper(), logging.WARNING)
-    logger.log(log_level, f"Security event: {event_type}", extra={'details': sanitized_details})
+    logger.log(log_level, f"Security event: {event_type}", extra={"details": sanitized_details})
 
 
 # Example usage decorator
 def secure_endpoint(development_mode: bool = False):
     """Decorator for API endpoints with secure error handling."""
+
     def decorator(func):
         def wrapper(*args, **kwargs):
             try:
                 return func(*args, **kwargs)
             except Exception as e:
                 # Log security event
-                log_security_event('endpoint_error', {
-                    'endpoint': func.__name__,
-                    'error_type': type(e).__name__,
-                    'args_count': len(args),
-                    'kwargs_keys': list(kwargs.keys())
-                })
+                log_security_event(
+                    "endpoint_error",
+                    {
+                        "endpoint": func.__name__,
+                        "error_type": type(e).__name__,
+                        "args_count": len(args),
+                        "kwargs_keys": list(kwargs.keys()),
+                    },
+                )
 
                 # Return safe error response
                 return ErrorSanitizer.create_safe_error_response(
-                    e,
-                    error_id=f"{func.__name__}_{id(e)}",
-                    development_mode=development_mode
+                    e, error_id=f"{func.__name__}_{id(e)}", development_mode=development_mode
                 )
 
         return wrapper
+
     return decorator

@@ -32,6 +32,7 @@ from .safety_validator import SafetyValidator
 @dataclass
 class DogfoodCycleResult:
     """Result of a complete dogfood improvement cycle"""
+
     success: bool
     branch_name: str
     improvements_applied: List[Dict[str, Any]]
@@ -40,6 +41,7 @@ class DogfoodCycleResult:
     decision_reason: str
     timestamp: datetime
     rollback_performed: bool = False
+
 
 class DogfoodController:
     """Main controller for dogfood self-improvement cycles"""
@@ -54,13 +56,11 @@ class DogfoodController:
         self.metrics_tracker = MetricsTracker(config)
 
         # Safety limits
-        self.max_changes_per_cycle = self.config.get('max_changes_per_cycle', 3)
-        self.require_approval_for_risky = self.config.get('require_approval_for_risky', True)
+        self.max_changes_per_cycle = self.config.get("max_changes_per_cycle", 3)
+        self.require_approval_for_risky = self.config.get("require_approval_for_risky", True)
 
     async def run_improvement_cycle(
-        self,
-        improvement_goal: str = "coupling_reduction",
-        safety_mode: str = "strict"
+        self, improvement_goal: str = "coupling_reduction", safety_mode: str = "strict"
     ) -> DogfoodCycleResult:
         """
         Run complete dogfood improvement cycle with safety-first logic.
@@ -90,10 +90,7 @@ class DogfoodController:
 
             # Step 4: Apply improvements via MCP tools
             self.logger.info("🛠️ Step 4: Applying improvements...")
-            applied_changes = await self._apply_improvements(
-                analysis_result,
-                safety_mode
-            )
+            applied_changes = await self._apply_improvements(analysis_result, safety_mode)
 
             if not applied_changes:
                 return DogfoodCycleResult(
@@ -103,7 +100,7 @@ class DogfoodController:
                     test_results={},
                     metrics_comparison={},
                     decision_reason="No improvements could be safely applied",
-                    timestamp=cycle_start
+                    timestamp=cycle_start,
                 )
 
             # Step 5: CRITICAL - Run full test suite
@@ -116,12 +113,7 @@ class DogfoodController:
 
             # Step 7: Make merge/rollback decision
             self.logger.info("🤔 Step 7: Making merge/rollback decision...")
-            decision_result = await self._make_decision(
-                test_results,
-                baseline_metrics,
-                new_metrics,
-                applied_changes
-            )
+            decision_result = await self._make_decision(test_results, baseline_metrics, new_metrics, applied_changes)
 
             # Step 8: Execute decision
             rollback_performed = False
@@ -141,7 +133,7 @@ class DogfoodController:
                 metrics_comparison=decision_result.metrics_comparison,
                 decision_reason=decision_result.reason,
                 timestamp=cycle_start,
-                rollback_performed=rollback_performed
+                rollback_performed=rollback_performed,
             )
 
         except Exception as e:
@@ -156,18 +148,9 @@ class DogfoodController:
         """Run MCP server analysis to identify improvement opportunities"""
         # This will integrate with the MCP server
         # For now, mock the interface
-        return {
-            "violations_found": [],
-            "improvement_suggestions": [],
-            "target_files": [],
-            "estimated_impact": "medium"
-        }
+        return {"violations_found": [], "improvement_suggestions": [], "target_files": [], "estimated_impact": "medium"}
 
-    async def _apply_improvements(
-        self,
-        analysis_result: Dict[str, Any],
-        safety_mode: str
-    ) -> List[Dict[str, Any]]:
+    async def _apply_improvements(self, analysis_result: Dict[str, Any], safety_mode: str) -> List[Dict[str, Any]]:
         """Apply improvements via MCP tools with safety constraints"""
         applied_changes = []
         suggestions = analysis_result.get("improvement_suggestions", [])
@@ -212,7 +195,7 @@ class DogfoodController:
             "success": True,
             "suggestion": suggestion,
             "files_modified": [],
-            "changes_applied": "Mock change applied"
+            "changes_applied": "Mock change applied",
         }
 
     @dataclass
@@ -226,8 +209,8 @@ class DogfoodController:
         test_results: Dict[str, Any],
         baseline_metrics: Dict[str, float],
         new_metrics: Dict[str, float],
-        applied_changes: List[Dict[str, Any]]
-    ) -> 'DogfoodController.DecisionResult':
+        applied_changes: List[Dict[str, Any]],
+    ) -> "DogfoodController.DecisionResult":
         """
         Make the critical merge/rollback decision based on safety-first logic
         """
@@ -239,7 +222,7 @@ class DogfoodController:
             return self.DecisionResult(
                 should_merge=False,
                 reason=f"Tests failed: {len(failed_tests)} failures detected",
-                metrics_comparison=metrics_comparison
+                metrics_comparison=metrics_comparison,
             )
 
         # CRITICAL RULE 2: No functional regressions
@@ -248,7 +231,7 @@ class DogfoodController:
             return self.DecisionResult(
                 should_merge=False,
                 reason=f"Functional regressions detected: {regressions}",
-                metrics_comparison=metrics_comparison
+                metrics_comparison=metrics_comparison,
             )
 
         # RULE 3: Overall connascence score must improve
@@ -262,7 +245,7 @@ class DogfoodController:
             return self.DecisionResult(
                 should_merge=False,
                 reason=f"Connascence score did not improve: {score_improvement:.3f}",
-                metrics_comparison=metrics_comparison
+                metrics_comparison=metrics_comparison,
             )
 
         # RULE 4: Check other quality metrics
@@ -283,5 +266,5 @@ class DogfoodController:
         return self.DecisionResult(
             should_merge=True,
             reason=f"All criteria met: score improved by {score_improvement:.3f}",
-            metrics_comparison=metrics_comparison
+            metrics_comparison=metrics_comparison,
         )

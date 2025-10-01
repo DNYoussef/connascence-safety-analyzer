@@ -14,6 +14,7 @@
 
 class GodObjectsFixer:
     """Fixer for god objects."""
+
     def __init__(self):
         pass
 

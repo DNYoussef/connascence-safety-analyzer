@@ -5,16 +5,14 @@ Validates genuine quality improvements and prevents fabricated optimization clai
 Provides evidence-based verification of measurable quality gains.
 """
 
-import time
-import json
-import statistics
-import hashlib
-from typing import Dict, List, Any, Optional, Tuple
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from datetime import datetime
-from pathlib import Path
-import re
+import json
 import logging
+from pathlib import Path
+import statistics
+import time
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -22,6 +20,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class QualityClaim:
     """Quality improvement claim to be validated"""
+
     claim_id: str
     description: str
     metric_name: str
@@ -37,6 +36,7 @@ class QualityClaim:
 @dataclass
 class ValidationResult:
     """Result of quality claim validation"""
+
     claim_id: str
     is_valid: bool
     confidence_score: float
@@ -51,6 +51,7 @@ class ValidationResult:
 @dataclass
 class TheaterPattern:
     """Pattern that indicates quality theater"""
+
     pattern_name: str
     description: str
     indicators: List[str]
@@ -73,20 +74,20 @@ class TheaterDetector:
 
         # Validation thresholds optimized for code quality metrics
         self.validation_thresholds = {
-            'minimum_improvement': 1.0,      # 1% minimum measurable improvement
-            'maximum_believable': 95.0,      # 95% maximum believable improvement
-            'confidence_threshold': 0.65,    # 65% confidence required
-            'sample_size_minimum': 5,        # Minimum files/measurements
-            'measurement_variance_max': 0.4, # Maximum acceptable variance
-            'evidence_completeness': 0.6     # 60% evidence required
+            "minimum_improvement": 1.0,  # 1% minimum measurable improvement
+            "maximum_believable": 95.0,  # 95% maximum believable improvement
+            "confidence_threshold": 0.65,  # 65% confidence required
+            "sample_size_minimum": 5,  # Minimum files/measurements
+            "measurement_variance_max": 0.4,  # Maximum acceptable variance
+            "evidence_completeness": 0.6,  # 60% evidence required
         }
 
         # Connascence-specific thresholds
         self.connascence_thresholds = {
-            'critical_violations_max': 0,    # No critical violations allowed
-            'high_violations_reduction': 50, # Must reduce high violations by 50%
-            'complexity_reduction': 20,       # 20% complexity reduction expected
-            'maintainability_increase': 10   # 10% maintainability improvement
+            "critical_violations_max": 0,  # No critical violations allowed
+            "high_violations_reduction": 50,  # Must reduce high violations by 50%
+            "complexity_reduction": 20,  # 20% complexity reduction expected
+            "maintainability_increase": 10,  # 10% maintainability improvement
         }
 
     def _initialize_theater_patterns(self) -> List[TheaterPattern]:
@@ -99,11 +100,11 @@ class TheaterDetector:
                     "zero violations claimed without evidence",
                     "100% test coverage with no test files",
                     "perfect maintainability index",
-                    "all metrics improved by exact same percentage"
+                    "all metrics improved by exact same percentage",
                 ],
                 severity="critical",
                 detection_method="statistical_analysis",
-                applies_to=["quality", "maintainability"]
+                applies_to=["quality", "maintainability"],
             ),
             TheaterPattern(
                 pattern_name="vanity_metrics",
@@ -112,11 +113,11 @@ class TheaterDetector:
                     "only line count metrics reported",
                     "comment ratio as primary metric",
                     "file count reduction without context",
-                    "formatting changes counted as improvements"
+                    "formatting changes counted as improvements",
                 ],
                 severity="high",
                 detection_method="metric_analysis",
-                applies_to=["quality", "performance"]
+                applies_to=["quality", "performance"],
             ),
             TheaterPattern(
                 pattern_name="cherry_picked_results",
@@ -125,11 +126,11 @@ class TheaterDetector:
                     "only best files analyzed",
                     "ignoring test failures",
                     "excluding problematic modules",
-                    "time window manipulation"
+                    "time window manipulation",
                 ],
                 severity="high",
                 detection_method="completeness_analysis",
-                applies_to=["quality", "security", "performance"]
+                applies_to=["quality", "security", "performance"],
             ),
             TheaterPattern(
                 pattern_name="fake_refactoring",
@@ -138,11 +139,11 @@ class TheaterDetector:
                     "only whitespace changes",
                     "variable renaming without logic changes",
                     "comment additions without code changes",
-                    "import reordering as optimization"
+                    "import reordering as optimization",
                 ],
                 severity="high",
                 detection_method="diff_analysis",
-                applies_to=["quality", "maintainability"]
+                applies_to=["quality", "maintainability"],
             ),
             TheaterPattern(
                 pattern_name="measurement_gaming",
@@ -151,11 +152,11 @@ class TheaterDetector:
                     "excluding initialization from timing",
                     "measuring empty test cases",
                     "baseline from debug mode",
-                    "optimized build vs unoptimized baseline"
+                    "optimized build vs unoptimized baseline",
                 ],
                 severity="medium",
                 detection_method="methodology_review",
-                applies_to=["performance"]
+                applies_to=["performance"],
             ),
             TheaterPattern(
                 pattern_name="false_automation",
@@ -164,11 +165,11 @@ class TheaterDetector:
                     "instant fix claims for complex issues",
                     "no automation code provided",
                     "fixes that require human judgment",
-                    "pattern fixes without pattern detection"
+                    "pattern fixes without pattern detection",
                 ],
                 severity="medium",
                 detection_method="automation_analysis",
-                applies_to=["quality"]
+                applies_to=["quality"],
             ),
             TheaterPattern(
                 pattern_name="complexity_hiding",
@@ -177,11 +178,11 @@ class TheaterDetector:
                     "complexity moved to external files",
                     "logic hidden in configuration",
                     "problems moved to dependencies",
-                    "issues reclassified rather than fixed"
+                    "issues reclassified rather than fixed",
                 ],
                 severity="high",
                 detection_method="structural_analysis",
-                applies_to=["quality", "maintainability"]
+                applies_to=["quality", "maintainability"],
             ),
             TheaterPattern(
                 pattern_name="test_theater",
@@ -190,26 +191,26 @@ class TheaterDetector:
                     "test coverage without assertions",
                     "duplicate tests for coverage",
                     "testing getters/setters only",
-                    "mocked everything tests"
+                    "mocked everything tests",
                 ],
                 severity="high",
                 detection_method="test_analysis",
-                applies_to=["quality"]
-            )
+                applies_to=["quality"],
+            ),
         ]
 
     def _initialize_connascence_weights(self) -> Dict[str, float]:
         """Initialize importance weights for different connascence types"""
         return {
-            'identity': 1.5,    # High weight - impacts maintainability
-            'meaning': 1.2,     # Medium-high - affects understanding
-            'algorithm': 2.0,   # Highest - correctness critical
-            'position': 1.0,    # Medium - structural coupling
-            'execution': 1.8,   # High - runtime dependencies
-            'timing': 2.0,      # Highest - hardest to fix
-            'values': 1.1,      # Medium - data coupling
-            'type': 1.3,        # Medium-high - type safety
-            'convention': 0.8   # Lower - style issues
+            "identity": 1.5,  # High weight - impacts maintainability
+            "meaning": 1.2,  # Medium-high - affects understanding
+            "algorithm": 2.0,  # Highest - correctness critical
+            "position": 1.0,  # Medium - structural coupling
+            "execution": 1.8,  # High - runtime dependencies
+            "timing": 2.0,  # Highest - hardest to fix
+            "values": 1.1,  # Medium - data coupling
+            "type": 1.3,  # Medium-high - type safety
+            "convention": 0.8,  # Lower - style issues
         }
 
     def validate_quality_claim(self, claim: QualityClaim) -> ValidationResult:
@@ -225,7 +226,7 @@ class TheaterDetector:
             theater_indicators=[],
             genuine_indicators=[],
             recommendation="",
-            risk_level="medium"
+            risk_level="medium",
         )
 
         # Step 1: Statistical plausibility check
@@ -245,15 +246,14 @@ class TheaterDetector:
 
         # Calculate overall confidence score
         confidence_score = self._calculate_confidence_score(
-            statistical_score, evidence_score, connascence_score,
-            theater_indicators, genuine_indicators
+            statistical_score, evidence_score, connascence_score, theater_indicators, genuine_indicators
         )
 
         # Determine validity
         is_valid = (
-            confidence_score >= self.validation_thresholds['confidence_threshold'] and
-            len(theater_indicators) < 2 and
-            len(genuine_indicators) >= 2
+            confidence_score >= self.validation_thresholds["confidence_threshold"]
+            and len(theater_indicators) < 2
+            and len(genuine_indicators) >= 2
         )
 
         # Determine risk level
@@ -261,8 +261,7 @@ class TheaterDetector:
 
         # Generate recommendation
         recommendation = self._generate_recommendation(
-            claim, statistical_score, evidence_score, connascence_score,
-            theater_indicators, genuine_indicators
+            claim, statistical_score, evidence_score, connascence_score, theater_indicators, genuine_indicators
         )
 
         # Update validation result
@@ -277,8 +276,10 @@ class TheaterDetector:
         # Store validation history
         self.validation_history.append(validation_result)
 
-        logger.info(f"Validation complete for {claim.claim_id}: {'VALID' if is_valid else 'INVALID'} "
-                   f"(confidence: {confidence_score:.2f}, risk: {risk_level})")
+        logger.info(
+            f"Validation complete for {claim.claim_id}: {'VALID' if is_valid else 'INVALID'} "
+            f"(confidence: {confidence_score:.2f}, risk: {risk_level})"
+        )
 
         return validation_result
 
@@ -289,9 +290,9 @@ class TheaterDetector:
         # Check improvement magnitude
         improvement = abs(claim.improvement_percent)
 
-        if improvement < self.validation_thresholds['minimum_improvement']:
+        if improvement < self.validation_thresholds["minimum_improvement"]:
             plausibility_score *= 0.3  # Too small to be meaningful
-        elif improvement > self.validation_thresholds['maximum_believable']:
+        elif improvement > self.validation_thresholds["maximum_believable"]:
             plausibility_score *= 0.1  # Too large to be believable
         elif improvement > 70.0:
             plausibility_score *= 0.6  # Large improvements need strong evidence
@@ -305,7 +306,7 @@ class TheaterDetector:
             plausibility_score *= 0.2  # Invalid baseline
 
         # Special checks for connascence metrics
-        if 'connascence' in claim.metric_name.lower() or 'violation' in claim.metric_name.lower():
+        if "connascence" in claim.metric_name.lower() or "violation" in claim.metric_name.lower():
             # Violations should decrease
             if claim.improved_value > claim.baseline_value:
                 plausibility_score *= 0.1  # Violations increased!
@@ -330,8 +331,18 @@ class TheaterDetector:
             method = claim.measurement_method.lower()
 
             # Good methodology keywords
-            good_keywords = ['baseline', 'before', 'after', 'comparison', 'measured',
-                           'analyzed', 'files', 'modules', 'violations', 'metrics']
+            good_keywords = [
+                "baseline",
+                "before",
+                "after",
+                "comparison",
+                "measured",
+                "analyzed",
+                "files",
+                "modules",
+                "violations",
+                "metrics",
+            ]
             keyword_score = sum(1 for keyword in good_keywords if keyword in method)
             evidence_components.append(min(0.3, keyword_score * 0.05))
 
@@ -347,12 +358,14 @@ class TheaterDetector:
             file_path = Path(evidence_file)
 
             # Check file naming
-            if any(keyword in evidence_file.lower() for keyword in
-                  ['report', 'analysis', 'metrics', 'violations', 'before', 'after']):
+            if any(
+                keyword in evidence_file.lower()
+                for keyword in ["report", "analysis", "metrics", "violations", "before", "after"]
+            ):
                 evidence_components.append(0.1)
 
             # Check file extensions
-            if file_path.suffix in ['.json', '.xml', '.csv', '.log', '.txt', '.md']:
+            if file_path.suffix in [".json", ".xml", ".csv", ".log", ".txt", ".md"]:
                 evidence_components.append(0.05)
 
             # Bonus for multiple evidence files
@@ -382,25 +395,23 @@ class TheaterDetector:
 
         if pattern.pattern_name == "perfect_metrics":
             # Check for suspiciously perfect improvements
-            return (claim.improved_value == 0 or
-                   claim.improvement_percent == 100.0 or
-                   claim.improvement_percent == 0.0)
+            return claim.improved_value == 0 or claim.improvement_percent == 100.0 or claim.improvement_percent == 0.0
 
         elif pattern.pattern_name == "vanity_metrics":
             # Check if focusing on less important metrics
             metric = claim.metric_name.lower()
-            vanity_keywords = ['lines', 'files', 'comments', 'whitespace', 'format']
+            vanity_keywords = ["lines", "files", "comments", "whitespace", "format"]
             return any(keyword in metric for keyword in vanity_keywords)
 
         elif pattern.pattern_name == "measurement_gaming":
             # Check for measurement manipulation indicators
             method = claim.measurement_method.lower()
-            gaming_keywords = ['selected', 'best', 'excluding', 'only', 'subset']
+            gaming_keywords = ["selected", "best", "excluding", "only", "subset"]
             return any(keyword in method for keyword in gaming_keywords)
 
         elif pattern.pattern_name == "fake_refactoring":
             # Check for cosmetic changes
-            if 'refactor' in claim.description.lower():
+            if "refactor" in claim.description.lower():
                 return claim.improvement_percent < 5.0  # Small improvement for "refactoring"
 
         return False
@@ -427,7 +438,7 @@ class TheaterDetector:
             genuine_indicators.append("detailed_methodology")
 
         # Gradual improvement (not instant fix)
-        if 'gradual' in claim.description.lower() or 'iterative' in claim.description.lower():
+        if "gradual" in claim.description.lower() or "iterative" in claim.description.lower():
             genuine_indicators.append("gradual_improvement")
 
         # Specific metric targeting
@@ -438,7 +449,7 @@ class TheaterDetector:
 
     def _validate_connascence_claim(self, claim: QualityClaim) -> float:
         """Validate claims specific to connascence improvements"""
-        if 'connascence' not in claim.metric_name.lower() and 'violation' not in claim.metric_name.lower():
+        if "connascence" not in claim.metric_name.lower() and "violation" not in claim.metric_name.lower():
             return 0.5  # Not a connascence-specific claim, neutral score
 
         validation_score = 1.0
@@ -454,29 +465,34 @@ class TheaterDetector:
         improvement = claim.improvement_percent
 
         # Different expectations for different violation severities
-        if 'critical' in claim.description.lower():
+        if "critical" in claim.description.lower():
             if improvement < 80.0:
                 validation_score *= 0.7  # Critical should be mostly eliminated
-        elif 'high' in claim.description.lower():
+        elif "high" in claim.description.lower():
             if improvement < 50.0:
                 validation_score *= 0.8  # High should be significantly reduced
 
         # Check for comprehensive coverage
-        if 'all files' in claim.measurement_method.lower() or 'entire codebase' in claim.measurement_method.lower():
+        if "all files" in claim.measurement_method.lower() or "entire codebase" in claim.measurement_method.lower():
             validation_score *= 1.1  # Bonus for comprehensive analysis
 
         return min(1.0, validation_score)
 
-    def _calculate_confidence_score(self, statistical_score: float, evidence_score: float,
-                                   connascence_score: float, theater_indicators: List[str],
-                                   genuine_indicators: List[str]) -> float:
+    def _calculate_confidence_score(
+        self,
+        statistical_score: float,
+        evidence_score: float,
+        connascence_score: float,
+        theater_indicators: List[str],
+        genuine_indicators: List[str],
+    ) -> float:
         """Calculate overall confidence score for quality claim"""
 
         # Weighted base score
         base_score = (
-            statistical_score * 0.3 +
-            evidence_score * 0.3 +
-            connascence_score * 0.4  # Higher weight for domain-specific validation
+            statistical_score * 0.3
+            + evidence_score * 0.3
+            + connascence_score * 0.4  # Higher weight for domain-specific validation
         )
 
         # Heavy penalty for theater indicators
@@ -511,31 +527,47 @@ class TheaterDetector:
         else:
             return "insufficient"
 
-    def _generate_recommendation(self, claim: QualityClaim, statistical_score: float,
-                                evidence_score: float, connascence_score: float,
-                                theater_indicators: List[str], genuine_indicators: List[str]) -> str:
+    def _generate_recommendation(
+        self,
+        claim: QualityClaim,
+        statistical_score: float,
+        evidence_score: float,
+        connascence_score: float,
+        theater_indicators: List[str],
+        genuine_indicators: List[str],
+    ) -> str:
         """Generate actionable recommendation based on validation results"""
 
         if len(theater_indicators) >= 2:
-            return (f"REJECT: Multiple theater patterns detected ({', '.join(theater_indicators)}). "
-                   f"Provide genuine evidence with comprehensive methodology and reproducible results.")
+            return (
+                f"REJECT: Multiple theater patterns detected ({', '.join(theater_indicators)}). "
+                f"Provide genuine evidence with comprehensive methodology and reproducible results."
+            )
 
         if evidence_score < 0.3:
-            return ("INSUFFICIENT EVIDENCE: Provide comprehensive analysis reports, "
-                   "before/after metrics, and detailed methodology description.")
+            return (
+                "INSUFFICIENT EVIDENCE: Provide comprehensive analysis reports, "
+                "before/after metrics, and detailed methodology description."
+            )
 
         if statistical_score < 0.4:
-            return ("STATISTICAL CONCERNS: Improvement claims appear unrealistic. "
-                   "Verify measurements and provide additional validation data.")
+            return (
+                "STATISTICAL CONCERNS: Improvement claims appear unrealistic. "
+                "Verify measurements and provide additional validation data."
+            )
 
         if connascence_score < 0.4:
-            return ("DOMAIN VALIDATION FAILED: Connascence improvements don't align with expectations. "
-                   "Focus on high-impact violation types with realistic reduction targets.")
+            return (
+                "DOMAIN VALIDATION FAILED: Connascence improvements don't align with expectations. "
+                "Focus on high-impact violation types with realistic reduction targets."
+            )
 
         if len(genuine_indicators) < 2:
-            return ("NEEDS VALIDATION: Provide additional evidence such as "
-                   "progressive improvement data, comprehensive coverage reports, "
-                   "or third-party verification.")
+            return (
+                "NEEDS VALIDATION: Provide additional evidence such as "
+                "progressive improvement data, comprehensive coverage reports, "
+                "or third-party verification."
+            )
 
         confidence = statistical_score * 0.3 + evidence_score * 0.3 + connascence_score * 0.4
 
@@ -559,7 +591,7 @@ class TheaterDetector:
             systemic_indicators.append("uniform_improvements_across_claims")
 
         # Check for escalating claims
-        if all(improvements[i] < improvements[i+1] for i in range(len(improvements)-1)):
+        if all(improvements[i] < improvements[i + 1] for i in range(len(improvements) - 1)):
             systemic_indicators.append("escalating_improvement_pattern")
 
         # Check for identical evidence patterns
@@ -570,14 +602,14 @@ class TheaterDetector:
         # Check for timing patterns
         timestamps = [c.timestamp for c in claims]
         if len(timestamps) > 2:
-            intervals = [timestamps[i+1] - timestamps[i] for i in range(len(timestamps)-1)]
+            intervals = [timestamps[i + 1] - timestamps[i] for i in range(len(timestamps) - 1)]
             if all(abs(interval - intervals[0]) < 60 for interval in intervals):
                 systemic_indicators.append("suspiciously_regular_timing")
 
         return {
             "systemic_theater_indicators": systemic_indicators,
             "risk_assessment": "high" if len(systemic_indicators) >= 2 else "medium" if systemic_indicators else "low",
-            "recommendation": self._generate_systemic_recommendation(systemic_indicators)
+            "recommendation": self._generate_systemic_recommendation(systemic_indicators),
         }
 
     def _generate_systemic_recommendation(self, indicators: List[str]) -> str:
@@ -606,21 +638,21 @@ class TheaterDetector:
                 "timestamp": datetime.now().isoformat(),
                 "analyzer": "Connascence Theater Detector",
                 "version": "1.0.0",
-                "total_claims": len(claims)
+                "total_claims": len(claims),
             },
             "summary": {
                 "valid_claims": sum(1 for r in results if r.is_valid),
                 "invalid_claims": sum(1 for r in results if not r.is_valid),
                 "average_confidence": statistics.mean([r.confidence_score for r in results]),
-                "high_risk_claims": sum(1 for r in results if r.risk_level == "high")
+                "high_risk_claims": sum(1 for r in results if r.risk_level == "high"),
             },
             "systemic_analysis": systemic_analysis,
             "individual_results": [asdict(r) for r in results],
             "theater_patterns_detected": list(set(sum([r.theater_indicators for r in results], []))),
             "recommendations": {
                 "immediate_actions": self._generate_immediate_actions(results),
-                "long_term_improvements": self._generate_long_term_improvements(results)
-            }
+                "long_term_improvements": self._generate_long_term_improvements(results),
+            },
         }
 
         # Save report
@@ -628,7 +660,7 @@ class TheaterDetector:
             output_path = Path(f".claude/.artifacts/theater_detection/report_{int(time.time())}.json")
 
         output_path.parent.mkdir(parents=True, exist_ok=True)
-        with open(output_path, 'w') as f:
+        with open(output_path, "w") as f:
             json.dump(report, f, indent=2)
 
         logger.info(f"Theater detection report exported to {output_path}")

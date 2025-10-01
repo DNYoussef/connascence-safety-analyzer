@@ -48,58 +48,44 @@ class MarkdownCleaner:
         # Cleanup phases configuration
         self.cleanup_phases = [
             {
-                'name': 'External Dependencies',
-                'path': 'vscode-extension/node_modules',
-                'expected_files': 806,
-                'description': 'VSCode extension node_modules markdown files'
+                "name": "External Dependencies",
+                "path": "vscode-extension/node_modules",
+                "expected_files": 806,
+                "description": "VSCode extension node_modules markdown files",
             },
             {
-                'name': 'Demo Repositories',
-                'path': 'sale/demos',
-                'expected_files': 912,
-                'description': 'Demo repository markdown files'
+                "name": "Demo Repositories",
+                "path": "sale/demos",
+                "expected_files": 912,
+                "description": "Demo repository markdown files",
             },
             {
-                'name': 'Claude Flow System Files',
-                'path': '.claude',
-                'expected_files': 141,
-                'description': 'Claude Flow system markdown files'
+                "name": "Claude Flow System Files",
+                "path": ".claude",
+                "expected_files": 141,
+                "description": "Claude Flow system markdown files",
             },
             {
-                'name': 'Duplicate Express Repository',
-                'path': 'express',
-                'expected_files': 12,
-                'description': 'Duplicate Express repository markdown files'
-            }
+                "name": "Duplicate Express Repository",
+                "path": "express",
+                "expected_files": 12,
+                "description": "Duplicate Express repository markdown files",
+            },
         ]
 
         # Additional specific files to clean
-        self.specific_files = [
-            '.pytest_cache/README.md',
-            'tests/.pytest_cache/README.md'
-        ]
+        self.specific_files = [".pytest_cache/README.md", "tests/.pytest_cache/README.md"]
 
         # Files/directories that should be preserved
-        self.preserved_files = [
-            'README.md',
-            'CLAUDE.md',
-            'CHANGELOG.md',
-            'docs/',
-            'analysis/',
-            'data-room/'
-        ]
+        self.preserved_files = ["README.md", "CLAUDE.md", "CHANGELOG.md", "docs/", "analysis/", "data-room/"]
 
     def setup_logging(self):
         """Configure logging based on verbosity level."""
         level = logging.DEBUG if self.verbose else logging.INFO
-        logging.basicConfig(
-            level=level,
-            format='%(asctime)s - %(levelname)s - %(message)s',
-            datefmt='%H:%M:%S'
-        )
+        logging.basicConfig(level=level, format="%(asctime)s - %(levelname)s - %(message)s", datefmt="%H:%M:%S")
         self.logger = logging.getLogger(__name__)
 
-    def count_markdown_files(self, path: str = '.') -> int:
+    def count_markdown_files(self, path: str = ".") -> int:
         """Count all markdown files in the given path.
 
         Args:
@@ -111,7 +97,7 @@ class MarkdownCleaner:
         try:
             # Use pathlib for cross-platform compatibility
             root_path = Path(path)
-            md_files = list(root_path.rglob('*.md'))
+            md_files = list(root_path.rglob("*.md"))
             return len(md_files)
         except Exception as e:
             self.logger.error(f"Error counting markdown files: {e}")
@@ -130,7 +116,7 @@ class MarkdownCleaner:
             dir_path = Path(directory)
             if not dir_path.exists():
                 return []
-            return list(dir_path.rglob('*.md'))
+            return list(dir_path.rglob("*.md"))
         except Exception as e:
             self.logger.error(f"Error finding markdown files in {directory}: {e}")
             return []
@@ -171,10 +157,10 @@ class MarkdownCleaner:
         Returns:
             Tuple of (files_deleted, files_failed)
         """
-        phase_name = phase['name']
-        phase_path = phase['path']
-        expected_files = phase['expected_files']
-        description = phase['description']
+        phase_name = phase["name"]
+        phase_path = phase["path"]
+        expected_files = phase["expected_files"]
+        description = phase["description"]
 
         self.logger.info(f"\n=== Phase: {phase_name} ({expected_files} files) ===")
 
@@ -240,9 +226,9 @@ class MarkdownCleaner:
             files_before: File count before cleanup
             files_after: File count after cleanup
         """
-        self.logger.info("\n" + "="*50)
+        self.logger.info("\n" + "=" * 50)
         self.logger.info("CLEANUP SUMMARY")
-        self.logger.info("="*50)
+        self.logger.info("=" * 50)
 
         if self.dry_run:
             self.logger.info("[DRY RUN MODE - No files were actually deleted]")
@@ -254,7 +240,9 @@ class MarkdownCleaner:
 
         self.logger.info(f"Markdown files before cleanup: {files_before}")
         self.logger.info(f"Markdown files after cleanup: {files_after}")
-        self.logger.info(f"Reduction: {files_before - files_after} files ({((files_before - files_after) / files_before * 100):.1f}%)")
+        self.logger.info(
+            f"Reduction: {files_before - files_after} files ({((files_before - files_after) / files_before * 100):.1f}%)"
+        )
 
         self.logger.info("\nFiles preserved (should be ~79):")
         self.logger.info("- README.md, CLAUDE.md, CHANGELOG.md (root)")
@@ -269,7 +257,7 @@ class MarkdownCleaner:
     def run(self):
         """Execute the complete cleanup process."""
         self.logger.info("Starting Connascence Markdown Cleanup...")
-        self.logger.info("="*50)
+        self.logger.info("=" * 50)
 
         # Count files before cleanup
         files_before = self.count_markdown_files()
@@ -323,26 +311,16 @@ Examples:
   python cleanup_markdown.py --dry-run          # Preview what would be deleted
   python cleanup_markdown.py --verbose          # Enable detailed logging
   python cleanup_markdown.py --dry-run --verbose # Preview with detailed output
-        """
+        """,
     )
 
     parser.add_argument(
-        '--dry-run', '-n',
-        action='store_true',
-        help='Show what would be deleted without actually deleting files'
+        "--dry-run", "-n", action="store_true", help="Show what would be deleted without actually deleting files"
     )
 
-    parser.add_argument(
-        '--verbose', '-v',
-        action='store_true',
-        help='Enable verbose logging'
-    )
+    parser.add_argument("--verbose", "-v", action="store_true", help="Enable verbose logging")
 
-    parser.add_argument(
-        '--version',
-        action='version',
-        version='Connascence Markdown Cleanup 1.0.0'
-    )
+    parser.add_argument("--version", action="version", version="Connascence Markdown Cleanup 1.0.0")
 
     args = parser.parse_args()
 
@@ -358,5 +336,5 @@ Examples:
         return 1
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

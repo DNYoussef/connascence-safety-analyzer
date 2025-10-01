@@ -18,29 +18,67 @@ class PolicyDetection:
         self.policy_indicators = {
             "nasa_jpl_pot10": [
                 # NASA/aerospace indicators
-                "nasa", "jpl", "aerospace", "flight", "mission", "spacecraft",
-                "embedded", "real-time", "safety-critical", "avionics",
+                "nasa",
+                "jpl",
+                "aerospace",
+                "flight",
+                "mission",
+                "spacecraft",
+                "embedded",
+                "real-time",
+                "safety-critical",
+                "avionics",
                 # Memory management patterns
-                "malloc", "free", "memory_pool", "static_allocation",
+                "malloc",
+                "free",
+                "memory_pool",
+                "static_allocation",
                 # Common in safety-critical code
-                "assert", "precondition", "postcondition", "invariant"
+                "assert",
+                "precondition",
+                "postcondition",
+                "invariant",
             ],
             "strict-core": [
                 # Enterprise/production indicators
-                "enterprise", "production", "critical", "banking", "finance",
-                "healthcare", "security", "audit", "compliance",
+                "enterprise",
+                "production",
+                "critical",
+                "banking",
+                "finance",
+                "healthcare",
+                "security",
+                "audit",
+                "compliance",
                 # Complex architectures
-                "microservice", "distributed", "kubernetes", "docker",
-                "enterprise_integration", "message_queue",
+                "microservice",
+                "distributed",
+                "kubernetes",
+                "docker",
+                "enterprise_integration",
+                "message_queue",
                 # Quality indicators
-                "code_review", "quality_gate", "sonarqube", "static_analysis"
+                "code_review",
+                "quality_gate",
+                "sonarqube",
+                "static_analysis",
             ],
             "lenient": [
                 # Development/experimental indicators
-                "prototype", "experiment", "poc", "demo", "sandbox",
-                "example", "tutorial", "learning", "playground",
-                "test", "mock", "stub", "temporary"
-            ]
+                "prototype",
+                "experiment",
+                "poc",
+                "demo",
+                "sandbox",
+                "example",
+                "tutorial",
+                "learning",
+                "playground",
+                "test",
+                "mock",
+                "stub",
+                "temporary",
+            ],
         }
 
     def detect_policy(self, paths: List[str]) -> str:
@@ -64,7 +102,7 @@ class PolicyDetection:
         policy_mapping = {
             "nasa_jpl_pot10": "default",  # Use default for now since nasa-compliance isn't available
             "strict-core": "default",
-            "lenient": "default"
+            "lenient": "default",
         }
 
         selected_policy = best_policy[0] if best_policy[1] > 0 else "default"
@@ -104,9 +142,17 @@ class PolicyDetection:
 
         # Look for specific configuration files
         config_files = [
-            "setup.py", "pyproject.toml", "requirements.txt", "Pipfile",
-            "Dockerfile", ".github", ".gitlab-ci.yml", "tox.ini",
-            "setup.cfg", "pytest.ini", ".pre-commit-config.yaml"
+            "setup.py",
+            "pyproject.toml",
+            "requirements.txt",
+            "Pipfile",
+            "Dockerfile",
+            ".github",
+            ".gitlab-ci.yml",
+            "tox.ini",
+            "setup.cfg",
+            "pytest.ini",
+            ".pre-commit-config.yaml",
         ]
 
         for config_file in config_files:
@@ -166,12 +212,7 @@ class PolicyDetection:
 
     def _is_test_file(self, file_path: Path) -> bool:
         """Check if a file is a test file."""
-        test_patterns = [
-            r"test_.*\.py$",
-            r".*_test\.py$",
-            r".*/tests?/.*\.py$",
-            r".*/test/.*\.py$"
-        ]
+        test_patterns = [r"test_.*\.py$", r".*_test\.py$", r".*/tests?/.*\.py$", r".*/test/.*\.py$"]
 
         path_str = str(file_path).lower()
         return any(re.search(pattern, path_str) for pattern in test_patterns)
@@ -181,8 +222,8 @@ class PolicyDetection:
         # Simple dependency extraction
         dependency_patterns = [
             r"^\s*([a-zA-Z0-9_-]+)",  # First word on line (requirements.txt style)
-            r'"([a-zA-Z0-9_-]+)"',    # Quoted dependencies
-            r"'([a-zA-Z0-9_-]+)'"     # Single-quoted dependencies
+            r'"([a-zA-Z0-9_-]+)"',  # Quoted dependencies
+            r"'([a-zA-Z0-9_-]+)'",  # Single-quoted dependencies
         ]
 
         for pattern in dependency_patterns:
@@ -223,8 +264,7 @@ class PolicyDetection:
 
         return scores
 
-    def _apply_structure_bonuses(self, scores: Dict[str, float],
-                                characteristics: Dict[str, Any]) -> Dict[str, float]:
+    def _apply_structure_bonuses(self, scores: Dict[str, float], characteristics: Dict[str, Any]) -> Dict[str, float]:
         """Apply bonuses based on project structure characteristics."""
 
         # NASA/safety-critical bonus
@@ -232,20 +272,23 @@ class PolicyDetection:
             scores["nasa_jpl_pot10"] = scores.get("nasa_jpl_pot10", 0) + 2.0
 
         # Enterprise/strict bonus
-        if (characteristics.get("has_dockerfile") or
-            characteristics.get("has_pyproject_toml") or
-            len(characteristics.get("config_files", set())) > 3):
+        if (
+            characteristics.get("has_dockerfile")
+            or characteristics.get("has_pyproject_toml")
+            or len(characteristics.get("config_files", set())) > 3
+        ):
             scores["strict-core"] = scores.get("strict-core", 0) + 1.5
 
         # Lenient bonus for simple projects
-        if (characteristics.get("python_files", 0) < 10 and
-            not characteristics.get("has_setup_py") and
-            not characteristics.get("has_requirements")):
+        if (
+            characteristics.get("python_files", 0) < 10
+            and not characteristics.get("has_setup_py")
+            and not characteristics.get("has_requirements")
+        ):
             scores["lenient"] = scores.get("lenient", 0) + 1.0
 
         # Default bonus for balanced projects
-        test_ratio = (characteristics.get("test_files", 0) /
-                     max(characteristics.get("python_files", 1), 1))
+        test_ratio = characteristics.get("test_files", 0) / max(characteristics.get("python_files", 1), 1)
         if 0.1 <= test_ratio <= 0.5:  # Reasonable test coverage
             scores["default"] = scores.get("default", 0) + 1.0
 

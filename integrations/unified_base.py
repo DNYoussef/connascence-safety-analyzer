@@ -12,7 +12,6 @@ tool integrations (Black, MyPy, Ruff, Radon, etc.).
 This eliminates the architectural fragmentation identified in the MECE report.
 """
 
-from fixes.phase0.production_safe_assertions import ProductionAssert
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
@@ -26,6 +25,8 @@ import subprocess
 import sys
 from typing import Any, Dict, List, Optional, Union
 
+from fixes.phase0.production_safe_assertions import ProductionAssert
+
 sys.path.append(str(Path(__file__).parent.parent))
 from config.central_constants import ExitCode, PerformanceLimits
 
@@ -34,6 +35,7 @@ logger = logging.getLogger(__name__)
 
 class IntegrationType(Enum):
     """Types of external tool integrations."""
+
     LINTER = "linter"
     FORMATTER = "formatter"
     TYPE_CHECKER = "type_checker"
@@ -45,6 +47,7 @@ class IntegrationType(Enum):
 @dataclass
 class IntegrationResult:
     """Standardized result from external tool integration."""
+
     success: bool
     exit_code: int
     stdout: str
@@ -131,10 +134,7 @@ class UnifiedBaseIntegration(ABC):
             return self._availability_cache
 
         try:
-            result = self._run_command(
-                self.version_command,
-                timeout=PerformanceLimits.DEFAULT_TIMEOUT_SECONDS
-            )
+            result = self._run_command(self.version_command, timeout=PerformanceLimits.DEFAULT_TIMEOUT_SECONDS)
             self._availability_cache = result.returncode == 0
             return self._availability_cache
         except Exception as e:
@@ -164,9 +164,9 @@ class UnifiedBaseIntegration(ABC):
         self._version_cache = "unknown"
         return self._version_cache
 
-    def run_analysis(self,
-                    file_path: Union[str, Path],
-                    additional_args: Optional[List[str]] = None) -> IntegrationResult:
+    def run_analysis(
+        self, file_path: Union[str, Path], additional_args: Optional[List[str]] = None
+    ) -> IntegrationResult:
         """
         Run analysis on a file or directory.
 
@@ -185,7 +185,7 @@ class UnifiedBaseIntegration(ABC):
                 stderr=f"{self.tool_name} is not available",
                 issues=[],
                 metadata={"error": "tool_unavailable"},
-                execution_time=0.0
+                execution_time=0.0,
             )
 
         # Build command
@@ -196,13 +196,11 @@ class UnifiedBaseIntegration(ABC):
 
         # Execute with timing
         import time
+
         start_time = time.time()
 
         try:
-            result = self._run_command(
-                cmd,
-                timeout=PerformanceLimits.MAX_ANALYSIS_TIME_SECONDS
-            )
+            result = self._run_command(cmd, timeout=PerformanceLimits.MAX_ANALYSIS_TIME_SECONDS)
             execution_time = time.time() - start_time
 
             # Parse output to issues
@@ -215,7 +213,7 @@ class UnifiedBaseIntegration(ABC):
                 stderr=result.stderr,
                 issues=issues,
                 metadata=self._get_metadata(file_path),
-                execution_time=execution_time
+                execution_time=execution_time,
             )
 
         except subprocess.TimeoutExpired:
@@ -227,7 +225,7 @@ class UnifiedBaseIntegration(ABC):
                 stderr=f"Analysis timed out after {PerformanceLimits.MAX_ANALYSIS_TIME_SECONDS}s",
                 issues=[],
                 metadata={"error": "timeout"},
-                execution_time=execution_time
+                execution_time=execution_time,
             )
         except Exception as e:
             execution_time = time.time() - start_time
@@ -238,12 +236,12 @@ class UnifiedBaseIntegration(ABC):
                 stderr=str(e),
                 issues=[],
                 metadata={"error": str(e)},
-                execution_time=execution_time
+                execution_time=execution_time,
             )
 
-    def batch_analyze(self,
-                     file_paths: List[Union[str, Path]],
-                     max_parallel: Optional[int] = None) -> Dict[str, IntegrationResult]:
+    def batch_analyze(
+        self, file_paths: List[Union[str, Path]], max_parallel: Optional[int] = None
+    ) -> Dict[str, IntegrationResult]:
         """
         Analyze multiple files with optional parallel processing.
 
@@ -271,7 +269,7 @@ class UnifiedBaseIntegration(ABC):
                     stderr=str(e),
                     issues=[],
                     metadata={"error": str(e)},
-                    execution_time=0.0
+                    execution_time=0.0,
                 )
 
         return results
@@ -279,23 +277,22 @@ class UnifiedBaseIntegration(ABC):
     def get_info(self) -> Dict[str, Any]:
         """Get comprehensive information about the integration."""
         return {
-            'tool_name': self.tool_name,
-            'description': self.description,
-            'type': self.integration_type.value,
-            'version': self.get_version(),
-            'available': self.is_available(),
-            'command': self.tool_command,
-            'config': self.config
+            "tool_name": self.tool_name,
+            "description": self.description,
+            "type": self.integration_type.value,
+            "version": self.get_version(),
+            "available": self.is_available(),
+            "command": self.tool_command,
+            "config": self.config,
         }
 
     # =================================================================
     # PROTECTED METHODS (Can be overridden by subclasses)
     # =================================================================
 
-    def _run_command(self,
-                    cmd: List[str],
-                    timeout: Optional[int] = None,
-                    cwd: Optional[Path] = None) -> subprocess.CompletedProcess:
+    def _run_command(
+        self, cmd: List[str], timeout: Optional[int] = None, cwd: Optional[Path] = None
+    ) -> subprocess.CompletedProcess:
         """
         Run a subprocess command with consistent error handling.
 
@@ -312,12 +309,7 @@ class UnifiedBaseIntegration(ABC):
         self.logger.debug(f"Running command: {' '.join(shlex.quote(arg) for arg in cmd)}")
 
         return subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            timeout=timeout,
-            cwd=cwd,
-            check=False  # Don't raise on non-zero exit
+            cmd, capture_output=True, text=True, timeout=timeout, cwd=cwd, check=False  # Don't raise on non-zero exit
         )
 
     def _parse_version(self, version_output: str) -> str:
@@ -327,9 +319,9 @@ class UnifiedBaseIntegration(ABC):
         """
         # Common version patterns
         patterns = [
-            r'(\d+\.\d+\.\d+)',  # x.y.z
-            r'(\d+\.\d+)',       # x.y
-            r'v?(\d+\.\d+\.\d+)', # vx.y.z
+            r"(\d+\.\d+\.\d+)",  # x.y.z
+            r"(\d+\.\d+)",  # x.y
+            r"v?(\d+\.\d+\.\d+)",  # vx.y.z
         ]
 
         for pattern in patterns:
@@ -341,7 +333,7 @@ class UnifiedBaseIntegration(ABC):
         words = version_output.split()
         for word in words:
             if any(c.isdigit() for c in word):
-                return word.strip('v')
+                return word.strip("v")
 
         return "unknown"
 
@@ -358,20 +350,18 @@ class UnifiedBaseIntegration(ABC):
         file_path = Path(file_path)
 
         metadata = {
-            'tool': self.tool_name,
-            'version': self.get_version(),
-            'file_path': str(file_path),
-            'file_exists': file_path.exists(),
-            'integration_type': self.integration_type.value
+            "tool": self.tool_name,
+            "version": self.get_version(),
+            "file_path": str(file_path),
+            "file_exists": file_path.exists(),
+            "integration_type": self.integration_type.value,
         }
 
         if file_path.exists():
             stat = file_path.stat()
-            metadata.update({
-                'file_size': stat.st_size,
-                'file_mtime': stat.st_mtime,
-                'is_directory': file_path.is_dir()
-            })
+            metadata.update(
+                {"file_size": stat.st_size, "file_mtime": stat.st_mtime, "is_directory": file_path.is_dir()}
+            )
 
         return metadata
 
@@ -379,6 +369,7 @@ class UnifiedBaseIntegration(ABC):
 # =============================================================================
 # INTEGRATION REGISTRY
 # =============================================================================
+
 
 class IntegrationRegistry:
     """Registry for managing available integrations."""
@@ -389,10 +380,9 @@ class IntegrationRegistry:
     def register(self, integration: UnifiedBaseIntegration):
         """Register an integration."""
 
-        ProductionAssert.not_none(integration, 'integration')
+        ProductionAssert.not_none(integration, "integration")
 
-
-        ProductionAssert.not_none(integration, 'integration')
+        ProductionAssert.not_none(integration, "integration")
 
         self._integrations[integration.tool_name] = integration
 
@@ -425,7 +415,7 @@ class IntegrationRegistry:
                         stderr=str(e),
                         issues=[],
                         metadata={"error": str(e)},
-                        execution_time=0.0
+                        execution_time=0.0,
                     )
 
         return results

@@ -17,14 +17,13 @@ Supports:
 @compliance NIST-SSDF, NTIA-SBOM
 """
 
-import json
-import hashlib
-import subprocess
-from datetime import datetime
-from pathlib import Path
-from typing import Dict, List, Optional, Any
 from dataclasses import dataclass, field
+from datetime import datetime
+import json
 import logging
+from pathlib import Path
+import subprocess
+from typing import Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -55,7 +54,6 @@ class SBOMMetadata:
 
 
 class SBOMGenerator:
-
     def __init__(self, project_root: str):
         self.project_root = Path(project_root)
         self.components: List[Component] = []
@@ -83,23 +81,20 @@ class SBOMGenerator:
         components = []
 
         try:
-            with open(req_file, 'r', encoding='utf-8') as f:
+            with open(req_file, encoding="utf-8") as f:
                 for line in f:
                     line = line.strip()
-                    if not line or line.startswith('#'):
+                    if not line or line.startswith("#"):
                         continue
 
-                    if '==' in line:
-                        name, version = line.split('==', 1)
+                    if "==" in line:
+                        name, version = line.split("==", 1)
                         name = name.strip()
                         version = version.strip()
 
-                        components.append(Component(
-                            name=name,
-                            version=version,
-                            type='library',
-                            purl=f"pkg:pypi/{name}@{version}"
-                        ))
+                        components.append(
+                            Component(name=name, version=version, type="library", purl=f"pkg:pypi/{name}@{version}")
+                        )
 
         except Exception as e:
             logger.error(f"Failed to scan requirements.txt: {e}")
@@ -111,21 +106,19 @@ class SBOMGenerator:
 
         try:
             import toml
-            with open(pipfile, 'r', encoding='utf-8') as f:
+
+            with open(pipfile, encoding="utf-8") as f:
                 data = toml.load(f)
 
-            for pkg_name, pkg_version in data.get('packages', {}).items():
+            for pkg_name, pkg_version in data.get("packages", {}).items():
                 if isinstance(pkg_version, str):
-                    version = pkg_version.lstrip('==~^>=<')
+                    version = pkg_version.lstrip("==~^>=<")
                 else:
-                    version = pkg_version.get('version', '').lstrip('==~^>=<')
+                    version = pkg_version.get("version", "").lstrip("==~^>=<")
 
-                components.append(Component(
-                    name=pkg_name,
-                    version=version,
-                    type='library',
-                    purl=f"pkg:pypi/{pkg_name}@{version}"
-                ))
+                components.append(
+                    Component(name=pkg_name, version=version, type="library", purl=f"pkg:pypi/{pkg_name}@{version}")
+                )
 
         except Exception as e:
             logger.error(f"Failed to scan Pipfile: {e}")
@@ -136,18 +129,15 @@ class SBOMGenerator:
         components = []
 
         try:
-            with open(package_json, 'r', encoding='utf-8') as f:
+            with open(package_json, encoding="utf-8") as f:
                 data = json.load(f)
 
-            for pkg_name, pkg_version in data.get('dependencies', {}).items():
-                version = pkg_version.lstrip('^~>=<')
+            for pkg_name, pkg_version in data.get("dependencies", {}).items():
+                version = pkg_version.lstrip("^~>=<")
 
-                components.append(Component(
-                    name=pkg_name,
-                    version=version,
-                    type='library',
-                    purl=f"pkg:npm/{pkg_name}@{version}"
-                ))
+                components.append(
+                    Component(name=pkg_name, version=version, type="library", purl=f"pkg:npm/{pkg_name}@{version}")
+                )
 
         except Exception as e:
             logger.error(f"Failed to scan package.json: {e}")
@@ -167,12 +157,8 @@ class SBOMGenerator:
             "metadata": {
                 "timestamp": self.metadata.timestamp,
                 "tools": [
-                    {
-                        "vendor": "Connascence",
-                        "name": self.metadata.tool_name,
-                        "version": self.metadata.tool_version
-                    }
-                ]
+                    {"vendor": "Connascence", "name": self.metadata.tool_name, "version": self.metadata.tool_version}
+                ],
             },
             "components": [
                 {
@@ -181,17 +167,16 @@ class SBOMGenerator:
                     "version": comp.version,
                     "purl": comp.purl,
                     "licenses": [{"license": {"id": lic}} for lic in comp.licenses] if comp.licenses else [],
-                    "hashes": [
-                        {"alg": alg.upper(), "content": hash_val}
-                        for alg, hash_val in comp.hashes.items()
-                    ] if comp.hashes else []
+                    "hashes": [{"alg": alg.upper(), "content": hash_val} for alg, hash_val in comp.hashes.items()]
+                    if comp.hashes
+                    else [],
                 }
                 for comp in self.components
-            ]
+            ],
         }
 
         if output_path:
-            with open(output_path, 'w', encoding='utf-8') as f:
+            with open(output_path, "w", encoding="utf-8") as f:
                 json.dump(cyclonedx, f, indent=2)
             logger.info(f"CycloneDX SBOM saved to {output_path}")
             return output_path
@@ -210,10 +195,8 @@ class SBOMGenerator:
             "documentNamespace": f"https://sbom.connascence.io/{self._generate_uuid()}",
             "creationInfo": {
                 "created": self.metadata.timestamp,
-                "creators": [
-                    f"Tool: {self.metadata.tool_name}-{self.metadata.tool_version}"
-                ],
-                "licenseListVersion": "3.19"
+                "creators": [f"Tool: {self.metadata.tool_name}-{self.metadata.tool_version}"],
+                "licenseListVersion": "3.19",
             },
             "packages": [
                 {
@@ -223,7 +206,7 @@ class SBOMGenerator:
                     "downloadLocation": comp.purl or "NOASSERTION",
                     "filesAnalyzed": False,
                     "licenseConcluded": comp.licenses[0] if comp.licenses else "NOASSERTION",
-                    "copyrightText": "NOASSERTION"
+                    "copyrightText": "NOASSERTION",
                 }
                 for comp in self.components
             ],
@@ -231,13 +214,15 @@ class SBOMGenerator:
                 {
                     "spdxElementId": "SPDXRef-DOCUMENT",
                     "relationshipType": "DESCRIBES",
-                    "relatedSpdxElement": f"SPDXRef-Package-{self.components[0].name}"
+                    "relatedSpdxElement": f"SPDXRef-Package-{self.components[0].name}",
                 }
-            ] if self.components else []
+            ]
+            if self.components
+            else [],
         }
 
         if output_path:
-            with open(output_path, 'w', encoding='utf-8') as f:
+            with open(output_path, "w", encoding="utf-8") as f:
                 json.dump(spdx, f, indent=2)
             logger.info(f"SPDX SBOM saved to {output_path}")
             return output_path
@@ -246,6 +231,7 @@ class SBOMGenerator:
 
     def _generate_uuid(self) -> str:
         import uuid
+
         return str(uuid.uuid4())
 
     def enrich_with_licenses(self) -> None:
@@ -258,16 +244,13 @@ class SBOMGenerator:
     def _detect_license(self, component: Component) -> Optional[str]:
         try:
             result = subprocess.run(
-                ['pip', 'show', component.name],
-                capture_output=True,
-                text=True,
-                timeout=10
+                ["pip", "show", component.name], check=False, capture_output=True, text=True, timeout=10
             )
 
             if result.returncode == 0:
-                for line in result.stdout.split('\n'):
-                    if line.startswith('License:'):
-                        return line.split(':', 1)[1].strip()
+                for line in result.stdout.split("\n"):
+                    if line.startswith("License:"):
+                        return line.split(":", 1)[1].strip()
 
         except Exception:
             pass
@@ -278,12 +261,12 @@ class SBOMGenerator:
 def main():
     import argparse
 
-    parser = argparse.ArgumentParser(description='SBOM Generator for Supply Chain Security')
-    parser.add_argument('--project', default='.', help='Project root directory')
-    parser.add_argument('--format', choices=['cyclonedx', 'spdx', 'both'], default='cyclonedx')
-    parser.add_argument('--output-cyclonedx', default='sbom-cyclonedx.json', help='CycloneDX output file')
-    parser.add_argument('--output-spdx', default='sbom-spdx.json', help='SPDX output file')
-    parser.add_argument('--enrich-licenses', action='store_true', help='Detect and add license information')
+    parser = argparse.ArgumentParser(description="SBOM Generator for Supply Chain Security")
+    parser.add_argument("--project", default=".", help="Project root directory")
+    parser.add_argument("--format", choices=["cyclonedx", "spdx", "both"], default="cyclonedx")
+    parser.add_argument("--output-cyclonedx", default="sbom-cyclonedx.json", help="CycloneDX output file")
+    parser.add_argument("--output-spdx", default="sbom-spdx.json", help="SPDX output file")
+    parser.add_argument("--enrich-licenses", action="store_true", help="Detect and add license information")
 
     args = parser.parse_args()
 
@@ -295,15 +278,15 @@ def main():
 
     print(f"Found {len(generator.components)} components")
 
-    if args.format in ['cyclonedx', 'both']:
+    if args.format in ["cyclonedx", "both"]:
         generator.generate_cyclonedx(args.output_cyclonedx)
         print(f"CycloneDX SBOM: {args.output_cyclonedx}")
 
-    if args.format in ['spdx', 'both']:
+    if args.format in ["spdx", "both"]:
         generator.generate_spdx(args.output_spdx)
         print(f"SPDX SBOM: {args.output_spdx}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     main()

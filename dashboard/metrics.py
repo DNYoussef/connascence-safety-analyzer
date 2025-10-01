@@ -8,211 +8,206 @@ for continuous monitoring of code quality metrics.
 """
 
 import argparse
-import json
-import os
-import sys
 from datetime import datetime, timedelta
+import json
 from pathlib import Path
-from typing import Dict, List, Any, Optional, Tuple
-import hashlib
+import sys
+from typing import Any, Dict, List
 
 
 class MetricsTrendAnalyzer:
     """Analyzes and tracks metrics trends over time."""
-    
+
     def __init__(self, storage_dir: str = "historical_metrics"):
         self.storage_dir = Path(storage_dir)
         self.storage_dir.mkdir(exist_ok=True)
         self.trends_file = self.storage_dir / "trends.json"
         self.current_metrics = {}
-        
+
     def load_historical_data(self) -> Dict[str, Any]:
         """Load historical metrics data."""
         if self.trends_file.exists():
             try:
-                with open(self.trends_file, 'r') as f:
+                with open(self.trends_file) as f:
                     return json.load(f)
             except Exception as e:
                 print(f"⚠️ Could not load historical data: {e}")
-                return {'entries': [], 'metadata': {'version': '1.0'}}
+                return {"entries": [], "metadata": {"version": "1.0"}}
         else:
-            return {'entries': [], 'metadata': {'version': '1.0'}}
-            
+            return {"entries": [], "metadata": {"version": "1.0"}}
+
     def save_historical_data(self, data: Dict[str, Any]) -> None:
         """Save historical metrics data."""
         try:
-            with open(self.trends_file, 'w') as f:
+            with open(self.trends_file, "w") as f:
                 json.dump(data, f, indent=2)
             print(f"✅ Historical data saved to {self.trends_file}")
         except Exception as e:
             print(f"❌ Could not save historical data: {e}")
-            
-    def extract_metrics_from_results(self, nasa_file: str, connascence_file: str, 
-                                   mece_file: str) -> Dict[str, Any]:
+
+    def extract_metrics_from_results(self, nasa_file: str, connascence_file: str, mece_file: str) -> Dict[str, Any]:
         """Extract key metrics from analysis result files."""
         metrics = {
-            'timestamp': datetime.now().isoformat(),
-            'nasa_score': 0.0,
-            'nasa_violations': 0,
-            'total_violations': 0,
-            'critical_violations': 0,
-            'god_objects': 0,
-            'mece_score': 0.0,
-            'mece_duplications': 0,
-            'overall_quality': 0.0,
-            'files_analyzed': 0
+            "timestamp": datetime.now().isoformat(),
+            "nasa_score": 0.0,
+            "nasa_violations": 0,
+            "total_violations": 0,
+            "critical_violations": 0,
+            "god_objects": 0,
+            "mece_score": 0.0,
+            "mece_duplications": 0,
+            "overall_quality": 0.0,
+            "files_analyzed": 0,
         }
-        
+
         # Extract NASA metrics
         if Path(nasa_file).exists():
             try:
-                with open(nasa_file, 'r') as f:
+                with open(nasa_file) as f:
                     nasa_data = json.load(f)
-                if 'nasa_compliance' in nasa_data:
-                    metrics['nasa_score'] = nasa_data['nasa_compliance'].get('score', 0.0)
-                    metrics['nasa_violations'] = len(nasa_data['nasa_compliance'].get('violations', []))
+                if "nasa_compliance" in nasa_data:
+                    metrics["nasa_score"] = nasa_data["nasa_compliance"].get("score", 0.0)
+                    metrics["nasa_violations"] = len(nasa_data["nasa_compliance"].get("violations", []))
                 print(f"✅ Extracted NASA metrics from {nasa_file}")
             except Exception as e:
                 print(f"⚠️ Could not extract NASA metrics: {e}")
-                
+
         # Extract Connascence metrics
         if Path(connascence_file).exists():
             try:
-                with open(connascence_file, 'r') as f:
+                with open(connascence_file) as f:
                     conn_data = json.load(f)
-                violations = conn_data.get('violations', [])
-                metrics['total_violations'] = len(violations)
-                metrics['critical_violations'] = len([v for v in violations if v.get('severity') == 'critical'])
-                
-                if 'summary' in conn_data:
-                    metrics['overall_quality'] = conn_data['summary'].get('overall_quality_score', 0.0)
-                    metrics['files_analyzed'] = conn_data['summary'].get('files_analyzed', 0)
-                    
+                violations = conn_data.get("violations", [])
+                metrics["total_violations"] = len(violations)
+                metrics["critical_violations"] = len([v for v in violations if v.get("severity") == "critical"])
+
+                if "summary" in conn_data:
+                    metrics["overall_quality"] = conn_data["summary"].get("overall_quality_score", 0.0)
+                    metrics["files_analyzed"] = conn_data["summary"].get("files_analyzed", 0)
+
                 # Count God Objects
-                metrics['god_objects'] = len([v for v in violations 
-                                            if v.get('type') == 'CoA' and 'God Object' in v.get('description', '')])
+                metrics["god_objects"] = len(
+                    [v for v in violations if v.get("type") == "CoA" and "God Object" in v.get("description", "")]
+                )
                 print(f"✅ Extracted Connascence metrics from {connascence_file}")
             except Exception as e:
                 print(f"⚠️ Could not extract Connascence metrics: {e}")
-                
+
         # Extract MECE metrics
         if Path(mece_file).exists():
             try:
-                with open(mece_file, 'r') as f:
+                with open(mece_file) as f:
                     mece_data = json.load(f)
-                metrics['mece_score'] = mece_data.get('mece_score', 0.0)
-                metrics['mece_duplications'] = len(mece_data.get('duplications', []))
+                metrics["mece_score"] = mece_data.get("mece_score", 0.0)
+                metrics["mece_duplications"] = len(mece_data.get("duplications", []))
                 print(f"✅ Extracted MECE metrics from {mece_file}")
             except Exception as e:
                 print(f"⚠️ Could not extract MECE metrics: {e}")
-                
+
         return metrics
-        
-    def update_trends(self, nasa_results: str, connascence_results: str, 
-                     mece_results: str, commit_sha: str) -> bool:
+
+    def update_trends(self, nasa_results: str, connascence_results: str, mece_results: str, commit_sha: str) -> bool:
         """Update historical trends with new analysis results."""
         print("📊 Updating historical trends...")
-        
+
         # Load existing data
         historical_data = self.load_historical_data()
-        
+
         # Extract current metrics
-        current_metrics = self.extract_metrics_from_results(
-            nasa_results, connascence_results, mece_results
-        )
-        current_metrics['commit_sha'] = commit_sha
-        
+        current_metrics = self.extract_metrics_from_results(nasa_results, connascence_results, mece_results)
+        current_metrics["commit_sha"] = commit_sha
+
         # Add to historical data
-        historical_data['entries'].append(current_metrics)
-        historical_data['metadata']['last_updated'] = datetime.now().isoformat()
-        
+        historical_data["entries"].append(current_metrics)
+        historical_data["metadata"]["last_updated"] = datetime.now().isoformat()
+
         # Keep only last 100 entries to manage file size
-        if len(historical_data['entries']) > 100:
-            historical_data['entries'] = historical_data['entries'][-100:]
-            
+        if len(historical_data["entries"]) > 100:
+            historical_data["entries"] = historical_data["entries"][-100:]
+
         # Save updated data
         self.save_historical_data(historical_data)
-        
+
         self.current_metrics = current_metrics
         return True
-        
+
     def calculate_trend_direction(self, values: List[float], window: int = 5) -> str:
         """Calculate trend direction for a list of values."""
         if len(values) < 2:
             return "stable"
-            
+
         # Use recent values for trend calculation
-        recent_values = values[-min(window, len(values)):]
-        
+        recent_values = values[-min(window, len(values)) :]
+
         if len(recent_values) < 2:
             return "stable"
-            
+
         # Simple linear trend
-        first_half = sum(recent_values[:len(recent_values)//2]) / len(recent_values[:len(recent_values)//2])
-        second_half = sum(recent_values[len(recent_values)//2:]) / len(recent_values[len(recent_values)//2:])
-        
+        first_half = sum(recent_values[: len(recent_values) // 2]) / len(recent_values[: len(recent_values) // 2])
+        second_half = sum(recent_values[len(recent_values) // 2 :]) / len(recent_values[len(recent_values) // 2 :])
+
         change = (second_half - first_half) / (first_half + 0.001)  # Avoid division by zero
-        
+
         if change > 0.05:  # 5% improvement
             return "improving"
         elif change < -0.05:  # 5% degradation
             return "declining"
         else:
             return "stable"
-            
+
     def generate_trends_dashboard(self, days: int = 30, output: str = "trend_dashboard.html") -> str:
         """Generate HTML dashboard showing trends over specified days."""
         print(f"🎨 Generating trend dashboard for last {days} days...")
-        
+
         # Load historical data
         historical_data = self.load_historical_data()
-        entries = historical_data.get('entries', [])
-        
+        entries = historical_data.get("entries", [])
+
         if not entries:
             print("⚠️ No historical data available, creating basic dashboard...")
             return self._create_basic_dashboard(output)
-            
+
         # Filter by date range
         cutoff_date = datetime.now() - timedelta(days=days)
         filtered_entries = []
-        
+
         for entry in entries:
             try:
-                entry_date = datetime.fromisoformat(entry['timestamp'].replace('Z', '+00:00'))
+                entry_date = datetime.fromisoformat(entry["timestamp"].replace("Z", "+00:00"))
                 if entry_date.replace(tzinfo=None) >= cutoff_date:
                     filtered_entries.append(entry)
             except:
                 # Include entries with parsing issues
                 filtered_entries.append(entry)
-                
+
         if not filtered_entries:
             print("⚠️ No data in specified date range, using all available data...")
-            filtered_entries = entries[-min(30, len(entries)):]  # Last 30 entries
-            
+            filtered_entries = entries[-min(30, len(entries)) :]  # Last 30 entries
+
         # Calculate trends
-        nasa_scores = [e.get('nasa_score', 0) for e in filtered_entries]
-        critical_violations = [e.get('critical_violations', 0) for e in filtered_entries]
-        total_violations = [e.get('total_violations', 0) for e in filtered_entries]
-        mece_scores = [e.get('mece_score', 0) for e in filtered_entries]
-        
+        nasa_scores = [e.get("nasa_score", 0) for e in filtered_entries]
+        critical_violations = [e.get("critical_violations", 0) for e in filtered_entries]
+        total_violations = [e.get("total_violations", 0) for e in filtered_entries]
+        mece_scores = [e.get("mece_score", 0) for e in filtered_entries]
+
         trends = {
-            'nasa_score': self.calculate_trend_direction(nasa_scores),
-            'critical_violations': self.calculate_trend_direction(critical_violations),
-            'total_violations': self.calculate_trend_direction(total_violations),
-            'mece_score': self.calculate_trend_direction(mece_scores)
+            "nasa_score": self.calculate_trend_direction(nasa_scores),
+            "critical_violations": self.calculate_trend_direction(critical_violations),
+            "total_violations": self.calculate_trend_direction(total_violations),
+            "mece_score": self.calculate_trend_direction(mece_scores),
         }
-        
+
         # Generate HTML
         html_content = self._generate_trend_html(filtered_entries, trends, days)
-        
+
         # Save dashboard
         output_path = Path(output)
-        with open(output_path, 'w', encoding='utf-8') as f:
+        with open(output_path, "w", encoding="utf-8") as f:
             f.write(html_content)
-            
+
         print(f"✅ Trend dashboard saved to: {output_path}")
         return str(output_path)
-        
+
     def _create_basic_dashboard(self, output: str) -> str:
         """Create basic dashboard when no historical data is available."""
         html_content = f"""<!DOCTYPE html>
@@ -255,39 +250,31 @@ class MetricsTrendAnalyzer:
     </div>
 </body>
 </html>"""
-        
+
         output_path = Path(output)
-        with open(output_path, 'w', encoding='utf-8') as f:
+        with open(output_path, "w", encoding="utf-8") as f:
             f.write(html_content)
-            
+
         return str(output_path)
-        
+
     def _generate_trend_html(self, entries: List[Dict], trends: Dict[str, str], days: int) -> str:
         """Generate comprehensive trend analysis HTML."""
         if not entries:
             return self._create_basic_dashboard("temp.html")
-            
+
         latest = entries[-1] if entries else {}
         entry_count = len(entries)
-        
+
         # Calculate averages
-        avg_nasa = sum(e.get('nasa_score', 0) for e in entries) / len(entries) if entries else 0
-        avg_critical = sum(e.get('critical_violations', 0) for e in entries) / len(entries) if entries else 0
-        avg_mece = sum(e.get('mece_score', 0) for e in entries) / len(entries) if entries else 0
-        
+        avg_nasa = sum(e.get("nasa_score", 0) for e in entries) / len(entries) if entries else 0
+        avg_critical = sum(e.get("critical_violations", 0) for e in entries) / len(entries) if entries else 0
+        avg_mece = sum(e.get("mece_score", 0) for e in entries) / len(entries) if entries else 0
+
         # Trend indicators
-        trend_icons = {
-            'improving': '📈 ↗️',
-            'declining': '📉 ↘️', 
-            'stable': '📊 →'
-        }
-        
-        trend_colors = {
-            'improving': '#28a745',
-            'declining': '#dc3545',
-            'stable': '#6c757d'
-        }
-        
+        trend_icons = {"improving": "📈 ↗️", "declining": "📉 ↘️", "stable": "📊 →"}
+
+        trend_colors = {"improving": "#28a745", "declining": "#dc3545", "stable": "#6c757d"}
+
         html_content = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -399,49 +386,44 @@ class MetricsTrendAnalyzer:
     </div>
 </body>
 </html>"""
-        
+
         return html_content
 
 
 def main():
     """Main CLI entry point."""
-    parser = argparse.ArgumentParser(
-        description="Connascence Safety Analyzer - Historical Metrics and Trend Analysis"
-    )
-    
-    subparsers = parser.add_subparsers(dest='command', help='Available commands')
-    
+    parser = argparse.ArgumentParser(description="Connascence Safety Analyzer - Historical Metrics and Trend Analysis")
+
+    subparsers = parser.add_subparsers(dest="command", help="Available commands")
+
     # Update trends command
-    update_parser = subparsers.add_parser('--update-trends', help='Update historical trends')
-    update_parser.add_argument('--nasa-results', required=True, help='Path to NASA analysis results')
-    update_parser.add_argument('--connascence-results', required=True, help='Path to connascence analysis results')
-    update_parser.add_argument('--mece-results', required=True, help='Path to MECE analysis results')
-    update_parser.add_argument('--commit-sha', required=True, help='Git commit SHA')
-    
+    update_parser = subparsers.add_parser("--update-trends", help="Update historical trends")
+    update_parser.add_argument("--nasa-results", required=True, help="Path to NASA analysis results")
+    update_parser.add_argument("--connascence-results", required=True, help="Path to connascence analysis results")
+    update_parser.add_argument("--mece-results", required=True, help="Path to MECE analysis results")
+    update_parser.add_argument("--commit-sha", required=True, help="Git commit SHA")
+
     # Generate trends dashboard command
-    dashboard_parser = subparsers.add_parser('--generate-trends-dashboard', help='Generate trends dashboard')
-    dashboard_parser.add_argument('--days', type=int, default=30, help='Number of days to include (default: 30)')
-    dashboard_parser.add_argument('--output', default='trend_dashboard.html', help='Output file name')
-    
+    dashboard_parser = subparsers.add_parser("--generate-trends-dashboard", help="Generate trends dashboard")
+    dashboard_parser.add_argument("--days", type=int, default=30, help="Number of days to include (default: 30)")
+    dashboard_parser.add_argument("--output", default="trend_dashboard.html", help="Output file name")
+
     # Handle both old-style and new-style arguments
     if len(sys.argv) > 1:
-        if sys.argv[1].startswith('--update-trends'):
+        if sys.argv[1].startswith("--update-trends"):
             # Handle --update-trends being passed as single argument
-            sys.argv[1] = '--update-trends'
-        elif sys.argv[1].startswith('--generate-trends-dashboard'):
-            sys.argv[1] = '--generate-trends-dashboard'
-    
+            sys.argv[1] = "--update-trends"
+        elif sys.argv[1].startswith("--generate-trends-dashboard"):
+            sys.argv[1] = "--generate-trends-dashboard"
+
     args = parser.parse_args()
-    
+
     try:
         analyzer = MetricsTrendAnalyzer()
-        
-        if args.command == '--update-trends':
+
+        if args.command == "--update-trends":
             success = analyzer.update_trends(
-                args.nasa_results,
-                args.connascence_results, 
-                args.mece_results,
-                args.commit_sha
+                args.nasa_results, args.connascence_results, args.mece_results, args.commit_sha
             )
             if success:
                 print("🎉 Historical trends updated successfully!")
@@ -449,19 +431,16 @@ def main():
             else:
                 print("❌ Failed to update historical trends")
                 return 1
-                
-        elif args.command == '--generate-trends-dashboard':
-            dashboard_path = analyzer.generate_trends_dashboard(
-                days=args.days,
-                output=args.output
-            )
+
+        elif args.command == "--generate-trends-dashboard":
+            dashboard_path = analyzer.generate_trends_dashboard(days=args.days, output=args.output)
             print(f"🎉 Trend dashboard generated: {dashboard_path}")
             return 0
-            
+
         else:
             parser.print_help()
             return 1
-            
+
     except Exception as e:
         print(f"❌ Error: {e}", file=sys.stderr)
         return 1

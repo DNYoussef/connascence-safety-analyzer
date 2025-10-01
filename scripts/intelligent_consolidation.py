@@ -31,7 +31,7 @@ class IntelligentConsolidator:
     def get_file_hash(self, file_path):
         """Get MD5 hash of file content"""
         try:
-            with open(file_path, 'rb') as f:
+            with open(file_path, "rb") as f:
                 return hashlib.md5(f.read()).hexdigest()
         except:
             return None
@@ -102,7 +102,7 @@ class IntelligentConsolidator:
         consolidated_data = {
             "consolidation_date": datetime.now().isoformat(),
             "source_files": [],
-            "folder_analyses": {}
+            "folder_analyses": {},
         }
 
         for analysis_file in analysis_files:
@@ -115,8 +115,10 @@ class IntelligentConsolidator:
                     consolidated_data["folder_analyses"][folder_name] = {
                         "source_file": str(analysis_file.relative_to(self.repo_root)),
                         "summary": data.get("summary", {}),
-                        "critical_violations": [v for v in data.get("violations", []) if v.get("severity") == "critical"][:10],
-                        "violation_count": len(data.get("violations", []))
+                        "critical_violations": [
+                            v for v in data.get("violations", []) if v.get("severity") == "critical"
+                        ][:10],
+                        "violation_count": len(data.get("violations", [])),
                     }
                     consolidated_data["source_files"].append(str(analysis_file.relative_to(self.repo_root)))
 
@@ -129,7 +131,7 @@ class IntelligentConsolidator:
         consolidated_path = self.repo_root / "docs" / "analysis-reports" / "CONSOLIDATED_ANALYSIS_RESULTS.json"
         consolidated_path.parent.mkdir(parents=True, exist_ok=True)
 
-        with open(consolidated_path, 'w') as f:
+        with open(consolidated_path, "w") as f:
             json.dump(consolidated_data, f, indent=2)
 
         self.log(f"Created consolidated analysis: {consolidated_path.relative_to(self.repo_root)}")
@@ -150,7 +152,7 @@ class IntelligentConsolidator:
             "startup-package/README.md",
             "analyzer/README.md",
             "cli/README.md",
-            "vscode-extension/README.md"
+            "vscode-extension/README.md",
         ]
 
         for readme in readme_files:
@@ -167,7 +169,7 @@ class IntelligentConsolidator:
 
             # Check for duplicate content
             try:
-                with open(readme, encoding='utf-8') as f:
+                with open(readme, encoding="utf-8") as f:
                     content = f.read().strip()
 
                 if len(content) < 100:  # Very short READMEs
@@ -175,27 +177,30 @@ class IntelligentConsolidator:
                     continue
 
                 # Check for template/boilerplate content
-                if "# TODO" in content or "Coming soon" in content or content.count('\n') < 5:
+                if "# TODO" in content or "Coming soon" in content or content.count("\n") < 5:
                     self.backup_and_remove(readme, "template/TODO README")
                     continue
 
             except Exception as e:
                 self.log(f"Could not read README {readme}: {e}")
 
-        removed_count = len([f for f in self.removed_files if "README.md" in f and f not in [str(r.relative_to(self.repo_root)) for r in important_readmes]])
-        self.log(f"Phase 3: Removed {removed_count} redundant READMEs, preserved {len(important_readmes)} important ones")
+        removed_count = len(
+            [
+                f
+                for f in self.removed_files
+                if "README.md" in f and f not in [str(r.relative_to(self.repo_root)) for r in important_readmes]
+            ]
+        )
+        self.log(
+            f"Phase 3: Removed {removed_count} redundant READMEs, preserved {len(important_readmes)} important ones"
+        )
 
     def phase4_remove_test_duplicates(self):
         """Phase 4: Remove duplicate test files"""
         self.log("=== PHASE 4: Removing Test File Duplicates ===")
 
         # Find test files that are likely duplicates
-        test_patterns = [
-            "**/test_*.py",
-            "**/*_test.py",
-            "**/*.test.js",
-            "**/*.test.ts"
-        ]
+        test_patterns = ["**/test_*.py", "**/*_test.py", "**/*.test.js", "**/*.test.ts"]
 
         test_files = []
         for pattern in test_patterns:
@@ -213,11 +218,7 @@ class IntelligentConsolidator:
         """Phase 5: Remove obvious backup directories"""
         self.log("=== PHASE 5: Removing Backup Directories ===")
 
-        backup_patterns = [
-            "*backup*",
-            "*old*",
-            "*temp*"
-        ]
+        backup_patterns = ["*backup*", "*old*", "*temp*"]
 
         backup_dirs = []
         for pattern in backup_patterns:
@@ -228,10 +229,7 @@ class IntelligentConsolidator:
 
         for backup_dir in backup_dirs:
             dir_name = backup_dir.name.lower()
-            if (dir_name not in safe_dirs and
-                "vscode-extension" not in dir_name and
-                backup_dir != self.backup_dir):
-
+            if dir_name not in safe_dirs and "vscode-extension" not in dir_name and backup_dir != self.backup_dir:
                 # Calculate directory size
                 total_size = 0
                 for root, dirs, files in os.walk(backup_dir):
@@ -293,14 +291,14 @@ class IntelligentConsolidator:
                 "Redundant README cleanup",
                 "Test file deduplication",
                 "Backup directory removal",
-                "Node modules analysis"
-            ]
+                "Node modules analysis",
+            ],
         }
 
         report_path = self.repo_root / "docs" / "INTELLIGENT_CONSOLIDATION_REPORT.json"
         report_path.parent.mkdir(parents=True, exist_ok=True)
 
-        with open(report_path, 'w') as f:
+        with open(report_path, "w") as f:
             json.dump(report, f, indent=2)
 
         self.log(f"Final report: {report_path.relative_to(self.repo_root)}")
@@ -324,9 +322,11 @@ class IntelligentConsolidator:
             self.log(f"ERROR: {e}")
             raise
 
+
 def main():
     consolidator = IntelligentConsolidator()
     consolidator.execute_intelligent_consolidation()
+
 
 if __name__ == "__main__":
     main()

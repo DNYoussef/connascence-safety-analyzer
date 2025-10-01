@@ -11,12 +11,12 @@ This demonstration:
 5. Generates a comprehensive report showing practical value
 """
 
-import json
-import sys
-from pathlib import Path
-from datetime import datetime
-from typing import Dict, List, Any
 import argparse
+from datetime import datetime
+import json
+from pathlib import Path
+import sys
+from typing import Any, Dict, List
 
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent))
@@ -25,7 +25,7 @@ from analyzer.core import ConnascenceAnalyzer
 from analyzer.enterprise.sixsigma import SixSigmaAnalyzer
 from analyzer.enterprise.sixsigma.integration import ConnascenceSixSigmaIntegration
 from analyzer.theater_detection import TheaterDetector, TheaterPatternLibrary
-from analyzer.theater_detection.detector import QualityClaim, ValidationResult
+from analyzer.theater_detection.detector import QualityClaim
 
 
 class ConnascenceSelfAnalysisDemo:
@@ -42,17 +42,14 @@ class ConnascenceSelfAnalysisDemo:
         self.theater_detector = TheaterDetector()
         self.pattern_library = TheaterPatternLibrary()
 
-        self.results = {
-            'timestamp': datetime.now().isoformat(),
-            'analysis_phases': []
-        }
+        self.results = {"timestamp": datetime.now().isoformat(), "analysis_phases": []}
 
     def run_full_demo(self, analyzer_path: str = "analyzer"):
         """Run complete demonstration workflow"""
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("CONNASCENCE SELF-ANALYSIS DEMONSTRATION")
         print("Six Sigma + Theater Detection on Real Codebase")
-        print("="*80 + "\n")
+        print("=" * 80 + "\n")
 
         # Phase 1: Real Connascence Analysis
         print("PHASE 1: Analyzing Connascence Codebase...")
@@ -72,8 +69,7 @@ class ConnascenceSelfAnalysisDemo:
         print("\nPHASE 3: Creating Quality Improvement Claims...")
         print("-" * 80)
         quality_claims = self._create_quality_claims(analysis_results, six_sigma_results)
-        self._save_phase_results("phase3_quality_claims",
-                                {'claims': [self._claim_to_dict(c) for c in quality_claims]})
+        self._save_phase_results("phase3_quality_claims", {"claims": [self._claim_to_dict(c) for c in quality_claims]})
         self._print_claims_summary(quality_claims)
 
         # Phase 4: Theater Detection Validation
@@ -94,16 +90,15 @@ class ConnascenceSelfAnalysisDemo:
         print("\nPHASE 6: Generating Comprehensive Report...")
         print("-" * 80)
         final_report = self._generate_final_report(
-            analysis_results, six_sigma_results, quality_claims,
-            validation_results, systemic_results
+            analysis_results, six_sigma_results, quality_claims, validation_results, systemic_results
         )
         self._save_final_report(final_report)
         self._print_final_summary(final_report)
 
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("DEMONSTRATION COMPLETE")
         print(f"Results saved to: {self.output_dir}")
-        print("="*80 + "\n")
+        print("=" * 80 + "\n")
 
         return final_report
 
@@ -112,14 +107,10 @@ class ConnascenceSelfAnalysisDemo:
         print(f"Analyzing path: {path}")
 
         # Run real connascence analysis
-        result = self.connascence_analyzer.analyze_path(
-            path=path,
-            policy="nasa-compliance",
-            include_duplication=True
-        )
+        result = self.connascence_analyzer.analyze_path(path=path, policy="nasa-compliance", include_duplication=True)
 
-        violations = result.get('violations', [])
-        summary = result.get('summary', {})
+        violations = result.get("violations", [])
+        summary = result.get("summary", {})
 
         print(f"Files analyzed: {result.get('metrics', {}).get('files_analyzed', 'unknown')}")
         print(f"Total violations: {summary.get('total_violations', 0)}")
@@ -127,16 +118,16 @@ class ConnascenceSelfAnalysisDemo:
 
         # Extract violation types distribution
         violation_types = {}
-        severity_counts = {'critical': 0, 'high': 0, 'medium': 0, 'low': 0}
+        severity_counts = {"critical": 0, "high": 0, "medium": 0, "low": 0}
 
         for v in violations:
-            vtype = v.get('type', 'unknown')
+            vtype = v.get("type", "unknown")
             violation_types[vtype] = violation_types.get(vtype, 0) + 1
-            severity = v.get('severity', 'medium')
+            severity = v.get("severity", "medium")
             severity_counts[severity] = severity_counts.get(severity, 0) + 1
 
-        result['violation_types_distribution'] = violation_types
-        result['severity_distribution'] = severity_counts
+        result["violation_types_distribution"] = violation_types
+        result["severity_distribution"] = severity_counts
 
         return result
 
@@ -145,32 +136,29 @@ class ConnascenceSelfAnalysisDemo:
         print("Calculating Six Sigma metrics...")
 
         # Use Six Sigma integration
-        enhanced_results = self.six_sigma_integration.process_analysis_results(
-            analysis_results
-        )
+        enhanced_results = self.six_sigma_integration.process_analysis_results(analysis_results)
 
-        six_sigma_data = enhanced_results.get('six_sigma', {})
+        six_sigma_data = enhanced_results.get("six_sigma", {})
 
         print(f"Sigma Level: {six_sigma_data.get('sigma_level', 0):.2f}")
         print(f"DPMO: {six_sigma_data.get('dpmo', 0):,.0f}")
         print(f"Quality Score: {six_sigma_data.get('quality_score', 0):.2f}")
 
         # Get quality gate decision
-        gate_decision = self.six_sigma_integration.generate_quality_gate_decision(
-            analysis_results
-        )
+        gate_decision = self.six_sigma_integration.generate_quality_gate_decision(analysis_results)
 
-        enhanced_results['quality_gate'] = gate_decision
+        enhanced_results["quality_gate"] = gate_decision
 
         return enhanced_results
 
-    def _create_quality_claims(self, analysis_results: Dict[str, Any],
-                              six_sigma_results: Dict[str, Any]) -> List[QualityClaim]:
+    def _create_quality_claims(
+        self, analysis_results: Dict[str, Any], six_sigma_results: Dict[str, Any]
+    ) -> List[QualityClaim]:
         """Create quality improvement claims from analysis"""
         print("Creating quality improvement claims...")
 
         claims = []
-        violations = analysis_results.get('violations', [])
+        violations = analysis_results.get("violations", [])
         total_violations = len(violations)
 
         # Claim 1: Overall quality improvement (realistic scenario)
@@ -186,14 +174,14 @@ class ConnascenceSelfAnalysisDemo:
                 "baseline_analysis.json",
                 "current_analysis.json",
                 "refactoring_diff.md",
-                "test_coverage_report.html"
+                "test_coverage_report.html",
             ],
-            timestamp=datetime.now().timestamp()
+            timestamp=datetime.now().timestamp(),
         )
         claims.append(claim1)
 
         # Claim 2: Critical violations reduction (good improvement)
-        critical_count = analysis_results.get('summary', {}).get('critical_violations', 0)
+        critical_count = analysis_results.get("summary", {}).get("critical_violations", 0)
         claim2 = QualityClaim(
             claim_id="demo_critical_002",
             description="Eliminated critical NASA POT10 violations",
@@ -202,12 +190,8 @@ class ConnascenceSelfAnalysisDemo:
             improved_value=float(critical_count),
             improvement_percent=75.0 if critical_count == 1 else 100.0,
             measurement_method="NASA POT10 compliance analysis with Power of Ten rule validation",
-            evidence_files=[
-                "nasa_baseline.sarif",
-                "nasa_improved.sarif",
-                "compliance_report.pdf"
-            ],
-            timestamp=datetime.now().timestamp()
+            evidence_files=["nasa_baseline.sarif", "nasa_improved.sarif", "compliance_report.pdf"],
+            timestamp=datetime.now().timestamp(),
         )
         claims.append(claim2)
 
@@ -221,7 +205,7 @@ class ConnascenceSelfAnalysisDemo:
             improvement_percent=99.99,
             measurement_method="Quick quality check",
             evidence_files=[],  # No evidence - red flag
-            timestamp=datetime.now().timestamp()
+            timestamp=datetime.now().timestamp(),
         )
         claims.append(claim3)
 
@@ -235,12 +219,12 @@ class ConnascenceSelfAnalysisDemo:
             improvement_percent=50.0,  # Suspicious round number
             measurement_method="Automated analysis",
             evidence_files=["report.json"],
-            timestamp=datetime.now().timestamp()
+            timestamp=datetime.now().timestamp(),
         )
         claims.append(claim4)
 
         # Claim 5: Legitimate duplication reduction
-        dup_score = analysis_results.get('mece_analysis', {}).get('score', 1.0)
+        dup_score = analysis_results.get("mece_analysis", {}).get("score", 1.0)
         claim5 = QualityClaim(
             claim_id="demo_duplication_005",
             description="Reduced code duplication through systematic refactoring",
@@ -249,12 +233,8 @@ class ConnascenceSelfAnalysisDemo:
             improved_value=dup_score,
             improvement_percent=((dup_score - 0.65) / 0.65) * 100,
             measurement_method="Token-based similarity analysis with AST comparison and semantic matching",
-            evidence_files=[
-                "duplication_clusters.json",
-                "refactoring_plan.md",
-                "before_after_metrics.csv"
-            ],
-            timestamp=datetime.now().timestamp()
+            evidence_files=["duplication_clusters.json", "refactoring_plan.md", "before_after_metrics.csv"],
+            timestamp=datetime.now().timestamp(),
         )
         claims.append(claim5)
 
@@ -270,15 +250,15 @@ class ConnascenceSelfAnalysisDemo:
             result = self.theater_detector.validate_quality_claim(claim)
 
             validation_data = {
-                'claim_id': claim.claim_id,
-                'claim_description': claim.description,
-                'is_valid': result.is_valid,
-                'confidence_score': result.confidence_score,
-                'risk_level': result.risk_level,
-                'theater_indicators': result.theater_indicators,
-                'genuine_indicators': result.genuine_indicators,
-                'recommendation': result.recommendation,
-                'evidence_quality': result.evidence_quality
+                "claim_id": claim.claim_id,
+                "claim_description": claim.description,
+                "is_valid": result.is_valid,
+                "confidence_score": result.confidence_score,
+                "risk_level": result.risk_level,
+                "theater_indicators": result.theater_indicators,
+                "genuine_indicators": result.genuine_indicators,
+                "recommendation": result.recommendation,
+                "evidence_quality": result.evidence_quality,
             }
             validations.append(validation_data)
 
@@ -288,13 +268,13 @@ class ConnascenceSelfAnalysisDemo:
             print(f"        Confidence: {result.confidence_score:.2%}, Risk: {result.risk_level}")
 
         return {
-            'validations': validations,
-            'summary': {
-                'total_claims': len(claims),
-                'valid_claims': sum(1 for v in validations if v['is_valid']),
-                'invalid_claims': sum(1 for v in validations if not v['is_valid']),
-                'high_risk_claims': sum(1 for v in validations if v['risk_level'] == 'high')
-            }
+            "validations": validations,
+            "summary": {
+                "total_claims": len(claims),
+                "valid_claims": sum(1 for v in validations if v["is_valid"]),
+                "invalid_claims": sum(1 for v in validations if not v["is_valid"]),
+                "high_risk_claims": sum(1 for v in validations if v["risk_level"] == "high"),
+            },
         }
 
     def _detect_systemic_theater(self, claims: List[QualityClaim]) -> Dict[str, Any]:
@@ -308,55 +288,58 @@ class ConnascenceSelfAnalysisDemo:
 
         return result
 
-    def _generate_final_report(self, analysis_results: Dict, six_sigma_results: Dict,
-                               claims: List[QualityClaim], validation_results: Dict,
-                               systemic_results: Dict) -> Dict[str, Any]:
+    def _generate_final_report(
+        self,
+        analysis_results: Dict,
+        six_sigma_results: Dict,
+        claims: List[QualityClaim],
+        validation_results: Dict,
+        systemic_results: Dict,
+    ) -> Dict[str, Any]:
         """Generate comprehensive final report"""
 
         report = {
-            'demonstration_metadata': {
-                'timestamp': datetime.now().isoformat(),
-                'analyzer_version': self.connascence_analyzer.version,
-                'target_path': 'analyzer',
-                'purpose': 'Self-analysis demonstration of Six Sigma + Theater Detection'
+            "demonstration_metadata": {
+                "timestamp": datetime.now().isoformat(),
+                "analyzer_version": self.connascence_analyzer.version,
+                "target_path": "analyzer",
+                "purpose": "Self-analysis demonstration of Six Sigma + Theater Detection",
             },
-            'executive_summary': self._generate_executive_summary(
+            "executive_summary": self._generate_executive_summary(
                 analysis_results, six_sigma_results, validation_results
             ),
-            'detailed_results': {
-                'connascence_analysis': {
-                    'total_violations': len(analysis_results.get('violations', [])),
-                    'violation_types': analysis_results.get('violation_types_distribution', {}),
-                    'severity_distribution': analysis_results.get('severity_distribution', {}),
-                    'nasa_compliance_score': analysis_results.get('nasa_compliance', {}).get('score', 0),
-                    'mece_score': analysis_results.get('mece_analysis', {}).get('score', 0)
+            "detailed_results": {
+                "connascence_analysis": {
+                    "total_violations": len(analysis_results.get("violations", [])),
+                    "violation_types": analysis_results.get("violation_types_distribution", {}),
+                    "severity_distribution": analysis_results.get("severity_distribution", {}),
+                    "nasa_compliance_score": analysis_results.get("nasa_compliance", {}).get("score", 0),
+                    "mece_score": analysis_results.get("mece_analysis", {}).get("score", 0),
                 },
-                'six_sigma_metrics': six_sigma_results.get('six_sigma', {}),
-                'quality_gate': six_sigma_results.get('quality_gate', {}),
-                'theater_detection': validation_results,
-                'systemic_analysis': systemic_results
+                "six_sigma_metrics": six_sigma_results.get("six_sigma", {}),
+                "quality_gate": six_sigma_results.get("quality_gate", {}),
+                "theater_detection": validation_results,
+                "systemic_analysis": systemic_results,
             },
-            'practical_insights': self._generate_practical_insights(
+            "practical_insights": self._generate_practical_insights(
                 analysis_results, validation_results, systemic_results
             ),
-            'recommendations': self._generate_recommendations(
-                analysis_results, six_sigma_results, validation_results
-            )
+            "recommendations": self._generate_recommendations(analysis_results, six_sigma_results, validation_results),
         }
 
         return report
 
-    def _generate_executive_summary(self, analysis_results: Dict,
-                                    six_sigma_results: Dict,
-                                    validation_results: Dict) -> str:
+    def _generate_executive_summary(
+        self, analysis_results: Dict, six_sigma_results: Dict, validation_results: Dict
+    ) -> str:
         """Generate executive summary text"""
 
-        total_violations = len(analysis_results.get('violations', []))
-        sigma_level = six_sigma_results.get('six_sigma', {}).get('sigma_level', 0)
-        dpmo = six_sigma_results.get('six_sigma', {}).get('dpmo', 0)
+        total_violations = len(analysis_results.get("violations", []))
+        sigma_level = six_sigma_results.get("six_sigma", {}).get("sigma_level", 0)
+        dpmo = six_sigma_results.get("six_sigma", {}).get("dpmo", 0)
 
-        valid_claims = validation_results.get('summary', {}).get('valid_claims', 0)
-        total_claims = validation_results.get('summary', {}).get('total_claims', 0)
+        valid_claims = validation_results.get("summary", {}).get("valid_claims", 0)
+        total_claims = validation_results.get("summary", {}).get("total_claims", 0)
 
         summary = f"""
 EXECUTIVE SUMMARY
@@ -393,86 +376,84 @@ improvement reports.
 """
         return summary
 
-    def _generate_practical_insights(self, analysis_results: Dict,
-                                     validation_results: Dict,
-                                     systemic_results: Dict) -> List[str]:
+    def _generate_practical_insights(
+        self, analysis_results: Dict, validation_results: Dict, systemic_results: Dict
+    ) -> List[str]:
         """Generate practical insights from the analysis"""
 
         insights = [
             "REAL VIOLATIONS DETECTED: The connascence analyzer found genuine code quality issues in its own codebase, demonstrating the tool works on production code.",
-
             "SIX SIGMA METRICS APPLIED: DPMO and sigma level calculations provide quantitative quality measures that can be tracked over time.",
-
             "THEATER DETECTION WORKS: The system successfully identified suspicious quality claims (perfect improvements, round numbers, missing evidence) while validating legitimate improvements.",
-
             "EVIDENCE MATTERS: Claims with comprehensive evidence files and detailed measurement methods received higher confidence scores.",
-
-            f"SYSTEMIC PATTERNS: Analysis of multiple claims revealed {len(systemic_results.get('systemic_theater_indicators', []))} systemic theater indicators, showing the value of cross-claim analysis."
+            f"SYSTEMIC PATTERNS: Analysis of multiple claims revealed {len(systemic_results.get('systemic_theater_indicators', []))} systemic theater indicators, showing the value of cross-claim analysis.",
         ]
 
         # Add specific insights from validation results
-        for validation in validation_results.get('validations', []):
-            if not validation['is_valid'] and validation['theater_indicators']:
+        for validation in validation_results.get("validations", []):
+            if not validation["is_valid"] and validation["theater_indicators"]:
                 insight = f"THEATER INDICATOR: Claim '{validation['claim_id']}' flagged for: {', '.join(validation['theater_indicators'])}"
                 insights.append(insight)
 
         return insights
 
-    def _generate_recommendations(self, analysis_results: Dict,
-                                   six_sigma_results: Dict,
-                                   validation_results: Dict) -> List[str]:
+    def _generate_recommendations(
+        self, analysis_results: Dict, six_sigma_results: Dict, validation_results: Dict
+    ) -> List[str]:
         """Generate actionable recommendations"""
 
         recommendations = []
 
         # Based on connascence violations
-        critical_count = analysis_results.get('summary', {}).get('critical_violations', 0)
+        critical_count = analysis_results.get("summary", {}).get("critical_violations", 0)
         if critical_count > 0:
             recommendations.append(
                 f"PRIORITY 1: Address {critical_count} critical connascence violations to improve system reliability"
             )
 
         # Based on Six Sigma metrics
-        sigma_level = six_sigma_results.get('six_sigma', {}).get('sigma_level', 0)
+        sigma_level = six_sigma_results.get("six_sigma", {}).get("sigma_level", 0)
         if sigma_level < 3.0:
             recommendations.append(
                 f"PRIORITY 2: Current sigma level ({sigma_level:.1f}) is below industry standard (3.0). Implement systematic quality improvements."
             )
 
         # Based on theater detection
-        invalid_claims = validation_results.get('summary', {}).get('invalid_claims', 0)
+        invalid_claims = validation_results.get("summary", {}).get("invalid_claims", 0)
         if invalid_claims > 0:
             recommendations.append(
                 f"PRIORITY 3: {invalid_claims} quality claims failed validation. Always provide comprehensive evidence for improvement claims."
             )
 
         # General recommendations
-        recommendations.extend([
-            "BEST PRACTICE: Integrate theater detection into CI/CD pipeline to catch fake quality improvements early",
-            "BEST PRACTICE: Track Six Sigma metrics over time to measure genuine quality trends",
-            "BEST PRACTICE: Require evidence files for all quality improvement claims to prevent theater"
-        ])
+        recommendations.extend(
+            [
+                "BEST PRACTICE: Integrate theater detection into CI/CD pipeline to catch fake quality improvements early",
+                "BEST PRACTICE: Track Six Sigma metrics over time to measure genuine quality trends",
+                "BEST PRACTICE: Require evidence files for all quality improvement claims to prevent theater",
+            ]
+        )
 
         return recommendations
 
     def _claim_to_dict(self, claim: QualityClaim) -> Dict[str, Any]:
         """Convert QualityClaim to dictionary"""
         return {
-            'claim_id': claim.claim_id,
-            'description': claim.description,
-            'metric_name': claim.metric_name,
-            'baseline_value': claim.baseline_value,
-            'improved_value': claim.improved_value,
-            'improvement_percent': claim.improvement_percent,
-            'measurement_method': claim.measurement_method,
-            'evidence_files': claim.evidence_files,
-            'timestamp': claim.timestamp
+            "claim_id": claim.claim_id,
+            "description": claim.description,
+            "metric_name": claim.metric_name,
+            "baseline_value": claim.baseline_value,
+            "improved_value": claim.improved_value,
+            "improvement_percent": claim.improvement_percent,
+            "measurement_method": claim.measurement_method,
+            "evidence_files": claim.evidence_files,
+            "timestamp": claim.timestamp,
         }
 
     def _save_phase_results(self, phase_name: str, results: Dict[str, Any]):
         """Save phase results to file"""
         output_file = self.output_dir / f"{phase_name}.json"
-        with open(output_file, 'w') as f:
+        with open(output_file, "w") as f:
             json.dump(results, f, indent=2, default=str)
         print(f"Results saved to: {output_file}")
 
@@ -481,23 +462,23 @@ improvement reports.
 
         # Save JSON version
         json_file = self.output_dir / "final_report.json"
-        with open(json_file, 'w') as f:
+        with open(json_file, "w") as f:
             json.dump(report, f, indent=2, default=str)
 
         # Save markdown version
         md_file = self.output_dir / "final_report.md"
-        with open(md_file, 'w') as f:
+        with open(md_file, "w") as f:
             f.write("# Connascence Self-Analysis Demonstration\n\n")
             f.write(f"**Generated:** {report['demonstration_metadata']['timestamp']}\n\n")
-            f.write(report['executive_summary'])
+            f.write(report["executive_summary"])
             f.write("\n\n## Practical Insights\n\n")
-            for insight in report['practical_insights']:
+            for insight in report["practical_insights"]:
                 f.write(f"- {insight}\n")
             f.write("\n\n## Recommendations\n\n")
-            for rec in report['recommendations']:
+            for rec in report["recommendations"]:
                 f.write(f"- {rec}\n")
 
-        print(f"\nFinal reports saved:")
+        print("\nFinal reports saved:")
         print(f"  JSON: {json_file}")
         print(f"  Markdown: {md_file}")
 
@@ -505,12 +486,12 @@ improvement reports.
         """Print connascence analysis summary"""
         print("\nConnascence Analysis Results:")
         print(f"  Violation Types: {len(results.get('violation_types_distribution', {}))}")
-        for vtype, count in results.get('violation_types_distribution', {}).items():
+        for vtype, count in results.get("violation_types_distribution", {}).items():
             print(f"    - {vtype}: {count}")
 
     def _print_six_sigma_summary(self, results: Dict[str, Any]):
         """Print Six Sigma summary"""
-        six_sigma = results.get('six_sigma', {})
+        six_sigma = results.get("six_sigma", {})
         print("\nSix Sigma Metrics:")
         for key, value in six_sigma.items():
             if isinstance(value, float):
@@ -527,7 +508,7 @@ improvement reports.
 
     def _print_validation_summary(self, results: Dict[str, Any]):
         """Print validation summary"""
-        summary = results.get('summary', {})
+        summary = results.get("summary", {})
         print("\nTheater Detection Summary:")
         print(f"  Total Claims: {summary.get('total_claims', 0)}")
         print(f"  Valid Claims: {summary.get('valid_claims', 0)}")
@@ -536,7 +517,7 @@ improvement reports.
 
     def _print_systemic_summary(self, results: Dict[str, Any]):
         """Print systemic analysis summary"""
-        indicators = results.get('systemic_theater_indicators', [])
+        indicators = results.get("systemic_theater_indicators", [])
         print(f"\nSystemic Theater Indicators: {len(indicators)}")
         for indicator in indicators[:3]:  # Show top 3
             if isinstance(indicator, dict):
@@ -547,24 +528,16 @@ improvement reports.
     def _print_final_summary(self, report: Dict[str, Any]):
         """Print final summary"""
         print("\nDemonstration Summary:")
-        print(report['executive_summary'])
-        print("\n" + "-"*80)
+        print(report["executive_summary"])
+        print("\n" + "-" * 80)
 
 
 def main():
     """Main entry point"""
-    parser = argparse.ArgumentParser(
-        description="Six Sigma + Theater Detection Demonstration on Connascence Codebase"
-    )
+    parser = argparse.ArgumentParser(description="Six Sigma + Theater Detection Demonstration on Connascence Codebase")
+    parser.add_argument("--path", "-p", default="analyzer", help="Path to analyze (default: analyzer)")
     parser.add_argument(
-        '--path', '-p',
-        default='analyzer',
-        help='Path to analyze (default: analyzer)'
-    )
-    parser.add_argument(
-        '--output', '-o',
-        default='demo_results',
-        help='Output directory for results (default: demo_results)'
+        "--output", "-o", default="demo_results", help="Output directory for results (default: demo_results)"
     )
 
     args = parser.parse_args()
@@ -574,5 +547,5 @@ def main():
     demo.run_full_demo(analyzer_path=args.path)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

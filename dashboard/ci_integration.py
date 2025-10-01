@@ -8,103 +8,103 @@ Compatible with GitHub Actions and other CI systems.
 """
 
 import argparse
-import json
-import os
-import sys
 from datetime import datetime
+import json
 from pathlib import Path
-from typing import Dict, List, Any, Optional
+import sys
 
 
 class CIDashboardGenerator:
     """Generates CI-compatible dashboards from analysis results."""
-    
+
     def __init__(self, output_dir: str = "."):
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(exist_ok=True)
         self.dashboard_data = {
-            'timestamp': datetime.now().isoformat(),
-            'analysis_results': {},
-            'policy_compliance': {},
-            'summary': {}
+            "timestamp": datetime.now().isoformat(),
+            "analysis_results": {},
+            "policy_compliance": {},
+            "summary": {},
         }
-        
+
     def load_analysis_results(self) -> None:
         """Load available analysis results from current directory."""
         result_files = {
-            'nasa': 'nasa_analysis.json',
-            'connascence': 'connascence_full.json', 
-            'mece': 'mece_analysis.json',
-            'god_objects': 'god_objects.json',
-            'correlated': 'correlated_results.json'
+            "nasa": "nasa_analysis.json",
+            "connascence": "connascence_full.json",
+            "mece": "mece_analysis.json",
+            "god_objects": "god_objects.json",
+            "correlated": "correlated_results.json",
         }
-        
+
         for analysis_type, filename in result_files.items():
             file_path = Path(filename)
             if file_path.exists():
                 try:
-                    with open(file_path, 'r') as f:
+                    with open(file_path) as f:
                         data = json.load(f)
-                    self.dashboard_data['analysis_results'][analysis_type] = data
+                    self.dashboard_data["analysis_results"][analysis_type] = data
                     print(f"✅ Loaded {analysis_type} results from {filename}")
                 except Exception as e:
                     print(f"⚠️ Could not load {filename}: {e}")
-                    self.dashboard_data['analysis_results'][analysis_type] = {'error': str(e)}
+                    self.dashboard_data["analysis_results"][analysis_type] = {"error": str(e)}
             else:
                 print(f"ℹ️ {filename} not found, skipping {analysis_type} analysis")
-                
+
     def generate_summary_metrics(self) -> None:
         """Generate summary metrics from loaded analysis data."""
         summary = {
-            'total_violations': 0,
-            'critical_violations': 0,
-            'nasa_score': 0.0,
-            'mece_score': 0.0,
-            'god_objects_count': 0,
-            'overall_quality_score': 0.0
+            "total_violations": 0,
+            "critical_violations": 0,
+            "nasa_score": 0.0,
+            "mece_score": 0.0,
+            "god_objects_count": 0,
+            "overall_quality_score": 0.0,
         }
-        
+
         # Extract NASA compliance
-        if 'nasa' in self.dashboard_data['analysis_results']:
-            nasa_data = self.dashboard_data['analysis_results']['nasa']
-            if 'nasa_compliance' in nasa_data:
-                summary['nasa_score'] = nasa_data['nasa_compliance'].get('score', 0.0)
-            
+        if "nasa" in self.dashboard_data["analysis_results"]:
+            nasa_data = self.dashboard_data["analysis_results"]["nasa"]
+            if "nasa_compliance" in nasa_data:
+                summary["nasa_score"] = nasa_data["nasa_compliance"].get("score", 0.0)
+
         # Extract connascence metrics
-        if 'connascence' in self.dashboard_data['analysis_results']:
-            conn_data = self.dashboard_data['analysis_results']['connascence']
-            violations = conn_data.get('violations', [])
-            summary['total_violations'] = len(violations)
-            summary['critical_violations'] = len([v for v in violations if v.get('severity') == 'critical'])
-            if 'summary' in conn_data:
-                summary['overall_quality_score'] = conn_data['summary'].get('overall_quality_score', 0.0)
-                
+        if "connascence" in self.dashboard_data["analysis_results"]:
+            conn_data = self.dashboard_data["analysis_results"]["connascence"]
+            violations = conn_data.get("violations", [])
+            summary["total_violations"] = len(violations)
+            summary["critical_violations"] = len([v for v in violations if v.get("severity") == "critical"])
+            if "summary" in conn_data:
+                summary["overall_quality_score"] = conn_data["summary"].get("overall_quality_score", 0.0)
+
         # Extract MECE score
-        if 'mece' in self.dashboard_data['analysis_results']:
-            mece_data = self.dashboard_data['analysis_results']['mece']
-            summary['mece_score'] = mece_data.get('mece_score', 0.0)
-            
+        if "mece" in self.dashboard_data["analysis_results"]:
+            mece_data = self.dashboard_data["analysis_results"]["mece"]
+            summary["mece_score"] = mece_data.get("mece_score", 0.0)
+
         # Extract god objects
-        if 'god_objects' in self.dashboard_data['analysis_results']:
-            god_data = self.dashboard_data['analysis_results']['god_objects']
-            violations = god_data.get('violations', [])
-            summary['god_objects_count'] = len([v for v in violations if v.get('type') == 'CoA' and 'God Object' in v.get('description', '')])
-            
-        self.dashboard_data['summary'] = summary
-        
+        if "god_objects" in self.dashboard_data["analysis_results"]:
+            god_data = self.dashboard_data["analysis_results"]["god_objects"]
+            violations = god_data.get("violations", [])
+            summary["god_objects_count"] = len(
+                [v for v in violations if v.get("type") == "CoA" and "God Object" in v.get("description", "")]
+            )
+
+        self.dashboard_data["summary"] = summary
+
     def generate_html_dashboard(self, policy: str = "nasa_jpl_pot10") -> str:
         """Generate comprehensive HTML dashboard."""
-        summary = self.dashboard_data['summary']
-        timestamp = self.dashboard_data['timestamp']
-        
+        summary = self.dashboard_data["summary"]
+        timestamp = self.dashboard_data["timestamp"]
+
         # Determine overall status
-        nasa_pass = summary['nasa_score'] >= 0.90
-        violations_acceptable = summary['critical_violations'] <= 50
+        nasa_pass = summary["nasa_score"] >= 0.90
+        violations_acceptable = summary["critical_violations"] <= 50
         overall_pass = nasa_pass and violations_acceptable
-        
+
         status_color = "#28a745" if overall_pass else "#dc3545"
         status_text = "PASSED" if overall_pass else "FAILED"
-        
+
         html_content = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -305,73 +305,75 @@ class CIDashboardGenerator:
     </div>
 </body>
 </html>"""
-        
+
         return html_content
-        
+
     def save_dashboard(self, html_content: str) -> str:
         """Save the HTML dashboard to file."""
         dashboard_path = self.output_dir / "comprehensive_dashboard.html"
-        
-        with open(dashboard_path, 'w', encoding='utf-8') as f:
+
+        with open(dashboard_path, "w", encoding="utf-8") as f:
             f.write(html_content)
-            
+
         print(f"✅ Dashboard saved to: {dashboard_path}")
         return str(dashboard_path)
-        
+
     def generate_dashboard(self, policy: str = "nasa_jpl_pot10") -> str:
         """Main method to generate complete dashboard."""
         print("Loading analysis results...")
         self.load_analysis_results()
-        
+
         print("Generating summary metrics...")
         self.generate_summary_metrics()
-        
+
         print("Creating HTML dashboard...")
         html_content = self.generate_html_dashboard(policy)
-        
+
         print("Saving dashboard...")
         dashboard_path = self.save_dashboard(html_content)
-        
+
         # Also create a simple JSON summary for CI systems
         json_summary_path = self.output_dir / "dashboard_summary.json"
-        with open(json_summary_path, 'w') as f:
-            json.dump({
-                'timestamp': self.dashboard_data['timestamp'],
-                'summary': self.dashboard_data['summary'],
-                'overall_status': 'PASSED' if (self.dashboard_data['summary']['nasa_score'] >= 0.90 and 
-                                             self.dashboard_data['summary']['critical_violations'] <= 50) else 'FAILED',
-                'policy': policy
-            }, f, indent=2)
-        
-        print(f"✅ Dashboard generation completed successfully!")
+        with open(json_summary_path, "w") as f:
+            json.dump(
+                {
+                    "timestamp": self.dashboard_data["timestamp"],
+                    "summary": self.dashboard_data["summary"],
+                    "overall_status": "PASSED"
+                    if (
+                        self.dashboard_data["summary"]["nasa_score"] >= 0.90
+                        and self.dashboard_data["summary"]["critical_violations"] <= 50
+                    )
+                    else "FAILED",
+                    "policy": policy,
+                },
+                f,
+                indent=2,
+            )
+
+        print("✅ Dashboard generation completed successfully!")
         return dashboard_path
 
 
 def main():
     """Main CLI entry point."""
-    parser = argparse.ArgumentParser(
-        description="Generate CI/CD dashboard from Connascence analysis results"
+    parser = argparse.ArgumentParser(description="Generate CI/CD dashboard from Connascence analysis results")
+    parser.add_argument(
+        "--output-dir", default=".", help="Output directory for dashboard files (default: current directory)"
     )
     parser.add_argument(
-        '--output-dir', 
-        default=".",
-        help="Output directory for dashboard files (default: current directory)"
+        "--policy", default="nasa_jpl_pot10", help="Policy compliance to highlight (default: nasa_jpl_pot10)"
     )
-    parser.add_argument(
-        '--policy',
-        default="nasa_jpl_pot10", 
-        help="Policy compliance to highlight (default: nasa_jpl_pot10)"
-    )
-    
+
     args = parser.parse_args()
-    
+
     try:
         generator = CIDashboardGenerator(args.output_dir)
         dashboard_path = generator.generate_dashboard(args.policy)
-        
+
         print(f"\n🎉 Success! Dashboard available at: {dashboard_path}")
         return 0
-        
+
     except Exception as e:
         print(f"❌ Dashboard generation failed: {e}", file=sys.stderr)
         return 1

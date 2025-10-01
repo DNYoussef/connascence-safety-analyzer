@@ -3,11 +3,10 @@ Circular Dependency Detector for Python Projects
 Identifies circular import patterns in the analyzer module.
 """
 
-import os
-import re
-from pathlib import Path
-from typing import Dict, Set, List, Tuple
 import json
+from pathlib import Path
+import re
+from typing import Dict, List, Set
 
 
 class CircularDependencyDetector:
@@ -23,7 +22,7 @@ class CircularDependencyDetector:
         imports = set()
 
         try:
-            with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+            with open(file_path, encoding="utf-8", errors="ignore") as f:
                 content = f.read()
         except Exception as e:
             print(f"Error reading {file_path}: {e}")
@@ -31,17 +30,17 @@ class CircularDependencyDetector:
 
         # Extract relative imports
         relative_patterns = [
-            r'from\s+\.+(\w+(?:\.\w+)*)',  # from .module or from ..module
-            r'from\s+(\w+(?:\.\w+)*)\s+import',  # from module import
-            r'import\s+(\w+(?:\.\w+)*)',  # import module
+            r"from\s+\.+(\w+(?:\.\w+)*)",  # from .module or from ..module
+            r"from\s+(\w+(?:\.\w+)*)\s+import",  # from module import
+            r"import\s+(\w+(?:\.\w+)*)",  # import module
         ]
 
         for pattern in relative_patterns:
             matches = re.findall(pattern, content)
             for match in matches:
                 # Filter for project-specific modules
-                if match.startswith(('analyzer', 'mcp', 'policy', 'integrations')):
-                    imports.add(match.split('.')[0])  # Get top-level module
+                if match.startswith(("analyzer", "mcp", "policy", "integrations")):
+                    imports.add(match.split(".")[0])  # Get top-level module
 
         return imports
 
@@ -50,8 +49,8 @@ class CircularDependencyDetector:
         print("Building import graph...")
 
         # Scan all Python files
-        for py_file in self.base_path.rglob('*.py'):
-            if '__pycache__' in str(py_file):
+        for py_file in self.base_path.rglob("*.py"):
+            if "__pycache__" in str(py_file):
                 continue
 
             # Get module name relative to base path
@@ -110,10 +109,10 @@ class CircularDependencyDetector:
         self.find_cycles()
 
         results = {
-            'total_modules': len(self.imports_graph),
-            'dependencies': {k: list(v) for k, v in self.imports_graph.items()},
-            'circular_dependencies': self.circular_dependencies,
-            'cycle_count': len(self.circular_dependencies)
+            "total_modules": len(self.imports_graph),
+            "dependencies": {k: list(v) for k, v in self.imports_graph.items()},
+            "circular_dependencies": self.circular_dependencies,
+            "cycle_count": len(self.circular_dependencies),
         }
 
         return results
@@ -127,10 +126,10 @@ class CircularDependencyDetector:
         print(f"\nTotal modules analyzed: {results['total_modules']}")
         print(f"Circular dependencies found: {results['cycle_count']}")
 
-        if results['circular_dependencies']:
+        if results["circular_dependencies"]:
             print("\nCircular Dependencies Detected:")
             print("-" * 40)
-            for i, cycle in enumerate(results['circular_dependencies'], 1):
+            for i, cycle in enumerate(results["circular_dependencies"], 1):
                 cycle_str = " -> ".join(cycle)
                 print(f"{i}. {cycle_str}")
         else:
@@ -138,7 +137,7 @@ class CircularDependencyDetector:
 
         print("\nModule Import Graph:")
         print("-" * 40)
-        for module, imports in results['dependencies'].items():
+        for module, imports in results["dependencies"].items():
             if imports:  # Only show modules with dependencies
                 print(f"{module}: {', '.join(imports)}")
 
@@ -157,7 +156,7 @@ def main():
 
     # Save results to JSON
     output_file = Path(project_root) / "fixes" / "phase0" / "circular_dependencies.json"
-    with open(output_file, 'w') as f:
+    with open(output_file, "w") as f:
         json.dump(results, f, indent=2)
 
     print(f"\nResults saved to: {output_file}")

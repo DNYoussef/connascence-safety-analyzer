@@ -31,4 +31,4 @@ class Violation:
             setattr(self, k, v)
 
 
-__all__ = ["ConnascenceASTAnalyzer", "AnalysisResult", "Violation", "ConnascenceViolation"]
+__all__ = ["AnalysisResult", "ConnascenceASTAnalyzer", "ConnascenceViolation", "Violation"]

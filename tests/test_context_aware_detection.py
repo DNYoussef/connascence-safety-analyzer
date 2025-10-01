@@ -23,7 +23,7 @@ def test_config_class_detection():
     """Test that config classes are properly classified and get higher thresholds."""
     print("Testing config class detection...")
 
-    config_class_code = '''
+    config_class_code = """
 class DatabaseConfig:
     def __init__(self):
         self.host = "localhost"
@@ -60,11 +60,11 @@ class DatabaseConfig:
     def validate_connection(self): pass
     def get_backup_config(self): pass
     def set_backup_config(self, backup): pass
-'''
+"""
 
     tree = ast.parse(config_class_code)
     class_node = tree.body[0]
-    source_lines = config_class_code.split('\n')
+    source_lines = config_class_code.split("\n")
 
     analyzer = ContextAnalyzer()
     analysis = analyzer.analyze_class_context(class_node, source_lines, "config/database.py")
@@ -88,7 +88,7 @@ def test_business_logic_detection():
     """Test that business logic classes get stricter thresholds."""
     print("Testing business logic class detection...")
 
-    business_class_code = '''
+    business_class_code = """
 class BusinessRuleEngine:
     def __init__(self):
         pass
@@ -110,11 +110,11 @@ class BusinessRuleEngine:
     def calculate_aggregates(self, agg): pass
     def process_calculations(self, calc): pass
     def execute_functions(self, funcs): pass
-'''
+"""
 
     tree = ast.parse(business_class_code)
     class_node = tree.body[0]
-    source_lines = business_class_code.split('\n')
+    source_lines = business_class_code.split("\n")
 
     analyzer = ContextAnalyzer()
     analysis = analyzer.analyze_class_context(class_node, source_lines, "business/rule_engine.py")
@@ -137,7 +137,7 @@ def test_magic_literal_context_awareness():
     """Test enhanced magic literal detection with context."""
     print("Testing context-aware magic literal detection...")
 
-    test_code = '''
+    test_code = """
 DEFAULT_PORT = 8080  # Should not be flagged (constant)
 CONFIG_TIMEOUT = 30  # Should not be flagged (constant)
 
@@ -152,9 +152,9 @@ def process_data():
 
 def calculate_tax(amount):
     return amount * 0.08  # Should be flagged (magic tax rate)
-'''
+"""
 
-    source_lines = test_code.split('\n')
+    source_lines = test_code.split("\n")
     detector = MagicLiteralDetector(source_lines)
 
     tree = ast.parse(test_code)
@@ -164,23 +164,27 @@ def calculate_tax(amount):
     print(f"Found {len(violations)} magic literal violations:")
 
     for violation in violations:
-        context = violation.metadata.get('context')
+        context = violation.metadata.get("context")
         if context:
-            print(f"  Line {violation.line_number}: '{violation.text}' "
-                  f"(severity: {violation.metadata.get('severity_score', 0):.1f}, "
-                  f"constant: {context.is_constant}, "
-                  f"config: {context.is_configuration}, "
-                  f"conditional: {context.in_conditional})")
+            print(
+                f"  Line {violation.line_number}: '{violation.text}' "
+                f"(severity: {violation.metadata.get('severity_score', 0):.1f}, "
+                f"constant: {context.is_constant}, "
+                f"config: {context.is_configuration}, "
+                f"conditional: {context.in_conditional})"
+            )
 
     # Should find magic literals but with appropriate context weighting
     assert len(violations) >= 3  # Should find some violations
 
     # Check that constants are handled appropriately
-    constant_violations = [v for v in violations if v.metadata.get('context') and v.metadata['context'].is_constant]
+    constant_violations = [v for v in violations if v.metadata.get("context") and v.metadata["context"].is_constant]
     if constant_violations:
         # Constants should have very low severity
         for v in constant_violations:
-            assert v.metadata['severity_score'] < 3.0, f"Constant violation has too high severity: {v.metadata['severity_score']}"
+            assert (
+                v.metadata["severity_score"] < 3.0
+            ), f"Constant violation has too high severity: {v.metadata['severity_score']}"
 
     print("Context-aware magic literal detection passed\n")
 
@@ -189,7 +193,7 @@ def test_integration_with_main_analyzer():
     """Test integration of context-aware detection with main analyzer."""
     print("Testing integration with main ConnascenceDetector...")
 
-    integration_code = '''
+    integration_code = """
 class UserService:  # Should be business logic
     def __init__(self):
         self.max_users = 1000  # Magic literal
@@ -210,9 +214,9 @@ class UserService:  # Should be business logic
     def import_user_data(self, data): pass
     def merge_duplicate_users(self, user1, user2): pass
     def process_user_deletion(self, user_id): pass
-'''
+"""
 
-    source_lines = integration_code.split('\n')
+    source_lines = integration_code.split("\n")
     detector = ConnascenceDetector("test_integration.py", source_lines)
 
     tree = ast.parse(integration_code)
@@ -222,10 +226,10 @@ class UserService:  # Should be business logic
     print(f"Found {len(detector.violations)} total violations:")
     for violation in detector.violations:
         print(f"  {violation.type}: {violation.description}")
-        if hasattr(violation, 'context') and isinstance(violation.context, dict):
-            if 'context_type' in violation.context:
+        if hasattr(violation, "context") and isinstance(violation.context, dict):
+            if "context_type" in violation.context:
                 print(f"    Context: {violation.context['context_type']}")
-            if 'analysis_type' in violation.context:
+            if "analysis_type" in violation.context:
                 print(f"    Analysis: {violation.context['analysis_type']}")
 
     # Should find god object violation for business logic class with >15 methods
@@ -239,6 +243,7 @@ class UserService:  # Should be business logic
         class_node = tree.body[0]
 
         from analyzer.context_analyzer import ContextAnalyzer
+
         context_analyzer = ContextAnalyzer()
         class_analysis = context_analyzer.analyze_class_context(class_node, source_lines, "test_integration.py")
 
@@ -285,6 +290,7 @@ def run_all_tests():
     except Exception as e:
         print(f"Test failed: {e}")
         import traceback
+
         traceback.print_exc()
         return False
 

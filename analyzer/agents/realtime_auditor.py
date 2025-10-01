@@ -22,12 +22,12 @@ Audit Functions:
 @integration MCP-IDE, LSP, Git-Hooks
 """
 
-import json
-from datetime import datetime
-from typing import Dict, List, Optional, Any
-from dataclasses import dataclass, field
 from collections import deque
+from dataclasses import dataclass
+from datetime import datetime
+import json
 import logging
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -68,20 +68,9 @@ class AuditReport:
 
 
 class RealtimeDiagnosticAuditor:
+    SEVERITY_WEIGHTS = {"error": 5, "warning": 3, "information": 1, "hint": 0.5}
 
-    SEVERITY_WEIGHTS = {
-        "error": 5,
-        "warning": 3,
-        "information": 1,
-        "hint": 0.5
-    }
-
-    QUALITY_THRESHOLDS = {
-        "excellent": 0.95,
-        "good": 0.85,
-        "acceptable": 0.75,
-        "poor": 0.60
-    }
+    QUALITY_THRESHOLDS = {"excellent": 0.95, "good": 0.85, "acceptable": 0.75, "poor": 0.60}
 
     def __init__(self, max_history: int = 1000):
         self.event_history: deque = deque(maxlen=max_history)
@@ -96,8 +85,8 @@ class RealtimeDiagnosticAuditor:
             line_number=diagnostic.get("range", {}).get("start", {}).get("line", 0),
             severity=diagnostic.get("severity", "warning").lower(),
             message=diagnostic.get("message", ""),
-            rule_id=diagnostic.get("code", None),
-            code_context=diagnostic.get("context", None)
+            rule_id=diagnostic.get("code"),
+            code_context=diagnostic.get("context"),
         )
 
         self.event_history.append(event)
@@ -117,7 +106,7 @@ class RealtimeDiagnosticAuditor:
                 severity=event.severity,
                 quality_impact=quality_impact,
                 remediation_priority=priority,
-                suggested_fix=self._generate_fix_suggestion(event, violation_type)
+                suggested_fix=self._generate_fix_suggestion(event, violation_type),
             )
 
             self.violations.append(violation)
@@ -145,24 +134,15 @@ class RealtimeDiagnosticAuditor:
     def _assess_quality_impact(self, event: DiagnosticEvent, violation_type: str) -> str:
         if violation_type == "nasa_compliance":
             return "critical"
-        elif violation_type == "security":
+        elif violation_type == "security" or event.severity == "error":
             return "high"
-        elif event.severity == "error":
-            return "high"
-        elif violation_type == "test_quality":
-            return "medium"
-        elif event.severity == "warning":
+        elif violation_type == "test_quality" or event.severity == "warning":
             return "medium"
         else:
             return "low"
 
     def _calculate_priority(self, event: DiagnosticEvent, quality_impact: str) -> int:
-        impact_scores = {
-            "critical": 10,
-            "high": 7,
-            "medium": 4,
-            "low": 2
-        }
+        impact_scores = {"critical": 10, "high": 7, "medium": 4, "low": 2}
 
         severity_bonus = self.SEVERITY_WEIGHTS.get(event.severity, 0)
         base_priority = impact_scores.get(quality_impact, 5)
@@ -226,7 +206,9 @@ class RealtimeDiagnosticAuditor:
         recent = list(self.quality_scores)[-10:]
         avg_recent = sum(recent) / len(recent)
 
-        older = list(self.quality_scores)[-20:-10] if len(self.quality_scores) >= 20 else list(self.quality_scores)[:-10]
+        older = (
+            list(self.quality_scores)[-20:-10] if len(self.quality_scores) >= 20 else list(self.quality_scores)[:-10]
+        )
         if not older:
             return "stable"
 
@@ -269,12 +251,12 @@ class RealtimeDiagnosticAuditor:
 
     def generate_audit_report(self, period_minutes: int = 60) -> AuditReport:
         now = datetime.now()
-        period_start = (now.replace(microsecond=0) -
-                       __import__('datetime').timedelta(minutes=period_minutes)).isoformat()
+        period_start = (
+            now.replace(microsecond=0) - __import__("datetime").timedelta(minutes=period_minutes)
+        ).isoformat()
         period_end = now.isoformat()
 
-        recent_events = [e for e in self.event_history
-                        if e.timestamp >= period_start]
+        recent_events = [e for e in self.event_history if e.timestamp >= period_start]
 
         quality_score = self.calculate_realtime_quality_score()
         trend = self.detect_quality_trend()
@@ -288,21 +270,18 @@ class RealtimeDiagnosticAuditor:
             violations=self.violations[-50:],
             quality_score=quality_score,
             trend=trend,
-            recommendations=recommendations
+            recommendations=recommendations,
         )
 
     def export_report(self, report: AuditReport, output_path: str):
         report_data = {
-            "audit_period": {
-                "start": report.period_start,
-                "end": report.period_end
-            },
+            "audit_period": {"start": report.period_start, "end": report.period_end},
             "summary": {
                 "total_events": report.total_events,
                 "violation_count": report.violation_count,
                 "quality_score": report.quality_score,
                 "quality_level": self._get_quality_level(report.quality_score),
-                "trend": report.trend
+                "trend": report.trend,
             },
             "violations": [
                 {
@@ -314,21 +293,20 @@ class RealtimeDiagnosticAuditor:
                     "file": v.diagnostic_event.file_path,
                     "line": v.diagnostic_event.line_number,
                     "message": v.diagnostic_event.message,
-                    "suggested_fix": v.suggested_fix
+                    "suggested_fix": v.suggested_fix,
                 }
                 for v in report.violations
             ],
-            "recommendations": report.recommendations
+            "recommendations": report.recommendations,
         }
 
-        with open(output_path, 'w') as f:
+        with open(output_path, "w") as f:
             json.dump(report_data, f, indent=2)
 
         logger.info(f"Audit report exported to {output_path}")
 
     def _get_quality_level(self, score: float) -> str:
-        for level, threshold in sorted(self.QUALITY_THRESHOLDS.items(),
-                                      key=lambda x: x[1], reverse=True):
+        for level, threshold in sorted(self.QUALITY_THRESHOLDS.items(), key=lambda x: x[1], reverse=True):
             if score >= threshold:
                 return level
         return "critical"
@@ -337,16 +315,16 @@ class RealtimeDiagnosticAuditor:
 def main():
     import argparse
 
-    parser = argparse.ArgumentParser(description='Real-Time Diagnostic Auditor')
-    parser.add_argument('--diagnostics', required=True, help='Path to diagnostics JSON stream')
-    parser.add_argument('--output', default='audit-report.json', help='Output file')
-    parser.add_argument('--period-minutes', type=int, default=60, help='Audit period in minutes')
+    parser = argparse.ArgumentParser(description="Real-Time Diagnostic Auditor")
+    parser.add_argument("--diagnostics", required=True, help="Path to diagnostics JSON stream")
+    parser.add_argument("--output", default="audit-report.json", help="Output file")
+    parser.add_argument("--period-minutes", type=int, default=60, help="Audit period in minutes")
 
     args = parser.parse_args()
 
     auditor = RealtimeDiagnosticAuditor()
 
-    with open(args.diagnostics, 'r') as f:
+    with open(args.diagnostics) as f:
         diagnostics = json.load(f)
 
     if isinstance(diagnostics, list):
@@ -362,7 +340,7 @@ def main():
 
     print(f"\nQuality Score: {report.quality_score:.2%}")
     print(f"Trend: {report.trend}")
-    print(f"\nRecommendations:")
+    print("\nRecommendations:")
     for rec in report.recommendations:
         print(f"  - {rec}")
 
@@ -370,6 +348,6 @@ def main():
     print(f"\nReport saved to: {args.output}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     main()

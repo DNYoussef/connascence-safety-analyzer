@@ -36,9 +36,9 @@ class BranchManager:
         self.project_root = Path.cwd()
 
         # Configuration
-        self.main_branch = self.config.get('main_branch', 'main')
-        self.dogfood_prefix = self.config.get('dogfood_prefix', 'dogfood')
-        self.auto_cleanup = self.config.get('auto_cleanup', True)
+        self.main_branch = self.config.get("main_branch", "main")
+        self.dogfood_prefix = self.config.get("dogfood_prefix", "dogfood")
+        self.auto_cleanup = self.config.get("auto_cleanup", True)
 
     async def create_dogfood_branch(self, improvement_goal: str) -> str:
         """
@@ -57,14 +57,14 @@ class BranchManager:
 
         try:
             # Ensure we're on main and up to date
-            await self._run_git_command(['checkout', self.main_branch])
-            await self._run_git_command(['pull', 'origin', self.main_branch])
+            await self._run_git_command(["checkout", self.main_branch])
+            await self._run_git_command(["pull", "origin", self.main_branch])
 
             # Create new branch
-            await self._run_git_command(['checkout', '-b', branch_name])
+            await self._run_git_command(["checkout", "-b", branch_name])
 
             # Push branch to remote for tracking
-            await self._run_git_command(['push', '-u', 'origin', branch_name])
+            await self._run_git_command(["push", "-u", "origin", branch_name])
 
             self.logger.info(f"✅ Created and pushed dogfood branch: {branch_name}")
             return branch_name
@@ -89,23 +89,21 @@ class BranchManager:
 
         try:
             # Switch to main
-            await self._run_git_command(['checkout', self.main_branch])
+            await self._run_git_command(["checkout", self.main_branch])
 
             # Pull latest changes
-            await self._run_git_command(['pull', 'origin', self.main_branch])
+            await self._run_git_command(["pull", "origin", self.main_branch])
 
             # Create merge commit with descriptive message
             merge_message = self._create_merge_message(branch_name)
 
             # Merge the branch
-            await self._run_git_command([
-                'merge', branch_name,
-                '--no-ff',  # Always create merge commit
-                '-m', merge_message
-            ])
+            await self._run_git_command(
+                ["merge", branch_name, "--no-ff", "-m", merge_message]  # Always create merge commit
+            )
 
             # Push to remote
-            await self._run_git_command(['push', 'origin', self.main_branch])
+            await self._run_git_command(["push", "origin", self.main_branch])
 
             # Clean up the dogfood branch if auto-cleanup enabled
             if self.auto_cleanup:
@@ -118,7 +116,7 @@ class BranchManager:
             self.logger.error(f"❌ Failed to merge branch {branch_name}: {e}")
             # Try to return to a safe state
             with contextlib.suppress(Exception):
-                await self._run_git_command(['checkout', self.main_branch])
+                await self._run_git_command(["checkout", self.main_branch])
 
             return False
 
@@ -136,17 +134,15 @@ class BranchManager:
 
         try:
             # Switch to main branch
-            await self._run_git_command(['checkout', self.main_branch])
+            await self._run_git_command(["checkout", self.main_branch])
 
             # Delete the dogfood branch locally
             with contextlib.suppress(subprocess.CalledProcessError):
-                await self._run_git_command(['branch', '-D', branch_name])
-
+                await self._run_git_command(["branch", "-D", branch_name])
 
             # Delete the branch from remote
             with contextlib.suppress(subprocess.CalledProcessError):
-                await self._run_git_command(['push', 'origin', '--delete', branch_name])
-
+                await self._run_git_command(["push", "origin", "--delete", branch_name])
 
             self.logger.info(f"🧹 Successfully cleaned up failed branch: {branch_name}")
             return True
@@ -166,36 +162,36 @@ class BranchManager:
 
         try:
             # Force checkout to main
-            await self._run_git_command(['checkout', '--force', self.main_branch])
+            await self._run_git_command(["checkout", "--force", self.main_branch])
 
             # Get all local dogfood branches
-            result = await self._run_git_command(['branch', '--list', f'{self.dogfood_prefix}*'])
+            result = await self._run_git_command(["branch", "--list", f"{self.dogfood_prefix}*"])
             dogfood_branches = [
-                line.strip().replace('* ', '')
-                for line in result.stdout.decode().split('\n')
+                line.strip().replace("* ", "")
+                for line in result.stdout.decode().split("\n")
                 if line.strip() and self.dogfood_prefix in line
             ]
 
             # Delete all dogfood branches
             for branch in dogfood_branches:
                 try:
-                    await self._run_git_command(['branch', '-D', branch])
+                    await self._run_git_command(["branch", "-D", branch])
                     self.logger.info(f"🧹 Deleted local branch: {branch}")
                 except:
                     pass
 
             # Get remote dogfood branches and delete them
             try:
-                result = await self._run_git_command(['branch', '-r', '--list', f'origin/{self.dogfood_prefix}*'])
+                result = await self._run_git_command(["branch", "-r", "--list", f"origin/{self.dogfood_prefix}*"])
                 remote_branches = [
-                    line.strip().replace('origin/', '')
-                    for line in result.stdout.decode().split('\n')
+                    line.strip().replace("origin/", "")
+                    for line in result.stdout.decode().split("\n")
                     if line.strip() and self.dogfood_prefix in line
                 ]
 
                 for branch in remote_branches:
                     try:
-                        await self._run_git_command(['push', 'origin', '--delete', branch])
+                        await self._run_git_command(["push", "origin", "--delete", branch])
                         self.logger.info(f"🧹 Deleted remote branch: {branch}")
                     except:
                         pass
@@ -212,7 +208,7 @@ class BranchManager:
     async def get_current_branch(self) -> str:
         """Get the name of the current branch"""
         try:
-            result = await self._run_git_command(['branch', '--show-current'])
+            result = await self._run_git_command(["branch", "--show-current"])
             return result.stdout.decode().strip()
         except subprocess.CalledProcessError:
             return "unknown"
@@ -220,7 +216,7 @@ class BranchManager:
     async def is_clean_working_directory(self) -> bool:
         """Check if working directory is clean (no uncommitted changes)"""
         try:
-            result = await self._run_git_command(['status', '--porcelain'])
+            result = await self._run_git_command(["status", "--porcelain"])
             return len(result.stdout.decode().strip()) == 0
         except subprocess.CalledProcessError:
             return False
@@ -240,9 +236,9 @@ class BranchManager:
             # Add files
             if files:
                 for file in files:
-                    await self._run_git_command(['add', file])
+                    await self._run_git_command(["add", file])
             else:
-                await self._run_git_command(['add', '.'])
+                await self._run_git_command(["add", "."])
 
             # Check if there are changes to commit
             if await self.is_clean_working_directory():
@@ -251,7 +247,7 @@ class BranchManager:
 
             # Commit with message
             full_message = f"{message}\n\n🤖 Generated by Dogfood Self-Improvement System"
-            await self._run_git_command(['commit', '-m', full_message])
+            await self._run_git_command(["commit", "-m", full_message])
 
             return True
 
@@ -261,7 +257,7 @@ class BranchManager:
 
     def _create_merge_message(self, branch_name: str) -> str:
         """Create descriptive merge message for dogfood branch"""
-        parts = branch_name.split('_')
+        parts = branch_name.split("_")
         improvement_goal = parts[1] if len(parts) > 1 else "improvement"
         parts[-1] if len(parts) > 2 else "unknown"
 
@@ -280,10 +276,10 @@ Automated self-improvement cycle completed successfully:
         """Clean up a dogfood branch after successful merge"""
         try:
             # Delete local branch
-            await self._run_git_command(['branch', '-d', branch_name])
+            await self._run_git_command(["branch", "-d", branch_name])
 
             # Delete remote branch
-            await self._run_git_command(['push', 'origin', '--delete', branch_name])
+            await self._run_git_command(["push", "origin", "--delete", branch_name])
 
             self.logger.info(f"🧹 Cleaned up dogfood branch: {branch_name}")
         except subprocess.CalledProcessError as e:
@@ -293,10 +289,10 @@ Automated self-improvement cycle completed successfully:
         """Clean up after failed branch creation"""
         try:
             # Try to switch back to main
-            await self._run_git_command(['checkout', self.main_branch])
+            await self._run_git_command(["checkout", self.main_branch])
 
             # Try to delete the partial branch
-            await self._run_git_command(['branch', '-D', branch_name])
+            await self._run_git_command(["branch", "-D", branch_name])
         except:
             pass  # Best effort cleanup
 
@@ -310,32 +306,19 @@ Automated self-improvement cycle completed successfully:
         Returns:
             CompletedProcess result
         """
-        cmd = ['git', *args]
+        cmd = ["git", *args]
 
         process = await asyncio.create_subprocess_exec(
-            *cmd,
-            cwd=self.project_root,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE
+            *cmd, cwd=self.project_root, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
         )
 
         stdout, stderr = await process.communicate()
 
-        result = subprocess.CompletedProcess(
-            args=cmd,
-            returncode=process.returncode,
-            stdout=stdout,
-            stderr=stderr
-        )
+        result = subprocess.CompletedProcess(args=cmd, returncode=process.returncode, stdout=stdout, stderr=stderr)
 
         if result.returncode != 0:
             self.logger.error(f"Git command failed: {' '.join(cmd)}")
             self.logger.error(f"Error output: {stderr.decode()}")
-            raise subprocess.CalledProcessError(
-                result.returncode,
-                cmd,
-                stdout,
-                stderr
-            )
+            raise subprocess.CalledProcessError(result.returncode, cmd, stdout, stderr)
 
         return result

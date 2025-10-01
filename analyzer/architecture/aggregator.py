@@ -10,10 +10,10 @@ NASA Rule 4 Compliant: Functions under 60 lines.
 Handles violation formatting, standardization, and metrics coordination.
 """
 
-import logging
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+import logging
 from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -48,68 +48,74 @@ class ViolationAggregator:
 
         # Process and standardize violations
         standardized_violations = self._standardize_violations(violations)
-        
+
         # Enhance recommendations with metadata
         enhanced_recommendations = self._enhance_recommendations(violations, recommendations)
-        
+
         # Build result object
         result = self._create_result_structure(
-            standardized_violations, metrics, enhanced_recommendations,
-            project_path, policy_preset, analysis_time, errors, warnings
+            standardized_violations,
+            metrics,
+            enhanced_recommendations,
+            project_path,
+            policy_preset,
+            analysis_time,
+            errors,
+            warnings,
         )
-        
+
         # Add enhanced metadata
         self._add_metadata_to_result(result, violations, enhanced_recommendations)
-        
+
         return result
 
     def _standardize_violations(self, violations: Dict[str, Any]) -> Dict[str, Any]:
         """Standardize violations format. NASA Rule 4 compliant."""
         # NASA Rule 5: Input validation
         assert violations is not None, "violations cannot be None"
-        
+
         standardized = {
             "connascence": self._standardize_connascence_violations(violations.get("connascence", [])),
             "duplication": self._standardize_duplication_violations(violations.get("duplication", [])),
             "nasa": self._standardize_nasa_violations(violations.get("nasa", [])),
         }
-        
+
         # Preserve metadata if present
         if "_metadata" in violations:
             standardized["_metadata"] = violations["_metadata"]
-        
+
         return standardized
 
     def _standardize_connascence_violations(self, violations: List[Dict]) -> List[Dict]:
         """Standardize connascence violation format. NASA Rule 4 compliant."""
         standardized_violations = []
-        
+
         for violation in violations:
             standardized = self._create_standard_violation_format(violation, "connascence")
             standardized_violations.append(standardized)
-        
+
         return standardized_violations
 
     def _standardize_duplication_violations(self, violations: List[Dict]) -> List[Dict]:
         """Standardize duplication violation format. NASA Rule 4 compliant."""
         standardized_violations = []
-        
+
         for violation in violations:
             standardized = self._create_standard_violation_format(violation, "duplication")
             standardized_violations.append(standardized)
-        
+
         return standardized_violations
 
     def _standardize_nasa_violations(self, violations: List[Dict]) -> List[Dict]:
         """Standardize NASA violation format. NASA Rule 4 compliant."""
         standardized_violations = []
-        
+
         for violation in violations:
             standardized = self._create_standard_violation_format(violation, "nasa_compliance")
             # Add NASA-specific context
             standardized = self._add_nasa_context(standardized, violation)
             standardized_violations.append(standardized)
-        
+
         return standardized_violations
 
     def _create_standard_violation_format(self, violation: Dict, category: str) -> Dict[str, Any]:
@@ -117,7 +123,7 @@ class ViolationAggregator:
         # NASA Rule 5: Input validation
         assert violation is not None, "violation cannot be None"
         assert category is not None, "category cannot be None"
-        
+
         return {
             "id": violation.get("id", self._generate_violation_id(violation)),
             "rule_id": violation.get("rule_id", f"{category.upper()}_UNKNOWN"),
@@ -141,7 +147,7 @@ class ViolationAggregator:
             "recommendation": original.get("context", {}).get("recommendation", ""),
             "compliance_impact": self._calculate_compliance_impact(original),
         }
-        
+
         standardized["context"].update(nasa_context)
         return standardized
 
@@ -150,28 +156,28 @@ class ViolationAggregator:
         # NASA Rule 5: Input validation
         assert violations is not None, "violations cannot be None"
         assert recommendations is not None, "recommendations cannot be None"
-        
+
         enhanced = recommendations.copy()
         phase_metadata = violations.get("_metadata", {})
-        
+
         # Add smart integration results
         if phase_metadata.get("smart_results"):
             enhanced = self._integrate_smart_recommendations(enhanced, phase_metadata["smart_results"])
-        
+
         # Add correlation-based recommendations
         if phase_metadata.get("correlations"):
             enhanced = self._add_correlation_recommendations(enhanced, phase_metadata["correlations"])
-        
+
         return enhanced
 
     def _integrate_smart_recommendations(self, enhanced: Dict, smart_results: Dict) -> Dict:
         """Integrate smart analysis recommendations. NASA Rule 4 compliant."""
         if smart_results.get("enhanced_recommendations"):
             enhanced["smart_recommendations"] = smart_results["enhanced_recommendations"]
-        
+
         if smart_results.get("correlations"):
             enhanced["correlations"] = smart_results["correlations"]
-        
+
         enhanced["smart_integration_enabled"] = True
         return enhanced
 
@@ -183,7 +189,7 @@ class ViolationAggregator:
                 for correlation in correlations[:3]  # Top 3 correlations
             ]
             enhanced["correlation_actions"] = correlation_actions
-        
+
         return enhanced
 
     def _create_result_structure(
@@ -227,15 +233,15 @@ class ViolationAggregator:
         # NASA Rule 5: Input validation
         assert result is not None, "result cannot be None"
         assert violations is not None, "violations cannot be None"
-        
+
         phase_metadata = violations.get("_metadata", {})
-        
+
         # Add audit trail and correlation data
         result["audit_trail"] = phase_metadata.get("audit_trail", [])
         result["correlations"] = phase_metadata.get("correlations", [])
         result["smart_recommendations"] = recommendations.get("smart_recommendations", [])
         result["cross_phase_analysis"] = phase_metadata.get("smart_results", {}).get("cross_phase_analysis", False)
-        
+
         # Add aggregation metadata
         result["aggregation_metadata"] = {
             "standardized_at": self._get_iso_timestamp(),
@@ -252,7 +258,7 @@ class ViolationAggregator:
         """Normalize severity levels. NASA Rule 4 compliant."""
         severity_mapping = {
             "critical": "critical",
-            "high": "high", 
+            "high": "high",
             "medium": "medium",
             "low": "low",
             "error": "high",
@@ -266,7 +272,7 @@ class ViolationAggregator:
         severity = violation.get("severity", "medium")
         weight_map = {"critical": 10.0, "high": 5.0, "medium": 2.0, "low": 1.0}
         base_weight = weight_map.get(severity, 2.0)
-        
+
         # Add context-based weight adjustments
         context_weight = violation.get("context", {}).get("weight_modifier", 1.0)
         return base_weight * context_weight
@@ -275,7 +281,7 @@ class ViolationAggregator:
         """Calculate NASA compliance impact. NASA Rule 4 compliant."""
         severity = violation.get("severity", "medium")
         nasa_rule = violation.get("context", {}).get("nasa_rule", "unknown")
-        
+
         if severity == "critical":
             return "high_impact"
         elif nasa_rule in ["Rule1", "Rule2", "Rule3"]:  # Critical NASA rules
@@ -286,20 +292,20 @@ class ViolationAggregator:
     def _count_analyzed_files(self, violations: Dict) -> int:
         """Count number of analyzed files. NASA Rule 4 compliant."""
         file_paths = set()
-        
+
         for category in ["connascence", "duplication", "nasa"]:
             for violation in violations.get(category, []):
                 if violation.get("file_path"):
                     file_paths.add(violation["file_path"])
-        
+
         return len(file_paths)
 
     def _count_total_violations(self, violations: Dict) -> int:
         """Count total violations across categories. NASA Rule 4 compliant."""
         return (
-            len(violations.get("connascence", [])) +
-            len(violations.get("duplication", [])) +
-            len(violations.get("nasa", []))
+            len(violations.get("connascence", []))
+            + len(violations.get("duplication", []))
+            + len(violations.get("nasa", []))
         )
 
     def _get_iso_timestamp(self) -> str:

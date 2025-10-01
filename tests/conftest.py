@@ -28,7 +28,7 @@ from unittest.mock import Mock
 
 import pytest
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 # Import from our mock implementations instead of removed analyzer module
 from utils.types import ConnascenceViolation
@@ -54,7 +54,7 @@ def sample_violations():
             description="Magic literal '100' should be extracted to constant",
             file_path="/test/sample.py",
             line_number=10,
-            weight=2.5
+            weight=2.5,
         ),
         ConnascenceViolation(
             id="test_params_1",
@@ -64,7 +64,7 @@ def sample_violations():
             description="Function has 6 positional parameters (max: 3)",
             file_path="/test/sample.py",
             line_number=15,
-            weight=4.0
+            weight=4.0,
         ),
         ConnascenceViolation(
             id="test_types_1",
@@ -74,7 +74,7 @@ def sample_violations():
             description="Function lacks type hints",
             file_path="/test/sample.py",
             line_number=20,
-            weight=2.0
+            weight=2.0,
         ),
         ConnascenceViolation(
             id="test_complexity_1",
@@ -84,8 +84,8 @@ def sample_violations():
             description="Class has 30 methods (max: 20)",
             file_path="/test/large_class.py",
             line_number=5,
-            weight=5.0
-        )
+            weight=5.0,
+        ),
     ]
 
 
@@ -226,28 +226,34 @@ def temp_project_dir():
     (project_path / "docs").mkdir()
 
     # Create Python files with various issues
-    (project_path / "src" / "main.py").write_text("""
+    (project_path / "src" / "main.py").write_text(
+        """
 def main(arg1, arg2, arg3, arg4, arg5):  # Too many params
     threshold = 100  # Magic literal
     if arg1 > threshold:
         return True
     return False
-""")
+"""
+    )
 
-    (project_path / "src" / "utils.py").write_text("""
+    (project_path / "src" / "utils.py").write_text(
+        """
 def clean_function(x: int) -> int:
     return x * 2
 
 def problematic_function(a, b, c):  # Missing types
     return a + b + 999  # Magic literal
-""")
+"""
+    )
 
-    (project_path / "tests" / "test_main.py").write_text("""
+    (project_path / "tests" / "test_main.py").write_text(
+        """
 import pytest
 
 def test_main():
     assert True
-""")
+"""
+    )
 
     yield project_path
 
@@ -269,21 +275,9 @@ def mock_analyzer():
 def threshold_configs():
     """Create various threshold configurations for testing."""
     return {
-        'strict': ThresholdConfig(
-            max_positional_params=2,
-            god_class_methods=15,
-            max_cyclomatic_complexity=8
-        ),
-        'balanced': ThresholdConfig(
-            max_positional_params=3,
-            god_class_methods=20,
-            max_cyclomatic_complexity=10
-        ),
-        'lenient': ThresholdConfig(
-            max_positional_params=5,
-            god_class_methods=30,
-            max_cyclomatic_complexity=15
-        )
+        "strict": ThresholdConfig(max_positional_params=2, god_class_methods=15, max_cyclomatic_complexity=8),
+        "balanced": ThresholdConfig(max_positional_params=3, god_class_methods=20, max_cyclomatic_complexity=10),
+        "lenient": ThresholdConfig(max_positional_params=5, god_class_methods=30, max_cyclomatic_complexity=15),
     }
 
 
@@ -291,14 +285,14 @@ def threshold_configs():
 def budget_limits():
     """Create sample budget limits for testing."""
     return {
-        'CoM': 5,      # Magic literals
-        'CoP': 3,      # Parameter bombs
-        'CoT': 8,      # Type issues
-        'CoA': 2,      # Algorithm/complexity issues
-        'total_violations': 20,
-        'critical': 0,  # No critical violations allowed
-        'high': 5,     # Max 5 high severity
-        'medium': 15   # Max 15 medium severity
+        "CoM": 5,  # Magic literals
+        "CoP": 3,  # Parameter bombs
+        "CoT": 8,  # Type issues
+        "CoA": 2,  # Algorithm/complexity issues
+        "total_violations": 20,
+        "critical": 0,  # No critical violations allowed
+        "high": 5,  # Max 5 high severity
+        "medium": 15,  # Max 15 medium severity
     }
 
 
@@ -306,33 +300,18 @@ def budget_limits():
 def sample_policy_config():
     """Create sample policy configuration."""
     return {
-        'name': 'test-policy',
-        'description': 'Test policy for unit tests',
-        'thresholds': {
-            'max_positional_params': 4,
-            'god_class_methods': 25,
-            'max_cyclomatic_complexity': 12,
-            'max_method_lines': 50,
-            'max_class_lines': 300
+        "name": "test-policy",
+        "description": "Test policy for unit tests",
+        "thresholds": {
+            "max_positional_params": 4,
+            "god_class_methods": 25,
+            "max_cyclomatic_complexity": 12,
+            "max_method_lines": 50,
+            "max_class_lines": 300,
         },
-        'budget_limits': {
-            'CoM': 10,
-            'CoP': 5,
-            'CoT': 15,
-            'CoA': 3,
-            'total_violations': 50,
-            'critical': 1,
-            'high': 8
-        },
-        'exclusions': [
-            'tests/*',
-            'deprecated/*',
-            '*.test.py'
-        ],
-        'frameworks': [
-            'pytest',
-            'django'
-        ]
+        "budget_limits": {"CoM": 10, "CoP": 5, "CoT": 15, "CoA": 3, "total_violations": 50, "critical": 1, "high": 8},
+        "exclusions": ["tests/*", "deprecated/*", "*.test.py"],
+        "frameworks": ["pytest", "django"],
     }
 
 
@@ -370,7 +349,7 @@ def sample_autofix_patches():
             file_path="/test/sample.py",
             line_range=(10, 10),
             safety_level="safe",
-            rollback_info={}
+            rollback_info={},
         ),
         PatchSuggestion(
             violation_id="param_bomb_1",
@@ -381,7 +360,7 @@ def sample_autofix_patches():
             file_path="/test/sample.py",
             line_range=(15, 15),
             safety_level="moderate",
-            rollback_info={}
+            rollback_info={},
         ),
         PatchSuggestion(
             violation_id="type_hints_1",
@@ -392,8 +371,8 @@ def sample_autofix_patches():
             file_path="/test/sample.py",
             line_range=(20, 20),
             safety_level="safe",
-            rollback_info={}
-        )
+            rollback_info={},
+        ),
     ]
 
 
@@ -406,21 +385,11 @@ def test_data_dir():
 # Pytest configuration
 def pytest_configure(config):
     """Configure pytest with custom markers."""
-    config.addinivalue_line(
-        "markers", "slow: marks tests as slow (deselect with '-m \"not slow\"')"
-    )
-    config.addinivalue_line(
-        "markers", "integration: marks tests as integration tests"
-    )
-    config.addinivalue_line(
-        "markers", "unit: marks tests as unit tests"
-    )
-    config.addinivalue_line(
-        "markers", "autofix: marks tests related to autofix functionality"
-    )
-    config.addinivalue_line(
-        "markers", "mcp: marks tests related to MCP server functionality"
-    )
+    config.addinivalue_line("markers", "slow: marks tests as slow (deselect with '-m \"not slow\"')")
+    config.addinivalue_line("markers", "integration: marks tests as integration tests")
+    config.addinivalue_line("markers", "unit: marks tests as unit tests")
+    config.addinivalue_line("markers", "autofix: marks tests related to autofix functionality")
+    config.addinivalue_line("markers", "mcp: marks tests related to MCP server functionality")
 
 
 def pytest_collection_modifyitems(config, items):
@@ -446,21 +415,20 @@ def pytest_collection_modifyitems(config, items):
 # Helper functions for tests
 def create_temp_file(content: str, suffix: str = ".py") -> Path:
     """Create temporary file with given content."""
-    temp_file = tempfile.NamedTemporaryFile(mode='w', suffix=suffix, delete=False)
+    temp_file = tempfile.NamedTemporaryFile(mode="w", suffix=suffix, delete=False)
     temp_file.write(content)
     temp_file.close()
     return Path(temp_file.name)
 
 
-def assert_violation_present(violations: List[ConnascenceViolation],
-                           connascence_type: str,
-                           severity: str = None,
-                           description_contains: str = None) -> bool:
+def assert_violation_present(
+    violations: List[ConnascenceViolation],
+    connascence_type: str,
+    severity: str = None,
+    description_contains: str = None,
+) -> bool:
     """Assert that a specific type of violation is present in the list."""
-    matching_violations = [
-        v for v in violations
-        if v.connascence_type == connascence_type
-    ]
+    matching_violations = [v for v in violations if v.connascence_type == connascence_type]
 
     assert len(matching_violations) > 0, f"No {connascence_type} violations found"
 
@@ -469,10 +437,7 @@ def assert_violation_present(violations: List[ConnascenceViolation],
         assert len(severity_matches) > 0, f"No {connascence_type} violations with severity {severity}"
 
     if description_contains:
-        description_matches = [
-            v for v in matching_violations
-            if description_contains.lower() in v.description.lower()
-        ]
+        description_matches = [v for v in matching_violations if description_contains.lower() in v.description.lower()]
         assert len(description_matches) > 0, f"No {connascence_type} violations containing '{description_contains}'"
 
     return True

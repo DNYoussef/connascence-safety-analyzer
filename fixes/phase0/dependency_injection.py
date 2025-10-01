@@ -3,10 +3,11 @@ Dependency Injection Configuration
 Breaks circular dependencies by using interfaces and dependency injection.
 """
 
-from fixes.phase0.production_safe_assertions import ProductionAssert
-import sys
 from pathlib import Path
+import sys
 from typing import Any, Dict, Optional
+
+from fixes.phase0.production_safe_assertions import ProductionAssert
 
 # Add project root to path
 project_root = Path(__file__).parent.parent.parent
@@ -15,11 +16,11 @@ sys.path.insert(0, str(project_root))
 from fixes.phase0.interfaces import (
     AdapterFactory,
     AnalyzerAdapter,
-    PolicyAdapter,
     IAnalyzer,
-    IPolicy,
+    IIntegration,
     IMCPTool,
-    IIntegration
+    IPolicy,
+    PolicyAdapter,
 )
 
 
@@ -67,8 +68,8 @@ class DependencyInjector:
             nasa = AnalyzerAdapter(PythonNASAAnalyzer())
 
             # Register with factory
-            AdapterFactory.register_analyzer('comprehensive', comprehensive)
-            AdapterFactory.register_analyzer('nasa', nasa)
+            AdapterFactory.register_analyzer("comprehensive", comprehensive)
+            AdapterFactory.register_analyzer("nasa", nasa)
 
             print("  -> Registered 2 analyzers")
         except ImportError as e:
@@ -78,21 +79,21 @@ class DependencyInjector:
         """Register all policy implementations."""
         try:
             # Import policies locally
-            from policy.policy_checker import PolicyChecker
             from policy.nasa_compliance import NASACompliancePolicy
+            from policy.policy_checker import PolicyChecker
 
             # Create mock policies if imports fail
             class MockPolicy:
                 def check_compliance(self, violations):
-                    ProductionAssert.not_none(violations, 'violations')
+                    ProductionAssert.not_none(violations, "violations")
 
-                    ProductionAssert.not_none(violations, 'violations')
+                    ProductionAssert.not_none(violations, "violations")
 
                     return len(violations) < 10
 
                 @property
                 def thresholds(self):
-                    return {'max_violations': 10}
+                    return {"max_violations": 10}
 
             # Try to use real policies, fall back to mocks
             try:
@@ -106,8 +107,8 @@ class DependencyInjector:
                 nasa_policy = MockPolicy()
 
             # Wrap in adapters
-            AdapterFactory.register_policy('default', PolicyAdapter(policy_checker))
-            AdapterFactory.register_policy('nasa', PolicyAdapter(nasa_policy))
+            AdapterFactory.register_policy("default", PolicyAdapter(policy_checker))
+            AdapterFactory.register_policy("nasa", PolicyAdapter(nasa_policy))
 
             print("  -> Registered 2 policies")
         except Exception as e:
@@ -128,8 +129,8 @@ class DependencyInjector:
                     return True
 
             # Register mock tools
-            AdapterFactory.register_mcp_tool('analyzer', MockMCPTool())
-            AdapterFactory.register_mcp_tool('memory', MockMCPTool())
+            AdapterFactory.register_mcp_tool("analyzer", MockMCPTool())
+            AdapterFactory.register_mcp_tool("memory", MockMCPTool())
 
             print("  -> Registered 2 MCP tools")
         except Exception as e:
@@ -159,19 +160,19 @@ class DependencyInjector:
                     return "diff content"
 
             # Register integrations
-            AdapterFactory.register_integration('github', MockGitHubIntegration())
+            AdapterFactory.register_integration("github", MockGitHubIntegration())
 
             print("  -> Registered 1 integration")
         except Exception as e:
             print(f"  -> Warning: Could not register integrations: {e}")
 
-    def get_analyzer(self, name: str = 'comprehensive') -> Optional[IAnalyzer]:
+    def get_analyzer(self, name: str = "comprehensive") -> Optional[IAnalyzer]:
         """Get an analyzer instance without direct import."""
         if not self.initialized:
             self.initialize()
         return AdapterFactory.get_analyzer(name)
 
-    def get_policy(self, name: str = 'default') -> Optional[IPolicy]:
+    def get_policy(self, name: str = "default") -> Optional[IPolicy]:
         """Get a policy instance without direct import."""
         if not self.initialized:
             self.initialize()
@@ -197,6 +198,7 @@ injector = DependencyInjector()
 # ============================================================================
 # Migration Helpers
 # ============================================================================
+
 
 def migrate_analyzer_imports():
     """
@@ -259,6 +261,7 @@ def migrate_mcp_imports():
 # Testing and Validation
 # ============================================================================
 
+
 def test_dependency_injection():
     """Test that dependency injection works without circular imports."""
     print("\nTesting Dependency Injection System")
@@ -268,7 +271,7 @@ def test_dependency_injection():
     injector.initialize()
 
     # Test getting analyzer
-    analyzer = injector.get_analyzer('comprehensive')
+    analyzer = injector.get_analyzer("comprehensive")
     if analyzer:
         print("[OK] Analyzer retrieved successfully")
         caps = analyzer.get_capabilities()
@@ -277,7 +280,7 @@ def test_dependency_injection():
         print("[FAIL] Failed to get analyzer")
 
     # Test getting policy
-    policy = injector.get_policy('default')
+    policy = injector.get_policy("default")
     if policy:
         print("[OK] Policy retrieved successfully")
         thresholds = policy.get_thresholds()
@@ -286,7 +289,7 @@ def test_dependency_injection():
         print("[FAIL] Failed to get policy")
 
     # Test getting MCP tool
-    tool = injector.get_mcp_tool('analyzer')
+    tool = injector.get_mcp_tool("analyzer")
     if tool:
         print("[OK] MCP tool retrieved successfully")
         schema = tool.get_schema()
@@ -295,7 +298,7 @@ def test_dependency_injection():
         print("[FAIL] Failed to get MCP tool")
 
     # Test getting integration
-    integration = injector.get_integration('github')
+    integration = injector.get_integration("github")
     if integration:
         print("[OK] Integration retrieved successfully")
         connected = integration.is_connected()

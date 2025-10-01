@@ -19,7 +19,6 @@ Provides common configuration loading and mock classes used across components.
 
 from typing import Any, Dict, Optional
 
-
 # ConnascenceViolation now available from utils.types
 # This class has been removed to eliminate duplication
 
@@ -44,6 +43,7 @@ class RateLimiter:
     def is_allowed(self) -> bool:
         """Check if a request is allowed."""
         import time
+
         now = time.time()
 
         # Remove old requests outside the window
@@ -55,7 +55,7 @@ class RateLimiter:
             return True
         return False
 
-    def check_rate_limit(self, client_id: str = 'default') -> bool:
+    def check_rate_limit(self, client_id: str = "default") -> bool:
         """Check rate limit for a client (alias for is_allowed)."""
         return self.is_allowed()
 
@@ -65,34 +65,34 @@ def load_config_defaults(component_name: str) -> Dict[str, Any]:
 
     # Common configuration defaults across components
     base_defaults = {
-        'rate_limit_requests': 100,
-        'rate_limit_window_seconds': 60,
-        'audit_enabled': True,
-        'max_positional_params': 4,
-        'god_class_methods': 25,
-        'max_cyclomatic_complexity': 12
+        "rate_limit_requests": 100,
+        "rate_limit_window_seconds": 60,
+        "audit_enabled": True,
+        "max_positional_params": 4,
+        "god_class_methods": 25,
+        "max_cyclomatic_complexity": 12,
     }
 
     # Component-specific defaults
     component_defaults = {
-        'mcp_server': {
-            'rate_limit_requests': 100,
-            'rate_limit_window_seconds': 60,
-            'audit_enabled': True,
+        "mcp_server": {
+            "rate_limit_requests": 100,
+            "rate_limit_window_seconds": 60,
+            "audit_enabled": True,
         },
-        'policy_manager': {
-            'max_positional_params': 2,
-            'god_class_methods': 15,
-            'max_cyclomatic_complexity': 8,
-            'com_limit': 3,
-            'cop_limit': 2,
-            'total_violations_limit': 10,
+        "policy_manager": {
+            "max_positional_params": 2,
+            "god_class_methods": 15,
+            "max_cyclomatic_complexity": 8,
+            "com_limit": 3,
+            "cop_limit": 2,
+            "total_violations_limit": 10,
         },
-        'policy_budgets': {
-            'max_positional_params': 4,
-            'god_class_methods': 25,
-            'max_cyclomatic_complexity': 12,
-        }
+        "policy_budgets": {
+            "max_positional_params": 4,
+            "god_class_methods": 25,
+            "max_cyclomatic_complexity": 12,
+        },
     }
 
     config = base_defaults.copy()
@@ -107,7 +107,7 @@ def create_rate_limiter(config: Optional[Dict[str, Any]] = None) -> RateLimiter:
     if config is None:
         config = {}
 
-    max_requests = config.get('rate_limit_requests', 100)
-    window_seconds = config.get('rate_limit_window_seconds', 60)
+    max_requests = config.get("rate_limit_requests", 100)
+    window_seconds = config.get("rate_limit_window_seconds", 60)
 
     return RateLimiter(max_requests, window_seconds)

@@ -83,27 +83,23 @@ BaseIntegration = UnifiedBaseIntegration  # Legacy alias
 
 __all__ = [
     # New consolidated architecture
-    'UnifiedBaseIntegration',
-    'IntegrationResult',
-    'IntegrationType',
-    'INTEGRATION_REGISTRY',
-
+    "UnifiedBaseIntegration",
+    "IntegrationResult",
+    "IntegrationType",
+    "INTEGRATION_REGISTRY",
     # Specific integrations
-    'BlackIntegration',
-    'MyPyIntegration',
-    'RuffIntegration',
-    'RadonIntegration',
-    'BanditIntegration',
-
+    "BlackIntegration",
+    "MyPyIntegration",
+    "RuffIntegration",
+    "RadonIntegration",
+    "BanditIntegration",
     # Coordination
-    'ToolCoordinator',
-
+    "ToolCoordinator",
     # Factory functions
-    'create_all_integrations',
-    'get_available_integrations',
-
+    "create_all_integrations",
+    "get_available_integrations",
     # Legacy compatibility
-    'BaseIntegration'
+    "BaseIntegration",
 ]
 
 # Log the architecture improvement

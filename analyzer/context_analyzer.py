@@ -199,7 +199,7 @@ class ContextAnalyzer:
     ) -> ClassContext:
         """Classify the context/domain of a class using multiple indicators."""
 
-        scores = {context: 0 for context in ClassContext}
+        scores = dict.fromkeys(ClassContext, 0)
 
         # File path indicators
         path_lower = file_path.lower()
@@ -345,11 +345,11 @@ class ContextAnalyzer:
         complexity = 1  # Base complexity
 
         for node in ast.walk(method_node):
-            if isinstance(node, (ast.If, ast.While, ast.For, ast.AsyncFor)):
-                complexity += 1
-            elif isinstance(node, ast.ExceptHandler):
-                complexity += 1
-            elif isinstance(node, (ast.BoolOp, ast.Compare)):
+            if (
+                isinstance(node, (ast.If, ast.While, ast.For, ast.AsyncFor))
+                or isinstance(node, ast.ExceptHandler)
+                or isinstance(node, (ast.BoolOp, ast.Compare))
+            ):
                 complexity += 1
 
         return float(complexity)

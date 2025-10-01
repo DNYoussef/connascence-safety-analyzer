@@ -12,7 +12,6 @@ Handles action prioritization, NASA/connascence/duplication-specific recommendat
 
 import logging
 from typing import Any, Dict, List, Optional
-from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -45,24 +44,16 @@ class RecommendationEngine:
             "priority_fixes": [],
             "improvement_actions": [],
             "strategic_suggestions": [],
-            "technical_debt_actions": []
+            "technical_debt_actions": [],
         }
 
         # Generate priority fixes for critical violations
-        recommendations["priority_fixes"] = self._generate_priority_fixes(
-            connascence_violations, nasa_violations
-        )
+        recommendations["priority_fixes"] = self._generate_priority_fixes(connascence_violations, nasa_violations)
 
         # Generate improvement actions by category
-        recommendations["improvement_actions"].extend(
-            self._generate_nasa_actions(nasa_violations, nasa_integration)
-        )
-        recommendations["improvement_actions"].extend(
-            self._generate_duplication_actions(duplication_clusters)
-        )
-        recommendations["improvement_actions"].extend(
-            self._generate_connascence_actions(connascence_violations)
-        )
+        recommendations["improvement_actions"].extend(self._generate_nasa_actions(nasa_violations, nasa_integration))
+        recommendations["improvement_actions"].extend(self._generate_duplication_actions(duplication_clusters))
+        recommendations["improvement_actions"].extend(self._generate_connascence_actions(connascence_violations))
 
         # Generate strategic suggestions
         recommendations["strategic_suggestions"] = self._generate_strategic_suggestions(
@@ -82,12 +73,10 @@ class RecommendationEngine:
                 "long_function": 8,
                 "complex_condition": 6,
                 "duplication": 7,
-            }
+            },
         }
 
-    def _generate_priority_fixes(
-        self, connascence_violations: List[Dict], nasa_violations: List[Dict]
-    ) -> List[str]:
+    def _generate_priority_fixes(self, connascence_violations: List[Dict], nasa_violations: List[Dict]) -> List[str]:
         """Generate priority fixes for critical violations. NASA Rule 4 compliant."""
         priority_fixes = []
 
@@ -143,9 +132,7 @@ class RecommendationEngine:
         template = connascence_fix_templates.get(connascence_type, f"Fix {connascence_type} violation")
         return f"HIGH: {template} in {file_path}:{line_number}"
 
-    def _generate_nasa_actions(
-        self, nasa_violations: List[Dict], nasa_integration=None
-    ) -> List[str]:
+    def _generate_nasa_actions(self, nasa_violations: List[Dict], nasa_integration=None) -> List[str]:
         """Generate NASA compliance improvement actions. NASA Rule 4 compliant."""
         if not nasa_violations:
             return []
@@ -191,10 +178,7 @@ class RecommendationEngine:
         actions = []
 
         # Analyze duplication patterns
-        high_similarity_clusters = [
-            c for c in duplication_clusters 
-            if c.get("similarity_score", 0) > 0.8
-        ]
+        high_similarity_clusters = [c for c in duplication_clusters if c.get("similarity_score", 0) > 0.8]
 
         if high_similarity_clusters:
             actions.append(
@@ -203,9 +187,7 @@ class RecommendationEngine:
 
         # Overall duplication strategy
         if len(duplication_clusters) > 5:
-            actions.append(
-                f"Implement systematic deduplication strategy for {len(duplication_clusters)} clusters"
-            )
+            actions.append(f"Implement systematic deduplication strategy for {len(duplication_clusters)} clusters")
 
         return actions
 
@@ -274,7 +256,7 @@ class RecommendationEngine:
         descriptions = {
             "CoN": "use consistent naming patterns",
             "CoT": "reduce shared mutable state",
-            "CoL": "minimize literal value dependencies", 
+            "CoL": "minimize literal value dependencies",
             "CoM": "replace magic numbers with constants",
             "CoA": "standardize algorithms across modules",
             "CoE": "remove execution order dependencies",
@@ -285,18 +267,16 @@ class RecommendationEngine:
         }
         return descriptions.get(connascence_type, "reduce coupling")
 
-    def _count_critical_violations(
-        self, connascence_violations: List[Dict], nasa_violations: List[Dict]
-    ) -> int:
+    def _count_critical_violations(self, connascence_violations: List[Dict], nasa_violations: List[Dict]) -> int:
         """Count critical violations. NASA Rule 4 compliant."""
         critical_count = 0
-        
+
         # Count critical connascence violations
         critical_count += len([v for v in connascence_violations if v.get("severity") == "critical"])
-        
+
         # Count critical NASA violations
         critical_count += len([v for v in nasa_violations if v.get("severity") == "critical"])
-        
+
         return critical_count
 
     def generate_file_specific_recommendations(self, file_path: str, violations: List[Dict]) -> List[str]:
@@ -304,14 +284,14 @@ class RecommendationEngine:
         # NASA Rule 5: Input validation
         assert file_path is not None, "file_path cannot be None"
         assert violations is not None, "violations cannot be None"
-        
+
         recommendations = []
-        
+
         # Check cache first
         cache_key = f"{file_path}_{len(violations)}"
         if cache_key in self.recommendation_cache:
             return self.recommendation_cache[cache_key]
-        
+
         # Group violations by type for file-specific advice
         type_groups = {}
         for violation in violations:
@@ -319,13 +299,13 @@ class RecommendationEngine:
             if v_type not in type_groups:
                 type_groups[v_type] = []
             type_groups[v_type].append(violation)
-        
+
         # Generate file-specific recommendations
         for v_type, group_violations in type_groups.items():
             if len(group_violations) > 3:  # Multiple instances of same type
                 rec = f"File has {len(group_violations)} {v_type} violations - consider refactoring patterns"
                 recommendations.append(rec)
-        
+
         # Cache and return
         self.recommendation_cache[cache_key] = recommendations
         return recommendations

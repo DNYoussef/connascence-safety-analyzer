@@ -20,18 +20,18 @@ Models:
 @requires scikit-learn>=1.0.0
 """
 
-import json
-from typing import Dict, List, Optional, Tuple
 from dataclasses import dataclass
 from datetime import datetime, timedelta
+import json
 import logging
+from typing import List, Tuple
 
 logger = logging.getLogger(__name__)
 
 try:
+    import numpy as np
     from sklearn.linear_model import LinearRegression, Ridge
     from sklearn.preprocessing import StandardScaler
-    import numpy as np
 
     SKLEARN_AVAILABLE = True
 except ImportError:
@@ -62,7 +62,6 @@ class QualityPrediction:
 
 
 class QualityPredictor:
-
     def __init__(self):
         self.history: List[QualitySnapshot] = []
         self.model_nasa = None
@@ -148,10 +147,7 @@ class QualityPredictor:
         recommendations = self._generate_recommendations(pred_nasa, pred_sigma, pred_violations, trend)
 
         std_nasa = np.std([s.nasa_compliance for s in self.history[-5:]])
-        confidence_interval = (
-            max(0.0, pred_nasa - 1.96 * std_nasa),
-            min(1.0, pred_nasa + 1.96 * std_nasa)
-        )
+        confidence_interval = (max(0.0, pred_nasa - 1.96 * std_nasa), min(1.0, pred_nasa + 1.96 * std_nasa))
 
         return QualityPrediction(
             predicted_nasa_compliance=pred_nasa,
@@ -160,7 +156,7 @@ class QualityPredictor:
             confidence_interval=confidence_interval,
             trend=trend,
             risk_level=risk_level,
-            recommendations=recommendations
+            recommendations=recommendations,
         )
 
     def _simple_trend_predict(self, days_ahead: int) -> QualityPrediction:
@@ -210,7 +206,7 @@ class QualityPredictor:
             confidence_interval=(max(0.0, pred_nasa - 0.1), min(1.0, pred_nasa + 0.1)),
             trend=trend,
             risk_level=risk_level,
-            recommendations=recommendations
+            recommendations=recommendations,
         )
 
     def _default_prediction(self) -> QualityPrediction:
@@ -221,11 +217,12 @@ class QualityPredictor:
             confidence_interval=(0.75, 0.95),
             trend="unknown",
             risk_level="medium",
-            recommendations=["Establish quality baseline with more snapshots"]
+            recommendations=["Establish quality baseline with more snapshots"],
         )
 
-    def _generate_recommendations(self, pred_nasa: float, pred_sigma: float,
-                                  pred_violations: int, trend: str) -> List[str]:
+    def _generate_recommendations(
+        self, pred_nasa: float, pred_sigma: float, pred_violations: int, trend: str
+    ) -> List[str]:
         recommendations = []
 
         if pred_nasa < 0.8:
@@ -248,7 +245,7 @@ class QualityPredictor:
 
     def _parse_timestamp(self, timestamp: str) -> datetime:
         try:
-            return datetime.fromisoformat(timestamp.replace('Z', '+00:00'))
+            return datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
         except Exception:
             return datetime.now()
 
@@ -256,14 +253,14 @@ class QualityPredictor:
 def main():
     import argparse
 
-    parser = argparse.ArgumentParser(description='Quality Predictor')
-    parser.add_argument('--history', required=True, help='Path to quality history JSON')
-    parser.add_argument('--days-ahead', type=int, default=7, help='Days to predict ahead')
-    parser.add_argument('--output', help='Output file for predictions')
+    parser = argparse.ArgumentParser(description="Quality Predictor")
+    parser.add_argument("--history", required=True, help="Path to quality history JSON")
+    parser.add_argument("--days-ahead", type=int, default=7, help="Days to predict ahead")
+    parser.add_argument("--output", help="Output file for predictions")
 
     args = parser.parse_args()
 
-    with open(args.history, 'r') as f:
+    with open(args.history) as f:
         history_data = json.load(f)
 
     predictor = QualityPredictor()
@@ -279,24 +276,21 @@ def main():
         "predicted_nasa_compliance": prediction.predicted_nasa_compliance,
         "predicted_sigma_level": prediction.predicted_sigma_level,
         "predicted_violations": prediction.predicted_violations,
-        "confidence_interval": {
-            "lower": prediction.confidence_interval[0],
-            "upper": prediction.confidence_interval[1]
-        },
+        "confidence_interval": {"lower": prediction.confidence_interval[0], "upper": prediction.confidence_interval[1]},
         "trend": prediction.trend,
         "risk_level": prediction.risk_level,
         "recommendations": prediction.recommendations,
-        "snapshots_analyzed": len(predictor.history)
+        "snapshots_analyzed": len(predictor.history),
     }
 
     if args.output:
-        with open(args.output, 'w') as f:
+        with open(args.output, "w") as f:
             json.dump(result, f, indent=2)
         print(f"Prediction saved to {args.output}")
     else:
         print(json.dumps(result, indent=2))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     main()

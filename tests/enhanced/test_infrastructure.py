@@ -15,12 +15,11 @@ This module provides:
 - Performance measurement and profiling utilities
 """
 
-import json
-import time
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from pathlib import Path
+import time
 from typing import Any, Dict, List, Optional, Tuple
-from unittest.mock import Mock, patch
+
 import psutil
 import pytest
 
@@ -28,6 +27,7 @@ import pytest
 @dataclass
 class MockCorrelation:
     """Mock cross-phase correlation for testing."""
+
     analyzer1: str
     analyzer2: str
     correlation_type: str
@@ -41,6 +41,7 @@ class MockCorrelation:
 @dataclass
 class MockSmartRecommendation:
     """Mock smart recommendation for testing."""
+
     id: str
     category: str
     description: str
@@ -54,6 +55,7 @@ class MockSmartRecommendation:
 @dataclass
 class MockAuditTrailEntry:
     """Mock audit trail entry for testing."""
+
     phase: str
     started: str
     completed: str
@@ -64,7 +66,7 @@ class MockAuditTrailEntry:
 
 class EnhancedTestDatasets:
     """Predefined test datasets with known connascence patterns."""
-    
+
     @staticmethod
     def get_connascence_sample_code() -> str:
         """Sample code with multiple connascence types for testing."""
@@ -116,20 +118,20 @@ class UserValidator:
         # CoLiteral + CoPosition - default value coupling
         return self.processor.process_users(users, format, timeout, 3, False, True)
         """
-    
+
     @staticmethod
     def get_expected_correlations() -> List[MockCorrelation]:
         """Expected cross-phase correlations for the sample code."""
         return [
             MockCorrelation(
                 analyzer1="ast_analyzer",
-                analyzer2="mece_analyzer", 
+                analyzer2="mece_analyzer",
                 correlation_type="algorithm_duplication_overlap",
                 correlation_score=0.85,
                 description="AST connascence violations overlap with MECE algorithm duplications in transform methods",
                 priority="high",
                 affected_files=["test_sample.py"],
-                remediation_impact="Fixing algorithm duplication will reduce CoAlgorithm violations"
+                remediation_impact="Fixing algorithm duplication will reduce CoAlgorithm violations",
             ),
             MockCorrelation(
                 analyzer1="ast_analyzer",
@@ -139,7 +141,7 @@ class UserValidator:
                 description="High parameter count correlates with NASA Power of Ten violations",
                 priority="medium",
                 affected_files=["test_sample.py"],
-                remediation_impact="Reducing parameters will improve NASA compliance"
+                remediation_impact="Reducing parameters will improve NASA compliance",
             ),
             MockCorrelation(
                 analyzer1="mece_analyzer",
@@ -149,10 +151,10 @@ class UserValidator:
                 description="MECE duplication clusters align with smart integration hotspot detection",
                 priority="high",
                 affected_files=["test_sample.py"],
-                remediation_impact="Hotspot remediation will eliminate duplication clusters"
-            )
+                remediation_impact="Hotspot remediation will eliminate duplication clusters",
+            ),
         ]
-    
+
     @staticmethod
     def get_expected_smart_recommendations() -> List[MockSmartRecommendation]:
         """Expected smart recommendations for the sample code."""
@@ -165,17 +167,17 @@ class UserValidator:
                 impact="high",
                 effort="low",
                 rationale="Multiple magic numbers detected across methods",
-                implementation_notes="Create Constants class with STATUS_ACTIVE, MAX_USERS, BATCH_SIZE"
+                implementation_notes="Create Constants class with STATUS_ACTIVE, MAX_USERS, BATCH_SIZE",
             ),
             MockSmartRecommendation(
-                id="rec_002", 
+                id="rec_002",
                 category="Method Refactoring",
                 description="Reduce parameter count using configuration object pattern",
                 priority="medium",
                 impact="medium",
                 effort="medium",
                 rationale="Process methods have excessive parameter coupling",
-                implementation_notes="Create ProcessConfig dataclass to encapsulate parameters"
+                implementation_notes="Create ProcessConfig dataclass to encapsulate parameters",
             ),
             MockSmartRecommendation(
                 id="rec_003",
@@ -185,7 +187,7 @@ class UserValidator:
                 impact="high",
                 effort="medium",
                 rationale="Transform logic duplicated across multiple methods",
-                implementation_notes="Create FormatStrategy interface with JsonStrategy, XmlStrategy implementations"
+                implementation_notes="Create FormatStrategy interface with JsonStrategy, XmlStrategy implementations",
             ),
             MockSmartRecommendation(
                 id="rec_004",
@@ -195,10 +197,10 @@ class UserValidator:
                 impact="medium",
                 effort="low",
                 rationale="String literals for format types repeated throughout codebase",
-                implementation_notes="Create FormatType enum with JSON, XML, CSV values"
-            )
+                implementation_notes="Create FormatType enum with JSON, XML, CSV values",
+            ),
         ]
-    
+
     @staticmethod
     def get_expected_audit_trail() -> List[MockAuditTrailEntry]:
         """Expected audit trail for enhanced analysis."""
@@ -209,15 +211,15 @@ class UserValidator:
                 completed="2024-01-15T10:00:02.500Z",
                 violations_found=15,
                 clusters_found=0,
-                correlations_found=0
+                correlations_found=0,
             ),
             MockAuditTrailEntry(
-                phase="mece_analysis", 
+                phase="mece_analysis",
                 started="2024-01-15T10:00:02.500Z",
                 completed="2024-01-15T10:00:04.200Z",
                 violations_found=0,
                 clusters_found=4,
-                correlations_found=0
+                correlations_found=0,
             ),
             MockAuditTrailEntry(
                 phase="nasa_analysis",
@@ -225,7 +227,7 @@ class UserValidator:
                 completed="2024-01-15T10:00:05.100Z",
                 violations_found=3,
                 clusters_found=0,
-                correlations_found=0
+                correlations_found=0,
             ),
             MockAuditTrailEntry(
                 phase="smart_integration",
@@ -233,7 +235,7 @@ class UserValidator:
                 completed="2024-01-15T10:00:07.800Z",
                 violations_found=0,
                 clusters_found=0,
-                correlations_found=3
+                correlations_found=3,
             ),
             MockAuditTrailEntry(
                 phase="correlation_analysis",
@@ -241,22 +243,22 @@ class UserValidator:
                 completed="2024-01-15T10:00:08.900Z",
                 violations_found=0,
                 clusters_found=0,
-                correlations_found=3
-            )
+                correlations_found=3,
+            ),
         ]
 
 
 class MockEnhancedAnalyzer:
     """Mock enhanced analyzer for controlled testing."""
-    
+
     def __init__(self, test_mode: str = "success"):
         self.test_mode = test_mode
         self.call_count = 0
-    
+
     def analyze_path(self, path: str, **kwargs) -> Dict[str, Any]:
         """Mock analysis that returns controlled test data."""
         self.call_count += 1
-        
+
         if self.test_mode == "failure":
             raise Exception("Simulated analysis failure")
         elif self.test_mode == "timeout":
@@ -269,9 +271,9 @@ class MockEnhancedAnalyzer:
                 "smart_recommendations": EnhancedTestDatasets.get_expected_smart_recommendations(),
                 "audit_trail": EnhancedTestDatasets.get_expected_audit_trail()[:2],  # Partial audit
                 "canonical_policy": "standard",
-                "cross_phase_analysis": False  # Disabled feature
+                "cross_phase_analysis": False,  # Disabled feature
             }
-        
+
         # Success mode - return complete enhanced results
         return {
             "success": True,
@@ -285,15 +287,15 @@ class MockEnhancedAnalyzer:
                 "ast_analyzer": True,
                 "mece_analyzer": kwargs.get("include_duplication", True),
                 "nasa_analyzer": kwargs.get("nasa_validation", False),
-                "smart_integration": kwargs.get("enable_smart_recommendations", False)
+                "smart_integration": kwargs.get("enable_smart_recommendations", False),
             },
             "policy_config": {
                 "violation_threshold": 0.8,
                 "correlation_threshold": kwargs.get("correlation_threshold", 0.7),
-                "smart_recommendations_enabled": kwargs.get("enable_smart_recommendations", False)
-            }
+                "smart_recommendations_enabled": kwargs.get("enable_smart_recommendations", False),
+            },
         }
-    
+
     def _get_mock_violations(self) -> List[Dict[str, Any]]:
         """Generate mock violations for testing."""
         return [
@@ -305,17 +307,17 @@ class MockEnhancedAnalyzer:
                 "file": "test_sample.py",
                 "line": 7,
                 "column": 20,
-                "description": "Status value hardcoded as magic number"
+                "description": "Status value hardcoded as magic number",
             },
             {
                 "id": "viol_002",
                 "type": "connascence_of_position",
                 "severity": "critical",
                 "message": "Method has 6 positional parameters causing parameter coupling",
-                "file": "test_sample.py", 
+                "file": "test_sample.py",
                 "line": 11,
                 "column": 8,
-                "description": "Excessive parameter coupling creates maintenance burden"
+                "description": "Excessive parameter coupling creates maintenance burden",
             },
             {
                 "id": "viol_003",
@@ -325,121 +327,131 @@ class MockEnhancedAnalyzer:
                 "file": "test_sample.py",
                 "line": 25,
                 "column": 12,
-                "description": "Similar transformation logic repeated across methods"
-            }
+                "description": "Similar transformation logic repeated across methods",
+            },
         ]
 
 
 class EnhancedTestUtilities:
     """Utility functions for enhanced pipeline testing."""
-    
+
     @staticmethod
     def validate_enhanced_result(result: Dict[str, Any]) -> Tuple[bool, List[str]]:
         """Validate enhanced analysis result structure and content."""
         errors = []
-        
+
         # Check required fields
         required_fields = [
-            "success", "violations", "correlations", "smart_recommendations", 
-            "audit_trail", "canonical_policy", "cross_phase_analysis"
+            "success",
+            "violations",
+            "correlations",
+            "smart_recommendations",
+            "audit_trail",
+            "canonical_policy",
+            "cross_phase_analysis",
         ]
-        
+
         for field in required_fields:
             if field not in result:
                 errors.append(f"Missing required field: {field}")
-        
+
         # Validate correlations structure
-        if "correlations" in result and result["correlations"]:
+        if result.get("correlations"):
             for i, corr in enumerate(result["correlations"]):
                 required_corr_fields = ["analyzer1", "analyzer2", "correlation_score", "description"]
                 for field in required_corr_fields:
                     if field not in corr:
                         errors.append(f"Correlation {i} missing field: {field}")
-                
+
                 # Validate correlation score range
                 if "correlation_score" in corr:
                     score = corr["correlation_score"]
                     if not (0.0 <= score <= 1.0):
                         errors.append(f"Correlation {i} score {score} out of range [0.0, 1.0]")
-        
+
         # Validate smart recommendations structure
-        if "smart_recommendations" in result and result["smart_recommendations"]:
+        if result.get("smart_recommendations"):
             for i, rec in enumerate(result["smart_recommendations"]):
                 required_rec_fields = ["category", "description", "priority", "impact", "effort"]
                 for field in required_rec_fields:
                     if field not in rec:
                         errors.append(f"Recommendation {i} missing field: {field}")
-                
+
                 # Validate priority values
                 if "priority" in rec and rec["priority"] not in ["low", "medium", "high", "critical"]:
                     errors.append(f"Recommendation {i} invalid priority: {rec['priority']}")
-        
+
         # Validate audit trail structure
-        if "audit_trail" in result and result["audit_trail"]:
+        if result.get("audit_trail"):
             for i, entry in enumerate(result["audit_trail"]):
                 required_audit_fields = ["phase", "started", "completed"]
                 for field in required_audit_fields:
                     if field not in entry:
                         errors.append(f"Audit trail entry {i} missing field: {field}")
-        
+
         return len(errors) == 0, errors
-    
+
     @staticmethod
     def measure_performance(func, *args, **kwargs) -> Tuple[Any, float, float]:
         """Measure function performance (execution time and memory usage)."""
         process = psutil.Process()
-        
+
         # Get initial memory usage
         initial_memory = process.memory_info().rss / 1024 / 1024  # MB
-        
+
         # Measure execution time
         start_time = time.time()
         result = func(*args, **kwargs)
         end_time = time.time()
-        
+
         # Get final memory usage
         final_memory = process.memory_info().rss / 1024 / 1024  # MB
         memory_delta = final_memory - initial_memory
-        
+
         execution_time = end_time - start_time
-        
+
         return result, execution_time, memory_delta
-    
+
     @staticmethod
     def create_test_file(content: str, file_path: Path) -> Path:
         """Create temporary test file with specified content."""
         file_path.parent.mkdir(parents=True, exist_ok=True)
-        file_path.write_text(content, encoding='utf-8')
+        file_path.write_text(content, encoding="utf-8")
         return file_path
-    
+
     @staticmethod
     def assert_correlation_quality(correlations: List[Dict[str, Any]], min_score: float = 0.7) -> None:
         """Assert that correlations meet quality thresholds."""
         assert len(correlations) > 0, "No correlations found"
-        
+
         for corr in correlations:
-            assert corr["correlation_score"] >= min_score, \
-                f"Correlation {corr.get('description', 'unknown')} score {corr['correlation_score']} below threshold {min_score}"
-    
+            assert (
+                corr["correlation_score"] >= min_score
+            ), f"Correlation {corr.get('description', 'unknown')} score {corr['correlation_score']} below threshold {min_score}"
+
     @staticmethod
     def assert_recommendations_actionable(recommendations: List[Dict[str, Any]]) -> None:
         """Assert that recommendations are actionable and well-formed."""
         assert len(recommendations) > 0, "No recommendations found"
-        
+
         for rec in recommendations:
             assert rec.get("description", "").strip(), "Recommendation missing description"
             assert rec.get("category", "").strip(), "Recommendation missing category"
-            assert rec.get("priority") in ["low", "medium", "high", "critical"], \
-                f"Invalid priority: {rec.get('priority')}"
-    
+            assert rec.get("priority") in [
+                "low",
+                "medium",
+                "high",
+                "critical",
+            ], f"Invalid priority: {rec.get('priority')}"
+
     @staticmethod
     def assert_audit_trail_complete(audit_trail: List[Dict[str, Any]], expected_phases: List[str]) -> None:
         """Assert that audit trail contains expected phases."""
         actual_phases = [entry["phase"] for entry in audit_trail]
-        
+
         for phase in expected_phases:
             assert phase in actual_phases, f"Missing expected phase: {phase}"
-        
+
         # Verify timing makes sense
         for entry in audit_trail:
             start_time = entry.get("started")
@@ -476,24 +488,31 @@ def sample_code_file(tmp_path):
 # Performance testing decorators
 def performance_test(max_time_seconds: float = 30.0, max_memory_mb: float = 100.0):
     """Decorator for performance testing with time and memory limits."""
+
     def decorator(func):
         def wrapper(*args, **kwargs):
             result, exec_time, memory_delta = EnhancedTestUtilities.measure_performance(func, *args, **kwargs)
-            
-            assert exec_time <= max_time_seconds, \
-                f"Function {func.__name__} took {exec_time:.2f}s, exceeds limit {max_time_seconds}s"
-            assert memory_delta <= max_memory_mb, \
-                f"Function {func.__name__} used {memory_delta:.2f}MB memory, exceeds limit {max_memory_mb}MB"
-            
+
+            assert (
+                exec_time <= max_time_seconds
+            ), f"Function {func.__name__} took {exec_time:.2f}s, exceeds limit {max_time_seconds}s"
+            assert (
+                memory_delta <= max_memory_mb
+            ), f"Function {func.__name__} used {memory_delta:.2f}MB memory, exceeds limit {max_memory_mb}MB"
+
             return result
+
         return wrapper
+
     return decorator
 
 
 def integration_test(interfaces: List[str]):
     """Decorator for integration tests targeting specific interfaces."""
+
     def decorator(func):
         func._integration_test = True
         func._target_interfaces = interfaces
         return func
+
     return decorator

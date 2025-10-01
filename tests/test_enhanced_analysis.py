@@ -31,7 +31,7 @@ class TestCurrentImplementationBehavior:
 
     def test_current_magic_number_behavior(self):
         """Test the actual magic number detection in current implementation."""
-        test_code = '''
+        test_code = """
 def test_function():
     # Numbers that should be flagged based on visit_Constant logic
     timeout = 42  # Should be flagged
@@ -47,20 +47,20 @@ def test_function():
     thousand = 1000  # Safe
 
     return zero + one + neg_one + two + ten + hundred + thousand + timeout + buffer
-'''
+"""
         violations = self._analyze_with_legacy(test_code)
         magic_violations = [v for v in violations if v.type == "connascence_of_meaning"]
 
         # Validate current behavior
-        flagged_values = {str(v.context.get('literal_value', '')) for v in magic_violations}
+        flagged_values = {str(v.context.get("literal_value", "")) for v in magic_violations}
 
         # These should NOT be flagged based on visit_Constant logic
-        safe_numbers = {'0', '1', '-1', '2', '10', '100', '1000'}
+        safe_numbers = {"0", "1", "-1", "2", "10", "100", "1000"}
         for safe in safe_numbers:
             assert safe not in flagged_values, f"Safe number {safe} was incorrectly flagged"
 
         # These SHOULD be flagged
-        unsafe_numbers = {'42', '1024'}
+        unsafe_numbers = {"42", "1024"}
         for unsafe in unsafe_numbers:
             assert unsafe in flagged_values, f"Unsafe number {unsafe} should have been flagged"
 
@@ -69,7 +69,7 @@ def test_function():
     def test_current_god_object_thresholds(self):
         """Test the actual god object detection thresholds."""
         # Test class at the current threshold (19 methods for CI)
-        threshold_class = '''
+        threshold_class = """
 class ThresholdClass:
     def __init__(self): pass
     def method_1(self): pass
@@ -90,7 +90,7 @@ class ThresholdClass:
     def method_16(self): pass
     def method_17(self): pass
     def method_18(self): pass
-'''
+"""
 
         violations = self._analyze_with_legacy(threshold_class)
         god_violations = [v for v in violations if v.type == "god_object"]
@@ -111,41 +111,48 @@ class ThresholdClass:
         parser = create_parser()
 
         # Test required path argument
-        args = parser.parse_args(['--path', '.'])
-        assert args.path == '.'
+        args = parser.parse_args(["--path", "."])
+        assert args.path == "."
 
         # Test default values
-        assert args.policy == 'default'
-        assert args.format == 'json'
+        assert args.policy == "default"
+        assert args.format == "json"
         assert args.nasa_validation is False
         assert args.strict_mode is False
 
         # Test all flags can be parsed
         full_args = [
-            '--path', '.',
-            '--policy', 'nasa_jpl_pot10',
-            '--format', 'sarif',
-            '--output', 'test.sarif',
-            '--nasa-validation',
-            '--strict-mode',
-            '--exclude', 'test_*',
-            '--exclude', '__pycache__',
-            '--include-nasa-rules',
-            '--include-god-objects',
-            '--include-mece-analysis',
-            '--enable-tool-correlation',
-            '--confidence-threshold', '0.85'
+            "--path",
+            ".",
+            "--policy",
+            "nasa_jpl_pot10",
+            "--format",
+            "sarif",
+            "--output",
+            "test.sarif",
+            "--nasa-validation",
+            "--strict-mode",
+            "--exclude",
+            "test_*",
+            "--exclude",
+            "__pycache__",
+            "--include-nasa-rules",
+            "--include-god-objects",
+            "--include-mece-analysis",
+            "--enable-tool-correlation",
+            "--confidence-threshold",
+            "0.85",
         ]
 
         args = parser.parse_args(full_args)
-        assert args.path == '.'
-        assert args.policy == 'nasa_jpl_pot10'
-        assert args.format == 'sarif'
-        assert args.output == 'test.sarif'
+        assert args.path == "."
+        assert args.policy == "nasa_jpl_pot10"
+        assert args.format == "sarif"
+        assert args.output == "test.sarif"
         assert args.nasa_validation is True
         assert args.strict_mode is True
-        assert 'test_*' in args.exclude
-        assert '__pycache__' in args.exclude
+        assert "test_*" in args.exclude
+        assert "__pycache__" in args.exclude
         assert args.include_nasa_rules is True
         assert args.include_god_objects is True
         assert args.include_mece_analysis is True
@@ -157,8 +164,9 @@ class ThresholdClass:
     def test_core_analyzer_integration(self):
         """Test integration with the core analyzer."""
         # Create a temporary file for testing
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as f:
-            f.write('''
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f:
+            f.write(
+                """
 def test_function():
     magic = 42
     return magic * 2
@@ -166,23 +174,21 @@ def test_function():
 class TestClass:
     def method1(self): pass
     def method2(self): pass
-''')
+"""
+            )
             temp_file = f.name
 
         try:
             # Test core analyzer
-            result = self.core_analyzer.analyze_path(
-                path=temp_file,
-                policy="default"
-            )
+            result = self.core_analyzer.analyze_path(path=temp_file, policy="default")
 
             # Validate result structure
-            assert 'success' in result
-            assert 'violations' in result
-            assert 'summary' in result
+            assert "success" in result
+            assert "violations" in result
+            assert "summary" in result
 
-            if result['success']:
-                violations = result['violations']
+            if result["success"]:
+                violations = result["violations"]
                 assert isinstance(violations, list)
 
                 print(f"Core analyzer test: {len(violations)} violations found")
@@ -245,29 +251,22 @@ class LargeClass:
         assert len(violations) > 0, "Should find violations in complex code"
 
         # Should find position coupling (too many parameters)
-        position_violations = violation_types.get('connascence_of_position', [])
+        position_violations = violation_types.get("connascence_of_position", [])
         assert len(position_violations) > 0, "Should find parameter coupling violations"
 
         # Should find magic number violations
-        meaning_violations = violation_types.get('connascence_of_meaning', [])
+        meaning_violations = violation_types.get("connascence_of_meaning", [])
         assert len(meaning_violations) > 0, "Should find magic number violations"
 
         # Should find god object if over threshold
-        god_violations = violation_types.get('god_object', [])
+        god_violations = violation_types.get("god_object", [])
         if len(god_violations) > 0:
             print(f"  Found god object violations: {len(god_violations)}")
 
     def test_file_analysis_behavior(self):
         """Test actual file analysis behavior."""
         # Test file filtering
-        should_analyze_patterns = [
-            "test.py",
-            "src/module.py",
-            "lib/utils.js",
-            "code.c",
-            "header.h"
-        ]
-
+        should_analyze_patterns = ["test.py", "src/module.py", "lib/utils.js", "code.c", "header.h"]
 
         analyzer = LegacyAnalyzer()
 
@@ -275,7 +274,7 @@ class LargeClass:
             # This tests the logic, not actual file existence
             Path(pattern)
             # Can't test should_analyze_file without actual files, but we can test the method exists
-            assert hasattr(analyzer, 'should_analyze_file')
+            assert hasattr(analyzer, "should_analyze_file")
 
         print("File analysis behavior test: method exists and is callable")
 
@@ -292,8 +291,8 @@ class LargeClass:
             js_strategy = JavaScriptStrategy()
             c_strategy = CStrategy()
 
-            assert hasattr(js_strategy, 'detect_magic_literals')
-            assert hasattr(c_strategy, 'detect_magic_literals')
+            assert hasattr(js_strategy, "detect_magic_literals")
+            assert hasattr(c_strategy, "detect_magic_literals")
 
             print("Multi-language test: Language strategies are available")
 
@@ -328,17 +327,14 @@ class TestRealWorldIntegration:
         # Analyze a single file to test integration
         constants_file = analyzer_dir / "constants.py"
         if constants_file.exists():
-            result = self.core_analyzer.analyze_path(
-                path=str(constants_file),
-                policy="standard"
-            )
+            result = self.core_analyzer.analyze_path(path=str(constants_file), policy="standard")
 
             # Should succeed
-            assert 'success' in result
+            assert "success" in result
             print(f"Self-analysis test: success={result.get('success')}")
 
-            if result.get('success'):
-                violations = result.get('violations', [])
+            if result.get("success"):
+                violations = result.get("violations", [])
                 print(f"Self-analysis test: {len(violations)} violations in constants.py")
 
     def test_test_packages_integration(self):
@@ -351,15 +347,16 @@ class TestRealWorldIntegration:
         # Try to analyze test packages directory
         try:
             result = self.core_analyzer.analyze_path(
-                path=str(test_packages),
-                policy="lenient"  # Use lenient for performance
+                path=str(test_packages), policy="lenient"  # Use lenient for performance
             )
 
             print(f"Test packages integration: success={result.get('success')}")
-            if result.get('success'):
-                violations = result.get('violations', [])
-                metrics = result.get('metrics', {})
-                print(f"Test packages integration: {len(violations)} violations, {metrics.get('files_analyzed', 0)} files")
+            if result.get("success"):
+                violations = result.get("violations", [])
+                metrics = result.get("metrics", {})
+                print(
+                    f"Test packages integration: {len(violations)} violations, {metrics.get('files_analyzed', 0)} files"
+                )
 
         except Exception as e:
             print(f"Test packages integration: Error - {e}")
@@ -368,7 +365,7 @@ class TestRealWorldIntegration:
         """Test basic performance characteristics."""
         import time
 
-        test_code = '''
+        test_code = """
 def performance_test():
     # Generate a reasonable amount of test code
     values = []
@@ -382,7 +379,7 @@ class PerformanceTestClass:
     def method_3(self): pass
     def method_4(self): pass
     def method_5(self): pass
-'''
+"""
 
         # Time the analysis
         start_time = time.time()

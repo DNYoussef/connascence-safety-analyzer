@@ -26,21 +26,21 @@ LICENSE_HEADER = """# SPDX-License-Identifier: MIT
 
 # Files that should be excluded from license header addition
 EXCLUDE_PATTERNS = {
-    'test_packages',
-    '__pycache__',
-    '.git',
-    'node_modules',
-    'build',
-    'dist',
-    '.pytest_cache',
-    'htmlcov',
-    'enterprise-package',
-    'startup-package',
-    'professional-package'
+    "test_packages",
+    "__pycache__",
+    ".git",
+    "node_modules",
+    "build",
+    "dist",
+    ".pytest_cache",
+    "htmlcov",
+    "enterprise-package",
+    "startup-package",
+    "professional-package",
 }
 
 # Extensions to process
-PYTHON_EXTENSIONS = {'.py'}
+PYTHON_EXTENSIONS = {".py"}
 
 
 def should_process_file(file_path: Path) -> bool:
@@ -56,13 +56,13 @@ def should_process_file(file_path: Path) -> bool:
 
 def has_license_header(content: str) -> bool:
     """Check if file already has SPDX license header."""
-    return 'SPDX-License-Identifier' in content[:1000]  # Check first 1000 chars
+    return "SPDX-License-Identifier" in content[:1000]  # Check first 1000 chars
 
 
 def add_license_header(file_path: Path) -> bool:
     """Add license header to file if it doesn't have one."""
     try:
-        with open(file_path, encoding='utf-8') as f:
+        with open(file_path, encoding="utf-8") as f:
             content = f.read()
 
         # Skip if already has license header
@@ -70,13 +70,13 @@ def add_license_header(file_path: Path) -> bool:
             return False
 
         # Handle shebang lines
-        lines = content.split('\n')
+        lines = content.split("\n")
         shebang_lines = []
         content_start = 0
 
         # Preserve shebang and encoding declarations
         for i, line in enumerate(lines):
-            if line.startswith('#!') or 'coding:' in line or 'encoding:' in line:
+            if line.startswith("#!") or "coding:" in line or "encoding:" in line:
                 shebang_lines.append(line)
                 content_start = i + 1
             else:
@@ -92,20 +92,20 @@ def add_license_header(file_path: Path) -> bool:
         # Add shebang lines first
         new_lines.extend(shebang_lines)
         if shebang_lines:
-            new_lines.append('')  # Blank line after shebang
+            new_lines.append("")  # Blank line after shebang
 
         # Add license header
-        new_lines.extend(LICENSE_HEADER.strip().split('\n'))
-        new_lines.append('')  # Blank line after license
+        new_lines.extend(LICENSE_HEADER.strip().split("\n"))
+        new_lines.append("")  # Blank line after license
 
         # Add original content (skip docstring if it's just after license)
-        remaining_content = '\n'.join(lines[content_start:])
+        remaining_content = "\n".join(lines[content_start:])
         if remaining_content.strip():
             new_lines.append(remaining_content)
 
         # Write updated content
-        with open(file_path, 'w', encoding='utf-8') as f:
-            f.write('\n'.join(new_lines))
+        with open(file_path, "w", encoding="utf-8") as f:
+            f.write("\n".join(new_lines))
 
         return True
 
@@ -121,7 +121,7 @@ def main():
 
     # Find all Python files
     python_files = []
-    for pattern in ['**/*.py']:
+    for pattern in ["**/*.py"]:
         python_files.extend(project_root.glob(pattern))
 
     # Filter files
@@ -142,5 +142,5 @@ def main():
     return 0
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

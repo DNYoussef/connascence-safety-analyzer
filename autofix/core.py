@@ -11,25 +11,26 @@
 # The above copyright notice and this permission notice shall be included in
 # all copies or substantial portions of the Software.
 
-from fixes.phase0.production_safe_assertions import ProductionAssert
 import ast
 from dataclasses import dataclass
 from pathlib import Path
 import re
 from typing import Dict, List, Optional, Tuple
 
-from .patch_api import PatchSuggestion
-
+from fixes.phase0.production_safe_assertions import ProductionAssert
 
 # Create a mock ConnascenceViolation for testing since analyzer.core was removed
 # ConnascenceViolation now imported from utils.types
 from utils.types import ConnascenceViolation
 
+from .patch_api import PatchSuggestion
+
 
 @dataclass
 class AutofixConfig:
     """Configuration for autofix engine."""
-    safety_level: str = 'moderate'  # conservative, moderate, aggressive
+
+    safety_level: str = "moderate"  # conservative, moderate, aggressive
     max_patches_per_file: int = 10
     preserve_formatting: bool = True
     backup_enabled: bool = True
@@ -48,14 +49,13 @@ class AutofixEngine:
     def _register_fixers(self) -> Dict[str, callable]:
         """Register violation type fixers."""
         return {
-            'connascence_of_meaning': self._fix_magic_literals,
-            'connascence_of_position': self._fix_parameter_coupling,
-            'god_object': self._fix_god_object,
-            'connascence_of_algorithm': self._fix_algorithm_duplication
+            "connascence_of_meaning": self._fix_magic_literals,
+            "connascence_of_position": self._fix_parameter_coupling,
+            "god_object": self._fix_god_object,
+            "connascence_of_algorithm": self._fix_algorithm_duplication,
         }
 
-    def generate_fixes(self, violations: List[ConnascenceViolation],
-                      source_code: str) -> List[PatchSuggestion]:
+    def generate_fixes(self, violations: List[ConnascenceViolation], source_code: str) -> List[PatchSuggestion]:
         """Generate fixes for violations."""
         patches = []
 
@@ -72,21 +72,21 @@ class AutofixEngine:
                     patches.append(patch)
 
         # Sort by confidence and safety
-        patches.sort(key=lambda p: (p.confidence, p.safety_level == 'safe'), reverse=True)
+        patches.sort(key=lambda p: (p.confidence, p.safety_level == "safe"), reverse=True)
 
-        return patches[:self.config.max_patches_per_file]
+        return patches[: self.config.max_patches_per_file]
 
     def analyze_file(self, file_path: str, violations: List[ConnascenceViolation]) -> List[PatchSuggestion]:
         """Analyze file and generate patches for violations."""
         try:
-            with open(file_path, encoding='utf-8') as f:
+            with open(file_path, encoding="utf-8") as f:
                 source_code = f.read()
         except FileNotFoundError:
             return []
 
         return self.generate_fixes(violations, source_code)
 
-    def apply_patches(self, patches: List[PatchSuggestion], confidence_threshold: float = 0.7) -> 'ApplyResult':
+    def apply_patches(self, patches: List[PatchSuggestion], confidence_threshold: float = 0.7) -> "ApplyResult":
         """Apply patches to files."""
         from dataclasses import dataclass
 
@@ -109,7 +109,9 @@ class AutofixEngine:
                 valid_patches.append(patch)
             else:
                 result.patches_skipped += 1
-                result.warnings.append(f"Patch for violation {patch.violation_id} skipped due to low confidence ({patch.confidence:.2f} < {confidence_threshold:.2f})")
+                result.warnings.append(
+                    f"Patch for violation {patch.violation_id} skipped due to low confidence ({patch.confidence:.2f} < {confidence_threshold:.2f})"
+                )
 
         if self.dry_run:
             result.warnings.append("Dry run mode: patches not actually applied")
@@ -119,8 +121,10 @@ class AutofixEngine:
         for patch in valid_patches:
             if not self.safe_autofixer._validate_patch(patch, ""):
                 result.patches_skipped += 1
-                if patch.safety_level == 'risky':
-                    result.warnings.append(f"Patch for violation {patch.violation_id} skipped due to risky safety level")
+                if patch.safety_level == "risky":
+                    result.warnings.append(
+                        f"Patch for violation {patch.violation_id} skipped due to risky safety level"
+                    )
                 else:
                     result.warnings.append(f"Patch for violation {patch.violation_id} failed safety validation")
             elif self._apply_single_patch(patch):
@@ -140,29 +144,28 @@ class AutofixEngine:
         except Exception:
             return False
 
-    def _fix_magic_literals(self, violation: ConnascenceViolation,
-                           tree: ast.AST, source: str) -> Optional[PatchSuggestion]:
+    def _fix_magic_literals(
+        self, violation: ConnascenceViolation, tree: ast.AST, source: str
+    ) -> Optional[PatchSuggestion]:
         """Fix magic literal violations."""
-        return self.patch_generator.generate_magic_literal_fix(
-            violation, tree, source
-        )
+        return self.patch_generator.generate_magic_literal_fix(violation, tree, source)
 
-    def _fix_parameter_coupling(self, violation: ConnascenceViolation,
-                              tree: ast.AST, source: str) -> Optional[PatchSuggestion]:
+    def _fix_parameter_coupling(
+        self, violation: ConnascenceViolation, tree: ast.AST, source: str
+    ) -> Optional[PatchSuggestion]:
         """Fix parameter position coupling."""
-        return self.patch_generator.generate_parameter_object_fix(
-            violation, tree, source
-        )
+        return self.patch_generator.generate_parameter_object_fix(violation, tree, source)
 
-    def _fix_god_object(self, violation: ConnascenceViolation,
-                       tree: ast.AST, source: str) -> Optional[PatchSuggestion]:
+    def _fix_god_object(self, violation: ConnascenceViolation, tree: ast.AST, source: str) -> Optional[PatchSuggestion]:
         """Fix god object violations."""
         from .class_splits import ClassSplitFixer
+
         fixer = ClassSplitFixer()
         return fixer.generate_patch(violation, tree, source)
 
-    def _fix_algorithm_duplication(self, violation: ConnascenceViolation,
-                                  tree: ast.AST, source: str) -> Optional[PatchSuggestion]:
+    def _fix_algorithm_duplication(
+        self, violation: ConnascenceViolation, tree: ast.AST, source: str
+    ) -> Optional[PatchSuggestion]:
         """Fix algorithm duplication violations."""
         # Placeholder for algorithm deduplication
         return None
@@ -173,14 +176,15 @@ class PatchGenerator:
 
     def __init__(self):
         self.magic_literal_patterns = {
-            'numeric': r'\b\d+\.?\d*\b',
-            'string': r'["\'][^"\'\n]*["\']',
-            'timeout': r'\b(?:timeout|delay|wait).*?\d+',
-            'buffer_size': r'\b(?:buffer|size|limit).*?\d+'
+            "numeric": r"\b\d+\.?\d*\b",
+            "string": r'["\'][^"\'\n]*["\']',
+            "timeout": r"\b(?:timeout|delay|wait).*?\d+",
+            "buffer_size": r"\b(?:buffer|size|limit).*?\d+",
         }
 
-    def generate_magic_literal_fix(self, violation: ConnascenceViolation,
-                                  tree: ast.AST, source: str) -> Optional[PatchSuggestion]:
+    def generate_magic_literal_fix(
+        self, violation: ConnascenceViolation, tree: ast.AST, source: str
+    ) -> Optional[PatchSuggestion]:
         """Generate fix for magic literal violations."""
         lines = source.splitlines()
         if violation.line_number > len(lines):
@@ -204,19 +208,20 @@ class PatchGenerator:
         constant_definition = f"{constant_name} = {literal_value}"
 
         return PatchSuggestion(
-            violation_id=getattr(violation, 'id', 'unknown'),
+            violation_id=getattr(violation, "id", "unknown"),
             confidence=0.8,
             description=f"Extract magic literal {literal_value} to constant {constant_name}",
             old_code=old_code,
             new_code=new_code,
             file_path=violation.file_path,
             line_range=(violation.line_number, violation.line_number),
-            safety_level='safe',
-            rollback_info={'constant_definition': constant_definition}
+            safety_level="safe",
+            rollback_info={"constant_definition": constant_definition},
         )
 
-    def generate_parameter_object_fix(self, violation: ConnascenceViolation,
-                                    tree: ast.AST, source: str) -> Optional[PatchSuggestion]:
+    def generate_parameter_object_fix(
+        self, violation: ConnascenceViolation, tree: ast.AST, source: str
+    ) -> Optional[PatchSuggestion]:
         """Generate parameter object fix for CoP violations."""
         # Find function with too many parameters
         func_finder = FunctionFinder(violation.line_number)
@@ -231,26 +236,26 @@ class PatchGenerator:
 
         # Generate parameter object class
         param_class_name = f"{func.name.title()}Params"
-        param_fields = [arg.arg for arg in func.args.args if arg.arg != 'self']
+        param_fields = [arg.arg for arg in func.args.args if arg.arg != "self"]
 
         class_definition = self._generate_param_class(param_class_name, param_fields)
 
         return PatchSuggestion(
-            violation_id=getattr(violation, 'id', 'unknown'),
+            violation_id=getattr(violation, "id", "unknown"),
             confidence=0.7,
             description=f"Extract parameters to {param_class_name} class",
             old_code=f"def {func.name}({', '.join(param_fields)}):",
             new_code=f"def {func.name}(self, params: {param_class_name}):",
             file_path=violation.file_path,
             line_range=(func.lineno, func.lineno),
-            safety_level='moderate',
-            rollback_info={'class_definition': class_definition}
+            safety_level="moderate",
+            rollback_info={"class_definition": class_definition},
         )
 
     def _extract_literal_value(self, violation: ConnascenceViolation, line: str) -> Optional[str]:
         """Extract literal value from violation context."""
-        if hasattr(violation, 'context') and 'literal_value' in violation.context:
-            return violation.context['literal_value']
+        if hasattr(violation, "context") and "literal_value" in violation.context:
+            return violation.context["literal_value"]
 
         # Fallback: try to extract from line
         for pattern in self.magic_literal_patterns.values():
@@ -263,23 +268,23 @@ class PatchGenerator:
     def _generate_constant_name(self, literal_value: str, file_path: str) -> str:
         """Generate appropriate constant name."""
         # Remove quotes for strings
-        clean_value = literal_value.strip('"\'')
+        clean_value = literal_value.strip("\"'")
 
         # Generate based on context
-        if 'timeout' in file_path.lower() or 'time' in clean_value.lower():
-            return 'TIMEOUT_SECONDS'
-        elif 'buffer' in file_path.lower() or 'size' in clean_value.lower():
-            return 'BUFFER_SIZE'
+        if "timeout" in file_path.lower() or "time" in clean_value.lower():
+            return "TIMEOUT_SECONDS"
+        elif "buffer" in file_path.lower() or "size" in clean_value.lower():
+            return "BUFFER_SIZE"
         elif clean_value.isdigit():
-            return 'DEFAULT_VALUE'
+            return "DEFAULT_VALUE"
         else:
             # Generate from file name
             base_name = Path(file_path).stem.upper()
-            return f'{base_name}_CONSTANT'
+            return f"{base_name}_CONSTANT"
 
     def _generate_param_class(self, class_name: str, fields: List[str]) -> str:
         """Generate parameter object class definition."""
-        field_definitions = [f'    {field}: Any = None' for field in fields]
+        field_definitions = [f"    {field}: Any = None" for field in fields]
 
         return f"""@dataclass
 class {class_name}:
@@ -295,11 +300,11 @@ class {class_name}:
             return None
 
         # Route to appropriate fix method based on violation type
-        violation_type = getattr(violation, 'connascence_type', getattr(violation, 'type', ''))
+        violation_type = getattr(violation, "connascence_type", getattr(violation, "type", ""))
 
-        if 'meaning' in violation_type.lower() or 'CoM' in violation_type:
+        if "meaning" in violation_type.lower() or "CoM" in violation_type:
             return self.generate_magic_literal_fix(violation, tree, source_code)
-        elif 'position' in violation_type.lower() or 'CoP' in violation_type:
+        elif "position" in violation_type.lower() or "CoP" in violation_type:
             return self.generate_parameter_object_fix(violation, tree, source_code)
         else:
             # Generic patch for other types
@@ -317,22 +322,22 @@ class {class_name}:
     def _generate_generic_patch(self, violation: ConnascenceViolation, source_code: str) -> PatchSuggestion:
         """Generate a generic patch suggestion."""
         lines = source_code.splitlines()
-        line_no = getattr(violation, 'line_number', 1)
+        line_no = getattr(violation, "line_number", 1)
 
-        old_code = lines[line_no - 1].strip() if line_no <= len(lines) else '# Issue detected'
+        old_code = lines[line_no - 1].strip() if line_no <= len(lines) else "# Issue detected"
 
-        violation_type = getattr(violation, 'connascence_type', getattr(violation, 'type', 'unknown'))
+        violation_type = getattr(violation, "connascence_type", getattr(violation, "type", "unknown"))
 
         return PatchSuggestion(
-            violation_id=getattr(violation, 'id', 'generic'),
+            violation_id=getattr(violation, "id", "generic"),
             confidence=0.5,
             description=f"Generic fix suggestion for {violation_type}",
             old_code=old_code,
             new_code=f"# TODO: Fix {getattr(violation, 'description', 'violation')}",
-            file_path=getattr(violation, 'file_path', 'unknown'),
+            file_path=getattr(violation, "file_path", "unknown"),
             line_range=(line_no, line_no),
-            safety_level='safe',
-            rollback_info={}
+            safety_level="safe",
+            rollback_info={},
         )
 
 
@@ -359,8 +364,8 @@ class SafeAutofixer:
             end_line = patch.line_range[1] - 1
 
             # Replace the target line(s)
-            new_lines = lines[:start_line] + [patch.new_code] + lines[end_line + 1:]
-            new_source = '\n'.join(new_lines)
+            new_lines = lines[:start_line] + [patch.new_code] + lines[end_line + 1 :]
+            new_source = "\n".join(new_lines)
 
             # Validate the result can be parsed
             try:
@@ -378,11 +383,11 @@ class SafeAutofixer:
         if patch.confidence < 0.5:
             return False
 
-        if patch.safety_level == 'aggressive' and self.config.safety_level == 'conservative':
+        if patch.safety_level == "aggressive" and self.config.safety_level == "conservative":
             return False
 
         # Skip risky patches regardless of confidence
-        if patch.safety_level == 'risky':
+        if patch.safety_level == "risky":
             return False
 
         # Ensure patch targets exist in source
@@ -394,7 +399,7 @@ class SafeAutofixer:
 
         return True
 
-    def preview_fixes(self, file_path: str, violations: List[ConnascenceViolation]) -> 'PreviewResult':
+    def preview_fixes(self, file_path: str, violations: List[ConnascenceViolation]) -> "PreviewResult":
         """Preview fixes for violations without applying them."""
         from dataclasses import dataclass
 
@@ -419,7 +424,7 @@ class SafeAutofixer:
 
         try:
             # Read source file
-            with open(file_path, encoding='utf-8') as f:
+            with open(file_path, encoding="utf-8") as f:
                 source_code = f.read()
         except FileNotFoundError:
             result.warnings.append(f"File not found: {file_path}")
@@ -430,14 +435,14 @@ class SafeAutofixer:
         patches = patch_generator.generate_patches(violations, source_code)
 
         # Limit patches per file based on config
-        max_patches = getattr(self.config, 'max_patches_per_file', 10)
+        max_patches = getattr(self.config, "max_patches_per_file", 10)
         patches = patches[:max_patches]
 
         # Filter and validate patches
         for patch in patches:
             if self._validate_patch(patch, source_code):
                 result.patches.append(patch)
-                if patch.safety_level == 'safe':
+                if patch.safety_level == "safe":
                     result.safe_patches += 1
 
         result.total_patches = len(result.patches)
@@ -447,7 +452,7 @@ class SafeAutofixer:
             result.recommendations = [
                 f"Apply {len(result.patches)} automated fixes",
                 f"Review {len([p for p in result.patches if p.safety_level != 'safe'])} moderate/high risk patches",
-                "Run tests after applying patches"
+                "Run tests after applying patches",
             ]
 
         if not result.patches:
@@ -464,14 +469,12 @@ class FunctionFinder(ast.NodeVisitor):
         self.found_function = None
 
     def visit_FunctionDef(self, node):
+        ProductionAssert.not_none(node, "node")
 
+        ProductionAssert.not_none(node, "node")
 
-        ProductionAssert.not_none(node, 'node')
-
-        ProductionAssert.not_none(node, 'node')
-
-        if hasattr(node, 'lineno') and node.lineno <= self.target_line:
-            end_line = getattr(node, 'end_lineno', node.lineno + 10)
+        if hasattr(node, "lineno") and node.lineno <= self.target_line:
+            end_line = getattr(node, "end_lineno", node.lineno + 10)
             if self.target_line <= end_line:
                 self.found_function = node
         self.generic_visit(node)

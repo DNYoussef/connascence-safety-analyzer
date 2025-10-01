@@ -15,10 +15,10 @@ class ArchitectureVisualizer:
 
     def __init__(self, analysis_report: Dict[str, Any]):
         self.report = analysis_report
-        self.import_graph = analysis_report['detailed_metrics']['import_graph']
-        self.coupling_matrix = analysis_report['detailed_metrics']['coupling_matrix']
-        self.fan_in = analysis_report['detailed_metrics']['fan_in']
-        self.fan_out = analysis_report['detailed_metrics']['fan_out']
+        self.import_graph = analysis_report["detailed_metrics"]["import_graph"]
+        self.coupling_matrix = analysis_report["detailed_metrics"]["coupling_matrix"]
+        self.fan_in = analysis_report["detailed_metrics"]["fan_in"]
+        self.fan_out = analysis_report["detailed_metrics"]["fan_out"]
 
     def generate_mermaid_dependency_graph(self) -> str:
         """Generate Mermaid diagram for dependency graph."""
@@ -34,9 +34,9 @@ class ArchitectureVisualizer:
             folders.update(targets.keys())
 
         # Style nodes by their role
-        core_modules = {'analyzer', 'core', 'utils'}
-        interface_modules = {'cli', 'mcp'}
-        feature_modules = {'autofix', 'experimental', 'dashboard', 'security'}
+        core_modules = {"analyzer", "core", "utils"}
+        interface_modules = {"cli", "mcp"}
+        feature_modules = {"autofix", "experimental", "dashboard", "security"}
 
         for folder in sorted(folders):
             if folder in core_modules:
@@ -83,26 +83,26 @@ class ArchitectureVisualizer:
         c4_diagram += "    title Connascence Analyzer - System Context\n\n"
 
         # External systems
-        c4_diagram += "    Person(user, \"Developer\", \"Uses connascence analyzer\")\n"
-        c4_diagram += "    System(vscode, \"VS Code\", \"IDE with extension\")\n"
-        c4_diagram += "    System(ci_cd, \"CI/CD Pipeline\", \"Automated analysis\")\n\n"
+        c4_diagram += '    Person(user, "Developer", "Uses connascence analyzer")\n'
+        c4_diagram += '    System(vscode, "VS Code", "IDE with extension")\n'
+        c4_diagram += '    System(ci_cd, "CI/CD Pipeline", "Automated analysis")\n\n'
 
         # Main system
-        c4_diagram += "    System_Boundary(connascence, \"Connascence Analyzer\") {\n"
-        c4_diagram += "        Container(cli, \"CLI Interface\", \"Python\", \"Command-line tool\")\n"
-        c4_diagram += "        Container(mcp, \"MCP Server\", \"Python\", \"Model Context Protocol\")\n"
-        c4_diagram += "        Container(analyzer, \"Core Analyzer\", \"Python\", \"Analysis engine\")\n"
-        c4_diagram += "        Container(vscode_ext, \"VS Code Extension\", \"TypeScript\", \"IDE integration\")\n"
+        c4_diagram += '    System_Boundary(connascence, "Connascence Analyzer") {\n'
+        c4_diagram += '        Container(cli, "CLI Interface", "Python", "Command-line tool")\n'
+        c4_diagram += '        Container(mcp, "MCP Server", "Python", "Model Context Protocol")\n'
+        c4_diagram += '        Container(analyzer, "Core Analyzer", "Python", "Analysis engine")\n'
+        c4_diagram += '        Container(vscode_ext, "VS Code Extension", "TypeScript", "IDE integration")\n'
         c4_diagram += "    }\n\n"
 
         # Relationships
-        c4_diagram += "    Rel(user, cli, \"Runs analysis\")\n"
-        c4_diagram += "    Rel(user, vscode, \"Uses IDE\")\n"
-        c4_diagram += "    Rel(vscode, vscode_ext, \"Loads\")\n"
-        c4_diagram += "    Rel(vscode_ext, mcp, \"Communicates\")\n"
-        c4_diagram += "    Rel(cli, analyzer, \"Uses\")\n"
-        c4_diagram += "    Rel(mcp, analyzer, \"Uses\")\n"
-        c4_diagram += "    Rel(ci_cd, cli, \"Executes\")\n"
+        c4_diagram += '    Rel(user, cli, "Runs analysis")\n'
+        c4_diagram += '    Rel(user, vscode, "Uses IDE")\n'
+        c4_diagram += '    Rel(vscode, vscode_ext, "Loads")\n'
+        c4_diagram += '    Rel(vscode_ext, mcp, "Communicates")\n'
+        c4_diagram += '    Rel(cli, analyzer, "Uses")\n'
+        c4_diagram += '    Rel(mcp, analyzer, "Uses")\n'
+        c4_diagram += '    Rel(ci_cd, cli, "Executes")\n'
         c4_diagram += "```\n"
 
         return c4_diagram
@@ -129,7 +129,9 @@ class ArchitectureVisualizer:
         matrix += "-" * 60 + "\n"
 
         for source, target, strength in interactions[:15]:
-            interaction_type = "CRITICAL" if strength > 0.5 else "HIGH" if strength > 0.3 else "MEDIUM" if strength > 0.1 else "LOW"
+            interaction_type = (
+                "CRITICAL" if strength > 0.5 else "HIGH" if strength > 0.3 else "MEDIUM" if strength > 0.1 else "LOW"
+            )
             matrix += f"{source:>12} | {target:>12} | {strength:>9.2%} | {interaction_type}\n"
 
         # Module responsibility analysis
@@ -168,7 +170,9 @@ class ArchitectureVisualizer:
         # Analysis flow
         flow_analysis += "3. ANALYSIS WORKFLOW:\n"
         flow_analysis += "   Source Code → Core Engine → Rules/Policy → Violations → Reporting\n"
-        flow_analysis += f"   Coupling: Analyzer→Policy ({self.coupling_matrix.get('analyzer', {}).get('policy', 0):.2%})\n\n"
+        flow_analysis += (
+            f"   Coupling: Analyzer→Policy ({self.coupling_matrix.get('analyzer', {}).get('policy', 0):.2%})\n\n"
+        )
 
         # Shared data structures
         flow_analysis += "SHARED DATA STRUCTURES:\n"
@@ -198,9 +202,10 @@ class ArchitectureVisualizer:
 
         # Architecture quality metrics
         total_folders = len(self.fan_in)
-        high_coupling_pairs = sum(1 for targets in self.coupling_matrix.values()
-                                 for strength in targets.values() if strength > 0.3)
-        circular_deps = len(self.report.get('circular_dependencies', []))
+        high_coupling_pairs = sum(
+            1 for targets in self.coupling_matrix.values() for strength in targets.values() if strength > 0.3
+        )
+        circular_deps = len(self.report.get("circular_dependencies", []))
 
         assessment += "QUALITY METRICS:\n"
         assessment += "-" * 16 + "\n"
@@ -228,7 +233,7 @@ class ArchitectureVisualizer:
         assessment += "- Limited abstraction between layers\n\n"
 
         # Architecture grade
-        total_issues = high_coupling_pairs + circular_deps + len(self.report.get('violations', []))
+        total_issues = high_coupling_pairs + circular_deps + len(self.report.get("violations", []))
         if total_issues < 5:
             grade = "A"
         elif total_issues < 15:
@@ -251,14 +256,15 @@ class ArchitectureVisualizer:
         roadmap += "PHASE 1: CRITICAL ISSUES (Immediate - 1-2 weeks)\n"
         roadmap += "-" * 50 + "\n"
         roadmap += "1. Break circular dependencies:\n"
-        for cycle in self.report.get('circular_dependencies', [])[:3]:
-            cycle_str = ' → '.join(cycle)
+        for cycle in self.report.get("circular_dependencies", [])[:3]:
+            cycle_str = " → ".join(cycle)
             roadmap += f"   - {cycle_str}\n"
             roadmap += "     Solution: Extract interface, use dependency injection\n"
 
         roadmap += "\n2. Reduce critical coupling (>50%):\n"
-        critical_coupling = [(s, t, str) for s, targets in self.coupling_matrix.items()
-                           for t, str in targets.items() if str > 0.5][:3]
+        critical_coupling = [
+            (s, t, str) for s, targets in self.coupling_matrix.items() for t, str in targets.items() if str > 0.5
+        ][:3]
         for source, target, strength in critical_coupling:
             roadmap += f"   - {source} → {target} ({strength:.1%})\n"
             roadmap += "     Solution: Introduce facade/adapter pattern\n"
@@ -323,6 +329,7 @@ class ArchitectureVisualizer:
 
         return report
 
+
 def main():
     """Generate comprehensive architectural visualization and analysis."""
     root_path = Path(__file__).parent.parent
@@ -349,18 +356,18 @@ def main():
 
     # Save comprehensive report
     comprehensive_file = output_dir / "architectural_analysis_comprehensive.md"
-    with open(comprehensive_file, 'w', encoding='utf-8') as f:
+    with open(comprehensive_file, "w", encoding="utf-8") as f:
         f.write(comprehensive_report)
 
     # Save individual diagrams
     diagrams = {
-        'dependency_graph.mmd': visualizer.generate_mermaid_dependency_graph(),
-        'c4_architecture.mmd': visualizer.generate_c4_architecture_diagram()
+        "dependency_graph.mmd": visualizer.generate_mermaid_dependency_graph(),
+        "c4_architecture.mmd": visualizer.generate_c4_architecture_diagram(),
     }
 
     for filename, content in diagrams.items():
         diagram_file = output_dir / filename
-        with open(diagram_file, 'w', encoding='utf-8') as f:
+        with open(diagram_file, "w", encoding="utf-8") as f:
             f.write(content)
 
     print("Architecture visualization complete!")
@@ -372,6 +379,7 @@ def main():
     print("ARCHITECTURAL SUMMARY")
     print("=" * 60)
     print(visualizer.generate_architectural_assessment())
+
 
 if __name__ == "__main__":
     main()

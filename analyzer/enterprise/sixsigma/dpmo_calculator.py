@@ -12,10 +12,8 @@ Calculates Six Sigma quality metrics:
 @compliance NASA-POT10-95%
 """
 
-import math
 from dataclasses import dataclass
 from typing import Optional
-from scipy import stats
 
 
 @dataclass
@@ -31,15 +29,7 @@ class SigmaMetrics:
 
 
 class DPMOCalculator:
-
-    SIGMA_TABLE = [
-        (3.4, 6.0),
-        (233, 5.0),
-        (6210, 4.0),
-        (66807, 3.0),
-        (308538, 2.0),
-        (691462, 1.0)
-    ]
+    SIGMA_TABLE = [(3.4, 6.0), (233, 5.0), (6210, 4.0), (66807, 3.0), (308538, 2.0), (691462, 1.0)]
 
     @staticmethod
     def calculate_dpmo(defects: int, opportunities: int, units: int = 1) -> float:
@@ -89,28 +79,23 @@ class DPMOCalculator:
 
         rty = 1.0
         for y in yields:
-            rty *= (y / 100)
+            rty *= y / 100
 
         return round(rty * 100, 2)
 
     @staticmethod
-    def calculate_process_capability(mean: float, std_dev: float,
-                                    usl: float, lsl: float) -> tuple[float, float]:
+    def calculate_process_capability(mean: float, std_dev: float, usl: float, lsl: float) -> tuple[float, float]:
         if std_dev == 0:
             return 0.0, 0.0
 
         cp = (usl - lsl) / (6 * std_dev)
 
-        cpk = min(
-            (usl - mean) / (3 * std_dev),
-            (mean - lsl) / (3 * std_dev)
-        )
+        cpk = min((usl - mean) / (3 * std_dev), (mean - lsl) / (3 * std_dev))
 
         return round(cp, 3), round(cpk, 3)
 
     @classmethod
-    def calculate_metrics(cls, defects: int, opportunities: int,
-                         units: int = 1) -> SigmaMetrics:
+    def calculate_metrics(cls, defects: int, opportunities: int, units: int = 1) -> SigmaMetrics:
         dpmo = cls.calculate_dpmo(defects, opportunities, units)
         sigma_level = cls.dpmo_to_sigma(dpmo)
         yield_percent = cls.calculate_yield(defects, opportunities * units)
@@ -122,23 +107,23 @@ class DPMOCalculator:
             dpmo=dpmo,
             sigma_level=sigma_level,
             yield_percent=yield_percent,
-            rty=rty
+            rty=rty,
         )
 
 
 def main():
     import argparse
 
-    parser = argparse.ArgumentParser(description='DPMO and Sigma Level Calculator')
-    parser.add_argument('--defects', type=int, required=True, help='Number of defects')
-    parser.add_argument('--opportunities', type=int, required=True, help='Opportunities per unit')
-    parser.add_argument('--units', type=int, default=1, help='Number of units')
+    parser = argparse.ArgumentParser(description="DPMO and Sigma Level Calculator")
+    parser.add_argument("--defects", type=int, required=True, help="Number of defects")
+    parser.add_argument("--opportunities", type=int, required=True, help="Opportunities per unit")
+    parser.add_argument("--units", type=int, default=1, help="Number of units")
 
     args = parser.parse_args()
 
     metrics = DPMOCalculator.calculate_metrics(args.defects, args.opportunities, args.units)
 
-    print(f"\\nSix Sigma Quality Metrics:")
+    print("\\nSix Sigma Quality Metrics:")
     print(f"  Defects: {metrics.defects}")
     print(f"  Opportunities: {metrics.opportunities}")
     print(f"  DPMO: {metrics.dpmo:,.0f}")
@@ -147,5 +132,5 @@ def main():
     print(f"  RTY: {metrics.rty}%")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

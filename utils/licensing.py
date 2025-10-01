@@ -27,6 +27,7 @@ from config.central_constants import LicenseConstants
 @dataclass
 class LicenseValidationResult:
     """Mock license validation result."""
+
     is_valid: bool = True
     license_type: str = LicenseConstants.MIT
     expires_at: Optional[str] = None
@@ -47,9 +48,7 @@ class LicenseValidator:
     def validate(self, license_key: Optional[str] = None) -> LicenseValidationResult:
         """Mock validation - always returns valid."""
         return LicenseValidationResult(
-            is_valid=True,
-            license_type=LicenseConstants.MIT,
-            message=LicenseConstants.MOCK_ALL_FEATURES_MESSAGE
+            is_valid=True, license_type=LicenseConstants.MIT, message=LicenseConstants.MOCK_ALL_FEATURES_MESSAGE
         )
 
     def check_feature(self, feature_name: str) -> bool:
@@ -58,9 +57,4 @@ class LicenseValidator:
 
     def get_license_info(self) -> Dict[str, Any]:
         """Get mock license information."""
-        return {
-            'type': LicenseConstants.MIT,
-            'valid': True,
-            'features': ['all'],
-            'expires': None
-        }
+        return {"type": LicenseConstants.MIT, "valid": True, "features": ["all"], "expires": None}

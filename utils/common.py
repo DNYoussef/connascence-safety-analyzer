@@ -34,7 +34,7 @@ def validate_file_path(file_path: str) -> bool:
         return False
 
     # Basic validation - no path traversal attempts
-    if '..' in file_path or file_path.startswith('/'):
+    if ".." in file_path or file_path.startswith("/"):
         return False
 
     return True
@@ -51,27 +51,27 @@ def safe_get_attribute(obj: Any, attr_name: str, default: Any = None) -> Any:
 def normalize_severity(severity: str) -> str:
     """Normalize severity strings to standard values."""
     severity_map = {
-        'low': 'low',
-        'medium': 'medium',
-        'moderate': 'medium',
-        'high': 'high',
-        'critical': 'critical',
-        'error': 'high',
-        'warning': 'medium',
-        'info': 'low'
+        "low": "low",
+        "medium": "medium",
+        "moderate": "medium",
+        "high": "high",
+        "critical": "critical",
+        "error": "high",
+        "warning": "medium",
+        "info": "low",
     }
 
-    return severity_map.get(severity.lower(), 'medium')
+    return severity_map.get(severity.lower(), "medium")
 
 
 def parse_version_string(version_output: str) -> str:
     """Parse version number from tool output."""
     # Common version patterns
     patterns = [
-        r'(\d+\.\d+\.\d+)',  # x.y.z
-        r'(\d+\.\d+)',       # x.y
-        r'v(\d+\.\d+\.\d+)', # vx.y.z
-        r'version (\d+\.\d+\.\d+)', # version x.y.z
+        r"(\d+\.\d+\.\d+)",  # x.y.z
+        r"(\d+\.\d+)",  # x.y
+        r"v(\d+\.\d+\.\d+)",  # vx.y.z
+        r"version (\d+\.\d+\.\d+)",  # version x.y.z
     ]
 
     for pattern in patterns:
@@ -88,6 +88,6 @@ def create_unique_identifier(prefix: str = "", length: int = 8) -> str:
     import string
 
     chars = string.ascii_letters + string.digits
-    unique_part = ''.join(random.choice(chars) for _ in range(length))
+    unique_part = "".join(random.choice(chars) for _ in range(length))
 
     return f"{prefix}{unique_part}" if prefix else unique_part

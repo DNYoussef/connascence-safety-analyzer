@@ -39,12 +39,14 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "pytest>=7.0",
-    "pytest-cov>=4.0", 
+    "pytest-cov>=4.0",
+    "pytest-asyncio>=0.21.0",
     "black>=22.0",
     "ruff>=0.1.0",
     "mypy>=1.0",
     "pre-commit>=2.20",
     "hypothesis>=6.0",
+    "dataclasses-json>=0.5.0",
 ]
 mcp = [
     "uvicorn>=0.20.0",
@@ -71,7 +73,7 @@ Changelog = "https://github.com/connascence/connascence-analyzer/blob/main/CHANG
 
 [project.scripts]
 connascence = "interfaces.cli.simple_cli:main"
-connascence-analyzer = "analyzer.core:main"
+connascence-analyzer = "interfaces.cli.simple_cli:main"
 
 [project.entry-points."mcp.servers"]
 connascence = "mcp.server:main"
@@ -110,8 +112,10 @@ extend-exclude = '''
 '''
 
 [tool.ruff]
-target-version = "py38" 
+target-version = "py38"
 line-length = 120
+
+[tool.ruff.lint]
 select = [
     "E",   # pycodestyle errors
     "W",   # pycodestyle warnings (includes W605 for escape sequences)
@@ -137,6 +141,7 @@ ignore = [
     "PLR0913", # too-many-arguments (will be handled by connascence CoP detection)
     "PLR0915", # too-many-statements (will be handled by connascence CoA detection)
     "PLR0912", # too-many-branches (will be handled by connascence CoA detection)
+    "PLW0603", # global statement (acceptable for DI container pattern)
 ]
 unfixable = [
     "B",  # Don't auto-fix potentially unsafe bugbear rules
@@ -144,12 +149,12 @@ unfixable = [
 ]
 
 # Regex pattern linting to prevent future SyntaxWarning issues
-[tool.ruff.flake8-bugbear]
+[tool.ruff.lint.flake8-bugbear]
 # Enable additional regex-related checks
 extend-immutable-calls = ["re.compile", "re.Pattern"]
 
 # Connascence-specific Ruff integration
-[tool.ruff.pylint]
+[tool.ruff.lint.pylint]
 # Configure PLR rules to align with connascence detection
 max-args = 4  # Connascence of Position (CoP) threshold
 max-branches = 8  # Connascence of Algorithm (CoA) complexity threshold
@@ -161,11 +166,11 @@ max-statements = 25  # Connascence of Algorithm (CoA) threshold
 # Note: Magic literal detection handled by connascence analyzer
 
 # McCabe complexity aligned with Connascence of Algorithm (CoA)
-[tool.ruff.mccabe]
+[tool.ruff.lint.mccabe]
 max-complexity = 8  # Lower threshold to catch CoA violations early
 
 
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 "tests/**/*.py" = [
     "S101",    # asserts allowed in tests
     "ARG",     # unused function args allowed in tests
@@ -193,7 +198,7 @@ max-complexity = 8  # Lower threshold to catch CoA violations early
     "PLR0915", # Legacy code improvements in progress
 ]
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 known-first-party = ["analyzer", "policy", "reporting", "cli", "mcp"]
 force-sort-within-sections = true
 

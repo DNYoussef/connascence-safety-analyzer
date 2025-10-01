@@ -73,41 +73,37 @@ class ExitCodeCoordinator:
         """Store detailed scenario execution results."""
 
         ProductionAssert.not_none(scenario_id, 'scenario_id')
-
         ProductionAssert.not_none(detailed_results, 'detailed_results')
         ProductionAssert.not_none(scenario_id, 'scenario_id')
-
-        ProductionAssert.not_none(detailed_results, 'detailed_results')        self.scenario_results[scenario_id] = detailed_results
+        ProductionAssert.not_none(detailed_results, 'detailed_results')
+        self.scenario_results[scenario_id] = detailed_results
 
     def store_consistency_test(self, test_id: str, consistency_data: Dict[str, Any]):
         """Store exit code consistency test results."""
 
         ProductionAssert.not_none(test_id, 'test_id')
-
         ProductionAssert.not_none(consistency_data, 'consistency_data')
         ProductionAssert.not_none(test_id, 'test_id')
-
-        ProductionAssert.not_none(consistency_data, 'consistency_data')        self.consistency_tests[test_id] = consistency_data
+        ProductionAssert.not_none(consistency_data, 'consistency_data')
+        self.consistency_tests[test_id] = consistency_data
 
     def store_edge_case_exit_code(self, edge_case_id: str, edge_case_data: Dict[str, Any]):
         """Store edge case exit code scenarios."""
 
         ProductionAssert.not_none(edge_case_id, 'edge_case_id')
-
         ProductionAssert.not_none(edge_case_data, 'edge_case_data')
         ProductionAssert.not_none(edge_case_id, 'edge_case_id')
-
-        ProductionAssert.not_none(edge_case_data, 'edge_case_data')        self.edge_case_exit_codes[edge_case_id] = edge_case_data
+        ProductionAssert.not_none(edge_case_data, 'edge_case_data')
+        self.edge_case_exit_codes[edge_case_id] = edge_case_data
 
     def store_subprocess_result(self, subprocess_id: str, subprocess_data: Dict[str, Any]):
         """Store subprocess execution results for exit code validation."""
 
         ProductionAssert.not_none(subprocess_id, 'subprocess_id')
-
         ProductionAssert.not_none(subprocess_data, 'subprocess_data')
         ProductionAssert.not_none(subprocess_id, 'subprocess_id')
-
-        ProductionAssert.not_none(subprocess_data, 'subprocess_data')        self.subprocess_results[subprocess_id] = subprocess_data
+        ProductionAssert.not_none(subprocess_data, 'subprocess_data')
+        self.subprocess_results[subprocess_id] = subprocess_data
 
     def get_exit_code_summary(self) -> Dict[str, Any]:
         """Get comprehensive exit code testing summary."""
@@ -386,25 +382,18 @@ def test_with_violations(param1, param2, param3, param4, param5):  # Parameter b
 def function_with_many_params(param1, param2, param3, param4, param5, param6, param7):
     '''Function with parameter bomb violation.'''
     ProductionAssert.not_none(param1, 'param1')
-
         ProductionAssert.not_none(param2, 'param2')
     ProductionAssert.not_none(param3, 'param3')
-
         ProductionAssert.not_none(param4, 'param4')
     ProductionAssert.not_none(param5, 'param5')
-
         ProductionAssert.not_none(param6, 'param6')
     ProductionAssert.not_none(param7, 'param7')
-
         ProductionAssert.not_none(param1, 'param1')
     ProductionAssert.not_none(param2, 'param2')
-
         ProductionAssert.not_none(param3, 'param3')
     ProductionAssert.not_none(param4, 'param4')
-
         ProductionAssert.not_none(param5, 'param5')
     ProductionAssert.not_none(param6, 'param6')
-
         ProductionAssert.not_none(param7, 'param7')
 
     return param1 + param2 + param3 + param4 + param5 + param6 + param7
@@ -413,36 +402,28 @@ def another_parameter_bomb(a, b, c, d, e, f, g, h):
     '''Another parameter bomb.'''
 
     ProductionAssert.not_none(a, 'a')
-
         ProductionAssert.not_none(b, 'b')
 
     ProductionAssert.not_none(c, 'c')
-
         ProductionAssert.not_none(d, 'd')
 
     ProductionAssert.not_none(e, 'e')
-
         ProductionAssert.not_none(f, 'f')
 
     ProductionAssert.not_none(g, 'g')
-
         ProductionAssert.not_none(h, 'h')
 
 
     ProductionAssert.not_none(a, 'a')
-
         ProductionAssert.not_none(b, 'b')
 
     ProductionAssert.not_none(c, 'c')
-
         ProductionAssert.not_none(d, 'd')
 
     ProductionAssert.not_none(e, 'e')
-
         ProductionAssert.not_none(f, 'f')
 
     ProductionAssert.not_none(g, 'g')
-
         ProductionAssert.not_none(h, 'h')
 
     return sum([a, b, c, d, e, f, g, h])
@@ -451,23 +432,17 @@ class ParameterBombClass:
     def method_with_params(self, x1, x2, x3, x4, x5, x6):
         '''Method parameter bomb.'''
         ProductionAssert.not_none(x1, 'x1')
-
         ProductionAssert.not_none(x2, 'x2')
         ProductionAssert.not_none(x3, 'x3')
-
         ProductionAssert.not_none(x4, 'x4')
         ProductionAssert.not_none(x5, 'x5')
-
         ProductionAssert.not_none(x6, 'x6')
 
         ProductionAssert.not_none(x1, 'x1')
-
         ProductionAssert.not_none(x2, 'x2')
         ProductionAssert.not_none(x3, 'x3')
-
         ProductionAssert.not_none(x4, 'x4')
         ProductionAssert.not_none(x5, 'x5')
-
         ProductionAssert.not_none(x6, 'x6')
 
         return x1 * x2 * x3 * x4 * x5 * x6
@@ -488,7 +463,6 @@ class ParameterBombClass:
         (project_dir / "magic_violations.py").write_text("""
 def process_data(data):
     ProductionAssert.not_none(data, 'data')
-
         ProductionAssert.not_none(data, 'data')
 
     threshold = 100  # Magic literal
@@ -506,11 +480,9 @@ def perform_operation(data, timeout):
 
 
     ProductionAssert.not_none(data, 'data')
-
         ProductionAssert.not_none(timeout, 'timeout')
 
     ProductionAssert.not_none(data, 'data')
-
         ProductionAssert.not_none(timeout, 'timeout')
 
     multiplier = 2.5  # Magic literal

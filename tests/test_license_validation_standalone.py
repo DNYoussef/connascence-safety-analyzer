@@ -116,9 +116,9 @@ def create_test_project_no_license(project_path: Path):
 
 def demonstrate_memory_coordination():
     """Demonstrate memory coordination functionality."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("DEMONSTRATING MEMORY COORDINATION")
-    print("="*60)
+    print("=" * 60)
 
     temp_dir = Path(tempfile.mkdtemp())
     try:
@@ -127,14 +127,8 @@ def demonstrate_memory_coordination():
 
         # Store some validation rules
         test_rules = {
-            "BSL-1.1": {
-                "commercial_restrictions": True,
-                "max_age_days": 1460
-            },
-            "Enterprise": {
-                "organizational_use_only": True,
-                "support_required": True
-            }
+            "BSL-1.1": {"commercial_restrictions": True, "max_age_days": 1460},
+            "Enterprise": {"organizational_use_only": True, "support_required": True},
         }
 
         coordinator.store_license_rules(test_rules)
@@ -158,9 +152,9 @@ def demonstrate_memory_coordination():
 
 def demonstrate_bsl_validation():
     """Demonstrate BSL-1.1 license validation."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("DEMONSTRATING BSL-1.1 LICENSE VALIDATION")
-    print("="*60)
+    print("=" * 60)
 
     temp_dir = Path(tempfile.mkdtemp())
     try:
@@ -195,9 +189,9 @@ def demonstrate_bsl_validation():
 
 def demonstrate_enterprise_validation():
     """Demonstrate enterprise license validation."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("DEMONSTRATING ENTERPRISE LICENSE VALIDATION")
-    print("="*60)
+    print("=" * 60)
 
     temp_dir = Path(tempfile.mkdtemp())
     try:
@@ -234,9 +228,9 @@ def demonstrate_enterprise_validation():
 
 def demonstrate_exit_code_4_pathway():
     """Demonstrate exit code 4 pathway for license errors."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("DEMONSTRATING EXIT CODE 4 PATHWAY")
-    print("="*60)
+    print("=" * 60)
 
     temp_dir = Path(tempfile.mkdtemp())
     try:
@@ -293,7 +287,7 @@ def demonstrate_exit_code_4_pathway():
 
         print(f"   Validation result: {report3.validation_result.value}")
         print(f"   Exit code: {report3.exit_code}")
-        enterprise_errors = [e for e in report3.errors if 'Enterprise' in e.error_type]
+        enterprise_errors = [e for e in report3.errors if "Enterprise" in e.error_type]
         print(f"   Enterprise requirement errors: {len(enterprise_errors)}")
 
         if enterprise_errors:
@@ -305,9 +299,9 @@ def demonstrate_exit_code_4_pathway():
 
 def demonstrate_cli_integration():
     """Demonstrate CLI integration of license validation."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("DEMONSTRATING CLI INTEGRATION")
-    print("="*60)
+    print("=" * 60)
 
     temp_dir = Path(tempfile.mkdtemp())
     try:
@@ -333,7 +327,7 @@ def demonstrate_cli_integration():
 
         try:
             # Test license validation command
-            sys.argv = ['license_validator.py', str(project_path), '--verbose']
+            sys.argv = ["license_validator.py", str(project_path), "--verbose"]
 
             with redirect_stdout(stdout_buffer), redirect_stderr(stderr_buffer):
                 try:
@@ -348,7 +342,7 @@ def demonstrate_cli_integration():
             output = stdout_buffer.getvalue()
             if output:
                 print("   Sample output:")
-                for line in output.split('\n')[:3]:  # First 3 lines
+                for line in output.split("\n")[:3]:  # First 3 lines
                     if line.strip():
                         print(f"     {line}")
 
@@ -381,9 +375,9 @@ def main():
         demonstrate_exit_code_4_pathway()
         demonstrate_cli_integration()
 
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("DEMONSTRATION COMPLETE")
-        print("="*60)
+        print("=" * 60)
         print("✓ Memory coordination working")
         print("✓ Sequential thinking workflow implemented")
         print("✓ BSL-1.1 license validation functional")
@@ -403,6 +397,7 @@ def main():
     except Exception as e:
         print(f"\n❌ Demonstration failed: {e}")
         import traceback
+
         traceback.print_exc()
         return 1
 

@@ -20,6 +20,7 @@ from typing import Any, Dict, List, Union
 
 try:
     import yaml
+
     YAML_AVAILABLE = True
 except ImportError:
     YAML_AVAILABLE = False
@@ -33,11 +34,11 @@ from analyzer.constants import (
     resolve_policy_name,
     validate_policy_name,
 )
-from utils.types import ConnascenceViolation
 from utils.config_loader import ThresholdConfig, load_config_defaults
+from utils.types import ConnascenceViolation
 
 # Load configuration defaults
-POLICY_DEFAULTS = load_config_defaults('policy_manager')
+POLICY_DEFAULTS = load_config_defaults("policy_manager")
 
 # Service defaults constants
 SERVICE_DEFAULTS_MAX_CYCLOMATIC_COMPLEXITY = 12
@@ -61,70 +62,71 @@ STRICT_CORE_COM_LIMIT = 3
 STRICT_CORE_COP_LIMIT = 2
 STRICT_CORE_TOTAL_VIOLATIONS_LIMIT = 10
 
+
 class PolicyManager:
     def __init__(self):
         # Unified standard presets (new canonical structure)
         self.presets = {
             # NASA compliance (highest safety)
-            'nasa-compliance': {
-                'name': 'NASA Compliance',
-                'description': 'NASA JPL Power of Ten compliance standards',
-                'thresholds': {
-                    'max_positional_params': STRICT_CORE_MAX_POSITIONAL_PARAMS,
-                    'god_class_methods': STRICT_CORE_GOD_CLASS_METHODS,
-                    'max_cyclomatic_complexity': STRICT_CORE_MAX_CYCLOMATIC_COMPLEXITY
+            "nasa-compliance": {
+                "name": "NASA Compliance",
+                "description": "NASA JPL Power of Ten compliance standards",
+                "thresholds": {
+                    "max_positional_params": STRICT_CORE_MAX_POSITIONAL_PARAMS,
+                    "god_class_methods": STRICT_CORE_GOD_CLASS_METHODS,
+                    "max_cyclomatic_complexity": STRICT_CORE_MAX_CYCLOMATIC_COMPLEXITY,
                 },
-                'budget_limits': {
-                    'CoM': STRICT_CORE_COM_LIMIT,
-                    'CoP': STRICT_CORE_COP_LIMIT,
-                    'total_violations': STRICT_CORE_TOTAL_VIOLATIONS_LIMIT
-                }
+                "budget_limits": {
+                    "CoM": STRICT_CORE_COM_LIMIT,
+                    "CoP": STRICT_CORE_COP_LIMIT,
+                    "total_violations": STRICT_CORE_TOTAL_VIOLATIONS_LIMIT,
+                },
             },
             # Strict analysis
-            'strict': {
-                'name': 'Strict Analysis',
-                'description': 'Strict code quality standards',
-                'thresholds': {
-                    'max_positional_params': STRICT_CORE_MAX_POSITIONAL_PARAMS,  # Expected by tests
-                    'god_class_methods': STRICT_CORE_GOD_CLASS_METHODS,     # Expected by tests
-                    'max_cyclomatic_complexity': STRICT_CORE_MAX_CYCLOMATIC_COMPLEXITY
+            "strict": {
+                "name": "Strict Analysis",
+                "description": "Strict code quality standards",
+                "thresholds": {
+                    "max_positional_params": STRICT_CORE_MAX_POSITIONAL_PARAMS,  # Expected by tests
+                    "god_class_methods": STRICT_CORE_GOD_CLASS_METHODS,  # Expected by tests
+                    "max_cyclomatic_complexity": STRICT_CORE_MAX_CYCLOMATIC_COMPLEXITY,
                 },
-                'budget_limits': {
-                    'CoM': STRICT_CORE_COM_LIMIT,
-                    'CoP': STRICT_CORE_COP_LIMIT,
-                    'total_violations': STRICT_CORE_TOTAL_VIOLATIONS_LIMIT
-                }
+                "budget_limits": {
+                    "CoM": STRICT_CORE_COM_LIMIT,
+                    "CoP": STRICT_CORE_COP_LIMIT,
+                    "total_violations": STRICT_CORE_TOTAL_VIOLATIONS_LIMIT,
+                },
             },
             # Standard balanced approach
-            'standard': {
-                'name': 'Standard Balanced',
-                'description': 'Balanced service defaults (recommended)',
-                'thresholds': {
-                    'max_positional_params': 3,  # Expected by tests
-                    'god_class_methods': 20,     # Expected by tests
-                    'max_cyclomatic_complexity': SERVICE_DEFAULTS_MAX_CYCLOMATIC_COMPLEXITY
+            "standard": {
+                "name": "Standard Balanced",
+                "description": "Balanced service defaults (recommended)",
+                "thresholds": {
+                    "max_positional_params": 3,  # Expected by tests
+                    "god_class_methods": 20,  # Expected by tests
+                    "max_cyclomatic_complexity": SERVICE_DEFAULTS_MAX_CYCLOMATIC_COMPLEXITY,
                 },
-                'budget_limits': {
-                    'CoM': SERVICE_DEFAULTS_COM_LIMIT,
-                    'CoP': SERVICE_DEFAULTS_COP_LIMIT,
-                    'total_violations': SERVICE_DEFAULTS_TOTAL_VIOLATIONS_LIMIT
-                }
+                "budget_limits": {
+                    "CoM": SERVICE_DEFAULTS_COM_LIMIT,
+                    "CoP": SERVICE_DEFAULTS_COP_LIMIT,
+                    "total_violations": SERVICE_DEFAULTS_TOTAL_VIOLATIONS_LIMIT,
+                },
             },
             # Lenient experimental
-            'lenient': {
-                'name': 'Lenient Experimental',
-                'description': 'Relaxed experimental settings',
-                'thresholds': {
-                    'max_positional_params': 4,  # Expected by tests
-                    'god_class_methods': EXPERIMENTAL_GOD_CLASS_METHODS,
-                    'max_cyclomatic_complexity': EXPERIMENTAL_MAX_CYCLOMATIC_COMPLEXITY
+            "lenient": {
+                "name": "Lenient Experimental",
+                "description": "Relaxed experimental settings",
+                "thresholds": {
+                    "max_positional_params": 4,  # Expected by tests
+                    "god_class_methods": EXPERIMENTAL_GOD_CLASS_METHODS,
+                    "max_cyclomatic_complexity": EXPERIMENTAL_MAX_CYCLOMATIC_COMPLEXITY,
                 },
-                'budget_limits': {
-                    'CoM': EXPERIMENTAL_COM_LIMIT,
-                    'CoP': EXPERIMENTAL_COP_LIMIT,
-                    'total_violations': EXPERIMENTAL_TOTAL_VIOLATIONS_LIMIT
-                }
-            }
+                "budget_limits": {
+                    "CoM": EXPERIMENTAL_COM_LIMIT,
+                    "CoP": EXPERIMENTAL_COP_LIMIT,
+                    "total_violations": EXPERIMENTAL_TOTAL_VIOLATIONS_LIMIT,
+                },
+            },
         }
 
         # Legacy aliases for backwards compatibility
@@ -135,17 +137,17 @@ class PolicyManager:
     def _add_legacy_aliases(self):
         """Add legacy policy aliases for backwards compatibility."""
         # CLI legacy names
-        self.presets['nasa_jpl_pot10'] = self.presets['nasa-compliance'].copy()
-        self.presets['strict-core'] = self.presets['strict'].copy()
-        self.presets['default'] = self.presets['standard'].copy()
-        self.presets['service-defaults'] = self.presets['standard'].copy()
-        self.presets['experimental'] = self.presets['lenient'].copy()
+        self.presets["nasa_jpl_pot10"] = self.presets["nasa-compliance"].copy()
+        self.presets["strict-core"] = self.presets["strict"].copy()
+        self.presets["default"] = self.presets["standard"].copy()
+        self.presets["service-defaults"] = self.presets["standard"].copy()
+        self.presets["experimental"] = self.presets["lenient"].copy()
 
         # VSCode legacy names
-        self.presets['safety_level_1'] = self.presets['nasa-compliance'].copy()
-        self.presets['general_safety_strict'] = self.presets['strict'].copy()
-        self.presets['modern_general'] = self.presets['standard'].copy()
-        self.presets['safety_level_3'] = self.presets['lenient'].copy()
+        self.presets["safety_level_1"] = self.presets["nasa-compliance"].copy()
+        self.presets["general_safety_strict"] = self.presets["strict"].copy()
+        self.presets["modern_general"] = self.presets["standard"].copy()
+        self.presets["safety_level_3"] = self.presets["lenient"].copy()
 
     def get_preset(self, name: str) -> ThresholdConfig:
         """Get a policy preset by name with unified resolution."""
@@ -160,14 +162,12 @@ class PolicyManager:
             preset_dict = self.presets[name].copy()
         else:
             available_policies = list_available_policies(include_legacy=True)
-            raise ValueError(
-                f"Preset not found: {name}. Available policies: {', '.join(available_policies)}"
-            )
+            raise ValueError(f"Preset not found: {name}. Available policies: {', '.join(available_policies)}")
 
         return ThresholdConfig(
-            max_positional_params=preset_dict.get('thresholds', {}).get('max_positional_params', 3),
-            god_class_methods=preset_dict.get('thresholds', {}).get('god_class_methods', 20),
-            max_cyclomatic_complexity=preset_dict.get('thresholds', {}).get('max_cyclomatic_complexity', 10)
+            max_positional_params=preset_dict.get("thresholds", {}).get("max_positional_params", 3),
+            god_class_methods=preset_dict.get("thresholds", {}).get("god_class_methods", 20),
+            max_cyclomatic_complexity=preset_dict.get("thresholds", {}).get("max_cyclomatic_complexity", 10),
         )
 
     def list_presets(self, unified_only: bool = False) -> List[str]:
@@ -183,32 +183,32 @@ class PolicyManager:
 
     def validate_policy(self, policy: Dict[str, Any]) -> Dict[str, Any]:
         """Validate policy configuration."""
-        validation_result = {'valid': True, 'errors': []}
+        validation_result = {"valid": True, "errors": []}
 
         # Check required sections
-        required_sections = ['name', 'thresholds', 'budget_limits']
+        required_sections = ["name", "thresholds", "budget_limits"]
         for section in required_sections:
             if section not in policy:
-                validation_result['valid'] = False
-                validation_result['errors'].append(f"Missing required section: {section}")
+                validation_result["valid"] = False
+                validation_result["errors"].append(f"Missing required section: {section}")
 
         # Validate thresholds
-        if 'thresholds' in policy:
-            thresholds = policy['thresholds']
-            required_thresholds = ['max_positional_params', 'god_class_methods', 'max_cyclomatic_complexity']
+        if "thresholds" in policy:
+            thresholds = policy["thresholds"]
+            required_thresholds = ["max_positional_params", "god_class_methods", "max_cyclomatic_complexity"]
             for threshold in required_thresholds:
                 if threshold not in thresholds:
-                    validation_result['errors'].append(f"Missing threshold: {threshold}")
+                    validation_result["errors"].append(f"Missing threshold: {threshold}")
                 elif not isinstance(thresholds[threshold], (int, float)):
-                    validation_result['errors'].append(f"Invalid threshold value for {threshold}")
+                    validation_result["errors"].append(f"Invalid threshold value for {threshold}")
 
         # Validate budget limits
-        if 'budget_limits' in policy:
-            budget_limits = policy['budget_limits']
-            if 'total_violations' not in budget_limits:
-                validation_result['errors'].append("Missing budget limit: total_violations")
+        if "budget_limits" in policy:
+            budget_limits = policy["budget_limits"]
+            if "total_violations" not in budget_limits:
+                validation_result["errors"].append("Missing budget limit: total_violations")
 
-        validation_result['valid'] = len(validation_result['errors']) == 0
+        validation_result["valid"] = len(validation_result["errors"]) == 0
         return validation_result
 
     def merge_policies(self, base_policy: str, overrides: Dict[str, Any]) -> Dict[str, Any]:
@@ -219,16 +219,16 @@ class PolicyManager:
         merged = self.presets[base_policy].copy()
 
         # Deep merge thresholds
-        if 'thresholds' in overrides:
-            merged['thresholds'] = {**merged['thresholds'], **overrides['thresholds']}
+        if "thresholds" in overrides:
+            merged["thresholds"] = {**merged["thresholds"], **overrides["thresholds"]}
 
         # Deep merge budget limits
-        if 'budget_limits' in overrides:
-            merged['budget_limits'] = {**merged['budget_limits'], **overrides['budget_limits']}
+        if "budget_limits" in overrides:
+            merged["budget_limits"] = {**merged["budget_limits"], **overrides["budget_limits"]}
 
         # Override other fields
         for key, value in overrides.items():
-            if key not in ['thresholds', 'budget_limits']:
+            if key not in ["thresholds", "budget_limits"]:
                 merged[key] = value
 
         return merged
@@ -237,11 +237,11 @@ class PolicyManager:
         """Save policy to file."""
         file_path = Path(file_path)
 
-        if file_path.suffix.lower() in ['.yml', '.yaml']:
-            with open(file_path, 'w') as f:
+        if file_path.suffix.lower() in [".yml", ".yaml"]:
+            with open(file_path, "w") as f:
                 yaml.dump(policy, f, default_flow_style=False)
         else:
-            with open(file_path, 'w') as f:
+            with open(file_path, "w") as f:
                 json.dump(policy, f, indent=2)
 
     def load_from_file(self, file_path: Union[str, Path]) -> Dict[str, Any]:
@@ -252,7 +252,7 @@ class PolicyManager:
             raise FileNotFoundError(f"Policy file not found: {file_path}")
 
         try:
-            if file_path.suffix.lower() in ['.yml', '.yaml']:
+            if file_path.suffix.lower() in [".yml", ".yaml"]:
                 with open(file_path) as f:
                     policy_dict = yaml.safe_load(f)
             else:
@@ -261,7 +261,7 @@ class PolicyManager:
 
             # Validate loaded policy
             validation_result = self.validate_policy(policy_dict)
-            if isinstance(validation_result, dict) and not validation_result['valid']:
+            if isinstance(validation_result, dict) and not validation_result["valid"]:
                 raise ValueError(f"Invalid policy configuration: {validation_result['errors']}")
             elif isinstance(validation_result, bool) and not validation_result:
                 raise ValueError("Invalid policy configuration")
@@ -275,68 +275,73 @@ class PolicyManager:
     def register_custom_policy(self, name: str, policy: Dict[str, Any]) -> None:
         """Register a custom policy."""
         validation = self.validate_policy(policy)
-        if not validation['valid']:
+        if not validation["valid"]:
             raise ValueError(f"Invalid policy: {validation['errors']}")
 
         self.custom_policies[name] = policy.copy()
 
-    def categorize_violations(self, violations: List[ConnascenceViolation], policy: Union[Dict[str, Any], ThresholdConfig]) -> Dict[str, List[ConnascenceViolation]]:
+    def categorize_violations(
+        self, violations: List[ConnascenceViolation], policy: Union[Dict[str, Any], ThresholdConfig]
+    ) -> Dict[str, List[ConnascenceViolation]]:
         """Categorize violations based on policy severity rules."""
         categories = {
-            'critical': [],
-            'high': [],
-            'medium': [],
-            'low': [],
-            'policy_violations': [],
-            'acceptable_violations': []
+            "critical": [],
+            "high": [],
+            "medium": [],
+            "low": [],
+            "policy_violations": [],
+            "acceptable_violations": [],
         }
 
         # Get policy thresholds
         if isinstance(policy, ThresholdConfig):
             max_params = policy.max_positional_params
             max_methods = policy.god_class_methods
-        elif isinstance(policy, dict) and 'thresholds' in policy:
-            thresholds = policy['thresholds']
-            max_params = thresholds.get('max_positional_params', 3)
-            max_methods = thresholds.get('god_class_methods', 20)
+        elif isinstance(policy, dict) and "thresholds" in policy:
+            thresholds = policy["thresholds"]
+            max_params = thresholds.get("max_positional_params", 3)
+            max_methods = thresholds.get("god_class_methods", 20)
         else:
             max_params = 3
             max_methods = 20
 
         for violation in violations:
-            severity = getattr(violation, 'severity', 'medium')
-            if severity in ['critical', 'high', 'medium', 'low']:
+            severity = getattr(violation, "severity", "medium")
+            if severity in ["critical", "high", "medium", "low"]:
                 categories[severity].append(violation)
             else:
-                categories['medium'].append(violation)
+                categories["medium"].append(violation)
 
             # Check if violation exceeds policy thresholds
-            violation_dict = {'id': getattr(violation, 'id', ''), 'severity': severity}
+            violation_dict = {"id": getattr(violation, "id", ""), "severity": severity}
 
             # Check parameter violations
-            if (getattr(violation, 'connascence_type', '') == 'CoP' and
-                '4 positional parameters' in getattr(violation, 'description', '')):
+            if getattr(violation, "connascence_type", "") == "CoP" and "4 positional parameters" in getattr(
+                violation, "description", ""
+            ):
                 if max_params < 4:  # 4 params > limit
-                    categories['policy_violations'].append(violation_dict)
+                    categories["policy_violations"].append(violation_dict)
                 else:
-                    categories['acceptable_violations'].append(violation_dict)
-            elif (getattr(violation, 'connascence_type', '') == 'CoP' and
-                  '2 positional parameters' in getattr(violation, 'description', '')):
+                    categories["acceptable_violations"].append(violation_dict)
+            elif getattr(violation, "connascence_type", "") == "CoP" and "2 positional parameters" in getattr(
+                violation, "description", ""
+            ):
                 if max_params < 2:  # 2 params > limit
-                    categories['policy_violations'].append(violation_dict)
+                    categories["policy_violations"].append(violation_dict)
                 else:
-                    categories['acceptable_violations'].append(violation_dict)
+                    categories["acceptable_violations"].append(violation_dict)
 
             # Check god class violations
-            elif (getattr(violation, 'connascence_type', '') == 'CoA' and
-                  '25 methods' in getattr(violation, 'description', '')):
+            elif getattr(violation, "connascence_type", "") == "CoA" and "25 methods" in getattr(
+                violation, "description", ""
+            ):
                 if max_methods < 25:  # 25 methods > limit
-                    categories['policy_violations'].append(violation_dict)
+                    categories["policy_violations"].append(violation_dict)
                 else:
-                    categories['acceptable_violations'].append(violation_dict)
+                    categories["acceptable_violations"].append(violation_dict)
             else:
                 # Default acceptable
-                categories['acceptable_violations'].append(violation_dict)
+                categories["acceptable_violations"].append(violation_dict)
 
         return categories
 
@@ -347,20 +352,27 @@ class PolicyManager:
             return policy.copy()
 
         # If policy is a ThresholdConfig object, convert to dict
-        if hasattr(policy, 'max_positional_params'):
+        if hasattr(policy, "max_positional_params"):
             return {
-                'max_positional_params': policy.max_positional_params,
-                'god_class_methods': policy.god_class_methods,
-                'max_cyclomatic_complexity': policy.max_cyclomatic_complexity
+                "max_positional_params": policy.max_positional_params,
+                "god_class_methods": policy.god_class_methods,
+                "max_cyclomatic_complexity": policy.max_cyclomatic_complexity,
             }
 
         # If policy has a to_dict method, use it
-        if hasattr(policy, 'to_dict'):
+        if hasattr(policy, "to_dict"):
             return policy.to_dict()
 
         # Fallback: try to extract attributes
         result = {}
-        for attr in ['name', 'thresholds', 'budget_limits', 'max_positional_params', 'god_class_methods', 'max_cyclomatic_complexity']:
+        for attr in [
+            "name",
+            "thresholds",
+            "budget_limits",
+            "max_positional_params",
+            "god_class_methods",
+            "max_cyclomatic_complexity",
+        ]:
             if hasattr(policy, attr):
                 result[attr] = getattr(policy, attr)
 
@@ -369,39 +381,41 @@ class PolicyManager:
     def deserialize_policy(self, policy_dict: Dict[str, Any]) -> ThresholdConfig:
         """Deserialize dictionary to policy object."""
         # Handle nested thresholds structure
-        if 'thresholds' in policy_dict:
-            thresholds = policy_dict['thresholds']
+        if "thresholds" in policy_dict:
+            thresholds = policy_dict["thresholds"]
             return ThresholdConfig(
-                max_positional_params=thresholds.get('max_positional_params', 3),
-                god_class_methods=thresholds.get('god_class_methods', 20),
-                max_cyclomatic_complexity=thresholds.get('max_cyclomatic_complexity', 10)
+                max_positional_params=thresholds.get("max_positional_params", 3),
+                god_class_methods=thresholds.get("god_class_methods", 20),
+                max_cyclomatic_complexity=thresholds.get("max_cyclomatic_complexity", 10),
             )
         else:
             return ThresholdConfig(
-                max_positional_params=policy_dict.get('max_positional_params', 3),
-                god_class_methods=policy_dict.get('god_class_methods', 20),
-                max_cyclomatic_complexity=policy_dict.get('max_cyclomatic_complexity', 10)
+                max_positional_params=policy_dict.get("max_positional_params", 3),
+                god_class_methods=policy_dict.get("god_class_methods", 20),
+                max_cyclomatic_complexity=policy_dict.get("max_cyclomatic_complexity", 10),
             )
 
-    def create_custom_policy(self, base_policy: Union[str, Dict[str, Any]], overrides: Dict[str, Any]) -> ThresholdConfig:
+    def create_custom_policy(
+        self, base_policy: Union[str, Dict[str, Any]], overrides: Dict[str, Any]
+    ) -> ThresholdConfig:
         """Create custom policy by applying overrides to base policy."""
         base = self.get_preset(base_policy) if isinstance(base_policy, str) else base_policy
 
         # Convert base to ThresholdConfig if it's a dict
         if isinstance(base, dict):
             base_config = ThresholdConfig(
-                max_positional_params=base.get('thresholds', {}).get('max_positional_params', 3),
-                god_class_methods=base.get('thresholds', {}).get('god_class_methods', 20),
-                max_cyclomatic_complexity=base.get('thresholds', {}).get('max_cyclomatic_complexity', 10)
+                max_positional_params=base.get("thresholds", {}).get("max_positional_params", 3),
+                god_class_methods=base.get("thresholds", {}).get("god_class_methods", 20),
+                max_cyclomatic_complexity=base.get("thresholds", {}).get("max_cyclomatic_complexity", 10),
             )
         else:
             base_config = base
 
         # Apply overrides
         custom_config = ThresholdConfig(
-            max_positional_params=overrides.get('max_positional_params', base_config.max_positional_params),
-            god_class_methods=overrides.get('god_class_methods', base_config.god_class_methods),
-            max_cyclomatic_complexity=overrides.get('max_cyclomatic_complexity', base_config.max_cyclomatic_complexity)
+            max_positional_params=overrides.get("max_positional_params", base_config.max_positional_params),
+            god_class_methods=overrides.get("god_class_methods", base_config.god_class_methods),
+            max_cyclomatic_complexity=overrides.get("max_cyclomatic_complexity", base_config.max_cyclomatic_complexity),
         )
 
         return custom_config
@@ -419,39 +433,47 @@ class PolicyManager:
             return True
         elif isinstance(policy, dict):
             # Validate dictionary policy
-            validation_result = {'valid': True, 'errors': []}
+            validation_result = {"valid": True, "errors": []}
 
             # Check required sections
-            required_sections = ['name', 'thresholds', 'budget_limits']
+            required_sections = ["name", "thresholds", "budget_limits"]
             for section in required_sections:
                 if section not in policy:
-                    validation_result['valid'] = False
-                    validation_result['errors'].append(f"Missing required section: {section}")
+                    validation_result["valid"] = False
+                    validation_result["errors"].append(f"Missing required section: {section}")
 
             # Validate thresholds
-            if 'thresholds' in policy:
-                thresholds = policy['thresholds']
-                required_thresholds = ['max_positional_params', 'god_class_methods', 'max_cyclomatic_complexity']
+            if "thresholds" in policy:
+                thresholds = policy["thresholds"]
+                required_thresholds = ["max_positional_params", "god_class_methods", "max_cyclomatic_complexity"]
                 for threshold in required_thresholds:
                     if threshold not in thresholds:
-                        validation_result['errors'].append(f"Missing threshold: {threshold}")
+                        validation_result["errors"].append(f"Missing threshold: {threshold}")
                     elif not isinstance(thresholds[threshold], (int, float)):
-                        validation_result['errors'].append(f"Invalid threshold value for {threshold}")
+                        validation_result["errors"].append(f"Invalid threshold value for {threshold}")
 
             # Validate budget limits
-            if 'budget_limits' in policy:
-                budget_limits = policy['budget_limits']
-                if 'total_violations' not in budget_limits:
-                    validation_result['errors'].append("Missing budget limit: total_violations")
+            if "budget_limits" in policy:
+                budget_limits = policy["budget_limits"]
+                if "total_violations" not in budget_limits:
+                    validation_result["errors"].append("Missing budget limit: total_violations")
 
-            validation_result['valid'] = len(validation_result['errors']) == 0
-            return validation_result['valid']
+            validation_result["valid"] = len(validation_result["errors"]) == 0
+            return validation_result["valid"]
 
         return False
 
+
 class PolicyViolation:
-    def __init__(self, violation_id: str, policy_rule: str, severity: str,
-                 description: str, file_path: str = None, line_number: int = None):
+    def __init__(
+        self,
+        violation_id: str,
+        policy_rule: str,
+        severity: str,
+        description: str,
+        file_path: str = None,
+        line_number: int = None,
+    ):
         self.violation_id = violation_id
         self.policy_rule = policy_rule
         self.severity = severity
@@ -463,11 +485,11 @@ class PolicyViolation:
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary representation."""
         return {
-            'violation_id': self.violation_id,
-            'policy_rule': self.policy_rule,
-            'severity': self.severity,
-            'description': self.description,
-            'file_path': self.file_path,
-            'line_number': self.line_number,
-            'timestamp': self.timestamp
+            "violation_id": self.violation_id,
+            "policy_rule": self.policy_rule,
+            "severity": self.severity,
+            "description": self.description,
+            "file_path": self.file_path,
+            "line_number": self.line_number,
+            "timestamp": self.timestamp,
         }

@@ -4,13 +4,13 @@ Git Checkpoint and Rollback Mechanism
 Provides safe rollback capabilities for the enhancement process.
 """
 
-import subprocess
+from datetime import datetime
+import hashlib
 import json
 import os
 from pathlib import Path
-from datetime import datetime
-from typing import Dict, List, Optional, Tuple
-import hashlib
+import subprocess
+from typing import Dict, List, Tuple
 
 
 class GitCheckpointManager:
@@ -24,26 +24,20 @@ class GitCheckpointManager:
     def _load_checkpoints(self) -> Dict:
         """Load existing checkpoints from file."""
         if self.checkpoint_file.exists():
-            with open(self.checkpoint_file, 'r') as f:
+            with open(self.checkpoint_file) as f:
                 return json.load(f)
         return {"checkpoints": []}
 
     def _save_checkpoints(self) -> None:
         """Save checkpoints to file."""
         self.checkpoint_file.parent.mkdir(exist_ok=True)
-        with open(self.checkpoint_file, 'w') as f:
+        with open(self.checkpoint_file, "w") as f:
             json.dump(self.checkpoints, f, indent=2)
 
     def _run_git_command(self, cmd: List[str]) -> Tuple[bool, str]:
         """Run a git command and return success status and output."""
         try:
-            result = subprocess.run(
-                ["git"] + cmd,
-                cwd=self.repo_path,
-                capture_output=True,
-                text=True,
-                check=True
-            )
+            result = subprocess.run(["git"] + cmd, cwd=self.repo_path, capture_output=True, text=True, check=True)
             return True, result.stdout.strip()
         except subprocess.CalledProcessError as e:
             return False, e.stderr.strip()
@@ -87,7 +81,7 @@ class GitCheckpointManager:
             "branch": branch,
             "stash_ref": stash_ref,
             "has_uncommitted": has_uncommitted,
-            "id": hashlib.md5(f"{name}_{commit_hash}_{datetime.now()}".encode()).hexdigest()[:8]
+            "id": hashlib.md5(f"{name}_{commit_hash}_{datetime.now()}".encode()).hexdigest()[:8],
         }
 
         # Save checkpoint
@@ -111,13 +105,12 @@ class GitCheckpointManager:
         # Find checkpoint
         checkpoint = None
         for cp in self.checkpoints["checkpoints"]:
-            if (checkpoint_id and cp["id"] == checkpoint_id) or \
-               (checkpoint_name and cp["name"] == checkpoint_name):
+            if (checkpoint_id and cp["id"] == checkpoint_id) or (checkpoint_name and cp["name"] == checkpoint_name):
                 checkpoint = cp
                 break
 
         if not checkpoint:
-            print(f"[FAIL] Checkpoint not found")
+            print("[FAIL] Checkpoint not found")
             return False
 
         print(f"\nRolling back to checkpoint: {checkpoint['name']}")
@@ -137,7 +130,7 @@ class GitCheckpointManager:
 
         # Apply stashed changes if checkpoint had them
         if checkpoint.get("stash_ref"):
-            print(f"  Applying stashed changes from checkpoint...")
+            print("  Applying stashed changes from checkpoint...")
             success, output = self._run_git_command(["stash", "apply", checkpoint["stash_ref"]])
             if not success:
                 print(f"  [WARNING] Could not apply stash: {output}")
@@ -149,17 +142,19 @@ class GitCheckpointManager:
         """Delete a checkpoint."""
         initial_count = len(self.checkpoints["checkpoints"])
         self.checkpoints["checkpoints"] = [
-            cp for cp in self.checkpoints["checkpoints"]
-            if not ((checkpoint_id and cp["id"] == checkpoint_id) or
-                   (checkpoint_name and cp["name"] == checkpoint_name))
+            cp
+            for cp in self.checkpoints["checkpoints"]
+            if not (
+                (checkpoint_id and cp["id"] == checkpoint_id) or (checkpoint_name and cp["name"] == checkpoint_name)
+            )
         ]
 
         if len(self.checkpoints["checkpoints"]) < initial_count:
             self._save_checkpoints()
-            print(f"[OK] Checkpoint deleted")
+            print("[OK] Checkpoint deleted")
             return True
         else:
-            print(f"[FAIL] Checkpoint not found")
+            print("[FAIL] Checkpoint not found")
             return False
 
 
@@ -172,7 +167,7 @@ class QualityGateEnforcer:
             "tests_pass": {"command": ["python", "-m", "pytest"], "required": True},
             "lint_pass": {"command": ["python", "-m", "flake8", "."], "required": False},
             "type_check": {"command": ["python", "-m", "mypy", "."], "required": False},
-            "nasa_compliance": {"threshold": 30, "required": True}
+            "nasa_compliance": {"threshold": 30, "required": True},
         }
 
     def run_quality_checks(self) -> Dict[str, bool]:
@@ -186,10 +181,7 @@ class QualityGateEnforcer:
         print("Running tests...")
         try:
             result = subprocess.run(
-                self.quality_gates["tests_pass"]["command"],
-                capture_output=True,
-                text=True,
-                timeout=60
+                self.quality_gates["tests_pass"]["command"], check=False, capture_output=True, text=True, timeout=60
             )
             results["tests_pass"] = result.returncode == 0
             print(f"  Tests: {'[OK] PASSED' if results['tests_pass'] else '[FAIL] FAILED'}")
@@ -201,7 +193,7 @@ class QualityGateEnforcer:
         print("Checking NASA compliance...")
         # This would run the actual analyzer
         results["nasa_compliance"] = True  # Mock result
-        print(f"  NASA Compliance: [OK] Above threshold")
+        print("  NASA Compliance: [OK] Above threshold")
 
         return results
 
@@ -210,7 +202,7 @@ class QualityGateEnforcer:
         # Create checkpoint before enforcement
         checkpoint = self.checkpoint_manager.create_checkpoint(
             name=f"pre_quality_gate_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
-            description="Checkpoint before quality gate enforcement"
+            description="Checkpoint before quality gate enforcement",
         )
 
         # Run quality checks
@@ -279,7 +271,7 @@ if __name__ == "__main__":
     hook_path.write_text(hook_content)
 
     # Make executable on Unix-like systems
-    if os.name != 'nt':
+    if os.name != "nt":
         os.chmod(hook_path, 0o755)
 
     print(f"[OK] Pre-commit hook created at {hook_path}")
@@ -295,10 +287,7 @@ def main():
 
     # Create a checkpoint
     print("\n1. Creating checkpoints...")
-    cp1 = mgr.create_checkpoint(
-        name="phase_0_foundation_start",
-        description="Before starting Phase 0 foundation fixes"
-    )
+    cp1 = mgr.create_checkpoint(name="phase_0_foundation_start", description="Before starting Phase 0 foundation fixes")
 
     # List checkpoints
     print("\n2. Listing checkpoints...")

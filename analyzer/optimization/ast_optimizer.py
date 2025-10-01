@@ -7,7 +7,6 @@ Optimized AST traversal algorithms for improved performance
 in connascence analysis.
 """
 
-from fixes.phase0.production_safe_assertions import ProductionAssert
 import ast
 from collections import defaultdict
 from dataclasses import dataclass
@@ -16,6 +15,8 @@ from pathlib import Path
 import sys
 import time
 from typing import Any, Callable, Dict, Iterator, List, Optional, Set, Union
+
+from fixes.phase0.production_safe_assertions import ProductionAssert
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
@@ -252,9 +253,7 @@ class OptimizedASTVisitor(ast.NodeVisitor):
                 key_parts.append(f"id:{node.id}")
             elif isinstance(node, ast.Attribute):
                 key_parts.append(f"attr:{node.attr}")
-            elif isinstance(node, ast.FunctionDef):
-                key_parts.append(f"name:{node.name}")
-            elif isinstance(node, ast.ClassDef):
+            elif isinstance(node, ast.FunctionDef) or isinstance(node, ast.ClassDef):
                 key_parts.append(f"name:{node.name}")
 
             return ":".join(key_parts)
@@ -487,10 +486,9 @@ class PerformanceProfiler:
     def start_profile(self, profile_name: str):
         """Start profiling a traversal operation."""
 
-        ProductionAssert.not_none(profile_name, 'profile_name')
+        ProductionAssert.not_none(profile_name, "profile_name")
 
-
-        ProductionAssert.not_none(profile_name, 'profile_name')
+        ProductionAssert.not_none(profile_name, "profile_name")
 
         self.active_profiles[profile_name] = {
             "start_time": time.time(),

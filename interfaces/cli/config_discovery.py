@@ -11,23 +11,25 @@ Automatically discovers and loads configuration from:
 """
 
 import configparser
-import json
 import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
 try:
     import toml
+
     TOML_AVAILABLE = True
 except ImportError:
     try:
         import tomli as toml
+
         TOML_AVAILABLE = True
     except ImportError:
         TOML_AVAILABLE = False
 
 try:
     import yaml
+
     YAML_AVAILABLE = True
 except ImportError:
     YAML_AVAILABLE = False
@@ -137,7 +139,7 @@ class ConfigDiscovery:
                 return None
 
         try:
-            with open(config_file, 'r', encoding='utf-8') as f:
+            with open(config_file, encoding="utf-8") as f:
                 data = yaml.safe_load(f)
 
             if data and isinstance(data, dict):
@@ -228,8 +230,16 @@ class ConfigDiscovery:
             if key in ("exclude", "include") and isinstance(value, str):
                 # Convert comma-separated strings to lists
                 normalized[key] = [item.strip() for item in value.split(",") if item.strip()]
-            elif key in ("exit_zero", "show_source", "strict_mode", "nasa_validation", 
-                        "ignore_failures", "parallel", "detailed", "metrics"):
+            elif key in (
+                "exit_zero",
+                "show_source",
+                "strict_mode",
+                "nasa_validation",
+                "ignore_failures",
+                "parallel",
+                "detailed",
+                "metrics",
+            ):
                 # Convert to boolean
                 normalized[key] = self._to_bool(value)
             elif key == "threshold" and value is not None:
@@ -245,8 +255,16 @@ class ConfigDiscovery:
 
     def _convert_env_value(self, value: str, key: str) -> Any:
         """Convert environment variable value to appropriate type."""
-        if key in ("exit_zero", "show_source", "strict_mode", "nasa_validation",
-                  "ignore_failures", "parallel", "detailed", "metrics"):
+        if key in (
+            "exit_zero",
+            "show_source",
+            "strict_mode",
+            "nasa_validation",
+            "ignore_failures",
+            "parallel",
+            "detailed",
+            "metrics",
+        ):
             return self._to_bool(value)
         elif key in ("exclude", "include"):
             return [item.strip() for item in value.split(",") if item.strip()]
@@ -319,7 +337,7 @@ class ConfigDiscovery:
             raise ImportError("YAML support not available. Install 'pyyaml' package.")
 
         try:
-            with open(config_file, 'r', encoding='utf-8') as f:
+            with open(config_file, encoding="utf-8") as f:
                 data = yaml.safe_load(f)
 
             if data and isinstance(data, dict):
@@ -333,17 +351,17 @@ class ConfigDiscovery:
     def _validate_config(self, config: Dict[str, Any]) -> Dict[str, Any]:
         """Validate configuration values and apply constraints."""
         validated = config.copy()
-        
+
         # Validate format option
         valid_formats = ["json", "text", "csv", "xml", "html", "yaml"]
         if validated.get("format") not in valid_formats:
             validated["format"] = "json"
-        
+
         # Validate severity levels
         valid_severities = ["low", "medium", "high", "critical", None]
         if validated.get("severity") not in valid_severities:
             validated["severity"] = None
-        
+
         # Validate threshold
         if "threshold" in validated and validated["threshold"] is not None:
             try:
@@ -354,14 +372,14 @@ class ConfigDiscovery:
                     validated["threshold"] = threshold
             except (ValueError, TypeError):
                 validated["threshold"] = None
-        
+
         # Ensure lists are actually lists
         for key in ("exclude", "include"):
             if key in validated and not isinstance(validated[key], list):
                 validated[key] = []
-        
+
         # Validate file paths
-        if "output_file" in validated and validated["output_file"]:
+        if validated.get("output_file"):
             try:
                 output_path = Path(validated["output_file"])
                 # Ensure parent directory exists or can be created
@@ -369,12 +387,12 @@ class ConfigDiscovery:
                     validated["output_file"] = str(output_path)
             except Exception:
                 validated["output_file"] = None
-        
-        if "baseline" in validated and validated["baseline"]:
+
+        if validated.get("baseline"):
             baseline_path = Path(validated["baseline"])
             if not baseline_path.exists():
                 validated["baseline"] = None
-        
+
         return validated
 
     def get_config_template(self, format_type: str = "yml") -> str:
@@ -390,7 +408,7 @@ class ConfigDiscovery:
 
     def _get_yaml_template(self) -> str:
         """Generate YAML configuration template."""
-        return '''# Connascence Analyzer Configuration
+        return """# Connascence Analyzer Configuration
 # See: https://connascence.io for more information
 
 # Analysis policy (default, strict, permissive)
@@ -446,11 +464,11 @@ metrics: false
 
 # Baseline file for comparison (optional)
 baseline: null
-'''
+"""
 
     def _get_toml_template(self) -> str:
         """Generate TOML configuration template."""
-        return '''# Connascence Analyzer Configuration
+        return """# Connascence Analyzer Configuration
 [tool.connascence]
 
 # Analysis policy (default, strict, permissive)
@@ -503,11 +521,11 @@ metrics = false
 
 # Baseline file for comparison (optional)
 # baseline = "baseline.json"
-'''
+"""
 
     def _get_cfg_template(self) -> str:
         """Generate CFG/INI configuration template."""
-        return '''# Connascence Analyzer Configuration
+        return """# Connascence Analyzer Configuration
 [connascence]
 
 # Analysis policy (default, strict, permissive)
@@ -560,35 +578,35 @@ metrics = false
 
 # Baseline file for comparison (optional)
 # baseline = baseline.json
-'''
+"""
 
     def validate_config_file(self, config_path: str) -> List[str]:
         """Validate a configuration file and return any errors."""
         errors = []
-        
+
         try:
             config = self.load_config_file(config_path)
             validated = self._validate_config(config)
-            
+
             # Check for required dependencies
             config_file = Path(config_path)
             if config_file.suffix in (".yml", ".yaml") and not YAML_AVAILABLE:
                 errors.append("YAML support not available. Install 'pyyaml' package.")
             elif config_file.suffix in (".toml", ".tml") and not TOML_AVAILABLE:
                 errors.append("TOML support not available. Install 'toml' or 'tomli' package.")
-            
+
             # Check for validation issues
             original_keys = set(config.keys())
             validated_keys = set(validated.keys())
-            
+
             if original_keys != validated_keys:
                 errors.append("Configuration was modified during validation")
-                
+
         except FileNotFoundError:
             errors.append(f"Configuration file not found: {config_path}")
         except ValueError as e:
             errors.append(f"Invalid configuration format: {e}")
         except Exception as e:
             errors.append(f"Error loading configuration: {e}")
-        
+
         return errors

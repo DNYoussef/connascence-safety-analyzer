@@ -3,10 +3,11 @@ Language-specific strategy implementations for connascence detection.
 Consolidates duplicate algorithms across JavaScript and C language detection.
 """
 
-from utils.types import ConnascenceViolation
 from pathlib import Path
 import re
 from typing import Dict, List
+
+from utils.types import ConnascenceViolation
 
 try:
     from .constants import (

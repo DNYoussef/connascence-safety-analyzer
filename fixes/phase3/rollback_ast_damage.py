@@ -4,9 +4,8 @@ Rollback Script for AST-Damaged Files
 Reverts files damaged by the assertion injector's AST unparsing.
 """
 
-import subprocess
-import sys
 from pathlib import Path
+import subprocess
 from typing import List, Tuple
 
 
@@ -23,29 +22,27 @@ class ASTDamageRollback:
 
         # Get list of modified files
         result = subprocess.run(
-            ["git", "status", "--porcelain"],
-            cwd=self.repo_path,
-            capture_output=True,
-            text=True
+            ["git", "status", "--porcelain"], check=False, cwd=self.repo_path, capture_output=True, text=True
         )
 
         damaged = []
-        for line in result.stdout.strip().split('\n'):
-            if line.startswith(' M '):
+        for line in result.stdout.strip().split("\n"):
+            if line.startswith(" M "):
                 file_path = line[3:].strip()
 
                 # Check if file has the telltale signs of AST damage
                 full_path = self.repo_path / file_path
-                if full_path.suffix == '.py' and full_path.exists():
+                if full_path.suffix == ".py" and full_path.exists():
                     # Check for damaged imports
-                    with open(full_path, 'r', encoding='utf-8', errors='ignore') as f:
+                    with open(full_path, encoding="utf-8", errors="ignore") as f:
                         first_lines = f.read(500)
 
                     # AST damage indicators:
                     # 1. Single-quoted docstrings at file start
                     # 2. ProductionAssert import at beginning
-                    if ('from fixes.phase0.production_safe_assertions import ProductionAssert' in first_lines or
-                        (first_lines.startswith("'") and not first_lines.startswith('"""'))):
+                    if "from fixes.phase0.production_safe_assertions import ProductionAssert" in first_lines or (
+                        first_lines.startswith("'") and not first_lines.startswith('"""')
+                    ):
                         damaged.append(file_path)
 
         self.damaged_files = damaged
@@ -56,11 +53,7 @@ class ASTDamageRollback:
         try:
             # Use git checkout to restore file
             result = subprocess.run(
-                ["git", "checkout", "--", file_path],
-                cwd=self.repo_path,
-                capture_output=True,
-                text=True,
-                check=True
+                ["git", "checkout", "--", file_path], cwd=self.repo_path, capture_output=True, text=True, check=True
             )
             return True
         except subprocess.CalledProcessError as e:
@@ -79,7 +72,7 @@ class ASTDamageRollback:
             print(f"Rolling back: {file_path}")
             if self.rollback_file(file_path):
                 success_count += 1
-                print(f"  [OK] Restored to last commit")
+                print("  [OK] Restored to last commit")
             else:
                 fail_count += 1
 
@@ -91,15 +84,12 @@ class ASTDamageRollback:
 
         # Check git status again
         result = subprocess.run(
-            ["git", "status", "--porcelain"],
-            cwd=self.repo_path,
-            capture_output=True,
-            text=True
+            ["git", "status", "--porcelain"], check=False, cwd=self.repo_path, capture_output=True, text=True
         )
 
         remaining_modified = []
-        for line in result.stdout.strip().split('\n'):
-            if line.startswith(' M ') and line[3:].strip() in self.damaged_files:
+        for line in result.stdout.strip().split("\n"):
+            if line.startswith(" M ") and line[3:].strip() in self.damaged_files:
                 remaining_modified.append(line[3:].strip())
 
         if remaining_modified:
@@ -139,7 +129,7 @@ def main():
 
     # Ask for confirmation
     response = input("\nProceed with rollback? (y/n): ")
-    if response.lower() != 'y':
+    if response.lower() != "y":
         print("Rollback cancelled")
         return
 

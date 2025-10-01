@@ -96,6 +96,6 @@ patterns for quality assurance and performance monitoring.
 
 __all__ = []
 
-__version__ = '1.0.0'
-__author__ = 'Connascence E2E Test Suite'
-__description__ = 'Comprehensive end-to-end testing with memory coordination'
+__version__ = "1.0.0"
+__author__ = "Connascence E2E Test Suite"
+__description__ = "Comprehensive end-to-end testing with memory coordination"

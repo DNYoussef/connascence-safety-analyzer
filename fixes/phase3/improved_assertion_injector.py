@@ -4,11 +4,10 @@ Improved Assertion Injector - Regex-Based
 Injects production-safe assertions without damaging file formatting.
 """
 
-import re
-import sys
 import json
 from pathlib import Path
-from typing import List, Dict, Tuple, Optional
+import re
+from typing import Dict, List, Optional, Tuple
 
 
 class ImprovedAssertionInjector:
@@ -17,60 +16,48 @@ class ImprovedAssertionInjector:
     def __init__(self, project_path: str):
         self.project_path = Path(project_path)
         self.baseline_file = self.project_path / "fixes" / "phase0" / "baseline" / "baseline_analysis.json"
-        self.results = {
-            "files_processed": 0,
-            "assertions_injected": 0,
-            "files_modified": [],
-            "errors": []
-        }
+        self.results = {"files_processed": 0, "assertions_injected": 0, "files_modified": [], "errors": []}
 
     def load_violation_data(self) -> List[Dict]:
         """Load Rule 5 violations from baseline."""
-        with open(self.baseline_file, 'r') as f:
+        with open(self.baseline_file) as f:
             data = json.load(f)
 
         # Filter for Rule 5 violations in project files (not test_packages)
         rule5_files = []
-        for file_info in data['files_with_violations']:
+        for file_info in data["files_with_violations"]:
             # Skip test_packages
-            if file_info['file'].startswith('test_packages'):
+            if file_info["file"].startswith("test_packages"):
                 continue
 
-            rule5_violations = [
-                v for v in file_info['violations']
-                if v['rule'] == 'nasa_rule_5'
-            ]
+            rule5_violations = [v for v in file_info["violations"] if v["rule"] == "nasa_rule_5"]
             if rule5_violations:
-                rule5_files.append({
-                    'file': file_info['file'],
-                    'violations': rule5_violations,
-                    'count': len(rule5_violations)
-                })
+                rule5_files.append(
+                    {"file": file_info["file"], "violations": rule5_violations, "count": len(rule5_violations)}
+                )
 
         # Sort by violation count
-        return sorted(rule5_files, key=lambda x: x['count'], reverse=True)
+        return sorted(rule5_files, key=lambda x: x["count"], reverse=True)
 
     def find_function_signature(self, content: str, line_number: int) -> Optional[Tuple[str, List[str]]]:
         """Find function signature near the given line."""
-        lines = content.split('\n')
+        lines = content.split("\n")
 
         # Search backwards from line_number to find function def
         for i in range(max(0, line_number - 1), max(0, line_number - 20), -1):
             line = lines[i].strip()
-            if line.startswith('def '):
+            if line.startswith("def "):
                 # Extract function name and parameters
-                match = re.match(r'def\s+(\w+)\s*\((.*?)\):', line)
+                match = re.match(r"def\s+(\w+)\s*\((.*?)\):", line)
                 if match:
                     func_name = match.group(1)
                     params = match.group(2).strip()
 
                     # Parse parameters
                     if params:
-                        param_list = [p.split(':')[0].split('=')[0].strip()
-                                    for p in params.split(',')]
+                        param_list = [p.split(":")[0].split("=")[0].strip() for p in params.split(",")]
                         # Filter out self, cls
-                        param_list = [p for p in param_list
-                                    if p and p not in ('self', 'cls')]
+                        param_list = [p for p in param_list if p and p not in ("self", "cls")]
                     else:
                         param_list = []
 
@@ -96,11 +83,11 @@ class ImprovedAssertionInjector:
     def inject_assertions_regex(self, file_path: Path) -> int:
         """Inject assertions using regex pattern matching."""
         # Read file
-        with open(file_path, 'r', encoding='utf-8') as f:
+        with open(file_path, encoding="utf-8") as f:
             content = f.read()
 
         # Check if import already exists
-        has_import = 'from fixes.phase0.production_safe_assertions import ProductionAssert' in content
+        has_import = "from fixes.phase0.production_safe_assertions import ProductionAssert" in content
 
         # Count assertions injected
         injections = 0
@@ -108,7 +95,7 @@ class ImprovedAssertionInjector:
         lines_to_add = {}
 
         # Find function definitions
-        pattern = r'^(\s*)(def\s+(\w+)\s*\((.*?)\):)\s*$'
+        pattern = r"^(\s*)(def\s+(\w+)\s*\((.*?)\):)\s*$"
         for match in re.finditer(pattern, content, re.MULTILINE):
             indent = match.group(1)
             func_line = match.group(2)
@@ -116,15 +103,15 @@ class ImprovedAssertionInjector:
             params_str = match.group(4)
 
             # Skip test functions and private methods
-            if func_name.startswith(('test_', '_test')) or func_name.startswith('_'):
+            if func_name.startswith(("test_", "_test")) or func_name.startswith("_"):
                 continue
 
             # Parse parameters
             params = []
             if params_str.strip():
-                for p in params_str.split(','):
-                    param = p.split(':')[0].split('=')[0].strip()
-                    if param and param not in ('self', 'cls'):
+                for p in params_str.split(","):
+                    param = p.split(":")[0].split("=")[0].strip()
+                    if param and param not in ("self", "cls"):
                         params.append(param)
 
             # Only inject if function has parameters
@@ -142,7 +129,7 @@ class ImprovedAssertionInjector:
 
             # Check for docstring
             remaining = content[func_start_pos:]
-            docstring_match = re.match(r'\s*(""".*?"""|\'\'\'.*?\'\'\')' , remaining, re.DOTALL)
+            docstring_match = re.match(r'\s*(""".*?"""|\'\'\'.*?\'\'\')', remaining, re.DOTALL)
 
             if docstring_match:
                 insert_pos = func_start_pos + docstring_match.end()
@@ -160,32 +147,34 @@ class ImprovedAssertionInjector:
         if lines_to_add:
             sorted_positions = sorted(lines_to_add.keys(), reverse=True)
             for pos in sorted_positions:
-                assertions_text = ''.join(lines_to_add[pos])
-                modified_content = modified_content[:pos] + '\n' + assertions_text + modified_content[pos:]
+                assertions_text = "".join(lines_to_add[pos])
+                modified_content = modified_content[:pos] + "\n" + assertions_text + modified_content[pos:]
 
             # Add import at the top if not present
             if not has_import:
                 # Find first import or beginning of file
-                first_import = re.search(r'^import |^from ', modified_content, re.MULTILINE)
+                first_import = re.search(r"^import |^from ", modified_content, re.MULTILINE)
                 if first_import:
                     insert_pos = first_import.start()
                 else:
                     # After shebang/encoding if present
-                    lines = modified_content.split('\n')
+                    lines = modified_content.split("\n")
                     insert_line = 0
                     for i, line in enumerate(lines):
-                        if line.startswith('#') or not line.strip():
+                        if line.startswith("#") or not line.strip():
                             insert_line = i + 1
                         else:
                             break
-                    insert_pos = len('\n'.join(lines[:insert_line]))
+                    insert_pos = len("\n".join(lines[:insert_line]))
 
-                modified_content = (modified_content[:insert_pos] +
-                                  'from fixes.phase0.production_safe_assertions import ProductionAssert\n' +
-                                  modified_content[insert_pos:])
+                modified_content = (
+                    modified_content[:insert_pos]
+                    + "from fixes.phase0.production_safe_assertions import ProductionAssert\n"
+                    + modified_content[insert_pos:]
+                )
 
             # Write back
-            with open(file_path, 'w', encoding='utf-8') as f:
+            with open(file_path, "w", encoding="utf-8") as f:
                 f.write(modified_content)
 
         return injections
@@ -198,7 +187,7 @@ class ImprovedAssertionInjector:
         # Load violations
         rule5_files = self.load_violation_data()
         print(f"Found {len(rule5_files)} project files with Rule 5 violations")
-        print(f"(Excluding test_packages)")
+        print("(Excluding test_packages)")
 
         # Process top N files
         files_to_process = rule5_files[:max_files]
@@ -206,7 +195,7 @@ class ImprovedAssertionInjector:
         print("-" * 40)
 
         for i, file_info in enumerate(files_to_process, 1):
-            file_path = self.project_path / file_info['file']
+            file_path = self.project_path / file_info["file"]
 
             if not file_path.exists():
                 print(f"[{i}/{len(files_to_process)}] Skipping {file_info['file']} - not found")
@@ -219,27 +208,24 @@ class ImprovedAssertionInjector:
                 injections = self.inject_assertions_regex(file_path)
 
                 if injections > 0:
-                    self.results["files_modified"].append(file_info['file'])
+                    self.results["files_modified"].append(file_info["file"])
                     self.results["assertions_injected"] += injections
                     print(f"  [OK] Injected {injections} assertions")
                 else:
-                    print(f"  [SKIP] No suitable functions found")
+                    print("  [SKIP] No suitable functions found")
 
                 self.results["files_processed"] += 1
 
             except Exception as e:
                 print(f"  [ERROR] {e}")
-                self.results["errors"].append({
-                    "file": file_info['file'],
-                    "error": str(e)
-                })
+                self.results["errors"].append({"file": file_info["file"], "error": str(e)})
 
         return self.results
 
     def save_results(self):
         """Save injection results."""
         output_file = self.project_path / "fixes" / "phase3" / "improved_injection_results.json"
-        with open(output_file, 'w') as f:
+        with open(output_file, "w") as f:
             json.dump(self.results, f, indent=2)
 
         print(f"\n[OK] Results saved to: {output_file}")
@@ -256,8 +242,8 @@ class ImprovedAssertionInjector:
         report.append(f"Assertions Injected: {self.results['assertions_injected']}")
         report.append(f"Errors: {len(self.results['errors'])}")
 
-        if self.results['assertions_injected'] > 0:
-            avg = self.results['assertions_injected'] / max(1, len(self.results['files_modified']))
+        if self.results["assertions_injected"] > 0:
+            avg = self.results["assertions_injected"] / max(1, len(self.results["files_modified"]))
             report.append(f"\nAverage Assertions per File: {avg:.1f}")
 
         report.append("\n" + "=" * 70)

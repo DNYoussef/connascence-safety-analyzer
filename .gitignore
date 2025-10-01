@@ -73,3 +73,10 @@ out/
 vscode-extension/node_modules/
 # Windows artifacts
 *.stackdump
+
+# VSCode extension compiled output
+integrations/vscode/out/
+
+# VSCode extension artifacts
+integrations/vscode/*.vsix
+integrations/vscode/.vscode-test/

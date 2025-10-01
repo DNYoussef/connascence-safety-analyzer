@@ -25,7 +25,7 @@ import sys
 
 import pytest
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from analyzer.ast_engine import AnalysisResult, ConnascenceASTAnalyzer
 from utils.types import ConnascenceViolation
@@ -51,7 +51,7 @@ def calculate_price(base_price):
         violations = self.analyzer.analyze_string(code, "test.py")
 
         # Should detect two magic literals: 100 and 0.2
-        magic_violations = [v for v in violations if v.connascence_type == 'CoM']
+        magic_violations = [v for v in violations if v.connascence_type == "CoM"]
         assert len(magic_violations) >= 2
 
         # Check that violations have required fields
@@ -60,8 +60,8 @@ def calculate_price(base_price):
             assert violation.line_number > 0
             assert violation.description
             # Handle both string and enum severity values
-            severity_val = violation.severity.value if hasattr(violation.severity, 'value') else violation.severity
-            assert severity_val in ['low', 'medium', 'high', 'critical']
+            severity_val = violation.severity.value if hasattr(violation.severity, "value") else violation.severity
+            assert severity_val in ["low", "medium", "high", "critical"]
 
     def test_parameter_bomb_detection(self):
         """Test detection of too many positional parameters (CoP)."""
@@ -77,12 +77,12 @@ class Calculator:
         violations = self.analyzer.analyze_string(code, "test.py")
 
         # Should detect parameter bombs
-        param_violations = [v for v in violations if v.connascence_type == 'CoP']
+        param_violations = [v for v in violations if v.connascence_type == "CoP"]
         assert len(param_violations) >= 2
 
         # Check severity is appropriate for parameter count
         for violation in param_violations:
-            assert violation.severity in ['medium', 'high', 'critical']
+            assert violation.severity in ["medium", "high", "critical"]
 
     def test_missing_type_hints_detection(self):
         """Test detection of missing type hints (CoT)."""
@@ -97,7 +97,7 @@ def typed_function(param1: int, param2: str) -> str:  # Has type hints
         violations = self.analyzer.analyze_string(code, "test.py")
 
         # Should detect missing type hints only in first function
-        type_violations = [v for v in violations if v.connascence_type == 'CoT']
+        type_violations = [v for v in violations if v.connascence_type == "CoT"]
         assert len(type_violations) >= 1
 
         # Should not flag the typed function
@@ -109,9 +109,11 @@ def typed_function(param1: int, param2: str) -> str:  # Has type hints
         # Create a class with many methods
         methods = []
         for i in range(25):  # Create 25 methods
-            methods.append(f"""
+            methods.append(
+                f"""
     def method_{i}(self):
-        return {i}""")
+        return {i}"""
+            )
 
         code = f"""
 class GodClass:
@@ -123,13 +125,13 @@ class GodClass:
         violations = self.analyzer.analyze_string(code, "test.py")
 
         # Should detect god class
-        algo_violations = [v for v in violations if v.connascence_type == 'CoA']
-        god_class_violations = [v for v in algo_violations if 'class' in v.description.lower()]
+        algo_violations = [v for v in violations if v.connascence_type == "CoA"]
+        god_class_violations = [v for v in algo_violations if "class" in v.description.lower()]
         assert len(god_class_violations) >= 1
 
         # Should be high or critical severity
         for violation in god_class_violations:
-            assert violation.severity in ['high', 'critical']
+            assert violation.severity in ["high", "critical"]
 
     def test_complex_method_detection(self):
         """Test detection of complex methods (CoA)."""
@@ -157,12 +159,12 @@ def complex_method(x):
         violations = self.analyzer.analyze_string(code, "test.py")
 
         # Should detect high cyclomatic complexity
-        complexity_violations = [v for v in violations if 'complexity' in v.description.lower()]
+        complexity_violations = [v for v in violations if "complexity" in v.description.lower()]
         assert len(complexity_violations) >= 1
 
         # Should suggest breaking down the method
         for violation in complexity_violations:
-            assert 'method' in violation.description.lower() or 'function' in violation.description.lower()
+            assert "method" in violation.description.lower() or "function" in violation.description.lower()
 
     def test_duplicate_code_detection(self):
         """Test detection of code duplication (CoA)."""
@@ -189,7 +191,7 @@ def validate_username(username):
         violations = self.analyzer.analyze_string(code, "test.py")
 
         # Should detect some form of duplication or similar patterns
-        [v for v in violations if 'duplicate' in v.description.lower()]
+        [v for v in violations if "duplicate" in v.description.lower()]
         # Note: Basic AST analysis might not catch all duplication, so we're lenient here
 
     def test_empty_file_handling(self):
@@ -228,7 +230,7 @@ def bad_function(a, b, c, d, e, f, g, h):  # High: too many params
 
         # Each violation should have valid severity
         for violation in violations:
-            assert violation.severity in ['low', 'medium', 'high', 'critical']
+            assert violation.severity in ["low", "medium", "high", "critical"]
 
     def test_violation_completeness(self):
         """Test that violations contain all required fields."""
@@ -241,19 +243,19 @@ def test_function(a, b, c, d, e):
 
         for violation in violations:
             # Check required fields
-            assert hasattr(violation, 'id')
-            assert hasattr(violation, 'rule_id')
-            assert hasattr(violation, 'connascence_type')
-            assert hasattr(violation, 'severity')
-            assert hasattr(violation, 'description')
-            assert hasattr(violation, 'file_path')
-            assert hasattr(violation, 'line_number')
-            assert hasattr(violation, 'weight')
+            assert hasattr(violation, "id")
+            assert hasattr(violation, "rule_id")
+            assert hasattr(violation, "connascence_type")
+            assert hasattr(violation, "severity")
+            assert hasattr(violation, "description")
+            assert hasattr(violation, "file_path")
+            assert hasattr(violation, "line_number")
+            assert hasattr(violation, "weight")
 
             # Check field values
             assert violation.id
-            assert violation.rule_id.startswith('CON_')
-            assert violation.connascence_type in ['CoN', 'CoT', 'CoM', 'CoP', 'CoA', 'CoE', 'CoTi', 'CoV', 'CoI']
+            assert violation.rule_id.startswith("CON_")
+            assert violation.connascence_type in ["CoN", "CoT", "CoM", "CoP", "CoA", "CoE", "CoTi", "CoV", "CoI"]
             assert violation.file_path == "test.py"
             assert violation.line_number > 0
             assert isinstance(violation.weight, (int, float))
@@ -286,9 +288,7 @@ def simple_function():
 
         # Create analyzer with strict thresholds
         strict_config = ThresholdConfig(
-            max_positional_params=2,  # Very strict
-            max_cyclomatic_complexity=5,
-            god_class_methods=10
+            max_positional_params=2, max_cyclomatic_complexity=5, god_class_methods=10  # Very strict
         )
 
         strict_analyzer = ConnascenceASTAnalyzer(thresholds=strict_config)
@@ -303,7 +303,7 @@ def moderate_function(a, b, c):  # 3 params - should trigger with strict config
         violations = strict_analyzer.analyze_string(code, "test.py")
 
         # Should detect violation with strict thresholds
-        param_violations = [v for v in violations if v.connascence_type == 'CoP']
+        param_violations = [v for v in violations if v.connascence_type == "CoP"]
         assert len(param_violations) >= 1
 
 
@@ -321,16 +321,11 @@ class TestAnalysisResult:
                 description="Test violation",
                 file_path="test.py",
                 line_number=1,
-                weight=2.0
+                weight=2.0,
             )
         ]
 
-        result = AnalysisResult(
-            violations=violations,
-            total_files=1,
-            analysis_time=1.5,
-            connascence_index=10.5
-        )
+        result = AnalysisResult(violations=violations, total_files=1, analysis_time=1.5, connascence_index=10.5)
 
         assert result.violations == violations
         assert result.total_files == 1
@@ -341,20 +336,35 @@ class TestAnalysisResult:
         """Test AnalysisResult summary methods."""
         violations = [
             ConnascenceViolation(
-                id="test1", rule_id="CON_CoM", connascence_type="CoM",
-                severity="critical", description="Critical", file_path="test.py",
-                line_number=1, weight=5.0
+                id="test1",
+                rule_id="CON_CoM",
+                connascence_type="CoM",
+                severity="critical",
+                description="Critical",
+                file_path="test.py",
+                line_number=1,
+                weight=5.0,
             ),
             ConnascenceViolation(
-                id="test2", rule_id="CON_CoP", connascence_type="CoP",
-                severity="high", description="High", file_path="test.py",
-                line_number=2, weight=3.0
+                id="test2",
+                rule_id="CON_CoP",
+                connascence_type="CoP",
+                severity="high",
+                description="High",
+                file_path="test.py",
+                line_number=2,
+                weight=3.0,
             ),
             ConnascenceViolation(
-                id="test3", rule_id="CON_CoM", connascence_type="CoM",
-                severity="medium", description="Medium", file_path="test.py",
-                line_number=3, weight=2.0
-            )
+                id="test3",
+                rule_id="CON_CoM",
+                connascence_type="CoM",
+                severity="medium",
+                description="Medium",
+                file_path="test.py",
+                line_number=3,
+                weight=2.0,
+            ),
         ]
 
         result = AnalysisResult(violations=violations, total_files=1, analysis_time=1.0)
@@ -368,8 +378,8 @@ class TestAnalysisResult:
 
         # Test violations by type
         by_type = result.violations_by_type
-        assert by_type['CoM'] == 2
-        assert by_type['CoP'] == 1
+        assert by_type["CoM"] == 2
+        assert by_type["CoP"] == 1
 
 
 @pytest.fixture
@@ -379,29 +389,35 @@ def sample_python_files(tmp_path):
 
     # File with magic literals
     magic_file = tmp_path / "magic_literals.py"
-    magic_file.write_text("""
+    magic_file.write_text(
+        """
 def calculate_discount(price):
     if price > 100:  # Magic literal
         return price * 0.1  # Magic literal
     return 0
-""")
-    files['magic'] = magic_file
+"""
+    )
+    files["magic"] = magic_file
 
     # File with parameter bombs
     params_file = tmp_path / "param_bombs.py"
-    params_file.write_text("""
+    params_file.write_text(
+        """
 def complex_function(a, b, c, d, e, f, g, h):
     return a + b + c + d + e + f + g + h
-""")
-    files['params'] = params_file
+"""
+    )
+    files["params"] = params_file
 
     # Clean file
     clean_file = tmp_path / "clean.py"
-    clean_file.write_text("""
+    clean_file.write_text(
+        """
 def simple_function(x: int) -> int:
     return x * 2
-""")
-    files['clean'] = clean_file
+"""
+    )
+    files["clean"] = clean_file
 
     return files
 
@@ -414,14 +430,14 @@ class TestAnalyzerIntegration:
         analyzer = ConnascenceASTAnalyzer()
 
         # Test magic literals file
-        violations = analyzer.analyze_file(sample_python_files['magic'])
-        magic_violations = [v for v in violations if v.connascence_type == 'CoM']
+        violations = analyzer.analyze_file(sample_python_files["magic"])
+        magic_violations = [v for v in violations if v.connascence_type == "CoM"]
         assert len(magic_violations) > 0
 
         # Test clean file
-        violations = analyzer.analyze_file(sample_python_files['clean'])
+        violations = analyzer.analyze_file(sample_python_files["clean"])
         # Should have few or no violations
-        critical_violations = [v for v in violations if v.severity == 'critical']
+        critical_violations = [v for v in violations if v.severity == "critical"]
         assert len(critical_violations) == 0
 
     def test_analyze_directory(self, sample_python_files, tmp_path):
@@ -448,6 +464,7 @@ class TestAnalyzerIntegration:
         analyzer = ConnascenceASTAnalyzer()
 
         import time
+
         start_time = time.time()
         violations = analyzer.analyze_string(large_code, "large.py")
         end_time = time.time()
