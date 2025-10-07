@@ -65,18 +65,41 @@ coverage.xml
 
 # Vendor-specific files (Claude Code configuration)
 .claude/
-CLAUDE.md
 
 # Temporary directories
 out/
 *_reproduction_output/
+archive/temp_files/
 vscode-extension/node_modules/
+
 # Windows artifacts
 *.stackdump
 
 # VSCode extension compiled output
+interfaces/vscode/out/
 integrations/vscode/out/
 
 # VSCode extension artifacts
+interfaces/vscode/*.vsix
+interfaces/vscode/.vscode-test/
 integrations/vscode/*.vsix
 integrations/vscode/.vscode-test/
+
+# Analysis artifacts
+*.json.bak
+*-report.json
+*.sarif
+analysis/
+fixes/
+
+# Cache directories
+.connascence/
+.connascence_cache/
+.benchmarks/
+.ruff_cache/
+
+# Demo and test artifacts
+demo_results/
+DEMO_ARTIFACTS/
+test_output/
+dogfood/
