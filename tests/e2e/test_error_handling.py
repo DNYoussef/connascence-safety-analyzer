@@ -51,11 +51,9 @@ class ErrorHandlingCoordinator:
 
     def store_error_scenario(self, scenario_id: str, error_config: Dict[str, Any]):
         """Store error scenario configuration and results."""
+        ProductionAssert.not_none(scenario_id, 'scenario_id')
+        ProductionAssert.not_none(error_config, 'error_config')
 
-        ProductionAssert.not_none(scenario_id, 'scenario_id')
-        ProductionAssert.not_none(error_config, 'error_config')
-        ProductionAssert.not_none(scenario_id, 'scenario_id')
-        ProductionAssert.not_none(error_config, 'error_config')
         self.error_scenarios[scenario_id] = {
             'config': error_config,
             'timestamp': time.time(),
@@ -75,47 +73,37 @@ class ErrorHandlingCoordinator:
 
     def store_recovery_attempt(self, scenario_id: str, recovery_data: Dict[str, Any]):
         """Store error recovery attempt results."""
+        ProductionAssert.not_none(scenario_id, 'scenario_id')
+        ProductionAssert.not_none(recovery_data, 'recovery_data')
 
-        ProductionAssert.not_none(scenario_id, 'scenario_id')
-        ProductionAssert.not_none(recovery_data, 'recovery_data')
-        ProductionAssert.not_none(scenario_id, 'scenario_id')
-        ProductionAssert.not_none(recovery_data, 'recovery_data')
         self.recovery_attempts[scenario_id] = recovery_data
 
     def store_edge_case_result(self, scenario_id: str, edge_case_data: Dict[str, Any]):
         """Store edge case testing results."""
+        ProductionAssert.not_none(scenario_id, 'scenario_id')
+        ProductionAssert.not_none(edge_case_data, 'edge_case_data')
 
-        ProductionAssert.not_none(scenario_id, 'scenario_id')
-        ProductionAssert.not_none(edge_case_data, 'edge_case_data')
-        ProductionAssert.not_none(scenario_id, 'scenario_id')
-        ProductionAssert.not_none(edge_case_data, 'edge_case_data')
         self.edge_case_results[scenario_id] = edge_case_data
 
     def store_failure_pattern(self, pattern_id: str, pattern_data: Dict[str, Any]):
         """Store failure pattern analysis."""
+        ProductionAssert.not_none(pattern_id, 'pattern_id')
+        ProductionAssert.not_none(pattern_data, 'pattern_data')
 
-        ProductionAssert.not_none(pattern_id, 'pattern_id')
-        ProductionAssert.not_none(pattern_data, 'pattern_data')
-        ProductionAssert.not_none(pattern_id, 'pattern_id')
-        ProductionAssert.not_none(pattern_data, 'pattern_data')
         self.failure_patterns[pattern_id] = pattern_data
 
     def store_graceful_degradation(self, scenario_id: str, degradation_data: Dict[str, Any]):
         """Store graceful degradation test results."""
+        ProductionAssert.not_none(scenario_id, 'scenario_id')
+        ProductionAssert.not_none(degradation_data, 'degradation_data')
 
-        ProductionAssert.not_none(scenario_id, 'scenario_id')
-        ProductionAssert.not_none(degradation_data, 'degradation_data')
-        ProductionAssert.not_none(scenario_id, 'scenario_id')
-        ProductionAssert.not_none(degradation_data, 'degradation_data')
         self.graceful_degradation_tests[scenario_id] = degradation_data
 
     def store_error_message_quality(self, scenario_id: str, message_analysis: Dict[str, Any]):
         """Store error message quality analysis."""
+        ProductionAssert.not_none(scenario_id, 'scenario_id')
+        ProductionAssert.not_none(message_analysis, 'message_analysis')
 
-        ProductionAssert.not_none(scenario_id, 'scenario_id')
-        ProductionAssert.not_none(message_analysis, 'message_analysis')
-        ProductionAssert.not_none(scenario_id, 'scenario_id')
-        ProductionAssert.not_none(message_analysis, 'message_analysis')
         self.error_message_quality[scenario_id] = message_analysis
 
     def get_error_handling_summary(self) -> Dict[str, Any]:
@@ -1111,10 +1099,7 @@ magic_value = 42  # Magic literal
         from concurrent.futures import ThreadPoolExecutor, as_completed
 
         def analyze_project_with_error_handling(project_path):
-
-
             ProductionAssert.not_none(project_path, 'project_path')
-        ProductionAssert.not_none(project_path, 'project_path')
 
             try:
                 cli = ConnascenceCLI()

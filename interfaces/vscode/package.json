@@ -155,6 +155,12 @@
         "icon": "$(debug-breakpoint-log)"
       },
       {
+        "command": "connascence.showWelcome",
+        "title": "Show Welcome Screen",
+        "category": "Connascence",
+        "icon": "$(home)"
+      },
+      {
         "command": "connascence.clearCache",
         "title": "Clear Analysis Cache",
         "category": "Connascence: Utilities",
@@ -314,28 +320,59 @@
     "languages": [
       {
         "id": "python",
-        "aliases": ["Python", "py"],
-        "extensions": [".py"]
+        "aliases": [
+          "Python",
+          "py"
+        ],
+        "extensions": [
+          ".py"
+        ]
       },
       {
         "id": "c",
-        "aliases": ["C", "c"],
-        "extensions": [".c", ".h"]
+        "aliases": [
+          "C",
+          "c"
+        ],
+        "extensions": [
+          ".c",
+          ".h"
+        ]
       },
       {
         "id": "cpp",
-        "aliases": ["C++", "cpp"],
-        "extensions": [".cpp", ".hpp", ".cc", ".cxx"]
+        "aliases": [
+          "C++",
+          "cpp"
+        ],
+        "extensions": [
+          ".cpp",
+          ".hpp",
+          ".cc",
+          ".cxx"
+        ]
       },
       {
         "id": "javascript",
-        "aliases": ["JavaScript", "js"],
-        "extensions": [".js", ".mjs"]
+        "aliases": [
+          "JavaScript",
+          "js"
+        ],
+        "extensions": [
+          ".js",
+          ".mjs"
+        ]
       },
       {
         "id": "typescript",
-        "aliases": ["TypeScript", "ts"],
-        "extensions": [".ts", ".tsx"]
+        "aliases": [
+          "TypeScript",
+          "ts"
+        ],
+        "extensions": [
+          ".ts",
+          ".tsx"
+        ]
       }
     ],
     "configuration": {
@@ -346,7 +383,7 @@
           "enum": [
             "none",
             "nasa-compliance",
-            "strict", 
+            "strict",
             "standard",
             "lenient",
             "general_safety_strict",
@@ -437,8 +474,8 @@
         "connascence.confidenceThreshold": {
           "type": "number",
           "default": 0.8,
-          "minimum": 0.0,
-          "maximum": 1.0,
+          "minimum": 0,
+          "maximum": 1,
           "description": "Confidence threshold for analysis suggestions (0.0-1.0)"
         },
         "connascence.excludePatterns": {
@@ -474,15 +511,15 @@
         "connascence.nasaComplianceThreshold": {
           "type": "number",
           "default": 0.95,
-          "minimum": 0.0,
-          "maximum": 1.0,
+          "minimum": 0,
+          "maximum": 1,
           "description": "NASA compliance threshold for safety-critical code (0.0-1.0)"
         },
         "connascence.meceQualityThreshold": {
           "type": "number",
           "default": 0.85,
-          "minimum": 0.0,
-          "maximum": 1.0,
+          "minimum": 0,
+          "maximum": 1,
           "description": "MECE (Mutually Exclusive, Collectively Exhaustive) quality threshold (0.0-1.0)"
         },
         "connascence.performanceAnalysis": {
@@ -580,7 +617,7 @@
         "connascence.enhancedPipeline": {
           "type": "object",
           "properties": {
-            "enableCrossPhaseCor relation": {
+            "enableCrossPhaseCorrelation": {
               "type": "boolean",
               "default": true,
               "description": "Enable cross-phase correlation analysis"
@@ -608,8 +645,8 @@
             "correlationThreshold": {
               "type": "number",
               "default": 0.6,
-              "minimum": 0.0,
-              "maximum": 1.0,
+              "minimum": 0,
+              "maximum": 1,
               "description": "Threshold for cross-phase correlation detection (0.0-1.0)"
             }
           },
@@ -636,13 +673,23 @@
               },
               "severity": {
                 "type": "string",
-                "enum": ["error", "warning", "info", "hint"]
+                "enum": [
+                  "error",
+                  "warning",
+                  "info",
+                  "hint"
+                ]
               },
               "message": {
                 "type": "string"
               }
             },
-            "required": ["name", "pattern", "severity", "message"]
+            "required": [
+              "name",
+              "pattern",
+              "severity",
+              "message"
+            ]
           },
           "default": [],
           "description": "Custom analysis rules"
@@ -657,7 +704,13 @@
           "items": {
             "type": "string"
           },
-          "default": ["python", "c", "cpp", "javascript", "typescript"],
+          "default": [
+            "python",
+            "c",
+            "cpp",
+            "javascript",
+            "typescript"
+          ],
           "description": "List of programming languages supported by Connascence analysis"
         },
         "connascence.linterIntegration": {
@@ -722,14 +775,28 @@
               "items": {
                 "type": "string"
               },
-              "default": ["0", "1", "-1", "True", "False", "None"],
+              "default": [
+                "0",
+                "1",
+                "-1",
+                "True",
+                "False",
+                "None"
+              ],
               "description": "Common literal values to exclude from magic literal detection"
             }
           },
           "default": {
             "enableEnhancedDetection": true,
             "contextualAnalysis": true,
-            "excludeCommonPatterns": ["0", "1", "-1", "True", "False", "None"]
+            "excludeCommonPatterns": [
+              "0",
+              "1",
+              "-1",
+              "True",
+              "False",
+              "None"
+            ]
           },
           "description": "Magic literal (Connascence of Meaning) detection settings"
         },
@@ -765,39 +832,33 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "echo 'Using pre-compiled files'",
-    "compile": "echo 'Using pre-compiled TypeScript files' && exit 0",
-    "watch": "echo 'Using pre-compiled TypeScript files' && exit 0", 
-    "package": "vsce package --no-dependencies",
-    "publish": "vsce publish --no-dependencies",
-    "build:production": "echo 'Using pre-compiled files'",
-    "test": "echo 'No tests configured'"
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js",
+    "package": "vsce package",
+    "publish": "vsce publish",
+    "build:production": "npm run compile && npm run lint && npm run test"
   },
   "devDependencies": {
-    "@types/vscode": "^1.74.0",
+    "@types/glob": "^8.1.0",
+    "@types/mocha": "^10.0.10",
     "@types/node": "18.x",
+    "@types/vscode": "^1.74.0",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
-    "eslint": "^8.57.0",
-    "typescript": "^5.3.3",
     "@vscode/test-electron": "^2.3.8",
     "@vscode/vsce": "^2.15.0",
+    "eslint": "^8.57.0",
     "mocha": "^10.2.0",
-    "@types/mocha": "^10.0.6",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.3.3",
     "webpack": "^5.89.0",
-    "webpack-cli": "^5.1.4",
-    "ts-loader": "^9.5.1"
+    "webpack-cli": "^5.1.4"
   },
-  "dependencies": {},
   "extensionDependencies": [
     "ms-python.python"
-  ],
-  "contributes": {
-    "jsonValidation": [
-      {
-        "fileMatch": "pyproject.toml",
-        "url": "./schemas/ruff-connascence-schema.json"
-      }
-    ]
-  }
+  ]
 }

@@ -58,10 +58,11 @@ class PerformanceBenchmarkCoordinator:
         """Store benchmark execution results."""
 
         ProductionAssert.not_none(benchmark_id, 'benchmark_id')
+
         ProductionAssert.not_none(benchmark_data, 'benchmark_data')
         ProductionAssert.not_none(benchmark_id, 'benchmark_id')
-        ProductionAssert.not_none(benchmark_data, 'benchmark_data')
-        self.benchmark_results[benchmark_id] = {
+
+        ProductionAssert.not_none(benchmark_data, 'benchmark_data')        self.benchmark_results[benchmark_id] = {
             'data': benchmark_data,
             'timestamp': time.time(),
             'benchmark_type': benchmark_data.get('benchmark_type', 'unknown')
@@ -71,64 +72,71 @@ class PerformanceBenchmarkCoordinator:
         """Store performance baseline for comparison."""
 
         ProductionAssert.not_none(baseline_id, 'baseline_id')
+
         ProductionAssert.not_none(baseline_data, 'baseline_data')
         ProductionAssert.not_none(baseline_id, 'baseline_id')
-        ProductionAssert.not_none(baseline_data, 'baseline_data')
-        self.performance_baselines[baseline_id] = baseline_data
+
+        ProductionAssert.not_none(baseline_data, 'baseline_data')        self.performance_baselines[baseline_id] = baseline_data
 
     def store_scalability_metrics(self, test_id: str, scalability_data: Dict[str, Any]):
         """Store scalability test results."""
 
         ProductionAssert.not_none(test_id, 'test_id')
+
         ProductionAssert.not_none(scalability_data, 'scalability_data')
         ProductionAssert.not_none(test_id, 'test_id')
-        ProductionAssert.not_none(scalability_data, 'scalability_data')
-        self.scalability_metrics[test_id] = scalability_data
+
+        ProductionAssert.not_none(scalability_data, 'scalability_data')        self.scalability_metrics[test_id] = scalability_data
 
     def store_memory_profile(self, profile_id: str, memory_data: Dict[str, Any]):
         """Store memory usage profiling data."""
 
         ProductionAssert.not_none(profile_id, 'profile_id')
+
         ProductionAssert.not_none(memory_data, 'memory_data')
         ProductionAssert.not_none(profile_id, 'profile_id')
-        ProductionAssert.not_none(memory_data, 'memory_data')
-        self.memory_profiles[profile_id] = memory_data
+
+        ProductionAssert.not_none(memory_data, 'memory_data')        self.memory_profiles[profile_id] = memory_data
 
     def store_throughput_measurement(self, measurement_id: str, throughput_data: Dict[str, Any]):
         """Store throughput measurement results."""
 
         ProductionAssert.not_none(measurement_id, 'measurement_id')
+
         ProductionAssert.not_none(throughput_data, 'throughput_data')
         ProductionAssert.not_none(measurement_id, 'measurement_id')
-        ProductionAssert.not_none(throughput_data, 'throughput_data')
-        self.throughput_measurements[measurement_id] = throughput_data
+
+        ProductionAssert.not_none(throughput_data, 'throughput_data')        self.throughput_measurements[measurement_id] = throughput_data
 
     def store_latency_measurement(self, measurement_id: str, latency_data: Dict[str, Any]):
         """Store latency measurement results."""
 
         ProductionAssert.not_none(measurement_id, 'measurement_id')
+
         ProductionAssert.not_none(latency_data, 'latency_data')
         ProductionAssert.not_none(measurement_id, 'measurement_id')
-        ProductionAssert.not_none(latency_data, 'latency_data')
-        self.latency_measurements[measurement_id] = latency_data
+
+        ProductionAssert.not_none(latency_data, 'latency_data')        self.latency_measurements[measurement_id] = latency_data
 
     def store_regression_test(self, test_id: str, regression_data: Dict[str, Any]):
         """Store performance regression test results."""
 
         ProductionAssert.not_none(test_id, 'test_id')
+
         ProductionAssert.not_none(regression_data, 'regression_data')
         ProductionAssert.not_none(test_id, 'test_id')
-        ProductionAssert.not_none(regression_data, 'regression_data')
-        self.regression_tests[test_id] = regression_data
+
+        ProductionAssert.not_none(regression_data, 'regression_data')        self.regression_tests[test_id] = regression_data
 
     def store_resource_utilization(self, utilization_id: str, resource_data: Dict[str, Any]):
         """Store resource utilization metrics."""
 
         ProductionAssert.not_none(utilization_id, 'utilization_id')
+
         ProductionAssert.not_none(resource_data, 'resource_data')
         ProductionAssert.not_none(utilization_id, 'utilization_id')
-        ProductionAssert.not_none(resource_data, 'resource_data')
-        self.resource_utilization[utilization_id] = resource_data
+
+        ProductionAssert.not_none(resource_data, 'resource_data')        self.resource_utilization[utilization_id] = resource_data
 
     def get_performance_summary(self) -> Dict[str, Any]:
         """Get comprehensive performance testing summary."""
@@ -259,6 +267,7 @@ class PerformanceProfiler:
         """Start resource monitoring."""
 
         ProductionAssert.not_none(process_pid, 'process_pid')
+
         ProductionAssert.not_none(process_pid, 'process_pid')
 
         if process_pid:
@@ -999,6 +1008,7 @@ class ConcurrentClass_{i}_{j}:
 
 
             ProductionAssert.not_none(project, 'project')
+
         ProductionAssert.not_none(project, 'project')
 
             cli = ConnascenceCLI()

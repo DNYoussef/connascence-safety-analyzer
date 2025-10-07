@@ -95,10 +95,11 @@ class MasterMemoryCoordinator:
         """Store integration test results that involve multiple coordinators."""
 
         ProductionAssert.not_none(test_id, 'test_id')
+
         ProductionAssert.not_none(integration_data, 'integration_data')
         ProductionAssert.not_none(test_id, 'test_id')
-        ProductionAssert.not_none(integration_data, 'integration_data')
-        self.integration_tests[test_id] = {
+
+        ProductionAssert.not_none(integration_data, 'integration_data')        self.integration_tests[test_id] = {
             'data': integration_data,
             'timestamp': time.time(),
             'coordinators_involved': self._detect_coordinators_involved(integration_data)

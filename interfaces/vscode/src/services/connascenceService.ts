@@ -4,6 +4,7 @@ import { spawn } from 'child_process';
 import { ConfigurationService } from './configurationService';
 import { TelemetryService } from './telemetryService';
 import { ConnascenceApiClient } from './connascenceApiClient';
+import { MCPClient } from './mcpClient';
 
 export interface AnalysisResult {
     findings: Finding[];
@@ -168,6 +169,7 @@ export interface WorkspaceAnalysisResult {
 
 export class ConnascenceService {
     private apiClient: ConnascenceApiClient;
+    private mcpClient: MCPClient | null = null;
     private parallelAnalysisEnabled: boolean = true;
     private meceAnalysisEnabled: boolean = true;
     private nasaComplianceEnabled: boolean = true;
@@ -175,10 +177,26 @@ export class ConnascenceService {
 
     constructor(
         private configService: ConfigurationService,
-        private telemetryService: TelemetryService
+        private telemetryService: TelemetryService,
+        private context: vscode.ExtensionContext
     ) {
         this.apiClient = new ConnascenceApiClient();
         this.initializeAdvancedCapabilities();
+        this.initializeMCPClient();
+    }
+
+    /**
+     * Initialize MCP client with graceful fallback
+     */
+    private async initializeMCPClient(): Promise<void> {
+        try {
+            this.mcpClient = new MCPClient(this.context);
+            await this.mcpClient.connect();
+            console.log('[ConnascenceService] MCP client connected successfully');
+        } catch (error) {
+            console.warn('[ConnascenceService] MCP client initialization failed, using CLI fallback:', error);
+            this.mcpClient = null;
+        }
     }
 
     private initializeAdvancedCapabilities(): void {
@@ -323,33 +341,140 @@ export class ConnascenceService {
 
     // MCP implementations
     private async analyzeMCP(filePath: string): Promise<AnalysisResult> {
-        // TODO: Implement MCP analysis
-        throw new Error('MCP analysis not yet implemented');
+        if (!this.mcpClient || !this.mcpClient.isServerConnected()) {
+            throw new Error('MCP server not connected');
+        }
+
+        try {
+            const result = await this.mcpClient.analyzeFile(filePath, {
+                profile: this.configService.getSafetyProfile(),
+                parallel: this.parallelAnalysisEnabled,
+                nasa: this.nasaComplianceEnabled,
+                mece: this.meceAnalysisEnabled,
+                smart: this.smartIntegrationEnabled
+            });
+
+            this.telemetryService.logEvent('mcp.analysis.completed', {
+                filePath,
+                findingsCount: result.findings?.length || 0,
+                qualityScore: result.qualityScore
+            });
+
+            return result;
+        } catch (error) {
+            this.telemetryService.logError(error as Error, 'mcp.analysis.failed');
+            throw error;
+        }
     }
 
     private async analyzeWorkspaceMCP(workspacePath: string): Promise<WorkspaceAnalysisResult> {
-        // TODO: Implement MCP workspace analysis
-        throw new Error('MCP workspace analysis not yet implemented');
+        if (!this.mcpClient || !this.mcpClient.isServerConnected()) {
+            throw new Error('MCP server not connected');
+        }
+
+        try {
+            const result = await this.mcpClient.analyzeWorkspace(workspacePath, {
+                profile: this.configService.getSafetyProfile(),
+                parallel: this.parallelAnalysisEnabled,
+                exclude: this.configService.getExcludePatterns(),
+                includeTests: false // Default to false
+            });
+
+            this.telemetryService.logEvent('mcp.workspace.analysis.completed', {
+                workspacePath,
+                filesAnalyzed: result.summary?.filesAnalyzed || 0,
+                totalIssues: result.summary?.totalIssues || 0
+            });
+
+            return result;
+        } catch (error) {
+            this.telemetryService.logError(error as Error, 'mcp.workspace.analysis.failed');
+            throw error;
+        }
     }
 
     private async validateSafetyMCP(filePath: string, profile: string): Promise<SafetyValidationResult> {
-        // TODO: Implement MCP safety validation
-        throw new Error('MCP safety validation not yet implemented');
+        if (!this.mcpClient || !this.mcpClient.isServerConnected()) {
+            throw new Error('MCP server not connected');
+        }
+
+        try {
+            const result = await this.mcpClient.validateSafety(filePath, profile);
+
+            this.telemetryService.logEvent('mcp.safety.validation.completed', {
+                filePath,
+                profile,
+                compliant: result.compliant,
+                violationsCount: result.violations?.length || 0
+            });
+
+            return result;
+        } catch (error) {
+            this.telemetryService.logError(error as Error, 'mcp.safety.validation.failed');
+            throw error;
+        }
     }
 
     private async suggestRefactoringMCP(filePath: string, selection?: any): Promise<RefactoringSuggestion[]> {
-        // TODO: Implement MCP refactoring suggestions
-        throw new Error('MCP refactoring suggestions not yet implemented');
+        if (!this.mcpClient || !this.mcpClient.isServerConnected()) {
+            throw new Error('MCP server not connected');
+        }
+
+        try {
+            const result = await this.mcpClient.getRefactoringSuggestions(filePath, selection);
+
+            this.telemetryService.logEvent('mcp.refactoring.suggestions.completed', {
+                filePath,
+                suggestionsCount: result?.length || 0,
+                hasSelection: !!selection
+            });
+
+            return result || [];
+        } catch (error) {
+            this.telemetryService.logError(error as Error, 'mcp.refactoring.suggestions.failed');
+            throw error;
+        }
     }
 
     private async getAutofixesMCP(filePath: string): Promise<AutoFix[]> {
-        // TODO: Implement MCP autofixes
-        throw new Error('MCP autofixes not yet implemented');
+        if (!this.mcpClient || !this.mcpClient.isServerConnected()) {
+            throw new Error('MCP server not connected');
+        }
+
+        try {
+            const result = await this.mcpClient.getAutofixes(filePath);
+
+            this.telemetryService.logEvent('mcp.autofixes.completed', {
+                filePath,
+                autofixesCount: result?.length || 0
+            });
+
+            return result || [];
+        } catch (error) {
+            this.telemetryService.logError(error as Error, 'mcp.autofixes.failed');
+            throw error;
+        }
     }
 
     private async generateReportMCP(workspacePath: string): Promise<any> {
-        // TODO: Implement MCP report generation
-        throw new Error('MCP report generation not yet implemented');
+        if (!this.mcpClient || !this.mcpClient.isServerConnected()) {
+            throw new Error('MCP server not connected');
+        }
+
+        try {
+            const format = 'json'; // Default format
+            const result = await this.mcpClient.generateReport(workspacePath, format);
+
+            this.telemetryService.logEvent('mcp.report.generation.completed', {
+                workspacePath,
+                format
+            });
+
+            return result;
+        } catch (error) {
+            this.telemetryService.logError(error as Error, 'mcp.report.generation.failed');
+            throw error;
+        }
     }
 
     // CLI implementations

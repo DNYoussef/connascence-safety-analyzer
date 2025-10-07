@@ -15,6 +15,7 @@ import { VisualHighlightingManager } from './features/visualHighlighting';
 import { NotificationManager } from './features/notificationManager';
 import { BrokenChainLogoManager } from './features/brokenChainLogo';
 import { AIFixSuggestionsProvider } from './features/aiFixSuggestions';
+import { WelcomeScreen } from './features/welcomeScreen';
 import { ConnascenceService } from './services/connascenceService';
 import { ConfigurationService } from './services/configurationService';
 import { EnhancedPipelineProvider } from './providers/enhancedPipelineProvider';
@@ -64,7 +65,10 @@ export function activate(context: vscode.ExtensionContext) {
         
         telemetry.logEvent('extension.activate.success');
         logger.info('🔗✨ Connascence Analyzer extension activated successfully - Ready to break chains!');
-        
+
+        // Show welcome screen on first activation
+        WelcomeScreen.showOnFirstActivation(context);
+
         // Show welcome message (delayed to avoid interrupting startup)
         setTimeout(() => showWelcomeMessage(), 2000);
         
@@ -127,7 +131,13 @@ function registerAllCommands(context: vscode.ExtensionContext) {
     const showLogoCommand = vscode.commands.registerCommand('connascence.showBrokenChainAnimation', () => {
         brokenChainLogo.showBrokenChainAnimation();
     });
-    
+
+    // Welcome screen command
+    const showWelcomeCommand = vscode.commands.registerCommand('connascence.showWelcome', () => {
+        const welcome = new WelcomeScreen(context);
+        welcome.show();
+    });
+
     // Dashboard refresh command
     const refreshDashboardCommand = vscode.commands.registerCommand('connascence.refreshDashboard', () => {
         dashboardProvider.refresh();
@@ -202,6 +212,7 @@ function registerAllCommands(context: vscode.ExtensionContext) {
         showCorrelationsCommand,
         notificationControlsCommand,
         showLogoCommand,
+        showWelcomeCommand,
         refreshDashboardCommand,
         groupByFileCommand,
         groupBySeverityCommand,

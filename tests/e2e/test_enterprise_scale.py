@@ -54,10 +54,11 @@ class EnterpriseScaleCoordinator:
         """Store enterprise project configuration and metrics."""
 
         ProductionAssert.not_none(project_id, 'project_id')
+
         ProductionAssert.not_none(project_config, 'project_config')
         ProductionAssert.not_none(project_id, 'project_id')
-        ProductionAssert.not_none(project_config, 'project_config')
-        self.enterprise_projects[project_id] = {
+
+        ProductionAssert.not_none(project_config, 'project_config')        self.enterprise_projects[project_id] = {
             'config': project_config,
             'timestamp': time.time(),
             'analysis_status': 'initialized'
@@ -67,55 +68,61 @@ class EnterpriseScaleCoordinator:
         """Store scale-related performance and capacity metrics."""
 
         ProductionAssert.not_none(project_id, 'project_id')
+
         ProductionAssert.not_none(scale_data, 'scale_data')
         ProductionAssert.not_none(project_id, 'project_id')
-        ProductionAssert.not_none(scale_data, 'scale_data')
-        self.scale_metrics[project_id] = scale_data
+
+        ProductionAssert.not_none(scale_data, 'scale_data')        self.scale_metrics[project_id] = scale_data
 
     def store_policy_enforcement(self, project_id: str, policy_results: Dict[str, Any]):
         """Store policy enforcement results and compliance data."""
 
         ProductionAssert.not_none(project_id, 'project_id')
+
         ProductionAssert.not_none(policy_results, 'policy_results')
         ProductionAssert.not_none(project_id, 'project_id')
-        ProductionAssert.not_none(policy_results, 'policy_results')
-        self.policy_enforcement_results[project_id] = policy_results
+
+        ProductionAssert.not_none(policy_results, 'policy_results')        self.policy_enforcement_results[project_id] = policy_results
 
     def store_compliance_tracking(self, project_id: str, compliance_data: Dict[str, Any]):
         """Store compliance tracking data for enterprise standards."""
 
         ProductionAssert.not_none(project_id, 'project_id')
+
         ProductionAssert.not_none(compliance_data, 'compliance_data')
         ProductionAssert.not_none(project_id, 'project_id')
-        ProductionAssert.not_none(compliance_data, 'compliance_data')
-        self.compliance_tracking[project_id] = compliance_data
+
+        ProductionAssert.not_none(compliance_data, 'compliance_data')        self.compliance_tracking[project_id] = compliance_data
 
     def store_parallel_analysis(self, analysis_id: str, parallel_results: Dict[str, Any]):
         """Store parallel/concurrent analysis results."""
 
         ProductionAssert.not_none(analysis_id, 'analysis_id')
+
         ProductionAssert.not_none(parallel_results, 'parallel_results')
         ProductionAssert.not_none(analysis_id, 'analysis_id')
-        ProductionAssert.not_none(parallel_results, 'parallel_results')
-        self.parallel_analysis_results[analysis_id] = parallel_results
+
+        ProductionAssert.not_none(parallel_results, 'parallel_results')        self.parallel_analysis_results[analysis_id] = parallel_results
 
     def store_resource_utilization(self, analysis_id: str, resource_data: Dict[str, Any]):
         """Store resource utilization metrics."""
 
         ProductionAssert.not_none(analysis_id, 'analysis_id')
+
         ProductionAssert.not_none(resource_data, 'resource_data')
         ProductionAssert.not_none(analysis_id, 'analysis_id')
-        ProductionAssert.not_none(resource_data, 'resource_data')
-        self.resource_utilization[analysis_id] = resource_data
+
+        ProductionAssert.not_none(resource_data, 'resource_data')        self.resource_utilization[analysis_id] = resource_data
 
     def simulate_team_workflow(self, workflow_id: str, workflow_data: Dict[str, Any]):
         """Store team workflow simulation results."""
 
         ProductionAssert.not_none(workflow_id, 'workflow_id')
+
         ProductionAssert.not_none(workflow_data, 'workflow_data')
         ProductionAssert.not_none(workflow_id, 'workflow_id')
-        ProductionAssert.not_none(workflow_data, 'workflow_data')
-        self.team_workflow_simulations[workflow_id] = workflow_data
+
+        ProductionAssert.not_none(workflow_data, 'workflow_data')        self.team_workflow_simulations[workflow_id] = workflow_data
 
     def get_enterprise_summary(self) -> Dict[str, Any]:
         """Get comprehensive enterprise analysis summary."""
@@ -1111,6 +1118,7 @@ class Project{i}Manager:
 
 
             ProductionAssert.not_none(project_dir, 'project_dir')
+
         ProductionAssert.not_none(project_dir, 'project_dir')
 
             cli = ConnascenceCLI()

@@ -17,15 +17,14 @@ Validates that the entire test suite follows connascence principles and
 maintains proper coupling boundaries. This meta-test ensures test quality.
 """
 
+from fixes.phase0.production_safe_assertions import ProductionAssert
 import ast
 from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
-import pytest
-
-from fixes.phase0.production_safe_assertions import ProductionAssert
 from interfaces.core.interface_base import InterfaceBase as AgentInterface
+import pytest
 
 
 class ConnascenceAnalyzer:
@@ -68,8 +67,9 @@ class ConnascenceAnalyzer:
 
         class PositionalCallVisitor(ast.NodeVisitor):
             def visit_Call(self, node):
-                ProductionAssert.not_none(node, "node")
-        ProductionAssert.not_none(node, "node")
+                ProductionAssert.not_none(node, 'node')
+
+                ProductionAssert.not_none(node, 'node')
 
                 # Check for calls with many positional arguments
                 if len(node.args) > 3:
@@ -92,8 +92,9 @@ class ConnascenceAnalyzer:
 
         class MagicValueVisitor(ast.NodeVisitor):
             def visit_Num(self, node):
-                ProductionAssert.not_none(node, "node")
-        ProductionAssert.not_none(node, "node")
+                ProductionAssert.not_none(node, 'node')
+
+                ProductionAssert.not_none(node, 'node')
 
                 # Check for magic numbers
                 if isinstance(node.n, int | float) and node.n not in [0, 1, -1]:
@@ -111,8 +112,11 @@ class ConnascenceAnalyzer:
                 self.generic_visit(node)
 
             def visit_Str(self, node):
-                ProductionAssert.not_none(node, "node")
-        ProductionAssert.not_none(node, "node")
+
+
+                ProductionAssert.not_none(node, 'node')
+
+                ProductionAssert.not_none(node, 'node')
 
                 # Check for magic strings in comparisons
                 if len(node.s) > 1 and not node.s.isspace():
@@ -146,8 +150,9 @@ class ConnascenceAnalyzer:
 
         class FunctionVisitor(ast.NodeVisitor):
             def visit_FunctionDef(self, node):
-                ProductionAssert.not_none(node, "node")
-        ProductionAssert.not_none(node, "node")
+                ProductionAssert.not_none(node, 'node')
+
+                ProductionAssert.not_none(node, 'node')
 
                 # Convert function body to string for comparison
                 body_str = ast.dump(node)
@@ -173,8 +178,9 @@ class ConnascenceAnalyzer:
 
         class TemporalVisitor(ast.NodeVisitor):
             def visit_FunctionDef(self, node):
-                ProductionAssert.not_none(node, "node")
-        ProductionAssert.not_none(node, "node")
+                ProductionAssert.not_none(node, 'node')
+
+                ProductionAssert.not_none(node, 'node')
 
                 # Look for setup/teardown patterns that indicate temporal coupling
                 setup_calls = []
@@ -525,7 +531,6 @@ class TestDocumentationCompliance:
     def test_files(self):
         """Provide test files for documentation compliance testing."""
         import pathlib
-
         test_dir = pathlib.Path(__file__).parent.parent
         return list(test_dir.rglob("test_*.py"))
 

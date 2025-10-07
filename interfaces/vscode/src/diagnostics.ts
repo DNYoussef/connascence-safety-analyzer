@@ -8,6 +8,8 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import { spawn } from 'child_process';
+import { MCPClient } from './services/mcpClient';
+import { CacheService, IncrementalAnalysisTracker } from './services/cacheService';
 
 export interface ConnascenceViolation {
     id: string;
@@ -26,8 +28,37 @@ export class ConnascenceDiagnostics {
     private diagnosticCollection?: vscode.DiagnosticCollection;
     private debounceTimer?: NodeJS.Timeout;
     private scanPromises = new Map<string, Promise<void>>();
+    private mcpClient: MCPClient | null = null;
+    private cacheService: CacheService;
+    private incrementalTracker: IncrementalAnalysisTracker;
 
-    constructor(private context: vscode.ExtensionContext) {}
+    constructor(private context: vscode.ExtensionContext) {
+        this.cacheService = new CacheService(context);
+        this.incrementalTracker = new IncrementalAnalysisTracker();
+        this.initializeMCPClient();
+        this.setupFileWatcher();
+    }
+
+    /**
+     * Initialize MCP client with graceful fallback
+     */
+    private async initializeMCPClient(): Promise<void> {
+        const config = vscode.workspace.getConfiguration('connascence');
+        const useMCP = config.get<boolean>('useMCP', false);
+
+        if (!useMCP) {
+            return; // MCP disabled, use CLI
+        }
+
+        try {
+            this.mcpClient = new MCPClient(this.context);
+            await this.mcpClient.connect();
+            console.log('[ConnascenceDiagnostics] MCP client connected');
+        } catch (error) {
+            console.warn('[ConnascenceDiagnostics] MCP client unavailable, using CLI fallback:', error);
+            this.mcpClient = null;
+        }
+    }
 
     setCollection(collection: vscode.DiagnosticCollection) {
         this.diagnosticCollection = collection;
@@ -35,11 +66,29 @@ export class ConnascenceDiagnostics {
 
     async scanFile(document: vscode.TextDocument): Promise<void> {
         if (document.languageId !== 'python') return;
-        
+
         const filePath = document.uri.fsPath;
-        
+
         try {
+            // Generate content hash for cache validation
+            const content = document.getText();
+            const contentHash = CacheService.generateHash(content);
+            const cacheKey = CacheService.generateFileKey(filePath, 'diagnostics');
+
+            // Check cache first
+            const cachedViolations = await this.cacheService.get<ConnascenceViolation[]>(cacheKey, contentHash);
+            if (cachedViolations) {
+                console.log(`[Diagnostics] Using cached results for ${path.basename(filePath)}`);
+                this.updateDiagnostics(document.uri, cachedViolations);
+                return;
+            }
+
+            // Run fresh analysis
             const violations = await this.runConnascenceAnalysis(filePath);
+
+            // Cache results
+            await this.cacheService.set(cacheKey, violations, contentHash, { persistent: true });
+
             this.updateDiagnostics(document.uri, violations);
         } catch (error) {
             console.error(`Failed to scan ${filePath}:`, error);
@@ -135,9 +184,43 @@ export class ConnascenceDiagnostics {
     }
 
     private async runMCPAnalysis(targetPath: string, isWorkspace: boolean): Promise<ConnascenceViolation[]> {
-        // TODO: Implement MCP client for VS Code
-        // This would connect to the MCP server and use scan_path tool
-        throw new Error('MCP analysis not yet implemented in VS Code extension');
+        if (!this.mcpClient || !this.mcpClient.isServerConnected()) {
+            console.warn('[ConnascenceDiagnostics] MCP not available, falling back to CLI');
+            const config = vscode.workspace.getConfiguration('connascence');
+            const binaryPath = config.get<string>('pathToBinary', 'connascence');
+            const policy = config.get<string>('policyPreset', 'service-defaults');
+            return this.runCLIAnalysis(binaryPath, targetPath, policy);
+        }
+
+        try {
+            let result: any;
+
+            if (isWorkspace) {
+                // Workspace analysis
+                result = await this.mcpClient.analyzeWorkspace(targetPath, {
+                    format: 'json',
+                    includeTests: vscode.workspace.getConfiguration('connascence').get('includeTests', false)
+                });
+            } else {
+                // Single file analysis
+                result = await this.mcpClient.analyzeFile(targetPath, {
+                    format: 'json'
+                });
+            }
+
+            // Parse the result
+            const violations = this.parseViolations(result);
+            return violations;
+
+        } catch (error) {
+            console.error('[ConnascenceDiagnostics] MCP analysis failed:', error);
+
+            // Fallback to CLI on error
+            const config = vscode.workspace.getConfiguration('connascence');
+            const binaryPath = config.get<string>('pathToBinary', 'connascence');
+            const policy = config.get<string>('policyPreset', 'service-defaults');
+            return this.runCLIAnalysis(binaryPath, targetPath, policy);
+        }
     }
 
     private parseViolations(result: any): ConnascenceViolation[] {
@@ -273,12 +356,44 @@ export class ConnascenceDiagnostics {
             .forEach(doc => this.scanFileDebounced(doc));
     }
 
+    /**
+     * Setup file watcher for incremental analysis
+     */
+    private setupFileWatcher(): void {
+        const watcher = vscode.workspace.createFileSystemWatcher('**/*.py');
+
+        watcher.onDidChange((uri) => {
+            this.incrementalTracker.trackModification(uri.fsPath);
+            const cacheKey = CacheService.generateFileKey(uri.fsPath, 'diagnostics');
+            this.cacheService.invalidate(cacheKey);
+        });
+
+        watcher.onDidDelete((uri) => {
+            const cacheKey = CacheService.generateFileKey(uri.fsPath, 'diagnostics');
+            this.cacheService.invalidate(cacheKey);
+            if (this.diagnosticCollection) {
+                this.diagnosticCollection.delete(uri);
+            }
+        });
+
+        this.context.subscriptions.push(watcher);
+    }
+
     dispose(): void {
         if (this.debounceTimer) {
             clearTimeout(this.debounceTimer);
         }
-        
+
         // Cancel any running scan promises
         this.scanPromises.clear();
+
+        // Disconnect MCP client
+        if (this.mcpClient) {
+            this.mcpClient.dispose();
+            this.mcpClient = null;
+        }
+
+        // Save cache before disposing
+        this.cacheService.dispose();
     }
 }

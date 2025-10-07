@@ -5,6 +5,8 @@ export interface TelemetryEvent {
     properties?: { [key: string]: any };
     measurements?: { [key: string]: number };
     timestamp: number;
+    sessionId?: string;
+    userId?: string;
 }
 
 export class TelemetryService {
@@ -224,16 +226,105 @@ export class TelemetryService {
     }
 
     private sendEvent(event: TelemetryEvent): void {
-        // In a real implementation, this would send the event to a telemetry service
-        // For development, we can log to console or send to a local endpoint
-        
+        // Send to development console in dev mode
         if (process.env.NODE_ENV === 'development') {
-            console.log('Telemetry Event:', event);
+            console.log('[Telemetry]', event);
         }
-        
-        // TODO: Implement actual telemetry endpoint
-        // This could send to Application Insights, Google Analytics, or custom endpoint
+
+        // Production telemetry implementation
+        try {
+            // Option 1: Use VSCode's built-in telemetry reporter (requires vscode-extension-telemetry package)
+            // This respects user's telemetry settings automatically
+            // const reporter = new TelemetryReporter(extensionId, extensionVersion, key);
+            // reporter.sendTelemetryEvent(event.name, event.properties, event.measurements);
+
+            // Option 2: Custom endpoint for self-hosted telemetry
+            const telemetryEndpoint = this.getTelemetryEndpoint();
+            if (telemetryEndpoint) {
+                this.sendToCustomEndpoint(telemetryEndpoint, event);
+            }
+
+            // Option 3: Local storage for offline-first telemetry
+            this.storeEventLocally(event);
+
+        } catch (error) {
+            // Silently fail - telemetry should never crash the extension
+            console.error('[Telemetry] Failed to send event:', error);
+        }
     }
+
+    private getTelemetryEndpoint(): string | null {
+        // Check for custom telemetry endpoint in configuration
+        try {
+            const vscode = require('vscode');
+            const config = vscode.workspace.getConfiguration('connascence');
+            return config.get('telemetryEndpoint', null) as string | null;
+        } catch {
+            return null;
+        }
+    }
+
+    private async sendToCustomEndpoint(endpoint: string, event: TelemetryEvent): Promise<void> {
+        // Only send if user has explicitly configured an endpoint
+        if (!endpoint) return;
+
+        try {
+            // Use fetch API (available in Node.js 18+)
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'User-Agent': 'Connascence-VSCode-Extension/2.0.2'
+                },
+                body: JSON.stringify({
+                    timestamp: event.timestamp,
+                    sessionId: event.sessionId || this.sessionId,
+                    userId: event.userId || this.userId,
+                    name: event.name,
+                    properties: event.properties,
+                    measurements: event.measurements
+                }),
+                signal: AbortSignal.timeout(5000) // 5 second timeout
+            });
+
+            if (!response.ok) {
+                console.warn(`[Telemetry] Endpoint returned ${response.status}`);
+            }
+        } catch (error: any) {
+            // Silent fail - network errors shouldn't break the extension
+            if (error.name !== 'AbortError') {
+                console.error('[Telemetry] Network error:', error.message);
+            }
+        }
+    }
+
+    private storeEventLocally(event: TelemetryEvent): void {
+        // Store events locally for batch upload or analysis
+        try {
+            const storageKey = `telemetry_${event.timestamp}`;
+            const eventData = JSON.stringify({
+                name: event.name,
+                properties: event.properties,
+                measurements: event.measurements,
+                timestamp: event.timestamp
+            });
+
+            // Use a simple in-memory cache (could be enhanced with file storage)
+            if (this.eventCache.size > 100) {
+                // Limit cache size to prevent memory bloat
+                const oldestKey = this.eventCache.keys().next().value;
+                if (oldestKey) {
+                    this.eventCache.delete(oldestKey);
+                }
+            }
+            this.eventCache.set(storageKey, eventData);
+        } catch (error) {
+            // Silent fail
+            console.error('[Telemetry] Failed to cache event:', error);
+        }
+    }
+
+    private eventCache: Map<string, string> = new Map();
 
     // Public methods for common telemetry scenarios
     trackCommand(command: string): { end: (success?: boolean) => void } {
