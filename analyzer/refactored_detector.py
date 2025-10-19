@@ -35,8 +35,7 @@ except ImportError:
         AlgorithmDetector,
         PositionDetector,
     )
-# Temporarily disabled broken detector pool
-# from .architecture.detector_pool import get_detector_pool
+from .architecture.detector_pool import get_detector_pool
 
 
 class RefactoredConnascenceDetector(ast.NodeVisitor):
@@ -147,8 +146,7 @@ class RefactoredConnascenceDetector(ast.NodeVisitor):
 
         # Get detector pool instance
         if self._detector_pool is None:
-            # self._detector_pool = get_detector_pool()  # Temporarily disabled
-            pass
+            self._detector_pool = get_detector_pool()
 
         # Acquire all detectors from pool
         if self._detector_pool:

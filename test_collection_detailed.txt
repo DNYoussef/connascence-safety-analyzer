@@ -1,0 +1,2596 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.5, pytest-7.4.3, pluggy-1.5.0 -- C:\Python312\python.exe
+cachedir: .pytest_cache
+hypothesis profile 'default'
+benchmark: 4.0.0 (defaults: timer=time.perf_counter disable_gc=False min_rounds=5 min_time=0.000005 max_time=1.0 calibration_precision=10 warmup=False warmup_iterations=100000)
+metadata: {'Python': '3.12.5', 'Platform': 'Windows-10-10.0.19045-SP0', 'Packages': {'pytest': '7.4.3', 'pluggy': '1.5.0'}, 'Plugins': {'anyio': '3.7.1', 'Faker': '18.13.0', 'hypothesis': '6.138.2', 'langsmith': '0.4.21', 'asyncio': '0.21.1', 'bandit': '0.6.1', 'benchmark': '4.0.0', 'cov': '4.1.0', 'env': '1.1.5', 'flask': '1.3.0', 'json-report': '1.5.0', 'metadata': '3.1.1', 'mock': '3.14.0', 'randomly': '3.16.0', 'timeout': '2.3.1', 'xdist': '3.6.1'}, 'JAVA_HOME': 'C:\\Program Files\\AdoptOpenJDK\\jre-8.0.265.01-hotspot\\'}
+Using --randomly-seed=2797545399
+rootdir: C:\Users\17175\Desktop\connascence\tests
+configfile: pytest.ini
+plugins: anyio-3.7.1, Faker-18.13.0, hypothesis-6.138.2, langsmith-0.4.21, asyncio-0.21.1, bandit-0.6.1, benchmark-4.0.0, cov-4.1.0, env-1.1.5, flask-1.3.0, json-report-1.5.0, metadata-3.1.1, mock-3.14.0, randomly-3.16.0, timeout-2.3.1, xdist-3.6.1
+asyncio: mode=Mode.STRICT
+collecting ... collected 513 items / 11 errors / 4 skipped
+
+<Package tests>
+  Connascence Analyzer Test Suite
+  
+  Comprehensive test coverage for the connascence analysis system including:
+  - Unit tests for core analyzers
+  - Integration tests for CLI commands
+  - Autofix system tests
+  - Policy and baseline tests
+  - MCP server tests
+  - Performance benchmarks
+  
+  Run with: pytest tests/
+  <Module test_god_objects.py>
+    Test suite for context-aware god object detection.
+    
+    Tests Requirements:
+    1. Config classes with many properties should be lenient
+    2. Business logic classes should be strict
+    3. Data models vs API controllers different thresholds
+    4. Dynamic threshold calculation based on class type
+    <Class TestGodObjectContextAware>
+      Test context-aware god object detection with different class types.
+      <Function test_config_classes_lenient_detection>
+        Test that config classes with many properties are treated leniently.
+      <Function test_legacy_class_handling>
+        Test handling of legacy classes that need refactoring.
+      <Function test_business_logic_classes_strict_detection>
+        Test that business logic classes are subject to strict detection.
+      <Function test_utility_classes_special_handling>
+        Test that utility classes get special handling.
+      <Function test_method_count_accuracy>
+        Test that method counting is accurate and consistent.
+      <Function test_data_model_vs_controller_thresholds>
+        Test different thresholds for data models vs API controllers.
+      <Function test_dynamic_threshold_calculation>
+        Test dynamic threshold calculation based on class type and context.
+      <Function test_interface_implementation_classes>
+        Test classes that implement large interfaces.
+<Module fixtures/test_connascence_compliance.py>
+  Connascence Compliance Validation
+  
+  Validates that the entire test suite follows connascence principles and
+  maintains proper coupling boundaries. This meta-test ensures test quality.
+  <Function test_overall_connascence_score>
+    Calculate overall connascence compliance score.
+  <Class TestDocumentationCompliance>
+    Tests that validate documentation and self-documenting code.
+    <Function test_test_method_naming>
+      Test methods should have descriptive names.
+    <Function test_docstring_coverage>
+      Test classes and complex methods should have docstrings.
+  <Class TestArchitecturalCompliance>
+    Tests that validate architectural compliance.
+    <Function test_dependency_direction_compliance>
+      Dependencies should flow in the correct direction.
+    <Function test_single_responsibility_adherence>
+      Test classes should follow single responsibility principle.
+    <Function test_agent_interface_adherence>
+      All agent implementations should properly implement the interface.
+  <Class TestConnascenceCompliance>
+    Test suite to validate connascence compliance.
+    <Function test_test_isolation_patterns>
+      Tests should follow proper isolation patterns.
+    <Function test_interface_abstraction_compliance>
+      Tests should depend on interfaces, not implementations.
+    <Function test_no_excessive_positional_parameters>
+      Test files should not use excessive positional parameters.
+    <Function test_minimal_magic_values>
+      Test files should minimize magic numbers and strings.
+    <Function test_minimal_temporal_coupling>
+      Test files should minimize temporal coupling.
+    <Function test_proper_builder_usage>
+      Test files should use builder pattern instead of direct constructors.
+    <Function test_no_algorithm_duplication>
+      Test files should not duplicate business logic algorithms.
+<Package tests>
+  Connascence Analyzer Test Suite
+  
+  Comprehensive test coverage for the connascence analysis system including:
+  - Unit tests for core analyzers
+  - Integration tests for CLI commands
+  - Autofix system tests
+  - Policy and baseline tests
+  - MCP server tests
+  - Performance benchmarks
+  
+  Run with: pytest tests/
+  <Module test_enhanced_analysis.py>
+    Test suite for enhanced connascence analysis features.
+    
+    This test suite validates the actual implementation's behavior for:
+    1. Current magic number detection logic
+    2. Current god object detection thresholds
+    3. CLI functionality as implemented
+    4. Integration with real code samples
+    <Class TestRealWorldIntegration>
+      Test integration with real-world scenarios.
+      <Function test_self_analysis_integration>
+        Test analyzing our own codebase.
+      <Function test_test_packages_integration>
+        Test integration with test packages if available.
+      <Function test_performance_characteristics>
+        Test basic performance characteristics.
+    <Class TestCurrentImplementationBehavior>
+      Test the actual behavior of the current implementation.
+      <Function test_multi_language_detection>
+        Test multi-language connascence detection.
+      <Function test_current_cli_parser_behavior>
+        Test the actual CLI parser as implemented.
+      <Function test_legacy_analyzer_direct>
+        Test the legacy analyzer directly.
+      <Function test_current_magic_number_behavior>
+        Test the actual magic number detection in current implementation.
+      <Function test_core_analyzer_integration>
+        Test integration with the core analyzer.
+      <Function test_file_analysis_behavior>
+        Test actual file analysis behavior.
+      <Function test_current_god_object_thresholds>
+        Test the actual god object detection thresholds.
+  <Module test_integrated_system.py>
+    Comprehensive Integration Tests for Enhanced Connascence Analyzer System
+    
+    Tests the complete integrated system including:
+    - All 9 connascence types detection
+    - NASA Power of Ten rule analysis  
+    - RefactoredDetector architecture
+    - AST Optimizer patterns
+    - Tree-Sitter integration
+    - Cross-phase correlation
+    <UnitTestCase TestSystemReporting>
+      Test integrated reporting capabilities.
+      <TestCaseFunction test_violation_correlation_reporting>
+        Test that violations are properly correlated and reported.
+    <UnitTestCase TestIntegratedSystem>
+      Test the complete integrated analyzer system.
+      <TestCaseFunction test_unified_analyzer_integration>
+        Test the unified analyzer orchestrates all analysis phases.
+      <TestCaseFunction test_cross_phase_correlation>
+        Test that violations from different phases are properly correlated.
+      <TestCaseFunction test_all_connascence_types_detection>
+        Test that all 9 connascence types are properly detected.
+      <TestCaseFunction test_performance_and_scalability>
+        Test that the integrated system performs acceptably.
+      <TestCaseFunction test_mece_analysis_completeness>
+        Test MECE (Mutually Exclusive, Collectively Exhaustive) analysis.
+      <TestCaseFunction test_detector_factory_integration>
+        Test that all specialized detectors are properly initialized.
+      <TestCaseFunction test_nasa_power_of_ten_analysis>
+        Test NASA Power of Ten rule analysis.
+  <Module test_regex_warnings.py>
+    Automated testing for regex SyntaxWarning detection.
+    Ensures all regex patterns in the analyzer follow best practices.
+    <Function test_specific_patterns_compile_without_warnings>
+      Test that our specific regex patterns don't generate warnings.
+    <Function test_regex_patterns_use_raw_strings>
+      Test that regex patterns in source code use raw strings.
+    <Function test_language_strategies_patterns>
+      Test that LanguageStrategy patterns compile without warnings.
+    <Function test_no_syntax_warnings_on_import>
+      Test that importing analyzer modules doesn't generate SyntaxWarnings.
+    <Function test_ruff_catches_invalid_escape_sequences>
+      Test that our ruff configuration catches invalid escape sequences.
+  <Module test_context_aware_detection.py>
+    Test Context-Aware Detection Improvements
+    =========================================
+    
+    Validates that the context-aware god object detection and formal grammar
+    analysis improvements work correctly and reduce false positives.
+    <Function test_config_class_detection>
+      Test that config classes are properly classified and get higher thresholds.
+    <Function test_business_logic_detection>
+      Test that business logic classes get stricter thresholds.
+    <Function test_integration_with_main_analyzer>
+      Test integration of context-aware detection with main analyzer.
+    <Function test_magic_literal_context_awareness>
+      Test enhanced magic literal detection with context.
+  <Module test_ast_analyzer.py>
+    Tests for AST-based connascence analysis engine.
+    
+    Tests all connascence forms detection including static forms
+    (CoN, CoT, CoM, CoP, CoA) and basic runtime forms.
+    <Class TestAnalysisResult>
+      Test the AnalysisResult data structure.
+      <Function test_analysis_result_creation>
+        Test creation of AnalysisResult.
+      <Function test_analysis_result_summary>
+        Test AnalysisResult summary methods.
+    <Class TestAnalyzerIntegration>
+      Integration tests for the analyzer.
+      <Function test_analyze_directory>
+        Test analyzing directories.
+      <Function test_analyze_file>
+        Test analyzing individual files.
+      <Function test_performance_on_large_file>
+        Test analyzer performance on larger files.
+    <Class TestConnascenceASTAnalyzer>
+      Test cases for the core AST analyzer.
+      <Function test_complex_method_detection>
+        Test detection of complex methods (CoA).
+      <Function test_threshold_configuration>
+        Test that analyzer respects threshold configuration.
+      <Function test_parameter_bomb_detection>
+        Test detection of too many positional parameters (CoP).
+      <Function test_magic_literal_detection>
+        Test detection of magic literals (CoM).
+      <Function test_god_class_detection>
+        Test detection of god classes (CoA).
+      <Function test_violation_completeness>
+        Test that violations contain all required fields.
+      <Function test_empty_file_handling>
+        Test handling of empty files.
+      <Function test_incremental_analysis>
+        Test incremental analysis with caching.
+      <Function test_duplicate_code_detection>
+        Test detection of code duplication (CoA).
+      <Function test_violation_severity_assignment>
+        Test that violations are assigned appropriate severity levels.
+      <Function test_syntax_error_handling>
+        Test handling of files with syntax errors.
+      <Function test_missing_type_hints_detection>
+        Test detection of missing type hints (CoT).
+  <Module test_sixsigma_integration.py>
+    Test Six Sigma Integration with Connascence Analyzer
+    <Function test_ctq_calculator>
+      Test Critical To Quality calculator
+    <Function test_six_sigma_telemetry>
+      Test Six Sigma telemetry basic functionality
+    <Function test_quality_gate>
+      Test quality gate decision making
+    <Function test_ci_cd_integration>
+      Test CI/CD pipeline integration
+    <Function test_dashboard_export>
+      Test dashboard data export
+    <Function test_process_capability>
+      Test process capability calculations
+    <Function test_integration>
+      Test integration with connascence analyzer results
+    <Function test_six_sigma_analyzer>
+      Test Six Sigma analyzer with sample violations
+    <Function test_executive_report>
+      Test executive report generation
+  <Module test_unified_visitor_performance.py>
+    Performance Test for Unified AST Visitor
+    
+    Tests the optimization achieved by using single-pass AST traversal
+    instead of multiple separate detector traversals.
+    
+    Expected: 85-90% performance improvement
+    NASA Rule compliance validation
+    <UnitTestCase TestUnifiedVisitorPerformance>
+      Test performance improvements from unified visitor architecture.
+      <TestCaseFunction test_nasa_rule_compliance>
+        Test NASA coding standards compliance in unified visitor.
+      <TestCaseFunction test_zero_breaking_changes>
+        Test that optimized detector maintains API compatibility.
+      <TestCaseFunction test_optimized_violation_detection>
+        Test that optimized detection produces same results as legacy.
+      <TestCaseFunction test_performance_improvement_estimation>
+        Estimate performance improvement from reduced AST traversals.
+      <TestCaseFunction test_unified_visitor_data_collection>
+        Test that unified visitor collects all necessary data in one pass.
+  <Module test_nasa_integration.py>
+    NASA Power of Ten Integration Tests
+    
+    Tests the complete NASA rule analysis integration including:
+    - YAML configuration loading
+    - All 10 NASA rules detection
+    - Compliance scoring
+    - Integration with connascence analysis
+    <UnitTestCase TestNASAIntegration>
+      Test NASA Power of Ten rule integration.
+      <TestCaseFunction test_syntax_error_handling>
+        Test handling of files with syntax errors.
+      <TestCaseFunction test_compliance_scoring>
+        Test NASA compliance scoring system.
+      <TestCaseFunction test_rule_6_variable_scope>
+        Test NASA Rule 6: Declare objects at smallest scope.
+      <TestCaseFunction test_nasa_config_loading>
+        Test NASA configuration is properly loaded.
+      <TestCaseFunction test_rule_2_loop_bounds>
+        Test NASA Rule 2: All loops must have fixed upper bounds.
+      <TestCaseFunction test_custom_config_loading>
+        Test loading custom NASA configuration.
+      <TestCaseFunction test_rule_3_heap_usage>
+        Test NASA Rule 3: Do not use heap after initialization.
+      <TestCaseFunction test_rule_7_return_values>
+        Test NASA Rule 7: Check return values of non-void functions.
+      <TestCaseFunction test_nasa_context_information>
+        Test that violations include proper NASA context.
+      <TestCaseFunction test_rule_1_control_flow_violations>
+        Test NASA Rule 1: Avoid complex flow constructs.
+      <TestCaseFunction test_yaml_fallback_handling>
+        Test graceful fallback when YAML is not available.
+      <TestCaseFunction test_rule_5_assertions>
+        Test NASA Rule 5: At least 2 assertions per function.
+      <TestCaseFunction test_rule_4_function_size>
+        Test NASA Rule 4: Functions should not exceed 60 lines.
+      <TestCaseFunction test_rule_summary_reporting>
+        Test NASA rule violation summary.
+    <UnitTestCase TestNASAConnascenceIntegration>
+      Test integration between NASA rules and connascence analysis.
+      <TestCaseFunction test_shared_violation_correlation>
+        Test violations that span both NASA and connascence analysis.
+<Module detectors/test_position_detector.py>
+  Unit tests for PositionDetector.
+  <UnitTestCase TestPositionDetector>
+    A class whose instances are single test cases.
+    
+    By default, the test code itself should be placed in a method named
+    'runTest'.
+    
+    If the fixture may be used for many test cases, create as
+    many test methods as are needed. When instantiating such a TestCase
+    subclass, specify in the constructor arguments the name of the test method
+    that the instance is to execute.
+    
+    Test authors should subclass TestCase for their own tests. Construction
+    and deconstruction of the test's environment ('fixture') can be
+    implemented by overriding the 'setUp' and 'tearDown' methods respectively.
+    
+    If it is necessary to override the __init__ method, the base class
+    __init__ method must always be called. It is important that subclasses
+    should not change the signature of their __init__ method, since instances
+    of the classes are instantiated automatically by parts of the framework
+    in order to be run.
+    
+    When subclassing TestCase, you can set these attributes:
+    * failureException: determines which exception will be raised when
+        the instance's assertion methods fail; test methods raising this
+        exception will be deemed to have 'failed' rather than 'errored'.
+    * longMessage: determines whether long messages (including repr of
+        objects used in assert methods) will be printed on failure in *addition*
+        to any explicit message passed.
+    * maxDiff: sets the maximum length of a diff in failure messages
+        by assert methods using difflib. It is looked up as an instance
+        attribute so can be configured by individual tests if required.
+    <TestCaseFunction test_violation_for_bad_function>
+      Test that functions with >3 params trigger violations.
+    <TestCaseFunction test_no_violations_for_good_function>
+      Test that functions with <=3 params don't trigger violations.
+<Package enhanced>
+  Enhanced Pipeline Integration Tests
+  ==================================
+  
+  Comprehensive test suite for enhanced pipeline integration across all interfaces:
+  
+  - test_infrastructure.py: Enhanced test datasets, utilities, and mock analyzers
+  - test_vscode_integration.py: VSCode extension enhanced pipeline integration tests  
+  - test_mcp_server_integration.py: MCP server enhanced pipeline integration tests
+  - test_web_dashboard_integration.py: Web dashboard enhanced visualization tests
+  - test_cli_integration.py: CLI interface enhanced features integration tests
+  
+  This test suite validates the complete enhanced pipeline integration including:
+  - Cross-phase correlation analysis
+  - Smart architectural recommendations
+  - Analysis audit trails with timing data
+  - Enhanced AI-powered fix generation
+  - Real-time visualization and data streaming
+  <Module test_error_handling_edge_cases.py>
+    Enhanced Pipeline Error Handling and Edge Case Tests
+    ===================================================
+    
+    Comprehensive testing of error conditions and edge cases:
+    - Malformed input handling
+    - Resource constraint scenarios
+    - Concurrent access edge cases
+    - Network/IO failure simulation
+    - Invalid configuration handling
+    - Partial failure recovery
+    - Timeout and resource exhaustion
+    - Interface error propagation
+    - Data corruption handling
+    <Class TestErrorHandlingAndEdgeCases>
+      Test suite for error handling and edge cases
+      <Function test_permission_denied_handling>
+        Test handling of permission denied scenarios
+      <Function test_memory_exhaustion_handling>
+        Test handling of memory exhaustion scenarios
+      <Function test_network_timeout_simulation>
+        Test handling of network timeouts in distributed scenarios
+      <Function test_interface_communication_failure>
+        Test handling of interface communication failures
+      <Function test_timeout_handling_with_partial_results>
+        Test timeout handling with partial result preservation
+      <Function test_malformed_python_syntax_handling>
+        Test handling of files with syntax errors
+      <Function test_circular_import_detection>
+        Test handling of circular import dependencies
+      <Function test_concurrent_file_modification>
+        Test handling of files modified during analysis
+      <Function test_encoding_error_handling>
+        Test handling of files with encoding issues
+      <Function test_extremely_large_file_handling>
+        Test handling of extremely large files
+      <Function test_corrupted_analysis_data_recovery>
+        Test recovery from corrupted intermediate analysis data
+    <Class TestEdgeCaseScenarios>
+      Test specific edge case scenarios
+      <Function test_single_line_file_handling>
+        Test handling of single-line files
+      <Function test_empty_project_handling>
+        Test handling of completely empty project
+      <Function test_deeply_nested_directory_structure>
+        Test handling of deeply nested directory structures
+      <Function test_unicode_filename_handling>
+        Test handling of files with Unicode names
+<Package tests>
+  Connascence Analyzer Test Suite
+  
+  Comprehensive test coverage for the connascence analysis system including:
+  - Unit tests for core analyzers
+  - Integration tests for CLI commands
+  - Autofix system tests
+  - Policy and baseline tests
+  - MCP server tests
+  - Performance benchmarks
+  
+  Run with: pytest tests/
+  <Module test_theater_detection.py>
+    Test Theater Detection System
+    <Function test_statistical_plausibility>
+      Test statistical plausibility validation
+    <Function test_export_validation_report>
+      Test validation report export
+    <Function test_pattern_library>
+      Test theater pattern library
+    <Function test_risk_level_assessment>
+      Test risk level assessment
+    <Function test_theater_detector_initialization>
+      Test theater detector initialization
+    <Function test_connascence_specific_validation>
+      Test connascence-specific validation logic
+    <Function test_validate_quality_claim_theater>
+      Test detection of theater in quality claim
+    <Function test_systemic_theater_detection>
+      Test detection of systemic theater patterns
+    <Function test_validate_quality_claim_genuine>
+      Test validation of genuine quality claim
+    <Function test_recommendation_generation>
+      Test recommendation generation
+    <Function test_evidence_validator>
+      Test evidence validator
+<Package e2e>
+  End-to-End Testing Suite for Connascence Analysis
+  
+  This module provides comprehensive end-to-end testing capabilities for the
+  connascence analysis system, including:
+  
+  - CLI workflow testing
+  - Repository analysis validation
+  - Report generation verification
+  - Enterprise-scale scenario testing
+  - Error handling and recovery validation
+  - Exit code correctness verification
+  - Performance benchmarking and profiling
+  - Memory coordination and tracking
+  
+  The e2e tests use memory coordination to track test scenarios, results,
+  and performance metrics across different test categories.
+  
+  Test Categories:
+  - CLI Workflows: Complete command-line interface testing
+  - Repository Analysis: Real repository testing with various frameworks
+  - Report Generation: SARIF, JSON, Markdown, and Text output validation
+  - Enterprise Scale: Large-scale analysis scenarios
+  - Error Handling: Comprehensive error and edge case testing
+  - Exit Codes: All exit code scenarios (0,1,2,3,4,130)
+  - Performance: Benchmarking, profiling, and scalability testing
+  
+  Usage:
+      # Run all e2e tests
+      pytest tests/e2e/ -v
+  
+      # Run specific test category
+      pytest tests/e2e/test_cli_workflows.py -v
+      pytest tests/e2e/test_repository_analysis.py -v
+      pytest tests/e2e/test_report_generation.py -v
+      pytest tests/e2e/test_enterprise_scale.py -v
+      pytest tests/e2e/test_error_handling.py -v
+      pytest tests/e2e/test_exit_codes.py -v
+      pytest tests/e2e/test_performance.py -v
+  
+      # Run with markers
+      pytest tests/e2e/ -m "e2e" -v
+      pytest tests/e2e/ -m "slow" -v
+      pytest tests/e2e/ -m "integration" -v
+  
+  Memory Coordination:
+  The e2e tests use specialized memory coordinators to track:
+  - Test scenario execution and results
+  - Performance metrics and benchmarks
+  - Error patterns and recovery attempts
+  - Exit code validation results
+  - Resource utilization data
+  - Sequential workflow validation
+  
+  This provides comprehensive tracking and analysis of test execution
+  patterns for quality assurance and performance monitoring.
+  <Module test_repository_analysis.py>
+    End-to-End Repository Analysis Tests
+    
+    Tests real repository analysis workflows with various project types.
+    Uses memory coordination for tracking analysis patterns and performance.
+    <Function test_repository_analysis_integration>
+      Integration test for repository analysis workflows.
+    <Class TestRepositoryAnalysisWorkflows>
+      Test end-to-end repository analysis workflows.
+      <Function test_django_project_analysis_workflow>
+        Test comprehensive Django project analysis.
+      <Function test_repository_comparison_workflow>
+        Test repository comparison and benchmarking.
+      <Function test_large_repository_performance>
+        Test performance with large repository simulation.
+      <Function test_memory_coordination_repository_tracking>
+        Test memory coordination for repository analysis tracking.
+      <Function test_flask_api_analysis_workflow>
+        Test Flask API project analysis with framework-specific patterns.
+<Package enhanced>
+  Enhanced Pipeline Integration Tests
+  ==================================
+  
+  Comprehensive test suite for enhanced pipeline integration across all interfaces:
+  
+  - test_infrastructure.py: Enhanced test datasets, utilities, and mock analyzers
+  - test_vscode_integration.py: VSCode extension enhanced pipeline integration tests  
+  - test_mcp_server_integration.py: MCP server enhanced pipeline integration tests
+  - test_web_dashboard_integration.py: Web dashboard enhanced visualization tests
+  - test_cli_integration.py: CLI interface enhanced features integration tests
+  
+  This test suite validates the complete enhanced pipeline integration including:
+  - Cross-phase correlation analysis
+  - Smart architectural recommendations
+  - Analysis audit trails with timing data
+  - Enhanced AI-powered fix generation
+  - Real-time visualization and data streaming
+  <Module test_end_to_end_validation.py>
+    End-to-End Enhanced Pipeline Integration Tests
+    ==============================================
+    
+    Comprehensive validation of complete data flow through the enhanced pipeline:
+    - File analysis through enhanced pipeline processing to final output
+    - Cross-interface validation (VSCode, MCP, Web Dashboard, CLI)
+    - Data consistency across all pipeline phases
+    - Performance validation under realistic workloads
+    - Integration between all enhanced features
+    <Class TestEndToEndDataFlow>
+      Test complete data flow through enhanced pipeline
+      <Function test_legacy_refactoring_pipeline>
+      <Function test_smart_recommendations_data_flow>
+      <Function test_audit_trail_timeline_processing>
+      <Function test_large_codebase_scalability>
+      <Function test_microservices_complete_pipeline>
+      <Function test_cross_phase_correlation_consistency>
+<Package tests>
+  Connascence Analyzer Test Suite
+  
+  Comprehensive test coverage for the connascence analysis system including:
+  - Unit tests for core analyzers
+  - Integration tests for CLI commands
+  - Autofix system tests
+  - Policy and baseline tests
+  - MCP server tests
+  - Performance benchmarks
+  
+  Run with: pytest tests/
+  <Module test_system_validation.py>
+    System Validation Tests
+    
+    End-to-end validation tests that verify the complete integrated system works correctly.
+    These tests simulate real-world usage scenarios to ensure all components work together.
+    <UnitTestCase TestSystemValidation>
+      End-to-end system validation tests.
+      <TestCaseFunction test_configuration_flexibility>
+        Test that system can work with different configurations.
+      <TestCaseFunction test_cross_language_compatibility>
+        Test that system can handle different file types appropriately.
+      <TestCaseFunction test_error_resilience>
+        Test that system handles various error conditions gracefully.
+      <TestCaseFunction test_complete_analysis_pipeline>
+        Test that the complete analysis pipeline works end-to-end.
+      <TestCaseFunction test_concurrent_analysis_safety>
+        Test that system can handle concurrent analysis requests.
+      <TestCaseFunction test_memory_usage_stability>
+        Test that system doesn't accumulate memory across multiple analyses.
+      <TestCaseFunction test_performance_with_large_codebase>
+        Test system performance with larger codebase.
+    <UnitTestCase TestSystemReporting>
+      Test system-wide reporting capabilities.
+      <TestCaseFunction test_severity_prioritization>
+        Test that violations are properly prioritized by severity.
+      <TestCaseFunction test_violation_aggregation>
+        Test that violations are properly aggregated across analysis types.
+  <Module test_mcp_integration.py>
+    Integration tests for MCP server functionality and fallback modes.
+    <Class TestConnascenceViolationModel>
+      Test ConnascenceViolation model functionality.
+      <Function test_violation_to_dict_conversion>
+        Test violation objects convert to dictionaries correctly.
+      <Function test_violation_creation>
+        Test violation objects can be created correctly.
+    <Class TestMCPRateLimiting>
+      Test MCP server rate limiting functionality.
+      <Function test_rate_limit_reset>
+        Test rate limit resets over time.
+      <Function test_rate_limit_enforcement>
+        Test rate limiting prevents excessive requests.
+    <Class TestMCPMetrics>
+      Test MCP server metrics collection.
+      <Function test_metrics_collection>
+        Test server collects usage metrics.
+    <Class TestMCPConfigurationValidation>
+      Test MCP server configuration validation.
+      <Function test_empty_path_restrictions>
+        Test no path restrictions allows all paths.
+      <Function test_path_validation>
+        Test path access validation.
+      <Function test_valid_configuration>
+        Test server accepts valid configuration.
+    <Class TestMCPToolExecution>
+      Test MCP tool execution functionality.
+      <Function test_invalid_tool_execution>
+        Test handling of invalid tool requests.
+      <Function test_propose_autofix_tool>
+        Test propose_autofix tool execution.
+      <Function test_scan_path_tool>
+        Test scan_path tool execution.
+      <Function test_explain_finding_tool>
+        Test explain_finding tool execution.
+    <Class TestMCPFallbackMode>
+      Test MCP server fallback functionality.
+      <Function test_graceful_degradation>
+        Test server degrades gracefully when dependencies unavailable.
+      <Function test_standalone_analyzer_fallback>
+        Test analyzer works without external MCP servers.
+    <Class TestMCPAsyncInterface>
+      Test async MCP interface methods.
+      <Function test_async_scan_path>
+        Test async scan_path interface.
+      <Function test_async_explain_finding>
+        Test async explain_finding interface.
+      <Function test_async_propose_autofix>
+        Test async propose_autofix interface.
+    <Class TestMCPServerBasic>
+      Basic MCP server functionality tests.
+      <Function test_server_info>
+        Test server provides correct information.
+      <Function test_server_initialization>
+        Test MCP server initializes correctly.
+      <Function test_available_tools>
+        Test server exposes expected tools.
+<Package enhanced>
+  Enhanced Pipeline Integration Tests
+  ==================================
+  
+  Comprehensive test suite for enhanced pipeline integration across all interfaces:
+  
+  - test_infrastructure.py: Enhanced test datasets, utilities, and mock analyzers
+  - test_vscode_integration.py: VSCode extension enhanced pipeline integration tests  
+  - test_mcp_server_integration.py: MCP server enhanced pipeline integration tests
+  - test_web_dashboard_integration.py: Web dashboard enhanced visualization tests
+  - test_cli_integration.py: CLI interface enhanced features integration tests
+  
+  This test suite validates the complete enhanced pipeline integration including:
+  - Cross-phase correlation analysis
+  - Smart architectural recommendations
+  - Analysis audit trails with timing data
+  - Enhanced AI-powered fix generation
+  - Real-time visualization and data streaming
+  <Module test_vscode_integration.py>
+    VSCode Extension Enhanced Integration Tests
+    ==========================================
+    
+    Comprehensive tests for VSCode extension enhanced pipeline integration:
+    - Enhanced pipeline provider integration
+    - Cross-phase correlation visualization  
+    - Smart recommendations display
+    - Enhanced analysis command execution
+    - Configuration validation and policy resolution
+    <Class TestVSCodeIntegrationFlow>
+      End-to-end integration tests for VSCode extension enhanced workflow.
+      <Function test_complete_enhanced_analysis_workflow>
+    <Class TestVSCodeEnhancedIntegration>
+      Test suite for VSCode extension enhanced pipeline integration.
+      <Function test_policy_resolution_integration>
+        Test VSCode policy resolution with enhanced constants.py.
+      <Function test_error_handling_enhanced_features>
+        Test VSCode extension error handling for enhanced features.
+      <Function test_smart_recommendations_display>
+        Test smart recommendations formatting for VSCode Quick Pick.
+      <Function test_enhanced_pipeline_provider_initialization>
+        Test enhanced pipeline provider initializes correctly.
+      <Function test_correlation_visualization_data>
+        Test correlation network data preparation for VSCode visualization.
+      <Function test_enhanced_command_registration>
+        Test enhanced analysis commands are properly registered.
+      <Function test_configuration_validation>
+        Test VSCode extension configuration validation for enhanced features.
+      <Function test_audit_trail_visualization>
+        Test audit trail data preparation for VSCode display.
+      <Function test_enhanced_analysis_execution>
+      <Function test_enhanced_diagnostics_integration>
+        Test enhanced diagnostics integration with VSCode problems panel.
+<Package tests>
+  Connascence Analyzer Test Suite
+  
+  Comprehensive test coverage for the connascence analysis system including:
+  - Unit tests for core analyzers
+  - Integration tests for CLI commands
+  - Autofix system tests
+  - Policy and baseline tests
+  - MCP server tests
+  - Performance benchmarks
+  
+  Run with: pytest tests/
+  <Module test_sixsigma_theater_integration.py>
+    Integration Tests for Six Sigma + Theater Detection Systems
+    Tests both systems working together with real connascence analysis data
+    <Class TestSixSigmaTheaterIntegration>
+      Test integration between Six Sigma and Theater Detection
+      <Function test_combined_quality_validation>
+        Test quality validation using both systems
+      <Function test_quality_gate_with_theater_validation>
+        Test quality gate decisions validated by theater detection
+      <Function test_executive_report_with_theater_validation>
+        Test executive report includes theater validation results
+      <Function test_connascence_specific_six_sigma_metrics>
+        Test Six Sigma metrics specific to connascence types
+      <Function test_systemic_theater_in_six_sigma_improvements>
+        Test detection of systemic theater across multiple Six Sigma cycles
+      <Function test_ci_cd_integration_with_theater_checks>
+        Test CI/CD integration with theater detection gates
+      <Function test_dashboard_data_with_theater_scores>
+        Test dashboard data includes theater detection scores
+      <Function test_real_connascence_analysis_flow>
+        Test complete flow with real connascence data
+      <Function test_theater_detection_on_six_sigma_metrics>
+        Test theater detection on Six Sigma quality metrics
+    <Class TestRealWorldScenarios>
+      Test real-world usage scenarios
+      <Function test_incremental_improvement_tracking>
+        Test tracking incremental improvements over time
+      <Function test_large_codebase_analysis>
+        Test with large codebase simulation
+  <Module test_policy.py>
+    Tests for the policy management system.
+    
+    Tests policy loading, validation, budget tracking, and baseline management
+    for the connascence analysis system.
+    <Class TestBaselineManager>
+      Test the baseline management system.
+      <Function test_baseline_cleanup>
+        Test baseline cleanup and maintenance.
+      <Function test_baseline_comparison>
+        Test comparing current violations against baseline.
+      <Function test_baseline_filtering>
+        Test filtering violations based on baseline.
+      <Function test_baseline_creation>
+        Test creating quality baselines.
+      <Function test_baseline_versioning>
+        Test baseline versioning and history.
+    <Class TestPolicyIntegration>
+      Integration tests for policy system components.
+      <Function test_end_to_end_policy_workflow>
+        Test complete policy workflow from loading to enforcement.
+      <Function test_policy_violation_categorization>
+        Test categorization of violations by policy rules.
+    <Class TestPolicyManager>
+      Test the policy management system.
+      <Function test_policy_inheritance>
+        Test policy inheritance and customization.
+      <Function test_invalid_preset_name>
+        Test handling of invalid preset names.
+      <Function test_custom_policy_loading>
+        Test loading custom policy from file.
+      <Function test_policy_serialization>
+        Test policy serialization and deserialization.
+      <Function test_default_presets_loading>
+        Test loading of default policy presets.
+      <Function test_policy_validation>
+        Test policy configuration validation.
+    <Class TestBudgetTracker>
+      Test the budget tracking system.
+      <Function test_budget_initialization>
+        Test budget tracker initialization.
+      <Function test_progressive_budget_tracking>
+        Test progressive budget tracking over multiple scans.
+      <Function test_budget_compliance_check>
+        Test budget compliance checking.
+      <Function test_budget_reporting>
+        Test budget usage reporting.
+      <Function test_violation_tracking>
+        Test tracking violations against budget.
+<Module performance/test_benchmarks.py>
+  Performance benchmarks for the connascence analyzer.
+  
+  Tests performance characteristics and ensures the system
+  meets performance requirements for various codebase sizes.
+  <Class TestPerformanceBenchmarks>
+    Performance benchmarks for connascence analysis.
+    <Function test_incremental_analysis_performance>
+      Test performance of incremental analysis with caching.
+    <Function test_memory_usage_stability>
+      Test memory usage stability during extended analysis.
+    <Function test_complexity_analysis_performance>
+      Test performance of complexity analysis on deeply nested code.
+    <Function test_medium_codebase_performance>
+      Test performance on medium codebase (50-100 files).
+    <Function test_small_codebase_performance>
+      Test performance on small codebase (< 10 files).
+    <Function test_large_file_performance>
+      Test performance on single large file.
+  <Class TestScalabilityBenchmarks>
+    Test scalability characteristics.
+    <Function test_concurrent_analysis_performance>
+      Test performance characteristics under concurrent load.
+    <Function test_linear_scaling_hypothesis>
+      Test that analysis time scales roughly linearly with code size.
+<Package e2e>
+  End-to-End Testing Suite for Connascence Analysis
+  
+  This module provides comprehensive end-to-end testing capabilities for the
+  connascence analysis system, including:
+  
+  - CLI workflow testing
+  - Repository analysis validation
+  - Report generation verification
+  - Enterprise-scale scenario testing
+  - Error handling and recovery validation
+  - Exit code correctness verification
+  - Performance benchmarking and profiling
+  - Memory coordination and tracking
+  
+  The e2e tests use memory coordination to track test scenarios, results,
+  and performance metrics across different test categories.
+  
+  Test Categories:
+  - CLI Workflows: Complete command-line interface testing
+  - Repository Analysis: Real repository testing with various frameworks
+  - Report Generation: SARIF, JSON, Markdown, and Text output validation
+  - Enterprise Scale: Large-scale analysis scenarios
+  - Error Handling: Comprehensive error and edge case testing
+  - Exit Codes: All exit code scenarios (0,1,2,3,4,130)
+  - Performance: Benchmarking, profiling, and scalability testing
+  
+  Usage:
+      # Run all e2e tests
+      pytest tests/e2e/ -v
+  
+      # Run specific test category
+      pytest tests/e2e/test_cli_workflows.py -v
+      pytest tests/e2e/test_repository_analysis.py -v
+      pytest tests/e2e/test_report_generation.py -v
+      pytest tests/e2e/test_enterprise_scale.py -v
+      pytest tests/e2e/test_error_handling.py -v
+      pytest tests/e2e/test_exit_codes.py -v
+      pytest tests/e2e/test_performance.py -v
+  
+      # Run with markers
+      pytest tests/e2e/ -m "e2e" -v
+      pytest tests/e2e/ -m "slow" -v
+      pytest tests/e2e/ -m "integration" -v
+  
+  Memory Coordination:
+  The e2e tests use specialized memory coordinators to track:
+  - Test scenario execution and results
+  - Performance metrics and benchmarks
+  - Error patterns and recovery attempts
+  - Exit code validation results
+  - Resource utilization data
+  - Sequential workflow validation
+  
+  This provides comprehensive tracking and analysis of test execution
+  patterns for quality assurance and performance monitoring.
+  <Module test_error_handling.py>
+    End-to-End Error Handling Tests
+    
+    Tests comprehensive error handling, edge cases, and failure scenarios.
+    Validates all exit codes, error recovery, and graceful degradation.
+    Uses memory coordination for tracking error patterns and recovery metrics.
+    <Function test_error_handling_integration>
+      Integration test for comprehensive error handling system.
+    <Class TestErrorHandlingWorkflows>
+      Test comprehensive error handling scenarios.
+      <Function test_concurrent_analysis_error_handling>
+        Test error handling in concurrent analysis scenarios.
+      <Function test_exit_code_1_violations_found_scenario>
+        Test exit code 1 - violations found scenario.
+      <Function test_file_system_error_scenarios>
+        Test handling of file system errors.
+      <Function test_exit_code_4_license_error_scenario>
+        Test exit code 4 - license validation error scenario.
+      <Function test_error_message_quality_analysis>
+        Test error message quality and usefulness.
+      <Function test_exit_code_2_configuration_error_scenario>
+        Test exit code 2 - configuration/usage error scenario.
+      <Function test_keyboard_interrupt_handling>
+        Test graceful handling of keyboard interrupts.
+      <Function test_exit_code_0_no_violations_scenario>
+        Test exit code 0 - no violations found scenario.
+      <Function test_memory_limit_scenarios>
+        Test handling of memory-intensive scenarios.
+      <Function test_error_handling_memory_coordination_validation>
+        Test error handling memory coordination system.
+<Package tests>
+  Connascence Analyzer Test Suite
+  
+  Comprehensive test coverage for the connascence analysis system including:
+  - Unit tests for core analyzers
+  - Integration tests for CLI commands
+  - Autofix system tests
+  - Policy and baseline tests
+  - MCP server tests
+  - Performance benchmarks
+  
+  Run with: pytest tests/
+  <Module test_magic_numbers.py>
+    Test suite for magic number sensitivity fixes and context-aware detection.
+    
+    Tests Requirements:
+    1. Common safe numbers [0,1,2,3,5,8,10,12] are NOT flagged
+    2. Context-aware analysis (conditionals vs assignments)
+    3. HTTP codes (200, 404, 500) in appropriate contexts
+    4. Loop counters and common constants
+    <Class TestMagicNumberWhitelist>
+      Test whitelist functionality for magic numbers.
+      <Function test_default_safe_numbers>
+        Test default safe numbers are not flagged.
+      <Function test_http_status_codes_context>
+        Test HTTP status codes in appropriate contexts.
+    <Class TestMagicNumberSensitivity>
+      Test magic number detection with enhanced sensitivity and context awareness.
+      <Function test_unsafe_numbers_flagged>
+        Test that unsafe magic numbers are properly flagged.
+      <Function test_safe_numbers_not_flagged>
+        Test that common safe numbers [0,1,2,3,5,8,10,12] are not flagged.
+      <Function test_whitelist_integration_with_constants>
+        Test integration with constants.py MAGIC_NUMBERS whitelist.
+      <Function test_http_status_codes_in_context>
+        Test that HTTP status codes are handled appropriately in context.
+      <Function test_context_aware_conditionals_vs_assignments>
+        Test context-sensitive analysis for conditionals vs assignments.
+      <Function test_severity_escalation_by_context>
+        Test that severity escalates appropriately based on context.
+      <Function test_loop_counters_and_common_constants>
+        Test detection of loop counters and common mathematical constants.
+      <Function test_edge_cases_and_boundaries>
+        Test edge cases and boundary conditions for magic number detection.
+      <Function test_regression_common_patterns>
+        Regression test for common patterns that should not generate false positives.
+  <Module test_smoke_imports.py>
+    Smoke Test Suite: Module Import Tests
+    
+    Comprehensive smoke tests to ensure all critical modules can be imported
+    without ImportError and basic functionality is accessible.
+    <Class TestCriticalFunctionality>
+      Test that critical functionality works at a basic level.
+      <Function test_connascence_cli_class_instantiation>
+        Test that ConnascenceCLI class can be instantiated.
+      <Function test_main_cli_function_exists>
+        Test that the main CLI function exists and is callable.
+    <Class TestSmokeImports>
+      Smoke tests for module imports and basic accessibility.
+      <Function test_core_analyzer_modules>
+        Test that all core analyzer modules can be imported.
+      <Function test_autofix_modules>
+        Test that all autofix modules can be imported.
+      <Function test_optional_dependencies_graceful_handling>
+        Test that optional dependencies are handled gracefully.
+      <Function test_cli_handlers_import>
+        Test that CLI handlers can be imported.
+      <Function test_cli_modules>
+        Test that CLI modules can be imported.
+      <Function test_dashboard_modules>
+        Test that dashboard modules can be imported.
+      <Function test_policy_modules>
+        Test that policy management modules can be imported.
+      <Function test_all_python_files_importable>
+        Test that all Python files in the project can be imported (slow test).
+      <Function test_analyzer_core_functionality>
+        Test that core analyzer functionality is accessible.
+      <Function test_reporting_modules>
+        Test that reporting modules can be imported.
+      <Function test_package_metadata_accessible>
+        Test that package metadata is accessible.
+      <Function test_mcp_modules>
+        Test that MCP server modules can be imported.
+      <Function test_constants_module_accessibility>
+        Test that all constants are properly accessible.
+      <Function test_critical_class_instantiation>
+        Test that critical classes can be instantiated.
+  <Module test_detector_pool.py>
+    Test suite for DetectorPool performance optimization architecture.
+    
+    Validates pool functionality, thread safety, and performance improvements.
+    NASA Rule 4: All test methods under 60 lines
+    <UnitTestCase TestDetectorPool>
+      Test DetectorPool functionality and performance optimizations.
+      <TestCaseFunction test_detector_release>
+        Test releasing detector back to pool.
+      <TestCaseFunction test_singleton_pattern>
+        Test that DetectorPool implements singleton correctly.
+      <TestCaseFunction test_cleanup_idle_detectors>
+        Test cleanup of idle detectors.
+      <TestCaseFunction test_warmup_functionality>
+        Test pool warmup creates pre-warmed instances.
+      <TestCaseFunction test_performance_metrics>
+        Test pool performance metrics tracking.
+      <TestCaseFunction test_acquire_all_detectors>
+        Test acquiring all detector types at once.
+      <TestCaseFunction test_detector_state_isolation>
+        Test that detector state is properly isolated between uses.
+      <TestCaseFunction test_pool_bounded_size>
+        Test that pool respects size limits.
+      <TestCaseFunction test_thread_safety>
+        Test thread-safe detector acquisition and release.
+      <TestCaseFunction test_detector_acquisition_single>
+        Test acquiring single detector from pool.
+      <TestCaseFunction test_detector_reuse>
+        Test that detectors are reused from pool.
+      <TestCaseFunction test_error_handling_invalid_detector>
+        Test error handling for invalid detector types.
+    <UnitTestCase TestPooledDetectorIntegration>
+      Test integration with RefactoredConnascenceDetector.
+      <TestCaseFunction test_pool_metrics_available>
+        Test that pool metrics are available from refactored detector.
+      <TestCaseFunction test_resource_cleanup_on_exception>
+        Test that pool resources are cleaned up even on exceptions.
+      <TestCaseFunction test_fallback_on_pool_failure>
+        Test fallback behavior when pool acquisition fails.
+      <TestCaseFunction test_refactored_detector_uses_pool>
+        Test that RefactoredConnascenceDetector uses pool correctly.
+  <Module test_e2e_practical_usage.py>
+    End-to-End Practical Usage Tests for Six Sigma + Theater Detection
+    Tests real-world scenarios with actual connascence analysis integration
+    <Class TestPracticalE2EScenarios>
+      Test practical real-world usage scenarios
+      <Function test_continuous_improvement_tracking>
+        Test tracking multiple improvement cycles
+      <Function test_multi_project_quality_comparison>
+        Test comparing quality across multiple projects
+      <Function test_quality_gate_enforcement>
+        Test strict quality gate enforcement
+      <Function test_export_and_persistence>
+        Test exporting results for reporting and persistence
+      <Function test_complete_code_quality_audit>
+        Test complete code quality audit workflow
+<Package enhanced>
+  Enhanced Pipeline Integration Tests
+  ==================================
+  
+  Comprehensive test suite for enhanced pipeline integration across all interfaces:
+  
+  - test_infrastructure.py: Enhanced test datasets, utilities, and mock analyzers
+  - test_vscode_integration.py: VSCode extension enhanced pipeline integration tests  
+  - test_mcp_server_integration.py: MCP server enhanced pipeline integration tests
+  - test_web_dashboard_integration.py: Web dashboard enhanced visualization tests
+  - test_cli_integration.py: CLI interface enhanced features integration tests
+  
+  This test suite validates the complete enhanced pipeline integration including:
+  - Cross-phase correlation analysis
+  - Smart architectural recommendations
+  - Analysis audit trails with timing data
+  - Enhanced AI-powered fix generation
+  - Real-time visualization and data streaming
+  <Module test_cli_integration.py>
+    CLI Interface Enhanced Integration Tests
+    =======================================
+    
+    Comprehensive tests for CLI interface enhanced pipeline integration:
+    - Enhanced arguments parsing and validation
+    - Unified analyzer selection logic and feature detection
+    - Export functionality for audit trails, correlations, and recommendations
+    - Enhanced console output with correlation summaries and timing data
+    - Policy resolution integration with constants.py
+    <Class TestCLIIntegrationFlow>
+      End-to-end integration tests for CLI enhanced workflow.
+      <Function test_complete_cli_enhanced_workflow>
+    <Class TestCLIEnhancedIntegration>
+      Test suite for CLI interface enhanced pipeline integration.
+      <Function test_cli_error_handling>
+        Test CLI error handling for enhanced features.
+      <Function test_enhanced_arguments_parsing>
+        Test enhanced CLI arguments parsing and validation.
+      <Function test_enhanced_console_output>
+        Test enhanced console output formatting and display.
+      <Function test_unified_analyzer_selection_logic>
+        Test unified analyzer selection based on enhanced features.
+      <Function test_enhanced_analysis_execution>
+      <Function test_enhanced_output_formats>
+        Test enhanced output in different formats (JSON, SARIF).
+      <Function test_enhanced_export_functionality>
+        Test CLI export functionality for enhanced data.
+      <Function test_policy_resolution_integration>
+        Test policy resolution integration with constants.py.
+<Module detectors/test_detector_factory.py>
+  Unit tests for DetectorFactory.
+  <UnitTestCase TestDetectorFactory>
+    A class whose instances are single test cases.
+    
+    By default, the test code itself should be placed in a method named
+    'runTest'.
+    
+    If the fixture may be used for many test cases, create as
+    many test methods as are needed. When instantiating such a TestCase
+    subclass, specify in the constructor arguments the name of the test method
+    that the instance is to execute.
+    
+    Test authors should subclass TestCase for their own tests. Construction
+    and deconstruction of the test's environment ('fixture') can be
+    implemented by overriding the 'setUp' and 'tearDown' methods respectively.
+    
+    If it is necessary to override the __init__ method, the base class
+    __init__ method must always be called. It is important that subclasses
+    should not change the signature of their __init__ method, since instances
+    of the classes are instantiated automatically by parts of the framework
+    in order to be run.
+    
+    When subclassing TestCase, you can set these attributes:
+    * failureException: determines which exception will be raised when
+        the instance's assertion methods fail; test methods raising this
+        exception will be deemed to have 'failed' rather than 'errored'.
+    * longMessage: determines whether long messages (including repr of
+        objects used in assert methods) will be printed on failure in *addition*
+        to any explicit message passed.
+    * maxDiff: sets the maximum length of a diff in failure messages
+        by assert methods using difflib. It is looked up as an instance
+        attribute so can be configured by individual tests if required.
+    <TestCaseFunction test_detect_all_integrates_detectors>
+      Test that detect_all runs all detectors and aggregates results.
+    <TestCaseFunction test_detect_by_type>
+      Test selective detection by violation type.
+<Package tests>
+  Connascence Analyzer Test Suite
+  
+  Comprehensive test coverage for the connascence analysis system including:
+  - Unit tests for core analyzers
+  - Integration tests for CLI commands
+  - Autofix system tests
+  - Policy and baseline tests
+  - MCP server tests
+  - Performance benchmarks
+  
+  Run with: pytest tests/
+  <Module test_production_readiness.py>
+    Production Readiness Validation Tests
+    =====================================
+    
+    Comprehensive test suite to validate the entire connascence analyzer system
+    for production deployment. Tests all critical functionality, performance
+    benchmarks, error handling, and system integration.
+    
+    NASA Power of Ten Compliant: All tests follow rules 1-10.
+    <UnitTestCase ProductionReadinessTests>
+      Production readiness validation test suite.
+      
+      Tests critical paths, error handling, performance requirements,
+      and system integration for production deployment.
+      <TestCaseFunction test_critical_path_batch_analysis>
+        Test critical path: batch analysis of Python project.
+      <TestCaseFunction test_concurrent_access_safety>
+        Test thread safety for concurrent operations.
+      <TestCaseFunction test_performance_requirements>
+        Test performance meets production requirements.
+      <TestCaseFunction test_configuration_flexibility>
+        Test system configuration and customization options.
+      <TestCaseFunction test_error_handling_robustness>
+        Test system robustness under error conditions.
+      <TestCaseFunction test_memory_management_under_load>
+        Test memory management under high load conditions.
+      <TestCaseFunction test_critical_path_streaming_analysis>
+        Test critical path: streaming analysis initialization and operation.
+      <TestCaseFunction test_system_integration_completeness>
+        Test complete system integration functionality.
+      <TestCaseFunction test_data_persistence_integrity>
+        Test data integrity and persistence mechanisms.
+<Package e2e>
+  End-to-End Testing Suite for Connascence Analysis
+  
+  This module provides comprehensive end-to-end testing capabilities for the
+  connascence analysis system, including:
+  
+  - CLI workflow testing
+  - Repository analysis validation
+  - Report generation verification
+  - Enterprise-scale scenario testing
+  - Error handling and recovery validation
+  - Exit code correctness verification
+  - Performance benchmarking and profiling
+  - Memory coordination and tracking
+  
+  The e2e tests use memory coordination to track test scenarios, results,
+  and performance metrics across different test categories.
+  
+  Test Categories:
+  - CLI Workflows: Complete command-line interface testing
+  - Repository Analysis: Real repository testing with various frameworks
+  - Report Generation: SARIF, JSON, Markdown, and Text output validation
+  - Enterprise Scale: Large-scale analysis scenarios
+  - Error Handling: Comprehensive error and edge case testing
+  - Exit Codes: All exit code scenarios (0,1,2,3,4,130)
+  - Performance: Benchmarking, profiling, and scalability testing
+  
+  Usage:
+      # Run all e2e tests
+      pytest tests/e2e/ -v
+  
+      # Run specific test category
+      pytest tests/e2e/test_cli_workflows.py -v
+      pytest tests/e2e/test_repository_analysis.py -v
+      pytest tests/e2e/test_report_generation.py -v
+      pytest tests/e2e/test_enterprise_scale.py -v
+      pytest tests/e2e/test_error_handling.py -v
+      pytest tests/e2e/test_exit_codes.py -v
+      pytest tests/e2e/test_performance.py -v
+  
+      # Run with markers
+      pytest tests/e2e/ -m "e2e" -v
+      pytest tests/e2e/ -m "slow" -v
+      pytest tests/e2e/ -m "integration" -v
+  
+  Memory Coordination:
+  The e2e tests use specialized memory coordinators to track:
+  - Test scenario execution and results
+  - Performance metrics and benchmarks
+  - Error patterns and recovery attempts
+  - Exit code validation results
+  - Resource utilization data
+  - Sequential workflow validation
+  
+  This provides comprehensive tracking and analysis of test execution
+  patterns for quality assurance and performance monitoring.
+  <Module test_sales_scenarios.py>
+    End-to-End Sales Scenario Tests
+    Validates the exact scenarios used in customer demos
+    <Class TestSalesDemoScenarios>
+      Test the three main sales demo scenarios end-to-end
+      <Function test_express_demo_scenario>
+        Test complete Express demo scenario - JavaScript polyglot analysis
+      <Function test_celery_demo_scenario>
+        Test complete Celery demo scenario - Python connascence analysis
+      <Function test_complete_sales_presentation>
+        Test complete sales presentation scenario
+      <Function test_curl_demo_scenario>
+        Test complete curl demo scenario - C General Safety safety analysis
+      <Function test_enterprise_security_scenario>
+        Test enterprise security features scenario
+      <Function test_vs_code_integration_scenario>
+        Test VS Code extension integration scenario
+<Package tests>
+  Connascence Analyzer Test Suite
+  
+  Comprehensive test coverage for the connascence analysis system including:
+  - Unit tests for core analyzers
+  - Integration tests for CLI commands
+  - Autofix system tests
+  - Policy and baseline tests
+  - MCP server tests
+  - Performance benchmarks
+  
+  Run with: pytest tests/
+  <Module test_architecture_extraction.py>
+    Architecture Extraction Validation Tests
+    =========================================
+    
+    Tests to validate that the god object extraction was successful and 
+    maintains backward compatibility with zero breaking changes.
+    <UnitTestCase TestArchitectureExtraction>
+      Test that god object extraction maintains all functionality.
+      <TestCaseFunction test_architecture_components_available>
+        Test that all architecture components are available.
+      <TestCaseFunction test_component_status_reporting>
+        Test that component status is correctly reported.
+      <TestCaseFunction test_architecture_extraction_validation>
+        Test the architecture extraction validation.
+      <TestCaseFunction test_backward_compatibility_maintained>
+        Test that all public API methods are still available.
+      <TestCaseFunction test_legacy_components_delegate_correctly>
+        Test that legacy components delegate to new architecture components.
+      <TestCaseFunction test_configuration_manager_integration>
+        Test that configuration manager is properly integrated.
+      <TestCaseFunction test_nasa_rule_4_compliance>
+        Test that all architecture components follow NASA Rule 4 (functions under 60 lines).
+    <UnitTestCase TestArchitectureComponentsIndependently>
+      Test each architecture component independently.
+      <TestCaseFunction test_recommendation_engine>
+        Test RecommendationEngine component.
+      <TestCaseFunction test_violation_aggregator>
+        Test ViolationAggregator component.
+      <TestCaseFunction test_enhanced_metrics_calculator>
+        Test EnhancedMetricsCalculator component.
+      <TestCaseFunction test_configuration_manager>
+        Test ConfigurationManager component.
+      <TestCaseFunction test_analysis_orchestrator>
+        Test AnalysisOrchestrator component.
+    <UnitTestCase TestIntegrationWithRealCode>
+      Test integration with real Python code to ensure functionality is preserved.
+      <TestCaseFunction test_file_analysis_still_works>
+        Test that file analysis functionality is preserved.
+  <Module test_nasa_compliance.py>
+    NASA Power of Ten Compliance Test Suite
+    
+    This test validates that the analyzer system adheres to all NASA Power of Ten rules:
+    1. Avoid complex flow constructs (no goto, recursion limited)
+    2. All loops have fixed upper bounds
+    3. No dynamic memory allocation after initialization
+    4. No function longer than 60 lines
+    5. Assertion density of at least 2 per function
+    6. Declare objects at smallest possible scope
+    7. Check return values of non-void functions
+    8. Use of preprocessor limited to file inclusion and simple macros
+    9. Limit pointer use to a single level of indirection
+    10. Compile with all warnings enabled and all warnings addressed
+    <Function test_nasa_power_of_ten_compliance>
+      Test NASA Power of Ten compliance across the analyzer system.
+<Package e2e>
+  End-to-End Testing Suite for Connascence Analysis
+  
+  This module provides comprehensive end-to-end testing capabilities for the
+  connascence analysis system, including:
+  
+  - CLI workflow testing
+  - Repository analysis validation
+  - Report generation verification
+  - Enterprise-scale scenario testing
+  - Error handling and recovery validation
+  - Exit code correctness verification
+  - Performance benchmarking and profiling
+  - Memory coordination and tracking
+  
+  The e2e tests use memory coordination to track test scenarios, results,
+  and performance metrics across different test categories.
+  
+  Test Categories:
+  - CLI Workflows: Complete command-line interface testing
+  - Repository Analysis: Real repository testing with various frameworks
+  - Report Generation: SARIF, JSON, Markdown, and Text output validation
+  - Enterprise Scale: Large-scale analysis scenarios
+  - Error Handling: Comprehensive error and edge case testing
+  - Exit Codes: All exit code scenarios (0,1,2,3,4,130)
+  - Performance: Benchmarking, profiling, and scalability testing
+  
+  Usage:
+      # Run all e2e tests
+      pytest tests/e2e/ -v
+  
+      # Run specific test category
+      pytest tests/e2e/test_cli_workflows.py -v
+      pytest tests/e2e/test_repository_analysis.py -v
+      pytest tests/e2e/test_report_generation.py -v
+      pytest tests/e2e/test_enterprise_scale.py -v
+      pytest tests/e2e/test_error_handling.py -v
+      pytest tests/e2e/test_exit_codes.py -v
+      pytest tests/e2e/test_performance.py -v
+  
+      # Run with markers
+      pytest tests/e2e/ -m "e2e" -v
+      pytest tests/e2e/ -m "slow" -v
+      pytest tests/e2e/ -m "integration" -v
+  
+  Memory Coordination:
+  The e2e tests use specialized memory coordinators to track:
+  - Test scenario execution and results
+  - Performance metrics and benchmarks
+  - Error patterns and recovery attempts
+  - Exit code validation results
+  - Resource utilization data
+  - Sequential workflow validation
+  
+  This provides comprehensive tracking and analysis of test execution
+  patterns for quality assurance and performance monitoring.
+  <Module test_cli_workflows.py>
+    End-to-End CLI Workflow Tests
+    
+    Tests complete CLI workflows from input to final report generation.
+    Uses memory coordination for scenario tracking and sequential thinking.
+    <Function test_complete_workflow_integration>
+      Integration test for complete workflow with memory coordination.
+    <Class TestCLIWorkflowsEndToEnd>
+      Test complete CLI workflows from input to report generation.
+      <Function test_output_format_workflow>
+        Test all output formats end-to-end.
+      <Function test_memory_coordination_validation>
+        Test memory coordination system is working properly.
+      <Function test_severity_filtering_workflow>
+        Test severity-based filtering workflow.
+      <Function test_large_project_performance_workflow>
+        Test performance with larger project simulation.
+      <Function test_basic_scan_workflow>
+        Test basic scan command workflow.
+      <Function test_scan_with_policy_workflow>
+        Test scan with different policy presets.
+      <Function test_exit_code_scenarios_comprehensive>
+        Test all exit code scenarios comprehensively.
+<Package enhanced>
+  Enhanced Pipeline Integration Tests
+  ==================================
+  
+  Comprehensive test suite for enhanced pipeline integration across all interfaces:
+  
+  - test_infrastructure.py: Enhanced test datasets, utilities, and mock analyzers
+  - test_vscode_integration.py: VSCode extension enhanced pipeline integration tests  
+  - test_mcp_server_integration.py: MCP server enhanced pipeline integration tests
+  - test_web_dashboard_integration.py: Web dashboard enhanced visualization tests
+  - test_cli_integration.py: CLI interface enhanced features integration tests
+  
+  This test suite validates the complete enhanced pipeline integration including:
+  - Cross-phase correlation analysis
+  - Smart architectural recommendations
+  - Analysis audit trails with timing data
+  - Enhanced AI-powered fix generation
+  - Real-time visualization and data streaming
+  <Module test_performance_benchmarks.py>
+    Enhanced Pipeline Performance and Scalability Benchmarks
+    ========================================================
+    
+    Comprehensive performance benchmarking for the enhanced pipeline:
+    - Analysis performance across different codebase sizes
+    - Memory usage patterns and optimization validation
+    - Correlation computation scalability
+    - Smart recommendation generation performance
+    - Cross-interface response time benchmarks
+    - Concurrent analysis capabilities
+    - Resource utilization monitoring
+    <Class TestPerformanceBenchmarks>
+      Performance benchmark test suite
+      <Function test_smart_recommendations_generation_performance>
+      <Function test_correlation_computation_performance>
+      <Function test_interface_response_time_benchmarks>
+      <Function test_scalability_across_project_sizes>
+      <Function test_concurrent_analysis_performance>
+      <Function test_memory_usage_patterns>
+<Package tests>
+  Connascence Analyzer Test Suite
+  
+  Comprehensive test coverage for the connascence analysis system including:
+  - Unit tests for core analyzers
+  - Integration tests for CLI commands
+  - Autofix system tests
+  - Policy and baseline tests
+  - MCP server tests
+  - Performance benchmarks
+  
+  Run with: pytest tests/
+  <Module test_performance_regression.py>
+    Performance regression tests for connascence analyzer.
+    
+    Tests Requirements:
+    1. Benchmark testing against baseline performance
+    2. Memory usage monitoring
+    3. Scalability testing with different codebase sizes
+    4. Performance comparison before/after enhancements
+    <Class TestPerformanceBenchmarks>
+      Benchmark tests to establish performance baselines.
+      <Function test_baseline_benchmark_medium_project>
+        Establish baseline performance for medium projects.
+      <Function test_baseline_benchmark_small_project>
+        Establish baseline performance for small projects.
+    <Class TestPerformanceRegression>
+      Performance regression tests for the analyzer.
+      <Function test_large_violation_count_performance>
+        Test performance when many violations are found.
+      <Function test_large_file_performance>
+        Test performance on large files.
+      <Function test_performance_constants_compliance>
+        Test compliance with performance constants from constants.py.
+      <Function test_small_file_performance>
+        Test performance on small files.
+      <Function test_concurrent_analysis_performance>
+        Test performance of concurrent analysis operations.
+      <Function test_analysis_caching_performance>
+        Test performance benefits of any internal caching.
+      <Function test_memory_scalability>
+        Test memory usage scaling with different file sizes.
+      <Function test_memory_cleanup_after_analysis>
+        Test that memory is properly cleaned up after analysis.
+      <Function test_directory_analysis_performance>
+        Test performance on directory analysis.
+      <Function test_medium_file_performance>
+        Test performance on medium-sized files.
+  <Module test_mcp_server.py>
+    Tests for the MCP (Model Context Protocol) server.
+    
+    Tests agent integration, tool functionality, safety controls,
+    and rate limiting for the connascence MCP server.
+    <Class TestConnascenceMCPServer>
+      Test the MCP server implementation.
+      <Function test_server_initialization>
+        Test server initializes correctly.
+      <Function test_rate_limiting>
+        Test rate limiting functionality.
+      <Function test_scan_path_tool>
+        Test the scan_path tool functionality.
+      <Function test_security_controls>
+        Test security controls and limitations.
+      <Function test_tools_registration>
+        Test that all tools are registered.
+      <Function test_error_handling>
+        Test error handling in tools.
+      <Function test_path_validation>
+        Test path validation and sandboxing.
+      <Function test_concurrent_requests>
+        Test handling of concurrent requests.
+      <Function test_propose_autofix_tool>
+        Test the propose_autofix tool.
+      <Function test_audit_logging>
+        Test audit logging functionality.
+      <Function test_explain_finding_tool>
+        Test the explain_finding tool.
+      <Function test_tool_input_validation>
+        Test tool input schema validation.
+      <Function test_policy_preset_validation>
+        Test policy preset validation.
+    <Class TestMCPServerIntegration>
+      Integration tests for MCP server.
+      <Function test_metrics_collection>
+        Test metrics collection and reporting.
+      <Function test_policy_enforcement>
+        Test policy enforcement workflow.
+      <Function test_server_configuration>
+        Test server configuration options.
+      <Function test_end_to_end_workflow>
+        Test complete MCP workflow.
+      <Function test_large_codebase_handling>
+        Test handling of large codebase analysis.
+    <Class TestMCPConnascenceTool>
+      Test the base MCP tool class.
+      <Function test_tool_creation>
+        Test tool creation and validation.
+      <Function test_tool_validation>
+        Test tool input validation.
+      <Function test_tool_execution>
+        Test tool execution with mock handler.
+  <Module test_autofix.py>
+    Tests for the intelligent autofix system.
+    
+    Tests patch generation, application, and safety controls for
+    all types of connascence violations.
+    <Class TestMagicLiteralFixer>
+      Test magic literal autofix functionality.
+      <Function test_string_literal_extraction>
+        Test extracting string magic literals.
+      <Function test_confidence_scoring>
+        Test confidence scoring for different literal types.
+      <Function test_numeric_literal_extraction>
+        Test extracting numeric magic literals.
+      <Function test_constant_name_generation>
+        Test generation of appropriate constant names.
+      <Function test_ignored_values>
+        Test that common values are ignored.
+    <Class TestSafeAutofixer>
+      Test the safe autofix wrapper.
+      <Function test_patch_limiting>
+        Test limiting patches per file for safety.
+      <Function test_preview_generation>
+        Test preview generation without applying changes.
+      <Function test_recommendation_generation>
+        Test generation of human-readable recommendations.
+    <Class TestPatchGenerator>
+      Test the unified patch generation system.
+      <Function test_patch_generation_routing>
+        Test that patches are routed to correct fixers.
+      <Function test_patch_caching>
+        Test that patch generation uses caching.
+    <Class TestTypeHintFixer>
+      Test type hint autofix functionality.
+      <Function test_return_type_inference>
+        Test return type inference from return statements.
+      <Function test_simple_type_inference>
+        Test basic type hint addition.
+      <Function test_parameter_type_inference>
+        Test parameter type inference from usage.
+    <Class TestParameterBombFixer>
+      Test parameter bomb autofix functionality.
+      <Function test_method_vs_function_handling>
+        Test different handling for methods vs functions.
+      <Function test_keyword_only_refactor>
+        Test conversion to keyword-only parameters.
+      <Function test_dataclass_refactor_suggestion>
+        Test suggestion to use dataclass for many parameters.
+    <Class TestAutofixEngine>
+      Test the main autofix engine.
+      <Function test_dry_run_mode>
+        Test dry run mode doesn't modify files.
+      <Function test_safety_level_filtering>
+        Test filtering patches by safety level.
+      <Function test_confidence_threshold_filtering>
+        Test filtering patches by confidence threshold.
+  <Module extension_integration_test.py>
+    Integration test for the VSCode extension with Python analyzer
+    <Function test_analyzer_execution>
+      Test if the analyzer can be executed via subprocess (as extension would do)
+    <Function test_analyzer_accessibility>
+      Test if the analyzer can be imported and executed
+    <Function test_extension_structure>
+      Test if extension files are properly updated
+<Package e2e>
+  End-to-End Testing Suite for Connascence Analysis
+  
+  This module provides comprehensive end-to-end testing capabilities for the
+  connascence analysis system, including:
+  
+  - CLI workflow testing
+  - Repository analysis validation
+  - Report generation verification
+  - Enterprise-scale scenario testing
+  - Error handling and recovery validation
+  - Exit code correctness verification
+  - Performance benchmarking and profiling
+  - Memory coordination and tracking
+  
+  The e2e tests use memory coordination to track test scenarios, results,
+  and performance metrics across different test categories.
+  
+  Test Categories:
+  - CLI Workflows: Complete command-line interface testing
+  - Repository Analysis: Real repository testing with various frameworks
+  - Report Generation: SARIF, JSON, Markdown, and Text output validation
+  - Enterprise Scale: Large-scale analysis scenarios
+  - Error Handling: Comprehensive error and edge case testing
+  - Exit Codes: All exit code scenarios (0,1,2,3,4,130)
+  - Performance: Benchmarking, profiling, and scalability testing
+  
+  Usage:
+      # Run all e2e tests
+      pytest tests/e2e/ -v
+  
+      # Run specific test category
+      pytest tests/e2e/test_cli_workflows.py -v
+      pytest tests/e2e/test_repository_analysis.py -v
+      pytest tests/e2e/test_report_generation.py -v
+      pytest tests/e2e/test_enterprise_scale.py -v
+      pytest tests/e2e/test_error_handling.py -v
+      pytest tests/e2e/test_exit_codes.py -v
+      pytest tests/e2e/test_performance.py -v
+  
+      # Run with markers
+      pytest tests/e2e/ -m "e2e" -v
+      pytest tests/e2e/ -m "slow" -v
+      pytest tests/e2e/ -m "integration" -v
+  
+  Memory Coordination:
+  The e2e tests use specialized memory coordinators to track:
+  - Test scenario execution and results
+  - Performance metrics and benchmarks
+  - Error patterns and recovery attempts
+  - Exit code validation results
+  - Resource utilization data
+  - Sequential workflow validation
+  
+  This provides comprehensive tracking and analysis of test execution
+  patterns for quality assurance and performance monitoring.
+  <Module test_exit_codes.py>
+    End-to-End Exit Code Tests
+    
+    Comprehensive testing of all exit codes (0,1,2,3,4) in real scenarios.
+    Tests exit code consistency, mapping accuracy, and behavior validation.
+    Uses memory coordination for tracking exit code patterns and scenarios.
+    <Function test_exit_code_integration>
+      Integration test for exit code system.
+    <Class TestExitCodeWorkflows>
+      Test comprehensive exit code scenarios.
+      <Function test_exit_code_1_comprehensive_scenarios>
+        Test all scenarios that should result in exit code 1.
+      <Function test_edge_case_exit_codes>
+        Test edge case scenarios for exit codes.
+      <Function test_exit_code_memory_coordination_validation>
+        Test exit code memory coordination system.
+      <Function test_subprocess_exit_code_validation>
+        Test exit codes via subprocess execution.
+      <Function test_exit_code_0_comprehensive_scenarios>
+        Test all scenarios that should result in exit code 0.
+      <Function test_exit_code_consistency_across_runs>
+        Test exit code consistency across multiple runs.
+      <Function test_exit_code_2_configuration_errors>
+        Test all scenarios that should result in exit code 2.
+<Package enhanced>
+  Enhanced Pipeline Integration Tests
+  ==================================
+  
+  Comprehensive test suite for enhanced pipeline integration across all interfaces:
+  
+  - test_infrastructure.py: Enhanced test datasets, utilities, and mock analyzers
+  - test_vscode_integration.py: VSCode extension enhanced pipeline integration tests  
+  - test_mcp_server_integration.py: MCP server enhanced pipeline integration tests
+  - test_web_dashboard_integration.py: Web dashboard enhanced visualization tests
+  - test_cli_integration.py: CLI interface enhanced features integration tests
+  
+  This test suite validates the complete enhanced pipeline integration including:
+  - Cross-phase correlation analysis
+  - Smart architectural recommendations
+  - Analysis audit trails with timing data
+  - Enhanced AI-powered fix generation
+  - Real-time visualization and data streaming
+  <Module test_user_experience_validation.py>
+    Enhanced Pipeline User Experience Validation Tests
+    =================================================
+    
+    Real-world user experience validation for the enhanced pipeline:
+    - Realistic codebase patterns and structures
+    - Developer workflow integration testing
+    - User interface responsiveness validation
+    - Practical recommendation quality assessment
+    - Cross-phase correlation effectiveness
+    - Smart recommendation actionability
+    - Audit trail comprehensiveness
+    - Production-ready deployment validation
+    <Class TestUserExperienceValidation>
+      User experience validation tests
+      <Function test_continuous_integration_validation>
+        Test CI/CD integration scenario
+      <Function test_django_web_application_analysis>
+      <Function test_data_processing_pipeline_analysis>
+      <Function test_comprehensive_refactoring_session>
+        Test comprehensive refactoring session workflow
+      <Function test_microservices_e_commerce_analysis>
+      <Function test_quick_analysis_workflow_simulation>
+        Test quick analysis workflow for developer productivity
+<Package tests>
+  Connascence Analyzer Test Suite
+  
+  Comprehensive test coverage for the connascence analysis system including:
+  - Unit tests for core analyzers
+  - Integration tests for CLI commands
+  - Autofix system tests
+  - Policy and baseline tests
+  - MCP server tests
+  - Performance benchmarks
+  
+  Run with: pytest tests/
+  <Module test_cli.py>
+    Tests for the Connascence CLI interface.
+    
+    Tests all CLI commands including scan, scan-diff, autofix, baseline management,
+    and MCP server functionality.
+    <Class TestCLIExecution>
+      Test actual CLI execution (integration tests).
+      <Function test_cli_help>
+        Test CLI help output.
+      <Function test_cli_version>
+        Test CLI version output.
+    <Class TestCLISubcommands>
+      Test individual CLI subcommands.
+      <Function test_mcp_serve_command>
+        Test MCP server command.
+      <Function test_scan_diff_command>
+        Test scan-diff command.
+      <Function test_baseline_snapshot_command>
+        Test baseline snapshot command.
+    <Class TestCLIIntegration>
+      Integration tests for CLI functionality.
+      <Function test_verbose_logging>
+        Test verbose logging option.
+      <Function test_cli_error_handling>
+        Test CLI error handling for invalid inputs.
+      <Function test_end_to_end_scan>
+        Test complete scan workflow.
+    <Class TestCLIScanCommand>
+      Test the scan command functionality.
+      <Function test_scan_with_policy>
+        Test scan command with specific policy.
+      <Function test_scan_json_output>
+        Test scan command with JSON output format.
+      <Function test_scan_basic_execution>
+        Test basic scan command execution.
+      <Function test_scan_with_violations>
+        Test scan command with violations found.
+    <Class TestConnascenceCLI>
+      Test the main CLI class.
+      <Function test_scan_command_parsing>
+        Test parsing of scan command arguments.
+      <Function test_baseline_command_parsing>
+        Test parsing of baseline command arguments.
+      <Function test_parser_creation>
+        Test that argument parser is created correctly.
+      <Function test_autofix_command_parsing>
+        Test parsing of autofix command arguments.
+    <Class TestCLIAutofixCommand>
+      Test the autofix command functionality.
+      <Function test_autofix_apply_mode>
+        Test autofix command in apply mode.
+      <Function test_autofix_without_force_flag>
+        Test autofix command without --force flag.
+      <Function test_autofix_confidence_filtering>
+        Test autofix command with confidence filtering.
+      <Function test_autofix_preview_mode>
+        Test autofix command in preview mode.
+<Package enhanced>
+  Enhanced Pipeline Integration Tests
+  ==================================
+  
+  Comprehensive test suite for enhanced pipeline integration across all interfaces:
+  
+  - test_infrastructure.py: Enhanced test datasets, utilities, and mock analyzers
+  - test_vscode_integration.py: VSCode extension enhanced pipeline integration tests  
+  - test_mcp_server_integration.py: MCP server enhanced pipeline integration tests
+  - test_web_dashboard_integration.py: Web dashboard enhanced visualization tests
+  - test_cli_integration.py: CLI interface enhanced features integration tests
+  
+  This test suite validates the complete enhanced pipeline integration including:
+  - Cross-phase correlation analysis
+  - Smart architectural recommendations
+  - Analysis audit trails with timing data
+  - Enhanced AI-powered fix generation
+  - Real-time visualization and data streaming
+  <Module test_mcp_server_integration.py>
+    MCP Server Enhanced Integration Tests
+    ====================================
+    
+    Comprehensive tests for MCP server enhanced pipeline integration:
+    - Enhanced pipeline context retrieval via subprocess
+    - Smart recommendation integration in AI fix generation
+    - Cross-phase correlation data in AI prompts  
+    - Enhanced fix and suggestion generation with architectural intelligence
+    - Error handling and graceful degradation
+    <Class TestMCPServerEnhancedIntegration>
+      Test suite for MCP server enhanced pipeline integration.
+      <Function test_ai_suggestion_generation_with_enhanced_context>
+        Test AI suggestion generation enhanced with pipeline recommendations.
+      <Function test_enhanced_pipeline_context_error_handling>
+        Test error handling for enhanced pipeline context retrieval.
+      <Function test_enhanced_prompt_building_comprehensive>
+        Test comprehensive enhanced prompt building with all features.
+      <Function test_ai_fix_generation_with_enhanced_context>
+      <Function test_enhanced_pipeline_context_timeout_handling>
+        Test timeout handling in enhanced pipeline context retrieval.
+      <Function test_mcp_ai_provider_integration>
+        Test MCP server AI provider integration with enhanced context.
+      <Function test_enhanced_pipeline_context_retrieval_success>
+        Test successful enhanced pipeline context retrieval via subprocess.
+    <Class TestMCPServerIntegrationFlow>
+      End-to-end integration tests for MCP server enhanced workflow.
+      <Function test_complete_mcp_enhanced_workflow>
+<Package tests>
+  Connascence Analyzer Test Suite
+  
+  Comprehensive test coverage for the connascence analysis system including:
+  - Unit tests for core analyzers
+  - Integration tests for CLI commands
+  - Autofix system tests
+  - Policy and baseline tests
+  - MCP server tests
+  - Performance benchmarks
+  
+  Run with: pytest tests/
+  <Module test_exit_codes_unit.py>
+    Smoke Test Suite: CLI Exit Code Tests
+    
+    Comprehensive tests for all CLI exit code paths to ensure proper error handling
+    and return codes for various scenarios.
+    <Class TestCommandHandlerIntegration>
+      Test that command handlers integrate properly with CLI.
+      <Function test_baseline_handler_integration>
+        Test that baseline command handler integrates properly.
+      <Function test_scan_handler_integration>
+        Test that scan command handler integrates properly.
+      <Function test_mcp_handler_integration>
+        Test that MCP command handler integrates properly.
+      <Function test_autofix_handler_integration>
+        Test that autofix command handler integrates properly.
+    <Class TestCLIExitCodes>
+      Test CLI exit codes for various scenarios.
+      <Function test_config_file_handling>
+        Test that config file parameter is handled.
+      <Function test_version_command_exit_code>
+        Test that version command returns proper exit code.
+      <Function test_invalid_command_exit_code>
+        Test exit code for invalid commands.
+      <Function test_verbose_flag_handling>
+        Test that verbose flag is handled properly.
+      <Function test_general_error_exit_code>
+        Test exit code for general errors.
+      <Function test_all_subcommand_parsers_exist>
+        Test that all expected subcommand parsers can be created.
+      <Function test_skip_license_check_flag>
+        Test skip license check flag functionality.
+      <Function test_command_line_script_exists>
+        Test that the connascence command-line script works.
+      <Function test_no_command_exit_code>
+        Test exit code when no command is provided.
+      <Function test_license_error_exit_code>
+        Test exit code for license validation errors.
+      <Function test_configuration_error_exit_code>
+        Test exit code for configuration errors.
+      <Function test_keyboard_interrupt_exit_code>
+        Test exit code when user interrupts with Ctrl+C.
+      <Function test_success_exit_code>
+        Test that successful operations return exit code 0.
+    <Class TestExitCodeConstants>
+      Test that exit code constants are properly defined.
+      <Function test_exit_code_enum_values>
+        Test that all expected exit codes are defined.
+      <Function test_backward_compatibility_mapping>
+        Test backward compatibility exit code mapping.
+  <Module test_detector_integration.py>
+    Detector Integration Tests
+    
+    Tests the specialized detector integration within the RefactoredDetector architecture:
+    - All 8 specialized detector types
+    - Proper initialization and wiring
+    - Cross-detector coordination
+    - Performance and scalability
+    <UnitTestCase TestDetectorIntegration>
+      Test integration of all specialized detectors.
+      <TestCaseFunction test_code_snippet_extraction>
+        Test that detectors can extract proper code snippets.
+      <TestCaseFunction test_timing_detector_integration>
+        Test TimingDetector integration and functionality.
+      <TestCaseFunction test_execution_detector_integration>
+        Test ExecutionDetector integration and functionality.
+      <TestCaseFunction test_detector_error_handling>
+        Test that detector errors don't crash the system.
+      <TestCaseFunction test_detector_performance_isolation>
+        Test that slow detectors don't block others.
+      <TestCaseFunction test_convention_detector_integration>
+        Test ConventionDetector integration and functionality.
+      <TestCaseFunction test_detector_context_information>
+        Test that detectors provide rich context information.
+      <TestCaseFunction test_all_detectors_initialized>
+        Test that all 8 specialized detectors are properly initialized.
+      <TestCaseFunction test_values_detector_integration>
+        Test ValuesDetector integration and functionality.
+      <TestCaseFunction test_detector_memory_efficiency>
+        Test that detectors don't accumulate memory across calls.
+      <TestCaseFunction test_cross_detector_coordination>
+        Test that multiple detectors can analyze the same code without conflicts.
+    <UnitTestCase TestDetectorSpecialization>
+      Test that each detector properly specializes in its domain.
+      <TestCaseFunction test_timing_detector_specialization>
+        Test TimingDetector only detects timing-related issues.
+      <TestCaseFunction test_convention_detector_specialization>
+        Test ConventionDetector only detects convention-related issues.
+      <TestCaseFunction test_execution_detector_specialization>
+        Test ExecutionDetector only detects execution order issues.
+      <TestCaseFunction test_values_detector_specialization>
+        Test ValuesDetector only detects value-related coupling.
+  <Module test_basic_functionality.py>
+    Basic functionality tests that should pass with current implementation.
+    
+    This test suite validates core functionality that is known to work:
+    1. Import and instantiation of analyzer classes
+    2. Basic argument parsing
+    3. File structure validation
+    4. Core algorithm functionality
+    <Function test_constants_module>
+      Test constants module functionality.
+    <Function test_legacy_analyzer_instantiation>
+      Test that legacy analyzer can be instantiated and has expected methods.
+    <Function test_error_handling_basic>
+      Test basic error handling doesn't crash.
+    <Function test_violation_dataclass>
+      Test ConnascenceViolation dataclass.
+    <Function test_language_strategies_import>
+      Test that language strategies can be imported.
+    <Function test_parser_basic_functionality>
+      Test basic parser functionality that should work.
+    <Function test_core_imports>
+      Test that core modules can be imported.
+    <Function test_core_analyzer_instantiation>
+      Test that core analyzer can be instantiated and has expected methods.
+    <Function test_basic_ast_functionality>
+      Test basic AST analysis functionality.
+    <Function test_thresholds_module>
+      Test thresholds module functionality.
+    <Function test_file_structure_validation>
+      Test that expected files and directories exist.
+    <Function test_temp_file_analysis>
+      Test analyzing a temporary file.
+  <Module test_cli_interface.py>
+    Test suite for CLI interface changes and flake8-style usage.
+    
+    Tests Requirements:
+    1. Test `connascence .` command works
+    2. Test configuration file discovery
+    3. Test backwards compatibility
+    4. Test error handling and help messages
+    <Class TestCLIConfigurationDiscovery>
+      Test configuration file discovery and handling.
+      <Function test_setup_cfg_discovery>
+        Test discovery of setup.cfg configuration.
+      <Function test_connascence_cfg_discovery>
+        Test discovery of .connascence.cfg configuration file.
+      <Function test_config_file_precedence>
+        Test configuration file precedence order.
+      <Function test_pyproject_toml_discovery>
+        Test discovery of pyproject.toml configuration.
+    <Class TestCLIInterface>
+      Test CLI interface and command-line argument handling.
+      <Function test_sarif_specific_flags>
+        Test SARIF-specific output flags.
+      <Function test_analysis_with_violations_exit_code>
+        Test exit code when violations found but not critical.
+      <Function test_flake8_style_usage_patterns>
+        Test CLI usage patterns similar to flake8.
+      <Function test_basic_directory_analysis_command>
+        Test that CLI argument parsing works with current implementation.
+      <Function test_format_argument_handling>
+        Test output format argument handling.
+      <Function test_output_file_handling>
+        Test output file argument handling.
+      <Function test_tool_correlation_flags>
+        Test tool correlation and confidence threshold flags.
+      <Function test_successful_analysis_exit_code>
+        Test exit code for successful analysis.
+      <Function test_critical_violations_exit_code_strict_mode>
+        Test exit code for critical violations in strict mode.
+      <Function test_sarif_output_format>
+        Test SARIF output format.
+      <Function test_error_handling_invalid_path>
+        Test error handling for invalid paths.
+      <Function test_analysis_failure_exit_code>
+        Test exit code for analysis failure.
+      <Function test_help_message_content>
+        Test help message contains expected information.
+      <Function test_exclude_patterns_handling>
+        Test exclude pattern handling.
+      <Function test_policy_argument_handling>
+        Test policy argument handling and validation.
+      <Function test_nasa_validation_flag>
+        Test NASA validation flag integration.
+      <Function test_strict_mode_flag>
+        Test strict mode flag handling.
+      <Function test_simplified_command_structure>
+        Test simplified command structure without subcommands.
+      <Function test_json_output_format>
+        Test JSON output format.
+    <Class TestCLIBackwardsCompatibility>
+      Test backwards compatibility with existing CLI usage patterns.
+      <Function test_error_handling_compatibility>
+        Test error handling maintains compatibility.
+      <Function test_legacy_argument_patterns>
+        Test that legacy argument patterns still work.
+      <Function test_policy_name_resolution>
+        Test policy name resolution for backwards compatibility.
+      <Function test_deprecated_policy_warnings>
+        Test that deprecated policy names generate warnings.
+<Package enhanced>
+  Enhanced Pipeline Integration Tests
+  ==================================
+  
+  Comprehensive test suite for enhanced pipeline integration across all interfaces:
+  
+  - test_infrastructure.py: Enhanced test datasets, utilities, and mock analyzers
+  - test_vscode_integration.py: VSCode extension enhanced pipeline integration tests  
+  - test_mcp_server_integration.py: MCP server enhanced pipeline integration tests
+  - test_web_dashboard_integration.py: Web dashboard enhanced visualization tests
+  - test_cli_integration.py: CLI interface enhanced features integration tests
+  
+  This test suite validates the complete enhanced pipeline integration including:
+  - Cross-phase correlation analysis
+  - Smart architectural recommendations
+  - Analysis audit trails with timing data
+  - Enhanced AI-powered fix generation
+  - Real-time visualization and data streaming
+  <Module test_web_dashboard_integration.py>
+    Web Dashboard Enhanced Integration Tests
+    =======================================
+    
+    Comprehensive tests for Web dashboard enhanced pipeline integration:
+    - Cross-phase correlation chart rendering and interaction
+    - Audit trail timeline visualization with phase timing
+    - Smart recommendations display and user interaction
+    - Enhanced data processing and real-time updates
+    - WebSocket integration for enhanced data streaming
+    <Class TestWebDashboardEnhancedIntegration>
+      Test suite for Web dashboard enhanced pipeline integration.
+      <Function test_smart_recommendations_rendering>
+        Test smart recommendations rendering for web dashboard display.
+      <Function test_audit_trail_chart_data_processing>
+        Test audit trail timeline data processing for bar chart visualization.
+      <Function test_real_time_data_updates>
+        Test real-time enhanced data updates via WebSocket simulation.
+      <Function test_enhanced_chart_initialization>
+      <Function test_enhanced_data_filtering>
+        Test enhanced data filtering and display options.
+      <Function test_correlation_details_popup>
+        Test correlation details popup functionality.
+      <Function test_correlation_chart_data_processing>
+        Test correlation network data processing for Chart.js visualization.
+      <Function test_audit_trail_summary_display>
+        Test audit trail summary display functionality.
+      <Function test_interactive_features>
+        Test interactive dashboard features for enhanced data.
+      <Function test_dashboard_error_handling>
+        Test dashboard error handling for enhanced features.
+    <Class TestWebDashboardIntegrationFlow>
+      End-to-end integration tests for Web dashboard enhanced workflow.
+      <Function test_complete_dashboard_enhanced_workflow>
+<Package e2e>
+  End-to-End Testing Suite for Connascence Analysis
+  
+  This module provides comprehensive end-to-end testing capabilities for the
+  connascence analysis system, including:
+  
+  - CLI workflow testing
+  - Repository analysis validation
+  - Report generation verification
+  - Enterprise-scale scenario testing
+  - Error handling and recovery validation
+  - Exit code correctness verification
+  - Performance benchmarking and profiling
+  - Memory coordination and tracking
+  
+  The e2e tests use memory coordination to track test scenarios, results,
+  and performance metrics across different test categories.
+  
+  Test Categories:
+  - CLI Workflows: Complete command-line interface testing
+  - Repository Analysis: Real repository testing with various frameworks
+  - Report Generation: SARIF, JSON, Markdown, and Text output validation
+  - Enterprise Scale: Large-scale analysis scenarios
+  - Error Handling: Comprehensive error and edge case testing
+  - Exit Codes: All exit code scenarios (0,1,2,3,4,130)
+  - Performance: Benchmarking, profiling, and scalability testing
+  
+  Usage:
+      # Run all e2e tests
+      pytest tests/e2e/ -v
+  
+      # Run specific test category
+      pytest tests/e2e/test_cli_workflows.py -v
+      pytest tests/e2e/test_repository_analysis.py -v
+      pytest tests/e2e/test_report_generation.py -v
+      pytest tests/e2e/test_enterprise_scale.py -v
+      pytest tests/e2e/test_error_handling.py -v
+      pytest tests/e2e/test_exit_codes.py -v
+      pytest tests/e2e/test_performance.py -v
+  
+      # Run with markers
+      pytest tests/e2e/ -m "e2e" -v
+      pytest tests/e2e/ -m "slow" -v
+      pytest tests/e2e/ -m "integration" -v
+  
+  Memory Coordination:
+  The e2e tests use specialized memory coordinators to track:
+  - Test scenario execution and results
+  - Performance metrics and benchmarks
+  - Error patterns and recovery attempts
+  - Exit code validation results
+  - Resource utilization data
+  - Sequential workflow validation
+  
+  This provides comprehensive tracking and analysis of test execution
+  patterns for quality assurance and performance monitoring.
+  <Module test_report_generation.py>
+    End-to-End Report Generation Tests
+    
+    Tests SARIF, JSON, Markdown, and Text report generation workflows.
+    Validates report compliance, content accuracy, and format specifications.
+    Uses memory coordination for tracking report generation patterns.
+    <Function test_report_generation_integration>
+      Integration test for complete report generation pipeline.
+    <Class TestReportGenerationWorkflows>
+      Test comprehensive report generation workflows.
+      <Function test_text_report_readability_validation>
+        Test text report generation with readability validation.
+      <Function test_markdown_report_formatting_validation>
+        Test Markdown report generation with formatting validation.
+      <Function test_multi_format_consistency_validation>
+        Test consistency across different report formats.
+      <Function test_memory_coordination_report_tracking>
+        Test memory coordination for report generation tracking.
+      <Function test_json_report_comprehensive_validation>
+        Test JSON report generation with comprehensive validation.
+      <Function test_report_generation_performance_benchmarks>
+        Test report generation performance across formats.
+      <Function test_sarif_report_generation_and_validation>
+        Test SARIF report generation with full compliance validation.
+
+Run started:2025-10-19 16:17:15.525462
+
+Test results:
+	No issues identified.
+
+Code scanned:
+	Total lines of code: 0
+	Total lines skipped (#nosec): 0
+
+Run metrics:
+	Total issues (by severity):
+		Undefined: 0
+		Low: 0
+		Medium: 0
+		High: 0
+	Total issues (by confidence):
+		Undefined: 0
+		Low: 0
+		Medium: 0
+		High: 0
+Files skipped (0):
+
+=================================== ERRORS ====================================
+________________ ERROR collecting e2e/test_enterprise_scale.py ________________
+..\..\AppData\Roaming\Python\Python312\site-packages\_pytest\python.py:617: in _importtestmodule
+    mod = import_path(self.path, mode=importmode, root=self.config.rootpath)
+..\..\AppData\Roaming\Python\Python312\site-packages\_pytest\pathlib.py:567: in import_path
+    importlib.import_module(module_name)
+C:\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+..\..\AppData\Roaming\Python\Python312\site-packages\_pytest\assertion\rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+..\..\AppData\Roaming\Python\Python312\site-packages\_pytest\assertion\rewrite.py:359: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+C:\Python312\Lib\ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "C:\Users\17175\Desktop\connascence\tests\e2e\test_enterprise_scale.py", line 61
+E       ProductionAssert.not_none(project_config, 'project_config')        self.enterprise_projects[project_id] = {
+E                                                                          ^^^^
+E   SyntaxError: invalid syntax
+______________ ERROR collecting e2e/test_memory_coordination.py _______________
+..\..\AppData\Roaming\Python\Python312\site-packages\_pytest\python.py:617: in _importtestmodule
+    mod = import_path(self.path, mode=importmode, root=self.config.rootpath)
+..\..\AppData\Roaming\Python\Python312\site-packages\_pytest\pathlib.py:567: in import_path
+    importlib.import_module(module_name)
+C:\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+..\..\AppData\Roaming\Python\Python312\site-packages\_pytest\assertion\rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+..\..\AppData\Roaming\Python\Python312\site-packages\_pytest\assertion\rewrite.py:359: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+C:\Python312\Lib\ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "C:\Users\17175\Desktop\connascence\tests\e2e\test_memory_coordination.py", line 102
+E       ProductionAssert.not_none(integration_data, 'integration_data')        self.integration_tests[test_id] = {
+E                                                                              ^^^^
+E   SyntaxError: invalid syntax
+__________________ ERROR collecting e2e/test_performance.py ___________________
+..\..\AppData\Roaming\Python\Python312\site-packages\_pytest\python.py:617: in _importtestmodule
+    mod = import_path(self.path, mode=importmode, root=self.config.rootpath)
+..\..\AppData\Roaming\Python\Python312\site-packages\_pytest\pathlib.py:567: in import_path
+    importlib.import_module(module_name)
+C:\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+..\..\AppData\Roaming\Python\Python312\site-packages\_pytest\assertion\rewrite.py:177: in exec_module
+    source_stat, co = _rewrite_test(fn, self.config)
+..\..\AppData\Roaming\Python\Python312\site-packages\_pytest\assertion\rewrite.py:359: in _rewrite_test
+    tree = ast.parse(source, filename=strfn)
+C:\Python312\Lib\ast.py:52: in parse
+    return compile(source, filename, mode, flags,
+E     File "C:\Users\17175\Desktop\connascence\tests\e2e\test_performance.py", line 65
+E       ProductionAssert.not_none(benchmark_data, 'benchmark_data')        self.benchmark_results[benchmark_id] = {
+E                                                                          ^^^^
+E   SyntaxError: invalid syntax
+_____________ ERROR collecting integration/test_ai_agent_usage.py _____________
+..\..\AppData\Roaming\Python\Python312\site-packages\_pytest\python.py:617: in _importtestmodule
+    mod = import_path(self.path, mode=importmode, root=self.config.rootpath)
+..\..\AppData\Roaming\Python\Python312\site-packages\_pytest\pathlib.py:567: in import_path
+    importlib.import_module(module_name)
+C:\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1310: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:488: in _call_with_frames_removed
+    ???
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+<frozen importlib._bootstrap_external>:991: in exec_module
+    ???
+<frozen importlib._bootstrap_external>:1129: in get_code
+    ???
+<frozen importlib._bootstrap_external>:1059: in source_to_code
+    ???
+<frozen importlib._bootstrap>:488: in _call_with_frames_removed
+    ???
+E     File "C:\Users\17175\Desktop\connascence\tests\integration\__init__.py", line 345
+E       ProductionAssert.not_none(test_name, 'test_name')
+E   IndentationError: unexpected indent
+_______ ERROR collecting integration/test_autofix_engine_integration.py _______
+..\..\AppData\Roaming\Python\Python312\site-packages\_pytest\python.py:617: in _importtestmodule
+    mod = import_path(self.path, mode=importmode, root=self.config.rootpath)
+..\..\AppData\Roaming\Python\Python312\site-packages\_pytest\pathlib.py:567: in import_path
+    importlib.import_module(module_name)
+C:\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1310: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:488: in _call_with_frames_removed
+    ???
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+<frozen importlib._bootstrap_external>:991: in exec_module
+    ???
+<frozen importlib._bootstrap_external>:1129: in get_code
+    ???
+<frozen importlib._bootstrap_external>:1059: in source_to_code
+    ???
+<frozen importlib._bootstrap>:488: in _call_with_frames_removed
+    ???
+E     File "C:\Users\17175\Desktop\connascence\tests\integration\__init__.py", line 345
+E       ProductionAssert.not_none(test_name, 'test_name')
+E   IndentationError: unexpected indent
+____________ ERROR collecting integration/test_complete_system.py _____________
+..\..\AppData\Roaming\Python\Python312\site-packages\_pytest\python.py:617: in _importtestmodule
+    mod = import_path(self.path, mode=importmode, root=self.config.rootpath)
+..\..\AppData\Roaming\Python\Python312\site-packages\_pytest\pathlib.py:567: in import_path
+    importlib.import_module(module_name)
+C:\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1310: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:488: in _call_with_frames_removed
+    ???
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+<frozen importlib._bootstrap_external>:991: in exec_module
+    ???
+<frozen importlib._bootstrap_external>:1129: in get_code
+    ???
+<frozen importlib._bootstrap_external>:1059: in source_to_code
+    ???
+<frozen importlib._bootstrap>:488: in _call_with_frames_removed
+    ???
+E     File "C:\Users\17175\Desktop\connascence\tests\integration\__init__.py", line 345
+E       ProductionAssert.not_none(test_name, 'test_name')
+E   IndentationError: unexpected indent
+_______ ERROR collecting integration/test_cross_component_validation.py _______
+..\..\AppData\Roaming\Python\Python312\site-packages\_pytest\python.py:617: in _importtestmodule
+    mod = import_path(self.path, mode=importmode, root=self.config.rootpath)
+..\..\AppData\Roaming\Python\Python312\site-packages\_pytest\pathlib.py:567: in import_path
+    importlib.import_module(module_name)
+C:\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1310: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:488: in _call_with_frames_removed
+    ???
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+<frozen importlib._bootstrap_external>:991: in exec_module
+    ???
+<frozen importlib._bootstrap_external>:1129: in get_code
+    ???
+<frozen importlib._bootstrap_external>:1059: in source_to_code
+    ???
+<frozen importlib._bootstrap>:488: in _call_with_frames_removed
+    ???
+E     File "C:\Users\17175\Desktop\connascence\tests\integration\__init__.py", line 345
+E       ProductionAssert.not_none(test_name, 'test_name')
+E   IndentationError: unexpected indent
+_____________ ERROR collecting integration/test_data_fixtures.py ______________
+..\..\AppData\Roaming\Python\Python312\site-packages\_pytest\python.py:617: in _importtestmodule
+    mod = import_path(self.path, mode=importmode, root=self.config.rootpath)
+..\..\AppData\Roaming\Python\Python312\site-packages\_pytest\pathlib.py:567: in import_path
+    importlib.import_module(module_name)
+C:\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1310: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:488: in _call_with_frames_removed
+    ???
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+<frozen importlib._bootstrap_external>:991: in exec_module
+    ???
+<frozen importlib._bootstrap_external>:1129: in get_code
+    ???
+<frozen importlib._bootstrap_external>:1059: in source_to_code
+    ???
+<frozen importlib._bootstrap>:488: in _call_with_frames_removed
+    ???
+E     File "C:\Users\17175\Desktop\connascence\tests\integration\__init__.py", line 345
+E       ProductionAssert.not_none(test_name, 'test_name')
+E   IndentationError: unexpected indent
+_________ ERROR collecting integration/test_mcp_server_integration.py _________
+..\..\AppData\Roaming\Python\Python312\site-packages\_pytest\python.py:617: in _importtestmodule
+    mod = import_path(self.path, mode=importmode, root=self.config.rootpath)
+..\..\AppData\Roaming\Python\Python312\site-packages\_pytest\pathlib.py:567: in import_path
+    importlib.import_module(module_name)
+C:\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1310: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:488: in _call_with_frames_removed
+    ???
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+<frozen importlib._bootstrap_external>:991: in exec_module
+    ???
+<frozen importlib._bootstrap_external>:1129: in get_code
+    ???
+<frozen importlib._bootstrap_external>:1059: in source_to_code
+    ???
+<frozen importlib._bootstrap>:488: in _call_with_frames_removed
+    ???
+E     File "C:\Users\17175\Desktop\connascence\tests\integration\__init__.py", line 345
+E       ProductionAssert.not_none(test_name, 'test_name')
+E   IndentationError: unexpected indent
+__________ ERROR collecting integration/test_real_world_scenarios.py __________
+..\..\AppData\Roaming\Python\Python312\site-packages\_pytest\python.py:617: in _importtestmodule
+    mod = import_path(self.path, mode=importmode, root=self.config.rootpath)
+..\..\AppData\Roaming\Python\Python312\site-packages\_pytest\pathlib.py:567: in import_path
+    importlib.import_module(module_name)
+C:\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1310: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:488: in _call_with_frames_removed
+    ???
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+<frozen importlib._bootstrap_external>:991: in exec_module
+    ???
+<frozen importlib._bootstrap_external>:1129: in get_code
+    ???
+<frozen importlib._bootstrap_external>:1059: in source_to_code
+    ???
+<frozen importlib._bootstrap>:488: in _call_with_frames_removed
+    ???
+E     File "C:\Users\17175\Desktop\connascence\tests\integration\__init__.py", line 345
+E       ProductionAssert.not_none(test_name, 'test_name')
+E   IndentationError: unexpected indent
+__________ ERROR collecting integration/test_workflow_integration.py __________
+..\..\AppData\Roaming\Python\Python312\site-packages\_pytest\python.py:617: in _importtestmodule
+    mod = import_path(self.path, mode=importmode, root=self.config.rootpath)
+..\..\AppData\Roaming\Python\Python312\site-packages\_pytest\pathlib.py:567: in import_path
+    importlib.import_module(module_name)
+C:\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1310: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:488: in _call_with_frames_removed
+    ???
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:935: in _load_unlocked
+    ???
+<frozen importlib._bootstrap_external>:991: in exec_module
+    ???
+<frozen importlib._bootstrap_external>:1129: in get_code
+    ???
+<frozen importlib._bootstrap_external>:1059: in source_to_code
+    ???
+<frozen importlib._bootstrap>:488: in _call_with_frames_removed
+    ???
+E     File "C:\Users\17175\Desktop\connascence\tests\integration\__init__.py", line 345
+E       ProductionAssert.not_none(test_name, 'test_name')
+E   IndentationError: unexpected indent
+============================== warnings summary ===============================
+tests\e2e\test_cli_workflows.py:678
+tests\e2e\test_error_handling.py:1207
+tests\e2e\test_exit_codes.py:1353
+tests\e2e\test_report_generation.py:1077
+tests\e2e\test_repository_analysis.py:1358
+  Unknown pytest.mark.e2e - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+
+tests\enhanced\test_cli_integration.py:534
+  Unknown pytest.mark.cli - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+
+tests\enhanced\test_mcp_server_integration.py:609
+  Unknown pytest.mark.mcp_server - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+
+tests\enhanced\test_vscode_integration.py:437
+  Unknown pytest.mark.vscode - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+
+tests\enhanced\test_web_dashboard_integration.py:577
+  Unknown pytest.mark.web_dashboard - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+
+tests\performance\test_benchmarks.py:32
+tests\performance\test_benchmarks.py:77
+tests\performance\test_benchmarks.py:147
+tests\performance\test_benchmarks.py:230
+tests\performance\test_benchmarks.py:264
+tests\performance\test_benchmarks.py:316
+tests\performance\test_benchmarks.py:359
+tests\performance\test_benchmarks.py:408
+  Unknown pytest.mark.performance - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+ERROR tests\e2e\test_enterprise_scale.py
+ERROR tests\e2e\test_memory_coordination.py
+ERROR tests\e2e\test_performance.py
+ERROR tests\integration\test_ai_agent_usage.py
+ERROR tests\integration\test_autofix_engine_integration.py
+ERROR tests\integration\test_complete_system.py
+ERROR tests\integration\test_cross_component_validation.py
+ERROR tests\integration\test_data_fixtures.py
+ERROR tests\integration\test_mcp_server_integration.py
+ERROR tests\integration\test_real_world_scenarios.py
+ERROR tests\integration\test_workflow_integration.py
+!!!!!!!!!!!!!!!!!! Interrupted: 11 errors during collection !!!!!!!!!!!!!!!!!!!
+=================== 513 tests collected, 11 errors in 4.14s ===================

@@ -548,96 +548,94 @@ class ConnascenceDetector(ast.NodeVisitor):
             },
         )
 
-    def _process_magic_literals(self):
-        """Process magic literals with formal grammar context. NASA Rule 4 compliant."""
-        # NASA Rule 5: Input validation assertion
-        assert hasattr(self, "magic_literals"), "magic_literals must be initialized"
 
-        for item in self.magic_literals:
-            # Handle different formats: old (node, value), enhanced (node, value, context)
-            if len(item) == 2:
-                node, value = item
-                context_info = {"in_conditional": self._is_in_conditional(node)}
-                severity_score = 3.0  # Default fallback severity
-            else:
-                node, value, context_info = item
-                # Check if we have formal grammar analysis context
-                if context_info.get("formal_analysis") and "context" in context_info:
-                    formal_context = context_info["context"]
-                    severity_score = context_info.get("severity_score", 3.0)
+    def _process_formal_magic_literal(self, node, value, context_info, formal_context, severity_score):
+        """
+        Process magic literal with formal grammar context.
 
-                    # Use formal grammar analyzer's severity calculation
-                    if severity_score < 2.0:
-                        continue  # Skip low-severity items
-                    elif severity_score > 8.0:
-                        severity = "high"
-                    elif severity_score > 5.0:
-                        severity = "medium"
-                    else:
-                        severity = "low"
+        NASA Rule 4: Function under 60 lines
+        """
+        # Determine severity based on score
+        if severity_score < 2.0:
+            return  # Skip low-severity items
+        elif severity_score > 8.0:
+            severity = "high"
+        elif severity_score > 5.0:
+            severity = "medium"
+        else:
+            severity = "low"
 
-                    # Generate enhanced description using formal context
-                    description = self._create_formal_magic_literal_description(value, formal_context, severity_score)
-                    recommendation = self._get_formal_magic_literal_recommendation(formal_context)
+        # Generate enhanced description using formal context
+        description = self._create_formal_magic_literal_description(value, formal_context, severity_score)
+        recommendation = self._get_formal_magic_literal_recommendation(formal_context)
 
-                    self.violations.append(
-                        ConnascenceViolation(
-                            type="connascence_of_meaning",
-                            severity=severity,
-                            file_path=self.file_path,
-                            line_number=node.lineno,
-                            column=node.col_offset,
-                            description=description,
-                            recommendation=recommendation,
-                            code_snippet=self.get_code_snippet(node),
-                            context={
-                                "literal_value": value,
-                                "formal_context": {
-                                    "in_conditional": formal_context.in_conditional,
-                                    "in_assignment": formal_context.in_assignment,
-                                    "is_constant": formal_context.is_constant,
-                                    "is_configuration": formal_context.is_configuration,
-                                    "variable_name": formal_context.variable_name,
-                                    "function_name": formal_context.function_name,
-                                    "class_name": formal_context.class_name,
-                                },
-                                "severity_score": severity_score,
-                                "analysis_type": "formal_grammar",
-                            },
-                        )
-                    )
-                    continue
-
-            # Fallback to original processing for non-formal analysis
-            severity = self._determine_magic_literal_severity(value, context_info)
-
-            # Skip very low priority items if they have contextual justification
-            if severity == "informational" and context_info.get("severity_modifier") == "lower":
-                continue
-
-            # Create appropriate description based on context
-            description = self._create_magic_literal_description(value, context_info)
-
-            self.violations.append(
-                ConnascenceViolation(
-                    type="connascence_of_meaning",
-                    severity=severity,
-                    file_path=self.file_path,
-                    line_number=node.lineno,
-                    column=node.col_offset,
-                    description=description,
-                    recommendation=self._get_magic_literal_recommendation(value, context_info),
-                    code_snippet=self.get_code_snippet(node),
-                    context={
-                        "literal_value": value,
-                        "analysis_context": context_info,
-                        "in_conditional": context_info.get("in_conditional", False),
-                        "analysis_type": "legacy",
+        self.violations.append(
+            ConnascenceViolation(
+                type="connascence_of_meaning",
+                severity=severity,
+                file_path=self.file_path,
+                line_number=node.lineno,
+                column=node.col_offset,
+                description=description,
+                recommendation=recommendation,
+                code_snippet=self.get_code_snippet(node),
+                context={
+                    "literal_value": value,
+                    "formal_context": {
+                        "in_conditional": formal_context.in_conditional,
+                        "in_assignment": formal_context.in_assignment,
+                        "is_constant": formal_context.is_constant,
+                        "is_configuration": formal_context.is_configuration,
+                        "variable_name": formal_context.variable_name,
+                        "function_name": formal_context.function_name,
+                        "class_name": formal_context.class_name,
                     },
-                )
+                    "severity_score": severity_score,
+                    "analysis_type": "formal_grammar",
+                },
             )
+        )
 
-        # Check for excessive global usage
+    def _process_legacy_magic_literal(self, node, value, context_info):
+        """
+        Process magic literal using legacy analysis.
+
+        NASA Rule 4: Function under 60 lines
+        """
+        severity = self._determine_magic_literal_severity(value, context_info)
+
+        # Skip very low priority items if they have contextual justification
+        if severity == "informational" and context_info.get("severity_modifier") == "lower":
+            return
+
+        # Create appropriate description based on context
+        description = self._create_magic_literal_description(value, context_info)
+
+        self.violations.append(
+            ConnascenceViolation(
+                type="connascence_of_meaning",
+                severity=severity,
+                file_path=self.file_path,
+                line_number=node.lineno,
+                column=node.col_offset,
+                description=description,
+                recommendation=self._get_magic_literal_recommendation(value, context_info),
+                code_snippet=self.get_code_snippet(node),
+                context={
+                    "literal_value": value,
+                    "analysis_context": context_info,
+                    "in_conditional": context_info.get("in_conditional", False),
+                    "analysis_type": "legacy",
+                },
+            )
+        )
+
+    def _check_excessive_globals(self):
+        """
+        Check for excessive global variable usage.
+
+        NASA Rule 4: Function under 60 lines
+        """
         if len(self.global_vars) > 5:
             # Find a representative location (first global usage)
             for node in ast.walk(ast.parse("".join(self.source_lines))):
@@ -656,6 +654,40 @@ class ConnascenceDetector(ast.NodeVisitor):
                         )
                     )
                     break
+
+    def _process_magic_literals(self):
+        """
+        Process magic literals with formal grammar context.
+
+        Refactored to comply with NASA Rule 4 (≤60 lines per function).
+        Helper functions handle formal analysis, legacy processing, and global checks.
+        """
+        # NASA Rule 5: Input validation assertion
+        assert hasattr(self, "magic_literals"), "magic_literals must be initialized"
+
+        for item in self.magic_literals:
+            # Handle different formats: old (node, value), enhanced (node, value, context)
+            if len(item) == 2:
+                node, value = item
+                context_info = {"in_conditional": self._is_in_conditional(node)}
+                # Process with legacy method
+                self._process_legacy_magic_literal(node, value, context_info)
+            else:
+                node, value, context_info = item
+                # Check if we have formal grammar analysis context
+                if context_info.get("formal_analysis") and "context" in context_info:
+                    formal_context = context_info["context"]
+                    severity_score = context_info.get("severity_score", 3.0)
+                    # Process with formal grammar method
+                    self._process_formal_magic_literal(
+                        node, value, context_info, formal_context, severity_score
+                    )
+                else:
+                    # Fallback to legacy processing
+                    self._process_legacy_magic_literal(node, value, context_info)
+
+        # Check for excessive global usage
+        self._check_excessive_globals()
 
     def _is_in_conditional(self, node: ast.AST) -> bool:
         """Check if node is within a conditional statement."""

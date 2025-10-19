@@ -168,10 +168,107 @@ class ConnascenceAnalyzer:
         else:
             return self._run_mock_analysis(path, policy, duplication_result, **kwargs)
 
+
+    def _analyze_file_or_directory(self, path_obj, policy_preset, **kwargs):
+        """
+        Analyze file or directory based on path type.
+
+        NASA Rule 4: Function under 60 lines
+        """
+        if path_obj.is_file():
+            # For single files, use analyze_file method
+            file_result = self.unified_analyzer.analyze_file(str(path_obj))
+            violations = file_result.get("connascence_violations", [])
+            nasa_violations = file_result.get("nasa_violations", [])
+
+            # Create a mock result object with all required attributes
+            class MockUnifiedResult:
+                def __init__(self):
+                    self.connascence_violations = violations
+                    self.nasa_violations = nasa_violations
+                    self.duplication_clusters = []
+                    self.total_violations = len(violations)
+                    self.critical_count = len([v for v in violations if v.get("severity") == "critical"])
+                    self.overall_quality_score = file_result.get("nasa_compliance_score", 1.0)
+                    self.nasa_compliance_score = file_result.get("nasa_compliance_score", 1.0)
+                    self.duplication_score = 1.0
+                    self.connascence_index = sum(v.get("weight", 1) for v in violations)
+                    self.files_analyzed = 1
+                    self.analysis_duration_ms = 100
+
+            return MockUnifiedResult()
+        else:
+            # For directories, use analyze_project method
+            return self.unified_analyzer.analyze_project(
+                project_path=str(path_obj), policy_preset=policy_preset, options=kwargs
+            )
+
+    def _format_unified_result(self, result, path: str, policy: str, duplication_result):
+        """
+        Convert unified result to expected format.
+
+        NASA Rule 4: Function under 60 lines
+        """
+        return {
+            "success": True,
+            "path": str(path),
+            "policy": policy,
+            "violations": result.connascence_violations,
+            "summary": {
+                "total_violations": result.total_violations,
+                "critical_violations": result.critical_count,
+                "overall_quality_score": result.overall_quality_score,
+            },
+            "nasa_compliance": {
+                "score": result.nasa_compliance_score,
+                "violations": result.nasa_violations,
+                "passing": result.nasa_compliance_score >= NASA_COMPLIANCE_THRESHOLD,
+            },
+            "mece_analysis": {
+                "score": result.duplication_score,
+                "duplications": result.duplication_clusters,
+                "passing": result.duplication_score >= MECE_QUALITY_THRESHOLD,
+            },
+            "duplication_analysis": format_duplication_analysis(duplication_result),
+            "god_objects": self._extract_god_objects(result.connascence_violations),
+            "metrics": {
+                "files_analyzed": result.files_analyzed,
+                "analysis_time": result.analysis_duration_ms / 1000.0,
+                "timestamp": time.time(),
+                "connascence_index": result.connascence_index,
+            },
+            "quality_gates": {
+                "overall_passing": result.overall_quality_score >= OVERALL_QUALITY_THRESHOLD,
+                "nasa_passing": result.nasa_compliance_score >= NASA_COMPLIANCE_THRESHOLD,
+                "mece_passing": result.duplication_score >= MECE_QUALITY_THRESHOLD,
+            },
+        }
+
+    def _create_error_result(self, error: Exception):
+        """
+        Create error result structure.
+
+        NASA Rule 4: Function under 60 lines
+        """
+        return {
+            "success": False,
+            "error": f"Unified analysis error: {error!s}",
+            "violations": [],
+            "summary": {"total_violations": 0},
+            "nasa_compliance": {"score": 0.0, "violations": []},
+            "mece_analysis": {"score": 0.0, "duplications": []},
+            "god_objects": [],
+        }
+
     def _run_unified_analysis(
         self, path: str, policy: str, duplication_result: Optional[Any] = None, **kwargs
     ) -> Dict[str, Any]:
-        """Run analysis using the unified analyzer pipeline."""
+        """
+        Run analysis using the unified analyzer pipeline.
+
+        Refactored to comply with NASA Rule 4 (≤60 lines per function).
+        Helper functions handle file/directory analysis, result formatting, and errors.
+        """
         try:
             time.time()
 
@@ -179,82 +276,15 @@ class ConnascenceAnalyzer:
             policy_preset = self._convert_policy_to_preset(policy)
             path_obj = Path(path)
 
-            # Use different methods for files vs directories
-            if path_obj.is_file():
-                # For single files, use analyze_file method
-                file_result = self.unified_analyzer.analyze_file(path)
-                # Convert file result to project result format with all required attributes
-                violations = file_result.get("connascence_violations", [])
-                nasa_violations = file_result.get("nasa_violations", [])
+            # Analyze file or directory
+            result = self._analyze_file_or_directory(path_obj, policy_preset, **kwargs)
 
-                # Create a mock result object with all required attributes
-                class MockUnifiedResult:
-                    def __init__(self):
-                        self.connascence_violations = violations
-                        self.nasa_violations = nasa_violations
-                        self.duplication_clusters = []
-                        self.total_violations = len(violations)
-                        self.critical_count = len([v for v in violations if v.get("severity") == "critical"])
-                        self.overall_quality_score = file_result.get("nasa_compliance_score", 1.0)
-                        self.nasa_compliance_score = file_result.get("nasa_compliance_score", 1.0)
-                        self.duplication_score = 1.0
-                        self.connascence_index = sum(v.get("weight", 1) for v in violations)
-                        self.files_analyzed = 1
-                        self.analysis_duration_ms = 100
-
-                result = MockUnifiedResult()
-            else:
-                # For directories, use analyze_project method
-                result = self.unified_analyzer.analyze_project(
-                    project_path=path, policy_preset=policy_preset, options=kwargs
-                )
-
-            # Convert unified result to expected format
-            return {
-                "success": True,
-                "path": str(path),
-                "policy": policy,
-                "violations": result.connascence_violations,
-                "summary": {
-                    "total_violations": result.total_violations,
-                    "critical_violations": result.critical_count,
-                    "overall_quality_score": result.overall_quality_score,
-                },
-                "nasa_compliance": {
-                    "score": result.nasa_compliance_score,
-                    "violations": result.nasa_violations,
-                    "passing": result.nasa_compliance_score >= NASA_COMPLIANCE_THRESHOLD,
-                },
-                "mece_analysis": {
-                    "score": result.duplication_score,
-                    "duplications": result.duplication_clusters,
-                    "passing": result.duplication_score >= MECE_QUALITY_THRESHOLD,
-                },
-                "duplication_analysis": format_duplication_analysis(duplication_result),
-                "god_objects": self._extract_god_objects(result.connascence_violations),
-                "metrics": {
-                    "files_analyzed": result.files_analyzed,
-                    "analysis_time": result.analysis_duration_ms / 1000.0,
-                    "timestamp": time.time(),
-                    "connascence_index": result.connascence_index,
-                },
-                "quality_gates": {
-                    "overall_passing": result.overall_quality_score >= OVERALL_QUALITY_THRESHOLD,
-                    "nasa_passing": result.nasa_compliance_score >= NASA_COMPLIANCE_THRESHOLD,
-                    "mece_passing": result.duplication_score >= MECE_QUALITY_THRESHOLD,
-                },
-            }
+            # Format and return result
+            return self._format_unified_result(result, path, policy, duplication_result)
 
         except Exception as e:
-            return {
-                "success": False,
-                "error": f"Unified analysis error: {e!s}",
-                "violations": [],
-                "summary": {"total_violations": 0},
-                "nasa_compliance": {"score": 0.0, "violations": []},
-                "mece_analysis": {"score": 0.0, "duplications": []},
-                "god_objects": [],
-            }
+            return self._create_error_result(e)
+
 
     def _run_fallback_analysis(
         self, path: str, policy: str, duplication_result: Optional[Any] = None, **kwargs
@@ -403,12 +433,13 @@ class ConnascenceAnalyzer:
         }
 
 
-def create_parser() -> argparse.ArgumentParser:
-    """Create command-line argument parser."""
-    parser = argparse.ArgumentParser(
-        description="Connascence Safety Analyzer", formatter_class=argparse.RawDescriptionHelpFormatter
-    )
 
+def _add_basic_arguments(parser: argparse.ArgumentParser):
+    """
+    Add basic arguments (path, policy, format, output).
+
+    NASA Rule 4: Function under 60 lines
+    """
     parser.add_argument("--path", "-p", type=str, default=".", help="Path to analyze (default: current directory)")
 
     # Get available policies for help text
@@ -416,7 +447,6 @@ def create_parser() -> argparse.ArgumentParser:
         "Analysis policy to use. Unified: nasa-compliance, strict, standard, lenient (legacy names also accepted)"
     )
     try:
-        # Try to dynamically get available policies if constants are available
         if "list_available_policies" in globals() and list_available_policies:
             available_policies = list_available_policies(include_legacy=True)
             policy_help = f"Analysis policy to use. Available: {', '.join(available_policies)}"
@@ -424,100 +454,121 @@ def create_parser() -> argparse.ArgumentParser:
         pass
 
     parser.add_argument(
-        "--policy", type=str, default="standard", help=policy_help  # Updated to use unified standard policy name
+        "--policy", type=str, default="standard", help=policy_help
     )
-
     parser.add_argument(
         "--format", "-f", type=str, default="json", choices=["json", "yaml", "sarif"], help="Output format"
     )
-
     parser.add_argument("--output", "-o", type=str, help="Output file path")
 
-    parser.add_argument("--nasa-validation", action="store_true", help="Enable NASA Power of Ten validation")
 
+def _add_analysis_arguments(parser: argparse.ArgumentParser):
+    """
+    Add analysis control arguments (NASA validation, duplication, strict mode).
+
+    NASA Rule 4: Function under 60 lines
+    """
+    parser.add_argument("--nasa-validation", action="store_true", help="Enable NASA Power of Ten validation")
     parser.add_argument(
         "--duplication-analysis",
         action="store_true",
         default=True,
         help="Enable unified duplication analysis (default: enabled)",
     )
-
     parser.add_argument("--no-duplication", action="store_true", help="Disable duplication analysis")
-
     parser.add_argument(
         "--duplication-threshold",
         type=float,
         default=0.7,
         help="Similarity threshold for duplication detection (0.0-1.0, default: 0.7)",
     )
-
     parser.add_argument("--strict-mode", action="store_true", help="Enable strict analysis mode")
-
     parser.add_argument("--exclude", type=str, nargs="*", default=[], help="Paths to exclude from analysis")
 
-    parser.add_argument("--include-nasa-rules", action="store_true", help="Include NASA-specific rules in SARIF output")
 
+def _add_output_control_arguments(parser: argparse.ArgumentParser):
+    """
+    Add output control arguments (include flags, tool correlation).
+
+    NASA Rule 4: Function under 60 lines
+    """
+    parser.add_argument("--include-nasa-rules", action="store_true", help="Include NASA-specific rules in SARIF output")
     parser.add_argument(
         "--include-god-objects", action="store_true", help="Include god object analysis in SARIF output"
     )
-
     parser.add_argument(
         "--include-mece-analysis", action="store_true", help="Include MECE duplication analysis in SARIF output"
     )
-
     parser.add_argument("--enable-tool-correlation", action="store_true", help="Enable cross-tool analysis correlation")
-
     parser.add_argument("--confidence-threshold", type=float, default=0.8, help="Confidence threshold for correlations")
 
-    # Missing CLI flags from README
+
+def _add_exit_condition_arguments(parser: argparse.ArgumentParser):
+    """
+    Add exit condition arguments (fail-on-critical, thresholds).
+
+    NASA Rule 4: Function under 60 lines
+    """
     parser.add_argument("--fail-on-critical", action="store_true", help="Exit with error code on critical violations")
-
     parser.add_argument("--max-god-objects", type=int, default=5, help="Maximum allowed god objects before failure")
-
     parser.add_argument("--compliance-threshold", type=int, default=95, help="Compliance threshold percentage (0-100)")
 
-    # Enhanced Pipeline CLI Arguments
+
+def _add_enhanced_pipeline_arguments(parser: argparse.ArgumentParser):
+    """
+    Add enhanced pipeline arguments (correlations, audit trail, recommendations).
+
+    NASA Rule 4: Function under 60 lines
+    """
     parser.add_argument("--enable-correlations", action="store_true", help="Enable cross-phase correlation analysis")
-
     parser.add_argument("--enable-audit-trail", action="store_true", help="Enable analysis audit trail tracking")
-
     parser.add_argument(
         "--enable-smart-recommendations", action="store_true", help="Enable AI-powered smart recommendations"
     )
-
     parser.add_argument(
         "--correlation-threshold",
         type=float,
         default=0.7,
         help="Minimum correlation threshold for cross-phase analysis (0.0-1.0)",
     )
-
     parser.add_argument("--export-audit-trail", type=str, help="Export audit trail to specified file path")
-
     parser.add_argument("--export-correlations", type=str, help="Export correlation data to specified file path")
-
     parser.add_argument(
         "--export-recommendations", type=str, help="Export smart recommendations to specified file path"
     )
-
     parser.add_argument("--enhanced-output", action="store_true", help="Include enhanced pipeline metadata in output")
-
     parser.add_argument("--phase-timing", action="store_true", help="Display detailed phase timing information")
+
+
+def create_parser() -> argparse.ArgumentParser:
+    """
+    Create command-line argument parser.
+
+    Refactored to comply with NASA Rule 4 (≤60 lines per function).
+    Helper functions organize arguments into logical groups.
+    """
+    parser = argparse.ArgumentParser(
+        description="Connascence Safety Analyzer", formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+
+    # Add argument groups
+    _add_basic_arguments(parser)
+    _add_analysis_arguments(parser)
+    _add_output_control_arguments(parser)
+    _add_exit_condition_arguments(parser)
+    _add_enhanced_pipeline_arguments(parser)
 
     return parser
 
 
-def main():
-    """Main entry point for command-line execution."""
-    parser = create_parser()
-    args = parser.parse_args()
 
-    # Initialize analyzer
-    analyzer = ConnascenceAnalyzer()
 
-    # Set policy based on flags
-    policy = "nasa_jpl_pot10" if args.nasa_validation else args.policy
+def _validate_and_resolve_policy(policy: str) -> str:
+    """
+    Validate and resolve policy name.
 
+    NASA Rule 4: Function under 60 lines
+    """
     # Resolve policy name (legacy to unified mapping)
     if resolve_policy_name:
         try:
@@ -535,14 +586,10 @@ def main():
                 try:
                     available_policies = list_available_policies(include_legacy=True)
                 except Exception:
-                    # Use UNIFIED_POLICY_NAMES as fallback for resolved policies
                     from analyzer.constants import UNIFIED_POLICY_NAMES
-
                     available_policies = UNIFIED_POLICY_NAMES
             else:
-                # Use UNIFIED_POLICY_NAMES as fallback for resolved policies
                 from analyzer.constants import UNIFIED_POLICY_NAMES
-
                 available_policies = UNIFIED_POLICY_NAMES
 
             print(
@@ -551,226 +598,305 @@ def main():
             )
             sys.exit(1)
 
-    # Handle duplication analysis options
+    return policy
+
+
+def _setup_duplication_analysis(args, analyzer) -> tuple:
+    """
+    Setup duplication analysis configuration.
+
+    Returns: (include_duplication, duplication_threshold)
+    NASA Rule 4: Function under 60 lines
+    """
     include_duplication = args.duplication_analysis and not args.no_duplication
     duplication_threshold = args.duplication_threshold
 
     if include_duplication and DUPLICATION_ANALYZER_AVAILABLE:
         analyzer.duplication_analyzer.similarity_threshold = duplication_threshold
 
-    try:
-        # Check if we should use enhanced unified analyzer
-        use_enhanced_analyzer = (
-            args.enable_correlations
-            or args.enable_audit_trail
-            or args.enable_smart_recommendations
-            or args.enhanced_output
+    return include_duplication, duplication_threshold
+
+
+def _run_analysis(args, policy: str, analyzer, include_duplication: bool, duplication_threshold: float):
+    """
+    Run analysis with appropriate analyzer (enhanced or standard).
+
+    NASA Rule 4: Function under 60 lines
+    """
+    use_enhanced_analyzer = (
+        args.enable_correlations
+        or args.enable_audit_trail
+        or args.enable_smart_recommendations
+        or args.enhanced_output
+    )
+
+    if use_enhanced_analyzer and UNIFIED_ANALYZER_AVAILABLE:
+        print("Using enhanced unified analyzer for cross-phase analysis...")
+
+        enhanced_analyzer = UnifiedConnascenceAnalyzer()
+        result = enhanced_analyzer.analyze_path(
+            path=args.path,
+            policy=policy,
+            enable_cross_phase_correlation=args.enable_correlations,
+            enable_audit_trail=args.enable_audit_trail,
+            enable_smart_recommendations=args.enable_smart_recommendations,
+            correlation_threshold=args.correlation_threshold,
+            include_duplication=include_duplication,
+            duplication_threshold=duplication_threshold,
+            nasa_validation=args.nasa_validation,
+            strict_mode=args.strict_mode,
+            enable_tool_correlation=args.enable_tool_correlation,
+            confidence_threshold=args.confidence_threshold,
+        )
+    else:
+        result = analyzer.analyze_path(
+            path=args.path,
+            policy=policy,
+            include_duplication=include_duplication,
+            duplication_threshold=duplication_threshold,
+            nasa_validation=args.nasa_validation,
+            strict_mode=args.strict_mode,
+            enable_tool_correlation=args.enable_tool_correlation,
+            confidence_threshold=args.confidence_threshold,
         )
 
-        if use_enhanced_analyzer and UNIFIED_ANALYZER_AVAILABLE:
-            print("Using enhanced unified analyzer for cross-phase analysis...")
+    return result, use_enhanced_analyzer
 
-            # Create enhanced analyzer instance
-            enhanced_analyzer = UnifiedConnascenceAnalyzer()
 
-            # Run enhanced analysis with new features
-            result = enhanced_analyzer.analyze_path(
-                path=args.path,
-                policy=policy,
-                enable_cross_phase_correlation=args.enable_correlations,
-                enable_audit_trail=args.enable_audit_trail,
-                enable_smart_recommendations=args.enable_smart_recommendations,
-                correlation_threshold=args.correlation_threshold,
-                include_duplication=include_duplication,
-                duplication_threshold=duplication_threshold,
-                nasa_validation=args.nasa_validation,
-                strict_mode=args.strict_mode,
-                enable_tool_correlation=args.enable_tool_correlation,
-                confidence_threshold=args.confidence_threshold,
-            )
+def _handle_output_format(args, result):
+    """
+    Handle different output formats (SARIF, JSON, plain).
+
+    NASA Rule 4: Function under 60 lines
+    """
+    if args.format == "sarif":
+        sarif_reporter = SARIFReporter()
+        if args.output:
+            sarif_reporter.export_results(result, args.output)
+            print(f"SARIF report written to: {args.output}")
         else:
-            # Use standard analyzer for backward compatibility
-            result = analyzer.analyze_path(
-                path=args.path,
-                policy=policy,
-                include_duplication=include_duplication,
-                duplication_threshold=duplication_threshold,
-                nasa_validation=args.nasa_validation,
-                strict_mode=args.strict_mode,
-                enable_tool_correlation=args.enable_tool_correlation,
-                confidence_threshold=args.confidence_threshold,
-            )
+            sarif_output = sarif_reporter.export_results(result)
+            try:
+                print(sarif_output)
+            except UnicodeEncodeError:
+                print(sarif_output.encode("ascii", errors="replace").decode("ascii"))
+    elif args.format == "json":
+        json_reporter = JSONReporter()
+        if args.output:
+            json_reporter.export_results(result, args.output)
+            print(f"JSON report written to: {args.output}")
+        else:
+            json_output = json_reporter.export_results(result)
+            try:
+                print(json_output)
+            except UnicodeEncodeError:
+                print(json_output.encode("ascii", errors="replace").decode("ascii"))
+    elif args.output:
+        with open(args.output, "w") as f:
+            f.write(str(result))
+    else:
+        print(result)
 
-        # Handle different output formats
-        if args.format == "sarif":
-            # Use the proper SARIFReporter class
-            sarif_reporter = SARIFReporter()
-            if args.output:
-                sarif_reporter.export_results(result, args.output)
-                print(f"SARIF report written to: {args.output}")
+
+def _export_enhanced_results(args, result, use_enhanced_analyzer: bool):
+    """
+    Export enhanced pipeline results (audit trail, correlations, recommendations).
+
+    NASA Rule 4: Function under 60 lines (54 LOC)
+    """
+    if not use_enhanced_analyzer or not UNIFIED_ANALYZER_AVAILABLE:
+        return
+
+    # Export audit trail
+    if args.export_audit_trail and result.get("audit_trail"):
+        with open(args.export_audit_trail, "w") as f:
+            json.dump(result["audit_trail"], f, indent=2, default=str)
+        print(f"Audit trail exported to: {args.export_audit_trail}")
+
+    # Export correlations
+    if args.export_correlations and result.get("correlations"):
+        with open(args.export_correlations, "w") as f:
+            json.dump(result["correlations"], f, indent=2, default=str)
+        print(f"Correlations exported to: {args.export_correlations}")
+
+    # Export smart recommendations
+    if args.export_recommendations and result.get("smart_recommendations"):
+        with open(args.export_recommendations, "w") as f:
+            json.dump(result["smart_recommendations"], f, indent=2, default=str)
+        print(f"Smart recommendations exported to: {args.export_recommendations}")
+
+    # Display phase timing
+    _display_phase_timing(args, result)
+
+    # Display correlations summary
+    _display_correlations_summary(result)
+
+    # Display recommendations summary
+    _display_recommendations_summary(result)
+
+
+def _display_phase_timing(args, result):
+    """Display phase timing information (helper for _export_enhanced_results)."""
+    if args.phase_timing and result.get("audit_trail"):
+        print("\n=== Analysis Phase Timing ===")
+        for phase in result["audit_trail"]:
+            if phase.get("started") and phase.get("completed"):
+                start_time = datetime.fromisoformat(phase["started"].replace("Z", "+00:00"))
+                end_time = datetime.fromisoformat(phase["completed"].replace("Z", "+00:00"))
+                duration = (end_time - start_time).total_seconds() * 1000
+
+                phase_name = phase["phase"].replace("_", " ").title()
+                violations = phase.get("violations_found", 0)
+                clusters = phase.get("clusters_found", 0)
+
+                print(
+                    f"{phase_name:25} | {duration:8.1f}ms | {violations:3d} violations | {clusters:3d} clusters"
+                )
+
+
+def _display_correlations_summary(result):
+    """Display correlation summary (helper for _export_enhanced_results)."""
+    if result.get("correlations") and len(result["correlations"]) > 0:
+        print("\n=== Cross-Phase Analysis Summary ===")
+        correlations = result["correlations"]
+        print(f"Found {len(correlations)} cross-phase correlations")
+
+        sorted_corr = sorted(correlations, key=lambda x: x.get("correlation_score", 0), reverse=True)
+        for i, corr in enumerate(sorted_corr[:3]):
+            score = corr.get("correlation_score", 0) * 100
+            analyzer1 = corr.get("analyzer1", "Unknown")
+            analyzer2 = corr.get("analyzer2", "Unknown")
+            print(f"{i+1}. {analyzer1} <-> {analyzer2}: {score:.1f}% correlation")
+
+
+def _display_recommendations_summary(result):
+    """Display recommendations summary (helper for _export_enhanced_results)."""
+    if result.get("smart_recommendations") and len(result["smart_recommendations"]) > 0:
+        print("\n=== Smart Recommendations Summary ===")
+        recommendations = result["smart_recommendations"]
+        print(f"Generated {len(recommendations)} architectural recommendations")
+
+        high_priority = [r for r in recommendations if r.get("priority", "").lower() == "high"]
+        for rec in high_priority[:3]:
+            category = rec.get("category", "General")
+            description = rec.get("description", "No description")[:60] + "..."
+            print(f"• [{category}] {description}")
+
+
+def _check_exit_conditions(args, result):
+    """
+    Check exit conditions and exit with appropriate code.
+
+    NASA Rule 4: Function under 60 lines
+    """
+    if not result.get("success", False):
+        print(f"Analysis failed: {result.get('error', 'Unknown error')}", file=sys.stderr)
+        sys.exit(1)
+
+    violations = result.get("violations", [])
+    critical_count = len([v for v in violations if v.get("severity") == "critical"])
+    god_objects = result.get("god_objects", [])
+    god_object_count = len(god_objects)
+    overall_quality_score = result.get("summary", {}).get("overall_quality_score", 1.0)
+    compliance_percent = int(overall_quality_score * 100)
+
+    should_exit_with_error = False
+    exit_reasons = []
+
+    if args.fail_on_critical and critical_count > 0:
+        should_exit_with_error = True
+        exit_reasons.append(f"{critical_count} critical violations found")
+
+    if god_object_count > args.max_god_objects:
+        should_exit_with_error = True
+        exit_reasons.append(f"{god_object_count} god objects (max: {args.max_god_objects})")
+
+    if compliance_percent < args.compliance_threshold:
+        should_exit_with_error = True
+        exit_reasons.append(f"compliance {compliance_percent}% < {args.compliance_threshold}%")
+
+    if critical_count > 0 and args.strict_mode:
+        should_exit_with_error = True
+        exit_reasons.append(f"{critical_count} critical violations (strict mode)")
+
+    if should_exit_with_error:
+        print(f"Analysis failed: {', '.join(exit_reasons)}", file=sys.stderr)
+        sys.exit(1)
+
+    print(f"Analysis completed successfully. {len(violations)} total violations ({critical_count} critical)")
+    sys.exit(0)
+
+
+def _handle_error(e: Exception, args):
+    """
+    Handle errors and generate minimal output for CI compatibility.
+
+    NASA Rule 4: Function under 60 lines
+    """
+    print(f"Analyzer error: {e}", file=sys.stderr)
+    import traceback
+    traceback.print_exc()
+
+    if args.output and args.format in ["json", "sarif"]:
+        try:
+            minimal_result = {
+                "success": False,
+                "error": str(e),
+                "violations": [],
+                "summary": {"total_violations": 0},
+                "nasa_compliance": {"score": 0.0, "violations": []},
+            }
+
+            if args.format == "sarif":
+                sarif_reporter = SARIFReporter()
+                sarif_reporter.export_results(minimal_result, args.output)
             else:
-                sarif_output = sarif_reporter.export_results(result)
-                # Handle Unicode characters for Windows terminal
-                try:
-                    print(sarif_output)
-                except UnicodeEncodeError:
-                    print(sarif_output.encode("ascii", errors="replace").decode("ascii"))
-        elif args.format == "json":
-            # Use JSONReporter for consistent formatting
-            json_reporter = JSONReporter()
-            if args.output:
-                json_reporter.export_results(result, args.output)
-                print(f"JSON report written to: {args.output}")
-            else:
-                json_output = json_reporter.export_results(result)
-                # Handle Unicode characters for Windows terminal
-                try:
-                    print(json_output)
-                except UnicodeEncodeError:
-                    print(json_output.encode("ascii", errors="replace").decode("ascii"))
-        # Fallback to simple output
-        elif args.output:
-            with open(args.output, "w") as f:
-                f.write(str(result))
-        else:
-            print(result)
+                json_reporter = JSONReporter()
+                json_reporter.export_results(minimal_result, args.output)
 
-        # Handle enhanced pipeline exports
-        if use_enhanced_analyzer and UNIFIED_ANALYZER_AVAILABLE:
-            # Export audit trail if requested
-            if args.export_audit_trail and result.get("audit_trail"):
-                with open(args.export_audit_trail, "w") as f:
-                    json.dump(result["audit_trail"], f, indent=2, default=str)
-                print(f"Audit trail exported to: {args.export_audit_trail}")
+            print(f"Minimal {args.format.upper()} report written for CI compatibility")
+        except Exception as export_error:
+            print(f"Failed to write minimal report: {export_error}", file=sys.stderr)
 
-            # Export correlations if requested
-            if args.export_correlations and result.get("correlations"):
-                with open(args.export_correlations, "w") as f:
-                    json.dump(result["correlations"], f, indent=2, default=str)
-                print(f"Correlations exported to: {args.export_correlations}")
+    sys.exit(1)
 
-            # Export smart recommendations if requested
-            if args.export_recommendations and result.get("smart_recommendations"):
-                with open(args.export_recommendations, "w") as f:
-                    json.dump(result["smart_recommendations"], f, indent=2, default=str)
-                print(f"Smart recommendations exported to: {args.export_recommendations}")
 
-            # Display phase timing information if requested
-            if args.phase_timing and result.get("audit_trail"):
-                print("\n=== Analysis Phase Timing ===")
-                for phase in result["audit_trail"]:
-                    if phase.get("started") and phase.get("completed"):
-                        start_time = datetime.fromisoformat(phase["started"].replace("Z", "+00:00"))
-                        end_time = datetime.fromisoformat(phase["completed"].replace("Z", "+00:00"))
-                        duration = (end_time - start_time).total_seconds() * 1000
+def main():
+    """
+    Main entry point for command-line execution.
 
-                        phase_name = phase["phase"].replace("_", " ").title()
-                        violations = phase.get("violations_found", 0)
-                        clusters = phase.get("clusters_found", 0)
+    Refactored to comply with NASA Rule 4 (≤60 lines per function).
+    Helper functions handle distinct logical sections.
+    """
+    parser = create_parser()
+    args = parser.parse_args()
 
-                        print(
-                            f"{phase_name:25} | {duration:8.1f}ms | {violations:3d} violations | {clusters:3d} clusters"
-                        )
+    analyzer = ConnascenceAnalyzer()
+    policy = "nasa_jpl_pot10" if args.nasa_validation else args.policy
 
-            # Display correlation summary if available
-            if result.get("correlations") and len(result["correlations"]) > 0:
-                print("\n=== Cross-Phase Analysis Summary ===")
-                correlations = result["correlations"]
-                print(f"Found {len(correlations)} cross-phase correlations")
+    # Validate and resolve policy
+    policy = _validate_and_resolve_policy(policy)
 
-                # Show highest correlations
-                sorted_corr = sorted(correlations, key=lambda x: x.get("correlation_score", 0), reverse=True)
-                for i, corr in enumerate(sorted_corr[:3]):  # Show top 3
-                    score = corr.get("correlation_score", 0) * 100
-                    analyzer1 = corr.get("analyzer1", "Unknown")
-                    analyzer2 = corr.get("analyzer2", "Unknown")
-                    print(f"{i+1}. {analyzer1} <-> {analyzer2}: {score:.1f}% correlation")
+    # Setup duplication analysis
+    include_duplication, duplication_threshold = _setup_duplication_analysis(args, analyzer)
 
-            # Display smart recommendations summary
-            if result.get("smart_recommendations") and len(result["smart_recommendations"]) > 0:
-                print("\n=== Smart Recommendations Summary ===")
-                recommendations = result["smart_recommendations"]
-                print(f"Generated {len(recommendations)} architectural recommendations")
+    try:
+        # Run analysis
+        result, use_enhanced_analyzer = _run_analysis(
+            args, policy, analyzer, include_duplication, duplication_threshold
+        )
 
-                # Show high priority recommendations
-                high_priority = [r for r in recommendations if r.get("priority", "").lower() == "high"]
-                for rec in high_priority[:3]:  # Show top 3 high priority
-                    category = rec.get("category", "General")
-                    description = rec.get("description", "No description")[:60] + "..."
-                    print(f"• [{category}] {description}")
+        # Handle output format
+        _handle_output_format(args, result)
 
-        # Exit with appropriate code
-        if result.get("success", False):
-            violations = result.get("violations", [])
-            critical_count = len([v for v in violations if v.get("severity") == "critical"])
-            god_objects = result.get("god_objects", [])
-            god_object_count = len(god_objects)
-            overall_quality_score = result.get("summary", {}).get("overall_quality_score", 1.0)
-            compliance_percent = int(overall_quality_score * 100)
+        # Export enhanced results
+        _export_enhanced_results(args, result, use_enhanced_analyzer)
 
-            # Check exit conditions based on new CLI flags
-            should_exit_with_error = False
-            exit_reasons = []
-
-            # Check --fail-on-critical flag
-            if args.fail_on_critical and critical_count > 0:
-                should_exit_with_error = True
-                exit_reasons.append(f"{critical_count} critical violations found")
-
-            # Check --max-god-objects flag
-            if god_object_count > args.max_god_objects:
-                should_exit_with_error = True
-                exit_reasons.append(f"{god_object_count} god objects (max: {args.max_god_objects})")
-
-            # Check --compliance-threshold flag
-            if compliance_percent < args.compliance_threshold:
-                should_exit_with_error = True
-                exit_reasons.append(f"compliance {compliance_percent}% < {args.compliance_threshold}%")
-
-            # Legacy: fail on critical violations if in strict mode
-            if critical_count > 0 and args.strict_mode:
-                should_exit_with_error = True
-                exit_reasons.append(f"{critical_count} critical violations (strict mode)")
-
-            if should_exit_with_error:
-                print(f"Analysis failed: {', '.join(exit_reasons)}", file=sys.stderr)
-                sys.exit(1)
-
-            print(f"Analysis completed successfully. {len(violations)} total violations ({critical_count} critical)")
-            sys.exit(0)
-        else:
-            print(f"Analysis failed: {result.get('error', 'Unknown error')}", file=sys.stderr)
-            sys.exit(1)
+        # Check exit conditions
+        _check_exit_conditions(args, result)
 
     except Exception as e:
-        print(f"Analyzer error: {e}", file=sys.stderr)
-        import traceback
-
-        traceback.print_exc()
-
-        # Generate a minimal output file for CI compatibility
-        if args.output and args.format in ["json", "sarif"]:
-            try:
-                minimal_result = {
-                    "success": False,
-                    "error": str(e),
-                    "violations": [],
-                    "summary": {"total_violations": 0},
-                    "nasa_compliance": {"score": 0.0, "violations": []},
-                }
-
-                if args.format == "sarif":
-                    sarif_reporter = SARIFReporter()
-                    sarif_reporter.export_results(minimal_result, args.output)
-                else:
-                    json_reporter = JSONReporter()
-                    json_reporter.export_results(minimal_result, args.output)
-
-                print(f"Minimal {args.format.upper()} report written for CI compatibility")
-            except Exception as export_error:
-                print(f"Failed to write minimal report: {export_error}", file=sys.stderr)
-
-        sys.exit(1)
+        _handle_error(e, args)
 
 
 # Deprecated: Use SARIFReporter class instead

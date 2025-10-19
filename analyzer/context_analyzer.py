@@ -194,14 +194,13 @@ class ContextAnalyzer:
             recommendations=recommendations,
         )
 
-    def _classify_class_context(
-        self, class_node: ast.ClassDef, source_lines: List[str], file_path: str
-    ) -> ClassContext:
-        """Classify the context/domain of a class using multiple indicators."""
 
-        scores = dict.fromkeys(ClassContext, 0)
+    def _score_by_file_path(self, file_path: str, scores: dict):
+        """
+        Score class context based on file path indicators.
 
-        # File path indicators
+        NASA Rule 4: Function under 60 lines
+        """
         path_lower = file_path.lower()
         if any(term in path_lower for term in ["test", "spec"]):
             scores[ClassContext.TEST] += 3
@@ -216,7 +215,12 @@ class ContextAnalyzer:
         elif any(term in path_lower for term in ["db", "database", "persistence", "repository"]):
             scores[ClassContext.INFRASTRUCTURE] += 2
 
-        # Class name analysis
+    def _score_by_class_name(self, class_node: ast.ClassDef, scores: dict):
+        """
+        Score class context based on class name patterns.
+
+        NASA Rule 4: Function under 60 lines
+        """
         class_name = class_node.name.lower()
         for context, indicators in [
             (ClassContext.CONFIG, self.config_indicators),
@@ -229,7 +233,12 @@ class ContextAnalyzer:
                     scores[context] += 2
                     break
 
-        # Base class analysis
+    def _score_by_base_classes(self, class_node: ast.ClassDef, scores: dict):
+        """
+        Score class context based on base class inheritance.
+
+        NASA Rule 4: Function under 60 lines
+        """
         for base in class_node.bases:
             base_name = ast.unparse(base) if hasattr(ast, "unparse") else str(base)
             for context, indicators in [
@@ -241,8 +250,15 @@ class ContextAnalyzer:
                 if base_name in indicators["base_classes"]:
                     scores[context] += 3
 
-        # Method pattern analysis
+    def _score_by_methods(self, class_node: ast.ClassDef, scores: dict):
+        """
+        Score class context based on method patterns and characteristics.
+
+        NASA Rule 4: Function under 60 lines
+        """
         methods = [node for node in class_node.body if isinstance(node, ast.FunctionDef)]
+
+        # Method pattern analysis
         for method in methods:
             method_name = method.name.lower()
             for context, indicators in [
@@ -273,9 +289,27 @@ class ContextAnalyzer:
         if max(scores.values()) == 0 and len(methods) > 5:
             scores[ClassContext.BUSINESS_LOGIC] += 1
 
+    def _classify_class_context(
+        self, class_node: ast.ClassDef, source_lines: List[str], file_path: str
+    ) -> ClassContext:
+        """
+        Classify the context/domain of a class using multiple indicators.
+
+        Refactored to comply with NASA Rule 4 (≤60 lines per function).
+        Helper functions handle file path, class name, base classes, and method analysis.
+        """
+        scores = dict.fromkeys(ClassContext, 0)
+
+        # Score by different indicators
+        self._score_by_file_path(file_path, scores)
+        self._score_by_class_name(class_node, scores)
+        self._score_by_base_classes(class_node, scores)
+        self._score_by_methods(class_node, scores)
+
         # Return the highest scoring context
         best_context = max(scores.items(), key=lambda x: x[1])
         return best_context[0] if best_context[1] > 0 else ClassContext.UNKNOWN
+
 
     def _count_methods(self, class_node: ast.ClassDef) -> int:
         """Count methods in a class, excluding special methods."""
