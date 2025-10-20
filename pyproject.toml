@@ -81,7 +81,7 @@ connascence = "mcp.server:main"
 # Tool Configuration
 
 [tool.setuptools]
-packages = ["analyzer", "interfaces", "autofix", "policy", "mcp", "utils", "security"]
+packages = ["analyzer", "interfaces", "autofix", "policy", "mcp", "utils", "security", "fixes"]
 
 [tool.setuptools.package-data]
 # Include runtime files for all packages

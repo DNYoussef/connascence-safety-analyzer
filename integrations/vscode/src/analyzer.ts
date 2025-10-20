@@ -47,7 +47,7 @@ export class ConnascenceAnalyzer {
             const cwd = workspaceFolder ? workspaceFolder.uri.fsPath : path.dirname(document.uri.fsPath);
 
             const { stdout } = await execAsync(
-                `connascence scan "${document.uri.fsPath}" --policy ${policy} --format json`,
+                `connascence "${document.uri.fsPath}" --policy ${policy} --format json`,
                 { cwd }
             );
 
@@ -171,10 +171,10 @@ export class ConnascenceAnalyzer {
     }
 
     private async generateFix(violation: Violation): Promise<vscode.TextEdit[]> {
-        // This would call the autofix API
+        // This would call the autofix API (currently not implemented)
         try {
             const { stdout } = await execAsync(
-                `connascence autofix --violation-id ${violation.type}:${violation.line} --dry-run --format json`,
+                `connascence "${violation.file}" --policy auto-fix --format json`,
                 { cwd: path.dirname(violation.file) }
             );
 
