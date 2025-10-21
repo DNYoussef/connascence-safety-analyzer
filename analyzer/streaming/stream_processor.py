@@ -60,6 +60,7 @@ except ImportError:
         def stop(self) -> None:
             pass
 
+
 logger = logging.getLogger(__name__)
 
 

@@ -164,7 +164,12 @@ class ConventionDetector(DetectorBase):
 
     def _has_docstring(self, node: ast.FunctionDef | ast.ClassDef) -> bool:
         """Check if function or class has a docstring."""
-        return bool(node.body and isinstance(node.body[0], ast.Expr) and isinstance(node.body[0].value, ast.Constant) and isinstance(node.body[0].value.value, str))
+        return bool(
+            node.body
+            and isinstance(node.body[0], ast.Expr)
+            and isinstance(node.body[0].value, ast.Constant)
+            and isinstance(node.body[0].value.value, str)
+        )
 
     def _create_naming_violation(self, node: ast.AST, name: str, name_type: str, message: str) -> None:
         """Create violation for naming convention issues."""

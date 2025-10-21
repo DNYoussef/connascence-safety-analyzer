@@ -1001,7 +1001,9 @@ class UnifiedConnascenceAnalyzer:
         dup_analysis = self.mece_analyzer.analyze_path(str(project_path), comprehensive=True)
         return dup_analysis.get("duplications", [])
 
-    def _run_smart_integration(self, project_path: Path, policy_preset: str, existing_violations: Optional[Dict] = None):
+    def _run_smart_integration(
+        self, project_path: Path, policy_preset: str, existing_violations: Optional[Dict] = None
+    ):
         """Run smart integration engine with enhanced correlation analysis."""
         if self.smart_engine:
             logger.info("Phase 5: Running smart integration engine with cross-phase correlation")
@@ -1047,7 +1049,10 @@ class UnifiedConnascenceAnalyzer:
             return None
 
     def _run_nasa_analysis(
-        self, connascence_violations: List[Dict[str, Any]], phase_metadata: Optional[Dict] = None, project_path: Optional[Path] = None
+        self,
+        connascence_violations: List[Dict[str, Any]],
+        phase_metadata: Optional[Dict] = None,
+        project_path: Optional[Path] = None,
     ) -> List[Dict[str, Any]]:
         """Run NASA compliance analysis with enhanced context awareness and Tree-Sitter backend."""
         nasa_violations = []

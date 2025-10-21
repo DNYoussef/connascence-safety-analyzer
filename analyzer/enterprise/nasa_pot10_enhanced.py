@@ -107,7 +107,10 @@ class WeightedScoringEngine:
             bonus += 3.0
         if metrics.multi_category.testing_compliance >= 95.0:
             bonus += 1.5
-        if len([v for v in functools.reduce(operator.iadd, metrics.violations_by_rule.values(), []) if v.auto_fixable]) >= 10:
+        if (
+            len([v for v in functools.reduce(operator.iadd, metrics.violations_by_rule.values(), []) if v.auto_fixable])
+            >= 10
+        ):
             bonus += 1.0
 
         return bonus

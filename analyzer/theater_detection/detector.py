@@ -649,7 +649,9 @@ class TheaterDetector:
             },
             "systemic_analysis": systemic_analysis,
             "individual_results": [asdict(r) for r in results],
-            "theater_patterns_detected": list(set(functools.reduce(operator.iadd, [r.theater_indicators for r in results], []))),
+            "theater_patterns_detected": list(
+                set(functools.reduce(operator.iadd, [r.theater_indicators for r in results], []))
+            ),
             "recommendations": {
                 "immediate_actions": self._generate_immediate_actions(results),
                 "long_term_improvements": self._generate_long_term_improvements(results),

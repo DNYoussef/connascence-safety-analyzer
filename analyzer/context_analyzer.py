@@ -377,9 +377,7 @@ class ContextAnalyzer:
         complexity = 1  # Base complexity
 
         for node in ast.walk(method_node):
-            if (
-                isinstance(node, (ast.If, ast.While, ast.For, ast.AsyncFor, ast.ExceptHandler, ast.BoolOp, ast.Compare))
-            ):
+            if isinstance(node, (ast.If, ast.While, ast.For, ast.AsyncFor, ast.ExceptHandler, ast.BoolOp, ast.Compare)):
                 complexity += 1
 
         return float(complexity)
