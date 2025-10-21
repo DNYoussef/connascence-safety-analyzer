@@ -340,7 +340,7 @@ jobs:
         
       - name: Additional Secret Scanning
         shell: bash
-        working-directory: vscode-extension
+        working-directory: interfaces/vscode
         run: |
           echo "🔍 Additional security checks..."
           
