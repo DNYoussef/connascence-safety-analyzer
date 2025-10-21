@@ -255,7 +255,7 @@ class RecommendationEngine:
         """Get connascence type description. NASA Rule 4 compliant."""
         descriptions = {
             "CoN": "use consistent naming patterns",
-            "CoT": "reduce shared mutable state",
+            "CoTS": "reduce shared mutable state",
             "CoL": "minimize literal value dependencies",
             "CoM": "replace magic numbers with constants",
             "CoA": "standardize algorithms across modules",

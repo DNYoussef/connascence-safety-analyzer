@@ -73,19 +73,16 @@ class CTQCalculator:
 
     SIGMA_DPMO_MAP = [(3.4, 6.0), (233, 5.0), (6210, 4.0), (66807, 3.0), (308538, 2.0), (float("inf"), 1.0)]
 
-    def __init__(self, config: Dict[str, Any] = None):
+    def __init__(self, config: Optional[Dict[str, Any]] = None):
         self.config = config or {}
         self.ctq_definitions: Optional[Dict[str, CTQDefinition]] = None
         self.target_sigma = self.config.get("targetSigma", 4.0)
 
-    async def load_ctq_definitions(self, checks_path: str = None) -> Dict[str, CTQDefinition]:
+    async def load_ctq_definitions(self, checks_path: Optional[str] = None) -> Dict[str, CTQDefinition]:
         if self.ctq_definitions:
             return self.ctq_definitions
 
-        if checks_path is None:
-            checks_path = Path.cwd() / "checks.yaml"
-        else:
-            checks_path = Path(checks_path)
+        checks_path = Path.cwd() / "checks.yaml" if checks_path is None else Path(checks_path)
 
         try:
             with open(checks_path, encoding="utf-8") as f:
@@ -328,7 +325,7 @@ class CTQCalculator:
 
         return alerts
 
-    def export_results(self, results: CTQResults, output_path: str = None) -> str:
+    def export_results(self, results: CTQResults, output_path: Optional[str] = None) -> str:
         output = {
             "timestamp": results.timestamp,
             "overall_score": results.overall_score,

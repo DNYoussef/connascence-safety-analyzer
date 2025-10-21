@@ -41,7 +41,7 @@ except ImportError:
         ValuesDetector,
     )
 try:
-    from utils.types import ConnascenceViolation
+    from utils.types import ConnascenceViolation  # noqa: F401
 except ImportError:
     from pathlib import Path
     import sys

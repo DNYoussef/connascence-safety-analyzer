@@ -314,9 +314,9 @@ class TestPerformanceBenchmarks:
             results[test_case["complexity"]] = {
                 "generation_time": recommendation_time,
                 "recommendation_count": recommendation_count,
-                "recommendations_per_second": recommendation_count / recommendation_time
-                if recommendation_time > 0
-                else 0,
+                "recommendations_per_second": (
+                    recommendation_count / recommendation_time if recommendation_time > 0 else 0
+                ),
             }
 
             # Validate performance and effectiveness
@@ -503,9 +503,11 @@ class TestPerformanceBenchmarks:
                 "final_memory_mb": final_memory,
                 "memory_increase_mb": peak_memory - initial_memory,
                 "memory_cleanup_mb": peak_memory - final_memory,
-                "cleanup_efficiency": (peak_memory - final_memory) / (peak_memory - initial_memory)
-                if peak_memory > initial_memory
-                else 1.0,
+                "cleanup_efficiency": (
+                    (peak_memory - final_memory) / (peak_memory - initial_memory)
+                    if peak_memory > initial_memory
+                    else 1.0
+                ),
             }
 
         performance_suite.benchmark_results["memory_patterns"] = results

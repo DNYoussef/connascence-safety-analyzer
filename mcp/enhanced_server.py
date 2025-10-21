@@ -168,7 +168,7 @@ class EnhancedConnascenceMCPServer:
                 self.logs = []
                 self.enabled = enabled
 
-            def log(self, event: str, details: Dict[str, Any] = None):
+            def log(self, event: str, details: Optional[Dict[str, Any]] = None):
                 ProductionAssert.not_none(event, "event")
 
                 if self.enabled:

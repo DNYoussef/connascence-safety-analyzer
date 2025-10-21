@@ -21,7 +21,6 @@ complex project structures, policy enforcement, and performance at scale.
 Uses memory coordination for tracking enterprise analysis patterns.
 """
 
-from fixes.phase0.production_safe_assertions import ProductionAssert
 from concurrent.futures import ThreadPoolExecutor
 import json
 from pathlib import Path
@@ -31,6 +30,8 @@ import time
 from typing import Any, Dict
 
 import pytest
+
+from fixes.phase0.production_safe_assertions import ProductionAssert
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
@@ -53,95 +54,95 @@ class EnterpriseScaleCoordinator:
     def store_enterprise_project(self, project_id: str, project_config: Dict[str, Any]):
         """Store enterprise project configuration and metrics."""
 
-        ProductionAssert.not_none(project_id, 'project_id')
+        ProductionAssert.not_none(project_id, "project_id")
 
-        ProductionAssert.not_none(project_config, 'project_config')
-        ProductionAssert.not_none(project_id, 'project_id')
+        ProductionAssert.not_none(project_config, "project_config")
+        ProductionAssert.not_none(project_id, "project_id")
 
-        ProductionAssert.not_none(project_config, 'project_config')
+        ProductionAssert.not_none(project_config, "project_config")
         self.enterprise_projects[project_id] = {
-            'config': project_config,
-            'timestamp': time.time(),
-            'analysis_status': 'initialized'
+            "config": project_config,
+            "timestamp": time.time(),
+            "analysis_status": "initialized",
         }
 
     def store_scale_metrics(self, project_id: str, scale_data: Dict[str, Any]):
         """Store scale-related performance and capacity metrics."""
 
-        ProductionAssert.not_none(project_id, 'project_id')
+        ProductionAssert.not_none(project_id, "project_id")
 
-        ProductionAssert.not_none(scale_data, 'scale_data')
-        ProductionAssert.not_none(project_id, 'project_id')
+        ProductionAssert.not_none(scale_data, "scale_data")
+        ProductionAssert.not_none(project_id, "project_id")
 
-        ProductionAssert.not_none(scale_data, 'scale_data')
+        ProductionAssert.not_none(scale_data, "scale_data")
         self.scale_metrics[project_id] = scale_data
 
     def store_policy_enforcement(self, project_id: str, policy_results: Dict[str, Any]):
         """Store policy enforcement results and compliance data."""
 
-        ProductionAssert.not_none(project_id, 'project_id')
+        ProductionAssert.not_none(project_id, "project_id")
 
-        ProductionAssert.not_none(policy_results, 'policy_results')
-        ProductionAssert.not_none(project_id, 'project_id')
+        ProductionAssert.not_none(policy_results, "policy_results")
+        ProductionAssert.not_none(project_id, "project_id")
 
-        ProductionAssert.not_none(policy_results, 'policy_results')
+        ProductionAssert.not_none(policy_results, "policy_results")
         self.policy_enforcement_results[project_id] = policy_results
 
     def store_compliance_tracking(self, project_id: str, compliance_data: Dict[str, Any]):
         """Store compliance tracking data for enterprise standards."""
 
-        ProductionAssert.not_none(project_id, 'project_id')
+        ProductionAssert.not_none(project_id, "project_id")
 
-        ProductionAssert.not_none(compliance_data, 'compliance_data')
-        ProductionAssert.not_none(project_id, 'project_id')
+        ProductionAssert.not_none(compliance_data, "compliance_data")
+        ProductionAssert.not_none(project_id, "project_id")
 
-        ProductionAssert.not_none(compliance_data, 'compliance_data')
+        ProductionAssert.not_none(compliance_data, "compliance_data")
         self.compliance_tracking[project_id] = compliance_data
 
     def store_parallel_analysis(self, analysis_id: str, parallel_results: Dict[str, Any]):
         """Store parallel/concurrent analysis results."""
 
-        ProductionAssert.not_none(analysis_id, 'analysis_id')
+        ProductionAssert.not_none(analysis_id, "analysis_id")
 
-        ProductionAssert.not_none(parallel_results, 'parallel_results')
-        ProductionAssert.not_none(analysis_id, 'analysis_id')
+        ProductionAssert.not_none(parallel_results, "parallel_results")
+        ProductionAssert.not_none(analysis_id, "analysis_id")
 
-        ProductionAssert.not_none(parallel_results, 'parallel_results')
+        ProductionAssert.not_none(parallel_results, "parallel_results")
         self.parallel_analysis_results[analysis_id] = parallel_results
 
     def store_resource_utilization(self, analysis_id: str, resource_data: Dict[str, Any]):
         """Store resource utilization metrics."""
 
-        ProductionAssert.not_none(analysis_id, 'analysis_id')
+        ProductionAssert.not_none(analysis_id, "analysis_id")
 
-        ProductionAssert.not_none(resource_data, 'resource_data')
-        ProductionAssert.not_none(analysis_id, 'analysis_id')
+        ProductionAssert.not_none(resource_data, "resource_data")
+        ProductionAssert.not_none(analysis_id, "analysis_id")
 
-        ProductionAssert.not_none(resource_data, 'resource_data')
+        ProductionAssert.not_none(resource_data, "resource_data")
         self.resource_utilization[analysis_id] = resource_data
 
     def simulate_team_workflow(self, workflow_id: str, workflow_data: Dict[str, Any]):
         """Store team workflow simulation results."""
 
-        ProductionAssert.not_none(workflow_id, 'workflow_id')
+        ProductionAssert.not_none(workflow_id, "workflow_id")
 
-        ProductionAssert.not_none(workflow_data, 'workflow_data')
-        ProductionAssert.not_none(workflow_id, 'workflow_id')
+        ProductionAssert.not_none(workflow_data, "workflow_data")
+        ProductionAssert.not_none(workflow_id, "workflow_id")
 
-        ProductionAssert.not_none(workflow_data, 'workflow_data')
+        ProductionAssert.not_none(workflow_data, "workflow_data")
         self.team_workflow_simulations[workflow_id] = workflow_data
 
     def get_enterprise_summary(self) -> Dict[str, Any]:
         """Get comprehensive enterprise analysis summary."""
         return {
-            'total_enterprise_projects': len(self.enterprise_projects),
-            'scale_tests_completed': len(self.scale_metrics),
-            'policy_enforcements': len(self.policy_enforcement_results),
-            'compliance_tests': len(self.compliance_tracking),
-            'parallel_analyses': len(self.parallel_analysis_results),
-            'resource_utilization_tests': len(self.resource_utilization),
-            'team_workflow_simulations': len(self.team_workflow_simulations),
-            'avg_scale_performance': self._calculate_avg_performance()
+            "total_enterprise_projects": len(self.enterprise_projects),
+            "scale_tests_completed": len(self.scale_metrics),
+            "policy_enforcements": len(self.policy_enforcement_results),
+            "compliance_tests": len(self.compliance_tracking),
+            "parallel_analyses": len(self.parallel_analysis_results),
+            "resource_utilization_tests": len(self.resource_utilization),
+            "team_workflow_simulations": len(self.team_workflow_simulations),
+            "avg_scale_performance": self._calculate_avg_performance(),
         }
 
     def _calculate_avg_performance(self) -> float:
@@ -151,7 +152,7 @@ class EnterpriseScaleCoordinator:
 
         performance_scores = []
         for metrics in self.scale_metrics.values():
-            score = metrics.get('performance_score', 0.0)
+            score = metrics.get("performance_score", 0.0)
             if score > 0:
                 performance_scores.append(score)
 
@@ -167,33 +168,33 @@ class EnterpriseProjectGenerator:
 
     def __init__(self):
         self.violation_patterns = {
-            'microservices': [
-                'parameter_bombs_in_apis',
-                'magic_configuration_values',
-                'god_service_classes',
-                'missing_type_hints'
+            "microservices": [
+                "parameter_bombs_in_apis",
+                "magic_configuration_values",
+                "god_service_classes",
+                "missing_type_hints",
             ],
-            'monolith': [
-                'god_classes_everywhere',
-                'deep_parameter_coupling',
-                'magic_constants_scattered',
-                'algorithm_connascence'
+            "monolith": [
+                "god_classes_everywhere",
+                "deep_parameter_coupling",
+                "magic_constants_scattered",
+                "algorithm_connascence",
             ],
-            'data_pipeline': [
-                'magic_thresholds',
-                'parameter_heavy_processors',
-                'untyped_transformations',
-                'configuration_coupling'
-            ]
+            "data_pipeline": [
+                "magic_thresholds",
+                "parameter_heavy_processors",
+                "untyped_transformations",
+                "configuration_coupling",
+            ],
         }
 
     def generate_microservices_architecture(self, base_path: Path, service_count: int = 10) -> Dict[str, Any]:
         """Generate microservices architecture with realistic violations."""
         project_config = {
-            'architecture': 'microservices',
-            'service_count': service_count,
-            'estimated_violations': service_count * 25,
-            'complexity_level': 'high'
+            "architecture": "microservices",
+            "service_count": service_count,
+            "estimated_violations": service_count * 25,
+            "complexity_level": "high",
         }
 
         # Create services structure
@@ -206,7 +207,8 @@ class EnterpriseProjectGenerator:
             service_dir.mkdir()
 
             # API layer with parameter bombs
-            (service_dir / "api.py").write_text(f"""
+            (service_dir / "api.py").write_text(
+                f"""
 # {service_name.title()} API with enterprise violations
 
 from flask import Flask, request, jsonify
@@ -370,10 +372,12 @@ class {service_name.title()}Manager:
     def setup_cost_optimization(self): pass
     def configure_compliance_monitoring(self): pass
     def setup_audit_logging(self): pass  # God class threshold exceeded
-""")
+"""
+            )
 
             # Business logic with violations
-            (service_dir / "business_logic.py").write_text(f"""
+            (service_dir / "business_logic.py").write_text(
+                f"""
 # {service_name.title()} Business Logic with violations
 
 def process_business_transaction(customer_id, transaction_type, amount,
@@ -505,21 +509,22 @@ class BusinessRuleEngine:
     def rule_method_20(self): pass
     def rule_method_21(self): pass
     def rule_method_22(self): pass  # God class
-""")
+"""
+            )
 
-        project_config['services_created'] = service_count
-        project_config['files_created'] = service_count * 2  # api.py + business_logic.py per service
-        project_config['estimated_violations'] = service_count * 30  # Refined estimate
+        project_config["services_created"] = service_count
+        project_config["files_created"] = service_count * 2  # api.py + business_logic.py per service
+        project_config["estimated_violations"] = service_count * 30  # Refined estimate
 
         return project_config
 
     def generate_data_pipeline(self, base_path: Path, pipeline_stages: int = 8) -> Dict[str, Any]:
         """Generate data pipeline with processing violations."""
         project_config = {
-            'architecture': 'data_pipeline',
-            'pipeline_stages': pipeline_stages,
-            'estimated_violations': pipeline_stages * 20,
-            'complexity_level': 'high'
+            "architecture": "data_pipeline",
+            "pipeline_stages": pipeline_stages,
+            "estimated_violations": pipeline_stages * 20,
+            "complexity_level": "high",
         }
 
         pipeline_dir = base_path / "pipeline"
@@ -529,7 +534,8 @@ class BusinessRuleEngine:
         for i in range(pipeline_stages):
             stage_name = f"stage_{i:02d}_{['ingestion', 'validation', 'transformation', 'enrichment', 'aggregation', 'filtering', 'analysis', 'output'][i % 8]}"
 
-            (pipeline_dir / f"{stage_name}.py").write_text(f"""
+            (pipeline_dir / f"{stage_name}.py").write_text(
+                f"""
 # Data Pipeline Stage: {stage_name}
 
 def process_stage_{i}(data, config, metadata, context, options,
@@ -673,11 +679,12 @@ class DataProcessor:
     def process_method_21(self): pass
     def process_method_22(self): pass
     def process_method_23(self): pass  # God class
-""")
+"""
+            )
 
-        project_config['stages_created'] = pipeline_stages
-        project_config['files_created'] = pipeline_stages
-        project_config['estimated_violations'] = pipeline_stages * 25
+        project_config["stages_created"] = pipeline_stages
+        project_config["files_created"] = pipeline_stages
+        project_config["estimated_violations"] = pipeline_stages * 25
 
         return project_config
 
@@ -707,9 +714,7 @@ class TestEnterpriseScaleAnalysis:
         project_path = Path(temp_dir)
 
         service_count = 15  # Enterprise scale
-        project_config = enterprise_project_generator.generate_microservices_architecture(
-            project_path, service_count
-        )
+        project_config = enterprise_project_generator.generate_microservices_architecture(project_path, service_count)
 
         enterprise_coordinator.store_enterprise_project(scenario_id, project_config)
         enterprise_workflow_validator.add_step("generate_microservices", project_config)
@@ -719,18 +724,23 @@ class TestEnterpriseScaleAnalysis:
         output_file = project_path / "microservices_analysis.json"
 
         start_time = time.time()
-        exit_code = cli.run([
-            "scan", str(project_path),
-            "--policy", "strict-core",  # Enterprise policy
-            "--format", "json",
-            "--output", str(output_file)
-        ])
+        exit_code = cli.run(
+            [
+                "scan",
+                str(project_path),
+                "--policy",
+                "strict-core",  # Enterprise policy
+                "--format",
+                "json",
+                "--output",
+                str(output_file),
+            ]
+        )
         execution_time = time.time() - start_time
 
-        enterprise_workflow_validator.add_step("execute_analysis", {
-            'exit_code': exit_code,
-            'execution_time_ms': execution_time * 1000
-        })
+        enterprise_workflow_validator.add_step(
+            "execute_analysis", {"exit_code": exit_code, "execution_time_ms": execution_time * 1000}
+        )
 
         # Step 3: Analyze scale performance
         assert output_file.exists(), "Analysis output not created"
@@ -738,17 +748,17 @@ class TestEnterpriseScaleAnalysis:
         with open(output_file) as f:
             results = json.load(f)
 
-        violations = results.get('violations', [])
+        violations = results.get("violations", [])
 
         scale_metrics = {
-            'total_services': service_count,
-            'total_files_analyzed': results.get('total_files_analyzed', 0),
-            'total_violations': len(violations),
-            'violations_per_service': len(violations) / service_count,
-            'analysis_time_ms': execution_time * 1000,
-            'files_per_second': results.get('total_files_analyzed', 0) / max(execution_time, 0.001),
-            'violations_per_second': len(violations) / max(execution_time, 0.001),
-            'performance_score': self._calculate_performance_score(execution_time, len(violations), service_count)
+            "total_services": service_count,
+            "total_files_analyzed": results.get("total_files_analyzed", 0),
+            "total_violations": len(violations),
+            "violations_per_service": len(violations) / service_count,
+            "analysis_time_ms": execution_time * 1000,
+            "files_per_second": results.get("total_files_analyzed", 0) / max(execution_time, 0.001),
+            "violations_per_second": len(violations) / max(execution_time, 0.001),
+            "performance_score": self._calculate_performance_score(execution_time, len(violations), service_count),
         }
 
         enterprise_coordinator.store_scale_metrics(scenario_id, scale_metrics)
@@ -756,11 +766,25 @@ class TestEnterpriseScaleAnalysis:
 
         # Step 4: Enterprise pattern validation
         enterprise_patterns = {
-            'api_parameter_bombs': len([v for v in violations if 'parameter' in v.get('description', '').lower() and 'api' in v.get('file_path', '').lower()]),
-            'service_god_classes': len([v for v in violations if 'methods' in v.get('description', '').lower() and 'class' in v.get('description', '').lower()]),
-            'configuration_magic_values': len([v for v in violations if 'magic' in v.get('description', '').lower()]),
-            'missing_enterprise_types': len([v for v in violations if 'type' in v.get('description', '').lower()]),
-            'business_logic_violations': len([v for v in violations if 'business_logic' in v.get('file_path', '').lower()])
+            "api_parameter_bombs": len(
+                [
+                    v
+                    for v in violations
+                    if "parameter" in v.get("description", "").lower() and "api" in v.get("file_path", "").lower()
+                ]
+            ),
+            "service_god_classes": len(
+                [
+                    v
+                    for v in violations
+                    if "methods" in v.get("description", "").lower() and "class" in v.get("description", "").lower()
+                ]
+            ),
+            "configuration_magic_values": len([v for v in violations if "magic" in v.get("description", "").lower()]),
+            "missing_enterprise_types": len([v for v in violations if "type" in v.get("description", "").lower()]),
+            "business_logic_violations": len(
+                [v for v in violations if "business_logic" in v.get("file_path", "").lower()]
+            ),
         }
 
         enterprise_workflow_validator.add_step("enterprise_pattern_validation", enterprise_patterns)
@@ -768,39 +792,47 @@ class TestEnterpriseScaleAnalysis:
         # Step 5: Service-level analysis
         service_analysis = {}
         for i in range(service_count):
-            service_violations = [v for v in violations if f'service_{i:02d}' in v.get('file_path', '')]
-            service_analysis[f'service_{i:02d}'] = {
-                'violation_count': len(service_violations),
-                'violation_types': list({v.get('connascence_type', '') for v in service_violations}),
-                'complexity_score': len(service_violations) * 2  # Simple complexity metric
+            service_violations = [v for v in violations if f"service_{i:02d}" in v.get("file_path", "")]
+            service_analysis[f"service_{i:02d}"] = {
+                "violation_count": len(service_violations),
+                "violation_types": list({v.get("connascence_type", "") for v in service_violations}),
+                "complexity_score": len(service_violations) * 2,  # Simple complexity metric
             }
 
-        enterprise_workflow_validator.add_step("service_level_analysis", {
-            'services_analyzed': len(service_analysis),
-            'avg_violations_per_service': sum(s['violation_count'] for s in service_analysis.values()) / len(service_analysis),
-            'most_violations': max(s['violation_count'] for s in service_analysis.values()),
-            'least_violations': min(s['violation_count'] for s in service_analysis.values())
-        })
+        enterprise_workflow_validator.add_step(
+            "service_level_analysis",
+            {
+                "services_analyzed": len(service_analysis),
+                "avg_violations_per_service": sum(s["violation_count"] for s in service_analysis.values())
+                / len(service_analysis),
+                "most_violations": max(s["violation_count"] for s in service_analysis.values()),
+                "least_violations": min(s["violation_count"] for s in service_analysis.values()),
+            },
+        )
 
         # Cleanup
         import shutil
+
         shutil.rmtree(temp_dir)
 
         # Performance assertions
         assert execution_time < 120.0, f"Enterprise analysis too slow: {execution_time}s"
-        assert scale_metrics['files_per_second'] > 0.5, "Processing rate too low"
-        assert scale_metrics['performance_score'] > 0.6, f"Low performance score: {scale_metrics['performance_score']}"
+        assert scale_metrics["files_per_second"] > 0.5, "Processing rate too low"
+        assert scale_metrics["performance_score"] > 0.6, f"Low performance score: {scale_metrics['performance_score']}"
         assert len(violations) > service_count * 10, "Should find many violations in enterprise project"
 
-        enterprise_workflow_validator.complete_scenario(True, {
-            'microservices_analysis_completed': True,
-            'scale_metrics': scale_metrics,
-            'enterprise_patterns': enterprise_patterns,
-            'service_analysis_summary': {
-                'services_analyzed': len(service_analysis),
-                'performance_acceptable': scale_metrics['performance_score'] > 0.6
-            }
-        })
+        enterprise_workflow_validator.complete_scenario(
+            True,
+            {
+                "microservices_analysis_completed": True,
+                "scale_metrics": scale_metrics,
+                "enterprise_patterns": enterprise_patterns,
+                "service_analysis_summary": {
+                    "services_analyzed": len(service_analysis),
+                    "performance_acceptable": scale_metrics["performance_score"] > 0.6,
+                },
+            },
+        )
 
     def test_data_pipeline_enterprise_analysis(self, enterprise_project_generator, enterprise_workflow_validator):
         """Test analysis of enterprise data pipeline."""
@@ -812,9 +844,7 @@ class TestEnterpriseScaleAnalysis:
         project_path = Path(temp_dir)
 
         pipeline_stages = 12  # Enterprise pipeline complexity
-        project_config = enterprise_project_generator.generate_data_pipeline(
-            project_path, pipeline_stages
-        )
+        project_config = enterprise_project_generator.generate_data_pipeline(project_path, pipeline_stages)
 
         enterprise_coordinator.store_enterprise_project(scenario_id, project_config)
 
@@ -823,47 +853,72 @@ class TestEnterpriseScaleAnalysis:
         output_file = project_path / "pipeline_analysis.json"
 
         start_time = time.time()
-        exit_code = cli.run([
-            "scan", str(project_path),
-            "--policy", "service-defaults",
-            "--format", "json",
-            "--output", str(output_file)
-        ])
+        exit_code = cli.run(
+            [
+                "scan",
+                str(project_path),
+                "--policy",
+                "service-defaults",
+                "--format",
+                "json",
+                "--output",
+                str(output_file),
+            ]
+        )
         execution_time = time.time() - start_time
 
         with open(output_file) as f:
             results = json.load(f)
 
-        violations = results.get('violations', [])
+        violations = results.get("violations", [])
 
         # Data pipeline specific metrics
         pipeline_metrics = {
-            'pipeline_stages': pipeline_stages,
-            'total_violations': len(violations),
-            'magic_thresholds': len([v for v in violations if 'magic' in v.get('description', '').lower() and any(keyword in v.get('description', '').lower() for keyword in ['threshold', 'limit', 'size'])]),
-            'parameter_heavy_processors': len([v for v in violations if 'parameter' in v.get('description', '').lower() and 'process' in v.get('description', '').lower()]),
-            'untyped_transformations': len([v for v in violations if 'type' in v.get('description', '').lower()]),
-            'god_processors': len([v for v in violations if 'methods' in v.get('description', '').lower() and 'processor' in v.get('file_path', '').lower()]),
-            'execution_time_ms': execution_time * 1000,
-            'performance_score': self._calculate_performance_score(execution_time, len(violations), pipeline_stages)
+            "pipeline_stages": pipeline_stages,
+            "total_violations": len(violations),
+            "magic_thresholds": len(
+                [
+                    v
+                    for v in violations
+                    if "magic" in v.get("description", "").lower()
+                    and any(keyword in v.get("description", "").lower() for keyword in ["threshold", "limit", "size"])
+                ]
+            ),
+            "parameter_heavy_processors": len(
+                [
+                    v
+                    for v in violations
+                    if "parameter" in v.get("description", "").lower() and "process" in v.get("description", "").lower()
+                ]
+            ),
+            "untyped_transformations": len([v for v in violations if "type" in v.get("description", "").lower()]),
+            "god_processors": len(
+                [
+                    v
+                    for v in violations
+                    if "methods" in v.get("description", "").lower() and "processor" in v.get("file_path", "").lower()
+                ]
+            ),
+            "execution_time_ms": execution_time * 1000,
+            "performance_score": self._calculate_performance_score(execution_time, len(violations), pipeline_stages),
         }
 
         enterprise_coordinator.store_scale_metrics(scenario_id, pipeline_metrics)
 
         # Cleanup
         import shutil
+
         shutil.rmtree(temp_dir)
 
         # Assertions
         assert exit_code == 1, "Should find violations in data pipeline"
-        assert pipeline_metrics['magic_thresholds'] > 0, "Should detect magic thresholds in pipeline"
-        assert pipeline_metrics['parameter_heavy_processors'] > 0, "Should detect parameter-heavy processors"
-        assert pipeline_metrics['performance_score'] > 0.5, "Pipeline analysis performance acceptable"
+        assert pipeline_metrics["magic_thresholds"] > 0, "Should detect magic thresholds in pipeline"
+        assert pipeline_metrics["parameter_heavy_processors"] > 0, "Should detect parameter-heavy processors"
+        assert pipeline_metrics["performance_score"] > 0.5, "Pipeline analysis performance acceptable"
 
-        enterprise_workflow_validator.complete_scenario(True, {
-            'pipeline_analysis_completed': True,
-            'pipeline_metrics': pipeline_metrics
-        })
+        enterprise_workflow_validator.complete_scenario(
+            True, {"pipeline_analysis_completed": True, "pipeline_metrics": pipeline_metrics}
+        )
 
     def test_policy_enforcement_enterprise_scale(self, enterprise_workflow_validator):
         """Test enterprise policy enforcement across large codebase."""
@@ -875,14 +930,15 @@ class TestEnterpriseScaleAnalysis:
         project_path = Path(temp_dir)
 
         # Generate project structure with deliberate policy violations
-        departments = ['finance', 'hr', 'operations', 'marketing', 'engineering']
+        departments = ["finance", "hr", "operations", "marketing", "engineering"]
 
         for dept in departments:
             dept_dir = project_path / dept
             dept_dir.mkdir()
 
             # Create department-specific violations
-            (dept_dir / f"{dept}_service.py").write_text(f"""
+            (dept_dir / f"{dept}_service.py").write_text(
+                f"""
 # {dept.title()} Service with policy violations
 
 def {dept}_process_request(user_id, request_type, data, metadata,
@@ -948,7 +1004,8 @@ class {dept.title()}Manager:
     def manage_scaling(self): pass
     def handle_deployments(self): pass
     def process_cleanup(self): pass  # God class
-""")
+"""
+            )
 
         # Test different policy presets
         policies = ["strict-core", "service-defaults", "experimental"]
@@ -959,29 +1016,32 @@ class {dept.title()}Manager:
             output_file = project_path / f"policy_{policy}_results.json"
 
             start_time = time.time()
-            exit_code = cli.run([
-                "scan", str(project_path),
-                "--policy", policy,
-                "--format", "json",
-                "--output", str(output_file)
-            ])
+            exit_code = cli.run(
+                ["scan", str(project_path), "--policy", policy, "--format", "json", "--output", str(output_file)]
+            )
             execution_time = time.time() - start_time
 
             with open(output_file) as f:
                 results = json.load(f)
 
-            violations = results.get('violations', [])
+            violations = results.get("violations", [])
 
             # Policy enforcement analysis
             policy_analysis = {
-                'policy_name': policy,
-                'total_violations': len(violations),
-                'critical_violations': len([v for v in violations if v.get('severity', {}).get('value') == 'critical']),
-                'security_violations': len([v for v in violations if any(keyword in v.get('description', '').lower() for keyword in ['secret', 'password', 'key'])]),
-                'parameter_violations': len([v for v in violations if 'parameter' in v.get('description', '').lower()]),
-                'god_class_violations': len([v for v in violations if 'methods' in v.get('description', '').lower()]),
-                'execution_time_ms': execution_time * 1000,
-                'exit_code': exit_code
+                "policy_name": policy,
+                "total_violations": len(violations),
+                "critical_violations": len([v for v in violations if v.get("severity", {}).get("value") == "critical"]),
+                "security_violations": len(
+                    [
+                        v
+                        for v in violations
+                        if any(keyword in v.get("description", "").lower() for keyword in ["secret", "password", "key"])
+                    ]
+                ),
+                "parameter_violations": len([v for v in violations if "parameter" in v.get("description", "").lower()]),
+                "god_class_violations": len([v for v in violations if "methods" in v.get("description", "").lower()]),
+                "execution_time_ms": execution_time * 1000,
+                "exit_code": exit_code,
             }
 
             policy_results[policy] = policy_analysis
@@ -989,12 +1049,12 @@ class {dept.title()}Manager:
 
         # Store policy enforcement results
         enforcement_summary = {
-            'policies_tested': len(policies),
-            'departments_analyzed': len(departments),
-            'policy_results': policy_results,
-            'strictest_policy': max(policy_results.items(), key=lambda x: x[1]['total_violations'])[0],
-            'most_secure_policy': max(policy_results.items(), key=lambda x: x[1]['security_violations'])[0],
-            'enforcement_effective': all(r['total_violations'] > 0 for r in policy_results.values())
+            "policies_tested": len(policies),
+            "departments_analyzed": len(departments),
+            "policy_results": policy_results,
+            "strictest_policy": max(policy_results.items(), key=lambda x: x[1]["total_violations"])[0],
+            "most_secure_policy": max(policy_results.items(), key=lambda x: x[1]["security_violations"])[0],
+            "enforcement_effective": all(r["total_violations"] > 0 for r in policy_results.values()),
         }
 
         enterprise_coordinator.store_policy_enforcement(scenario_id, enforcement_summary)
@@ -1002,11 +1062,13 @@ class {dept.title()}Manager:
 
         # Compliance tracking
         compliance_data = {
-            'total_security_violations_found': sum(r['security_violations'] for r in policy_results.values()),
-            'critical_violations_across_policies': sum(r['critical_violations'] for r in policy_results.values()),
-            'departments_with_violations': len(departments),  # All departments should have violations
-            'policy_compliance_score': self._calculate_compliance_score(policy_results),
-            'remediation_priority': 'high' if any(r['critical_violations'] > 0 for r in policy_results.values()) else 'medium'
+            "total_security_violations_found": sum(r["security_violations"] for r in policy_results.values()),
+            "critical_violations_across_policies": sum(r["critical_violations"] for r in policy_results.values()),
+            "departments_with_violations": len(departments),  # All departments should have violations
+            "policy_compliance_score": self._calculate_compliance_score(policy_results),
+            "remediation_priority": (
+                "high" if any(r["critical_violations"] > 0 for r in policy_results.values()) else "medium"
+            ),
         }
 
         enterprise_coordinator.store_compliance_tracking(scenario_id, compliance_data)
@@ -1014,19 +1076,23 @@ class {dept.title()}Manager:
 
         # Cleanup
         import shutil
+
         shutil.rmtree(temp_dir)
 
         # Assertions
-        assert all(r['exit_code'] == 1 for r in policy_results.values()), "All policies should find violations"
-        assert enforcement_summary['enforcement_effective'], "Policy enforcement should be effective"
-        assert compliance_data['total_security_violations_found'] > 0, "Should detect security violations"
-        assert compliance_data['policy_compliance_score'] < 1.0, "Should have compliance issues"
+        assert all(r["exit_code"] == 1 for r in policy_results.values()), "All policies should find violations"
+        assert enforcement_summary["enforcement_effective"], "Policy enforcement should be effective"
+        assert compliance_data["total_security_violations_found"] > 0, "Should detect security violations"
+        assert compliance_data["policy_compliance_score"] < 1.0, "Should have compliance issues"
 
-        enterprise_workflow_validator.complete_scenario(True, {
-            'policy_enforcement_completed': True,
-            'enforcement_summary': enforcement_summary,
-            'compliance_data': compliance_data
-        })
+        enterprise_workflow_validator.complete_scenario(
+            True,
+            {
+                "policy_enforcement_completed": True,
+                "enforcement_summary": enforcement_summary,
+                "compliance_data": compliance_data,
+            },
+        )
 
     def test_parallel_analysis_enterprise_scale(self, enterprise_workflow_validator):
         """Test parallel analysis capabilities for enterprise scale."""
@@ -1046,7 +1112,8 @@ class {dept.title()}Manager:
             project_dir.mkdir()
 
             # Create project with violations
-            (project_dir / "main.py").write_text(f"""
+            (project_dir / "main.py").write_text(
+                f"""
 # Project {i} with violations
 
 def project_{i}_function(param1, param2, param3, param4, param5):  # Parameter bomb
@@ -1079,14 +1146,14 @@ class Project{i}Manager:
     def method_19(self): pass
     def method_20(self): pass
     def method_21(self): pass  # God class
-""")
+"""
+            )
 
             projects.append(project_dir)
 
-        enterprise_workflow_validator.add_step("generate_parallel_projects", {
-            'project_count': project_count,
-            'projects_created': len(projects)
-        })
+        enterprise_workflow_validator.add_step(
+            "generate_parallel_projects", {"project_count": project_count, "projects_created": len(projects)}
+        )
 
         # Sequential analysis baseline
         sequential_start = time.time()
@@ -1096,50 +1163,40 @@ class Project{i}Manager:
             cli = ConnascenceCLI()
             output_file = project_dir / "sequential_analysis.json"
 
-            exit_code = cli.run([
-                "scan", str(project_dir),
-                "--format", "json",
-                "--output", str(output_file)
-            ])
+            exit_code = cli.run(["scan", str(project_dir), "--format", "json", "--output", str(output_file)])
 
             with open(output_file) as f:
                 results = json.load(f)
 
-            sequential_results.append({
-                'project': project_dir.name,
-                'violations': len(results.get('violations', [])),
-                'exit_code': exit_code
-            })
+            sequential_results.append(
+                {"project": project_dir.name, "violations": len(results.get("violations", [])), "exit_code": exit_code}
+            )
 
         sequential_time = time.time() - sequential_start
-        enterprise_workflow_validator.add_step("sequential_analysis", {
-            'execution_time_ms': sequential_time * 1000,
-            'projects_analyzed': len(sequential_results)
-        })
+        enterprise_workflow_validator.add_step(
+            "sequential_analysis",
+            {"execution_time_ms": sequential_time * 1000, "projects_analyzed": len(sequential_results)},
+        )
 
         # Parallel analysis using ThreadPoolExecutor
         parallel_start = time.time()
         parallel_results = []
 
         def analyze_project_parallel(project_dir):
-            ProductionAssert.not_none(project_dir, 'project_dir')
+            ProductionAssert.not_none(project_dir, "project_dir")
 
             cli = ConnascenceCLI()
             output_file = project_dir / "parallel_analysis.json"
 
-            exit_code = cli.run([
-                "scan", str(project_dir),
-                "--format", "json",
-                "--output", str(output_file)
-            ])
+            exit_code = cli.run(["scan", str(project_dir), "--format", "json", "--output", str(output_file)])
 
             with open(output_file) as f:
                 results = json.load(f)
 
             return {
-                'project': project_dir.name,
-                'violations': len(results.get('violations', [])),
-                'exit_code': exit_code
+                "project": project_dir.name,
+                "violations": len(results.get("violations", [])),
+                "exit_code": exit_code,
             }
 
         # Execute parallel analysis
@@ -1148,21 +1205,21 @@ class Project{i}Manager:
             parallel_results = [future.result() for future in futures]
 
         parallel_time = time.time() - parallel_start
-        enterprise_workflow_validator.add_step("parallel_analysis", {
-            'execution_time_ms': parallel_time * 1000,
-            'projects_analyzed': len(parallel_results)
-        })
+        enterprise_workflow_validator.add_step(
+            "parallel_analysis", {"execution_time_ms": parallel_time * 1000, "projects_analyzed": len(parallel_results)}
+        )
 
         # Parallel analysis metrics
         parallel_metrics = {
-            'sequential_time_ms': sequential_time * 1000,
-            'parallel_time_ms': parallel_time * 1000,
-            'speedup_factor': sequential_time / parallel_time if parallel_time > 0 else 1.0,
-            'efficiency': (sequential_time / parallel_time) / 3 if parallel_time > 0 else 0.0,  # 3 workers
-            'projects_analyzed': len(projects),
-            'total_violations_sequential': sum(r['violations'] for r in sequential_results),
-            'total_violations_parallel': sum(r['violations'] for r in parallel_results),
-            'results_consistency': sum(r['violations'] for r in sequential_results) == sum(r['violations'] for r in parallel_results)
+            "sequential_time_ms": sequential_time * 1000,
+            "parallel_time_ms": parallel_time * 1000,
+            "speedup_factor": sequential_time / parallel_time if parallel_time > 0 else 1.0,
+            "efficiency": (sequential_time / parallel_time) / 3 if parallel_time > 0 else 0.0,  # 3 workers
+            "projects_analyzed": len(projects),
+            "total_violations_sequential": sum(r["violations"] for r in sequential_results),
+            "total_violations_parallel": sum(r["violations"] for r in parallel_results),
+            "results_consistency": sum(r["violations"] for r in sequential_results)
+            == sum(r["violations"] for r in parallel_results),
         }
 
         enterprise_coordinator.store_parallel_analysis(scenario_id, parallel_metrics)
@@ -1170,11 +1227,11 @@ class Project{i}Manager:
 
         # Resource utilization simulation
         resource_metrics = {
-            'max_concurrent_analyses': 3,
-            'memory_efficiency': 0.85,  # Simulated
-            'cpu_utilization': 0.75,  # Simulated
-            'io_throughput': len(projects) * 2 / max(parallel_time, 0.001),  # files per second
-            'scalability_factor': parallel_metrics['speedup_factor']
+            "max_concurrent_analyses": 3,
+            "memory_efficiency": 0.85,  # Simulated
+            "cpu_utilization": 0.75,  # Simulated
+            "io_throughput": len(projects) * 2 / max(parallel_time, 0.001),  # files per second
+            "scalability_factor": parallel_metrics["speedup_factor"],
         }
 
         enterprise_coordinator.store_resource_utilization(scenario_id, resource_metrics)
@@ -1182,19 +1239,25 @@ class Project{i}Manager:
 
         # Cleanup
         import shutil
+
         shutil.rmtree(temp_base)
 
         # Assertions
-        assert parallel_metrics['speedup_factor'] > 1.0, f"Parallel analysis should be faster: {parallel_metrics['speedup_factor']}"
-        assert parallel_metrics['results_consistency'], "Parallel and sequential results should match"
-        assert parallel_metrics['efficiency'] > 0.2, f"Parallel efficiency too low: {parallel_metrics['efficiency']}"
+        assert (
+            parallel_metrics["speedup_factor"] > 1.0
+        ), f"Parallel analysis should be faster: {parallel_metrics['speedup_factor']}"
+        assert parallel_metrics["results_consistency"], "Parallel and sequential results should match"
+        assert parallel_metrics["efficiency"] > 0.2, f"Parallel efficiency too low: {parallel_metrics['efficiency']}"
 
-        enterprise_workflow_validator.complete_scenario(True, {
-            'parallel_analysis_completed': True,
-            'parallel_metrics': parallel_metrics,
-            'resource_metrics': resource_metrics,
-            'speedup_achieved': parallel_metrics['speedup_factor'] > 1.5
-        })
+        enterprise_workflow_validator.complete_scenario(
+            True,
+            {
+                "parallel_analysis_completed": True,
+                "parallel_metrics": parallel_metrics,
+                "resource_metrics": resource_metrics,
+                "speedup_achieved": parallel_metrics["speedup_factor"] > 1.5,
+            },
+        )
 
     def test_team_workflow_simulation_enterprise(self, enterprise_workflow_validator):
         """Simulate enterprise team workflows with connascence analysis."""
@@ -1204,23 +1267,23 @@ class Project{i}Manager:
         # Simulate team workflow scenarios
         team_scenarios = [
             {
-                'team': 'development_team',
-                'workflow': 'pre_commit_analysis',
-                'trigger': 'code_commit',
-                'expected_time_limit': 30  # 30 seconds max
+                "team": "development_team",
+                "workflow": "pre_commit_analysis",
+                "trigger": "code_commit",
+                "expected_time_limit": 30,  # 30 seconds max
             },
             {
-                'team': 'qa_team',
-                'workflow': 'integration_analysis',
-                'trigger': 'feature_branch_merge',
-                'expected_time_limit': 300  # 5 minutes max
+                "team": "qa_team",
+                "workflow": "integration_analysis",
+                "trigger": "feature_branch_merge",
+                "expected_time_limit": 300,  # 5 minutes max
             },
             {
-                'team': 'devops_team',
-                'workflow': 'deployment_analysis',
-                'trigger': 'release_candidate',
-                'expected_time_limit': 600  # 10 minutes max
-            }
+                "team": "devops_team",
+                "workflow": "deployment_analysis",
+                "trigger": "release_candidate",
+                "expected_time_limit": 600,  # 10 minutes max
+            },
         ]
 
         workflow_results = {}
@@ -1231,97 +1294,113 @@ class Project{i}Manager:
             project_path = Path(temp_dir)
 
             # Create project appropriate for team workflow
-            if scenario['team'] == 'development_team':
+            if scenario["team"] == "development_team":
                 # Small, focused change
-                (project_path / "feature.py").write_text("""
+                (project_path / "feature.py").write_text(
+                    """
 def new_feature(param1, param2, param3, param4):  # Parameter bomb
     threshold = 50  # Magic literal
     if param1 > threshold:
         return param1 * 1.5  # Magic literal
     return param1
-""")
-            elif scenario['team'] == 'qa_team':
+"""
+                )
+            elif scenario["team"] == "qa_team":
                 # Medium-sized integration
                 for i in range(5):
-                    (project_path / f"module_{i}.py").write_text(f"""
+                    (project_path / f"module_{i}.py").write_text(
+                        f"""
 def process_{i}(data, config, options):  # Missing type hints
     magic_val = {100 + i * 10}  # Magic literal
     if len(data) > magic_val:
         return False
     return True
-""")
+"""
+                    )
             else:  # devops_team
                 # Large deployment candidate
                 for i in range(10):
-                    (project_path / f"service_{i}.py").write_text(f"""
+                    (project_path / f"service_{i}.py").write_text(
+                        f"""
 def deploy_service_{i}(config, env, region, options, metadata):  # Parameter bomb
     deployment_timeout = {300 + i * 30}  # Magic literal
     secret_key = "deploy_key_{i}"  # Magic string
     return True
-""")
+"""
+                    )
 
             # Execute workflow analysis
             cli = ConnascenceCLI()
             output_file = project_path / f"{scenario['team']}_analysis.json"
 
             start_time = time.time()
-            exit_code = cli.run([
-                "scan", str(project_path),
-                "--policy", "service-defaults",
-                "--format", "json",
-                "--output", str(output_file)
-            ])
+            exit_code = cli.run(
+                [
+                    "scan",
+                    str(project_path),
+                    "--policy",
+                    "service-defaults",
+                    "--format",
+                    "json",
+                    "--output",
+                    str(output_file),
+                ]
+            )
             execution_time = time.time() - start_time
 
             with open(output_file) as f:
                 results = json.load(f)
 
-            violations = results.get('violations', [])
+            violations = results.get("violations", [])
 
             # Workflow-specific analysis
             workflow_analysis = {
-                'team': scenario['team'],
-                'workflow_type': scenario['workflow'],
-                'execution_time_ms': execution_time * 1000,
-                'time_limit_ms': scenario['expected_time_limit'] * 1000,
-                'within_time_limit': execution_time <= scenario['expected_time_limit'],
-                'violations_found': len(violations),
-                'exit_code': exit_code,
-                'workflow_success': exit_code in [0, 1] and execution_time <= scenario['expected_time_limit']
+                "team": scenario["team"],
+                "workflow_type": scenario["workflow"],
+                "execution_time_ms": execution_time * 1000,
+                "time_limit_ms": scenario["expected_time_limit"] * 1000,
+                "within_time_limit": execution_time <= scenario["expected_time_limit"],
+                "violations_found": len(violations),
+                "exit_code": exit_code,
+                "workflow_success": exit_code in [0, 1] and execution_time <= scenario["expected_time_limit"],
             }
 
-            workflow_results[scenario['team']] = workflow_analysis
+            workflow_results[scenario["team"]] = workflow_analysis
             enterprise_workflow_validator.add_step(f"simulate_{scenario['team']}_workflow", workflow_analysis)
 
             # Cleanup
             import shutil
+
             shutil.rmtree(temp_dir)
 
         # Team workflow summary
         workflow_summary = {
-            'teams_simulated': len(team_scenarios),
-            'successful_workflows': sum(1 for w in workflow_results.values() if w['workflow_success']),
-            'avg_execution_time_ms': sum(w['execution_time_ms'] for w in workflow_results.values()) / len(workflow_results),
-            'all_within_limits': all(w['within_time_limit'] for w in workflow_results.values()),
-            'total_violations_across_teams': sum(w['violations_found'] for w in workflow_results.values())
+            "teams_simulated": len(team_scenarios),
+            "successful_workflows": sum(1 for w in workflow_results.values() if w["workflow_success"]),
+            "avg_execution_time_ms": sum(w["execution_time_ms"] for w in workflow_results.values())
+            / len(workflow_results),
+            "all_within_limits": all(w["within_time_limit"] for w in workflow_results.values()),
+            "total_violations_across_teams": sum(w["violations_found"] for w in workflow_results.values()),
         }
 
-        enterprise_coordinator.simulate_team_workflow(scenario_id, {
-            'workflow_results': workflow_results,
-            'workflow_summary': workflow_summary
-        })
+        enterprise_coordinator.simulate_team_workflow(
+            scenario_id, {"workflow_results": workflow_results, "workflow_summary": workflow_summary}
+        )
 
         enterprise_workflow_validator.add_step("team_workflow_summary", workflow_summary)
 
         # Assertions
-        assert workflow_summary['successful_workflows'] == len(team_scenarios), "All team workflows should succeed"
-        assert workflow_summary['all_within_limits'], "All workflows should meet time limits"
+        assert workflow_summary["successful_workflows"] == len(team_scenarios), "All team workflows should succeed"
+        assert workflow_summary["all_within_limits"], "All workflows should meet time limits"
 
-        enterprise_workflow_validator.complete_scenario(True, {
-            'team_workflow_simulation_completed': True,
-            'workflow_summary': workflow_summary,
-            'enterprise_ready': workflow_summary['all_within_limits']
-        })
+        enterprise_workflow_validator.complete_scenario(
+            True,
+            {
+                "team_workflow_simulation_completed": True,
+                "workflow_summary": workflow_summary,
+                "enterprise_ready": workflow_summary["all_within_limits"],
+            },
+        )
 
     def test_enterprise_memory_coordination_validation(self):
         """Test enterprise-scale memory coordination system."""
@@ -1329,34 +1408,23 @@ def deploy_service_{i}(config, env, region, options, metadata):  # Parameter bom
         test_project_id = "enterprise_memory_test"
 
         # Store comprehensive test data
-        enterprise_coordinator.store_enterprise_project(test_project_id, {
-            'architecture': 'test_enterprise',
-            'scale': 'large',
-            'complexity': 'high'
-        })
+        enterprise_coordinator.store_enterprise_project(
+            test_project_id, {"architecture": "test_enterprise", "scale": "large", "complexity": "high"}
+        )
 
-        enterprise_coordinator.store_scale_metrics(test_project_id, {
-            'performance_score': 0.85,
-            'violations_count': 150,
-            'execution_time_ms': 45000
-        })
+        enterprise_coordinator.store_scale_metrics(
+            test_project_id, {"performance_score": 0.85, "violations_count": 150, "execution_time_ms": 45000}
+        )
 
-        enterprise_coordinator.store_policy_enforcement(test_project_id, {
-            'policies_tested': 3,
-            'enforcement_effective': True
-        })
+        enterprise_coordinator.store_policy_enforcement(
+            test_project_id, {"policies_tested": 3, "enforcement_effective": True}
+        )
 
         # Test parallel analysis storage
-        enterprise_coordinator.store_parallel_analysis("parallel_test", {
-            'speedup_factor': 2.5,
-            'efficiency': 0.83
-        })
+        enterprise_coordinator.store_parallel_analysis("parallel_test", {"speedup_factor": 2.5, "efficiency": 0.83})
 
         # Test team workflow storage
-        enterprise_coordinator.simulate_team_workflow("team_test", {
-            'successful_workflows': 3,
-            'avg_time_ms': 25000
-        })
+        enterprise_coordinator.simulate_team_workflow("team_test", {"successful_workflows": 3, "avg_time_ms": 25000})
 
         # Validate comprehensive storage
         assert test_project_id in enterprise_coordinator.enterprise_projects
@@ -1367,16 +1435,17 @@ def deploy_service_{i}(config, env, region, options, metadata):  # Parameter bom
 
         # Test summary generation
         summary = enterprise_coordinator.get_enterprise_summary()
-        assert summary['total_enterprise_projects'] > 0
-        assert summary['scale_tests_completed'] > 0
-        assert summary['policy_enforcements'] > 0
-        assert summary['parallel_analyses'] > 0
-        assert summary['team_workflow_simulations'] > 0
-        assert summary['avg_scale_performance'] > 0
+        assert summary["total_enterprise_projects"] > 0
+        assert summary["scale_tests_completed"] > 0
+        assert summary["policy_enforcements"] > 0
+        assert summary["parallel_analyses"] > 0
+        assert summary["team_workflow_simulations"] > 0
+        assert summary["avg_scale_performance"] > 0
 
     # Helper methods
-    def _calculate_performance_score(self, execution_time: float, violations_count: int,
-                                   complexity_factor: int) -> float:
+    def _calculate_performance_score(
+        self, execution_time: float, violations_count: int, complexity_factor: int
+    ) -> float:
         """Calculate performance score for enterprise analysis."""
         # Base score from execution time (lower is better)
         time_score = max(0, 1.0 - (execution_time / 120.0))  # 120s = 0 score
@@ -1388,7 +1457,7 @@ def deploy_service_{i}(config, env, region, options, metadata):  # Parameter bom
         complexity_adjustment = min(1.0, complexity_factor / 20.0)
 
         # Combined score
-        performance_score = (time_score * 0.5 + throughput_score * 0.3 + complexity_adjustment * 0.2)
+        performance_score = time_score * 0.5 + throughput_score * 0.3 + complexity_adjustment * 0.2
 
         return max(0.0, min(1.0, performance_score))
 
@@ -1397,8 +1466,8 @@ def deploy_service_{i}(config, env, region, options, metadata):  # Parameter bom
         if not policy_results:
             return 1.0  # Perfect compliance if no violations found
 
-        total_violations = sum(r['total_violations'] for r in policy_results.values())
-        total_critical = sum(r['critical_violations'] for r in policy_results.values())
+        total_violations = sum(r["total_violations"] for r in policy_results.values())
+        total_critical = sum(r["critical_violations"] for r in policy_results.values())
 
         # Compliance decreases with violations, critical violations weighted more
         base_score = 1.0
@@ -1420,29 +1489,19 @@ def test_enterprise_scale_integration():
     # Test comprehensive enterprise integration
     scenario_id = "enterprise_integration_test"
 
-    coordinator.store_enterprise_project(scenario_id, {
-        'integration_test': True,
-        'timestamp': time.time()
-    })
+    coordinator.store_enterprise_project(scenario_id, {"integration_test": True, "timestamp": time.time()})
 
-    coordinator.store_scale_metrics(scenario_id, {
-        'test_performance': 0.9
-    })
+    coordinator.store_scale_metrics(scenario_id, {"test_performance": 0.9})
 
     # Validate integration
     assert scenario_id in coordinator.enterprise_projects
     assert scenario_id in coordinator.scale_metrics
 
     summary = coordinator.get_enterprise_summary()
-    assert summary['total_enterprise_projects'] > 0
+    assert summary["total_enterprise_projects"] > 0
 
     print("Enterprise scale integration test completed successfully")
 
 
 if __name__ == "__main__":
-    pytest.main([
-        __file__,
-        "-v",
-        "--tb=short",
-        "-m", "e2e"
-    ])
+    pytest.main([__file__, "-v", "--tb=short", "-m", "e2e"])

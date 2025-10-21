@@ -253,7 +253,7 @@ class OptimizedASTVisitor(ast.NodeVisitor):
                 key_parts.append(f"id:{node.id}")
             elif isinstance(node, ast.Attribute):
                 key_parts.append(f"attr:{node.attr}")
-            elif isinstance(node, ast.FunctionDef) or isinstance(node, ast.ClassDef):
+            elif isinstance(node, (ast.FunctionDef, ast.ClassDef)):
                 key_parts.append(f"name:{node.name}")
 
             return ":".join(key_parts)

@@ -21,7 +21,7 @@ from pathlib import Path
 # Import shared utilities
 import sys
 import time
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from fixes.phase0.production_safe_assertions import ProductionAssert
 
@@ -143,13 +143,13 @@ class AuditLogger:
         self.logs = []
         self.enabled = enabled
 
-    def log(self, event: str, details: Dict[str, Any] = None):
+    def log(self, event: str, details: Optional[Dict[str, Any]] = None):
         ProductionAssert.not_none(event, "event")
 
         if self.enabled:
             self.logs.append({"timestamp": time.time(), "event": event, "details": details or {}})
 
-    def log_request(self, tool_name: str, timestamp: float = None, **kwargs):
+    def log_request(self, tool_name: str, timestamp: Optional[float] = None, **kwargs):
         """Log tool request."""
 
         ProductionAssert.not_none(tool_name, "tool_name")
@@ -496,15 +496,6 @@ class ConnascenceMCPServer:
         else:
             return violation
 
-    def get_metrics(self):
-        """Get server metrics."""
-        return {
-            "requests_processed": sum(len(reqs) for reqs in self.rate_limiter.requests.values()),
-            "rate_limit_violations": 0,
-            "audit_logs": len(self.audit_logger.logs),
-            "uptime": time.time(),
-        }
-
     def get_info(self):
         """Get server information."""
         return {
@@ -806,8 +797,8 @@ class MCPConnascenceTool:
     def __init__(
         self,
         name: str,
-        description: str = None,
-        input_schema: Dict[str, Any] = None,
+        description: Optional[str] = None,
+        input_schema: Optional[Dict[str, Any]] = None,
         handler=None,
         server: ConnascenceMCPServer = None,
     ):

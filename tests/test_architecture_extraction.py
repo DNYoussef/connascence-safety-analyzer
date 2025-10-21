@@ -5,7 +5,7 @@
 Architecture Extraction Validation Tests
 =========================================
 
-Tests to validate that the god object extraction was successful and 
+Tests to validate that the god object extraction was successful and
 maintains backward compatibility with zero breaking changes.
 """
 

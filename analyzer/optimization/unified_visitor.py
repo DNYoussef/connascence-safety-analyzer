@@ -350,9 +350,8 @@ class UnifiedASTVisitor(ast.NodeVisitor):
         if node_type == "class":
             if not name[0].isupper() or "_" in name:
                 return f"Class '{name}' should use PascalCase"
-        elif node_type == "function":
-            if any(c.isupper() for c in name) and "_" in name:
-                return f"Function '{name}' should use snake_case"
+        elif node_type == "function" and any(c.isupper() for c in name) and "_" in name:
+            return f"Function '{name}' should use snake_case"
 
         return None
 

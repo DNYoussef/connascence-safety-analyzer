@@ -2,6 +2,7 @@
 """Debug script to understand why RefactoredConnascenceDetector returns 0 violations."""
 
 import ast
+
 from analyzer.refactored_detector import RefactoredConnascenceDetector
 
 test_code = """

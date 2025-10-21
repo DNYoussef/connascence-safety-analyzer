@@ -87,12 +87,12 @@ class WorkflowTestCoordinator:
             "total_execution_time": total_execution_time,
             "stages_completed": stages_completed,
             "error_rate": (errors_encountered / stages_completed) * 100 if stages_completed > 0 else 0,
-            "workflow_success_rate": ((stages_completed - errors_encountered) / stages_completed) * 100
-            if stages_completed > 0
-            else 0,
-            "average_quality_score": sum(quality_improvements) / len(quality_improvements)
-            if quality_improvements
-            else 0,
+            "workflow_success_rate": (
+                ((stages_completed - errors_encountered) / stages_completed) * 100 if stages_completed > 0 else 0
+            ),
+            "average_quality_score": (
+                sum(quality_improvements) / len(quality_improvements) if quality_improvements else 0
+            ),
             "quality_improvement_trend": quality_improvements,
         }
 
@@ -942,9 +942,11 @@ class TestCompleteWorkflowIntegration:
             {
                 "fixes_applied_count": application_result["fixes_applied"],
                 "backups_created": application_result["backups_created"],
-                "application_success_rate": (application_result["fixes_applied"] / len(safe_high_confidence)) * 100
-                if safe_high_confidence
-                else 0,
+                "application_success_rate": (
+                    (application_result["fixes_applied"] / len(safe_high_confidence)) * 100
+                    if safe_high_confidence
+                    else 0
+                ),
                 "status": "success",
                 "dependencies": ["autofix_generation"],
             },
@@ -1185,9 +1187,9 @@ class Class_{i}:  # Potential CoA if methods added
                         "load_level": load_level,
                         "execution_time": execution_time,
                         "violations_per_file": len(analysis_result["findings"]) / load_level,
-                        "time_per_violation": execution_time / len(analysis_result["findings"])
-                        if analysis_result["findings"]
-                        else 0,
+                        "time_per_violation": (
+                            execution_time / len(analysis_result["findings"]) if analysis_result["findings"] else 0
+                        ),
                     }
                 )
 

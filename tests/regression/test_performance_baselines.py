@@ -15,21 +15,21 @@ Metrics Tracked:
 import ast
 import gc
 import time
-from pathlib import Path
-from typing import Dict, List
+from typing import Dict
 
 import pytest
-from fixes.phase0.production_safe_assertions import ProductionAssert
+
+from analyzer.detectors.algorithm_detector import AlgorithmDetector
+from analyzer.detectors.convention_detector import ConventionDetector
+from analyzer.detectors.execution_detector import ExecutionDetector
+from analyzer.detectors.god_object_detector import GodObjectDetector
+from analyzer.detectors.magic_literal_detector import MagicLiteralDetector
 
 # Import all detectors
 from analyzer.detectors.position_detector import PositionDetector
-from analyzer.detectors.values_detector import ValuesDetector
-from analyzer.detectors.algorithm_detector import AlgorithmDetector
-from analyzer.detectors.magic_literal_detector import MagicLiteralDetector
 from analyzer.detectors.timing_detector import TimingDetector
-from analyzer.detectors.execution_detector import ExecutionDetector
-from analyzer.detectors.god_object_detector import GodObjectDetector
-from analyzer.detectors.convention_detector import ConventionDetector
+from analyzer.detectors.values_detector import ValuesDetector
+from fixes.phase0.production_safe_assertions import ProductionAssert
 
 
 class PerformanceBaseline:
@@ -38,13 +38,7 @@ class PerformanceBaseline:
     def __init__(self):
         self.baselines: Dict[str, Dict] = {}
 
-    def measure_detector(
-        self,
-        detector_name: str,
-        detector_class,
-        code: str,
-        iterations: int = 100
-    ) -> Dict:
+    def measure_detector(self, detector_name: str, detector_class, code: str, iterations: int = 100) -> Dict:
         """
         Measure detector performance over multiple iterations.
 
@@ -57,16 +51,16 @@ class PerformanceBaseline:
         Returns:
             Performance metrics dict
         """
-        ProductionAssert.not_none(detector_name, 'detector_name')
-        ProductionAssert.not_none(detector_class, 'detector_class')
-        ProductionAssert.not_none(code, 'code')
+        ProductionAssert.not_none(detector_name, "detector_name")
+        ProductionAssert.not_none(detector_class, "detector_class")
+        ProductionAssert.not_none(code, "code")
 
         # Parse code once
         tree = ast.parse(code)
-        source_lines = code.split('\n')
+        source_lines = code.split("\n")
 
         # Warmup
-        detector = detector_class(file_path='test.py', source_lines=source_lines)
+        detector = detector_class(file_path="test.py", source_lines=source_lines)
         detector.detect_violations(tree)
 
         # Measure
@@ -75,10 +69,7 @@ class PerformanceBaseline:
 
         violations_total = 0
         for _ in range(iterations):
-            detector = detector_class(
-                file_path='test.py',
-                source_lines=source_lines
-            )
+            detector = detector_class(file_path="test.py", source_lines=source_lines)
             violations = detector.detect_violations(tree)
             violations_total += len(violations)
 
@@ -90,23 +81,18 @@ class PerformanceBaseline:
         violations_per_second = (violations_total / elapsed_ms) * 1000 if elapsed_ms > 0 else 0
 
         metrics = {
-            'detector': detector_name,
-            'iterations': iterations,
-            'total_time_ms': round(elapsed_ms, 2),
-            'avg_time_ms': round(avg_time_ms, 4),
-            'violations_found': violations_total,
-            'violations_per_second': round(violations_per_second, 2)
+            "detector": detector_name,
+            "iterations": iterations,
+            "total_time_ms": round(elapsed_ms, 2),
+            "avg_time_ms": round(avg_time_ms, 4),
+            "violations_found": violations_total,
+            "violations_per_second": round(violations_per_second, 2),
         }
 
         self.baselines[detector_name] = metrics
         return metrics
 
-    def compare_to_baseline(
-        self,
-        detector_name: str,
-        current_metrics: Dict,
-        threshold_percent: float = 20.0
-    ) -> bool:
+    def compare_to_baseline(self, detector_name: str, current_metrics: Dict, threshold_percent: float = 20.0) -> bool:
         """
         Compare current metrics to baseline (allowing threshold% regression).
 
@@ -118,15 +104,15 @@ class PerformanceBaseline:
         Returns:
             True if within threshold, False if regression detected
         """
-        ProductionAssert.not_none(detector_name, 'detector_name')
-        ProductionAssert.not_none(current_metrics, 'current_metrics')
+        ProductionAssert.not_none(detector_name, "detector_name")
+        ProductionAssert.not_none(current_metrics, "current_metrics")
 
         if detector_name not in self.baselines:
             return True  # No baseline yet
 
         baseline = self.baselines[detector_name]
-        current_time = current_metrics['avg_time_ms']
-        baseline_time = baseline['avg_time_ms']
+        current_time = current_metrics["avg_time_ms"]
+        baseline_time = baseline["avg_time_ms"]
 
         if baseline_time == 0:
             return True
@@ -174,71 +160,49 @@ class TestPerformanceBaselines:
     def test_position_detector_baseline(self, perf_baseline):
         """Establish baseline for PositionDetector."""
         metrics = perf_baseline.measure_detector(
-            'PositionDetector',
-            PositionDetector,
-            SAMPLE_CODE_SMALL,
-            iterations=100
+            "PositionDetector", PositionDetector, SAMPLE_CODE_SMALL, iterations=100
         )
 
-        print(f"\n[PositionDetector Baseline]")
+        print("\n[PositionDetector Baseline]")
         print(f"  Avg time: {metrics['avg_time_ms']} ms")
         print(f"  Violations found: {metrics['violations_found']}")
 
         # Baseline should complete in reasonable time (<10ms avg)
-        assert metrics['avg_time_ms'] < 10.0, (
-            f"PositionDetector too slow: {metrics['avg_time_ms']} ms"
-        )
+        assert metrics["avg_time_ms"] < 10.0, f"PositionDetector too slow: {metrics['avg_time_ms']} ms"
 
     def test_values_detector_baseline(self, perf_baseline):
         """Establish baseline for ValuesDetector."""
-        metrics = perf_baseline.measure_detector(
-            'ValuesDetector',
-            ValuesDetector,
-            SAMPLE_CODE_SMALL,
-            iterations=100
-        )
+        metrics = perf_baseline.measure_detector("ValuesDetector", ValuesDetector, SAMPLE_CODE_SMALL, iterations=100)
 
-        print(f"\n[ValuesDetector Baseline]")
+        print("\n[ValuesDetector Baseline]")
         print(f"  Avg time: {metrics['avg_time_ms']} ms")
         print(f"  Violations found: {metrics['violations_found']}")
 
-        assert metrics['avg_time_ms'] < 10.0, (
-            f"ValuesDetector too slow: {metrics['avg_time_ms']} ms"
-        )
+        assert metrics["avg_time_ms"] < 10.0, f"ValuesDetector too slow: {metrics['avg_time_ms']} ms"
 
     def test_algorithm_detector_baseline(self, perf_baseline):
         """Establish baseline for AlgorithmDetector."""
         metrics = perf_baseline.measure_detector(
-            'AlgorithmDetector',
-            AlgorithmDetector,
-            SAMPLE_CODE_SMALL,
-            iterations=100
+            "AlgorithmDetector", AlgorithmDetector, SAMPLE_CODE_SMALL, iterations=100
         )
 
-        print(f"\n[AlgorithmDetector Baseline]")
+        print("\n[AlgorithmDetector Baseline]")
         print(f"  Avg time: {metrics['avg_time_ms']} ms")
         print(f"  Violations found: {metrics['violations_found']}")
 
-        assert metrics['avg_time_ms'] < 10.0, (
-            f"AlgorithmDetector too slow: {metrics['avg_time_ms']} ms"
-        )
+        assert metrics["avg_time_ms"] < 10.0, f"AlgorithmDetector too slow: {metrics['avg_time_ms']} ms"
 
     def test_magic_literal_detector_baseline(self, perf_baseline):
         """Establish baseline for MagicLiteralDetector."""
         metrics = perf_baseline.measure_detector(
-            'MagicLiteralDetector',
-            MagicLiteralDetector,
-            SAMPLE_CODE_SMALL,
-            iterations=100
+            "MagicLiteralDetector", MagicLiteralDetector, SAMPLE_CODE_SMALL, iterations=100
         )
 
-        print(f"\n[MagicLiteralDetector Baseline]")
+        print("\n[MagicLiteralDetector Baseline]")
         print(f"  Avg time: {metrics['avg_time_ms']} ms")
         print(f"  Violations found: {metrics['violations_found']}")
 
-        assert metrics['avg_time_ms'] < 10.0, (
-            f"MagicLiteralDetector too slow: {metrics['avg_time_ms']} ms"
-        )
+        assert metrics["avg_time_ms"] < 10.0, f"MagicLiteralDetector too slow: {metrics['avg_time_ms']} ms"
 
     def test_all_detectors_scalability(self, perf_baseline):
         """
@@ -248,10 +212,10 @@ class TestPerformanceBaselines:
         performance scales linearly (not quadratically).
         """
         detectors = [
-            ('PositionDetector', PositionDetector),
-            ('ValuesDetector', ValuesDetector),
-            ('AlgorithmDetector', AlgorithmDetector),
-            ('MagicLiteralDetector', MagicLiteralDetector),
+            ("PositionDetector", PositionDetector),
+            ("ValuesDetector", ValuesDetector),
+            ("AlgorithmDetector", AlgorithmDetector),
+            ("MagicLiteralDetector", MagicLiteralDetector),
         ]
 
         print("\n" + "=" * 60)
@@ -261,29 +225,20 @@ class TestPerformanceBaselines:
         for detector_name, detector_class in detectors:
             # Measure at different scales
             small = perf_baseline.measure_detector(
-                f'{detector_name}_1x',
-                detector_class,
-                SAMPLE_CODE_SMALL,
-                iterations=10
+                f"{detector_name}_1x", detector_class, SAMPLE_CODE_SMALL, iterations=10
             )
 
             medium = perf_baseline.measure_detector(
-                f'{detector_name}_10x',
-                detector_class,
-                SAMPLE_CODE_MEDIUM,
-                iterations=10
+                f"{detector_name}_10x", detector_class, SAMPLE_CODE_MEDIUM, iterations=10
             )
 
             large = perf_baseline.measure_detector(
-                f'{detector_name}_50x',
-                detector_class,
-                SAMPLE_CODE_LARGE,
-                iterations=10
+                f"{detector_name}_50x", detector_class, SAMPLE_CODE_LARGE, iterations=10
             )
 
             # Calculate scaling factor
-            scaling_1x_to_10x = medium['avg_time_ms'] / small['avg_time_ms'] if small['avg_time_ms'] > 0 else 0
-            scaling_10x_to_50x = large['avg_time_ms'] / medium['avg_time_ms'] if medium['avg_time_ms'] > 0 else 0
+            scaling_1x_to_10x = medium["avg_time_ms"] / small["avg_time_ms"] if small["avg_time_ms"] > 0 else 0
+            scaling_10x_to_50x = large["avg_time_ms"] / medium["avg_time_ms"] if medium["avg_time_ms"] > 0 else 0
 
             print(f"\n{detector_name}:")
             print(f"  1x:  {small['avg_time_ms']:.4f} ms")
@@ -293,9 +248,7 @@ class TestPerformanceBaselines:
             # Linear scaling: 10x code should take ~10x time
             # Quadratic would be ~100x
             # Allow up to 20x (still much better than quadratic)
-            assert scaling_1x_to_10x < 20, (
-                f"{detector_name} scales poorly (1x→10x): {scaling_1x_to_10x:.2f}x"
-            )
+            assert scaling_1x_to_10x < 20, f"{detector_name} scales poorly (1x→10x): {scaling_1x_to_10x:.2f}x"
 
         print("=" * 60)
 
@@ -310,14 +263,14 @@ def test_performance_baseline_report(perf_baseline=None):
         perf_baseline = PerformanceBaseline()
 
     detectors = [
-        ('PositionDetector', PositionDetector),
-        ('ValuesDetector', ValuesDetector),
-        ('AlgorithmDetector', AlgorithmDetector),
-        ('MagicLiteralDetector', MagicLiteralDetector),
-        ('TimingDetector', TimingDetector),
-        ('ExecutionDetector', ExecutionDetector),
-        ('GodObjectDetector', GodObjectDetector),
-        ('ConventionDetector', ConventionDetector),
+        ("PositionDetector", PositionDetector),
+        ("ValuesDetector", ValuesDetector),
+        ("AlgorithmDetector", AlgorithmDetector),
+        ("MagicLiteralDetector", MagicLiteralDetector),
+        ("TimingDetector", TimingDetector),
+        ("ExecutionDetector", ExecutionDetector),
+        ("GodObjectDetector", GodObjectDetector),
+        ("ConventionDetector", ConventionDetector),
     ]
 
     print("\n" + "=" * 60)
@@ -325,12 +278,7 @@ def test_performance_baseline_report(perf_baseline=None):
     print("=" * 60)
 
     for detector_name, detector_class in detectors:
-        metrics = perf_baseline.measure_detector(
-            detector_name,
-            detector_class,
-            SAMPLE_CODE_SMALL,
-            iterations=100
-        )
+        metrics = perf_baseline.measure_detector(detector_name, detector_class, SAMPLE_CODE_SMALL, iterations=100)
 
         print(f"\n{detector_name}:")
         print(f"  Avg time: {metrics['avg_time_ms']} ms")

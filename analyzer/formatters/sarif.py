@@ -8,7 +8,8 @@ NASA Rule 4: All functions under 60 lines
 """
 
 from pathlib import Path
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional
+
 from .sarif_rules import get_connascence_rules, get_severity_mapping
 
 
@@ -30,9 +31,7 @@ class SARIFExporter:
         self.version = version
         self.severity_map = get_severity_mapping()
 
-    def generate_sarif(
-        self, violations: List[Dict], source_root: Optional[str] = None
-    ) -> Dict:
+    def generate_sarif(self, violations: List[Dict], source_root: Optional[str] = None) -> Dict:
         """
         Generate SARIF report from connascence violations.
 
@@ -70,16 +69,12 @@ class SARIFExporter:
                 "name": "Connascence Analyzer",
                 "version": self.version,
                 "informationUri": "https://github.com/connascence/connascence.io",
-                "shortDescription": {
-                    "text": "Static analysis tool for detecting connascence violations"
-                },
+                "shortDescription": {"text": "Static analysis tool for detecting connascence violations"},
                 "rules": get_connascence_rules(),
             }
         }
 
-    def _create_results(
-        self, violations: List[Dict], source_root: Optional[str]
-    ) -> List[Dict]:
+    def _create_results(self, violations: List[Dict], source_root: Optional[str]) -> List[Dict]:
         """
         Convert violations to SARIF results.
 
@@ -99,9 +94,7 @@ class SARIFExporter:
                 results.append(result)
         return results
 
-    def _create_result(
-        self, violation: Dict, source_root: Optional[str]
-    ) -> Optional[Dict]:
+    def _create_result(self, violation: Dict, source_root: Optional[str]) -> Optional[Dict]:
         """
         Create single SARIF result from violation.
 
@@ -140,9 +133,7 @@ class SARIFExporter:
             ],
         }
 
-    def _create_relative_uri(
-        self, file_path: str, source_root: Optional[str]
-    ) -> str:
+    def _create_relative_uri(self, file_path: str, source_root: Optional[str]) -> str:
         """
         Create relative URI for SARIF artifact location.
 

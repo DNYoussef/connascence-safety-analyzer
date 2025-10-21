@@ -7,8 +7,10 @@ Provides evidence-based verification of measurable quality gains.
 
 from dataclasses import asdict, dataclass
 from datetime import datetime
+import functools
 import json
 import logging
+import operator
 from pathlib import Path
 import statistics
 import time
@@ -395,7 +397,7 @@ class TheaterDetector:
 
         if pattern.pattern_name == "perfect_metrics":
             # Check for suspiciously perfect improvements
-            return claim.improved_value == 0 or claim.improvement_percent == 100.0 or claim.improvement_percent == 0.0
+            return claim.improved_value == 0 or claim.improvement_percent in {100.0, 0.0}
 
         elif pattern.pattern_name == "vanity_metrics":
             # Check if focusing on less important metrics
@@ -442,7 +444,7 @@ class TheaterDetector:
             genuine_indicators.append("gradual_improvement")
 
         # Specific metric targeting
-        if any(conn_type in claim.metric_name.lower() for conn_type in self.connascence_weights.keys()):
+        if any(conn_type in claim.metric_name.lower() for conn_type in self.connascence_weights):
             genuine_indicators.append("specific_connascence_targeting")
 
         return genuine_indicators
@@ -468,9 +470,8 @@ class TheaterDetector:
         if "critical" in claim.description.lower():
             if improvement < 80.0:
                 validation_score *= 0.7  # Critical should be mostly eliminated
-        elif "high" in claim.description.lower():
-            if improvement < 50.0:
-                validation_score *= 0.8  # High should be significantly reduced
+        elif "high" in claim.description.lower() and improvement < 50.0:
+            validation_score *= 0.8  # High should be significantly reduced
 
         # Check for comprehensive coverage
         if "all files" in claim.measurement_method.lower() or "entire codebase" in claim.measurement_method.lower():
@@ -648,7 +649,9 @@ class TheaterDetector:
             },
             "systemic_analysis": systemic_analysis,
             "individual_results": [asdict(r) for r in results],
-            "theater_patterns_detected": list(set(sum([r.theater_indicators for r in results], []))),
+            "theater_patterns_detected": list(
+                set(functools.reduce(operator.iadd, [r.theater_indicators for r in results], []))
+            ),
             "recommendations": {
                 "immediate_actions": self._generate_immediate_actions(results),
                 "long_term_improvements": self._generate_long_term_improvements(results),

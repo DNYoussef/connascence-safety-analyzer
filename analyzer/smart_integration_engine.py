@@ -523,10 +523,8 @@ class PythonASTAnalyzer:
         complexity = 1  # Base complexity
 
         for child in ast.walk(node):
-            if (
-                isinstance(child, (ast.If, ast.While, ast.For, ast.AsyncFor))
-                or isinstance(child, ast.ExceptHandler)
-                or isinstance(child, (ast.With, ast.AsyncWith))
+            if isinstance(
+                child, (ast.If, ast.While, ast.For, ast.AsyncFor, ast.ExceptHandler, ast.With, ast.AsyncWith)
             ):
                 complexity += 1
             elif isinstance(child, ast.BoolOp):

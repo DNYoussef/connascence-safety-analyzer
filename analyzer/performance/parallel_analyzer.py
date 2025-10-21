@@ -233,7 +233,7 @@ class ParallelConnascenceAnalyzer:
         file_chunks = self._create_file_chunks([Path(f) for f in file_paths])
 
         # Execute parallel analysis on chunks
-        chunk_results, chunk_times = self._execute_parallel_chunks(file_chunks, policy_preset, {})
+        chunk_results, _chunk_times = self._execute_parallel_chunks(file_chunks, policy_preset, {})
 
         # Combine results
         all_violations = []
@@ -262,7 +262,7 @@ class ParallelConnascenceAnalyzer:
             "chunk_count": len(file_chunks),
         }
 
-    def benchmark_parallel_performance(self, test_project_sizes: List[int] = None) -> Dict[str, Any]:
+    def benchmark_parallel_performance(self, test_project_sizes: Optional[List[int]] = None) -> Dict[str, Any]:
         """
         Benchmark parallel processing performance against sequential processing.
 

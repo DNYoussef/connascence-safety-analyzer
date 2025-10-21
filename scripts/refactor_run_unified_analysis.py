@@ -10,7 +10,7 @@ from pathlib import Path
 core_file = Path(__file__).parent.parent / "analyzer" / "core.py"
 
 # Read the file
-with open(core_file, 'r', encoding='utf-8') as f:
+with open(core_file, encoding="utf-8") as f:
     content = f.read()
 
 # Helper functions to insert before _run_unified_analysis()
@@ -149,22 +149,17 @@ if start_idx == -1 or end_idx == -1:
     exit(1)
 
 # Create new content
-new_content = (
-    content[:start_idx] +
-    helper_functions +
-    new_function +
-    content[end_idx:]
-)
+new_content = content[:start_idx] + helper_functions + new_function + content[end_idx:]
 
 # Write the refactored file
-with open(core_file, 'w', encoding='utf-8') as f:
+with open(core_file, "w", encoding="utf-8") as f:
     f.write(new_content)
 
 print("[SUCCESS] Refactored _run_unified_analysis() function!")
-print(f"  Original: ~87 LOC")
-print(f"  Refactored: ~25 LOC")
-print(f"  Helper functions created: 3")
-print(f"    - _analyze_file_or_directory(): ~35 LOC")
-print(f"    - _format_unified_result(): ~40 LOC")
-print(f"    - _create_error_result(): ~12 LOC")
-print(f"  Lines saved: ~62 LOC from main function")
+print("  Original: ~87 LOC")
+print("  Refactored: ~25 LOC")
+print("  Helper functions created: 3")
+print("    - _analyze_file_or_directory(): ~35 LOC")
+print("    - _format_unified_result(): ~40 LOC")
+print("    - _create_error_result(): ~12 LOC")
+print("  Lines saved: ~62 LOC from main function")

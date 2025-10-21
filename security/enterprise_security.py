@@ -25,7 +25,6 @@ Implements comprehensive security controls for enterprise deployment:
 - RBAC (Role-Based Access Control)
 """
 
-from fixes.phase0.production_safe_assertions import ProductionAssert
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
@@ -45,12 +44,15 @@ from typing import Any, Callable, Dict, List, Optional, Set
 
 import bcrypt
 
+from fixes.phase0.production_safe_assertions import ProductionAssert
+
 # Enterprise cryptography imports
 try:
     from cryptography.hazmat.primitives import hashes
     from cryptography.hazmat.primitives.ciphers.aead import AESGCM
     from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
     from cryptography.hazmat.primitives.kdf.scrypt import Scrypt
+
     CRYPTO_AVAILABLE = True
 except ImportError:
     CRYPTO_AVAILABLE = False
@@ -61,6 +63,7 @@ logger = logging.getLogger(__name__)
 
 class SecurityLevel(Enum):
     """Security clearance levels for enterprise access control."""
+
     PUBLIC = "public"
     INTERNAL = "internal"
     CONFIDENTIAL = "confidential"
@@ -70,16 +73,18 @@ class SecurityLevel(Enum):
 
 class UserRole(Enum):
     """User roles for RBAC system."""
-    VIEWER = "viewer"           # Read-only access
-    ANALYST = "analyst"         # Analysis execution
-    DEVELOPER = "developer"     # Code modification suggestions
-    AUDITOR = "auditor"         # Security and compliance review
-    ADMIN = "admin"             # System administration
+
+    VIEWER = "viewer"  # Read-only access
+    ANALYST = "analyst"  # Analysis execution
+    DEVELOPER = "developer"  # Code modification suggestions
+    AUDITOR = "auditor"  # Security and compliance review
+    ADMIN = "admin"  # System administration
     SECURITY_OFFICER = "security_officer"  # Security oversight
 
 
 class AuditEventType(Enum):
     """Types of events that require audit logging."""
+
     USER_LOGIN = "user_login"
     USER_LOGOUT = "user_logout"
     ANALYSIS_START = "analysis_start"
@@ -95,6 +100,7 @@ class AuditEventType(Enum):
 @dataclass
 class SecurityContext:
     """Security context for authenticated operations."""
+
     user_id: str
     username: str
     roles: Set[UserRole]
@@ -121,6 +127,7 @@ class SecurityContext:
 @dataclass
 class AuditEvent:
     """Audit log event with tamper protection."""
+
     timestamp: datetime
     event_type: AuditEventType
     user_id: str
@@ -149,16 +156,12 @@ class AuditEvent:
             self.resource,
             self.action,
             self.result,
-            json.dumps(self.details, sort_keys=True)  # Ensure deterministic JSON
+            json.dumps(self.details, sort_keys=True),  # Ensure deterministic JSON
         ]
-        data = '|'.join(data_components)  # Use delimiter to prevent collision
+        data = "|".join(data_components)  # Use delimiter to prevent collision
 
         audit_key = SecurityManager._get_audit_key()
-        return hmac.new(
-            audit_key,
-            data.encode('utf-8'),
-            hashlib.sha256
-        ).hexdigest()
+        return hmac.new(audit_key, data.encode("utf-8"), hashlib.sha256).hexdigest()
 
     def verify_integrity(self) -> bool:
         """Verify audit event has not been tampered with."""
@@ -197,7 +200,9 @@ class EncryptionManager:
     def __init__(self, master_key: Optional[str] = None):
         """Initialize with master key for encryption."""
         if not CRYPTO_AVAILABLE:
-            raise RuntimeError("Enterprise cryptography library not available. Install 'cryptography>=41.0.0' for production security.")
+            raise RuntimeError(
+                "Enterprise cryptography library not available. Install 'cryptography>=41.0.0' for production security."
+            )
 
         if master_key:
             self.master_key = master_key.encode()
@@ -222,7 +227,7 @@ class EncryptionManager:
             nonce = secrets.token_bytes(12)  # 96-bit nonce for GCM
 
             # Encrypt data with authentication
-            ciphertext = aesgcm.encrypt(nonce, data.encode('utf-8'), None)
+            ciphertext = aesgcm.encrypt(nonce, data.encode("utf-8"), None)
 
             # Combine salt + nonce + ciphertext and encode as hex
             encrypted_package = salt + nonce + ciphertext
@@ -239,10 +244,10 @@ class EncryptionManager:
             encrypted_bytes = bytes.fromhex(encrypted_hex)
 
             # Extract components
-            salt = encrypted_bytes[:self.kdf_salt_size]
+            salt = encrypted_bytes[: self.kdf_salt_size]
             nonce_start = self.kdf_salt_size
-            nonce = encrypted_bytes[nonce_start:nonce_start + 12]
-            ciphertext = encrypted_bytes[nonce_start + 12:]
+            nonce = encrypted_bytes[nonce_start : nonce_start + 12]
+            ciphertext = encrypted_bytes[nonce_start + 12 :]
 
             # Derive decryption key
             decryption_key = self._derive_key(salt)
@@ -251,7 +256,7 @@ class EncryptionManager:
             aesgcm = AESGCM(decryption_key)
             plaintext = aesgcm.decrypt(nonce, ciphertext, None)
 
-            return plaintext.decode('utf-8')
+            return plaintext.decode("utf-8")
 
         except Exception as e:
             logger.error(f"Decryption failed: {e}")
@@ -266,8 +271,8 @@ class EncryptionManager:
                 length=self.aes_key_size,
                 salt=salt,
                 n=2**14,  # CPU/memory cost factor
-                r=8,      # Block size factor
-                p=1,      # Parallelization factor
+                r=8,  # Block size factor
+                p=1,  # Parallelization factor
             )
             return kdf.derive(self.master_key)
 
@@ -349,7 +354,7 @@ class SecurityManager:
 
             if key_file.exists():
                 try:
-                    with open(key_file, 'rb') as f:
+                    with open(key_file, "rb") as f:
                         cls._audit_key = f.read()
 
                     # Validate key size
@@ -367,11 +372,11 @@ class SecurityManager:
                 # Save to secure file with restricted permissions
                 try:
                     key_file.parent.mkdir(parents=True, exist_ok=True)
-                    with open(key_file, 'wb') as f:
+                    with open(key_file, "wb") as f:
                         f.write(cls._audit_key)
 
                     # Set file permissions (Unix-like systems)
-                    if hasattr(os, 'chmod'):
+                    if hasattr(os, "chmod"):
                         os.chmod(key_file, 0o600)  # Owner read/write only
 
                 except Exception as e:
@@ -393,7 +398,7 @@ class SecurityManager:
                 "authentication",
                 "login_attempt",
                 "failure",
-                {"username": username, "reason": "invalid_credentials"}
+                {"username": username, "reason": "invalid_credentials"},
             )
             return None
 
@@ -410,7 +415,7 @@ class SecurityManager:
             session_token=session_token,
             expires_at=expires_at,
             ip_address=ip_address,
-            permissions=set(user_data.get("permissions", []))
+            permissions=set(user_data.get("permissions", [])),
         )
 
         # Store active session
@@ -425,7 +430,7 @@ class SecurityManager:
             "authentication",
             "login",
             "success",
-            {"username": username, "roles": user_data["roles"]}
+            {"username": username, "roles": user_data["roles"]},
         )
 
         return context
@@ -451,7 +456,7 @@ class SecurityManager:
                 "session",
                 "ip_mismatch",
                 "blocked",
-                {"original_ip": context.ip_address, "new_ip": ip_address}
+                {"original_ip": context.ip_address, "new_ip": ip_address},
             )
             self.invalidate_session(session_token)
             return None
@@ -470,7 +475,7 @@ class SecurityManager:
                 "authentication",
                 "logout",
                 "success",
-                {}
+                {},
             )
             del self.sessions[session_token]
             return True
@@ -508,7 +513,7 @@ class SecurityManager:
             resource,
             action,
             "blocked",
-            {"reason": "insufficient_permissions", "roles": [r.value for r in context.roles]}
+            {"reason": "insufficient_permissions", "roles": [r.value for r in context.roles]},
         )
 
         return False
@@ -519,9 +524,7 @@ class SecurityManager:
 
         if user_key not in self.rate_limiters:
             # Create user-specific rate limiter
-            self.rate_limiters[user_key] = RateLimiter(
-                max_tokens=self._get_rate_limit_config(context.roles, operation)
-            )
+            self.rate_limiters[user_key] = RateLimiter(max_tokens=self._get_rate_limit_config(context.roles, operation))
 
         allowed = self.rate_limiters[user_key].allow_request()
 
@@ -534,13 +537,14 @@ class SecurityManager:
                 "rate_limit",
                 operation,
                 "blocked",
-                {"reason": "rate_limit_exceeded"}
+                {"reason": "rate_limit_exceeded"},
             )
 
         return allowed
 
-    def log_analysis_event(self, context: SecurityContext, event_type: AuditEventType,
-                          resource: str, details: Dict[str, Any]) -> None:
+    def log_analysis_event(
+        self, context: SecurityContext, event_type: AuditEventType, resource: str, details: Dict[str, Any]
+    ) -> None:
         """Log analysis-related audit event."""
         self._log_audit_event(
             event_type,
@@ -550,13 +554,16 @@ class SecurityManager:
             resource,
             event_type.value,
             "success",
-            details
+            details,
         )
 
-    def get_audit_trail(self, context: SecurityContext,
-                       start_time: Optional[datetime] = None,
-                       end_time: Optional[datetime] = None,
-                       user_id: Optional[str] = None) -> List[AuditEvent]:
+    def get_audit_trail(
+        self,
+        context: SecurityContext,
+        start_time: Optional[datetime] = None,
+        end_time: Optional[datetime] = None,
+        user_id: Optional[str] = None,
+    ) -> List[AuditEvent]:
         """Retrieve audit trail for compliance reporting."""
 
         # Only auditors and admins can access audit logs
@@ -596,7 +603,7 @@ class SecurityManager:
                 action=row[7],
                 result=row[8],
                 details=json.loads(row[9]),
-                integrity_hash=row[10]
+                integrity_hash=row[10],
             )
 
             # Verify integrity
@@ -614,7 +621,7 @@ class SecurityManager:
             "audit_logs",
             "access",
             "success",
-            {"records_retrieved": len(events)}
+            {"records_retrieved": len(events)},
         )
 
         return events
@@ -625,7 +632,8 @@ class SecurityManager:
         db_path = self.config_path / "audit.db"
 
         with sqlite3.connect(str(db_path)) as conn:
-            conn.execute("""
+            conn.execute(
+                """
                 CREATE TABLE IF NOT EXISTS audit_events (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     timestamp TEXT NOT NULL,
@@ -639,17 +647,22 @@ class SecurityManager:
                     details TEXT NOT NULL,
                     integrity_hash TEXT NOT NULL
                 )
-            """)
+            """
+            )
 
-            conn.execute("""
+            conn.execute(
+                """
                 CREATE INDEX IF NOT EXISTS idx_audit_timestamp
                 ON audit_events(timestamp)
-            """)
+            """
+            )
 
-            conn.execute("""
+            conn.execute(
+                """
                 CREATE INDEX IF NOT EXISTS idx_audit_user
                 ON audit_events(user_id)
-            """)
+            """
+            )
 
     @contextmanager
     def _get_audit_db(self):
@@ -663,9 +676,17 @@ class SecurityManager:
         finally:
             conn.close()
 
-    def _log_audit_event(self, event_type: AuditEventType, user_id: str,
-                        session_token: str, ip_address: str, resource: str,
-                        action: str, result: str, details: Dict[str, Any]) -> None:
+    def _log_audit_event(
+        self,
+        event_type: AuditEventType,
+        user_id: str,
+        session_token: str,
+        ip_address: str,
+        resource: str,
+        action: str,
+        result: str,
+        details: Dict[str, Any],
+    ) -> None:
         """Log audit event to database."""
 
         event = AuditEvent(
@@ -677,28 +698,31 @@ class SecurityManager:
             resource=resource,
             action=action,
             result=result,
-            details=details
+            details=details,
         )
 
         try:
             with self._get_audit_db() as cursor:
-                cursor.execute("""
+                cursor.execute(
+                    """
                     INSERT INTO audit_events
                     (timestamp, event_type, user_id, session_token, ip_address,
                      resource, action, result, details, integrity_hash)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """, (
-                    event.timestamp.isoformat(),
-                    event.event_type.value,
-                    event.user_id,
-                    event.session_token,
-                    event.ip_address,
-                    event.resource,
-                    event.action,
-                    event.result,
-                    json.dumps(event.details),
-                    event.integrity_hash
-                ))
+                """,
+                    (
+                        event.timestamp.isoformat(),
+                        event.event_type.value,
+                        event.user_id,
+                        event.session_token,
+                        event.ip_address,
+                        event.resource,
+                        event.action,
+                        event.result,
+                        json.dumps(event.details),
+                        event.integrity_hash,
+                    ),
+                )
         except Exception as e:
             logger.error(f"Failed to log audit event: {e}")
 
@@ -722,7 +746,7 @@ class SecurityManager:
                 "permissions": [],
                 "account_locked": False,
                 "failed_attempts": 0,
-                "last_failed_attempt": None
+                "last_failed_attempt": None,
             },
             "analyst": {
                 "user_id": "analyst-001",
@@ -733,7 +757,7 @@ class SecurityManager:
                 "permissions": ["analysis:read", "analysis:execute"],
                 "account_locked": False,
                 "failed_attempts": 0,
-                "last_failed_attempt": None
+                "last_failed_attempt": None,
             },
             "developer": {
                 "user_id": "dev-001",
@@ -744,8 +768,8 @@ class SecurityManager:
                 "permissions": ["analysis:read", "analysis:execute", "code:suggest_fixes"],
                 "account_locked": False,
                 "failed_attempts": 0,
-                "last_failed_attempt": None
-            }
+                "last_failed_attempt": None,
+            },
         }
 
         user_data = mock_users.get(username)
@@ -757,8 +781,8 @@ class SecurityManager:
             return None
 
         # Verify password using bcrypt with timing attack protection
-        password_bytes = password.encode('utf-8')
-        stored_hash = user_data["password_hash"].encode('utf-8')
+        password_bytes = password.encode("utf-8")
+        stored_hash = user_data["password_hash"].encode("utf-8")
 
         try:
             if bcrypt.checkpw(password_bytes, stored_hash):
@@ -792,16 +816,13 @@ class SecurityManager:
             self.config = {
                 "session_timeout_hours": 8,
                 "max_concurrent_sessions": 5,
-                "rate_limits": {
-                    "analysis": {"default": 10, "admin": 100},
-                    "export": {"default": 2, "admin": 20}
-                },
+                "rate_limits": {"analysis": {"default": 10, "admin": 100}, "export": {"default": 2, "admin": 20}},
                 "audit_retention_days": 365,
-                "encryption_enabled": True
+                "encryption_enabled": True,
             }
 
             # Save default config
-            with open(config_file, 'w') as f:
+            with open(config_file, "w") as f:
                 json.dump(self.config, f, indent=2)
 
     def _setup_rate_limiting(self) -> None:
@@ -812,36 +833,27 @@ class SecurityManager:
     def _get_permission_matrix(self) -> Dict[UserRole, Dict[str, List[str]]]:
         """Define role-based permission matrix."""
         return {
-            UserRole.VIEWER: {
-                "analysis": ["read"],
-                "reports": ["read"]
-            },
-            UserRole.ANALYST: {
-                "analysis": ["read", "execute"],
-                "reports": ["read", "generate"],
-                "code": ["read"]
-            },
+            UserRole.VIEWER: {"analysis": ["read"], "reports": ["read"]},
+            UserRole.ANALYST: {"analysis": ["read", "execute"], "reports": ["read", "generate"], "code": ["read"]},
             UserRole.DEVELOPER: {
                 "analysis": ["read", "execute"],
                 "reports": ["read", "generate"],
                 "code": ["read", "suggest_fixes"],
-                "refactoring": ["suggest"]
+                "refactoring": ["suggest"],
             },
             UserRole.AUDITOR: {
                 "analysis": ["read"],
                 "reports": ["read", "generate"],
                 "audit": ["read", "export"],
-                "compliance": ["read", "validate"]
+                "compliance": ["read", "validate"],
             },
-            UserRole.ADMIN: {
-                "all": ["all"]  # Admins have all permissions
-            },
+            UserRole.ADMIN: {"all": ["all"]},  # Admins have all permissions
             UserRole.SECURITY_OFFICER: {
                 "analysis": ["read"],
                 "audit": ["read", "export"],
                 "security": ["read", "configure"],
-                "users": ["read", "manage"]
-            }
+                "users": ["read", "manage"],
+            },
         }
 
     def _validate_username(self, username: str) -> bool:
@@ -850,7 +862,7 @@ class SecurityManager:
             return False
 
         # Only allow alphanumeric characters and underscores
-        if not re.match(r'^[a-zA-Z0-9_]+$', username):
+        if not re.match(r"^[a-zA-Z0-9_]+$", username):
             return False
 
         return True
@@ -861,11 +873,11 @@ class SecurityManager:
             return False
 
         # Check for basic complexity (at least one uppercase, lowercase, digit, special char)
-        if not re.search(r'[A-Z]', password):
+        if not re.search(r"[A-Z]", password):
             return False
-        if not re.search(r'[a-z]', password):
+        if not re.search(r"[a-z]", password):
             return False
-        if not re.search(r'\d', password):
+        if not re.search(r"\d", password):
             return False
         if not re.search(r'[!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?]', password):
             return False
@@ -879,9 +891,9 @@ class SecurityManager:
         salt = bcrypt.gensalt(rounds=12)
 
         # Hash password
-        password_hash = bcrypt.hashpw(password.encode('utf-8'), salt)
+        password_hash = bcrypt.hashpw(password.encode("utf-8"), salt)
 
-        return password_hash.decode('utf-8')
+        return password_hash.decode("utf-8")
 
     def _get_rate_limit_config(self, roles: Set[UserRole], operation: str) -> int:
         """Get rate limit configuration for user roles and operation."""
@@ -897,28 +909,22 @@ class SecurityManager:
 # Decorator for securing MCP endpoints
 def require_auth(permission: str):
     """Decorator to require authentication and authorization."""
-    ProductionAssert.not_none(permission, 'permission')
+    ProductionAssert.not_none(permission, "permission")
 
-    ProductionAssert.not_none(permission, 'permission')
+    ProductionAssert.not_none(permission, "permission")
 
     def decorator(func: Callable) -> Callable:
         def wrapper(*args, **kwargs):
-            ProductionAssert.not_none(*args, '*args')
-            ProductionAssert.not_none(**kwargs, '**kwargs')
-
-            ProductionAssert.not_none(*args, '*args')
-            ProductionAssert.not_none(**kwargs, '**kwargs')
-
             # Extract security manager and context from args
             # Implementation depends on MCP server structure
-            security_manager = kwargs.get('security_manager')
-            context = kwargs.get('security_context')
+            security_manager = kwargs.get("security_manager")
+            context = kwargs.get("security_context")
 
             if not security_manager or not context:
                 raise PermissionError("Authentication required")
 
             # Parse permission (resource:action)
-            resource, action = permission.split(':') if ':' in permission else (permission, 'execute')
+            resource, action = permission.split(":") if ":" in permission else (permission, "execute")
 
             if not security_manager.check_permission(context, resource, action):
                 raise PermissionError(f"Permission denied: {permission}")
@@ -928,5 +934,7 @@ def require_auth(permission: str):
                 raise PermissionError("Rate limit exceeded")
 
             return func(*args, **kwargs)
+
         return wrapper
+
     return decorator

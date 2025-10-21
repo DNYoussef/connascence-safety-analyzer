@@ -414,7 +414,7 @@ class ConfigDiscovery:
 # Analysis policy (default, strict, permissive)
 policy: default
 
-# Output format (json, text, csv, xml, html, yaml)  
+# Output format (json, text, csv, xml, html, yaml)
 format: json
 
 # Files/patterns to exclude from analysis
@@ -538,7 +538,7 @@ format = json
 exclude = test_*, *.pyc, __pycache__/*
 
 # Files/patterns to include (empty = all files)
-include = 
+include =
 
 # Maximum line length for position connascence
 max_line_length = 120

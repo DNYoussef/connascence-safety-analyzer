@@ -8,10 +8,9 @@ and configuration-driven thresholds to reduce parameter order coupling.
 import ast
 from typing import List
 
-from utils.types import ConnascenceViolation
 from analyzer.utils.ast_utils import ASTUtils
 from analyzer.utils.violation_factory import ViolationFactory
-from analyzer.utils.detector_result import DetectorResult, AnalysisContext
+from utils.types import ConnascenceViolation
 
 from .base import DetectorBase
 
@@ -65,7 +64,7 @@ class PositionDetector(DetectorBase):
         violations = []
 
         # Use pre-collected parameter data
-        if hasattr(collected_data, 'function_params'):
+        if hasattr(collected_data, "function_params"):
             for func_name, param_count in collected_data.function_params.items():
                 if param_count > self.max_positional_params:
                     # Get function node for location info
@@ -75,15 +74,13 @@ class PositionDetector(DetectorBase):
 
                     severity = self._calculate_severity(param_count)
                     location = ASTUtils.get_node_location(func_node, self.file_path)
-                    code_snippet = ASTUtils.extract_code_snippet(
-                        self.source_lines, func_node
-                    )
+                    code_snippet = ASTUtils.extract_code_snippet(self.source_lines, func_node)
 
                     violation = ViolationFactory.create_cop_violation(
                         location=location,
                         function_name=func_name,
                         param_count=param_count,
-                        threshold=self.max_positional_params
+                        threshold=self.max_positional_params,
                     )
 
                     violation["severity"] = severity
@@ -93,7 +90,7 @@ class PositionDetector(DetectorBase):
                         "parameter_count": param_count,
                         "function_name": func_name,
                         "threshold": self.max_positional_params,
-                        "analysis_method": "pre_collected"
+                        "analysis_method": "pre_collected",
                     }
 
                     violations.append(violation)
@@ -123,7 +120,7 @@ class PositionDetector(DetectorBase):
             location=location,
             function_name=node.name,
             param_count=positional_count,
-            threshold=self.max_positional_params
+            threshold=self.max_positional_params,
         )
 
         # Override severity if needed (create_cop_violation uses default logic)

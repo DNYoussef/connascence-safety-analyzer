@@ -15,7 +15,7 @@ import collections
 from pathlib import Path
 import sys
 import time
-from typing import Any
+from typing import Any, Optional
 
 from fixes.phase0.production_safe_assertions import ProductionAssert
 
@@ -24,7 +24,7 @@ from utils.types import ConnascenceViolation
 
 # Import Tree-sitter backend for multi-language support
 try:
-    from grammar.backends.tree_sitter_backend import LanguageSupport, TreeSitterBackend
+    from grammar.backends.tree_sitter_backend import LanguageSupport, TreeSitterBackend  # noqa: F401
 
     TREE_SITTER_BACKEND_AVAILABLE = True
 except ImportError:
@@ -37,7 +37,7 @@ try:
         cached_file_content,
         cached_file_lines,
         cached_python_files,
-        get_global_cache,
+        get_global_cache,  # noqa: F401
     )
 
     OPTIMIZATION_AVAILABLE = True
@@ -548,7 +548,6 @@ class ConnascenceDetector(ast.NodeVisitor):
             },
         )
 
-
     def _process_formal_magic_literal(self, node, value, context_info, formal_context, severity_score):
         """
         Process magic literal with formal grammar context.
@@ -679,9 +678,7 @@ class ConnascenceDetector(ast.NodeVisitor):
                     formal_context = context_info["context"]
                     severity_score = context_info.get("severity_score", 3.0)
                     # Process with formal grammar method
-                    self._process_formal_magic_literal(
-                        node, value, context_info, formal_context, severity_score
-                    )
+                    self._process_formal_magic_literal(node, value, context_info, formal_context, severity_score)
                 else:
                     # Fallback to legacy processing
                     self._process_legacy_magic_literal(node, value, context_info)
@@ -891,7 +888,7 @@ class ConnascenceAnalyzer:
     while maintaining 100% backward compatibility.
     """
 
-    def __init__(self, exclusions: list[str] = None):
+    def __init__(self, exclusions: Optional[list[str]] = None):
         self.exclusions = exclusions or [
             "test_*",
             "tests/",
@@ -984,7 +981,7 @@ class ConnascenceAnalyzer:
             # Update stats
             self.file_stats[str(py_file)] = {
                 "violations": len(file_violations),
-                "types": list(set(v.type for v in file_violations)),
+                "types": list({v.type for v in file_violations}),
             }
 
         self.violations = all_violations

@@ -115,9 +115,11 @@ class NISTSSDFAligner:
                 implementation_level="defined" if ci_cd else "initial",
                 evidence=[str(f.relative_to(self.project_root)) for f in ci_cd[:5]],
                 gaps=[] if ci_cd else ["No automated build/deployment environment found"],
-                recommendations=["Maintain isolated dev/test/prod environments"]
-                if ci_cd
-                else ["Implement CI/CD with environment isolation"],
+                recommendations=(
+                    ["Maintain isolated dev/test/prod environments"]
+                    if ci_cd
+                    else ["Implement CI/CD with environment isolation"]
+                ),
             )
         )
 
@@ -178,9 +180,11 @@ class NISTSSDFAligner:
                 implementation_level="defined" if test_files else "initial",
                 evidence=[str(f.relative_to(self.project_root)) for f in test_files[:10]],
                 gaps=[] if test_files else ["No automated security testing found"],
-                recommendations=["Maintain comprehensive security test coverage"]
-                if test_files
-                else ["Implement security-focused test suite"],
+                recommendations=(
+                    ["Maintain comprehensive security test coverage"]
+                    if test_files
+                    else ["Implement security-focused test suite"]
+                ),
             )
         )
 
@@ -215,9 +219,11 @@ class NISTSSDFAligner:
                 implementation_level="quantitatively_managed" if security_scans else "initial",
                 evidence=[str(f.relative_to(self.project_root)) for f in security_scans],
                 gaps=[] if security_scans else ["No automated security scanning found"],
-                recommendations=["Track security scan metrics over time"]
-                if security_scans
-                else ["Implement Bandit and dependency scanning"],
+                recommendations=(
+                    ["Track security scan metrics over time"]
+                    if security_scans
+                    else ["Implement Bandit and dependency scanning"]
+                ),
             )
         )
 
@@ -304,7 +310,7 @@ class NISTSSDFAligner:
         maturity_level = self.calculate_maturity_level()
 
         group_summary = {}
-        for practice_id in self.SSDF_PRACTICES.keys():
+        for practice_id in self.SSDF_PRACTICES:
             group = practice_id.split(".")[0]
             if group not in group_summary:
                 group_summary[group] = {"quantitatively_managed": 0, "defined": 0, "managed": 0, "initial": 0}

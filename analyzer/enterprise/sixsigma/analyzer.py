@@ -122,7 +122,7 @@ class SixSigmaAnalyzer:
 
         # Calculate process capability
         if total_violations > 0:
-            violation_rates = [violations_by_type.get(vtype, 0) / total_violations for vtype in self.CTQ_WEIGHTS.keys()]
+            violation_rates = [violations_by_type.get(vtype, 0) / total_violations for vtype in self.CTQ_WEIGHTS]
             cp, cpk = self.telemetry.calculate_process_capability(
                 violation_rates, 0.0, 0.1  # Target: 0%, USL: 10% violation rate
             )
@@ -197,7 +197,7 @@ class SixSigmaAnalyzer:
 
         # High-impact connascence types
         high_impact_types = sorted(
-            [(vtype, count) for vtype, count in violations_by_type.items()],
+            violations_by_type.items(),
             key=lambda x: x[1] * self.CTQ_WEIGHTS.get(x[0], 0.1),
             reverse=True,
         )[:3]
@@ -389,11 +389,11 @@ class SixSigmaAnalyzer:
             quadrant = (
                 "quick_win"
                 if impact > 5 and effort < 4
-                else "major_project"
-                if impact > 5 and effort >= 4
-                else "fill_in"
-                if impact <= 5 and effort < 4
-                else "low_priority"
+                else (
+                    "major_project"
+                    if impact > 5 and effort >= 4
+                    else "fill_in" if impact <= 5 and effort < 4 else "low_priority"
+                )
             )
 
             matrix.append(

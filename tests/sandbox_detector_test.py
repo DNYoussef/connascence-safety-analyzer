@@ -7,14 +7,14 @@ behavior of the detection pipeline.
 """
 
 import ast
-import sys
 from pathlib import Path
+import sys
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-print("="*80)
+print("=" * 80)
 print("DETECTOR PIPELINE FUNCTIONALITY AUDIT")
-print("="*80)
+print("=" * 80)
 
 # Test 1: Can we import detectors?
 print("\n[TEST 1] Import Test")
@@ -22,19 +22,20 @@ print("-" * 40)
 
 try:
     from analyzer.detectors.position_detector import PositionDetector
+
     print("[PASS] PositionDetector imported successfully")
 except Exception as e:
     print(f"[FAIL] PositionDetector import failed: {e}")
     sys.exit(1)
 
 try:
-    from analyzer.detectors.magic_literal_detector import MagicLiteralDetector
+
     print("[PASS] MagicLiteralDetector imported successfully")
 except Exception as e:
     print(f"[FAIL] MagicLiteralDetector import failed: {e}")
 
 try:
-    from analyzer.detectors.god_object_detector import GodObjectDetector
+
     print("[PASS] GodObjectDetector imported successfully")
 except Exception as e:
     print(f"[FAIL] GodObjectDetector import failed: {e}")
@@ -51,18 +52,19 @@ def test_function(a, b, c, d, e, f, g, h):
     return a + b + magic_number + magic_float
 """
 
-source_lines = sample_code.split('\n')
-file_path = 'test.py'
+source_lines = sample_code.split("\n")
+file_path = "test.py"
 
 try:
     detector = PositionDetector(file_path=file_path, source_lines=source_lines)
-    print(f"[PASS] PositionDetector instantiated")
+    print("[PASS] PositionDetector instantiated")
     print(f"   - file_path: {detector.file_path}")
     print(f"   - source_lines count: {len(detector.source_lines)}")
     print(f"   - max_positional_params: {getattr(detector, 'max_positional_params', 'NOT SET')}")
 except Exception as e:
     print(f"[FAIL] PositionDetector instantiation failed: {e}")
     import traceback
+
     traceback.print_exc()
     sys.exit(1)
 
@@ -72,7 +74,7 @@ print("-" * 40)
 
 try:
     tree = ast.parse(sample_code)
-    print(f"[PASS] Code parsed successfully")
+    print("[PASS] Code parsed successfully")
     print(f"   - AST type: {type(tree)}")
     print(f"   - Body length: {len(tree.body)}")
 
@@ -85,6 +87,7 @@ try:
 except Exception as e:
     print(f"[FAIL] AST parsing failed: {e}")
     import traceback
+
     traceback.print_exc()
     sys.exit(1)
 
@@ -94,7 +97,7 @@ print("-" * 40)
 
 try:
     violations = detector.detect_violations(tree)
-    print(f"[PASS] detect_violations() executed")
+    print("[PASS] detect_violations() executed")
     print(f"   - Return type: {type(violations)}")
     print(f"   - Violations count: {len(violations)}")
 
@@ -103,15 +106,15 @@ try:
         print("   Investigating why...")
 
         # Check if detector has necessary methods
-        print(f"\n   Detector methods:")
+        print("\n   Detector methods:")
         for attr in dir(detector):
-            if not attr.startswith('_') and callable(getattr(detector, attr)):
+            if not attr.startswith("_") and callable(getattr(detector, attr)):
                 print(f"     - {attr}")
 
         # Check detector attributes
-        print(f"\n   Detector attributes:")
-        for attr in ['file_path', 'source_lines', 'max_positional_params', 'context']:
-            value = getattr(detector, attr, 'NOT FOUND')
+        print("\n   Detector attributes:")
+        for attr in ["file_path", "source_lines", "max_positional_params", "context"]:
+            value = getattr(detector, attr, "NOT FOUND")
             print(f"     - {attr}: {value}")
 
     else:
@@ -125,6 +128,7 @@ try:
 except Exception as e:
     print(f"[FAIL] Detection execution failed: {e}")
     import traceback
+
     traceback.print_exc()
 
     # Try to understand what went wrong
@@ -132,8 +136,9 @@ except Exception as e:
     print(f"   - Detector class: {detector.__class__.__name__}")
     print(f"   - Has detect_violations: {hasattr(detector, 'detect_violations')}")
 
-    if hasattr(detector, 'detect_violations'):
+    if hasattr(detector, "detect_violations"):
         import inspect
+
         sig = inspect.signature(detector.detect_violations)
         print(f"   - detect_violations signature: {sig}")
 
@@ -144,6 +149,7 @@ print("-" * 40)
 # Add monkey-patch to trace execution
 original_detect = detector.detect_violations
 
+
 def traced_detect(tree):
     print(f"   → detect_violations() called with tree type: {type(tree)}")
     try:
@@ -153,6 +159,7 @@ def traced_detect(tree):
     except Exception as e:
         print(f"   ← detect_violations() raised exception: {e}")
         raise
+
 
 detector.detect_violations = traced_detect
 
@@ -168,14 +175,15 @@ print("-" * 40)
 
 try:
     import inspect
+
     source = inspect.getsource(PositionDetector.detect_violations)
     print("   detect_violations source code (first 50 lines):")
-    lines = source.split('\n')[:50]
+    lines = source.split("\n")[:50]
     for i, line in enumerate(lines, 1):
         print(f"   {i:3d} | {line}")
 except Exception as e:
     print(f"   Could not get source: {e}")
 
-print("\n" + "="*80)
+print("\n" + "=" * 80)
 print("AUDIT COMPLETE")
-print("="*80)
+print("=" * 80)

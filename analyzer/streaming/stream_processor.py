@@ -32,10 +32,34 @@ try:
 
     WATCHDOG_AVAILABLE = True
 except ImportError:
-    Observer = None
-    FileSystemEventHandler = None
-    FileSystemEvent = None
     WATCHDOG_AVAILABLE = False
+
+    # Create stub classes for when watchdog is not available
+    class FileSystemEvent:  # type: ignore
+        """Stub class for when watchdog is not available."""
+
+        pass
+
+    class FileSystemEventHandler:  # type: ignore
+        """Stub class for when watchdog is not available."""
+
+        pass
+
+    class Observer:  # type: ignore
+        """Stub class for when watchdog is not available."""
+
+        def __init__(self, *args: Any, **kwargs: Any) -> None:
+            pass
+
+        def schedule(self, *args: Any, **kwargs: Any) -> None:
+            pass
+
+        def start(self) -> None:
+            pass
+
+        def stop(self) -> None:
+            pass
+
 
 logger = logging.getLogger(__name__)
 
@@ -153,11 +177,7 @@ class FileWatcher(FileSystemEventHandler):
         path_obj = Path(file_path)
 
         # Check file patterns
-        for pattern in self.file_patterns:
-            if path_obj.match(pattern):
-                return True
-
-        return False
+        return any(path_obj.match(pattern) for pattern in self.file_patterns)
 
     def _handle_change(self, file_path: str, change_type: str) -> None:
         """Handle file change with debouncing."""
@@ -581,7 +601,7 @@ class StreamProcessor:
                 logger.warning(f"Could not read {file_path}: {e}")
                 new_content = ""
 
-            delta = incremental_cache.track_file_change(file_path, None, new_content)
+            incremental_cache.track_file_change(file_path, None, new_content)
 
             # For now, run full analysis (incremental AST diff would be implemented here)
             violations = await self._run_full_analysis(analyzer, file_path)

@@ -485,9 +485,7 @@ class EnterpriseReproducer:
             "status": (
                 "EXACT_MATCH"
                 if total_variance == 0
-                else "CLOSE_MATCH"
-                if abs(total_variance) <= 20
-                else "MISMATCH"  # Allow some variance
+                else "CLOSE_MATCH" if abs(total_variance) <= 20 else "MISMATCH"  # Allow some variance
             ),
         }
 

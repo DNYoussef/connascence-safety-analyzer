@@ -1,9 +1,10 @@
 """
 Code utility functions for connascence analysis.
 
-Consolidates common code snippet extraction functionality 
+Consolidates common code snippet extraction functionality
 used across multiple detector classes.
 """
+
 import ast
 from typing import List
 

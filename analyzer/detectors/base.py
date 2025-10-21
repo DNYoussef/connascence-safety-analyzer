@@ -7,7 +7,7 @@ Supports two-phase analysis: data collection and violation analysis.
 
 from abc import ABC, abstractmethod
 import ast
-from typing import Any, Dict, List, Protocol
+from typing import Any, Dict, List, Optional, Protocol
 
 from utils.types import ConnascenceViolation
 
@@ -43,7 +43,7 @@ class DetectorBase(ABC):
     NASA Rule 6 Compliant: Clear variable scoping
     """
 
-    def __init__(self, file_path: str = "", source_lines: List[str] = None):
+    def __init__(self, file_path: str = "", source_lines: Optional[List[str]] = None):
         # NASA Rule 5: Input validation - relaxed for pool compatibility
         assert isinstance(file_path, str), "file_path must be string"
         if source_lines is None:

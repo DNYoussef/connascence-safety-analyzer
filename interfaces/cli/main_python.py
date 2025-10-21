@@ -224,26 +224,26 @@ Examples:
     connascence scan .                    # Scan current directory
     connascence scan src/                 # Scan specific directory
     connascence scan --policy strict-core # Use strict quality policy
-    
+
   Streaming and Monitoring:
     connascence scan . --watch            # Continuous monitoring mode
     connascence scan . --enable-streaming # Real-time streaming analysis
-    
+
   Incremental Analysis:
     connascence scan . --incremental      # Use caching for faster scans
     connascence scan . --since HEAD~1     # Analyze changes since last commit
     connascence scan . --since main       # Analyze changes since main branch
-    
+
   Custom Thresholds:
     connascence scan . --threshold "critical=5,high=15,medium=50"
     connascence scan . --god-object-limit 30 --nasa-compliance-min 0.95
     connascence scan . --duplication-threshold 0.9
-    
+
   Advanced Features:
     connascence scan . --enable-correlations  # Cross-component analysis
     connascence scan . --budget-check         # Check PR budget limits
     connascence scan . --severity high        # Only report high+ severity
-    
+
   Output Options:
     connascence scan . --format json -o results.json
     connascence scan . --format sarif -o report.sarif
@@ -341,11 +341,11 @@ Examples:
     connascence scan-diff --base HEAD~1      # Compare with previous commit
     connascence scan-diff --base main        # Compare with main branch
     connascence scan-diff --base HEAD~5 --head HEAD~2  # Compare specific range
-    
+
   Pull Request Analysis:
     connascence scan-diff --base origin/main --head HEAD  # PR diff analysis
     connascence scan-diff --base main --format markdown   # Markdown PR report
-    
+
   Output Formats:
     connascence scan-diff --base HEAD~1 --format json -o changes.json
     connascence scan-diff --base main --format sarif -o pr-analysis.sarif
@@ -395,12 +395,12 @@ Examples:
   Basic Autofix:
     connascence autofix .                     # Fix all violations in current dir
     connascence autofix src/ --dry-run        # Preview fixes without applying
-    
+
   Selective Fixing:
     connascence autofix . --types CoM CoP    # Fix only Method/Position violations
     connascence autofix . --severity high    # Fix only high+ severity violations
     connascence autofix . --types god-objects # Fix only god object violations
-    
+
   Interactive Mode:
     connascence autofix . --interactive       # Review each fix interactively
     connascence autofix . --interactive --types CoA --severity critical
@@ -513,23 +513,23 @@ Examples:
     connascence analyze-performance .            # Standard benchmark on current dir
     connascence analyze-performance src/         # Analyze specific directory
     connascence analyze-performance . --iterations 20  # More thorough testing
-    
+
   Benchmark Suites:
     connascence analyze-performance . --benchmark-suite quick        # Fast analysis
     connascence analyze-performance . --benchmark-suite comprehensive # Full suite
     connascence analyze-performance . --benchmark-suite memory       # Memory focus
     connascence analyze-performance . --benchmark-suite cpu          # CPU focus
-    
+
   Profiling Options:
     connascence analyze-performance . --profile-memory  # Memory profiling
     connascence analyze-performance . --profile-cpu     # CPU profiling
     connascence analyze-performance . --profile-memory --profile-cpu  # Both
-    
+
   Output and Comparison:
     connascence analyze-performance . --output-format json -o perf.json
     connascence analyze-performance . --output-format html -o report.html
     connascence analyze-performance . --compare-baseline baseline.json
-    
+
   Complete Performance Audit:
     connascence analyze-performance . --benchmark-suite comprehensive \\
         --profile-memory --profile-cpu --output-format html \\
@@ -579,32 +579,32 @@ Examples:
     connascence validate-architecture .          # Standard validation
     connascence validate-architecture src/       # Validate specific directory
     connascence validate-architecture . --compliance-level strict  # Strict rules
-    
+
   Compliance Levels:
     connascence validate-architecture . --compliance-level basic    # Basic checks
     connascence validate-architecture . --compliance-level standard # Default level
     connascence validate-architecture . --compliance-level strict   # Strict rules
     connascence validate-architecture . --compliance-level nasa     # NASA standards
-    
+
   Specific Validation Types:
     connascence validate-architecture . --check-dependencies  # Dependency constraints
     connascence validate-architecture . --check-layering      # Layer separation
     connascence validate-architecture . --check-coupling      # Component coupling
-    
+
   Coupling Analysis:
     connascence validate-architecture . --check-coupling --max-coupling-score 0.5
     connascence validate-architecture . --check-coupling --max-coupling-score 0.9
-    
+
   Custom Architecture Definition:
     connascence validate-architecture . --architecture-file arch.json
     connascence validate-architecture . --architecture-file design.yaml
-    
+
   Complete Architecture Audit:
     connascence validate-architecture . --compliance-level nasa \\
         --check-dependencies --check-layering --check-coupling \\
         --generate-diagram --report-format html \\
         --max-coupling-score 0.6 --architecture-file system.yaml
-    
+
   Output Options:
     connascence validate-architecture . --generate-diagram    # Create arch diagram
     connascence validate-architecture . --report-format json  # JSON report

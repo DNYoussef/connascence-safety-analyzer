@@ -1,4 +1,5 @@
 """Unit tests for PositionDetector."""
+
 import ast
 import unittest
 

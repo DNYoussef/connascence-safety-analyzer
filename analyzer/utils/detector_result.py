@@ -10,6 +10,7 @@ NASA Rule 4 Compliant: All functions under 60 lines
 
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
+
 from fixes.phase0.production_safe_assertions import ProductionAssert
 
 
@@ -30,7 +31,7 @@ class DetectorResult:
 
     def __post_init__(self):
         """Validate required fields."""
-        ProductionAssert.not_none(self.file_path, 'file_path')
+        ProductionAssert.not_none(self.file_path, "file_path")
 
         # Ensure violations is a list
         if not isinstance(self.violations, list):
@@ -60,7 +61,7 @@ class DetectorResult:
 
         NASA Rule 5: Input assertion
         """
-        ProductionAssert.not_none(violation, 'violation')
+        ProductionAssert.not_none(violation, "violation")
 
         self.violations.append(violation)
 
@@ -73,7 +74,7 @@ class DetectorResult:
 
         NASA Rule 5: Input assertion
         """
-        ProductionAssert.not_none(error, 'error')
+        ProductionAssert.not_none(error, "error")
 
         self.errors.append(error)
 
@@ -86,7 +87,7 @@ class DetectorResult:
 
         NASA Rule 5: Input assertion
         """
-        ProductionAssert.not_none(warning, 'warning')
+        ProductionAssert.not_none(warning, "warning")
 
         self.warnings.append(warning)
 
@@ -105,7 +106,7 @@ class DetectorResult:
             "errors": self.errors,
             "warnings": self.warnings,
             "has_errors": self.has_errors,
-            "has_warnings": self.has_warnings
+            "has_warnings": self.has_warnings,
         }
 
 
@@ -124,7 +125,7 @@ class AnalysisContext:
 
     def __post_init__(self):
         """Validate required fields."""
-        ProductionAssert.not_none(self.file_path, 'file_path')
+        ProductionAssert.not_none(self.file_path, "file_path")
 
         # Ensure source_lines is a list
         if not isinstance(self.source_lines, list):
@@ -172,7 +173,7 @@ class AnalysisContext:
             return []
 
         # Convert to 0-indexed for slicing
-        return self.source_lines[start_line - 1:end_line]
+        return self.source_lines[start_line - 1 : end_line]
 
     def to_dict(self) -> Dict[str, Any]:
         """
@@ -181,8 +182,4 @@ class AnalysisContext:
         Returns:
             Dict representation of AnalysisContext
         """
-        return {
-            "file_path": self.file_path,
-            "line_count": self.line_count,
-            "config": self.config
-        }
+        return {"file_path": self.file_path, "line_count": self.line_count, "config": self.config}

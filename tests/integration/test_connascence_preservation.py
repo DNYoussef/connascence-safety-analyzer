@@ -25,26 +25,24 @@ Created: Phase 0 (Week 1 - Integration Planning)
 Purpose: Ensure backward compatibility before SPEK integration
 """
 
-from fixes.phase0.production_safe_assertions import ProductionAssert
 import ast
 from pathlib import Path
 import sys
-import tempfile
-from typing import Dict, List
+from typing import Dict
 
 import pytest
 
+from fixes.phase0.production_safe_assertions import ProductionAssert
+
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from analyzer.check_connascence import ConnascenceDetector
-from analyzer.detectors.position_detector import PositionDetector
-from analyzer.detectors.magic_literal_detector import MagicLiteralDetector
-from analyzer.detectors.algorithm_detector import AlgorithmDetector
-from analyzer.detectors.execution_detector import ExecutionDetector
-from analyzer.detectors.values_detector import ValuesDetector
-from analyzer.detectors.timing_detector import TimingDetector
-from analyzer.detectors.god_object_detector import GodObjectDetector
 from analyzer.detectors.convention_detector import ConventionDetector
+from analyzer.detectors.execution_detector import ExecutionDetector
+from analyzer.detectors.god_object_detector import GodObjectDetector
+from analyzer.detectors.magic_literal_detector import MagicLiteralDetector
+from analyzer.detectors.position_detector import PositionDetector
+from analyzer.detectors.timing_detector import TimingDetector
+from analyzer.detectors.values_detector import ValuesDetector
 
 
 class ConnascenceTypeValidator:
@@ -58,7 +56,7 @@ class ConnascenceTypeValidator:
         """Create sample code that triggers each connascence type."""
         return {
             # CoP - Position: Too many positional parameters
-            'CoP': '''
+            "CoP": '''
 def process_user_data(user_id, username, email, phone, address, city, state, zip_code):
     """Function with too many positional parameters (8 > threshold 3)"""
     return {
@@ -73,7 +71,7 @@ def process_user_data(user_id, username, email, phone, address, city, state, zip
     }
 ''',
             # CoM - Meaning: Magic literals
-            'CoM': '''
+            "CoM": '''
 def calculate_discount(price):
     """Function with magic literals"""
     if price > 100:  # Magic literal: 100
@@ -85,7 +83,7 @@ def calculate_discount(price):
     return discount
 ''',
             # CoA - Algorithm: God object (too many methods)
-            'CoA': '''
+            "CoA": '''
 class UserManager:
     """God object with too many methods"""
     def create_user(self): pass
@@ -112,7 +110,7 @@ class UserManager:
     def handle_webhooks(self): pass
 ''',
             # CoE - Execution: Execution order dependencies (using GLOBAL state)
-            'CoE': '''
+            "CoE": '''
 # Global state creates execution order dependencies
 database_connected = False
 database_cursor = None
@@ -138,7 +136,7 @@ def disconnect_database():
     database_connected = False
 ''',
             # CoV - Value: Value-based coupling (duplicate literals 3+ times)
-            'CoV': '''
+            "CoV": '''
 # Value-based coupling with duplicate literals (3+ occurrences required)
 DEFAULT_STATUS = "ACTIVE"  # 1
 
@@ -154,7 +152,7 @@ def process_status(status_code):
         return fallback
 ''',
             # CoId - Identity (Timing): Timing-based dependencies
-            'CoId': '''
+            "CoId": '''
 import time
 
 def rate_limited_function():
@@ -168,7 +166,7 @@ def delayed_processing():
     return "processed"
 ''',
             # CoN - Name: Naming connascence (convention detector)
-            'CoN': '''
+            "CoN": '''
 def getUserData():  # Naming violation: camelCase instead of snake_case
     """Function with naming convention violation"""
     UserName = "test"  # Naming violation: PascalCase for local variable
@@ -179,7 +177,7 @@ def Process_Data():  # Naming violation: Mixed case
     pass
 ''',
             # CoT - Type: Type connascence (NOTE: ConventionDetector checks naming, not type hints)
-            'CoT': '''
+            "CoT": '''
 def calculateTotal(items):  # Naming violation: camelCase function name
     """Function with naming violations (CoT test reused for naming conventions)"""
     SubTotal = sum(items)  # Naming violation: PascalCase variable
@@ -190,7 +188,7 @@ def Process_Order():  # Naming violation: Mixed case
     pass
 ''',
             # CoI - Identity: Identity connascence (via duplicate sentinel values)
-            'CoI': '''
+            "CoI": '''
 # Identity connascence via duplicate sentinel values (3+ occurrences required)
 SENTINEL = None  # 1
 
@@ -204,11 +202,10 @@ def process_with_default(value):
         default_value = None  # 4
         return default_value
     return value
-'''
+''',
         }
 
-    def validate_detector(self, detector_type: str, detector_class,
-                         sample_code: str) -> Dict[str, any]:
+    def validate_detector(self, detector_type: str, detector_class, sample_code: str) -> Dict[str, any]:
         """
         Validate a specific detector type works correctly.
 
@@ -220,50 +217,50 @@ def process_with_default(value):
         Returns:
             Dict with validation results
         """
-        ProductionAssert.not_none(detector_type, 'detector_type')
-        ProductionAssert.not_none(detector_class, 'detector_class')
-        ProductionAssert.not_none(sample_code, 'sample_code')
+        ProductionAssert.not_none(detector_type, "detector_type")
+        ProductionAssert.not_none(detector_class, "detector_class")
+        ProductionAssert.not_none(sample_code, "sample_code")
 
         try:
             # Parse the sample code
             tree = ast.parse(sample_code)
 
             # Create detector instance
-            source_lines = sample_code.split('\n')
-            detector = detector_class(file_path='test.py', source_lines=source_lines)
+            source_lines = sample_code.split("\n")
+            detector = detector_class(file_path="test.py", source_lines=source_lines)
 
             # Detect violations
             violations = detector.detect_violations(tree)
 
             # Validation criteria
             validation_result = {
-                'type': detector_type,
-                'detector_class': detector_class.__name__,
-                'violations_found': len(violations),
-                'violations_expected': True,  # All sample code should trigger violations
-                'passed': len(violations) > 0,  # Must find at least 1 violation
-                'violation_details': [
+                "type": detector_type,
+                "detector_class": detector_class.__name__,
+                "violations_found": len(violations),
+                "violations_expected": True,  # All sample code should trigger violations
+                "passed": len(violations) > 0,  # Must find at least 1 violation
+                "violation_details": [
                     {
-                        'description': getattr(v, 'description', ''),
-                        'line': getattr(v, 'line_number', 0),
-                        'severity': getattr(v, 'severity', 'unknown')
+                        "description": getattr(v, "description", ""),
+                        "line": getattr(v, "line_number", 0),
+                        "severity": getattr(v, "severity", "unknown"),
                     }
                     for v in violations[:3]  # First 3 violations for inspection
                 ],
-                'error': None
+                "error": None,
             }
 
             return validation_result
 
         except Exception as e:
             return {
-                'type': detector_type,
-                'detector_class': detector_class.__name__,
-                'violations_found': 0,
-                'violations_expected': True,
-                'passed': False,
-                'violation_details': [],
-                'error': str(e)
+                "type": detector_type,
+                "detector_class": detector_class.__name__,
+                "violations_found": 0,
+                "violations_expected": True,
+                "passed": False,
+                "violation_details": [],
+                "error": str(e),
             }
 
     def validate_all_types(self) -> Dict[str, Dict]:
@@ -275,21 +272,21 @@ def process_with_default(value):
         """
         # Map connascence types to their detectors
         type_detector_map = {
-            'CoP': PositionDetector,
-            'CoM': MagicLiteralDetector,
-            'CoA': GodObjectDetector,  # Algorithm includes god object detection
-            'CoE': ExecutionDetector,
-            'CoV': ValuesDetector,
-            'CoId': TimingDetector,
-            'CoN': ConventionDetector,  # Naming conventions
-            'CoT': ConventionDetector,  # Type hints are part of conventions
-            'CoI': ValuesDetector,  # Identity is related to value comparisons
+            "CoP": PositionDetector,
+            "CoM": MagicLiteralDetector,
+            "CoA": GodObjectDetector,  # Algorithm includes god object detection
+            "CoE": ExecutionDetector,
+            "CoV": ValuesDetector,
+            "CoId": TimingDetector,
+            "CoN": ConventionDetector,  # Naming conventions
+            "CoT": ConventionDetector,  # Type hints are part of conventions
+            "CoI": ValuesDetector,  # Identity is related to value comparisons
         }
 
         results = {}
 
         for conn_type, detector_class in type_detector_map.items():
-            sample_code = self.sample_code_by_type.get(conn_type, '')
+            sample_code = self.sample_code_by_type.get(conn_type, "")
             if sample_code:
                 result = self.validate_detector(conn_type, detector_class, sample_code)
                 results[conn_type] = result
@@ -306,32 +303,32 @@ def process_with_default(value):
         Returns:
             Summary dict with pass/fail counts and details
         """
-        ProductionAssert.not_none(results, 'results')
+        ProductionAssert.not_none(results, "results")
 
         total = len(results)
-        passed = sum(1 for r in results.values() if r['passed'])
+        passed = sum(1 for r in results.values() if r["passed"])
         failed = total - passed
 
         failed_types = [
             {
-                'type': conn_type,
-                'detector': r['detector_class'],
-                'error': r['error'],
-                'violations_found': r['violations_found']
+                "type": conn_type,
+                "detector": r["detector_class"],
+                "error": r["error"],
+                "violations_found": r["violations_found"],
             }
             for conn_type, r in results.items()
-            if not r['passed']
+            if not r["passed"]
         ]
 
         return {
-            'total_types': total,
-            'types_passed': passed,
-            'types_failed': failed,
-            'pass_rate': (passed / total * 100) if total > 0 else 0,
-            'all_passed': failed == 0,
-            'failed_types': failed_types,
-            'expected_types': 9,
-            'coverage_complete': total >= 9
+            "total_types": total,
+            "types_passed": passed,
+            "types_failed": failed,
+            "pass_rate": (passed / total * 100) if total > 0 else 0,
+            "all_passed": failed == 0,
+            "failed_types": failed_types,
+            "expected_types": 9,
+            "coverage_complete": total >= 9,
         }
 
 
@@ -346,102 +343,93 @@ class TestConnascenceTypePreservation:
 
     def test_cop_position_detector_works(self, connascence_validator):
         """Test CoP (Position) detector finds parameter position violations."""
-        sample_code = connascence_validator.sample_code_by_type['CoP']
-        result = connascence_validator.validate_detector('CoP', PositionDetector, sample_code)
+        sample_code = connascence_validator.sample_code_by_type["CoP"]
+        result = connascence_validator.validate_detector("CoP", PositionDetector, sample_code)
 
-        assert result['passed'], (
-            f"CoP detector failed: {result['error']} - "
-            f"Found {result['violations_found']} violations (expected >0)"
+        assert result["passed"], (
+            f"CoP detector failed: {result['error']} - " f"Found {result['violations_found']} violations (expected >0)"
         )
-        assert result['violations_found'] > 0, "CoP detector should find parameter violations"
+        assert result["violations_found"] > 0, "CoP detector should find parameter violations"
 
     def test_com_meaning_detector_works(self, connascence_validator):
         """Test CoM (Meaning) detector finds magic literal violations."""
-        sample_code = connascence_validator.sample_code_by_type['CoM']
-        result = connascence_validator.validate_detector('CoM', MagicLiteralDetector, sample_code)
+        sample_code = connascence_validator.sample_code_by_type["CoM"]
+        result = connascence_validator.validate_detector("CoM", MagicLiteralDetector, sample_code)
 
-        assert result['passed'], (
-            f"CoM detector failed: {result['error']} - "
-            f"Found {result['violations_found']} violations (expected >0)"
+        assert result["passed"], (
+            f"CoM detector failed: {result['error']} - " f"Found {result['violations_found']} violations (expected >0)"
         )
-        assert result['violations_found'] >= 4, "CoM detector should find multiple magic literals"
+        assert result["violations_found"] >= 4, "CoM detector should find multiple magic literals"
 
     def test_coa_algorithm_detector_works(self, connascence_validator):
         """Test CoA (Algorithm) detector finds god object violations."""
-        sample_code = connascence_validator.sample_code_by_type['CoA']
-        result = connascence_validator.validate_detector('CoA', GodObjectDetector, sample_code)
+        sample_code = connascence_validator.sample_code_by_type["CoA"]
+        result = connascence_validator.validate_detector("CoA", GodObjectDetector, sample_code)
 
-        assert result['passed'], (
-            f"CoA detector failed: {result['error']} - "
-            f"Found {result['violations_found']} violations (expected >0)"
+        assert result["passed"], (
+            f"CoA detector failed: {result['error']} - " f"Found {result['violations_found']} violations (expected >0)"
         )
-        assert result['violations_found'] > 0, "CoA detector should find god object"
+        assert result["violations_found"] > 0, "CoA detector should find god object"
 
     def test_coe_execution_detector_works(self, connascence_validator):
         """Test CoE (Execution) detector finds execution order violations."""
-        sample_code = connascence_validator.sample_code_by_type['CoE']
-        result = connascence_validator.validate_detector('CoE', ExecutionDetector, sample_code)
+        sample_code = connascence_validator.sample_code_by_type["CoE"]
+        result = connascence_validator.validate_detector("CoE", ExecutionDetector, sample_code)
 
-        assert result['passed'], (
-            f"CoE detector failed: {result['error']} - "
-            f"Found {result['violations_found']} violations (expected >0)"
+        assert result["passed"], (
+            f"CoE detector failed: {result['error']} - " f"Found {result['violations_found']} violations (expected >0)"
         )
-        assert result['violations_found'] > 0, "CoE detector should find execution dependencies"
+        assert result["violations_found"] > 0, "CoE detector should find execution dependencies"
 
     def test_cov_value_detector_works(self, connascence_validator):
         """Test CoV (Value) detector finds value-based coupling."""
-        sample_code = connascence_validator.sample_code_by_type['CoV']
-        result = connascence_validator.validate_detector('CoV', ValuesDetector, sample_code)
+        sample_code = connascence_validator.sample_code_by_type["CoV"]
+        result = connascence_validator.validate_detector("CoV", ValuesDetector, sample_code)
 
-        assert result['passed'], (
-            f"CoV detector failed: {result['error']} - "
-            f"Found {result['violations_found']} violations (expected >0)"
+        assert result["passed"], (
+            f"CoV detector failed: {result['error']} - " f"Found {result['violations_found']} violations (expected >0)"
         )
-        assert result['violations_found'] > 0, "CoV detector should find value coupling"
+        assert result["violations_found"] > 0, "CoV detector should find value coupling"
 
     def test_coid_timing_detector_works(self, connascence_validator):
         """Test CoId (Identity-Timing) detector finds timing violations."""
-        sample_code = connascence_validator.sample_code_by_type['CoId']
-        result = connascence_validator.validate_detector('CoId', TimingDetector, sample_code)
+        sample_code = connascence_validator.sample_code_by_type["CoId"]
+        result = connascence_validator.validate_detector("CoId", TimingDetector, sample_code)
 
-        assert result['passed'], (
-            f"CoId detector failed: {result['error']} - "
-            f"Found {result['violations_found']} violations (expected >0)"
+        assert result["passed"], (
+            f"CoId detector failed: {result['error']} - " f"Found {result['violations_found']} violations (expected >0)"
         )
-        assert result['violations_found'] > 0, "CoId detector should find timing dependencies"
+        assert result["violations_found"] > 0, "CoId detector should find timing dependencies"
 
     def test_con_name_detector_works(self, connascence_validator):
         """Test CoN (Name) detector finds naming convention violations."""
-        sample_code = connascence_validator.sample_code_by_type['CoN']
-        result = connascence_validator.validate_detector('CoN', ConventionDetector, sample_code)
+        sample_code = connascence_validator.sample_code_by_type["CoN"]
+        result = connascence_validator.validate_detector("CoN", ConventionDetector, sample_code)
 
-        assert result['passed'], (
-            f"CoN detector failed: {result['error']} - "
-            f"Found {result['violations_found']} violations (expected >0)"
+        assert result["passed"], (
+            f"CoN detector failed: {result['error']} - " f"Found {result['violations_found']} violations (expected >0)"
         )
-        assert result['violations_found'] > 0, "CoN detector should find naming violations"
+        assert result["violations_found"] > 0, "CoN detector should find naming violations"
 
     def test_cot_type_detector_works(self, connascence_validator):
         """Test CoT (Type) detector finds type hint violations."""
-        sample_code = connascence_validator.sample_code_by_type['CoT']
-        result = connascence_validator.validate_detector('CoT', ConventionDetector, sample_code)
+        sample_code = connascence_validator.sample_code_by_type["CoT"]
+        result = connascence_validator.validate_detector("CoT", ConventionDetector, sample_code)
 
-        assert result['passed'], (
-            f"CoT detector failed: {result['error']} - "
-            f"Found {result['violations_found']} violations (expected >0)"
+        assert result["passed"], (
+            f"CoT detector failed: {result['error']} - " f"Found {result['violations_found']} violations (expected >0)"
         )
-        assert result['violations_found'] > 0, "CoT detector should find missing type hints"
+        assert result["violations_found"] > 0, "CoT detector should find missing type hints"
 
     def test_coi_identity_detector_works(self, connascence_validator):
         """Test CoI (Identity) detector finds identity coupling."""
-        sample_code = connascence_validator.sample_code_by_type['CoI']
-        result = connascence_validator.validate_detector('CoI', ValuesDetector, sample_code)
+        sample_code = connascence_validator.sample_code_by_type["CoI"]
+        result = connascence_validator.validate_detector("CoI", ValuesDetector, sample_code)
 
-        assert result['passed'], (
-            f"CoI detector failed: {result['error']} - "
-            f"Found {result['violations_found']} violations (expected >0)"
+        assert result["passed"], (
+            f"CoI detector failed: {result['error']} - " f"Found {result['violations_found']} violations (expected >0)"
         )
-        assert result['violations_found'] > 0, "CoI detector should find identity coupling"
+        assert result["violations_found"] > 0, "CoI detector should find identity coupling"
 
     def test_all_9_types_validated(self, connascence_validator):
         """
@@ -454,9 +442,9 @@ class TestConnascenceTypePreservation:
         summary = connascence_validator.get_summary(results)
 
         # Print detailed summary for debugging
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("CONNASCENCE TYPE PRESERVATION TEST SUMMARY")
-        print("="*80)
+        print("=" * 80)
         print(f"Total types tested: {summary['total_types']}/9")
         print(f"Types passed: {summary['types_passed']}")
         print(f"Types failed: {summary['types_failed']}")
@@ -464,27 +452,23 @@ class TestConnascenceTypePreservation:
         print(f"All passed: {summary['all_passed']}")
         print(f"Coverage complete: {summary['coverage_complete']}")
 
-        if summary['failed_types']:
+        if summary["failed_types"]:
             print("\nFAILED TYPES:")
-            for failed in summary['failed_types']:
+            for failed in summary["failed_types"]:
                 print(f"  - {failed['type']}: {failed['detector']} - {failed['error']}")
                 print(f"    Violations found: {failed['violations_found']}")
 
-        print("="*80)
+        print("=" * 80)
 
         # CRITICAL ASSERTIONS
-        assert summary['coverage_complete'], (
-            f"Not all 9 types tested! Only {summary['total_types']}/9"
-        )
+        assert summary["coverage_complete"], f"Not all 9 types tested! Only {summary['total_types']}/9"
 
-        assert summary['all_passed'], (
+        assert summary["all_passed"], (
             f"CRITICAL: {summary['types_failed']} connascence types FAILED! "
             f"Failed types: {[f['type'] for f in summary['failed_types']]}"
         )
 
-        assert summary['pass_rate'] == 100.0, (
-            f"CRITICAL: Pass rate is {summary['pass_rate']:.1f}%, must be 100%"
-        )
+        assert summary["pass_rate"] == 100.0, f"CRITICAL: Pass rate is {summary['pass_rate']:.1f}%, must be 100%"
 
     def test_comprehensive_integration_scenario(self, connascence_validator):
         """Test realistic code with multiple connascence types."""
@@ -537,14 +521,14 @@ class PaymentProcessor:
 
         # This code should trigger multiple violation types
         tree = ast.parse(complex_code)
-        source_lines = complex_code.split('\n')
+        source_lines = complex_code.split("\n")
 
         # Test multiple detectors find violations
         detectors = [
-            PositionDetector(file_path='test.py', source_lines=source_lines),
-            MagicLiteralDetector(file_path='test.py', source_lines=source_lines),
-            GodObjectDetector(file_path='test.py', source_lines=source_lines),
-            ValuesDetector(file_path='test.py', source_lines=source_lines),
+            PositionDetector(file_path="test.py", source_lines=source_lines),
+            MagicLiteralDetector(file_path="test.py", source_lines=source_lines),
+            GodObjectDetector(file_path="test.py", source_lines=source_lines),
+            ValuesDetector(file_path="test.py", source_lines=source_lines),
         ]
 
         total_violations = 0
@@ -553,8 +537,7 @@ class PaymentProcessor:
             total_violations += len(violations)
 
         assert total_violations >= 4, (
-            f"Complex code should trigger multiple violation types, "
-            f"found only {total_violations}"
+            f"Complex code should trigger multiple violation types, " f"found only {total_violations}"
         )
 
 
@@ -566,17 +549,12 @@ def test_connascence_preservation_integration():
     summary = validator.get_summary(results)
 
     # Must preserve all 9 types
-    assert summary['coverage_complete'], "Not all 9 connascence types covered"
-    assert summary['all_passed'], f"Some types failed: {summary['failed_types']}"
-    assert summary['pass_rate'] == 100.0, f"Pass rate: {summary['pass_rate']}%"
+    assert summary["coverage_complete"], "Not all 9 connascence types covered"
+    assert summary["all_passed"], f"Some types failed: {summary['failed_types']}"
+    assert summary["pass_rate"] == 100.0, f"Pass rate: {summary['pass_rate']}%"
 
     print(f"\n✅ All {summary['types_passed']}/9 connascence types working correctly")
 
 
 if __name__ == "__main__":
-    pytest.main([
-        __file__,
-        "-v",
-        "--tb=short",
-        "-m", "integration"
-    ])
+    pytest.main([__file__, "-v", "--tb=short", "-m", "integration"])

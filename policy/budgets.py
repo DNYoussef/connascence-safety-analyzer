@@ -179,9 +179,9 @@ class EnhancedBudgetTracker:
             "budget_violations": budget_violations,
             "total_violations": total_count,
             "violations_by_severity": severity_counts,
-            "waived_violations": len(violations) - len(effective_violations)
-            if self.config.waiver_exemptions_enabled
-            else 0,
+            "waived_violations": (
+                len(violations) - len(effective_violations) if self.config.waiver_exemptions_enabled else 0
+            ),
         }
 
     def _apply_waivers(self, violations: List[ConnascenceViolation]) -> List[ConnascenceViolation]:

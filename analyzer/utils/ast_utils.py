@@ -21,10 +21,7 @@ class ASTUtils:
     """
 
     @staticmethod
-    def find_nodes_by_type(
-        tree: ast.AST,
-        node_types: Union[Type[ast.AST], Tuple[Type[ast.AST], ...]]
-    ) -> List[ast.AST]:
+    def find_nodes_by_type(tree: ast.AST, node_types: Union[Type[ast.AST], Tuple[Type[ast.AST], ...]]) -> List[ast.AST]:
         """
         Find all nodes of specified type(s) in the AST tree.
 
@@ -134,11 +131,7 @@ class ASTUtils:
         return location
 
     @staticmethod
-    def extract_code_snippet(
-        source_lines: List[str],
-        node: ast.AST,
-        context_lines: int = 2
-    ) -> str:
+    def extract_code_snippet(source_lines: List[str], node: ast.AST, context_lines: int = 2) -> str:
         """
         Extract code snippet around the given AST node.
 

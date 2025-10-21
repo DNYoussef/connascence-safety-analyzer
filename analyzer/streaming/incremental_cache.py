@@ -74,7 +74,7 @@ class DependencyNode:
         # Check if any dependencies have changed
         for dep_path in self.dependencies:
             if dep_path in file_hashes:
-                current_hash = file_hashes[dep_path]
+                file_hashes[dep_path]
                 # This would need to track dependency hashes - simplified for now
                 pass
         return False
@@ -368,7 +368,7 @@ class IncrementalCache:
         if changed_file not in self._dependency_graph:
             return
 
-        node = self._dependency_graph[changed_file]
+        self._dependency_graph[changed_file]
         invalidated_files = set()
 
         # Find all files that depend on the changed file

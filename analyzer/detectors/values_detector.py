@@ -7,11 +7,11 @@ Simplified to eliminate broken API dependencies while maintaining core functiona
 
 import ast
 from collections import defaultdict
-from typing import Dict, List, Set
+from typing import Dict, List
 
-from utils.types import ConnascenceViolation
 from analyzer.utils.ast_utils import ASTUtils
 from analyzer.utils.violation_factory import ViolationFactory
+from utils.types import ConnascenceViolation
 
 from .base import DetectorBase
 
@@ -65,10 +65,9 @@ class ValuesDetector(DetectorBase):
                 self.string_literals[value].append(node)
 
         # Track numbers
-        elif isinstance(value, (int, float)):
-            if value not in self.excluded_numbers:
-                value_str = str(value)
-                self.numeric_literals[value_str].append(node)
+        elif isinstance(value, (int, float)) and value not in self.excluded_numbers:
+            value_str = str(value)
+            self.numeric_literals[value_str].append(node)
 
     def _check_duplicate_literals(self) -> None:
         """Check for duplicate literals (minimum 3 occurrences)."""
@@ -77,20 +76,14 @@ class ValuesDetector(DetectorBase):
         # Check string literals
         for literal_value, nodes in self.string_literals.items():
             if len(nodes) >= min_occurrences:
-                self._create_duplicate_literal_violation(
-                    nodes[0], literal_value, "string", len(nodes)
-                )
+                self._create_duplicate_literal_violation(nodes[0], literal_value, "string", len(nodes))
 
         # Check numeric literals
         for literal_value, nodes in self.numeric_literals.items():
             if len(nodes) >= min_occurrences:
-                self._create_duplicate_literal_violation(
-                    nodes[0], literal_value, "numeric", len(nodes)
-                )
+                self._create_duplicate_literal_violation(nodes[0], literal_value, "numeric", len(nodes))
 
-    def _create_duplicate_literal_violation(
-        self, node: ast.AST, value: str, value_type: str, usage_count: int
-    ) -> None:
+    def _create_duplicate_literal_violation(self, node: ast.AST, value: str, value_type: str, usage_count: int) -> None:
         """Create violation for duplicate literal."""
         severity = "medium" if usage_count >= 5 else "low"
         location = ASTUtils.get_node_location(node, self.file_path)

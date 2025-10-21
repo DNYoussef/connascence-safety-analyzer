@@ -10,7 +10,7 @@ from contextlib import contextmanager
 from pathlib import Path
 import statistics
 import time
-from typing import Dict
+from typing import Dict, Optional
 
 # Import optimization components
 try:
@@ -48,7 +48,7 @@ def benchmark_timer():
 class PerformanceBenchmark:
     """Benchmark suite for file I/O optimizations."""
 
-    def __init__(self, test_directory: str = None):
+    def __init__(self, test_directory: Optional[str] = None):
         """Initialize benchmark suite."""
         self.test_directory = test_directory or "."
         self.results: Dict[str, Dict] = {}
@@ -97,9 +97,9 @@ class PerformanceBenchmark:
         times_traditional = []
         for i in range(3):
             with benchmark_timer() as timer:
-                files1 = list(test_path.rglob("*.py"))
-                files2 = list(test_path.rglob("*.py"))  # Duplicate traversal
-                files3 = list(test_path.rglob("*.py"))  # Third traversal
+                list(test_path.rglob("*.py"))
+                list(test_path.rglob("*.py"))  # Duplicate traversal
+                list(test_path.rglob("*.py"))  # Third traversal
             times_traditional.append(timer())
 
         # Optimized approach (cached)
@@ -108,9 +108,9 @@ class PerformanceBenchmark:
             cache = get_global_cache()
             for i in range(3):
                 with benchmark_timer() as timer:
-                    files1 = cache.get_python_files(str(test_path))
-                    files2 = cache.get_python_files(str(test_path))  # Cached
-                    files3 = cache.get_python_files(str(test_path))  # Cached
+                    cache.get_python_files(str(test_path))
+                    cache.get_python_files(str(test_path))  # Cached
+                    cache.get_python_files(str(test_path))  # Cached
                 times_optimized.append(timer())
         else:
             times_optimized = times_traditional  # Fallback
@@ -150,7 +150,7 @@ class PerformanceBenchmark:
                 for file_path in python_files:
                     try:
                         content = file_path.read_text(encoding="utf-8")
-                        lines = content.splitlines()
+                        content.splitlines()
                     except Exception:
                         pass
             times_traditional.append(timer())
@@ -163,7 +163,7 @@ class PerformanceBenchmark:
                 with benchmark_timer() as timer:
                     for file_path in python_files:
                         content = cache.get_file_content(file_path)
-                        lines = cache.get_file_lines(file_path)
+                        cache.get_file_lines(file_path)
                 times_optimized.append(timer())
         else:
             times_optimized = times_traditional
@@ -204,7 +204,7 @@ class PerformanceBenchmark:
                 for file_path in python_files:
                     try:
                         content = file_path.read_text(encoding="utf-8")
-                        tree = ast.parse(content, filename=str(file_path))
+                        ast.parse(content, filename=str(file_path))
                     except Exception:
                         pass
             times_traditional.append(timer())
@@ -216,7 +216,7 @@ class PerformanceBenchmark:
             for _ in range(3):
                 with benchmark_timer() as timer:
                     for file_path in python_files:
-                        tree = cache.get_ast_tree(file_path)
+                        cache.get_ast_tree(file_path)
                 times_optimized.append(timer())
         else:
             times_optimized = times_traditional
@@ -257,7 +257,7 @@ class PerformanceBenchmark:
             analyzer_no_cache.file_cache = None  # Disable caching
 
             with benchmark_timer() as timer:
-                result_no_cache = analyzer_no_cache.analyze_project(test_path)
+                analyzer_no_cache.analyze_project(test_path)
             times_without_cache.append(timer())
 
             # With optimization
@@ -270,7 +270,7 @@ class PerformanceBenchmark:
 
             # Run second iteration to see cache benefits
             with benchmark_timer() as timer:
-                result_cached = analyzer_with_cache.analyze_project(test_path)
+                analyzer_with_cache.analyze_project(test_path)
             times_with_cache.append(timer())
 
         except Exception as e:
@@ -333,7 +333,7 @@ class PerformanceBenchmark:
             print("  Streaming components not available")
             return
 
-        test_path = Path(self.test_directory)
+        Path(self.test_directory)
 
         try:
             # Initialize streaming components
@@ -344,21 +344,21 @@ class PerformanceBenchmark:
             times_streaming_init = []
             for i in range(3):
                 with benchmark_timer() as timer:
-                    analyzer_streaming = UnifiedConnascenceAnalyzer(analysis_mode="streaming")
+                    UnifiedConnascenceAnalyzer(analysis_mode="streaming")
                 times_streaming_init.append(timer())
 
             # Test hybrid analyzer initialization
             times_hybrid_init = []
             for i in range(3):
                 with benchmark_timer() as timer:
-                    analyzer_hybrid = UnifiedConnascenceAnalyzer(analysis_mode="hybrid")
+                    UnifiedConnascenceAnalyzer(analysis_mode="hybrid")
                 times_hybrid_init.append(timer())
 
             # Compare with batch initialization
             times_batch_init = []
             for i in range(3):
                 with benchmark_timer() as timer:
-                    analyzer_batch = UnifiedConnascenceAnalyzer(analysis_mode="batch")
+                    UnifiedConnascenceAnalyzer(analysis_mode="batch")
                 times_batch_init.append(timer())
 
             # Calculate averages
@@ -370,7 +370,7 @@ class PerformanceBenchmark:
             dashboard_times = []
             for i in range(5):
                 with benchmark_timer() as timer:
-                    dashboard_data = dashboard_reporter.generate_real_time_report()
+                    dashboard_reporter.generate_real_time_report()
                 dashboard_times.append(timer())
 
             avg_dashboard_time = statistics.mean(dashboard_times)
@@ -379,7 +379,7 @@ class PerformanceBenchmark:
             monitor_times = []
             for i in range(5):
                 with benchmark_timer() as timer:
-                    perf_report = streaming_monitor.get_performance_report()
+                    streaming_monitor.get_performance_report()
                 monitor_times.append(timer())
 
             avg_monitor_time = statistics.mean(monitor_times)
@@ -391,9 +391,11 @@ class PerformanceBenchmark:
                 "batch_init_time_ms": round(avg_batch_init * 1000, 2),
                 "dashboard_generation_time_ms": round(avg_dashboard_time * 1000, 2),
                 "monitor_report_time_ms": round(avg_monitor_time * 1000, 2),
-                "streaming_overhead_percent": round(((avg_streaming_init - avg_batch_init) / avg_batch_init) * 100, 1)
-                if avg_batch_init > 0
-                else 0,
+                "streaming_overhead_percent": (
+                    round(((avg_streaming_init - avg_batch_init) / avg_batch_init) * 100, 1)
+                    if avg_batch_init > 0
+                    else 0
+                ),
                 "components_available": True,
             }
 
@@ -414,7 +416,6 @@ class PerformanceBenchmark:
         print("PERFORMANCE BENCHMARK REPORT")
         print("=" * 60)
 
-        total_improvement = 0
         improvements = []
 
         for test_name, results in self.results.items():

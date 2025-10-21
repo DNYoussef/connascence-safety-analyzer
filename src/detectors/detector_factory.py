@@ -4,6 +4,7 @@ Detector Factory - Coordinates specialized detector classes.
 Replaces the monolithic ConnascenceDetector with a factory pattern that
 coordinates specialized detectors following Single Responsibility Principle.
 """
+
 import ast
 from typing import Any, Dict, List
 

@@ -516,10 +516,7 @@ class MagicLiteralDetector(ast.NodeVisitor):
             return True
 
         # Ignore boolean and None
-        if value is None or isinstance(value, bool):
-            return True
-
-        return False
+        return bool(value is None or isinstance(value, bool))
 
     def _build_context(self, node: ast.Constant) -> MagicLiteralContext:
         """Build comprehensive context for a magic literal."""

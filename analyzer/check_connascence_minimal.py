@@ -10,7 +10,7 @@ import ast
 from pathlib import Path
 import sys
 import time
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 from utils.types import ConnascenceViolation
 
@@ -25,7 +25,7 @@ class ConnascenceAnalyzer:
     while maintaining 100% backward compatibility.
     """
 
-    def __init__(self, exclusions: List[str] = None):
+    def __init__(self, exclusions: Optional[List[str]] = None):
         self.exclusions = exclusions or [
             "test_*",
             "tests/",
@@ -97,7 +97,7 @@ class ConnascenceAnalyzer:
             # Update stats
             self.file_stats[str(py_file)] = {
                 "violations": len(file_violations),
-                "types": list(set(v.type for v in file_violations)),
+                "types": list({v.type for v in file_violations}),
             }
 
         self.violations = all_violations

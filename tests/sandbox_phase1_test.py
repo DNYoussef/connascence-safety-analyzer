@@ -7,15 +7,15 @@ actually work as expected with real AST nodes and data.
 """
 
 import ast
-import sys
 from pathlib import Path
+import sys
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from analyzer.utils.ast_utils import ASTUtils
+from analyzer.utils.detector_result import AnalysisContext, DetectorResult
 from analyzer.utils.violation_factory import ViolationFactory
-from analyzer.utils.detector_result import DetectorResult, AnalysisContext
 
 
 def test_ast_utils():
@@ -40,15 +40,15 @@ def example_function(a, b, c, d, e):
     # Test 2: get_function_parameters
     func = functions[0]
     params = ASTUtils.get_function_parameters(func)
-    assert params['positional_count'] == 5, f"Expected 5 params, got {params['positional_count']}"
-    assert params['total_count'] == 5, f"Expected total 5, got {params['total_count']}"
-    assert 'a' in params['parameter_names'], "Expected 'a' in parameter names"
+    assert params["positional_count"] == 5, f"Expected 5 params, got {params['positional_count']}"
+    assert params["total_count"] == 5, f"Expected total 5, got {params['total_count']}"
+    assert "a" in params["parameter_names"], "Expected 'a' in parameter names"
     print(f"[PASS] get_function_parameters() works: {params}")
 
     # Test 3: get_node_location
     location = ASTUtils.get_node_location(func, "test.py")
-    assert location['file'] == "test.py", "Expected file='test.py'"
-    assert location['line'] == 2, f"Expected line=2, got {location['line']}"
+    assert location["file"] == "test.py", "Expected file='test.py'"
+    assert location["line"] == 2, f"Expected line=2, got {location['line']}"
     print(f"[PASS] get_node_location() works: {location}")
 
     # Test 4: get_node_type_name
@@ -68,53 +68,40 @@ def test_violation_factory():
     # Test 1: create_violation (generic)
     location = {"file": "test.py", "line": 10, "column": 5}
     violation = ViolationFactory.create_violation(
-        violation_type="CoP",
-        severity="high",
-        location=location,
-        description="Test violation",
-        recommendation="Fix it"
+        violation_type="CoP", severity="high", location=location, description="Test violation", recommendation="Fix it"
     )
 
-    assert violation['type'] == "CoP", f"Expected type='CoP', got '{violation['type']}'"
-    assert violation['severity'] == "high", f"Expected severity='high'"
-    assert violation['file_path'] == "test.py", "Expected file_path='test.py'"
-    assert violation['line_number'] == 10, "Expected line_number=10"
-    assert violation['description'] == "Test violation", "Expected description match"
+    assert violation["type"] == "CoP", f"Expected type='CoP', got '{violation['type']}'"
+    assert violation["severity"] == "high", "Expected severity='high'"
+    assert violation["file_path"] == "test.py", "Expected file_path='test.py'"
+    assert violation["line_number"] == 10, "Expected line_number=10"
+    assert violation["description"] == "Test violation", "Expected description match"
     print(f"[PASS] create_violation() works: {violation['type']} at line {violation['line_number']}")
 
     # Test 2: create_cop_violation
     cop_violation = ViolationFactory.create_cop_violation(
-        location=location,
-        function_name="test_func",
-        param_count=5,
-        threshold=3
+        location=location, function_name="test_func", param_count=5, threshold=3
     )
 
-    assert cop_violation['type'] == "CoP", "Expected CoP violation"
-    assert cop_violation['severity'] == "medium", "Expected medium severity (5 params)"
-    assert "test_func" in cop_violation['description'], "Expected function name in description"
+    assert cop_violation["type"] == "CoP", "Expected CoP violation"
+    assert cop_violation["severity"] == "medium", "Expected medium severity (5 params)"
+    assert "test_func" in cop_violation["description"], "Expected function name in description"
     print(f"[PASS] create_cop_violation() works: {cop_violation['description']}")
 
     # Test 3: create_com_violation
-    com_violation = ViolationFactory.create_com_violation(
-        location=location,
-        literal_value=42,
-        literal_type="number"
-    )
+    com_violation = ViolationFactory.create_com_violation(location=location, literal_value=42, literal_type="number")
 
-    assert com_violation['type'] == "CoM", "Expected CoM violation"
-    assert "42" in com_violation['description'], "Expected literal value in description"
+    assert com_violation["type"] == "CoM", "Expected CoM violation"
+    assert "42" in com_violation["description"], "Expected literal value in description"
     print(f"[PASS] create_com_violation() works: {com_violation['description']}")
 
     # Test 4: create_cot_violation
     cot_violation = ViolationFactory.create_cot_violation(
-        location=location,
-        element_name="my_function",
-        missing_types="return type"
+        location=location, element_name="my_function", missing_types="return type"
     )
 
-    assert cot_violation['type'] == "CoT", "Expected CoT violation"
-    assert "my_function" in cot_violation['description'], "Expected element name in description"
+    assert cot_violation["type"] == "CoT", "Expected CoT violation"
+    assert "my_function" in cot_violation["description"], "Expected element name in description"
     print(f"[PASS] create_cot_violation() works: {cot_violation['description']}")
 
     print("[PASS] All ViolationFactory tests passed")
@@ -153,9 +140,9 @@ def test_detector_result():
 
     # Test 5: to_dict()
     result_dict = result.to_dict()
-    assert 'file_path' in result_dict, "Expected 'file_path' in dict"
-    assert 'violation_count' in result_dict, "Expected 'violation_count' in dict"
-    assert result_dict['violation_count'] == 1, "Expected violation_count=1 in dict"
+    assert "file_path" in result_dict, "Expected 'file_path' in dict"
+    assert "violation_count" in result_dict, "Expected 'violation_count' in dict"
+    assert result_dict["violation_count"] == 1, "Expected violation_count=1 in dict"
     print(f"[PASS] to_dict() works: {result_dict.keys()}")
 
     print("[PASS] All DetectorResult tests passed")
@@ -168,16 +155,8 @@ def test_analysis_context():
     print("=" * 60)
 
     # Test 1: Create context
-    source_lines = [
-        "# Line 1",
-        "def example():",
-        "    return 42",
-        "# Line 4"
-    ]
-    context = AnalysisContext(
-        file_path="test.py",
-        source_lines=source_lines
-    )
+    source_lines = ["# Line 1", "def example():", "    return 42", "# Line 4"]
+    context = AnalysisContext(file_path="test.py", source_lines=source_lines)
 
     assert context.file_path == "test.py", "Expected file_path='test.py'"
     assert context.line_count == 4, f"Expected 4 lines, got {context.line_count}"
@@ -196,9 +175,9 @@ def test_analysis_context():
 
     # Test 4: to_dict()
     context_dict = context.to_dict()
-    assert 'file_path' in context_dict, "Expected 'file_path' in dict"
-    assert 'line_count' in context_dict, "Expected 'line_count' in dict"
-    assert context_dict['line_count'] == 4, "Expected line_count=4 in dict"
+    assert "file_path" in context_dict, "Expected 'file_path' in dict"
+    assert "line_count" in context_dict, "Expected 'line_count' in dict"
+    assert context_dict["line_count"] == 4, "Expected line_count=4 in dict"
     print(f"[PASS] to_dict() works: {context_dict.keys()}")
 
     print("[PASS] All AnalysisContext tests passed")
@@ -215,7 +194,7 @@ def main():
         ("ASTUtils", test_ast_utils),
         ("ViolationFactory", test_violation_factory),
         ("DetectorResult", test_detector_result),
-        ("AnalysisContext", test_analysis_context)
+        ("AnalysisContext", test_analysis_context),
     ]
 
     passed = 0
@@ -228,6 +207,7 @@ def main():
         except Exception as e:
             print(f"[FAIL] {test_name} test failed: {e}")
             import traceback
+
             traceback.print_exc()
             failed += 1
 

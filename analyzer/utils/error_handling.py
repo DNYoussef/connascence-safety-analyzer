@@ -367,7 +367,7 @@ def handle_errors(
                     self._error_handler = ErrorHandler(component_name)
 
                 # Handle the error
-                error = self._error_handler.handle_exception(
+                self._error_handler.handle_exception(
                     e, category, severity, context={"method": func.__name__, "args": str(args)[:100]}
                 )
 

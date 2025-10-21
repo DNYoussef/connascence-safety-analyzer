@@ -374,7 +374,7 @@ class StreamResultAggregator:
         if new_result.violations:
             self.aggregated_result.real_time_violations[new_result.file_path] = [
                 {"timestamp": new_result.timestamp, "violations": new_result.violations, "type": violation_type}
-                for violation_type in new_result.violations.keys()
+                for violation_type in new_result.violations
                 if new_result.violations[violation_type]
             ]
 
@@ -477,9 +477,9 @@ class StreamResultAggregator:
                 sum(len(v) if isinstance(v, list) else 1 for v in r.violations.values() if v) for r in recent_results
             )
             / 5.0,
-            "avg_processing_time_ms": sum(r.processing_time_ms for r in recent_results) / len(recent_results)
-            if recent_results
-            else 0.0,
+            "avg_processing_time_ms": (
+                sum(r.processing_time_ms for r in recent_results) / len(recent_results) if recent_results else 0.0
+            ),
         }
 
         return velocity

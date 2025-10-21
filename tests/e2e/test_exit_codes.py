@@ -21,7 +21,6 @@ Tests exit code consistency, mapping accuracy, and behavior validation.
 Uses memory coordination for tracking exit code patterns and scenarios.
 """
 
-from fixes.phase0.production_safe_assertions import ProductionAssert
 import json
 import os
 from pathlib import Path
@@ -32,6 +31,8 @@ import time
 from typing import Any, Dict
 
 import pytest
+
+from fixes.phase0.production_safe_assertions import ProductionAssert
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
@@ -45,80 +46,81 @@ class ExitCodeCoordinator:
     def __init__(self):
         self.exit_code_scenarios = {}
         self.exit_code_mappings = {
-            0: 'success_no_violations',
-            1: 'violations_found',
-            2: 'configuration_error',
-            3: 'system_error',
-            4: 'license_error',
-            130: 'keyboard_interrupt'
+            0: "success_no_violations",
+            1: "violations_found",
+            2: "configuration_error",
+            3: "system_error",
+            4: "license_error",
+            130: "keyboard_interrupt",
         }
         self.scenario_results = {}
         self.consistency_tests = {}
         self.edge_case_exit_codes = {}
         self.subprocess_results = {}
 
-    def store_exit_code_scenario(self, scenario_id: str, expected_code: int,
-                                actual_code: int, scenario_config: Dict[str, Any]):
+    def store_exit_code_scenario(
+        self, scenario_id: str, expected_code: int, actual_code: int, scenario_config: Dict[str, Any]
+    ):
         """Store exit code scenario and validation results."""
         self.exit_code_scenarios[scenario_id] = {
-            'expected_code': expected_code,
-            'actual_code': actual_code,
-            'correct_mapping': expected_code == actual_code,
-            'scenario_config': scenario_config,
-            'timestamp': time.time(),
-            'scenario_type': self.exit_code_mappings.get(expected_code, 'unknown')
+            "expected_code": expected_code,
+            "actual_code": actual_code,
+            "correct_mapping": expected_code == actual_code,
+            "scenario_config": scenario_config,
+            "timestamp": time.time(),
+            "scenario_type": self.exit_code_mappings.get(expected_code, "unknown"),
         }
 
     def store_scenario_result(self, scenario_id: str, detailed_results: Dict[str, Any]):
         """Store detailed scenario execution results."""
 
-        ProductionAssert.not_none(scenario_id, 'scenario_id')
-        ProductionAssert.not_none(detailed_results, 'detailed_results')
-        ProductionAssert.not_none(scenario_id, 'scenario_id')
-        ProductionAssert.not_none(detailed_results, 'detailed_results')
+        ProductionAssert.not_none(scenario_id, "scenario_id")
+        ProductionAssert.not_none(detailed_results, "detailed_results")
+        ProductionAssert.not_none(scenario_id, "scenario_id")
+        ProductionAssert.not_none(detailed_results, "detailed_results")
         self.scenario_results[scenario_id] = detailed_results
 
     def store_consistency_test(self, test_id: str, consistency_data: Dict[str, Any]):
         """Store exit code consistency test results."""
 
-        ProductionAssert.not_none(test_id, 'test_id')
-        ProductionAssert.not_none(consistency_data, 'consistency_data')
-        ProductionAssert.not_none(test_id, 'test_id')
-        ProductionAssert.not_none(consistency_data, 'consistency_data')
+        ProductionAssert.not_none(test_id, "test_id")
+        ProductionAssert.not_none(consistency_data, "consistency_data")
+        ProductionAssert.not_none(test_id, "test_id")
+        ProductionAssert.not_none(consistency_data, "consistency_data")
         self.consistency_tests[test_id] = consistency_data
 
     def store_edge_case_exit_code(self, edge_case_id: str, edge_case_data: Dict[str, Any]):
         """Store edge case exit code scenarios."""
 
-        ProductionAssert.not_none(edge_case_id, 'edge_case_id')
-        ProductionAssert.not_none(edge_case_data, 'edge_case_data')
-        ProductionAssert.not_none(edge_case_id, 'edge_case_id')
-        ProductionAssert.not_none(edge_case_data, 'edge_case_data')
+        ProductionAssert.not_none(edge_case_id, "edge_case_id")
+        ProductionAssert.not_none(edge_case_data, "edge_case_data")
+        ProductionAssert.not_none(edge_case_id, "edge_case_id")
+        ProductionAssert.not_none(edge_case_data, "edge_case_data")
         self.edge_case_exit_codes[edge_case_id] = edge_case_data
 
     def store_subprocess_result(self, subprocess_id: str, subprocess_data: Dict[str, Any]):
         """Store subprocess execution results for exit code validation."""
 
-        ProductionAssert.not_none(subprocess_id, 'subprocess_id')
-        ProductionAssert.not_none(subprocess_data, 'subprocess_data')
-        ProductionAssert.not_none(subprocess_id, 'subprocess_id')
-        ProductionAssert.not_none(subprocess_data, 'subprocess_data')
+        ProductionAssert.not_none(subprocess_id, "subprocess_id")
+        ProductionAssert.not_none(subprocess_data, "subprocess_data")
+        ProductionAssert.not_none(subprocess_id, "subprocess_id")
+        ProductionAssert.not_none(subprocess_data, "subprocess_data")
         self.subprocess_results[subprocess_id] = subprocess_data
 
     def get_exit_code_summary(self) -> Dict[str, Any]:
         """Get comprehensive exit code testing summary."""
         total_scenarios = len(self.exit_code_scenarios)
-        correct_mappings = sum(1 for s in self.exit_code_scenarios.values() if s['correct_mapping'])
+        correct_mappings = sum(1 for s in self.exit_code_scenarios.values() if s["correct_mapping"])
 
         return {
-            'total_scenarios_tested': total_scenarios,
-            'correct_exit_codes': correct_mappings,
-            'exit_code_accuracy': correct_mappings / max(total_scenarios, 1),
-            'exit_codes_tested': list({s['expected_code'] for s in self.exit_code_scenarios.values()}),
-            'consistency_tests_run': len(self.consistency_tests),
-            'edge_cases_tested': len(self.edge_case_exit_codes),
-            'subprocess_tests_run': len(self.subprocess_results),
-            'overall_exit_code_reliability': self._calculate_reliability_score()
+            "total_scenarios_tested": total_scenarios,
+            "correct_exit_codes": correct_mappings,
+            "exit_code_accuracy": correct_mappings / max(total_scenarios, 1),
+            "exit_codes_tested": list({s["expected_code"] for s in self.exit_code_scenarios.values()}),
+            "consistency_tests_run": len(self.consistency_tests),
+            "edge_cases_tested": len(self.edge_case_exit_codes),
+            "subprocess_tests_run": len(self.subprocess_results),
+            "overall_exit_code_reliability": self._calculate_reliability_score(),
         }
 
     def get_exit_code_breakdown(self) -> Dict[int, Dict[str, Any]]:
@@ -126,14 +128,14 @@ class ExitCodeCoordinator:
         breakdown = {}
 
         for code in self.exit_code_mappings:
-            scenarios = [s for s in self.exit_code_scenarios.values() if s['expected_code'] == code]
+            scenarios = [s for s in self.exit_code_scenarios.values() if s["expected_code"] == code]
             if scenarios:
                 breakdown[code] = {
-                    'code_description': self.exit_code_mappings[code],
-                    'scenarios_tested': len(scenarios),
-                    'correct_mappings': sum(1 for s in scenarios if s['correct_mapping']),
-                    'accuracy': sum(1 for s in scenarios if s['correct_mapping']) / len(scenarios),
-                    'scenario_types': list({s['scenario_config'].get('scenario_type', 'unknown') for s in scenarios})
+                    "code_description": self.exit_code_mappings[code],
+                    "scenarios_tested": len(scenarios),
+                    "correct_mappings": sum(1 for s in scenarios if s["correct_mapping"]),
+                    "accuracy": sum(1 for s in scenarios if s["correct_mapping"]) / len(scenarios),
+                    "scenario_types": list({s["scenario_config"].get("scenario_type", "unknown") for s in scenarios}),
                 }
 
         return breakdown
@@ -144,16 +146,18 @@ class ExitCodeCoordinator:
             return 0.0
 
         # Base score from accuracy
-        accuracy = sum(1 for s in self.exit_code_scenarios.values() if s['correct_mapping']) / len(self.exit_code_scenarios)
+        accuracy = sum(1 for s in self.exit_code_scenarios.values() if s["correct_mapping"]) / len(
+            self.exit_code_scenarios
+        )
 
         # Coverage bonus (testing multiple exit codes)
-        unique_codes = len({s['expected_code'] for s in self.exit_code_scenarios.values()})
+        unique_codes = len({s["expected_code"] for s in self.exit_code_scenarios.values()})
         coverage_bonus = min(unique_codes / 6, 1.0) * 0.2  # 6 main exit codes, up to 20% bonus
 
         # Consistency bonus
         consistency_bonus = 0.0
         if self.consistency_tests:
-            consistent_tests = sum(1 for t in self.consistency_tests.values() if t.get('consistent', False))
+            consistent_tests = sum(1 for t in self.consistency_tests.values() if t.get("consistent", False))
             consistency_bonus = (consistent_tests / len(self.consistency_tests)) * 0.1
 
         return min(1.0, accuracy + coverage_bonus + consistency_bonus)
@@ -172,7 +176,7 @@ class ExitCodeScenarioGenerator:
             1: self._generate_violation_scenarios,
             2: self._generate_config_error_scenarios,
             3: self._generate_system_error_scenarios,
-            4: self._generate_license_error_scenarios
+            4: self._generate_license_error_scenarios,
         }
 
     def generate_scenario_for_exit_code(self, exit_code: int, base_path: Path) -> Dict[str, Any]:
@@ -187,20 +191,20 @@ class ExitCodeScenarioGenerator:
         """Generate scenarios that should result in exit code 0."""
         scenarios = [
             {
-                'name': 'empty_directory',
-                'setup': lambda: self._create_empty_directory(base_path),
-                'description': 'Empty directory with no files'
+                "name": "empty_directory",
+                "setup": lambda: self._create_empty_directory(base_path),
+                "description": "Empty directory with no files",
             },
             {
-                'name': 'clean_code_only',
-                'setup': lambda: self._create_clean_code_project(base_path),
-                'description': 'Project with clean, violation-free code'
+                "name": "clean_code_only",
+                "setup": lambda: self._create_clean_code_project(base_path),
+                "description": "Project with clean, violation-free code",
             },
             {
-                'name': 'excluded_violations',
-                'setup': lambda: self._create_excluded_violations_project(base_path),
-                'description': 'Project with violations in excluded directories'
-            }
+                "name": "excluded_violations",
+                "setup": lambda: self._create_excluded_violations_project(base_path),
+                "description": "Project with violations in excluded directories",
+            },
         ]
         return scenarios
 
@@ -208,25 +212,25 @@ class ExitCodeScenarioGenerator:
         """Generate scenarios that should result in exit code 1."""
         scenarios = [
             {
-                'name': 'parameter_bombs',
-                'setup': lambda: self._create_parameter_bomb_project(base_path),
-                'description': 'Project with parameter bomb violations'
+                "name": "parameter_bombs",
+                "setup": lambda: self._create_parameter_bomb_project(base_path),
+                "description": "Project with parameter bomb violations",
             },
             {
-                'name': 'magic_literals',
-                'setup': lambda: self._create_magic_literal_project(base_path),
-                'description': 'Project with magic literal violations'
+                "name": "magic_literals",
+                "setup": lambda: self._create_magic_literal_project(base_path),
+                "description": "Project with magic literal violations",
             },
             {
-                'name': 'god_classes',
-                'setup': lambda: self._create_god_class_project(base_path),
-                'description': 'Project with god class violations'
+                "name": "god_classes",
+                "setup": lambda: self._create_god_class_project(base_path),
+                "description": "Project with god class violations",
             },
             {
-                'name': 'mixed_violations',
-                'setup': lambda: self._create_mixed_violations_project(base_path),
-                'description': 'Project with multiple violation types'
-            }
+                "name": "mixed_violations",
+                "setup": lambda: self._create_mixed_violations_project(base_path),
+                "description": "Project with multiple violation types",
+            },
         ]
         return scenarios
 
@@ -234,25 +238,28 @@ class ExitCodeScenarioGenerator:
         """Generate scenarios that should result in exit code 2."""
         scenarios = [
             {
-                'name': 'nonexistent_path',
-                'setup': lambda: {'args': ["scan", "/completely/nonexistent/path"], 'no_project': True},
-                'description': 'Scanning non-existent path'
+                "name": "nonexistent_path",
+                "setup": lambda: {"args": ["scan", "/completely/nonexistent/path"], "no_project": True},
+                "description": "Scanning non-existent path",
             },
             {
-                'name': 'invalid_policy',
-                'setup': lambda: {'args': ["scan", str(base_path), "--policy", "invalid-policy"], 'create_basic': True},
-                'description': 'Using invalid policy name'
+                "name": "invalid_policy",
+                "setup": lambda: {"args": ["scan", str(base_path), "--policy", "invalid-policy"], "create_basic": True},
+                "description": "Using invalid policy name",
             },
             {
-                'name': 'invalid_format',
-                'setup': lambda: {'args': ["scan", str(base_path), "--format", "invalid-format"], 'create_basic': True},
-                'description': 'Using invalid output format'
+                "name": "invalid_format",
+                "setup": lambda: {"args": ["scan", str(base_path), "--format", "invalid-format"], "create_basic": True},
+                "description": "Using invalid output format",
             },
             {
-                'name': 'invalid_severity',
-                'setup': lambda: {'args': ["scan", str(base_path), "--severity", "invalid-severity"], 'create_basic': True},
-                'description': 'Using invalid severity level'
-            }
+                "name": "invalid_severity",
+                "setup": lambda: {
+                    "args": ["scan", str(base_path), "--severity", "invalid-severity"],
+                    "create_basic": True,
+                },
+                "description": "Using invalid severity level",
+            },
         ]
         return scenarios
 
@@ -260,15 +267,15 @@ class ExitCodeScenarioGenerator:
         """Generate scenarios that might result in exit code 3."""
         scenarios = [
             {
-                'name': 'corrupted_files',
-                'setup': lambda: self._create_corrupted_file_project(base_path),
-                'description': 'Project with corrupted/binary files'
+                "name": "corrupted_files",
+                "setup": lambda: self._create_corrupted_file_project(base_path),
+                "description": "Project with corrupted/binary files",
             },
             {
-                'name': 'permission_denied',
-                'setup': lambda: self._create_permission_denied_scenario(base_path),
-                'description': 'Files with restricted permissions'
-            }
+                "name": "permission_denied",
+                "setup": lambda: self._create_permission_denied_scenario(base_path),
+                "description": "Files with restricted permissions",
+            },
         ]
         return scenarios
 
@@ -276,9 +283,9 @@ class ExitCodeScenarioGenerator:
         """Generate scenarios that might result in exit code 4."""
         scenarios = [
             {
-                'name': 'license_validation_trigger',
-                'setup': lambda: self._create_license_validation_scenario(base_path),
-                'description': 'Scenario that triggers license validation'
+                "name": "license_validation_trigger",
+                "setup": lambda: self._create_license_validation_scenario(base_path),
+                "description": "Scenario that triggers license validation",
             }
         ]
         return scenarios
@@ -287,18 +294,15 @@ class ExitCodeScenarioGenerator:
         """Create empty directory scenario."""
         empty_dir = base_path / "empty_project"
         empty_dir.mkdir(parents=True)
-        return {
-            'project_path': empty_dir,
-            'args': ["scan", str(empty_dir)],
-            'expected_violations': 0
-        }
+        return {"project_path": empty_dir, "args": ["scan", str(empty_dir)], "expected_violations": 0}
 
     def _create_clean_code_project(self, base_path: Path) -> Dict[str, Any]:
         """Create clean code project without violations."""
         clean_dir = base_path / "clean_project"
         clean_dir.mkdir(parents=True)
 
-        (clean_dir / "clean_module.py").write_text("""
+        (clean_dir / "clean_module.py").write_text(
+            """
 from typing import List, Dict, Optional
 from dataclasses import dataclass
 
@@ -337,13 +341,10 @@ class CleanProcessor:
 def create_clean_item(*, item_id: str, name: str) -> CleanDataItem:
     '''Create clean item with keyword arguments.'''
     return CleanDataItem(item_id=item_id, name=name)
-""")
+"""
+        )
 
-        return {
-            'project_path': clean_dir,
-            'args': ["scan", str(clean_dir)],
-            'expected_violations': 0
-        }
+        return {"project_path": clean_dir, "args": ["scan", str(clean_dir)], "expected_violations": 0}
 
     def _create_excluded_violations_project(self, base_path: Path) -> Dict[str, Any]:
         """Create project with violations in excluded directories."""
@@ -351,26 +352,30 @@ def create_clean_item(*, item_id: str, name: str) -> CleanDataItem:
         project_dir.mkdir(parents=True)
 
         # Clean main code
-        (project_dir / "main.py").write_text("""
+        (project_dir / "main.py").write_text(
+            """
 def clean_main() -> str:
     return "clean"
-""")
+"""
+        )
 
         # Violations in test directory (typically excluded)
         test_dir = project_dir / "tests"
         test_dir.mkdir()
 
-        (test_dir / "test_violations.py").write_text("""
+        (test_dir / "test_violations.py").write_text(
+            """
 def test_with_violations(param1, param2, param3, param4, param5):  # Parameter bomb
     magic_value = 42  # Magic literal
     return magic_value
-""")
+"""
+        )
 
         return {
-            'project_path': project_dir,
-            'args': ["scan", str(project_dir)],  # Tests might be excluded by default
-            'expected_violations': 0,  # If tests are excluded
-            'has_excluded_violations': True
+            "project_path": project_dir,
+            "args": ["scan", str(project_dir)],  # Tests might be excluded by default
+            "expected_violations": 0,  # If tests are excluded
+            "has_excluded_violations": True,
         }
 
     def _create_parameter_bomb_project(self, base_path: Path) -> Dict[str, Any]:
@@ -378,7 +383,8 @@ def test_with_violations(param1, param2, param3, param4, param5):  # Parameter b
         project_dir = base_path / "parameter_bomb_project"
         project_dir.mkdir(parents=True)
 
-        (project_dir / "parameter_violations.py").write_text("""
+        (project_dir / "parameter_violations.py").write_text(
+            """
 def function_with_many_params(param1, param2, param3, param4, param5, param6, param7):
     '''Function with parameter bomb violation.'''
     ProductionAssert.not_none(param1, 'param1')
@@ -446,13 +452,14 @@ class ParameterBombClass:
         ProductionAssert.not_none(x6, 'x6')
 
         return x1 * x2 * x3 * x4 * x5 * x6
-""")
+"""
+        )
 
         return {
-            'project_path': project_dir,
-            'args': ["scan", str(project_dir)],
-            'expected_violations': 3,  # 3 parameter bombs
-            'violation_types': ['CoP']
+            "project_path": project_dir,
+            "args": ["scan", str(project_dir)],
+            "expected_violations": 3,  # 3 parameter bombs
+            "violation_types": ["CoP"],
         }
 
     def _create_magic_literal_project(self, base_path: Path) -> Dict[str, Any]:
@@ -460,7 +467,8 @@ class ParameterBombClass:
         project_dir = base_path / "magic_literal_project"
         project_dir.mkdir(parents=True)
 
-        (project_dir / "magic_violations.py").write_text("""
+        (project_dir / "magic_violations.py").write_text(
+            """
 def process_data(data):
     ProductionAssert.not_none(data, 'data')
         ProductionAssert.not_none(data, 'data')
@@ -495,13 +503,14 @@ class ConfigManager:
         self.cache_size = 1024  # Magic literal
         self.port = 8080  # Magic literal
         self.buffer_size = 8192  # Magic literal
-""")
+"""
+        )
 
         return {
-            'project_path': project_dir,
-            'args': ["scan", str(project_dir)],
-            'expected_violations': 8,  # Multiple magic literals
-            'violation_types': ['CoM']
+            "project_path": project_dir,
+            "args": ["scan", str(project_dir)],
+            "expected_violations": 8,  # Multiple magic literals
+            "violation_types": ["CoM"],
         }
 
     def _create_god_class_project(self, base_path: Path) -> Dict[str, Any]:
@@ -511,7 +520,8 @@ class ConfigManager:
 
         methods = "\n    ".join([f"def method_{i:02d}(self): pass" for i in range(1, 26)])  # 25 methods
 
-        (project_dir / "god_class.py").write_text(f"""
+        (project_dir / "god_class.py").write_text(
+            f"""
 class GodClass:
     '''Class with too many methods - god class violation.'''
 
@@ -524,13 +534,14 @@ class AnotherGodClass:
     '''Another god class.'''
 
     {methods}
-""")
+"""
+        )
 
         return {
-            'project_path': project_dir,
-            'args': ["scan", str(project_dir)],
-            'expected_violations': 2,  # 2 god classes
-            'violation_types': ['CoA']
+            "project_path": project_dir,
+            "args": ["scan", str(project_dir)],
+            "expected_violations": 2,  # 2 god classes
+            "violation_types": ["CoA"],
         }
 
     def _create_mixed_violations_project(self, base_path: Path) -> Dict[str, Any]:
@@ -538,7 +549,8 @@ class AnotherGodClass:
         project_dir = base_path / "mixed_violations_project"
         project_dir.mkdir(parents=True)
 
-        (project_dir / "mixed_violations.py").write_text("""
+        (project_dir / "mixed_violations.py").write_text(
+            """
 def mixed_function(param1, param2, param3, param4, param5, param6):  # Parameter bomb
     '''Function with multiple violation types.'''
     magic_threshold = 42  # Magic literal
@@ -580,13 +592,14 @@ class MegaClass:
     def method_20(self): pass
     def method_21(self): pass
     def method_22(self): pass  # God class
-""")
+"""
+        )
 
         return {
-            'project_path': project_dir,
-            'args': ["scan", str(project_dir)],
-            'expected_violations': 8,  # Mixed violations: CoP, CoM, CoT, CoA
-            'violation_types': ['CoP', 'CoM', 'CoT', 'CoA']
+            "project_path": project_dir,
+            "args": ["scan", str(project_dir)],
+            "expected_violations": 8,  # Mixed violations: CoP, CoM, CoT, CoA
+            "violation_types": ["CoP", "CoM", "CoT", "CoA"],
         }
 
     def _create_corrupted_file_project(self, base_path: Path) -> Dict[str, Any]:
@@ -598,14 +611,14 @@ class MegaClass:
         (project_dir / "normal.py").write_text("def normal(): pass")
 
         # Binary file with .py extension
-        with open(project_dir / "corrupted.py", 'wb') as f:
-            f.write(b'\x00\x01\x02\x03\xff\xfe\xfd\xfc')
+        with open(project_dir / "corrupted.py", "wb") as f:
+            f.write(b"\x00\x01\x02\x03\xff\xfe\xfd\xfc")
 
         return {
-            'project_path': project_dir,
-            'args': ["scan", str(project_dir)],
-            'expected_handling': 'graceful',
-            'should_not_crash': True
+            "project_path": project_dir,
+            "args": ["scan", str(project_dir)],
+            "expected_handling": "graceful",
+            "should_not_crash": True,
         }
 
     def _create_permission_denied_scenario(self, base_path: Path) -> Dict[str, Any]:
@@ -624,11 +637,11 @@ class MegaClass:
             permission_restricted = False
 
         return {
-            'project_path': project_dir,
-            'args': ["scan", str(project_dir)],
-            'permission_restricted': permission_restricted,
-            'expected_handling': 'graceful',
-            'restore_permissions': lambda: os.chmod(str(restricted_file), 0o644) if permission_restricted else None
+            "project_path": project_dir,
+            "args": ["scan", str(project_dir)],
+            "permission_restricted": permission_restricted,
+            "expected_handling": "graceful",
+            "restore_permissions": lambda: os.chmod(str(restricted_file), 0o644) if permission_restricted else None,
         }
 
     def _create_license_validation_scenario(self, base_path: Path) -> Dict[str, Any]:
@@ -639,19 +652,19 @@ class MegaClass:
         (project_dir / "main.py").write_text("def main(): pass")
 
         return {
-            'project_path': project_dir,
-            'args': ["scan", str(project_dir)],
-            'license_test': True,
-            'expected_handling': 'depends_on_license_system'
+            "project_path": project_dir,
+            "args": ["scan", str(project_dir)],
+            "license_test": True,
+            "expected_handling": "depends_on_license_system",
         }
 
     def _generate_default_scenario(self, base_path: Path, exit_code: int) -> Dict[str, Any]:
         """Generate default scenario for unknown exit codes."""
         return [
             {
-                'name': f'default_scenario_code_{exit_code}',
-                'setup': lambda: {'args': ["scan", str(base_path)], 'create_basic': True},
-                'description': f'Default scenario for exit code {exit_code}'
+                "name": f"default_scenario_code_{exit_code}",
+                "setup": lambda: {"args": ["scan", str(base_path)], "create_basic": True},
+                "description": f"Default scenario for exit code {exit_code}",
             }
         ]
 
@@ -685,31 +698,30 @@ class TestExitCodeWorkflows:
         exit_code_0_results = {}
 
         for scenario_config in scenarios:
-            scenario_name = scenario_config['name']
+            scenario_name = scenario_config["name"]
 
-            exit_code_workflow_validator.add_step(f"setup_{scenario_name}", {
-                'scenario': scenario_name,
-                'description': scenario_config['description']
-            })
+            exit_code_workflow_validator.add_step(
+                f"setup_{scenario_name}", {"scenario": scenario_name, "description": scenario_config["description"]}
+            )
 
             # Setup scenario
-            setup_result = scenario_config['setup']()
+            setup_result = scenario_config["setup"]()
 
             # Execute analysis
             cli = ConnascenceCLI()
-            args = setup_result['args'] if 'args' in setup_result else ['scan', str(setup_result['project_path'])]
+            args = setup_result["args"] if "args" in setup_result else ["scan", str(setup_result["project_path"])]
 
             start_time = time.time()
             exit_code = cli.run(args)
             execution_time = time.time() - start_time
 
             result = {
-                'scenario_name': scenario_name,
-                'exit_code': exit_code,
-                'expected_exit_code': 0,
-                'correct_exit_code': exit_code == 0,
-                'execution_time': execution_time,
-                'setup_result': setup_result
+                "scenario_name": scenario_name,
+                "exit_code": exit_code,
+                "expected_exit_code": 0,
+                "correct_exit_code": exit_code == 0,
+                "execution_time": execution_time,
+                "setup_result": setup_result,
             }
 
             exit_code_0_results[scenario_name] = result
@@ -717,12 +729,13 @@ class TestExitCodeWorkflows:
             # Store in coordinator
             exit_code_coordinator.store_exit_code_scenario(
                 f"{scenario_id}_{scenario_name}",
-                0, exit_code,
+                0,
+                exit_code,
                 {
-                    'scenario_type': scenario_name,
-                    'description': scenario_config['description'],
-                    'execution_time': execution_time
-                }
+                    "scenario_type": scenario_name,
+                    "description": scenario_config["description"],
+                    "execution_time": execution_time,
+                },
             )
 
             exit_code_workflow_validator.add_step(f"execute_{scenario_name}", result)
@@ -732,26 +745,27 @@ class TestExitCodeWorkflows:
 
         # Summary
         exit_code_0_summary = {
-            'scenarios_tested': len(scenarios),
-            'all_correct': all(r['correct_exit_code'] for r in exit_code_0_results.values()),
-            'avg_execution_time': sum(r['execution_time'] for r in exit_code_0_results.values()) / len(exit_code_0_results),
-            'max_execution_time': max(r['execution_time'] for r in exit_code_0_results.values()),
-            'performance_acceptable': all(r['execution_time'] < 30 for r in exit_code_0_results.values())
+            "scenarios_tested": len(scenarios),
+            "all_correct": all(r["correct_exit_code"] for r in exit_code_0_results.values()),
+            "avg_execution_time": sum(r["execution_time"] for r in exit_code_0_results.values())
+            / len(exit_code_0_results),
+            "max_execution_time": max(r["execution_time"] for r in exit_code_0_results.values()),
+            "performance_acceptable": all(r["execution_time"] < 30 for r in exit_code_0_results.values()),
         }
 
         exit_code_coordinator.store_scenario_result(scenario_id, exit_code_0_summary)
 
         # Cleanup
         import shutil
+
         shutil.rmtree(temp_base)
 
-        assert exit_code_0_summary['all_correct'], "Not all exit code 0 scenarios returned correct exit code"
-        assert exit_code_0_summary['performance_acceptable'], "Some scenarios took too long to execute"
+        assert exit_code_0_summary["all_correct"], "Not all exit code 0 scenarios returned correct exit code"
+        assert exit_code_0_summary["performance_acceptable"], "Some scenarios took too long to execute"
 
-        exit_code_workflow_validator.complete_scenario(True, {
-            'exit_code_0_comprehensive_completed': True,
-            'summary': exit_code_0_summary
-        })
+        exit_code_workflow_validator.complete_scenario(
+            True, {"exit_code_0_comprehensive_completed": True, "summary": exit_code_0_summary}
+        )
 
     def test_exit_code_1_comprehensive_scenarios(self, exit_code_workflow_validator, scenario_generator):
         """Test all scenarios that should result in exit code 1."""
@@ -767,49 +781,54 @@ class TestExitCodeWorkflows:
         exit_code_1_results = {}
 
         for scenario_config in scenarios:
-            scenario_name = scenario_config['name']
+            scenario_name = scenario_config["name"]
 
             # Setup scenario
-            setup_result = scenario_config['setup']()
+            setup_result = scenario_config["setup"]()
 
             # Execute analysis
             cli = ConnascenceCLI()
-            exit_code = cli.run(setup_result['args'])
+            exit_code = cli.run(setup_result["args"])
 
             # Also generate JSON output to verify violations
-            output_file = setup_result['project_path'] / "violations.json"
+            output_file = setup_result["project_path"] / "violations.json"
             cli_json = ConnascenceCLI()
-            cli_json.run(setup_result['args'] + ["--format", "json", "--output", str(output_file)])
+            cli_json.run(setup_result["args"] + ["--format", "json", "--output", str(output_file)])
 
             violations_found = 0
             if output_file.exists():
                 with open(output_file) as f:
                     try:
                         results = json.load(f)
-                        violations_found = len(results.get('violations', []))
+                        violations_found = len(results.get("violations", []))
                     except (json.JSONDecodeError, KeyError):
                         pass
 
             result = {
-                'scenario_name': scenario_name,
-                'exit_code': exit_code,
-                'expected_exit_code': 1,
-                'correct_exit_code': exit_code == 1,
-                'violations_found': violations_found,
-                'expected_violations': setup_result.get('expected_violations', 1),
-                'violations_match_expectation': violations_found >= setup_result.get('expected_violations', 1) if setup_result.get('expected_violations', 1) > 0 else violations_found > 0
+                "scenario_name": scenario_name,
+                "exit_code": exit_code,
+                "expected_exit_code": 1,
+                "correct_exit_code": exit_code == 1,
+                "violations_found": violations_found,
+                "expected_violations": setup_result.get("expected_violations", 1),
+                "violations_match_expectation": (
+                    violations_found >= setup_result.get("expected_violations", 1)
+                    if setup_result.get("expected_violations", 1) > 0
+                    else violations_found > 0
+                ),
             }
 
             exit_code_1_results[scenario_name] = result
 
             exit_code_coordinator.store_exit_code_scenario(
                 f"{scenario_id}_{scenario_name}",
-                1, exit_code,
+                1,
+                exit_code,
                 {
-                    'scenario_type': scenario_name,
-                    'violations_found': violations_found,
-                    'expected_violations': setup_result.get('expected_violations', 1)
-                }
+                    "scenario_type": scenario_name,
+                    "violations_found": violations_found,
+                    "expected_violations": setup_result.get("expected_violations", 1),
+                },
             )
 
             exit_code_workflow_validator.add_step(f"execute_{scenario_name}", result)
@@ -820,26 +839,27 @@ class TestExitCodeWorkflows:
 
         # Summary
         exit_code_1_summary = {
-            'scenarios_tested': len(scenarios),
-            'all_correct_exit_codes': all(r['correct_exit_code'] for r in exit_code_1_results.values()),
-            'all_found_violations': all(r['violations_found'] > 0 for r in exit_code_1_results.values()),
-            'total_violations_found': sum(r['violations_found'] for r in exit_code_1_results.values()),
-            'avg_violations_per_scenario': sum(r['violations_found'] for r in exit_code_1_results.values()) / len(exit_code_1_results)
+            "scenarios_tested": len(scenarios),
+            "all_correct_exit_codes": all(r["correct_exit_code"] for r in exit_code_1_results.values()),
+            "all_found_violations": all(r["violations_found"] > 0 for r in exit_code_1_results.values()),
+            "total_violations_found": sum(r["violations_found"] for r in exit_code_1_results.values()),
+            "avg_violations_per_scenario": sum(r["violations_found"] for r in exit_code_1_results.values())
+            / len(exit_code_1_results),
         }
 
         exit_code_coordinator.store_scenario_result(scenario_id, exit_code_1_summary)
 
         # Cleanup
         import shutil
+
         shutil.rmtree(temp_base)
 
-        assert exit_code_1_summary['all_correct_exit_codes'], "Not all violation scenarios returned exit code 1"
-        assert exit_code_1_summary['all_found_violations'], "Not all violation scenarios found violations"
+        assert exit_code_1_summary["all_correct_exit_codes"], "Not all violation scenarios returned exit code 1"
+        assert exit_code_1_summary["all_found_violations"], "Not all violation scenarios found violations"
 
-        exit_code_workflow_validator.complete_scenario(True, {
-            'exit_code_1_comprehensive_completed': True,
-            'summary': exit_code_1_summary
-        })
+        exit_code_workflow_validator.complete_scenario(
+            True, {"exit_code_1_comprehensive_completed": True, "summary": exit_code_1_summary}
+        )
 
     def test_exit_code_2_configuration_errors(self, exit_code_workflow_validator, scenario_generator):
         """Test all scenarios that should result in exit code 2."""
@@ -855,67 +875,68 @@ class TestExitCodeWorkflows:
         exit_code_2_results = {}
 
         for scenario_config in scenarios:
-            scenario_name = scenario_config['name']
+            scenario_name = scenario_config["name"]
 
             # Setup scenario
-            setup_result = scenario_config['setup']()
+            setup_result = scenario_config["setup"]()
 
             # Create basic project if needed
-            if setup_result.get('create_basic'):
+            if setup_result.get("create_basic"):
                 basic_file = base_path / "basic.py"
                 basic_file.write_text("def basic(): pass")
 
             # Execute analysis
             cli = ConnascenceCLI()
-            args = setup_result['args']
+            args = setup_result["args"]
 
             exit_code = cli.run(args)
 
             result = {
-                'scenario_name': scenario_name,
-                'exit_code': exit_code,
-                'expected_exit_code': 2,
-                'correct_exit_code': exit_code == 2,
-                'args_used': args,
-                'error_type': 'configuration_error'
+                "scenario_name": scenario_name,
+                "exit_code": exit_code,
+                "expected_exit_code": 2,
+                "correct_exit_code": exit_code == 2,
+                "args_used": args,
+                "error_type": "configuration_error",
             }
 
             exit_code_2_results[scenario_name] = result
 
             exit_code_coordinator.store_exit_code_scenario(
                 f"{scenario_id}_{scenario_name}",
-                2, exit_code,
-                {
-                    'scenario_type': scenario_name,
-                    'args': args,
-                    'error_type': 'configuration_error'
-                }
+                2,
+                exit_code,
+                {"scenario_type": scenario_name, "args": args, "error_type": "configuration_error"},
             )
 
             exit_code_workflow_validator.add_step(f"execute_{scenario_name}", result)
 
             # Assertions
-            assert exit_code == 2, f"Configuration error scenario '{scenario_name}' should return exit code 2, got {exit_code}"
+            assert (
+                exit_code == 2
+            ), f"Configuration error scenario '{scenario_name}' should return exit code 2, got {exit_code}"
 
         # Summary
         exit_code_2_summary = {
-            'scenarios_tested': len(scenarios),
-            'all_correct_exit_codes': all(r['correct_exit_code'] for r in exit_code_2_results.values()),
-            'configuration_errors_detected': len([r for r in exit_code_2_results.values() if r['correct_exit_code']])
+            "scenarios_tested": len(scenarios),
+            "all_correct_exit_codes": all(r["correct_exit_code"] for r in exit_code_2_results.values()),
+            "configuration_errors_detected": len([r for r in exit_code_2_results.values() if r["correct_exit_code"]]),
         }
 
         exit_code_coordinator.store_scenario_result(scenario_id, exit_code_2_summary)
 
         # Cleanup
         import shutil
+
         shutil.rmtree(temp_base)
 
-        assert exit_code_2_summary['all_correct_exit_codes'], "Not all configuration error scenarios returned exit code 2"
+        assert exit_code_2_summary[
+            "all_correct_exit_codes"
+        ], "Not all configuration error scenarios returned exit code 2"
 
-        exit_code_workflow_validator.complete_scenario(True, {
-            'exit_code_2_configuration_errors_completed': True,
-            'summary': exit_code_2_summary
-        })
+        exit_code_workflow_validator.complete_scenario(
+            True, {"exit_code_2_configuration_errors_completed": True, "summary": exit_code_2_summary}
+        )
 
     def test_exit_code_consistency_across_runs(self, exit_code_workflow_validator):
         """Test exit code consistency across multiple runs."""
@@ -926,11 +947,13 @@ class TestExitCodeWorkflows:
         temp_dir = tempfile.mkdtemp()
         project_path = Path(temp_dir)
 
-        (project_path / "consistent_test.py").write_text("""
+        (project_path / "consistent_test.py").write_text(
+            """
 def test_function(param1, param2, param3, param4, param5):  # Parameter bomb
     magic_value = 42  # Magic literal
     return param1 + param2 + param3 + param4 + param5 + magic_value
-""")
+"""
+        )
 
         # Run analysis multiple times
         consistency_results = []
@@ -940,43 +963,38 @@ def test_function(param1, param2, param3, param4, param5):  # Parameter bomb
             cli = ConnascenceCLI()
             exit_code = cli.run(["scan", str(project_path)])
 
-            consistency_results.append({
-                'run_number': run + 1,
-                'exit_code': exit_code,
-                'timestamp': time.time()
-            })
+            consistency_results.append({"run_number": run + 1, "exit_code": exit_code, "timestamp": time.time()})
 
-            exit_code_workflow_validator.add_step(f"consistency_run_{run + 1}", {
-                'exit_code': exit_code,
-                'run': run + 1
-            })
+            exit_code_workflow_validator.add_step(
+                f"consistency_run_{run + 1}", {"exit_code": exit_code, "run": run + 1}
+            )
 
         # Analyze consistency
-        exit_codes = [r['exit_code'] for r in consistency_results]
+        exit_codes = [r["exit_code"] for r in consistency_results]
 
         consistency_analysis = {
-            'total_runs': run_count,
-            'unique_exit_codes': list(set(exit_codes)),
-            'consistent': len(set(exit_codes)) == 1,
-            'expected_exit_code': 1,  # Should find violations
-            'all_correct': all(code == 1 for code in exit_codes),
-            'exit_code_distribution': {code: exit_codes.count(code) for code in set(exit_codes)}
+            "total_runs": run_count,
+            "unique_exit_codes": list(set(exit_codes)),
+            "consistent": len(set(exit_codes)) == 1,
+            "expected_exit_code": 1,  # Should find violations
+            "all_correct": all(code == 1 for code in exit_codes),
+            "exit_code_distribution": {code: exit_codes.count(code) for code in set(exit_codes)},
         }
 
         exit_code_coordinator.store_consistency_test(scenario_id, consistency_analysis)
 
         # Cleanup
         import shutil
+
         shutil.rmtree(temp_dir)
 
         # Assertions
-        assert consistency_analysis['consistent'], f"Exit codes not consistent across runs: {exit_codes}"
-        assert consistency_analysis['all_correct'], f"Expected exit code 1 for all runs, got: {exit_codes}"
+        assert consistency_analysis["consistent"], f"Exit codes not consistent across runs: {exit_codes}"
+        assert consistency_analysis["all_correct"], f"Expected exit code 1 for all runs, got: {exit_codes}"
 
-        exit_code_workflow_validator.complete_scenario(True, {
-            'exit_code_consistency_verified': True,
-            'consistency_analysis': consistency_analysis
-        })
+        exit_code_workflow_validator.complete_scenario(
+            True, {"exit_code_consistency_verified": True, "consistency_analysis": consistency_analysis}
+        )
 
     def test_subprocess_exit_code_validation(self, exit_code_workflow_validator):
         """Test exit codes via subprocess execution."""
@@ -989,35 +1007,35 @@ def test_function(param1, param2, param3, param4, param5):  # Parameter bomb
 
         subprocess_tests = [
             {
-                'name': 'subprocess_violations',
-                'setup': lambda: self._create_violation_file(project_path),
-                'expected_exit_code': 1
+                "name": "subprocess_violations",
+                "setup": lambda: self._create_violation_file(project_path),
+                "expected_exit_code": 1,
             },
             {
-                'name': 'subprocess_clean',
-                'setup': lambda: self._create_clean_file(project_path),
-                'expected_exit_code': 0
+                "name": "subprocess_clean",
+                "setup": lambda: self._create_clean_file(project_path),
+                "expected_exit_code": 0,
             },
             {
-                'name': 'subprocess_config_error',
-                'setup': lambda: None,  # No setup needed
-                'args': ["scan", "/nonexistent"],
-                'expected_exit_code': 2
-            }
+                "name": "subprocess_config_error",
+                "setup": lambda: None,  # No setup needed
+                "args": ["scan", "/nonexistent"],
+                "expected_exit_code": 2,
+            },
         ]
 
         subprocess_results = {}
 
         for test_config in subprocess_tests:
-            test_name = test_config['name']
+            test_name = test_config["name"]
 
             # Setup
-            if test_config['setup']:
-                test_config['setup']()
+            if test_config["setup"]:
+                test_config["setup"]()
 
             # Prepare subprocess arguments
-            if 'args' in test_config:
-                cmd_args = [sys.executable, "-m", "cli.connascence"] + test_config['args']
+            if "args" in test_config:
+                cmd_args = [sys.executable, "-m", "cli.connascence"] + test_config["args"]
             else:
                 cmd_args = [sys.executable, "-m", "cli.connascence", "scan", str(project_path)]
 
@@ -1025,41 +1043,42 @@ def test_function(param1, param2, param3, param4, param5):  # Parameter bomb
             try:
                 process = subprocess.run(
                     cmd_args,
+                    check=False,
                     cwd=str(Path(__file__).parent.parent.parent),
                     capture_output=True,
                     text=True,
-                    timeout=30
+                    timeout=30,
                 )
 
                 subprocess_exit_code = process.returncode
 
                 result = {
-                    'test_name': test_name,
-                    'subprocess_exit_code': subprocess_exit_code,
-                    'expected_exit_code': test_config['expected_exit_code'],
-                    'correct_exit_code': subprocess_exit_code == test_config['expected_exit_code'],
-                    'stdout': process.stdout,
-                    'stderr': process.stderr,
-                    'subprocess_successful': True
+                    "test_name": test_name,
+                    "subprocess_exit_code": subprocess_exit_code,
+                    "expected_exit_code": test_config["expected_exit_code"],
+                    "correct_exit_code": subprocess_exit_code == test_config["expected_exit_code"],
+                    "stdout": process.stdout,
+                    "stderr": process.stderr,
+                    "subprocess_successful": True,
                 }
 
             except subprocess.TimeoutExpired:
                 result = {
-                    'test_name': test_name,
-                    'subprocess_exit_code': -1,
-                    'expected_exit_code': test_config['expected_exit_code'],
-                    'correct_exit_code': False,
-                    'error': 'subprocess_timeout',
-                    'subprocess_successful': False
+                    "test_name": test_name,
+                    "subprocess_exit_code": -1,
+                    "expected_exit_code": test_config["expected_exit_code"],
+                    "correct_exit_code": False,
+                    "error": "subprocess_timeout",
+                    "subprocess_successful": False,
                 }
             except Exception as e:
                 result = {
-                    'test_name': test_name,
-                    'subprocess_exit_code': -1,
-                    'expected_exit_code': test_config['expected_exit_code'],
-                    'correct_exit_code': False,
-                    'error': str(e),
-                    'subprocess_successful': False
+                    "test_name": test_name,
+                    "subprocess_exit_code": -1,
+                    "expected_exit_code": test_config["expected_exit_code"],
+                    "correct_exit_code": False,
+                    "error": str(e),
+                    "subprocess_successful": False,
                 }
 
             subprocess_results[test_name] = result
@@ -1068,28 +1087,33 @@ def test_function(param1, param2, param3, param4, param5):  # Parameter bomb
             exit_code_workflow_validator.add_step(f"subprocess_{test_name}", result)
 
             # Assertions (if subprocess was successful)
-            if result['subprocess_successful']:
-                assert result['correct_exit_code'], f"Subprocess test '{test_name}' expected exit code {test_config['expected_exit_code']}, got {result['subprocess_exit_code']}"
+            if result["subprocess_successful"]:
+                assert result[
+                    "correct_exit_code"
+                ], f"Subprocess test '{test_name}' expected exit code {test_config['expected_exit_code']}, got {result['subprocess_exit_code']}"
 
         # Summary
         subprocess_summary = {
-            'tests_run': len(subprocess_tests),
-            'successful_subprocesses': sum(1 for r in subprocess_results.values() if r['subprocess_successful']),
-            'correct_exit_codes': sum(1 for r in subprocess_results.values() if r['correct_exit_code']),
-            'subprocess_reliability': sum(1 for r in subprocess_results.values() if r['subprocess_successful']) / len(subprocess_tests)
+            "tests_run": len(subprocess_tests),
+            "successful_subprocesses": sum(1 for r in subprocess_results.values() if r["subprocess_successful"]),
+            "correct_exit_codes": sum(1 for r in subprocess_results.values() if r["correct_exit_code"]),
+            "subprocess_reliability": sum(1 for r in subprocess_results.values() if r["subprocess_successful"])
+            / len(subprocess_tests),
         }
 
         # Cleanup
         import shutil
+
         shutil.rmtree(temp_dir)
 
-        assert subprocess_summary['subprocess_reliability'] > 0.8, "Subprocess execution reliability too low"
-        assert subprocess_summary['correct_exit_codes'] >= subprocess_summary['successful_subprocesses'], "Subprocess exit codes incorrect"
+        assert subprocess_summary["subprocess_reliability"] > 0.8, "Subprocess execution reliability too low"
+        assert (
+            subprocess_summary["correct_exit_codes"] >= subprocess_summary["successful_subprocesses"]
+        ), "Subprocess exit codes incorrect"
 
-        exit_code_workflow_validator.complete_scenario(True, {
-            'subprocess_exit_code_validation_completed': True,
-            'subprocess_summary': subprocess_summary
-        })
+        exit_code_workflow_validator.complete_scenario(
+            True, {"subprocess_exit_code_validation_completed": True, "subprocess_summary": subprocess_summary}
+        )
 
     def test_edge_case_exit_codes(self, exit_code_workflow_validator):
         """Test edge case scenarios for exit codes."""
@@ -1101,38 +1125,38 @@ def test_function(param1, param2, param3, param4, param5):  # Parameter bomb
 
         edge_cases = [
             {
-                'name': 'extremely_large_file',
-                'setup': lambda: self._create_large_file(project_path),
-                'expected_behavior': 'handle_gracefully',
-                'max_exit_code': 3
+                "name": "extremely_large_file",
+                "setup": lambda: self._create_large_file(project_path),
+                "expected_behavior": "handle_gracefully",
+                "max_exit_code": 3,
             },
             {
-                'name': 'deeply_nested_violations',
-                'setup': lambda: self._create_deeply_nested_project(project_path),
-                'expected_behavior': 'find_violations',
-                'expected_exit_code': 1
+                "name": "deeply_nested_violations",
+                "setup": lambda: self._create_deeply_nested_project(project_path),
+                "expected_behavior": "find_violations",
+                "expected_exit_code": 1,
             },
             {
-                'name': 'unicode_violations',
-                'setup': lambda: self._create_unicode_violation_file(project_path),
-                'expected_behavior': 'handle_unicode',
-                'expected_exit_code': 1
+                "name": "unicode_violations",
+                "setup": lambda: self._create_unicode_violation_file(project_path),
+                "expected_behavior": "handle_unicode",
+                "expected_exit_code": 1,
             },
             {
-                'name': 'mixed_encoding_files',
-                'setup': lambda: self._create_mixed_encoding_project(project_path),
-                'expected_behavior': 'handle_gracefully',
-                'max_exit_code': 2
-            }
+                "name": "mixed_encoding_files",
+                "setup": lambda: self._create_mixed_encoding_project(project_path),
+                "expected_behavior": "handle_gracefully",
+                "max_exit_code": 2,
+            },
         ]
 
         edge_case_results = {}
 
         for edge_case in edge_cases:
-            case_name = edge_case['name']
+            case_name = edge_case["name"]
 
             # Setup edge case
-            edge_case['setup']()
+            edge_case["setup"]()
 
             # Execute analysis
             cli = ConnascenceCLI()
@@ -1150,21 +1174,21 @@ def test_function(param1, param2, param3, param4, param5):  # Parameter bomb
             execution_time = time.time() - start_time
 
             # Validate based on expected behavior
-            if 'expected_exit_code' in edge_case:
-                correct_exit_code = exit_code == edge_case['expected_exit_code']
-            elif 'max_exit_code' in edge_case:
-                correct_exit_code = 0 <= exit_code <= edge_case['max_exit_code']
+            if "expected_exit_code" in edge_case:
+                correct_exit_code = exit_code == edge_case["expected_exit_code"]
+            elif "max_exit_code" in edge_case:
+                correct_exit_code = 0 <= exit_code <= edge_case["max_exit_code"]
             else:
                 correct_exit_code = exit_code >= 0  # Any non-negative exit code
 
             result = {
-                'case_name': case_name,
-                'exit_code': exit_code,
-                'execution_successful': execution_successful,
-                'correct_exit_code': correct_exit_code,
-                'execution_time': execution_time,
-                'error': error,
-                'expected_behavior': edge_case['expected_behavior']
+                "case_name": case_name,
+                "exit_code": exit_code,
+                "execution_successful": execution_successful,
+                "correct_exit_code": correct_exit_code,
+                "execution_time": execution_time,
+                "error": error,
+                "expected_behavior": edge_case["expected_behavior"],
             }
 
             edge_case_results[case_name] = result
@@ -1178,25 +1202,28 @@ def test_function(param1, param2, param3, param4, param5):  # Parameter bomb
 
         # Summary
         edge_case_summary = {
-            'edge_cases_tested': len(edge_cases),
-            'all_executed_successfully': all(r['execution_successful'] for r in edge_case_results.values()),
-            'all_exit_codes_correct': all(r['correct_exit_code'] for r in edge_case_results.values()),
-            'avg_execution_time': sum(r['execution_time'] for r in edge_case_results.values()) / len(edge_case_results),
-            'max_execution_time': max(r['execution_time'] for r in edge_case_results.values()),
-            'edge_case_robustness': sum(1 for r in edge_case_results.values() if r['execution_successful'] and r['correct_exit_code']) / len(edge_cases)
+            "edge_cases_tested": len(edge_cases),
+            "all_executed_successfully": all(r["execution_successful"] for r in edge_case_results.values()),
+            "all_exit_codes_correct": all(r["correct_exit_code"] for r in edge_case_results.values()),
+            "avg_execution_time": sum(r["execution_time"] for r in edge_case_results.values()) / len(edge_case_results),
+            "max_execution_time": max(r["execution_time"] for r in edge_case_results.values()),
+            "edge_case_robustness": sum(
+                1 for r in edge_case_results.values() if r["execution_successful"] and r["correct_exit_code"]
+            )
+            / len(edge_cases),
         }
 
         # Cleanup
         import shutil
+
         shutil.rmtree(temp_dir)
 
-        assert edge_case_summary['all_executed_successfully'], "Not all edge cases executed successfully"
-        assert edge_case_summary['edge_case_robustness'] > 0.8, "Edge case robustness too low"
+        assert edge_case_summary["all_executed_successfully"], "Not all edge cases executed successfully"
+        assert edge_case_summary["edge_case_robustness"] > 0.8, "Edge case robustness too low"
 
-        exit_code_workflow_validator.complete_scenario(True, {
-            'edge_case_exit_codes_tested': True,
-            'edge_case_summary': edge_case_summary
-        })
+        exit_code_workflow_validator.complete_scenario(
+            True, {"edge_case_exit_codes_tested": True, "edge_case_summary": edge_case_summary}
+        )
 
     def test_exit_code_memory_coordination_validation(self):
         """Test exit code memory coordination system."""
@@ -1204,29 +1231,19 @@ def test_function(param1, param2, param3, param4, param5):  # Parameter bomb
         test_scenario_id = "exit_code_memory_test"
 
         # Store comprehensive test data
-        exit_code_coordinator.store_exit_code_scenario(test_scenario_id, 1, 1, {
-            'test_type': 'memory_validation',
-            'scenario_type': 'test_violations'
-        })
+        exit_code_coordinator.store_exit_code_scenario(
+            test_scenario_id, 1, 1, {"test_type": "memory_validation", "scenario_type": "test_violations"}
+        )
 
-        exit_code_coordinator.store_scenario_result(test_scenario_id, {
-            'test_result': True,
-            'validation_passed': True
-        })
+        exit_code_coordinator.store_scenario_result(test_scenario_id, {"test_result": True, "validation_passed": True})
 
-        exit_code_coordinator.store_consistency_test("consistency_test", {
-            'consistent': True,
-            'runs': 5
-        })
+        exit_code_coordinator.store_consistency_test("consistency_test", {"consistent": True, "runs": 5})
 
-        exit_code_coordinator.store_edge_case_exit_code("edge_test", {
-            'handled_gracefully': True
-        })
+        exit_code_coordinator.store_edge_case_exit_code("edge_test", {"handled_gracefully": True})
 
-        exit_code_coordinator.store_subprocess_result("subprocess_test", {
-            'subprocess_successful': True,
-            'correct_exit_code': True
-        })
+        exit_code_coordinator.store_subprocess_result(
+            "subprocess_test", {"subprocess_successful": True, "correct_exit_code": True}
+        )
 
         # Validate comprehensive storage
         assert test_scenario_id in exit_code_coordinator.exit_code_scenarios
@@ -1237,11 +1254,11 @@ def test_function(param1, param2, param3, param4, param5):  # Parameter bomb
 
         # Test summary generation
         summary = exit_code_coordinator.get_exit_code_summary()
-        assert summary['total_scenarios_tested'] > 0
-        assert summary['exit_code_accuracy'] > 0
-        assert summary['consistency_tests_run'] > 0
-        assert summary['edge_cases_tested'] > 0
-        assert summary['subprocess_tests_run'] > 0
+        assert summary["total_scenarios_tested"] > 0
+        assert summary["exit_code_accuracy"] > 0
+        assert summary["consistency_tests_run"] > 0
+        assert summary["edge_cases_tested"] > 0
+        assert summary["subprocess_tests_run"] > 0
 
         # Test breakdown generation
         breakdown = exit_code_coordinator.get_exit_code_breakdown()
@@ -1251,27 +1268,29 @@ def test_function(param1, param2, param3, param4, param5):  # Parameter bomb
     # Helper methods
     def _create_violation_file(self, project_path: Path):
         """Create file with violations."""
-        (project_path / "violations.py").write_text("""
+        (project_path / "violations.py").write_text(
+            """
 def bad_function(a, b, c, d, e, f): pass  # Parameter bomb
 magic = 42  # Magic literal
-""")
+"""
+        )
 
     def _create_clean_file(self, project_path: Path):
         """Create clean file without violations."""
-        (project_path / "clean.py").write_text("""
+        (project_path / "clean.py").write_text(
+            """
 from typing import List
 
 MAX_ITEMS: int = 100
 
 def clean_function(*, items: List[str]) -> int:
     return len(items)
-""")
+"""
+        )
 
     def _create_large_file(self, project_path: Path):
         """Create very large file."""
-        large_content = "# Large file\n" + "\n".join([
-            f"def function_{i}(): pass" for i in range(10000)
-        ])
+        large_content = "# Large file\n" + "\n".join([f"def function_{i}(): pass" for i in range(10000)])
         (project_path / "large.py").write_text(large_content)
 
     def _create_deeply_nested_project(self, project_path: Path):
@@ -1281,14 +1300,17 @@ def clean_function(*, items: List[str]) -> int:
             current_path = current_path / f"level_{level}"
             current_path.mkdir(parents=True)
 
-            (current_path / f"nested_{level}.py").write_text(f"""
+            (current_path / f"nested_{level}.py").write_text(
+                f"""
 def nested_function_{level}(a, b, c, d, e): pass  # Parameter bomb
 nested_magic_{level} = {100 + level}  # Magic literal
-""")
+"""
+            )
 
     def _create_unicode_violation_file(self, project_path: Path):
         """Create file with Unicode content and violations."""
-        (project_path / "unicode_violations.py").write_text("""
+        (project_path / "unicode_violations.py").write_text(
+            """
 # -*- coding: utf-8 -*-
 # File with Unicode characters: aβyδε
 
@@ -1326,28 +1348,34 @@ class Clasenicode:
     def mtodo_19(self): pass
     def mtodo_20(self): pass
     def método_21(self): pass  # God class
-""", encoding='utf-8')
+""",
+            encoding="utf-8",
+        )
 
     def _create_mixed_encoding_project(self, project_path: Path):
         """Create project with mixed file encodings."""
         # UTF-8 file
-        with open(project_path / "utf8_file.py", 'w', encoding='utf-8') as f:
-            f.write("""
+        with open(project_path / "utf8_file.py", "w", encoding="utf-8") as f:
+            f.write(
+                """
 # UTF-8 file
 def utf8_function(): pass
-""")
+"""
+            )
 
         # ASCII file
-        with open(project_path / "ascii_file.py", 'w', encoding='ascii') as f:
-            f.write("""
+        with open(project_path / "ascii_file.py", "w", encoding="ascii") as f:
+            f.write(
+                """
 # ASCII file
 def ascii_function(): pass
-""")
+"""
+            )
 
         # File with potential encoding issues
-        with open(project_path / "mixed_encoding.py", 'wb') as f:
+        with open(project_path / "mixed_encoding.py", "wb") as f:
             f.write(b"# Mixed encoding file\n")
-            f.write("def mixed_function(): pass\n".encode('ascii'))
+            f.write("def mixed_function(): pass\n".encode("ascii"))
 
 
 @pytest.mark.e2e
@@ -1359,24 +1387,16 @@ def test_exit_code_integration():
     # Test complete exit code integration
     scenario_id = "exit_code_integration_test"
 
-    coordinator.store_exit_code_scenario(scenario_id, 0, 0, {
-        'integration_test': True,
-        'timestamp': time.time()
-    })
+    coordinator.store_exit_code_scenario(scenario_id, 0, 0, {"integration_test": True, "timestamp": time.time()})
 
     # Validate integration
     assert scenario_id in coordinator.exit_code_scenarios
 
     summary = coordinator.get_exit_code_summary()
-    assert summary['total_scenarios_tested'] > 0
+    assert summary["total_scenarios_tested"] > 0
 
     print("Exit code integration test completed successfully")
 
 
 if __name__ == "__main__":
-    pytest.main([
-        __file__,
-        "-v",
-        "--tb=short",
-        "-m", "e2e"
-    ])
+    pytest.main([__file__, "-v", "--tb=short", "-m", "e2e"])

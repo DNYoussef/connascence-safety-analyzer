@@ -168,7 +168,6 @@ class ConnascenceAnalyzer:
         else:
             return self._run_mock_analysis(path, policy, duplication_result, **kwargs)
 
-
     def _analyze_file_or_directory(self, path_obj, policy_preset, **kwargs):
         """
         Analyze file or directory based on path type.
@@ -284,7 +283,6 @@ class ConnascenceAnalyzer:
 
         except Exception as e:
             return self._create_error_result(e)
-
 
     def _run_fallback_analysis(
         self, path: str, policy: str, duplication_result: Optional[Any] = None, **kwargs
@@ -433,7 +431,6 @@ class ConnascenceAnalyzer:
         }
 
 
-
 def _add_basic_arguments(parser: argparse.ArgumentParser):
     """
     Add basic arguments (path, policy, format, output).
@@ -453,9 +450,7 @@ def _add_basic_arguments(parser: argparse.ArgumentParser):
     except:
         pass
 
-    parser.add_argument(
-        "--policy", type=str, default="standard", help=policy_help
-    )
+    parser.add_argument("--policy", type=str, default="standard", help=policy_help)
     parser.add_argument(
         "--format", "-f", type=str, default="json", choices=["json", "yaml", "sarif"], help="Output format"
     )
@@ -561,8 +556,6 @@ def create_parser() -> argparse.ArgumentParser:
     return parser
 
 
-
-
 def _validate_and_resolve_policy(policy: str) -> str:
     """
     Validate and resolve policy name.
@@ -579,24 +572,25 @@ def _validate_and_resolve_policy(policy: str) -> str:
             pass
 
     # Validate policy name (after resolution)
-    if validate_policy_name:
-        if not validate_policy_name(policy):
-            available_policies = []
-            if list_available_policies:
-                try:
-                    available_policies = list_available_policies(include_legacy=True)
-                except Exception:
-                    from analyzer.constants import UNIFIED_POLICY_NAMES
-                    available_policies = UNIFIED_POLICY_NAMES
-            else:
+    if validate_policy_name and not validate_policy_name(policy):
+        available_policies = []
+        if list_available_policies:
+            try:
+                available_policies = list_available_policies(include_legacy=True)
+            except Exception:
                 from analyzer.constants import UNIFIED_POLICY_NAMES
-                available_policies = UNIFIED_POLICY_NAMES
 
-            print(
-                f"Error: Unknown policy '{policy}'. Available policies: {', '.join(available_policies)}",
-                file=sys.stderr,
-            )
-            sys.exit(1)
+                available_policies = UNIFIED_POLICY_NAMES
+        else:
+            from analyzer.constants import UNIFIED_POLICY_NAMES
+
+            available_policies = UNIFIED_POLICY_NAMES
+
+        print(
+            f"Error: Unknown policy '{policy}'. Available policies: {', '.join(available_policies)}",
+            file=sys.stderr,
+        )
+        sys.exit(1)
 
     return policy
 
@@ -624,10 +618,7 @@ def _run_analysis(args, policy: str, analyzer, include_duplication: bool, duplic
     NASA Rule 4: Function under 60 lines
     """
     use_enhanced_analyzer = (
-        args.enable_correlations
-        or args.enable_audit_trail
-        or args.enable_smart_recommendations
-        or args.enhanced_output
+        args.enable_correlations or args.enable_audit_trail or args.enable_smart_recommendations or args.enhanced_output
     )
 
     if use_enhanced_analyzer and UNIFIED_ANALYZER_AVAILABLE:
@@ -749,9 +740,7 @@ def _display_phase_timing(args, result):
                 violations = phase.get("violations_found", 0)
                 clusters = phase.get("clusters_found", 0)
 
-                print(
-                    f"{phase_name:25} | {duration:8.1f}ms | {violations:3d} violations | {clusters:3d} clusters"
-                )
+                print(f"{phase_name:25} | {duration:8.1f}ms | {violations:3d} violations | {clusters:3d} clusters")
 
 
 def _display_correlations_summary(result):
@@ -835,6 +824,7 @@ def _handle_error(e: Exception, args):
     """
     print(f"Analyzer error: {e}", file=sys.stderr)
     import traceback
+
     traceback.print_exc()
 
     if args.output and args.format in ["json", "sarif"]:
