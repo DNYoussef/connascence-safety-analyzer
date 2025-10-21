@@ -4,6 +4,7 @@ Validate that detector pool fix resolved the 0 violations issue.
 """
 
 import ast
+import sys
 
 from analyzer.refactored_detector import RefactoredConnascenceDetector
 
@@ -65,7 +66,7 @@ print("\n" + "=" * 60)
 if len(violations) > 0:
     print("[SUCCESS] Detector pool is working! Violations detected.")
     print(f"Pool metrics: {detector.get_pool_metrics()}")
-    exit(0)
+    sys.exit(0)
 else:
     print("[FAILURE] No violations detected. Pool may still be broken.")
-    exit(1)
+    sys.exit(1)

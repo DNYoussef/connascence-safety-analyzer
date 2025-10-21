@@ -862,10 +862,7 @@ class SecurityManager:
             return False
 
         # Only allow alphanumeric characters and underscores
-        if not re.match(r"^[a-zA-Z0-9_]+$", username):
-            return False
-
-        return True
+        return re.match(r"^[a-zA-Z0-9_]+$", username)
 
     def _validate_password_format(self, password: str) -> bool:
         """Validate password format (basic validation - full policy in production)."""
@@ -879,10 +876,7 @@ class SecurityManager:
             return False
         if not re.search(r"\d", password):
             return False
-        if not re.search(r'[!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?]', password):
-            return False
-
-        return True
+        return re.search(r'[!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?]', password)
 
     @staticmethod
     def hash_password(password: str) -> str:

@@ -1,0 +1,21 @@
+{
+  "success": false,
+  "error": "Path does not exist: scan",
+  "violations": [],
+  "summary": {
+    "total_violations": 0
+  },
+  "nasa_compliance": {
+    "score": 0.0,
+    "violations": []
+  },
+  "mece_analysis": {
+    "score": 0.0,
+    "duplications": []
+  },
+  "duplication_analysis": {
+    "score": 1.0,
+    "violations": []
+  },
+  "god_objects": []
+}

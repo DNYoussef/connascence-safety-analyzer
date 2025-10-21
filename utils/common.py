@@ -34,10 +34,7 @@ def validate_file_path(file_path: str) -> bool:
         return False
 
     # Basic validation - no path traversal attempts
-    if ".." in file_path or file_path.startswith("/"):
-        return False
-
-    return True
+    return not (".." in file_path or file_path.startswith("/"))
 
 
 def safe_get_attribute(obj: Any, attr_name: str, default: Any = None) -> Any:

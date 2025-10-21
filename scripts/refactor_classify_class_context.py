@@ -5,6 +5,7 @@ from 82 LOC to ≤60 LOC.
 """
 
 from pathlib import Path
+import sys
 
 # Path to the file
 context_analyzer_file = Path(__file__).parent.parent / "analyzer" / "context_analyzer.py"
@@ -145,7 +146,7 @@ end_idx = content.find(end_marker)
 if start_idx == -1 or end_idx == -1:
     print("[ERROR] Could not find _classify_class_context() function boundaries")
     print(f"start_idx: {start_idx}, end_idx: {end_idx}")
-    exit(1)
+    sys.exit(1)
 
 # Create new content
 new_content = content[:start_idx] + helper_functions + new_function + content[end_idx:]

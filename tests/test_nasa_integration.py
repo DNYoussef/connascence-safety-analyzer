@@ -46,7 +46,7 @@ def factorial(n):
     if n <= 1:
         return 1
     return n * factorial(n - 1)  # Recursive call
-    
+
 def fibonacci(n):
     if n <= 1:
         return n
@@ -71,14 +71,14 @@ def fibonacci(n):
 # Bounded loops (should pass)
 for i in range(10):
     print(i)
-    
+
 for item in [1, 2, 3, 4, 5]:
     process(item)
 
-# Unbounded loops (should fail)  
+# Unbounded loops (should fail)
 while True:
     process_forever()
-    
+
 x = 0
 while x < get_dynamic_limit():  # Dynamic bound
     x += 1
@@ -103,7 +103,7 @@ import ctypes
 def use_malloc():
     ptr = ctypes.malloc(100)  # Dynamic allocation
     return ptr
-    
+
 def use_calloc():
     ptr = ctypes.calloc(10, 10)  # Another allocation
     return ptr
@@ -153,11 +153,11 @@ def good_function_with_assertions(x, y):
 def bad_function_no_assertions(x, y):
     result = x / y  # No assertions, risky division
     return result
-    
+
 def bad_function_one_assertion(x, y):
     assert x > 0  # Only one assertion
     return x + y
-    
+
 def trivial_function():  # Should be exempt (too short)
     return 42
 """
@@ -211,7 +211,7 @@ def risky_function():
 def main():
     risky_function()  # Return value not checked
     another_risky_call()  # Another unchecked return
-    
+
     # Good practice
     result = safe_function()
     if result is not None:
@@ -268,16 +268,16 @@ def problematic_function(n):
     # Rule 1: Recursion
     if n > 0:
         return n * problematic_function(n-1)
-    
+
     # Rule 2: Unbounded loop
     while True:
         process_data()
         if random_condition():
             break
-            
+
     # Rule 3: Dynamic allocation
     ptr = ctypes.malloc(100)
-    
+
     # Rule 5: No assertions
     result = risky_operation()
     return result  # Rule 7: No return check
@@ -397,7 +397,7 @@ def algorithm_duplicate():  # NASA + connascence of algorithm
         conn_lines = {v.line_number for v in conn_violations}
 
         # May have overlapping line numbers indicating correlated issues
-        overlapping_lines = nasa_lines.intersection(conn_lines)
+        nasa_lines.intersection(conn_lines)
         # This is informational - not all violations will overlap
 
 

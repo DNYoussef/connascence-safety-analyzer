@@ -22,7 +22,7 @@ from dataclasses import asdict, dataclass
 import json
 from pathlib import Path
 import time
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from fixes.phase0.production_safe_assertions import ProductionAssert
 
@@ -73,7 +73,7 @@ class IntegrationTestMemoryCoordinator:
         self.test_results.append(test_result)
         self.component_coverage.add(test_result.component)
 
-    def get_test_results(self, component: str = None, status: str = None) -> List[TestResult]:
+    def get_test_results(self, component: Optional[str] = None, status: Optional[str] = None) -> List[TestResult]:
         """Retrieve test results with optional filtering"""
         results = self.test_results.copy()
 
@@ -194,7 +194,7 @@ def store_integration_result(
     execution_time: float,
     component: str,
     details: Dict[str, Any],
-    dependencies: List[str] = None,
+    dependencies: Optional[List[str]] = None,
 ):
     """Convenience function to store integration test results"""
     result = TestResult(
@@ -216,7 +216,7 @@ def get_integration_metrics() -> Dict[str, Any]:
     return INTEGRATION_COORDINATOR.calculate_coverage_metrics()
 
 
-def export_integration_results(output_dir: Path = None) -> Dict[str, Any]:
+def export_integration_results(output_dir: Optional[Path] = None) -> Dict[str, Any]:
     """Export integration test results"""
     if output_dir is None:
         output_dir = Path(__file__).parent.parent.parent / "test_results" / "integration"

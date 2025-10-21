@@ -16,7 +16,7 @@ from pathlib import Path
 
 # Import shared utilities
 import sys
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Optional, Union
 
 try:
     import yaml
@@ -428,9 +428,7 @@ class PolicyManager:
                 return False
             if policy.god_class_methods <= 0:
                 return False
-            if policy.max_cyclomatic_complexity > 100:
-                return False
-            return True
+            return not policy.max_cyclomatic_complexity > 100
         elif isinstance(policy, dict):
             # Validate dictionary policy
             validation_result = {"valid": True, "errors": []}
@@ -471,8 +469,8 @@ class PolicyViolation:
         policy_rule: str,
         severity: str,
         description: str,
-        file_path: str = None,
-        line_number: int = None,
+        file_path: Optional[str] = None,
+        line_number: Optional[int] = None,
     ):
         self.violation_id = violation_id
         self.policy_rule = policy_rule

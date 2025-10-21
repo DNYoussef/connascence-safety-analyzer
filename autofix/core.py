@@ -364,7 +364,7 @@ class SafeAutofixer:
             end_line = patch.line_range[1] - 1
 
             # Replace the target line(s)
-            new_lines = lines[:start_line] + [patch.new_code] + lines[end_line + 1 :]
+            new_lines = [*lines[:start_line], patch.new_code, *lines[end_line + 1 :]]
             new_source = "\n".join(new_lines)
 
             # Validate the result can be parsed
@@ -394,10 +394,7 @@ class SafeAutofixer:
         lines = source_code.splitlines()
         start_line = patch.line_range[0] - 1
 
-        if start_line >= len(lines):
-            return False
-
-        return True
+        return not start_line >= len(lines)
 
     def preview_fixes(self, file_path: str, violations: List[ConnascenceViolation]) -> "PreviewResult":
         """Preview fixes for violations without applying them."""

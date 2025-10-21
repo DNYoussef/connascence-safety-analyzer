@@ -42,7 +42,7 @@ class TestClass:
     def __init__(self, config):
         # CofE: Identity - class structure depends on config
         self.setting = config["setting"]
-        
+
     def process(self, data, format="json"):
         # CofE: Position - parameter order dependency
         # CofE: Meaning - format string coupling
@@ -100,7 +100,7 @@ class TestCLIEnhancedIntegration:
 
             # Verify arguments are parsed correctly
             if "--enable-correlations" in test_args:
-                assert args.enable_correlations == True
+                assert args.enable_correlations
             if "--correlation-threshold" in test_args:
                 assert args.correlation_threshold == 0.8
             if "--export-audit-trail" in test_args:
@@ -196,7 +196,7 @@ class TestCLIEnhancedIntegration:
             assert is_valid, f"Enhanced CLI analysis result validation failed: {errors}"
 
             # Verify enhanced features are enabled
-            assert result["cross_phase_analysis"] == True
+            assert result["cross_phase_analysis"]
             assert len(result["correlations"]) > 0
             assert len(result["smart_recommendations"]) > 0
             assert len(result["audit_trail"]) > 0
@@ -326,7 +326,7 @@ class TestCLIEnhancedIntegration:
 
                 # Should raise error or handle gracefully
                 result = self._handle_invalid_policy("invalid_policy")
-                assert result == False or "error" in str(result).lower()
+                assert not result or "error" in str(result).lower()
 
     @integration_test(["cli"])
     def test_enhanced_output_formats(self, tmp_path, enhanced_test_datasets):
@@ -349,7 +349,7 @@ class TestCLIEnhancedIntegration:
         assert "smart_recommendations" in json_data
         assert "audit_trail" in json_data
         assert "cross_phase_analysis" in json_data
-        assert json_data["cross_phase_analysis"] == True
+        assert json_data["cross_phase_analysis"]
 
         # Test SARIF output format (should include enhanced metadata)
         sarif_output = self._format_enhanced_sarif_output(enhanced_result)
@@ -389,26 +389,26 @@ class TestCLIEnhancedIntegration:
                     "analyzer.unified_analyzer.UnifiedConnascenceAnalyzer", side_effect=ImportError("Not available")
                 ):
                     result = self._simulate_cli_execution(mock_args, scenario)
-                    assert "error" in str(result).lower() or result == False
+                    assert "error" in str(result).lower() or not result
 
             elif scenario == "invalid_threshold":
                 mock_args.correlation_threshold = 1.5  # Invalid range
                 result = self._simulate_cli_execution(mock_args, scenario)
                 # Should handle gracefully or validate input
-                assert result != None
+                assert result is not None
 
             elif scenario == "export_permission_denied":
                 mock_args.export_correlations = "/root/protected_file.json"  # No permission
                 with patch("builtins.open", side_effect=PermissionError("Permission denied")):
                     result = self._simulate_cli_execution(mock_args, scenario)
-                    assert "permission" in str(result).lower() or result == False
+                    assert "permission" in str(result).lower() or not result
 
             elif scenario == "analysis_timeout":
                 mock_analyzer = MockEnhancedAnalyzer("timeout")
                 with patch("analyzer.unified_analyzer.UnifiedConnascenceAnalyzer", return_value=mock_analyzer):
                     result = self._simulate_cli_execution(mock_args, scenario)
                     # Should handle timeout gracefully
-                    assert result != None
+                    assert result is not None
 
     # Helper methods for CLI testing
 

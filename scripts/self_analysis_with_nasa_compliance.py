@@ -371,9 +371,7 @@ class ComprehensiveSelfAnalysis:
             return False
         if "__pycache__" in str(file_path):
             return False
-        if "node_modules" in str(file_path):
-            return False
-        return True
+        return "node_modules" not in str(file_path)
 
     def _serialize_violation(self, violation) -> Dict[str, Any]:
         """Serialize violation for JSON output."""

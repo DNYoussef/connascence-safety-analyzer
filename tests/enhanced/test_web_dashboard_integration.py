@@ -34,7 +34,7 @@ class TestClass:
     def __init__(self, config):
         # CofE: Identity - class structure depends on config
         self.setting = config["setting"]
-        
+
     def process(self, data, format="json"):
         # CofE: Position - parameter order dependency
         # CofE: Meaning - format string coupling
@@ -204,7 +204,7 @@ class TestWebDashboardEnhancedIntegration:
         """Test enhanced Chart.js initialization with real data."""
         correlations = enhanced_test_datasets.get_expected_correlations()
         audit_trail = enhanced_test_datasets.get_expected_audit_trail()
-        recommendations = enhanced_test_datasets.get_expected_smart_recommendations()
+        enhanced_test_datasets.get_expected_smart_recommendations()
 
         # Mock Chart.js initialization
         mock_charts = {}
@@ -221,8 +221,8 @@ class TestWebDashboardEnhancedIntegration:
             correlation_chart_config = self._create_correlation_chart_config(correlations)
             audit_chart_config = self._create_audit_trail_chart_config(audit_trail)
 
-            correlation_chart = MockChart("correlation_ctx", correlation_chart_config)
-            audit_chart = MockChart("audit_ctx", audit_chart_config)
+            MockChart("correlation_ctx", correlation_chart_config)
+            MockChart("audit_ctx", audit_chart_config)
 
             # Validate chart configurations
             assert correlation_chart_config["type"] == "scatter"
@@ -584,7 +584,7 @@ class TestWebDashboardIntegrationFlow:
     def test_complete_dashboard_enhanced_workflow(self, enhanced_test_datasets):
         """Test complete Web dashboard enhanced workflow with all features."""
         # 1. Simulate receiving enhanced analysis data
-        enhanced_data = {
+        {
             "correlations": [c.__dict__ for c in enhanced_test_datasets.get_expected_correlations()],
             "smart_recommendations": [r.__dict__ for r in enhanced_test_datasets.get_expected_smart_recommendations()],
             "audit_trail": [a.__dict__ for a in enhanced_test_datasets.get_expected_audit_trail()],

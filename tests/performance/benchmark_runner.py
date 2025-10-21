@@ -17,7 +17,7 @@ import statistics
 import sys
 import tempfile
 import time
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import psutil
 
@@ -135,7 +135,7 @@ class PerformanceBenchmarker:
         logger.info(f"Comprehensive benchmark completed in {total_time:.2f} seconds")
         return results
 
-    def benchmark_codebase(self, codebase_path: str, test_name: str = None) -> BenchmarkResult:
+    def benchmark_codebase(self, codebase_path: str, test_name: Optional[str] = None) -> BenchmarkResult:
         """Benchmark analyzer performance on a specific codebase."""
 
         codebase_path = Path(codebase_path)

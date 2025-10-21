@@ -99,9 +99,8 @@ class AssertionInjector(ast.NodeTransformer):
         """Extract type name from annotation"""
         if isinstance(annotation, ast.Name):
             return annotation.id
-        elif isinstance(annotation, ast.Subscript):
-            if isinstance(annotation.value, ast.Name):
-                return annotation.value.id
+        elif isinstance(annotation, ast.Subscript) and isinstance(annotation.value, ast.Name):
+            return annotation.value.id
         return None
 
 

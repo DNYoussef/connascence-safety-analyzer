@@ -224,7 +224,7 @@ class CIDashboardGenerator:
             <div class="status-badge">{status_text}</div>
             <p>Policy: {policy.upper()} | Generated: {datetime.fromisoformat(timestamp).strftime('%Y-%m-%d %H:%M:%S UTC')}</p>
         </div>
-        
+
         <div class="metrics-grid">
             <div class="metric-card {'success' if nasa_pass else 'critical'}">
                 <div class="metric-value">{summary['nasa_score']:.1%}</div>
@@ -233,73 +233,73 @@ class CIDashboardGenerator:
                     <div class="progress-fill" style="width: {summary['nasa_score'] * 100}%"></div>
                 </div>
             </div>
-            
+
             <div class="metric-card {'success' if summary['critical_violations'] <= 10 else 'warning' if summary['critical_violations'] <= 50 else 'critical'}">
                 <div class="metric-value">{summary['critical_violations']}</div>
                 <div class="metric-label">Critical Violations</div>
             </div>
-            
+
             <div class="metric-card">
                 <div class="metric-value">{summary['total_violations']}</div>
                 <div class="metric-label">Total Violations</div>
             </div>
-            
+
             <div class="metric-card {'success' if summary['mece_score'] >= 0.8 else 'warning'}">
                 <div class="metric-value">{summary['mece_score']:.2f}</div>
                 <div class="metric-label">MECE Score</div>
             </div>
-            
+
             <div class="metric-card {'success' if summary['god_objects_count'] <= 5 else 'warning' if summary['god_objects_count'] <= 25 else 'critical'}">
                 <div class="metric-value">{summary['god_objects_count']}</div>
                 <div class="metric-label">God Objects</div>
             </div>
-            
+
             <div class="metric-card {'success' if summary['overall_quality_score'] >= 0.7 else 'warning'}">
                 <div class="metric-value">{summary['overall_quality_score']:.1%}</div>
                 <div class="metric-label">Overall Quality Score</div>
             </div>
         </div>
-        
+
         <div class="details-section">
             <h2 class="section-title">DATA Analysis Details</h2>
-            
+
             {'<div class="analysis-item">✅ NASA Power of Ten compliance analysis completed</div>' if 'nasa' in self.dashboard_data['analysis_results'] else '<div class="analysis-item">⚠️ NASA analysis not available</div>'}
-            
+
             {'<div class="analysis-item">✅ God Object detection completed</div>' if 'god_objects' in self.dashboard_data['analysis_results'] else '<div class="analysis-item">ℹ️ God Object analysis not available</div>'}
-            
+
             {'<div class="analysis-item">✅ MECE duplication analysis completed</div>' if 'mece' in self.dashboard_data['analysis_results'] else '<div class="analysis-item">ℹ️ MECE analysis not available</div>'}
-            
+
             {'<div class="analysis-item">✅ Full connascence analysis completed</div>' if 'connascence' in self.dashboard_data['analysis_results'] else '<div class="analysis-item">⚠️ Connascence analysis not available</div>'}
-            
+
             {'<div class="analysis-item">✅ Tool correlation analysis completed</div>' if 'correlated' in self.dashboard_data['analysis_results'] else '<div class="analysis-item">ℹ️ Tool correlation not available</div>'}
         </div>
-        
+
         <div class="details-section">
             <h2 class="section-title">TARGET Quality Gates</h2>
-            
+
             <div class="analysis-item">
-                {'✅ NASA Compliance: PASSED' if nasa_pass else '❌ NASA Compliance: FAILED'} 
+                {'✅ NASA Compliance: PASSED' if nasa_pass else '❌ NASA Compliance: FAILED'}
                 ({summary['nasa_score']:.1%} {'≥' if nasa_pass else '<'} 90%)
             </div>
-            
+
             <div class="analysis-item">
-                {'✅ Critical Violations: ACCEPTABLE' if violations_acceptable else '❌ Critical Violations: TOO HIGH'} 
+                {'✅ Critical Violations: ACCEPTABLE' if violations_acceptable else '❌ Critical Violations: TOO HIGH'}
                 ({summary['critical_violations']} {'≤' if violations_acceptable else '>'} 50)
             </div>
-            
+
             <div class="analysis-item">
-                {'✅ God Objects: ACCEPTABLE' if summary['god_objects_count'] <= 25 else '❌ God Objects: TOO MANY'} 
+                {'✅ God Objects: ACCEPTABLE' if summary['god_objects_count'] <= 25 else '❌ God Objects: TOO MANY'}
                 ({summary['god_objects_count']} {'≤' if summary['god_objects_count'] <= 25 else '>'} 25)
             </div>
-            
+
             <div class="analysis-item">
-                {'✅ MECE Score: GOOD' if summary['mece_score'] >= 0.75 else '⚠️ MECE Score: NEEDS IMPROVEMENT'} 
+                {'✅ MECE Score: GOOD' if summary['mece_score'] >= 0.75 else '⚠️ MECE Score: NEEDS IMPROVEMENT'}
                 ({summary['mece_score']:.2f} {'≥' if summary['mece_score'] >= 0.75 else '<'} 0.75)
             </div>
         </div>
-        
+
         <div class="footer">
-            <p>SECURITY Generated by Connascence Safety Analyzer | 
+            <p>SECURITY Generated by Connascence Safety Analyzer |
             Defense Industry Compliance: {'✅ APPROVED' if nasa_pass else '❌ NOT APPROVED'}</p>
         </div>
     </div>

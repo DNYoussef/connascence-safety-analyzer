@@ -16,7 +16,7 @@ file_violations = defaultdict(lambda: {"rule_1": [], "rule_2": [], "rule_4": [],
 def calculate_complexity(node):
     complexity = 1
     for child in ast.walk(node):
-        if isinstance(child, (ast.If, ast.While, ast.For, ast.ExceptHandler)) or isinstance(child, (ast.And, ast.Or)):
+        if isinstance(child, (ast.If, ast.While, ast.For, ast.ExceptHandler, ast.And, ast.Or)):
             complexity += 1
     return complexity
 
@@ -31,10 +31,7 @@ def calculate_nesting(node, depth=0):
 
 
 def has_assertions(func_node):
-    for node in ast.walk(func_node):
-        if isinstance(node, ast.Assert):
-            return True
-    return False
+    return any(isinstance(node, ast.Assert) for node in ast.walk(func_node))
 
 
 def estimate_fix_effort(violation_type, severity, auto_fixable):

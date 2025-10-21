@@ -133,7 +133,7 @@ def test_evidence_validator():
     assert score < 0.4
 
     # Test improvement claim validation
-    is_valid, message, score = validator.validate_improvement_claim(
+    is_valid, _message, score = validator.validate_improvement_claim(
         baseline=100.0, improved=60.0, claim_type="violations"
     )
     assert is_valid

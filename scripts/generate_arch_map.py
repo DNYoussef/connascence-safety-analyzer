@@ -2,7 +2,9 @@
 """Generate comprehensive architectural analysis map."""
 
 import ast
+import builtins
 from collections import defaultdict
+import contextlib
 import json
 from pathlib import Path
 
@@ -26,10 +28,8 @@ for module in module_dirs:
         py_files = list(module_path.rglob("*.py"))
         total_loc = 0
         for f in py_files:
-            try:
+            with contextlib.suppress(builtins.BaseException):
                 total_loc += len(open(f).readlines())
-            except:
-                pass
 
         arch_map["module_structure"][module] = {
             "files": len(py_files),
@@ -121,7 +121,7 @@ for file, stats in sorted(file_violations.items(), key=lambda x: x[1]["count"], 
                 "violations": stats["count"],
                 "loc": loc,
                 "density": round(density, 4),
-                "rules_violated": sorted(list(stats["rules"])),
+                "rules_violated": sorted(stats["rules"]),
                 "priority": "critical" if density > 0.3 else "high" if density > 0.2 else "medium",
             }
         )
@@ -142,9 +142,8 @@ for py_file in Path(".").rglob("*.py"):
                 if isinstance(node, ast.Import):
                     for alias in node.names:
                         imports.add(alias.name.split(".")[0])
-                elif isinstance(node, ast.ImportFrom):
-                    if node.module:
-                        imports.add(node.module.split(".")[0])
+                elif isinstance(node, ast.ImportFrom) and node.module:
+                    imports.add(node.module.split(".")[0])
             import_counts[str(py_file)] = len(imports)
     except:
         pass

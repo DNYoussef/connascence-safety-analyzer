@@ -5,6 +5,7 @@ Extracts helper functions while maintaining functionality.
 """
 
 from pathlib import Path
+import sys
 
 # Path to the file
 core_file = Path(__file__).parent.parent / "analyzer" / "core.py"
@@ -365,7 +366,7 @@ for i, line in enumerate(lines):
 
 if main_start is None:
     print("[ERROR] Could not find main() function")
-    exit(1)
+    sys.exit(1)
 
 # Find the end of main() (next function definition or end of file)
 main_end = None

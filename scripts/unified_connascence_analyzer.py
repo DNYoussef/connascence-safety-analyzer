@@ -261,8 +261,6 @@ def check_dependencies():
     missing_deps = []
 
     # Check Python version
-    if sys.version_info < (3, 8):
-        missing_deps.append("Python 3.8+ required")
 
     # Check for optional tools
     tools_status = {}

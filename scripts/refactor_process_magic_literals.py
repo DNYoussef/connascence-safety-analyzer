@@ -5,6 +5,7 @@ from 108 LOC to ≤60 LOC.
 """
 
 from pathlib import Path
+import sys
 
 # Path to the file
 check_connascence_file = Path(__file__).parent.parent / "analyzer" / "check_connascence.py"
@@ -169,7 +170,7 @@ end_idx = content.find(end_marker)
 
 if start_idx == -1 or end_idx == -1:
     print("[ERROR] Could not find _process_magic_literals() function boundaries")
-    exit(1)
+    sys.exit(1)
 
 # Create new content
 new_content = content[:start_idx] + helper_functions + new_function + content[end_idx:]

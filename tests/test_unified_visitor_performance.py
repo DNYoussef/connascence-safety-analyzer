@@ -39,20 +39,20 @@ global_var6 = True  # This should trigger global violation
 
 class LargeClass:
     """Test class with many methods for god object detection."""
-    
+
     def method1(self, a, b, c, d, e, f):  # Should be 6 non-self parameters
         """Method with too many positional parameters."""
         return a + b + c + d + e + f
-    
+
     def method2(self):
         """Method with magic literals."""
         return 42 * 3.14159  # Magic numbers
-    
+
     def method3(self):
         """Timing-related method."""
         time.sleep(0.1)
         return True
-    
+
     def method4(self):
         """Duplicate algorithm - part 1."""
         if True:
@@ -60,7 +60,7 @@ class LargeClass:
                 if i % 2 == 0:
                     return i
         return None
-    
+
     def method5(self):
         """Duplicate algorithm - part 2."""
         if True:
@@ -68,18 +68,18 @@ class LargeClass:
                 if i % 2 == 0:
                     return i
         return None
-    
+
     def method6(self):
         """Hardcoded values."""
         config_url = "https://api.example.com/v1"
         api_key = "abc123def456"
         return config_url, api_key
-    
+
     def method7(self):
         """Convention violations."""
         BadVariableName = "should_be_snake_case"
         return BadVariableName
-    
+
     def method8(self):
         """Execution order dependencies."""
         items = []

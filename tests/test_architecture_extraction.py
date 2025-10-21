@@ -9,6 +9,8 @@ Tests to validate that the god object extraction was successful and
 maintains backward compatibility with zero breaking changes.
 """
 
+import builtins
+import contextlib
 import os
 from pathlib import Path
 import sys
@@ -217,7 +219,7 @@ def example_function(param1, param2):
 class ExampleClass:
     def __init__(self):
         self.data = []
-    
+
     def add_item(self, item):
         self.data.append(item)  # Simple method
 """
@@ -230,10 +232,8 @@ class ExampleClass:
 
     def tearDown(self):
         """Clean up temporary file."""
-        try:
+        with contextlib.suppress(builtins.BaseException):
             os.unlink(self.temp_file.name)
-        except:
-            pass
 
     def test_file_analysis_still_works(self):
         """Test that file analysis functionality is preserved."""

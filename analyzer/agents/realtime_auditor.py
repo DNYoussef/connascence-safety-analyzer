@@ -27,7 +27,7 @@ from dataclasses import dataclass
 from datetime import datetime
 import json
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any, ClassVar, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -68,9 +68,15 @@ class AuditReport:
 
 
 class RealtimeDiagnosticAuditor:
-    SEVERITY_WEIGHTS = {"error": 5, "warning": 3, "information": 1, "hint": 0.5}
+    # Constants for quality scoring
+    SEVERITY_WEIGHTS: ClassVar[Dict[str, float]] = {"error": 5, "warning": 3, "information": 1, "hint": 0.5}
+    QUALITY_THRESHOLDS: ClassVar[Dict[str, float]] = {"excellent": 0.95, "good": 0.85, "acceptable": 0.75, "poor": 0.60}
 
-    QUALITY_THRESHOLDS = {"excellent": 0.95, "good": 0.85, "acceptable": 0.75, "poor": 0.60}
+    # Magic value constants for trend detection and quality assessment
+    MIN_SAMPLES_FOR_TREND: ClassVar[int] = 5
+    TREND_WINDOW_SIZE: ClassVar[int] = 20
+    TREND_THRESHOLD: ClassVar[float] = 0.05
+    HIGH_PRIORITY_THRESHOLD: ClassVar[int] = 8
 
     def __init__(self, max_history: int = 1000):
         self.event_history: deque = deque(maxlen=max_history)
@@ -149,7 +155,8 @@ class RealtimeDiagnosticAuditor:
 
         return min(10, int(base_priority + severity_bonus / 2))
 
-    def _generate_fix_suggestion(self, event: DiagnosticEvent, violation_type: str) -> Optional[str]:
+    def _generate_fix_suggestion(self, event: DiagnosticEvent, violation_type: str) -> Optional[str]:  # noqa: PLR0911
+        """Generate fix suggestions for violations. Multiple returns needed for different violation types."""
         message_lower = event.message.lower()
 
         if violation_type == "nasa_compliance":
@@ -200,14 +207,16 @@ class RealtimeDiagnosticAuditor:
         return quality_score
 
     def detect_quality_trend(self) -> str:
-        if len(self.quality_scores) < 5:
+        if len(self.quality_scores) < self.MIN_SAMPLES_FOR_TREND:
             return "insufficient_data"
 
         recent = list(self.quality_scores)[-10:]
         avg_recent = sum(recent) / len(recent)
 
         older = (
-            list(self.quality_scores)[-20:-10] if len(self.quality_scores) >= 20 else list(self.quality_scores)[:-10]
+            list(self.quality_scores)[-self.TREND_WINDOW_SIZE : -10]
+            if len(self.quality_scores) >= self.TREND_WINDOW_SIZE
+            else list(self.quality_scores)[:-10]
         )
         if not older:
             return "stable"
@@ -216,9 +225,9 @@ class RealtimeDiagnosticAuditor:
 
         delta = avg_recent - avg_older
 
-        if delta > 0.05:
+        if delta > self.TREND_THRESHOLD:
             return "improving"
-        elif delta < -0.05:
+        elif delta < -self.TREND_THRESHOLD:
             return "degrading"
         else:
             return "stable"
@@ -229,7 +238,9 @@ class RealtimeDiagnosticAuditor:
         if trend == "degrading":
             recommendations.append("URGENT: Quality trend is degrading - implement immediate quality intervention")
 
-        high_priority_violations = [v for v in self.violations if v.remediation_priority >= 8]
+        high_priority_violations = [
+            v for v in self.violations if v.remediation_priority >= self.HIGH_PRIORITY_THRESHOLD
+        ]
         if high_priority_violations:
             recommendations.append(f"Address {len(high_priority_violations)} high-priority violations immediately")
 

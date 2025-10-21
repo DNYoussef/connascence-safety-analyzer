@@ -169,7 +169,7 @@ class DependencyAnalyzer:
             if node in rec_stack:
                 # Found a cycle
                 cycle_start = path.index(node)
-                cycle = path[cycle_start:] + [node]
+                cycle = [*path[cycle_start:], node]
                 if len(cycle) > 2:  # Only report non-trivial cycles
                     self.circular_dependencies.append(cycle)
                 return

@@ -15,7 +15,7 @@ from typing import Dict, List, Optional
 class ReleaseNotesGenerator:
     """Generate professional release notes from changelog."""
 
-    def __init__(self, changelog_path: Path = None):
+    def __init__(self, changelog_path: Optional[Path] = None):
         """Initialize with changelog path."""
         self.changelog_path = changelog_path or Path("CHANGELOG.md")
 

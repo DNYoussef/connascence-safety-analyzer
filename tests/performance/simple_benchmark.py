@@ -15,10 +15,12 @@ import time
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
+from typing import Optional
+
 from analyzer.core import ConnascenceAnalyzer
 
 
-def benchmark_codebase(path: str, name: str = None):
+def benchmark_codebase(path: str, name: Optional[str] = None):
     """Simple benchmark of analyzer performance."""
 
     path = Path(path)
@@ -159,10 +161,7 @@ def main():
             throughput = result["files_per_second"]
 
             # Determine status based on performance
-            if (files > 100 and time_s > 30) or (files <= 100 and time_s > 5):
-                status = "SLOW"
-            else:
-                status = "OK"
+            status = "SLOW" if (files > 100 and time_s > 30) or (files <= 100 and time_s > 5) else "OK"
 
             print(f"{name:<15} {files:<8} {lines:<10} {time_s:<8.2f} {throughput:<8.1f} {status:<8}")
         else:

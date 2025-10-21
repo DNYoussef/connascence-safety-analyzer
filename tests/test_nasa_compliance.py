@@ -19,7 +19,7 @@ import ast
 import logging
 from pathlib import Path
 import sys
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -44,13 +44,13 @@ class NASAComplianceValidator:
         # NASA Rule 5: State validation assertion
         assert self.nasa_analyzer is not None, "NASA analyzer must be initialized"
 
-    def validate_system_compliance(self, project_path: Path = None) -> Dict[str, any]:
+    def validate_system_compliance(self, project_path: Optional[Path] = None) -> Dict[str, any]:
         """
         Validate entire system for NASA Power of Ten compliance.
         NASA Rule 4 compliant: Function under 60 lines.
         """
         # NASA Rule 5: Input validation assertions
-        assert project_path is not None or True, "project_path can be None for default validation"
+        assert True, "project_path can be None for default validation"
 
         if project_path is None:
             project_path = Path(__file__).parent.parent / "analyzer"
@@ -126,10 +126,7 @@ class NASAComplianceValidator:
         path_str = str(py_file)
 
         # NASA Rule 1: Early return to avoid deep nesting
-        if any(pattern in path_str for pattern in skip_patterns):
-            return False
-
-        return True
+        return not any(pattern in path_str for pattern in skip_patterns)
 
     def _validate_single_file(self, py_file: Path) -> Dict[str, any]:
         """Validate a single file for NASA compliance. NASA Rule 4 compliant."""

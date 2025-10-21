@@ -64,11 +64,11 @@ class UserService:
                         # CofE: Identity - relying on external db connection state
         self.db = db_connection
         self.cache = {}
-    
+
     def get_user(self, user_id):
                         # CofE: Position - parameter order dependency
         return self.db.query("SELECT * FROM users WHERE id = ?", user_id)
-    
+
     def update_user_status(self, user_id, status):
                         # CofE: Meaning - status values have semantic coupling
         self.cache[user_id] = status
@@ -83,13 +83,13 @@ class OrderService:
     def __init__(self, user_service: UserService):
                         # CofE: Type - tight coupling to UserService implementation
         self.user_service = user_service
-        
+
     def create_order(self, user_id, items):
                         # CofE: Algorithm - must call get_user before creating order
         user = self.user_service.get_user(user_id)
         if not user or user.status != "ACTIVE":
             raise ValueError("Invalid user")
-            
+
                         # CofE: Execution - order of operations matters
         order_id = self._generate_order_id()
         self._reserve_items(items)
@@ -103,7 +103,7 @@ class NotificationService:
                         # CofE: Identity - relies on config structure
         self.email_config = config["email"]
         self.sms_config = config["sms"]
-        
+
     def send_notification(self, user_id, message, channel="email"):
                         # CofE: Position - default parameter creates coupling
                         # CofE: Meaning - channel values have implicit meaning
@@ -170,7 +170,7 @@ class LegacyProcessor:
     def __init__(self):
         self.mode = "BATCH"  # CofE: Meaning - mode values coupled to behavior
         self.batch_size = 100  # CofE: Algorithm - processing depends on batch size
-        
+
     def process_data(self, data, format="CSV"):
                         # CofE: Position - parameter order matters for legacy calls
                         # CofE: Meaning - format string has implicit behavior
@@ -178,7 +178,7 @@ class LegacyProcessor:
             return self._batch_process(data, format)
         elif self.mode == "STREAM":
             return self._stream_process(data, format)
-            
+
     def _batch_process(self, data, format):
                         # CofE: Execution - must process in specific order
         validated_data = self._validate(data, format)
@@ -194,7 +194,7 @@ class ModernAdapter:
     def __init__(self, processor: LegacyProcessor):
                         # CofE: Type - coupled to legacy implementation
         self.legacy = processor
-        
+
     def process(self, data, output_format="JSON"):
                         # CofE: Algorithm - must adapt format for legacy system
         legacy_format = self._map_format(output_format)
@@ -441,7 +441,7 @@ class Module{i}:
         # CofE: Type - module depends on specific dependency type
         self.dep = dependency_{i % 3}
         self.config = {{"mode": "TYPE_{i % 2}"}}  # CofE: Meaning - config coupling
-        
+
     def process(self, data, format="JSON"):
         # CofE: Position - parameter order dependency
         # CofE: Algorithm - processing algorithm varies by module
@@ -449,7 +449,7 @@ class Module{i}:
             return self._process_type_0(data, format)
         else:
             return self._process_type_1(data, format)
-            
+
     def _process_type_0(self, data, format):
         # CofE: Execution - specific execution order required
         validated = self._validate(data)

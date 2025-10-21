@@ -114,7 +114,7 @@ class EnhancedFingerprintGenerator:
 
     @staticmethod
     def generate_finding_fingerprint(
-        violation: ConnascenceViolation, source_lines: List[str] = None
+        violation: ConnascenceViolation, source_lines: Optional[List[str]] = None
     ) -> FindingFingerprint:
         """Generate stable fingerprint for a violation."""
 
