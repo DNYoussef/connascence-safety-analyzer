@@ -34,6 +34,7 @@ export interface Finding {
     line: number;
     column?: number;
     suggestion?: string;
+    code?: string;
 }
 
 export interface SafetyValidationResult {

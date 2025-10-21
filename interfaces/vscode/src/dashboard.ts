@@ -1627,7 +1627,7 @@ export class ConnascenceDashboard {
             <div class="section-title">🔥 Risk Heat Map</div>
             <div class="heat-map-container">
                 <div class="heat-map-grid">
-                    ${fileAnalysis.slice(0, 12).map((file, index) => {
+                    ${fileAnalysis.slice(0, 12).map((file: any, index: any) => {
                         const riskLevel = file.critical > 0 ? 'critical' : file.high > 0 ? 'high' : file.index > 10 ? 'medium' : 'low';
                         const riskScore = Math.min(file.index / 20 * 100, 100);
                         return `
@@ -1673,7 +1673,7 @@ export class ConnascenceDashboard {
                     </div>
                     <div class="impact-details">
                         <div class="blocking-files">
-                            Files affected: ${fileAnalysis.filter(f => f.critical > 0).map(f => f.fileName).join(', ')}
+                            Files affected: ${fileAnalysis.filter((f: any) => f.critical > 0).map((f: any) => f.fileName).join(', ')}
                         </div>
                         <div class="impact-suggestion">
                             🔧 <strong>Action Required:</strong> Fix all critical violations to pass quality gates
@@ -1691,7 +1691,7 @@ export class ConnascenceDashboard {
                     </div>
                     <div class="impact-details">
                         <div class="blocking-files">
-                            Top contributors: ${summary.topTypes.slice(0, 3).map(([type, count]) => `${type} (${count})`).join(', ')}
+                            Top contributors: ${summary.topTypes.slice(0, 3).map(([type, count]: any) => `${type} (${count})`).join(', ')}
                         </div>
                         <div class="impact-suggestion">
                             🔧 <strong>Recommendation:</strong> Focus on reducing ${summary.topTypes[0] ? summary.topTypes[0][0] : 'coupling'} violations
@@ -2811,12 +2811,12 @@ export class ConnascenceDashboard {
             const outputPath = options?.outputPath || 
                 (vscode.workspace.workspaceFolders?.[0]?.uri.fsPath + '/' + filename);
                 
-            vscode.workspace.fs.writeFile(
+            Promise.resolve(vscode.workspace.fs.writeFile(
                 vscode.Uri.file(outputPath),
                 Buffer.from(content)
-            ).then(() => {
+            )).then(() => {
                 vscode.window.showInformationMessage(`Report exported: ${filename}`);
-            }).catch(error => {
+            }).catch((error: any) => {
                 vscode.window.showErrorMessage(`Failed to export report: ${error.message}`);
             });
         }

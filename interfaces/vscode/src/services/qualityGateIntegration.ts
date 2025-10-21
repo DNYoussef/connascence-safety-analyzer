@@ -159,8 +159,8 @@ export class QualityGateIntegrationService {
         });
 
         // NASA Compliance Gate (if applicable)
-        const nasaViolations = violations.filter(v => 
-            v.message.toLowerCase().includes('nasa') || 
+        const nasaViolations = violations.filter(v =>
+            v.description.toLowerCase().includes('nasa') ||
             v.connascenceType.toLowerCase().includes('pot10')
         );
         

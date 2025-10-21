@@ -73,7 +73,7 @@ export class ConnascenceExtension {
         // Initialize services first
         this.configService = new ConfigurationService();
         // TelemetryService adapter will be created in the constructor
-        this.connascenceService = new ConnascenceService(this.configService, new TelemetryServiceAdapter(this.telemetry));
+        this.connascenceService = new ConnascenceService(this.configService, new TelemetryServiceAdapter(this.telemetry), this.context);
         
         // Initialize UI components
         this.statusBarManager = new StatusBarManager(this.connascenceService, this.configService);
