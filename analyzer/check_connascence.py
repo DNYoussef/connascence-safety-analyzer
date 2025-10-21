@@ -24,7 +24,7 @@ from utils.types import ConnascenceViolation
 
 # Import Tree-sitter backend for multi-language support
 try:
-    from grammar.backends.tree_sitter_backend import LanguageSupport, TreeSitterBackend
+    from grammar.backends.tree_sitter_backend import LanguageSupport, TreeSitterBackend  # noqa: F401
 
     TREE_SITTER_BACKEND_AVAILABLE = True
 except ImportError:
@@ -37,7 +37,7 @@ try:
         cached_file_content,
         cached_file_lines,
         cached_python_files,
-        get_global_cache,
+        get_global_cache,  # noqa: F401
     )
 
     OPTIMIZATION_AVAILABLE = True

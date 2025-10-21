@@ -32,10 +32,33 @@ try:
 
     WATCHDOG_AVAILABLE = True
 except ImportError:
-    Observer = None
-    FileSystemEventHandler = None
-    FileSystemEvent = None
     WATCHDOG_AVAILABLE = False
+
+    # Create stub classes for when watchdog is not available
+    class FileSystemEvent:  # type: ignore
+        """Stub class for when watchdog is not available."""
+
+        pass
+
+    class FileSystemEventHandler:  # type: ignore
+        """Stub class for when watchdog is not available."""
+
+        pass
+
+    class Observer:  # type: ignore
+        """Stub class for when watchdog is not available."""
+
+        def __init__(self, *args: Any, **kwargs: Any) -> None:
+            pass
+
+        def schedule(self, *args: Any, **kwargs: Any) -> None:
+            pass
+
+        def start(self) -> None:
+            pass
+
+        def stop(self) -> None:
+            pass
 
 logger = logging.getLogger(__name__)
 
