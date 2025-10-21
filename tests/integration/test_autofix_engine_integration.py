@@ -21,7 +21,7 @@ Tests autofix engine with real violation data, patch generation, and safety vali
 from pathlib import Path
 import tempfile
 import time
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import pytest
 
@@ -255,7 +255,7 @@ def mock_autofix_engine():
             self.patches_generated = 0
             self.safety_validator = MockSafetyValidator()
 
-        def generate_fix(self, violation: Dict[str, Any], context: Dict[str, Any] = None) -> Dict[str, Any]:
+        def generate_fix(self, violation: Dict[str, Any], context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
             """Generate autofix for a violation"""
             self.patches_generated += 1
 

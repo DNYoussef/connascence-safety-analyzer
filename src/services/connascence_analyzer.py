@@ -39,7 +39,7 @@ class ConnascenceAnalyzer:
         if not file_path.exists():
             return []
 
-        if not file_path.suffix == ".py":
+        if file_path.suffix != ".py":
             return []
 
         try:
@@ -61,7 +61,9 @@ class ConnascenceAnalyzer:
             print(f"Warning: Error analyzing {file_path}: {e}")
             return []
 
-    def analyze_directory(self, directory_path: Path, exclude_patterns: List[str] = None) -> List[ConnascenceViolation]:
+    def analyze_directory(
+        self, directory_path: Path, exclude_patterns: Optional[List[str]] = None
+    ) -> List[ConnascenceViolation]:
         """
         Recursively analyze all Python files in a directory.
 
@@ -114,7 +116,7 @@ class ConnascenceAnalyzer:
             by_type[vtype] = by_type.get(vtype, 0) + 1
 
         # Count unique files
-        unique_files = len(set(v.file_path for v in violations))
+        unique_files = len({v.file_path for v in violations})
 
         return {
             "total_violations": len(violations),

@@ -87,7 +87,7 @@ class Post(models.Model):
         (DRAFT, 'Draft'),
         (PUBLISHED, 'Published'),
     ]
-    
+
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     # CofE: Type - Post depends on User model
     title = models.CharField(max_length=200)
@@ -115,14 +115,14 @@ def create_post(request):
         # CofE: Position - parameter processing depends on order
         title = request.POST.get('title')
         content = request.POST.get('content')
-        
+
         if title and content:
             # CofE: Execution - must create in specific sequence
             post = Post(author=request.user, title=title, content=content)
             post.status = Post.DRAFT  # CofE: Meaning - status coupling
             post.save()
             return redirect('post_detail', pk=post.pk)
-    
+
     return render(request, 'blog/create_post.html')
 
 def user_profile_api(request, user_id):
@@ -145,7 +145,7 @@ from .models import Post, UserProfile
 class UserProfileSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='user.username', read_only=True)
     # CofE: Identity - serializer coupled to User model structure
-    
+
     class Meta:
         model = UserProfile
         fields = ['user', 'username', 'bio', 'location', 'birth_date']
@@ -154,11 +154,11 @@ class PostSerializer(serializers.ModelSerializer):
     author_name = serializers.CharField(source='author.username', read_only=True)
     # CofE: Type - serializer depends on specific author structure
     status_display = serializers.CharField(source='get_status_display', read_only=True)
-    
+
     class Meta:
         model = Post
         fields = ['id', 'title', 'content', 'status', 'status_display', 'author', 'author_name', 'created_at']
-    
+
     def validate_status(self, value):
         # CofE: Meaning - validation coupled to specific status values
         if value not in [Post.DRAFT, Post.PUBLISHED]:
@@ -190,27 +190,27 @@ class UserService:
         # CofE: Type - depends on specific database and auth implementations
         self.db = database
         self.auth = auth_service
-        
+
     def create_user(self, user_data):
         # CofE: Algorithm - user creation depends on auth service workflow
         if not self.auth.validate_registration_data(user_data):
             return {'error': 'Invalid registration data'}
-        
+
         # CofE: Execution - specific order required for user creation
         user_id = self.db.create_user(user_data)
         self.auth.create_auth_record(user_id, user_data['password'])
-        
+
         # CofE: Meaning - user status has semantic coupling across services
         self.db.update_user_status(user_id, 'PENDING_VERIFICATION')
-        
+
         return {'user_id': user_id, 'status': 'created'}
-    
+
     def get_user_profile(self, user_id):
         # CofE: Identity - profile structure coupled to database schema
         user_data = self.db.get_user(user_id)
         if not user_data:
             return None
-        
+
         return {
             'id': user_data['id'],
             'username': user_data['username'],
@@ -228,24 +228,24 @@ class OrderService:
         # CofE: Type - tight coupling to specific service implementations
         self.user_service = user_service
         self.inventory_service = inventory_service
-        
+
     def create_order(self, user_id, items):
         # CofE: Algorithm - order creation depends on user service validation
         user_profile = self.user_service.get_user_profile(user_id)
         if not user_profile or user_profile['status'] != 'ACTIVE':
             # CofE: Meaning - status string coupling across services
             return {'error': 'Invalid user or inactive account'}
-        
+
         # CofE: Execution - must check inventory before creating order
         for item in items:
             if not self.inventory_service.check_availability(item['product_id'], item['quantity']):
                 return {'error': f'Insufficient inventory for {item["product_id"]}'}
-        
+
         # CofE: Algorithm - order processing algorithm depends on inventory service
         order_id = self._generate_order_id()
         for item in items:
             self.inventory_service.reserve_item(item['product_id'], item['quantity'])
-        
+
         order_data = {
             'id': order_id,
             'user_id': user_id,
@@ -253,7 +253,7 @@ class OrderService:
             'status': 'PROCESSING',  # CofE: Meaning - order status coupling
             'created_at': self._get_timestamp()
         }
-        
+
         return {'order_id': order_id, 'status': 'created'}
                     """,
                     "inventory_service.py": """
@@ -262,37 +262,37 @@ class InventoryService:
         # CofE: Identity - service structure depends on database and cache
         self.db = database
         self.cache = cache
-        
+
     def check_availability(self, product_id, requested_quantity):
         # CofE: Algorithm - availability check algorithm coupled to cache strategy
         cached_stock = self.cache.get(f"stock_{product_id}")
         if cached_stock is not None:
             return cached_stock >= requested_quantity
-        
+
         # CofE: Execution - fallback to database requires specific query pattern
         db_stock = self.db.get_product_stock(product_id)
         self.cache.set(f"stock_{product_id}", db_stock, timeout=300)
         return db_stock >= requested_quantity
-    
+
     def reserve_item(self, product_id, quantity):
         # CofE: Algorithm - reservation algorithm depends on transaction handling
         current_stock = self.db.get_product_stock(product_id)
         if current_stock < quantity:
             raise Exception(f"Insufficient stock for product {product_id}")
-        
+
         # CofE: Execution - must update database and cache in specific order
         new_stock = current_stock - quantity
         self.db.update_product_stock(product_id, new_stock)
         self.cache.set(f"stock_{product_id}", new_stock, timeout=300)
-        
+
         return True
-    
+
     def get_product_info(self, product_id):
         # CofE: Identity - product info structure coupled to database schema
         product_data = self.db.get_product(product_id)
         if not product_data:
             return None
-        
+
         return {
             'id': product_data['id'],
             'name': product_data['name'],
@@ -329,7 +329,7 @@ class DataExtractor:
         # CofE: Identity - extractor coupled to specific config structure
         self.source_type = config['source_type']
         self.connection_params = config['connection_params']
-        
+
     def extract_data(self, query_params):
         # CofE: Algorithm - extraction algorithm depends on source type
         if self.source_type == 'database':
@@ -340,23 +340,23 @@ class DataExtractor:
             return self._extract_from_api(query_params)
         else:
             raise ValueError(f"Unsupported source type: {self.source_type}")
-    
+
     def _extract_from_database(self, params):
         # CofE: Position - parameter order matters for database queries
         query = params.get('query')
         limit = params.get('limit', 1000)
         offset = params.get('offset', 0)
-        
+
         # CofE: Execution - must connect before querying
         connection = self._get_database_connection()
         result = connection.execute(query, limit=limit, offset=offset)
         return pd.DataFrame(result.fetchall())
-    
+
     def _extract_from_csv(self, params):
         # CofE: Meaning - file path structure has semantic coupling
         file_path = params['file_path']
         delimiter = params.get('delimiter', ',')
-        
+
         return pd.read_csv(file_path, delimiter=delimiter)
                     """,
                     "data_transformer.py": """
@@ -369,11 +369,11 @@ class DataTransformer:
         # CofE: Type - transformer depends on specific extractor implementation
         self.extractor = extractor
         self.transformation_rules = {}
-        
+
     def transform_data(self, data: pd.DataFrame, rules: Dict[str, Any]):
         # CofE: Algorithm - transformation depends on rule structure
         transformed_data = data.copy()
-        
+
         for column, rule in rules.items():
             if rule['type'] == 'normalize':
                 # CofE: Meaning - rule types have semantic coupling
@@ -382,15 +382,15 @@ class DataTransformer:
                 transformed_data[column] = self._categorize_column(transformed_data[column], rule['categories'])
             elif rule['type'] == 'aggregate':
                 transformed_data = self._aggregate_data(transformed_data, column, rule['function'])
-        
+
         return transformed_data
-    
+
     def _normalize_column(self, column):
         # CofE: Algorithm - normalization algorithm has specific requirements
         if column.dtype in ['int64', 'float64']:
             return (column - column.min()) / (column.max() - column.min())
         return column
-    
+
     def _categorize_column(self, column, categories):
         # CofE: Position - category order affects results
         def categorize_value(value):
@@ -398,24 +398,24 @@ class DataTransformer:
                 if category['min'] <= value <= category['max']:
                     return category['label']
             return 'Unknown'
-        
+
         return column.apply(categorize_value)
-    
+
     def validate_transformation(self, original_data, transformed_data):
         # CofE: Execution - validation must happen after transformation
         validation_results = {}
-        
+
         # Check data integrity
         if len(original_data) != len(transformed_data):
             validation_results['row_count_mismatch'] = True
-        
+
         # Check for null values introduced during transformation
         original_nulls = original_data.isnull().sum().sum()
         transformed_nulls = transformed_data.isnull().sum().sum()
-        
+
         if transformed_nulls > original_nulls:
             validation_results['new_nulls_introduced'] = transformed_nulls - original_nulls
-        
+
         return validation_results
                     """,
                     "data_loader.py": """
@@ -429,7 +429,7 @@ class DataLoader:
         # CofE: Identity - loader structure coupled to target config
         self.target_type = target_config['type']
         self.target_params = target_config['params']
-        
+
     def load_data(self, data: pd.DataFrame):
         # CofE: Algorithm - loading algorithm depends on target type
         if self.target_type == 'database':
@@ -440,38 +440,38 @@ class DataLoader:
             return self._load_to_parquet(data)
         else:
             raise ValueError(f"Unsupported target type: {self.target_type}")
-    
+
     def _load_to_database(self, data):
         # CofE: Position - database parameters must be in correct order
         table_name = self.target_params['table_name']
         if_exists = self.target_params.get('if_exists', 'append')
         index = self.target_params.get('index', False)
-        
+
         # CofE: Execution - must establish connection before loading
         connection = self._get_database_connection()
         data.to_sql(table_name, connection, if_exists=if_exists, index=index)
-        
+
         return {'status': 'success', 'rows_loaded': len(data)}
-    
+
     def _load_to_csv(self, data):
         # CofE: Meaning - file path structure has semantic meaning
         file_path = self.target_params['file_path']
         delimiter = self.target_params.get('delimiter', ',')
-        
+
         data.to_csv(file_path, sep=delimiter, index=False)
         return {'status': 'success', 'file_path': file_path}
-    
+
     def run_full_pipeline(self, query_params, transformation_rules):
         # CofE: Execution - pipeline steps must execute in specific order
         # Step 1: Extract data
         raw_data = self.transformer.extractor.extract_data(query_params)
-        
+
         # Step 2: Transform data
         transformed_data = self.transformer.transform_data(raw_data, transformation_rules)
-        
+
         # Step 3: Validate transformation
         validation_results = self.transformer.validate_transformation(raw_data, transformed_data)
-        
+
         # Step 4: Load data if validation passes
         if not validation_results:  # No validation errors
             load_results = self.load_data(transformed_data)
@@ -560,7 +560,7 @@ class TestUserExperienceValidation:
         analysis_time = time.time() - start_time
 
         # Validate user experience metrics
-        ux_metrics = self._calculate_ux_metrics(result, analysis_time, codebase)
+        self._calculate_ux_metrics(result, analysis_time, codebase)
 
         # Validate analysis quality
         correlations = result.get("correlations", [])
@@ -688,7 +688,7 @@ class TestUserExperienceValidation:
         audit_trail = result.get("audit_trail", [])
         pipeline_phases = ["extraction", "transformation", "loading", "validation"]
 
-        audit_phases = set(entry.get("phase", "") for entry in audit_trail)
+        audit_phases = {entry.get("phase", "") for entry in audit_trail}
         covered_phases = [
             phase for phase in pipeline_phases if any(phase in audit_phase for audit_phase in audit_phases)
         ]
@@ -707,7 +707,7 @@ class QuickTestClass:
         # CofE: Identity - coupled to config structure
         self.setting = config_dict["setting"]
         self.mode = config_dict["mode"]
-    
+
     def process(self, data, format="json"):
         # CofE: Position - parameter order dependency
         # CofE: Meaning - format string coupling
@@ -764,7 +764,7 @@ class LegacySystem:
     def __init__(self):
         self.mode = "LEGACY"  # CofE: Meaning - mode coupling
         self.processor = None
-        
+
     def initialize(self, config):
         # CofE: Execution - initialization order matters
         if config["type"] == "BATCH":
@@ -772,7 +772,7 @@ class LegacySystem:
         elif config["type"] == "STREAM":
             self.processor = StreamProcessor(config)
         self.mode = config["type"]  # CofE: Meaning - mode synchronization
-        
+
     def process_data(self, data):
         # CofE: Algorithm - processing depends on mode
         if self.mode == "BATCH":
@@ -787,7 +787,7 @@ class ModernAdapter:
     def __init__(self, legacy: LegacySystem):
         # CofE: Type - tight coupling to legacy system
         self.legacy = legacy
-        
+
     def modernize_input(self, modern_data):
         # CofE: Algorithm - adapter depends on legacy format requirements
         legacy_format = self._convert_to_legacy_format(modern_data)
@@ -853,19 +853,13 @@ class ModernAdapter:
         scenario = ux_validation_suite.user_scenarios[2]  # Continuous integration validation
 
         # Simulate CI/CD scenario with code changes
-        original_code = """
-class OriginalClass:
-    def process(self, data):
-        # CofE: Algorithm - original implementation
-        return {"result": data}
-"""
 
         modified_code = """
 class OriginalClass:
     def __init__(self, config):
         # CofE: Identity - new config dependency added
         self.config = config
-        
+
     def process(self, data, output_format="json"):
         # CofE: Position - new parameter added
         # CofE: Meaning - format coupling introduced
@@ -988,7 +982,7 @@ class OriginalClass:
 
         for interface in interfaces:
             start_time = time.time()
-            formatted_output = self._format_for_interface(result, interface)
+            self._format_for_interface(result, interface)
             response_time = time.time() - start_time
             response_times[interface] = response_time
 

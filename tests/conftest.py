@@ -23,7 +23,7 @@ from pathlib import Path
 import shutil
 import sys
 import tempfile
-from typing import Dict, List
+from typing import Dict, List, Optional
 from unittest.mock import Mock
 
 import pytest
@@ -424,8 +424,8 @@ def create_temp_file(content: str, suffix: str = ".py") -> Path:
 def assert_violation_present(
     violations: List[ConnascenceViolation],
     connascence_type: str,
-    severity: str = None,
-    description_contains: str = None,
+    severity: Optional[str] = None,
+    description_contains: Optional[str] = None,
 ) -> bool:
     """Assert that a specific type of violation is present in the list."""
     matching_violations = [v for v in violations if v.connascence_type == connascence_type]

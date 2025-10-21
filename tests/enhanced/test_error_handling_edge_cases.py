@@ -17,6 +17,7 @@ Comprehensive testing of error conditions and edge cases:
 - Data corruption handling
 """
 
+import contextlib
 from dataclasses import dataclass
 from pathlib import Path
 import tempfile
@@ -258,7 +259,7 @@ class LargeClass:
             large_file_content += f'            "key_{i}": "value_{i}_{"x" * 50}",\n'
 
         large_file_content += """        }
-        
+
     def process_data(self):
         # CofE: Algorithm - processing large dataset
         result = {}
@@ -297,7 +298,7 @@ class ClassA:
     def __init__(self):
         # CofE: Type - depends on ClassB
         self.b_instance = ClassB()
-        
+
     def use_b(self):
         return self.b_instance.method()
             """,
@@ -308,7 +309,7 @@ class ClassB:
     def __init__(self):
         # CofE: Type - depends on ClassC
         self.c_instance = ClassC()
-        
+
     def method(self):
         return self.c_instance.process()
             """,
@@ -336,7 +337,7 @@ class ClassC:
 
         # Should detect circular dependency pattern
         correlations = result.get("correlations", [])
-        circular_correlations = [
+        [
             c
             for c in correlations
             if c.get("correlation_type") == "circular_dependency" or "circular" in c.get("description", "").lower()
@@ -365,7 +366,7 @@ class DataProcessor{i}:
                 large_data_structure += f'            "key_{j}": ["item_{k}" for k in range(100)],\n'
 
             large_data_structure += """        }
-        
+
     def process(self):
         # CofE: Algorithm - memory-intensive processing
         results = {}
@@ -395,7 +396,7 @@ class DataProcessor{i}:
 
         # Check for memory-related warnings or graceful degradation
         if "warnings" in result:
-            memory_warnings = [w for w in result["warnings"] if "memory" in w.get("message", "").lower()]
+            [w for w in result["warnings"] if "memory" in w.get("message", "").lower()]
             # May have memory warnings, which is acceptable
 
         # Should not crash - getting a result means it handled memory constraints
@@ -422,7 +423,7 @@ class TestClass:
     def initial_method(self):
         # CofE: Algorithm - modified during analysis
         return "modified"
-        
+
     def new_method(self):
         # CofE: Type - new dependency added
         return self.helper_method()
@@ -453,7 +454,7 @@ class TestClass:
 
         # Check for any warnings about file changes
         warnings = result.get("warnings", [])
-        file_change_warnings = [w for w in warnings if "modif" in w.get("message", "").lower()]
+        [w for w in warnings if "modif" in w.get("message", "").lower()]
         # May have warnings about file modification
 
     @integration_test(["error_handling"])
@@ -499,10 +500,8 @@ class PermissionTestClass:
 
         finally:
             # Restore permissions for cleanup
-            try:
+            with contextlib.suppress(OSError, PermissionError):
                 test_file.chmod(0o666)
-            except (OSError, PermissionError):
-                pass
 
     @integration_test(["error_handling"])
     def test_network_timeout_simulation(self, temp_error_test_directory):
@@ -535,14 +534,14 @@ class NetworkTestClass:
 
         # Check for network-related errors or fallback indicators
         if "errors" in result:
-            network_errors = [
+            [
                 e
                 for e in result["errors"]
                 if "network" in e.get("message", "").lower() or "timeout" in e.get("message", "").lower()
             ]
 
         if "warnings" in result:
-            fallback_warnings = [w for w in result["warnings"] if "fallback" in w.get("message", "").lower()]
+            [w for w in result["warnings"] if "fallback" in w.get("message", "").lower()]
 
         # Should produce some results even with network issues
         assert isinstance(result, dict), "Should return results despite network issues"
@@ -571,10 +570,10 @@ class CorruptionTestClass:
 
         # Check for corruption-related errors and recovery
         if "errors" in result:
-            corruption_errors = [e for e in result["errors"] if "corrupt" in e.get("message", "").lower()]
+            [e for e in result["errors"] if "corrupt" in e.get("message", "").lower()]
 
         if "warnings" in result:
-            recovery_warnings = [
+            [
                 w
                 for w in result["warnings"]
                 if "recover" in w.get("message", "").lower() or "regenerat" in w.get("message", "").lower()
@@ -628,7 +627,7 @@ class TimeoutTestClass{i}:
     def method_{i}(self):
         # CofE: Algorithm - method {i} implementation
         return "result_{i}"
-        
+
     def complex_method_{i}(self):
         # CofE: Execution - complex processing for timeout test
         data = []
@@ -661,7 +660,7 @@ class TimeoutTestClass{i}:
             assert result["partial_results"] is True, "Should indicate partial results"
 
         if "errors" in result:
-            timeout_errors = [e for e in result["errors"] if "timeout" in e.get("message", "").lower()]
+            [e for e in result["errors"] if "timeout" in e.get("message", "").lower()]
             # May have timeout errors
 
         # Should have some analysis results even if incomplete
@@ -789,7 +788,7 @@ class UnicodeClass:
 
         # May have warnings about Unicode handling
         if "warnings" in result:
-            unicode_warnings = [w for w in result["warnings"] if "unicode" in w.get("message", "").lower()]
+            [w for w in result["warnings"] if "unicode" in w.get("message", "").lower()]
 
 
 if __name__ == "__main__":

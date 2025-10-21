@@ -127,7 +127,7 @@ class TestSequentialThinkingProcessor:
         license_file.write_text("Business Source License 1.1\n\nParameters\nLicensor: Test\n")
 
         # Run sequential validation
-        result, steps = self.processor.process_license_validation(license_file, project_root)
+        _result, steps = self.processor.process_license_validation(license_file, project_root)
 
         # Verify steps were recorded
         assert len(steps) > 0

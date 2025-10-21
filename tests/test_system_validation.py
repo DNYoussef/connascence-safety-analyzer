@@ -42,49 +42,49 @@ processing_complete = False
 
 class DataProcessor:  # Could be God Object if extended
     """Processes data with various coupling issues."""
-    
+
     def __init__(self):
         self.timeout = 30  # Magic number (CoM)
-        self.retry_limit = 30  # Duplicate value (CoV) 
+        self.retry_limit = 30  # Duplicate value (CoV)
         self.state = []  # State dependency (CoE)
-        
+
     def process_items(self, items, batch_size, timeout, retries, debug_mode):  # CoP - too many params
         """Process items with timing dependencies."""
         global processing_complete
-        
+
         # NASA Rule 5 violation - no assertions
         for item in items:  # NASA Rule 2 - could be unbounded
             if debug_mode:
                 print(f"Processing {item}")
-                
+
             # Timing dependency (CoTm)
             time.sleep(0.01)
-            
+
             # Algorithm duplication (CoA)
             processed = self._apply_algorithm(item)
             result = self._apply_algorithm(processed)  # Same algorithm
-            
+
             self.state.append(result)
-            
+
         processing_complete = True
         return len(self.state)
-    
+
     def _apply_algorithm(self, item):
         """Duplicated algorithm logic."""
         return item * 2 + 1  # Same formula used elsewhere
-        
+
     def get_results(self):
         """Execution order dependency."""
         global processing_complete
         if not processing_complete:  # CoE - execution dependency
             raise RuntimeError("Processing not complete")
         return self.state.copy()
-        
+
     # NASA Rule 4 violation - function too long (simulated)
     def massive_processing_function(self):
         """This would be a 60+ line function in real code."""
         step_1 = "initialize"
-        step_2 = "validate"  
+        step_2 = "validate"
         step_3 = "process"
         step_4 = "transform"
         step_5 = "aggregate"
@@ -100,7 +100,7 @@ class DataProcessor:  # Could be God Object if extended
 class badlyNamed_class:
     def BAD_Method_Name(self):
         return self._another_bad_name()
-        
+
     def _another_bad_name(self):
         MAGIC_CONSTANT = 42  # Should be at module level
         return MAGIC_CONSTANT
@@ -115,12 +115,12 @@ def fibonacci(n):
 # Unchecked return values (NASA Rule 7)
 def main_processing():
     processor = DataProcessor()
-    
+
     # Return values not checked
     processor.process_items([1, 2, 3], 10, 30, 3, True)
     fibonacci(10)
     dangerous_operation()
-    
+
     return "done"
 
 def dangerous_operation():
@@ -133,7 +133,7 @@ def dangerous_operation():
 def calculate_hash_v1(data):
     return hash(str(data)) % 1000
 
-def calculate_hash_v2(data):  
+def calculate_hash_v2(data):
     return hash(str(data)) % 1000  # Same algorithm
 
 # Values coupling - duplicate constants
@@ -317,7 +317,7 @@ def test_function_{i}():
 
             detector = RefactoredConnascenceDetector(f"test_{i}.py", test_code.split("\n"))
             tree = ast.parse(test_code)
-            violations = detector.detect_all_violations(tree)
+            detector.detect_all_violations(tree)
 
             # Force garbage collection
             gc.collect()
@@ -440,12 +440,12 @@ def problematic_function():
 def critical_issues():
     # Critical: Recursion (NASA Rule 1)
     return critical_issues()
-    
+
 def high_issues():
-    # High: No assertions (NASA Rule 5) 
+    # High: No assertions (NASA Rule 5)
     result = risky_operation()
     return result
-    
+
 def medium_issues():
     # Medium: Convention violation
     bad_variable_name = 42

@@ -68,7 +68,7 @@ class ProductionReadinessTests(unittest.TestCase):
 def process_data(data_list, index_pos, flag_value):
     if index_pos == 0:  # Position connascence
         return data_list[0] * 2
-    elif flag_value == "SPECIAL":  # Value connascence  
+    elif flag_value == "SPECIAL":  # Value connascence
         return sum(data_list)
     return None
         """,
@@ -114,7 +114,7 @@ def process_external(items, pos, special_flag):
             self.assertIsNotNone(analyzer.stream_processor, "Should have stream processor")
 
             # Create test file for streaming
-            test_file = self.create_test_file(
+            self.create_test_file(
                 "streaming_test.py",
                 """
 def test_function():
@@ -160,7 +160,7 @@ def test_function():
             analyzer = UnifiedConnascenceAnalyzer(analysis_mode="batch")
             self.analyzers_created.append(analyzer)
 
-            result = analyzer.analyze_project(self.test_dir)
+            analyzer.analyze_project(self.test_dir)
 
             # Check memory usage
             current_memory = process.memory_info().rss / (1024 * 1024)
@@ -187,7 +187,7 @@ def broken_function(
         )
 
         # Test with unreadable file permissions (if possible)
-        restricted_file = self.create_test_file("restricted.py", "def test(): pass")
+        self.create_test_file("restricted.py", "def test(): pass")
 
         # Test with non-Python files
         self.create_test_file("README.txt", "This is not Python code")
@@ -222,7 +222,7 @@ def function_{i}(param1, param2, param3):
 class TestClass_{i}:
     def __init__(self, value_{i}):
         self.value = value_{i}
-        
+
     def process(self, data_{i}):
         return self.value + data_{i}
             """
@@ -306,11 +306,11 @@ def main_function(data_list, position, flag):
     # Multiple connascence types in realistic code
     if position == 0:  # Position connascence
         result = utils.process_first(data_list)
-    elif flag == "SPECIAL":  # Value connascence  
+    elif flag == "SPECIAL":  # Value connascence
         result = utils.process_special(data_list, MAGIC_CONSTANT)
     else:
         result = utils.process_default(data_list, position)
-    
+
     return result
         """,
         )

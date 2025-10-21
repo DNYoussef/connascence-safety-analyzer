@@ -82,24 +82,24 @@ except ImportError as e:
 BaseIntegration = UnifiedBaseIntegration  # Legacy alias
 
 __all__ = [
-    # New consolidated architecture
-    "UnifiedBaseIntegration",
-    "IntegrationResult",
-    "IntegrationType",
     "INTEGRATION_REGISTRY",
+    "BanditIntegration",
+    # Legacy compatibility
+    "BaseIntegration",
     # Specific integrations
     "BlackIntegration",
+    "IntegrationResult",
+    "IntegrationType",
     "MyPyIntegration",
-    "RuffIntegration",
     "RadonIntegration",
-    "BanditIntegration",
+    "RuffIntegration",
     # Coordination
     "ToolCoordinator",
+    # New consolidated architecture
+    "UnifiedBaseIntegration",
     # Factory functions
     "create_all_integrations",
     "get_available_integrations",
-    # Legacy compatibility
-    "BaseIntegration",
 ]
 
 # Log the architecture improvement

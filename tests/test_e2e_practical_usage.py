@@ -237,7 +237,7 @@ class TestPracticalE2EScenarios:
         analysis = {"violations": [{"type": "algorithm", "severity": "high"}, {"type": "timing", "severity": "medium"}]}
 
         # Process and export
-        six_sigma_result = six_sigma.process_analysis_results(analysis)
+        six_sigma.process_analysis_results(analysis)
         dashboard_data = six_sigma.export_dashboard_data(analysis)
         exec_report = six_sigma.generate_executive_report(analysis)
 
@@ -254,10 +254,10 @@ class TestPracticalE2EScenarios:
             timestamp=0,
         )
 
-        validation = theater_detector.validate_quality_claim(claim)
+        theater_detector.validate_quality_claim(claim)
 
         # Export theater validation
-        with tempfile.TemporaryDirectory() as tmpdir:
+        with tempfile.TemporaryDirectory():
             report_path = theater_detector.export_validation_report([claim])
 
             # Verify export

@@ -351,7 +351,7 @@ class TreeSitterBackend:
         """Extract function definitions from AST."""
         functions = []
 
-        if language == LanguageSupport.C or language == LanguageSupport.PYTHON:
+        if language in (LanguageSupport.C, LanguageSupport.PYTHON):
             function_nodes = self.find_nodes_by_type(ast, ["function_definition"])
         elif language == LanguageSupport.JAVASCRIPT:
             function_nodes = self.find_nodes_by_type(ast, ["function_declaration", "function_expression"])
@@ -524,7 +524,7 @@ class TreeSitterBackend:
 
         if TREE_SITTER_AVAILABLE:
             # Extract function name (language-specific parsing)
-            if language == LanguageSupport.PYTHON or language == LanguageSupport.C:
+            if language in (LanguageSupport.PYTHON, LanguageSupport.C):
                 name_node = next((child for child in node.children if child.type == "identifier"), None)
             else:
                 name_node = None

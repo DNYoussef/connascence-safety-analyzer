@@ -40,7 +40,7 @@ class TestClass:
     def __init__(self, config):
         # CofE: Identity - class structure depends on config
         self.setting = config["setting"]
-        
+
     def process(self, data, format="json"):
         # CofE: Position - parameter order dependency
         # CofE: Meaning - format string coupling
@@ -97,7 +97,7 @@ class TestMCPServerEnhancedIntegration:
             # Validate content quality
             assert len(context["smart_recommendations"]) > 0
             assert len(context["correlations"]) > 0
-            assert context["cross_phase_analysis"] == True
+            assert context["cross_phase_analysis"]
 
     @integration_test(["mcp_server"])
     def test_enhanced_pipeline_context_timeout_handling(self):
@@ -122,8 +122,8 @@ class TestMCPServerEnhancedIntegration:
             # Should return empty context on timeout
             assert context["smart_recommendations"] == []
             assert context["correlations"] == []
-            assert context["cross_phase_analysis"] == False
-            assert context.get("timeout") == True
+            assert not context["cross_phase_analysis"]
+            assert context.get("timeout")
 
     @integration_test(["mcp_server"])
     def test_enhanced_pipeline_context_error_handling(self):
@@ -155,7 +155,7 @@ class TestMCPServerEnhancedIntegration:
                 # Should return safe empty context
                 assert context["smart_recommendations"] == []
                 assert context["correlations"] == []
-                assert context["cross_phase_analysis"] == False
+                assert not context["cross_phase_analysis"]
 
                 # Should include error information
                 assert any(key in context for key in ["spawn_error", "parse_error", "error"])
@@ -617,7 +617,7 @@ class TestMCPServerIntegrationFlow:
     async def test_complete_mcp_enhanced_workflow(self, sample_code_file, enhanced_test_datasets):
         """Test complete MCP server enhanced workflow."""
         # 1. Initialize MCP server with AI providers
-        mock_server = Mock()
+        Mock()
 
         # 2. Simulate enhanced context retrieval
         enhanced_context = {

@@ -20,7 +20,9 @@ required by safety standards like General Safety Standards.
 """
 
 from dataclasses import dataclass
+import functools
 import json
+import operator
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 
@@ -98,7 +100,7 @@ class OverlayManager:
 
         # Use cache if available
         if overlay_id in self._rule_cache:
-            return sum(self._rule_cache[overlay_id].values(), [])
+            return functools.reduce(operator.iadd, self._rule_cache[overlay_id].values(), [])
 
         overlay = self._overlays[overlay_id]
         all_rules = []
@@ -340,7 +342,7 @@ class OverlayManager:
         """Load overlay from YAML or JSON file."""
         try:
             with open(file_path) as f:
-                data = yaml.safe_load(f) if file_path.suffix == ".yml" or file_path.suffix == ".yaml" else json.load(f)
+                data = yaml.safe_load(f) if file_path.suffix in {".yml", ".yaml"} else json.load(f)
 
             return self._dict_to_overlay(data)
         except Exception:

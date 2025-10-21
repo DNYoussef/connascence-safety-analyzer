@@ -112,7 +112,7 @@ class WaiverRule:
         if self.scope == WaiverScope.FINDING_SPECIFIC:
             return self.pattern == violation_fingerprint
         elif self.scope == WaiverScope.RULE_WIDE:
-            return self.pattern == rule_type or self.pattern == "*"
+            return self.pattern in (rule_type, "*")
         elif self.scope == WaiverScope.FILE_WIDE:
             # Support glob patterns
             import fnmatch

@@ -86,9 +86,7 @@ def compare_objects(obj1, obj2):
     ProductionAssert.not_none(obj2, "obj2")
 
     # Identity comparison instead of equality
-    if obj1 is obj2:
-        return True
-    return False
+    return obj1 is obj2
 
 
 # CoTi - Timing: Sleep and timing dependencies

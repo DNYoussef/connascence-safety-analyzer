@@ -182,7 +182,7 @@ class TestSixSigmaTheaterIntegration:
                 * (10 - i * 2)  # Steadily decreasing by exact amounts
             }
 
-            six_sigma_result = six_sigma.process_analysis_results(analysis)
+            six_sigma.process_analysis_results(analysis)
 
             claim = QualityClaim(
                 claim_id=f"cycle_{i}",
@@ -288,13 +288,9 @@ class TestSixSigmaTheaterIntegration:
         good_analysis = {"violations": [{"type": "meaning", "severity": "low"}]}
 
         # Poor quality with theater patterns
-        poor_analysis = {
-            "violations": [{"type": "algorithm", "severity": "critical"}, {"type": "timing", "severity": "critical"}]
-            * 5
-        }
 
         # Test good case
-        good_exit = six_sigma.integrate_with_ci_cd(good_analysis, fail_on_quality_gate=True)
+        six_sigma.integrate_with_ci_cd(good_analysis, fail_on_quality_gate=True)
 
         good_claim = QualityClaim(
             claim_id="ci_good",
@@ -407,7 +403,7 @@ class TestRealWorldScenarios:
 
             analysis = {"violations": [{"type": "identity", "severity": "medium"}] * violations_count}
 
-            six_sigma_result = six_sigma.process_analysis_results(analysis)
+            six_sigma.process_analysis_results(analysis)
 
             claim = QualityClaim(
                 claim_id=f"increment_{cycle}",

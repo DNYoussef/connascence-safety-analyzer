@@ -77,14 +77,14 @@ class UserProcessor:
         self.status = 1  # CoLiteral - magic number
         self.max_users = 100  # CoLiteral - magic number
         self.format_types = ["json", "xml", "csv"]  # CoPosition + CoLiteral
-    
+
     def process_users(self, users, format, timeout, retries, debug, validate):
         # CoPosition - parameter order dependency
         if self.status == 1:  # CoLiteral - magic comparison
             return self._process_active(users, format, timeout, retries, debug, validate)
         elif self.status == 2:  # CoLiteral - magic comparison
             return []
-    
+
     def _process_active(self, users, format, timeout, retries, debug, validate):
         # CoAlgorithm - duplicated processing logic
         results = []
@@ -94,7 +94,7 @@ class UserProcessor:
                 if len(user) > 50:  # CoLiteral - magic number
                     results.append(user)
         return results
-    
+
     def _transform_user(self, user, format):
         # CoAlgorithm + CoLiteral - algorithm duplication with magic strings
         if format == "json":  # CoLiteral - string literal
@@ -102,7 +102,7 @@ class UserProcessor:
         elif format == "xml":  # CoLiteral - string literal
             return user.strip().upper()
         return user.strip()  # CoAlgorithm - duplicated .strip() calls
-    
+
     def validate_user(self, user, format, timeout):
         # CoPosition + CoAlgorithm - parameter coupling + algorithm duplication
         if format == "json":  # CoLiteral - duplicated string check
@@ -113,7 +113,7 @@ class UserProcessor:
 class UserValidator:
     def __init__(self):
         self.processor = UserProcessor()  # CoType - class coupling
-    
+
     def validate_batch(self, users, format="json", timeout=30):
         # CoLiteral + CoPosition - default value coupling
         return self.processor.process_users(users, format, timeout, 3, False, True)

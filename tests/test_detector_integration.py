@@ -61,10 +61,10 @@ import asyncio
 def sync_timing_violation():
     time.sleep(0.1)  # Direct timing dependency
     time.sleep(0.2)  # Another timing call
-    
+
 async def async_timing_violation():
     await asyncio.sleep(0.1)  # Async timing dependency
-    
+
 def threading_timing():
     import threading
     event = threading.Event()
@@ -94,16 +94,16 @@ def threading_timing():
 class badClassName:  # Should be BadClassName
     def BAD_method_NAME(self):  # Should be bad_method_name
         return True
-        
+
 def Another_Bad_Function():  # Should be another_bad_function
     pass
-    
+
 # Inconsistent naming styles
 def camelCaseFunction():  # Mixed with snake_case elsewhere
     snake_case_var = 1
     CamelCaseVar = 2
     return snake_case_var + CamelCaseVar
-    
+
 # Missing docstrings
 def undocumented_function(param):
     complex_logic = param * 42
@@ -139,7 +139,7 @@ def check_environment():
     if env == "production":  # Should use CONFIG_VALUE
         return True
     return False
-    
+
 # Magic numbers used multiple times
 def calculate_fees(amount):
     processing_fee = amount * 0.03  # 3% fee
@@ -169,25 +169,25 @@ def initialize_system():
     global initialization_complete
     shared_state.clear()
     initialization_complete = True
-    
+
 def process_data(item):
     global shared_state
     if not initialization_complete:  # Execution order dependency
         raise RuntimeError("System not initialized")
     shared_state.append(item)
-    
+
 def get_results():
     global shared_state
     return len(shared_state)  # Depends on process_data being called
-    
+
 # Class with execution dependencies
 class OrderDependent:
     def __init__(self):
         self.setup_complete = False
-        
+
     def setup(self):
         self.setup_complete = True
-        
+
     def process(self):
         if not self.setup_complete:  # Execution dependency
             raise RuntimeError("Setup required")
@@ -211,14 +211,14 @@ class BadlyDesignedClass:  # Convention violation
     def __init__(self):
         self.magic_number = 42  # Values violation
         self.state = []  # Execution state
-        
+
     def process_with_delay(self, item):  # Multiple violations
         import time
         time.sleep(0.1)  # Timing violation
-        
+
         if self.magic_number == 42:  # Values coupling
             self.state.append(item)  # Execution dependency
-            
+
         return len(self.state)  # Position/execution coupling
 """
 
@@ -449,7 +449,7 @@ class GoodName:  # Not execution issue
         timeout = 30  # Not execution issue
         time.sleep(0.1)  # Not execution issue
         shared_data.append(item)  # Execution issue
-        
+
     def get_count(self):
         return len(shared_data)  # Execution dependency
 """

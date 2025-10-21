@@ -124,13 +124,12 @@ class MagicLiteralFixer:
                 return f"{pattern_name.upper()}_{value_str}".replace(".", "_")
 
         # Use context clues
-        if context.usage_context == "condition":
-            if isinstance(context.value, (int, float)):
-                return (
-                    f"MAX_{self._extract_concept(context)}"
-                    if context.value > 0
-                    else f"MIN_{self._extract_concept(context)}"
-                )
+        if context.usage_context == "condition" and isinstance(context.value, (int, float)):
+            return (
+                f"MAX_{self._extract_concept(context)}"
+                if context.value > 0
+                else f"MIN_{self._extract_concept(context)}"
+            )
 
         # Use surrounding variable names
         if context.variable_names:

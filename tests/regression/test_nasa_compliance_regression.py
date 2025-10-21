@@ -115,17 +115,16 @@ class NASAComplianceValidator:
                 if isinstance(node, ast.FunctionDef):
                     # Check if function calls itself
                     for child in ast.walk(node):
-                        if isinstance(child, ast.Call):
-                            if isinstance(child.func, ast.Name):
-                                if child.func.id == node.name:
-                                    violations.append(
-                                        {
-                                            "file": str(file_path.relative_to(self.project_root)),
-                                            "function": node.name,
-                                            "line": node.lineno,
-                                            "type": "direct_recursion",
-                                        }
-                                    )
+                        if isinstance(child, ast.Call) and isinstance(child.func, ast.Name):
+                            if child.func.id == node.name:
+                                violations.append(
+                                    {
+                                        "file": str(file_path.relative_to(self.project_root)),
+                                        "function": node.name,
+                                        "line": node.lineno,
+                                        "type": "direct_recursion",
+                                    }
+                                )
 
         except (SyntaxError, UnicodeDecodeError):
             pass
@@ -154,15 +153,14 @@ class NASAComplianceValidator:
             for node in ast.walk(tree):
                 if isinstance(node, ast.While):
                     # Check for while True: pattern
-                    if isinstance(node.test, ast.Constant):
-                        if node.test.value is True:
-                            violations.append(
-                                {
-                                    "file": str(file_path.relative_to(self.project_root)),
-                                    "line": node.lineno,
-                                    "type": "while_true",
-                                }
-                            )
+                    if isinstance(node.test, ast.Constant) and node.test.value is True:
+                        violations.append(
+                            {
+                                "file": str(file_path.relative_to(self.project_root)),
+                                "line": node.lineno,
+                                "type": "while_true",
+                            }
+                        )
 
         except (SyntaxError, UnicodeDecodeError):
             pass
@@ -269,7 +267,6 @@ class TestNASAComplianceRegression:
 
         # Calculate compliance percentage
         # (This is a regression test, so we expect high compliance)
-        compliance_threshold = 95.0  # 95% compliance minimum
 
         # Detailed report
         report = [

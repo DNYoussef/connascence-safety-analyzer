@@ -46,7 +46,7 @@ def medium_function(param1, param2=42):
 class MediumClass:
     def __init__(self):
         self.value = 42
-    
+
     def method1(self): pass
     def method2(self): pass
     def method3(self): pass
@@ -63,10 +63,10 @@ def complex_function(param1, param2=42, param3=None):
     magic_number = 42
     another_magic = 100
     third_magic = 3.14159
-    
+
     if param3 is None:
         param3 = []
-    
+
     if param1 > magic_number:
         result = param1 * 2
         for i in range(another_magic):
@@ -82,19 +82,19 @@ def complex_function(param1, param2=42, param3=None):
             result = result / another_magic
         except ZeroDivisionError:
             result = magic_number
-    
+
     return result, param3
 
 class ComplexClass:
     """Class with many methods (god object)."""
-    
+
     def __init__(self, value=42):
         self.value = value
         self.magic = 100
         self.pi = 3.14159
-        
+
     def method1(self): return self.value * 42
-    def method2(self): return self.magic + 100  
+    def method2(self): return self.magic + 100
     def method3(self): return self.pi * 3.14159
     def method4(self): return self.value / 42
     def method5(self): return self.magic - 100
@@ -179,7 +179,7 @@ def benchmark_with_pool(scenarios: List[Dict], iterations: int = 50) -> Dict:
 
             # Use RefactoredConnascenceDetector with pool
             detector = RefactoredConnascenceDetector(f"test_{i}.py", source_lines)
-            violations = detector.detect_all_violations(tree)
+            detector.detect_all_violations(tree)
 
             end_time = time.perf_counter()
             times.append(end_time - start_time)

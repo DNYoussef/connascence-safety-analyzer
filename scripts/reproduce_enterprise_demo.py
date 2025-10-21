@@ -839,7 +839,6 @@ Examples:
         sys.exit(EXIT_CONFIG_ERROR)
 
     # Handle argument aliases
-    quick_mode = args.quick or args.quick_mode
     generate_report_mode = args.generate_report or args.validate_performance
 
     # Initialize reproducer

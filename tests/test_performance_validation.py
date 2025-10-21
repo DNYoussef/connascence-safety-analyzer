@@ -34,32 +34,32 @@ global_var7 = 3.14159  # Trigger global violation
 
 class LargeClass:
     """Test class with many methods - should trigger god object detection."""
-    
+
     def __init__(self):
         self.data = []
         self.config = {"timeout": 30, "retries": 5}  # Magic numbers
-    
+
     def method_with_many_params(self, a, b, c, d, e, f, g):  # Position violation
         """Method with too many positional parameters."""
         return sum([a, b, c, d, e, f, g])
-    
+
     def method_with_timing(self):
         """Method with timing dependencies."""
         time.sleep(0.1)  # Timing violation
         threading.Event().wait(timeout=2.0)  # Another timing violation
         return True
-    
+
     def method_with_hardcoded_values(self):
         """Method with hardcoded business values."""
         api_endpoint = "https://api.production.com/v1/data"  # Values violation
         api_key = "sk-prod-abc123def456ghi789"  # Values violation
         max_retries = 7  # Magic number
         return {"endpoint": api_endpoint, "key": api_key, "retries": max_retries}
-    
+
     def BadMethodName(self):  # Convention violation
         """Method with bad naming convention."""
         return "should_be_snake_case"
-    
+
     def execution_dependent_method(self):
         """Method with execution order dependencies."""
         items = []
@@ -68,7 +68,7 @@ class LargeClass:
         items.append(3)
         result = items.pop()  # Execution order dependency
         return result
-    
+
     def duplicate_algorithm_1(self):
         """First instance of duplicate algorithm."""
         if True:
@@ -76,7 +76,7 @@ class LargeClass:
                 if i % 2 == 0:
                     return i * 2
         return None
-    
+
     def duplicate_algorithm_2(self):
         """Second instance of duplicate algorithm."""
         if True:
@@ -84,26 +84,26 @@ class LargeClass:
                 if i % 2 == 0:
                     return i * 2
         return None
-    
+
     def method9(self):
         """Additional method for god object."""
         return "method9"
-    
+
     def method10(self):
         """Additional method for god object."""
         return "method10"
-    
+
     def method11(self):
         """Additional method for god object."""
         return "method11"
-    
+
     def method12(self):
         """Additional method for god object."""
         return "method12"
 
 class another_bad_class_name:  # Convention violation
     """Class with bad naming convention."""
-    
+
     def another_timing_method(self):
         """Another method with timing issues."""
         import time

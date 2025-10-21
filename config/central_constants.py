@@ -13,7 +13,7 @@ all configurable constants, string literals, and threshold values.
 from dataclasses import dataclass
 from enum import IntEnum
 from pathlib import Path
-from typing import Dict, Final, List
+from typing import Dict, Final, List, Optional
 
 # =============================================================================
 # LICENSE & METADATA CONSTANTS
@@ -327,7 +327,7 @@ class CentralConfig:
     version: VersionInfo = VersionInfo()
 
     @classmethod
-    def load(cls, config_path: Path = None) -> "CentralConfig":
+    def load(cls, config_path: Optional[Path] = None) -> "CentralConfig":
         """Load configuration with optional override file."""
         config = cls()
 

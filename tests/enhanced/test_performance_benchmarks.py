@@ -428,7 +428,7 @@ class TestPerformanceBenchmarks:
 
             for iteration in range(10):  # Multiple iterations for statistical accuracy
                 start_time = time.time()
-                formatted_output = self._format_for_interface(enhanced_result, interface)
+                self._format_for_interface(enhanced_result, interface)
                 formatting_time = time.time() - start_time
                 formatting_times.append(formatting_time)
 
@@ -552,7 +552,7 @@ class Module{file_index}:
         # CofE: Type - dependency coupling
         self.dep = dependency_{file_index % 3}
         self.config = {{"mode": "TYPE_{file_index % 2}"}}  # CofE: Meaning
-        
+
     def process(self, data, format="JSON"):
         # CofE: Position - parameter order dependency
         if self.config["mode"] == "TYPE_0":
@@ -570,7 +570,7 @@ class Module{file_index}:
             return self._complex_processing_{i}(param_{i})
         else:
             return self._simple_processing_{i}(param_{i})
-            
+
     def _complex_processing_{i}(self, data):
         # CofE: Execution - specific execution order
         validated = self._validate_{i}(data)
@@ -589,14 +589,14 @@ class Service{i}:
     def __init__(self, service_{(i + 1) % file_count}):
         # Intentional cross-service dependency for correlation
         self.dependency = service_{(i + 1) % file_count}
-        
+
     def execute(self, data):
         # CofE: Algorithm - services depend on each other's algorithms
         if hasattr(self.dependency, 'preprocess'):
             preprocessed = self.dependency.preprocess(data)
             return self.process(preprocessed)
         return self.process(data)
-        
+
     def process(self, data):
         # CofE: Execution - execution order matters across services
         return {{"result": data, "service": "Service{i}"}}
@@ -617,14 +617,14 @@ class Component{i}:
         # CofE: Meaning - status strings should be enum
         self.status = "ACTIVE"  # Should be enum
         self.mode = "BATCH"     # Should be enum
-        
+
     def update_status(self, new_status):
         # CofE: Meaning - magic string coupling
         if new_status in ["ACTIVE", "INACTIVE", "PENDING"]:
             self.status = new_status
             return True
         return False
-        
+
     def process_data(self, data, output_format):
         # CofE: Position - should use builder pattern
         # CofE: Algorithm - should extract strategy
@@ -634,13 +634,13 @@ class Component{i}:
             return self._to_xml(data)
         elif output_format == "CSV":
             return self._to_csv(data)
-            
+
     def _to_json(self, data):
         # Repeated pattern - should extract
         validated = self._validate(data)
         formatted = self._format_json(validated)
         return self._finalize(formatted)
-        
+
     def _to_xml(self, data):
         # Repeated pattern - should extract
         validated = self._validate(data)

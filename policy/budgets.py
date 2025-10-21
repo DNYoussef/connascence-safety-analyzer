@@ -304,7 +304,7 @@ class BudgetTracker:
             {"timestamp": time.time(), "usage": self.current_usage.copy(), "violation_count": len(violations)}
         )
 
-    def check_compliance(self, violations: List[ConnascenceViolation] = None) -> Dict[str, Any]:
+    def check_compliance(self, violations: Optional[List[ConnascenceViolation]] = None) -> Dict[str, Any]:
         """Check if current violations comply with budget."""
         if violations is None:
             violations = self.violations

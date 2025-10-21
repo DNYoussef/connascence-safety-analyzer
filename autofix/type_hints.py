@@ -225,7 +225,7 @@ class TypeHintFixer:
                 evidence.append("returns dict literal")
 
         if len(return_types) == 1:
-            return list(return_types)[0], 0.8, evidence
+            return next(iter(return_types)), 0.8, evidence
         elif len(return_types) > 1:
             if "None" in return_types and len(return_types) == 2:
                 other_type = next(t for t in return_types if t != "None")

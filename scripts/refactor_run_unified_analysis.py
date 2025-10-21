@@ -5,6 +5,7 @@ Extracts result handling into helper functions.
 """
 
 from pathlib import Path
+import sys
 
 # Path to the file
 core_file = Path(__file__).parent.parent / "analyzer" / "core.py"
@@ -146,7 +147,7 @@ end_idx = content.find(end_marker)
 if start_idx == -1 or end_idx == -1:
     print("[ERROR] Could not find _run_unified_analysis() function boundaries")
     print(f"start_idx: {start_idx}, end_idx: {end_idx}")
-    exit(1)
+    sys.exit(1)
 
 # Create new content
 new_content = content[:start_idx] + helper_functions + new_function + content[end_idx:]

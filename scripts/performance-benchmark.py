@@ -60,7 +60,7 @@ class PerformanceBenchmark:
         print("\n[1/8] Benchmarking import time...")
 
         # Clear modules to get accurate import time
-        modules_to_clear = [m for m in sys.modules.keys() if "analyzer" in m]
+        modules_to_clear = [m for m in sys.modules if "analyzer" in m]
         for mod in modules_to_clear:
             del sys.modules[mod]
 
@@ -140,7 +140,7 @@ class PerformanceBenchmark:
             from analyzer.consolidated_analyzer import ConsolidatedConnascenceAnalyzer
 
             analyzer = ConsolidatedConnascenceAnalyzer(str(test_file))
-            result = analyzer.analyze()
+            analyzer.analyze()
             status = "success"
             error = ""
         except Exception as e:
@@ -287,7 +287,7 @@ class PerformanceBenchmark:
 
             for py_file in python_files:
                 analyzer = ConsolidatedConnascenceAnalyzer(str(py_file))
-                result = analyzer.analyze()
+                analyzer.analyze()
 
             status = "success"
             error = ""
@@ -372,7 +372,7 @@ class PerformanceBenchmark:
             error = str(e)
 
         duration = time.time() - start
-        current, peak = tracemalloc.get_traced_memory()
+        _current, peak = tracemalloc.get_traced_memory()
         tracemalloc.stop()
         mem_after = self.process.memory_info().rss / 1024 / 1024
 

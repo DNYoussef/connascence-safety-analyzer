@@ -180,7 +180,7 @@ def demonstrate_bsl_validation():
         # Show sequential thinking steps
         print("\nSequential Thinking Steps:")
         for step in report.sequential_steps[-3:]:  # Last 3 steps
-            timestamp, description = step.split(": ", 1)
+            _timestamp, description = step.split(": ", 1)
             print(f"  - {description}")
 
     finally:

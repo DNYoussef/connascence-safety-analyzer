@@ -521,7 +521,7 @@ class ASTSafeRefactoring:
             call_line = f"    {new_method_name}();"
 
         # Reconstruct the code
-        new_lines = lines[: start_idx + extract_start] + [call_line] + lines[start_idx + extract_end :]
+        new_lines = [*lines[: start_idx + extract_start], call_line, *lines[start_idx + extract_end :]]
 
         # Add the extracted method before the original function
         method_lines = extracted_method.split("\n")

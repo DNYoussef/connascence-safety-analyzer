@@ -11,7 +11,7 @@ import json
 from pathlib import Path
 import subprocess
 import sys
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 
 import tomllib
 
@@ -24,7 +24,7 @@ class ReleaseValidator:
         self.verbose = verbose
         self.results = {}
 
-    def run_command(self, command: List[str], cwd: Path = None) -> Tuple[int, str, str]:
+    def run_command(self, command: List[str], cwd: Optional[Path] = None) -> Tuple[int, str, str]:
         """Run shell command and capture output."""
         if self.verbose:
             print(f"Running: {' '.join(command)}")
@@ -132,7 +132,7 @@ class ReleaseValidator:
         print("  ✅ Ruff linting passed")
 
         # Run mypy type checking
-        returncode, stdout, stderr = self.run_command(["python", "-m", "mypy", ".", "--ignore-missing-imports"])
+        returncode, stdout, _stderr = self.run_command(["python", "-m", "mypy", ".", "--ignore-missing-imports"])
 
         if returncode != 0:
             print("❌ MyPy type checking failed")
@@ -244,7 +244,7 @@ class ReleaseValidator:
         """Ensure git working directory is clean."""
         print("Checking git status...")
 
-        returncode, stdout, stderr = self.run_command(["git", "status", "--porcelain"])
+        returncode, stdout, _stderr = self.run_command(["git", "status", "--porcelain"])
 
         if returncode != 0:
             print("❌ Git status check failed")

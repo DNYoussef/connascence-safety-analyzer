@@ -41,7 +41,7 @@ class TestClass:
     def __init__(self, config):
         # CofE: Identity - class structure depends on config
         self.setting = config["setting"]
-        
+
     def process(self, data, format="json"):
         # CofE: Position - parameter order dependency
         # CofE: Meaning - format string coupling
@@ -113,7 +113,7 @@ class TestVSCodeEnhancedIntegration:
         """Test enhanced analysis execution through VSCode extension."""
         mock_analyzer = MockEnhancedAnalyzer("success")
 
-        with patch("subprocess.spawn") as mock_spawn:
+        with patch("subprocess.spawn"):
             # Mock subprocess execution for enhanced analyzer
             mock_process = Mock()
             mock_process.stdout = Mock()
@@ -133,7 +133,7 @@ class TestVSCodeEnhancedIntegration:
             assert is_valid, f"Enhanced result validation failed: {errors}"
 
             # Verify enhanced features are present
-            assert enhanced_result["cross_phase_analysis"] == True
+            assert enhanced_result["cross_phase_analysis"]
             assert len(enhanced_result["correlations"]) > 0
             assert len(enhanced_result["smart_recommendations"]) > 0
             assert len(enhanced_result["audit_trail"]) > 0
@@ -281,13 +281,13 @@ class TestVSCodeEnhancedIntegration:
         for scenario_mode, expected_behavior in test_scenarios:
             mock_analyzer = MockEnhancedAnalyzer(scenario_mode)
 
-            with patch("subprocess.spawn") as mock_spawn:
+            with patch("subprocess.spawn"):
                 try:
                     result = mock_analyzer.analyze_path("/test/path")
 
                     if scenario_mode == "partial_failure":
                         # Should handle gracefully with partial data
-                        assert result["success"] == True
+                        assert result["success"]
                         assert result["correlations"] == []  # Missing data handled
 
                 except Exception as e:
@@ -407,9 +407,8 @@ class TestVSCodeEnhancedIntegration:
             if "correlationThreshold" in key:
                 if not isinstance(value, (int, float)) or not (0.0 <= value <= 1.0):
                     return False
-            elif "enable" in key:
-                if not isinstance(value, bool):
-                    return False
+            elif "enable" in key and not isinstance(value, bool):
+                return False
 
         return True
 
@@ -444,7 +443,7 @@ class TestVSCodeIntegrationFlow:
     def test_complete_enhanced_analysis_workflow(self, sample_code_file, enhanced_test_datasets):
         """Test complete enhanced analysis workflow in VSCode extension."""
         # 1. Initialize enhanced pipeline provider
-        mock_provider = Mock()
+        Mock()
 
         # 2. Execute enhanced analysis
         mock_analyzer = MockEnhancedAnalyzer("success")

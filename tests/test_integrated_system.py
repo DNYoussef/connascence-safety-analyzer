@@ -42,11 +42,11 @@ def process_user(name, age, email):
 
 user_data = process_user("John", "john@example.com", 25)  # Wrong order
 
-# Connascence of Name (CoN) 
+# Connascence of Name (CoN)
 class UserProcessor:
     def process_user_data(self):
         return self.calculate_result()
-    
+
     def calculate_result(self):  # Rename breaks the calling method
         return "processed"
 
@@ -64,7 +64,7 @@ ADMIN_LEVEL = 5
 def check_permissions(user_level):
     return user_level >= 5  # Magic number should use ADMIN_LEVEL
 
-# Connascence of Algorithm (CoA) 
+# Connascence of Algorithm (CoA)
 def hash_password_v1(password):
     return hash(password) % 1000
 
@@ -106,18 +106,7 @@ current_user = None
         violations = detector.detect_all_violations(tree)
 
         # Check that we found violations for multiple connascence types
-        violation_types = {v.type for v in violations}
-
-        expected_types = [
-            "connascence_of_timing",  # sleep call
-            "connascence_of_meaning",  # magic numbers
-            "connascence_of_algorithm",  # duplicate logic
-            "connascence_of_position",  # parameter order
-            "connascence_of_convention",  # naming violations
-            "connascence_of_values",  # duplicate values
-            "connascence_of_execution",  # execution order
-            "connascence_of_identity",  # global state
-        ]
+        {v.type for v in violations}
 
         # Assert we detect multiple types
         self.assertGreaterEqual(len(violations), 5, "Should detect multiple connascence violations")
@@ -141,11 +130,11 @@ def fibonacci(n):
         return n
     return fibonacci(n-1) + fibonacci(n-2)  # Recursive call
 
-# NASA Rule 2 - Unbounded loop  
+# NASA Rule 2 - Unbounded loop
 def process_forever():
     while True:  # Unbounded loop
         process_data()
-        
+
 # NASA Rule 4 - Function too long (simplified)
 def massive_function():
     # This would be a 60+ line function
@@ -285,8 +274,8 @@ def problematic_function(x, y):  # NASA Rule 5: needs assertions
 def recursive_func(n):
     if n > 0:
         return recursive_func(n-1)  # NASA Rule 1 + Algorithm connascence
-        
-# Memory violations  
+
+# Memory violations
 import ctypes
 def unsafe_memory():
     ptr = ctypes.malloc(100)  # NASA Rule 3
@@ -310,7 +299,7 @@ class badNaming:  # Convention connascence
 global_state = []
 def order_dependent_1():
     global_state.clear()
-    
+
 def order_dependent_2():
     return len(global_state)  # Execution connascence
 """

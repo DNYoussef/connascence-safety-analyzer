@@ -317,7 +317,7 @@ class ConsolidationValidator:
         print(f"Validation report saved: {report_path.relative_to(self.repo_root)}")
         print(f"{'='*60}\n")
 
-        return overall_status == "PASSED" or overall_status == "PASSED_WITH_WARNINGS"
+        return overall_status in {"PASSED", "PASSED_WITH_WARNINGS"}
 
     def run_full_validation(self):
         """Run complete validation suite"""

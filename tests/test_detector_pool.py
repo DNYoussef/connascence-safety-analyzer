@@ -269,7 +269,7 @@ def example_function():
         from analyzer.refactored_detector import RefactoredConnascenceDetector
 
         detector = RefactoredConnascenceDetector("test.py", self.source_lines)
-        violations = detector.detect_all_violations(self.tree)
+        detector.detect_all_violations(self.tree)
 
         # Should have metrics
         metrics = detector.get_pool_metrics()
@@ -318,7 +318,7 @@ if __name__ == "__main__":
 def test_function(param1, param2=42):
     global_var = "test"
     magic_numbers = [1, 2, 3, 42, 100]
-    
+
     if param1 > magic_numbers[3]:
         return param1 * 2
     elif param1 < 0:
@@ -332,7 +332,7 @@ def test_function(param1, param2=42):
 class TestClass:
     def __init__(self):
         self.value = 42
-    
+
     def method1(self): pass
     def method2(self): pass
     def method3(self): pass
@@ -349,7 +349,7 @@ class TestClass:
         start_time = time.time()
         for i in range(iterations):
             detector = RefactoredConnascenceDetector(f"test{i}.py", source_lines)
-            violations = detector.detect_all_violations(tree)
+            detector.detect_all_violations(tree)
         end_time = time.time()
 
         print(f"Pool-based analysis: {end_time - start_time:.3f}s for {iterations} iterations")
