@@ -8,7 +8,7 @@ MCP Server Enhanced Integration Tests
 Comprehensive tests for MCP server enhanced pipeline integration:
 - Enhanced pipeline context retrieval via subprocess
 - Smart recommendation integration in AI fix generation
-- Cross-phase correlation data in AI prompts  
+- Cross-phase correlation data in AI prompts
 - Enhanced fix and suggestion generation with architectural intelligence
 - Error handling and graceful degradation
 """

@@ -136,12 +136,12 @@ class ExecutionDetector(DetectorBase):
             # Look for patterns that suggest order matters
             init_functions = [
                 name
-                for name in self.initialization_patterns.keys()
+                for name in self.initialization_patterns
                 if any(keyword in name.lower() for keyword in ["init", "setup", "start"])
             ]
 
             if len(init_functions) >= 2:
-                representative_node = list(self.initialization_patterns.values())[0]
+                representative_node = next(iter(self.initialization_patterns.values()))
                 self._create_initialization_order_violation(representative_node, init_functions)
 
     def _check_exception_flow_coupling(self) -> None:

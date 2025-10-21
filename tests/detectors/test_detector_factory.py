@@ -1,4 +1,5 @@
 """Unit tests for DetectorFactory."""
+
 import ast
 import unittest
 

@@ -3,6 +3,7 @@ Position Detector - Detects Connascence of Position violations.
 
 Extracted from ConnascenceDetector to follow Single Responsibility Principle.
 """
+
 import ast
 from typing import List
 

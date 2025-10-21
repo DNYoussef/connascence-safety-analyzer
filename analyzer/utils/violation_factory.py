@@ -9,6 +9,7 @@ NASA Rule 4 Compliant: All functions under 60 lines
 """
 
 from typing import Any, Dict, Optional
+
 from fixes.phase0.production_safe_assertions import ProductionAssert
 
 
@@ -23,10 +24,7 @@ class ViolationFactory:
 
     @staticmethod
     def _validate_violation_inputs(
-        violation_type: str,
-        severity: str,
-        location: Dict[str, Any],
-        description: str
+        violation_type: str, severity: str, location: Dict[str, Any], description: str
     ) -> None:
         """
         Validate inputs for violation creation.
@@ -40,10 +38,10 @@ class ViolationFactory:
         NASA Rule 4: Under 60 lines
         NASA Rule 5: Input assertions
         """
-        ProductionAssert.not_none(violation_type, 'violation_type')
-        ProductionAssert.not_none(severity, 'severity')
-        ProductionAssert.not_none(location, 'location')
-        ProductionAssert.not_none(description, 'description')
+        ProductionAssert.not_none(violation_type, "violation_type")
+        ProductionAssert.not_none(severity, "severity")
+        ProductionAssert.not_none(location, "location")
+        ProductionAssert.not_none(description, "description")
 
         # Validate severity
         valid_severities = {"low", "medium", "high", "critical"}
@@ -61,7 +59,7 @@ class ViolationFactory:
         description: str,
         recommendation: Optional[str] = None,
         code_snippet: Optional[str] = None,
-        context: Optional[Dict[str, Any]] = None
+        context: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         """
         Create a standardized ConnascenceViolation object.
@@ -81,9 +79,7 @@ class ViolationFactory:
         NASA Rule 4: Under 60 lines
         NASA Rule 5: Input assertions
         """
-        ViolationFactory._validate_violation_inputs(
-            violation_type, severity, location, description
-        )
+        ViolationFactory._validate_violation_inputs(violation_type, severity, location, description)
 
         # Build violation object
         violation = {
@@ -113,10 +109,7 @@ class ViolationFactory:
 
     @staticmethod
     def create_cop_violation(
-        location: Dict[str, Any],
-        function_name: str,
-        param_count: int,
-        threshold: int = 3
+        location: Dict[str, Any], function_name: str, param_count: int, threshold: int = 3
     ) -> Dict[str, Any]:
         """
         Create a Connascence of Position (CoP) violation.
@@ -132,24 +125,16 @@ class ViolationFactory:
 
         NASA Rule 4: Under 60 lines
         """
-        ProductionAssert.not_none(location, 'location')
-        ProductionAssert.not_none(function_name, 'function_name')
+        ProductionAssert.not_none(location, "location")
+        ProductionAssert.not_none(function_name, "function_name")
 
-        description = (
-            f"Function '{function_name}' has {param_count} positional "
-            f"parameters (threshold: {threshold})"
-        )
+        description = f"Function '{function_name}' has {param_count} positional " f"parameters (threshold: {threshold})"
 
         recommendation = (
-            "Consider using a parameter object, keyword arguments, or "
-            "breaking the function into smaller pieces."
+            "Consider using a parameter object, keyword arguments, or " "breaking the function into smaller pieces."
         )
 
-        context = {
-            "function_name": function_name,
-            "param_count": param_count,
-            "threshold": threshold
-        }
+        context = {"function_name": function_name, "param_count": param_count, "threshold": threshold}
 
         return ViolationFactory.create_violation(
             violation_type="CoP",
@@ -157,15 +142,11 @@ class ViolationFactory:
             location=location,
             description=description,
             recommendation=recommendation,
-            context=context
+            context=context,
         )
 
     @staticmethod
-    def create_com_violation(
-        location: Dict[str, Any],
-        literal_value: Any,
-        literal_type: str
-    ) -> Dict[str, Any]:
+    def create_com_violation(location: Dict[str, Any], literal_value: Any, literal_type: str) -> Dict[str, Any]:
         """
         Create a Connascence of Meaning (CoM) violation.
 
@@ -179,24 +160,15 @@ class ViolationFactory:
 
         NASA Rule 4: Under 60 lines
         """
-        ProductionAssert.not_none(location, 'location')
-        ProductionAssert.not_none(literal_value, 'literal_value')
-        ProductionAssert.not_none(literal_type, 'literal_type')
+        ProductionAssert.not_none(location, "location")
+        ProductionAssert.not_none(literal_value, "literal_value")
+        ProductionAssert.not_none(literal_type, "literal_type")
 
-        description = (
-            f"Magic {literal_type} literal '{literal_value}' should be "
-            f"extracted to a named constant"
-        )
+        description = f"Magic {literal_type} literal '{literal_value}' should be " f"extracted to a named constant"
 
-        recommendation = (
-            "Extract this literal to a module-level constant with a "
-            "descriptive name."
-        )
+        recommendation = "Extract this literal to a module-level constant with a " "descriptive name."
 
-        context = {
-            "literal_value": literal_value,
-            "literal_type": literal_type
-        }
+        context = {"literal_value": literal_value, "literal_type": literal_type}
 
         return ViolationFactory.create_violation(
             violation_type="CoM",
@@ -204,15 +176,11 @@ class ViolationFactory:
             location=location,
             description=description,
             recommendation=recommendation,
-            context=context
+            context=context,
         )
 
     @staticmethod
-    def create_cot_violation(
-        location: Dict[str, Any],
-        element_name: str,
-        missing_types: str
-    ) -> Dict[str, Any]:
+    def create_cot_violation(location: Dict[str, Any], element_name: str, missing_types: str) -> Dict[str, Any]:
         """
         Create a Connascence of Type (CoT) violation.
 
@@ -226,22 +194,15 @@ class ViolationFactory:
 
         NASA Rule 4: Under 60 lines
         """
-        ProductionAssert.not_none(location, 'location')
-        ProductionAssert.not_none(element_name, 'element_name')
-        ProductionAssert.not_none(missing_types, 'missing_types')
+        ProductionAssert.not_none(location, "location")
+        ProductionAssert.not_none(element_name, "element_name")
+        ProductionAssert.not_none(missing_types, "missing_types")
 
-        description = (
-            f"'{element_name}' is missing type hints: {missing_types}"
-        )
+        description = f"'{element_name}' is missing type hints: {missing_types}"
 
-        recommendation = (
-            "Add explicit type hints for all parameters and return values."
-        )
+        recommendation = "Add explicit type hints for all parameters and return values."
 
-        context = {
-            "element_name": element_name,
-            "missing_types": missing_types
-        }
+        context = {"element_name": element_name, "missing_types": missing_types}
 
         return ViolationFactory.create_violation(
             violation_type="CoT",
@@ -249,5 +210,5 @@ class ViolationFactory:
             location=location,
             description=description,
             recommendation=recommendation,
-            context=context
+            context=context,
         )

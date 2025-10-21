@@ -66,7 +66,7 @@ class ComplianceForecaster:
         self.is_fitted = False
 
         if SKLEARN_AVAILABLE:
-            for category in ["overall"] + self.CATEGORIES:
+            for category in ["overall", *self.CATEGORIES]:
                 self.models[category] = LinearRegression()
 
     def add_snapshot(self, snapshot: ComplianceSnapshot):
@@ -100,10 +100,7 @@ class ComplianceForecaster:
         self.is_fitted = True
 
     def forecast(self, target_date: Optional[str] = None, days_ahead: int = 30) -> ComplianceForecast:
-        if target_date:
-            target_dt = self._parse_timestamp(target_date)
-        else:
-            target_dt = datetime.now() + timedelta(days=days_ahead)
+        target_dt = self._parse_timestamp(target_date) if target_date else datetime.now() + timedelta(days=days_ahead)
 
         if SKLEARN_AVAILABLE and self.is_fitted:
             return self._sklearn_forecast(target_dt)

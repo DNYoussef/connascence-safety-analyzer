@@ -8,7 +8,7 @@ recovery procedures.
 
 Features:
 - Real-time memory usage tracking with configurable thresholds
-- Memory leak detection using growth pattern analysis  
+- Memory leak detection using growth pattern analysis
 - Automatic alerts and intervention when limits exceeded
 - Memory profiling integration for detailed analysis
 - Thread-safe monitoring for concurrent operations
@@ -301,7 +301,7 @@ class MemoryMonitor:
             system_memory = psutil.virtual_memory()
 
             # Get garbage collection stats
-            gc_stats = gc.get_stats() if hasattr(gc, "get_stats") else []
+            gc.get_stats() if hasattr(gc, "get_stats") else []
             gc_collections = (
                 gc.get_count()[0] if gc.get_count() else 0,
                 gc.get_count()[1] if len(gc.get_count()) > 1 else 0,

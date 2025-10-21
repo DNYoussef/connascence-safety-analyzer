@@ -4,6 +4,7 @@ Validate that detector pool fix resolved the 0 violations issue.
 """
 
 import ast
+
 from analyzer.refactored_detector import RefactoredConnascenceDetector
 
 # Test code with violations for all 9 connascence types
@@ -47,10 +48,10 @@ print(f"Violation types: {type(violations[0]) if violations else 'N/A'}")
 # Group violations by type
 violation_types = {}
 for v in violations:
-    if hasattr(v, 'type'):
+    if hasattr(v, "type"):
         vtype = v.type
     elif isinstance(v, dict):
-        vtype = v.get('type', 'unknown')
+        vtype = v.get("type", "unknown")
     else:
         vtype = str(type(v))
 

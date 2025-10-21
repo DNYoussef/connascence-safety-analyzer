@@ -255,13 +255,13 @@ class ComprehensiveSelfAnalysis:
                 self.results["tool_integration"] = {
                     "tools_analyzed": list(enabled_tools),
                     "correlation_scores": correlation_scores,
-                    "average_correlation": sum(correlation_scores.values()) / len(correlation_scores)
-                    if correlation_scores
-                    else 0,
+                    "average_correlation": (
+                        sum(correlation_scores.values()) / len(correlation_scores) if correlation_scores else 0
+                    ),
                     "tool_coverage": {tool: len(results) for tool, results in tool_results.items()},
-                    "integration_effectiveness": "high"
-                    if sum(correlation_scores.values()) / len(correlation_scores) > 0.7
-                    else "medium",
+                    "integration_effectiveness": (
+                        "high" if sum(correlation_scores.values()) / len(correlation_scores) > 0.7 else "medium"
+                    ),
                 }
 
                 print(f"    📊 Tools Integrated: {len(enabled_tools)}")
@@ -380,9 +380,9 @@ class ComprehensiveSelfAnalysis:
         if hasattr(violation, "__dict__"):
             return {
                 "type": violation.type.value if hasattr(violation.type, "value") else str(violation.type),
-                "severity": violation.severity.value
-                if hasattr(violation.severity, "value")
-                else str(violation.severity),
+                "severity": (
+                    violation.severity.value if hasattr(violation.severity, "value") else str(violation.severity)
+                ),
                 "message": getattr(violation, "message", ""),
                 "file": getattr(violation, "file_path", ""),
                 "line": getattr(violation, "line_number", 0),

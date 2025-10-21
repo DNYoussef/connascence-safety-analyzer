@@ -157,9 +157,11 @@ class ISO27001Mapper:
                     implementation_status=status,
                     evidence_files=[str(f.relative_to(self.project_root)) for f in (ci_cd_configs + test_files)[:10]],
                     gap_analysis=None if status == "implemented" else "CI/CD or testing infrastructure incomplete",
-                    recommendations=["Maintain comprehensive test coverage"]
-                    if status == "implemented"
-                    else ["Implement CI/CD and testing infrastructure"],
+                    recommendations=(
+                        ["Maintain comprehensive test coverage"]
+                        if status == "implemented"
+                        else ["Implement CI/CD and testing infrastructure"]
+                    ),
                 )
             )
 
@@ -287,7 +289,7 @@ class ISO27001Mapper:
         compliance_percentage = (implemented + 0.5 * partial) / total_applicable if total_applicable > 0 else 0.0
 
         domain_summary = {}
-        for control_id in self.TECHNOLOGICAL_CONTROLS.keys():
+        for control_id in self.TECHNOLOGICAL_CONTROLS:
             domain = control_id.split(".")[0]
             if domain not in domain_summary:
                 domain_summary[domain] = {"implemented": 0, "partial": 0, "missing": 0, "not_applicable": 0}

@@ -649,7 +649,7 @@ PRIORITY ACTIONS:
         return {
             "count": len(sorted_hotspots),
             "files": sorted_hotspots,
-            "top_hotspot": list(sorted_hotspots.keys())[0] if sorted_hotspots else None,
+            "top_hotspot": next(iter(sorted_hotspots.keys())) if sorted_hotspots else None,
         }
 
     def _convert_to_legacy_format(self, analysis_result: UnifiedAnalysisResult) -> Any:

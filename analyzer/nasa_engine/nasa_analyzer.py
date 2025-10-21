@@ -101,7 +101,7 @@ class NASAAnalyzer:
             }
         }
 
-    def analyze_file(self, file_path: str, source_code: str = None) -> List[ConnascenceViolation]:
+    def analyze_file(self, file_path: str, source_code: Optional[str] = None) -> List[ConnascenceViolation]:
         """Analyze a single file for NASA compliance. NASA Rule 4 compliant."""
         # NASA Rule 5: Input validation assertions
         assert file_path is not None, "file_path cannot be None"
@@ -167,9 +167,8 @@ class NASAAnalyzer:
                 self.assertions.append(node)
             elif isinstance(node, ast.Global):
                 self.global_variables.extend([ast.Name(id=name, ctx=ast.Store()) for name in node.names])
-            elif isinstance(node, ast.Call):
-                if self._is_malloc_call(node):
-                    self.malloc_calls.append(node)
+            elif isinstance(node, ast.Call) and self._is_malloc_call(node):
+                self.malloc_calls.append(node)
 
     def _is_malloc_call(self, node: ast.Call) -> bool:
         """Check if call is a memory allocation function."""

@@ -10,6 +10,8 @@ and ensure consistency across the codebase.
 """
 
 # NASA Power of Ten Rules Thresholds
+from typing import Optional
+
 NASA_PARAMETER_THRESHOLD = 6  # Rule #6: Function parameters should not exceed 6
 NASA_GLOBAL_THRESHOLD = 5  # Rule #7: Limit global variable usage
 NASA_COMPLIANCE_THRESHOLD = 0.95  # Minimum NASA compliance score for passing
@@ -871,7 +873,7 @@ def get_component_config(component_name: str) -> dict:
     )
 
 
-def should_enable_component(component_name: str, policy_name: str = None) -> bool:
+def should_enable_component(component_name: str, policy_name: Optional[str] = None) -> bool:
     """
     Determine if a component should be enabled based on policy and configuration.
 

@@ -153,11 +153,7 @@ class FileWatcher(FileSystemEventHandler):
         path_obj = Path(file_path)
 
         # Check file patterns
-        for pattern in self.file_patterns:
-            if path_obj.match(pattern):
-                return True
-
-        return False
+        return any(path_obj.match(pattern) for pattern in self.file_patterns)
 
     def _handle_change(self, file_path: str, change_type: str) -> None:
         """Handle file change with debouncing."""
@@ -581,7 +577,7 @@ class StreamProcessor:
                 logger.warning(f"Could not read {file_path}: {e}")
                 new_content = ""
 
-            delta = incremental_cache.track_file_change(file_path, None, new_content)
+            incremental_cache.track_file_change(file_path, None, new_content)
 
             # For now, run full analysis (incremental AST diff would be implemented here)
             violations = await self._run_full_analysis(analyzer, file_path)

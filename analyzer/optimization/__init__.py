@@ -7,7 +7,7 @@ Optimized for NASA Rule 7 compliance and parallel processing.
 
 Key Features:
 - LRU cache with 50MB memory limit
-- Content hash-based AST caching  
+- Content hash-based AST caching
 - Thread-safe operations
 - ~70% I/O reduction
 - Comprehensive error handling

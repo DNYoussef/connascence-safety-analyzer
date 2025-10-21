@@ -149,7 +149,7 @@ class SixSigmaTelemetry:
         ):
             self.current_session_data["units_passed"] += 1
 
-    def calculate_dpmo(self, defects: int = None, opportunities: int = None) -> float:
+    def calculate_dpmo(self, defects: Optional[int] = None, opportunities: Optional[int] = None) -> float:
         """
         Calculate Defects Per Million Opportunities
 
@@ -166,7 +166,7 @@ class SixSigmaTelemetry:
         dpmo = (defects / opportunities) * 1_000_000
         return round(dpmo, 2)
 
-    def calculate_rty(self, units_processed: int = None, units_passed: int = None) -> float:
+    def calculate_rty(self, units_processed: Optional[int] = None, units_passed: Optional[int] = None) -> float:
         """
         Calculate Rolled Throughput Yield
 
@@ -183,7 +183,7 @@ class SixSigmaTelemetry:
         rty = (units_passed / units_processed) * 100
         return round(rty, 2)
 
-    def calculate_sigma_level(self, dpmo: float = None) -> float:
+    def calculate_sigma_level(self, dpmo: Optional[float] = None) -> float:
         """
         Calculate sigma level from DPMO
 
@@ -211,7 +211,7 @@ class SixSigmaTelemetry:
         else:
             return 1.0
 
-    def get_quality_level(self, dpmo: float = None) -> QualityLevel:
+    def get_quality_level(self, dpmo: Optional[float] = None) -> QualityLevel:
         """Determine quality level based on DPMO"""
         if dpmo is None:
             dpmo = self.calculate_dpmo()
@@ -263,7 +263,7 @@ class SixSigmaTelemetry:
             # Use violation rate as process measurement
             violation_rate = self.current_session_data["defects"] / self.current_session_data["files_analyzed"]
             # Target: 0 violations per file, acceptable: 5 violations per file
-            cp, cpk = self.calculate_process_capability([violation_rate], 0, 5)
+            _cp, cpk = self.calculate_process_capability([violation_rate], 0, 5)
             process_capability = cpk
 
         metrics = SixSigmaMetrics(
@@ -360,12 +360,14 @@ class SixSigmaTelemetry:
             "metrics_history": [m.to_dict() for m in self.metrics_history],
             "summary": {
                 "total_sessions": len(self.metrics_history),
-                "average_dpmo": round(statistics.mean([m.dpmo for m in self.metrics_history]), 2)
-                if self.metrics_history
-                else 0,
-                "average_sigma": round(statistics.mean([m.sigma_level for m in self.metrics_history]), 2)
-                if self.metrics_history
-                else 6.0,
+                "average_dpmo": (
+                    round(statistics.mean([m.dpmo for m in self.metrics_history]), 2) if self.metrics_history else 0
+                ),
+                "average_sigma": (
+                    round(statistics.mean([m.sigma_level for m in self.metrics_history]), 2)
+                    if self.metrics_history
+                    else 6.0
+                ),
                 "best_sigma": max([m.sigma_level for m in self.metrics_history]) if self.metrics_history else 6.0,
             },
         }

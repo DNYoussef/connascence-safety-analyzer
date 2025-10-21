@@ -280,9 +280,11 @@ class AccountLockoutManager:
             "last_attempt": attempt_info["last_attempt"],
             "is_locked": self.is_account_locked(username),
             "locked_until": locked_until,
-            "time_remaining": (locked_until - datetime.now(datetime.UTC)).total_seconds()
-            if locked_until and locked_until > datetime.now(datetime.UTC)
-            else 0,
+            "time_remaining": (
+                (locked_until - datetime.now(datetime.UTC)).total_seconds()
+                if locked_until and locked_until > datetime.now(datetime.UTC)
+                else 0
+            ),
         }
 
 

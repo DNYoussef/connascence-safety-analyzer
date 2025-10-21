@@ -205,9 +205,9 @@ class CIDashboard:
         self,
         violations: List,
         changed_files: List[Path],
-        message: str = None,
-        baseline_comparison: Dict = None,
-        budget_status: Dict = None,
+        message: Optional[str] = None,
+        baseline_comparison: Optional[Dict] = None,
+        budget_status: Optional[Dict] = None,
     ) -> Dict[str, Any]:
         """Create PR analysis report."""
         report = {

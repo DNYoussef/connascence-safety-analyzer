@@ -7,7 +7,7 @@ VSCode Extension Enhanced Integration Tests
 
 Comprehensive tests for VSCode extension enhanced pipeline integration:
 - Enhanced pipeline provider integration
-- Cross-phase correlation visualization  
+- Cross-phase correlation visualization
 - Smart recommendations display
 - Enhanced analysis command execution
 - Configuration validation and policy resolution

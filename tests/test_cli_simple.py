@@ -5,9 +5,9 @@ Simple CLI Integration Test
 Direct test of detectors to verify Phase 0 integration works.
 """
 
-import sys
 import ast
 from pathlib import Path
+import sys
 
 # Add project root to path
 project_root = Path(__file__).parent.parent
@@ -34,18 +34,18 @@ print("=" * 60)
 
 # Test all 8 detectors
 detectors = [
-    ('PositionDetector', 'analyzer.detectors.position_detector'),
-    ('ValuesDetector', 'analyzer.detectors.values_detector'),
-    ('AlgorithmDetector', 'analyzer.detectors.algorithm_detector'),
-    ('MagicLiteralDetector', 'analyzer.detectors.magic_literal_detector'),
-    ('TimingDetector', 'analyzer.detectors.timing_detector'),
-    ('ExecutionDetector', 'analyzer.detectors.execution_detector'),
-    ('GodObjectDetector', 'analyzer.detectors.god_object_detector'),
-    ('ConventionDetector', 'analyzer.detectors.convention_detector'),
+    ("PositionDetector", "analyzer.detectors.position_detector"),
+    ("ValuesDetector", "analyzer.detectors.values_detector"),
+    ("AlgorithmDetector", "analyzer.detectors.algorithm_detector"),
+    ("MagicLiteralDetector", "analyzer.detectors.magic_literal_detector"),
+    ("TimingDetector", "analyzer.detectors.timing_detector"),
+    ("ExecutionDetector", "analyzer.detectors.execution_detector"),
+    ("GodObjectDetector", "analyzer.detectors.god_object_detector"),
+    ("ConventionDetector", "analyzer.detectors.convention_detector"),
 ]
 
 tree = ast.parse(test_code)
-source_lines = test_code.split('\n')
+source_lines = test_code.split("\n")
 
 total_violations = 0
 detectors_passed = 0
@@ -54,12 +54,12 @@ detectors_failed = 0
 for detector_name, module_path in detectors:
     try:
         # Import detector
-        parts = module_path.rsplit('.', 1)
+        parts = module_path.rsplit(".", 1)
         module = __import__(parts[0], fromlist=[detector_name])
         detector_class = getattr(module, detector_name)
 
         # Instantiate and run
-        detector = detector_class(file_path='test.py', source_lines=source_lines)
+        detector = detector_class(file_path="test.py", source_lines=source_lines)
         violations = detector.detect_violations(tree)
 
         # Report

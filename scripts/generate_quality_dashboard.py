@@ -6,11 +6,10 @@ This script aggregates various quality reports (security, coverage, linting)
 into a single HTML dashboard for easy visualization.
 """
 
-import json
-import os
-from pathlib import Path
-from typing import Dict, Any, List
 from datetime import datetime
+import json
+from pathlib import Path
+from typing import Any, Dict
 
 
 class QualityDashboardGenerator:
@@ -30,7 +29,7 @@ class QualityDashboardGenerator:
                     "coverage": data["totals"]["percent_covered"],
                     "lines_covered": data["totals"]["covered_lines"],
                     "lines_total": data["totals"]["num_statements"],
-                    "status": "pass" if data["totals"]["percent_covered"] >= 60 else "warn"
+                    "status": "pass" if data["totals"]["percent_covered"] >= 60 else "warn",
                 }
         return {"coverage": 0, "lines_covered": 0, "lines_total": 0, "status": "fail"}
 
@@ -50,7 +49,7 @@ class QualityDashboardGenerator:
                     "critical": critical,
                     "medium": medium,
                     "low": low,
-                    "status": "fail" if critical > 0 else ("warn" if medium > 5 else "pass")
+                    "status": "fail" if critical > 0 else ("warn" if medium > 5 else "pass"),
                 }
         return {"total_issues": 0, "critical": 0, "medium": 0, "low": 0, "status": "unknown"}
 
@@ -68,7 +67,7 @@ class QualityDashboardGenerator:
                         "critical": metadata.get("critical", 0),
                         "high": metadata.get("high", 0),
                         "moderate": metadata.get("moderate", 0),
-                        "low": metadata.get("low", 0)
+                        "low": metadata.get("low", 0),
                     }
             except (json.JSONDecodeError, KeyError):
                 pass
@@ -76,11 +75,7 @@ class QualityDashboardGenerator:
         total = sum(vulnerabilities.values())
         status = "fail" if vulnerabilities["critical"] > 0 else ("warn" if vulnerabilities["high"] > 0 else "pass")
 
-        return {
-            **vulnerabilities,
-            "total": total,
-            "status": status
-        }
+        return {**vulnerabilities, "total": total, "status": status}
 
     def load_code_quality(self) -> Dict[str, Any]:
         """Load code quality metrics."""
@@ -97,7 +92,7 @@ class QualityDashboardGenerator:
                         "errors": error_count,
                         "warnings": warning_count,
                         "total": len(issues),
-                        "status": "fail" if error_count > 10 else ("warn" if warning_count > 50 else "pass")
+                        "status": "fail" if error_count > 10 else ("warn" if warning_count > 50 else "pass"),
                     }
             except (json.JSONDecodeError, KeyError):
                 pass

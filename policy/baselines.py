@@ -285,9 +285,9 @@ class EnhancedBaselineManager:
             "new_violation_details": [self._violation_summary(v) for v in new_violations],
             "resolved_violation_details": [fp.to_dict() for fp in resolved_violations],
             "net_change": len(current_violations) - len(baseline.fingerprints),
-            "improvement_percentage": (len(resolved_violations) / len(baseline.fingerprints) * 100)
-            if baseline.fingerprints
-            else 0,
+            "improvement_percentage": (
+                (len(resolved_violations) / len(baseline.fingerprints) * 100) if baseline.fingerprints else 0
+            ),
         }
 
     def filter_new_violations_only(

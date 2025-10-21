@@ -61,10 +61,7 @@ class TimingDetector(DetectorBase):
             return True
 
         # Module.sleep() call (time.sleep, asyncio.sleep, etc.)
-        if isinstance(node.func, ast.Attribute) and node.func.attr == "sleep":
-            return True
-
-        return False
+        return bool(isinstance(node.func, ast.Attribute) and node.func.attr == "sleep")
 
     def _is_timing_related_call(self, node: ast.Call) -> bool:
         """Check if this is a timing-related call that might cause coupling."""
@@ -75,10 +72,7 @@ class TimingDetector(DetectorBase):
             return True
 
         # Attribute calls
-        if isinstance(node.func, ast.Attribute) and node.func.attr in timing_functions:
-            return True
-
-        return False
+        return bool(isinstance(node.func, ast.Attribute) and node.func.attr in timing_functions)
 
     def _create_sleep_violation(self, node: ast.Call) -> None:
         """Create violation for sleep() calls."""

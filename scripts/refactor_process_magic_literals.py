@@ -10,7 +10,7 @@ from pathlib import Path
 check_connascence_file = Path(__file__).parent.parent / "analyzer" / "check_connascence.py"
 
 # Read the file
-with open(check_connascence_file, 'r', encoding='utf-8') as f:
+with open(check_connascence_file, encoding="utf-8") as f:
     content = f.read()
 
 # Helper functions to insert before _process_magic_literals()
@@ -172,22 +172,17 @@ if start_idx == -1 or end_idx == -1:
     exit(1)
 
 # Create new content
-new_content = (
-    content[:start_idx] +
-    helper_functions +
-    new_function +
-    content[end_idx:]
-)
+new_content = content[:start_idx] + helper_functions + new_function + content[end_idx:]
 
 # Write the refactored file
-with open(check_connascence_file, 'w', encoding='utf-8') as f:
+with open(check_connascence_file, "w", encoding="utf-8") as f:
     f.write(new_content)
 
 print("[SUCCESS] Refactored _process_magic_literals() function!")
-print(f"  Original: ~108 LOC")
-print(f"  Refactored: ~35 LOC")
-print(f"  Helper functions created: 3")
-print(f"    - _process_formal_magic_literal(): ~45 LOC")
-print(f"    - _process_legacy_magic_literal(): ~30 LOC")
-print(f"    - _check_excessive_globals(): ~20 LOC")
-print(f"  Lines saved: ~73 LOC from main function")
+print("  Original: ~108 LOC")
+print("  Refactored: ~35 LOC")
+print("  Helper functions created: 3")
+print("    - _process_formal_magic_literal(): ~45 LOC")
+print("    - _process_legacy_magic_literal(): ~30 LOC")
+print("    - _check_excessive_globals(): ~20 LOC")
+print("  Lines saved: ~73 LOC from main function")

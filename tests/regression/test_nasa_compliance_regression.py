@@ -14,12 +14,11 @@ NASA Rules Tested:
 """
 
 import ast
-import os
-import sys
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List
 
 import pytest
+
 from fixes.phase0.production_safe_assertions import ProductionAssert
 
 
@@ -29,10 +28,10 @@ class NASAComplianceValidator:
     def __init__(self):
         self.project_root = Path(__file__).parent.parent.parent
         self.violations: Dict[str, List[Dict]] = {
-            'rule4': [],  # Function length violations
-            'rule5': [],  # Missing assertions
-            'rule7': [],  # Recursion violations
-            'rule8': [],  # Unbounded loop violations
+            "rule4": [],  # Function length violations
+            "rule5": [],  # Missing assertions
+            "rule7": [],  # Recursion violations
+            "rule8": [],  # Unbounded loop violations
         }
 
     def scan_directory(self, directory: Path, pattern: str = "*.py") -> List[Path]:
@@ -46,7 +45,7 @@ class NASAComplianceValidator:
         Returns:
             List of Python file paths
         """
-        ProductionAssert.not_none(directory, 'directory')
+        ProductionAssert.not_none(directory, "directory")
 
         files = []
         if directory.exists():
@@ -63,12 +62,12 @@ class NASAComplianceValidator:
         Returns:
             List of violations (function name, line count, location)
         """
-        ProductionAssert.not_none(file_path, 'file_path')
+        ProductionAssert.not_none(file_path, "file_path")
 
         violations = []
 
         try:
-            with open(file_path, 'r', encoding='utf-8') as f:
+            with open(file_path, encoding="utf-8") as f:
                 content = f.read()
                 tree = ast.parse(content, filename=str(file_path))
 
@@ -77,15 +76,17 @@ class NASAComplianceValidator:
                     length = node.end_lineno - node.lineno + 1
 
                     if length > 60:
-                        violations.append({
-                            'file': str(file_path.relative_to(self.project_root)),
-                            'function': node.name,
-                            'length': length,
-                            'line': node.lineno,
-                            'threshold': 60
-                        })
+                        violations.append(
+                            {
+                                "file": str(file_path.relative_to(self.project_root)),
+                                "function": node.name,
+                                "length": length,
+                                "line": node.lineno,
+                                "threshold": 60,
+                            }
+                        )
 
-        except (SyntaxError, UnicodeDecodeError) as e:
+        except (SyntaxError, UnicodeDecodeError):
             # Skip files with syntax errors or encoding issues
             pass
 
@@ -101,12 +102,12 @@ class NASAComplianceValidator:
         Returns:
             List of recursion violations
         """
-        ProductionAssert.not_none(file_path, 'file_path')
+        ProductionAssert.not_none(file_path, "file_path")
 
         violations = []
 
         try:
-            with open(file_path, 'r', encoding='utf-8') as f:
+            with open(file_path, encoding="utf-8") as f:
                 content = f.read()
                 tree = ast.parse(content, filename=str(file_path))
 
@@ -117,12 +118,14 @@ class NASAComplianceValidator:
                         if isinstance(child, ast.Call):
                             if isinstance(child.func, ast.Name):
                                 if child.func.id == node.name:
-                                    violations.append({
-                                        'file': str(file_path.relative_to(self.project_root)),
-                                        'function': node.name,
-                                        'line': node.lineno,
-                                        'type': 'direct_recursion'
-                                    })
+                                    violations.append(
+                                        {
+                                            "file": str(file_path.relative_to(self.project_root)),
+                                            "function": node.name,
+                                            "line": node.lineno,
+                                            "type": "direct_recursion",
+                                        }
+                                    )
 
         except (SyntaxError, UnicodeDecodeError):
             pass
@@ -139,12 +142,12 @@ class NASAComplianceValidator:
         Returns:
             List of unbounded loop violations
         """
-        ProductionAssert.not_none(file_path, 'file_path')
+        ProductionAssert.not_none(file_path, "file_path")
 
         violations = []
 
         try:
-            with open(file_path, 'r', encoding='utf-8') as f:
+            with open(file_path, encoding="utf-8") as f:
                 content = f.read()
                 tree = ast.parse(content, filename=str(file_path))
 
@@ -153,11 +156,13 @@ class NASAComplianceValidator:
                     # Check for while True: pattern
                     if isinstance(node.test, ast.Constant):
                         if node.test.value is True:
-                            violations.append({
-                                'file': str(file_path.relative_to(self.project_root)),
-                                'line': node.lineno,
-                                'type': 'while_true'
-                            })
+                            violations.append(
+                                {
+                                    "file": str(file_path.relative_to(self.project_root)),
+                                    "line": node.lineno,
+                                    "type": "while_true",
+                                }
+                            )
 
         except (SyntaxError, UnicodeDecodeError):
             pass
@@ -174,7 +179,7 @@ class NASAComplianceValidator:
         Returns:
             Summary dict with violation counts
         """
-        ProductionAssert.not_none(directories, 'directories')
+        ProductionAssert.not_none(directories, "directories")
 
         for dir_name in directories:
             directory = self.project_root / dir_name
@@ -182,25 +187,19 @@ class NASAComplianceValidator:
 
             for file_path in files:
                 # Skip test files and __pycache__
-                if '__pycache__' in str(file_path) or 'test_' in file_path.name:
+                if "__pycache__" in str(file_path) or "test_" in file_path.name:
                     continue
 
                 # Check all rules
-                self.violations['rule4'].extend(
-                    self.check_rule4_function_length(file_path)
-                )
-                self.violations['rule7'].extend(
-                    self.check_rule7_recursion(file_path)
-                )
-                self.violations['rule8'].extend(
-                    self.check_rule8_bounded_loops(file_path)
-                )
+                self.violations["rule4"].extend(self.check_rule4_function_length(file_path))
+                self.violations["rule7"].extend(self.check_rule7_recursion(file_path))
+                self.violations["rule8"].extend(self.check_rule8_bounded_loops(file_path))
 
         return {
-            'rule4_violations': len(self.violations['rule4']),
-            'rule7_violations': len(self.violations['rule7']),
-            'rule8_violations': len(self.violations['rule8']),
-            'total_violations': sum(len(v) for v in self.violations.values())
+            "rule4_violations": len(self.violations["rule4"]),
+            "rule7_violations": len(self.violations["rule7"]),
+            "rule8_violations": len(self.violations["rule8"]),
+            "total_violations": sum(len(v) for v in self.violations.values()),
         }
 
 
@@ -215,66 +214,46 @@ class TestNASAComplianceRegression:
 
     def test_analyzer_utils_rule4_compliance(self, nasa_validator):
         """Test that analyzer utilities comply with Rule 4 (≤60 lines)."""
-        files = nasa_validator.scan_directory(
-            nasa_validator.project_root / 'analyzer' / 'utils'
-        )
+        files = nasa_validator.scan_directory(nasa_validator.project_root / "analyzer" / "utils")
 
         violations = []
         for file_path in files:
             violations.extend(nasa_validator.check_rule4_function_length(file_path))
 
-        assert len(violations) == 0, (
-            f"Found {len(violations)} Rule 4 violations in analyzer/utils:\n" +
-            "\n".join([
-                f"  - {v['file']}:{v['line']} {v['function']}() = {v['length']} LOC"
-                for v in violations
-            ])
+        assert len(violations) == 0, f"Found {len(violations)} Rule 4 violations in analyzer/utils:\n" + "\n".join(
+            [f"  - {v['file']}:{v['line']} {v['function']}() = {v['length']} LOC" for v in violations]
         )
 
     def test_analyzer_detectors_rule4_compliance(self, nasa_validator):
         """Test that analyzer detectors comply with Rule 4 (≤60 lines)."""
-        files = nasa_validator.scan_directory(
-            nasa_validator.project_root / 'analyzer' / 'detectors'
-        )
+        files = nasa_validator.scan_directory(nasa_validator.project_root / "analyzer" / "detectors")
 
         violations = []
         for file_path in files:
             violations.extend(nasa_validator.check_rule4_function_length(file_path))
 
-        assert len(violations) == 0, (
-            f"Found {len(violations)} Rule 4 violations in analyzer/detectors:\n" +
-            "\n".join([
-                f"  - {v['file']}:{v['line']} {v['function']}() = {v['length']} LOC"
-                for v in violations
-            ])
+        assert len(violations) == 0, f"Found {len(violations)} Rule 4 violations in analyzer/detectors:\n" + "\n".join(
+            [f"  - {v['file']}:{v['line']} {v['function']}() = {v['length']} LOC" for v in violations]
         )
 
     def test_no_recursion_in_codebase(self, nasa_validator):
         """Test that codebase has no recursion (Rule 7)."""
-        summary = nasa_validator.scan_codebase(['analyzer', 'src', 'utils'])
+        summary = nasa_validator.scan_codebase(["analyzer", "src", "utils"])
 
-        violations = nasa_validator.violations['rule7']
+        violations = nasa_validator.violations["rule7"]
 
-        assert summary['rule7_violations'] == 0, (
-            f"Found {len(violations)} recursion violations:\n" +
-            "\n".join([
-                f"  - {v['file']}:{v['line']} {v['function']}() has {v['type']}"
-                for v in violations
-            ])
+        assert summary["rule7_violations"] == 0, f"Found {len(violations)} recursion violations:\n" + "\n".join(
+            [f"  - {v['file']}:{v['line']} {v['function']}() has {v['type']}" for v in violations]
         )
 
     def test_no_unbounded_loops(self, nasa_validator):
         """Test that codebase has no unbounded loops (Rule 8)."""
-        summary = nasa_validator.scan_codebase(['analyzer', 'src', 'utils'])
+        summary = nasa_validator.scan_codebase(["analyzer", "src", "utils"])
 
-        violations = nasa_validator.violations['rule8']
+        violations = nasa_validator.violations["rule8"]
 
-        assert summary['rule8_violations'] == 0, (
-            f"Found {len(violations)} unbounded loop violations:\n" +
-            "\n".join([
-                f"  - {v['file']}:{v['line']} has {v['type']}"
-                for v in violations
-            ])
+        assert summary["rule8_violations"] == 0, f"Found {len(violations)} unbounded loop violations:\n" + "\n".join(
+            [f"  - {v['file']}:{v['line']} has {v['type']}" for v in violations]
         )
 
     def test_full_nasa_compliance_scan(self, nasa_validator):
@@ -284,9 +263,9 @@ class TestNASAComplianceRegression:
         This is the master regression test that validates all NASA rules
         across analyzer/, src/, and utils/.
         """
-        summary = nasa_validator.scan_codebase(['analyzer', 'src', 'utils'])
+        summary = nasa_validator.scan_codebase(["analyzer", "src", "utils"])
 
-        total_violations = summary['total_violations']
+        total_violations = summary["total_violations"]
 
         # Calculate compliance percentage
         # (This is a regression test, so we expect high compliance)
@@ -301,37 +280,29 @@ class TestNASAComplianceRegression:
             f"Rule 7 (no recursion): {summary['rule7_violations']} violations",
             f"Rule 8 (bounded loops): {summary['rule8_violations']} violations",
             f"Total violations: {total_violations}",
-            "=" * 60
+            "=" * 60,
         ]
 
         if total_violations > 0:
             report.append("\nViolation Details:")
 
             # Show Rule 4 violations
-            if nasa_validator.violations['rule4']:
+            if nasa_validator.violations["rule4"]:
                 report.append("\nRule 4 Violations (Function Length >60):")
-                for v in nasa_validator.violations['rule4'][:10]:  # Show first 10
-                    report.append(
-                        f"  - {v['file']}:{v['line']} "
-                        f"{v['function']}() = {v['length']} LOC"
-                    )
+                for v in nasa_validator.violations["rule4"][:10]:  # Show first 10
+                    report.append(f"  - {v['file']}:{v['line']} " f"{v['function']}() = {v['length']} LOC")
 
             # Show Rule 7 violations
-            if nasa_validator.violations['rule7']:
+            if nasa_validator.violations["rule7"]:
                 report.append("\nRule 7 Violations (Recursion):")
-                for v in nasa_validator.violations['rule7'][:10]:
-                    report.append(
-                        f"  - {v['file']}:{v['line']} "
-                        f"{v['function']}() has {v['type']}"
-                    )
+                for v in nasa_validator.violations["rule7"][:10]:
+                    report.append(f"  - {v['file']}:{v['line']} " f"{v['function']}() has {v['type']}")
 
             # Show Rule 8 violations
-            if nasa_validator.violations['rule8']:
+            if nasa_validator.violations["rule8"]:
                 report.append("\nRule 8 Violations (Unbounded Loops):")
-                for v in nasa_validator.violations['rule8'][:10]:
-                    report.append(
-                        f"  - {v['file']}:{v['line']} has {v['type']}"
-                    )
+                for v in nasa_validator.violations["rule8"][:10]:
+                    report.append(f"  - {v['file']}:{v['line']} has {v['type']}")
 
         report.append("=" * 60)
 
@@ -346,7 +317,7 @@ def test_nasa_compliance_baseline():
     This test always passes but prints current metrics for tracking.
     """
     validator = NASAComplianceValidator()
-    summary = validator.scan_codebase(['analyzer', 'src', 'utils'])
+    summary = validator.scan_codebase(["analyzer", "src", "utils"])
 
     print("\n" + "=" * 60)
     print("NASA COMPLIANCE BASELINE METRICS")

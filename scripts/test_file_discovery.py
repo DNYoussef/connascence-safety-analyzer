@@ -1,4 +1,5 @@
 """Quick test script to verify file discovery and analysis."""
+
 from pathlib import Path
 import sys
 

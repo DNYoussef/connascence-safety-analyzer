@@ -5,15 +5,14 @@ Manual CLI Integration Test
 Tests that both CLIs work with Phase 0 refactored detectors.
 """
 
-import sys
 import os
 from pathlib import Path
+import sys
 
 # Add project root to path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-import subprocess
 
 # Create test file with violations
 test_code = """
@@ -56,14 +55,14 @@ try:
     from analyzer.check_connascence import ConnascenceCLI
 
     cli = ConnascenceCLI()
-    print(f"✓ ConnascenceCLI imported successfully")
+    print("✓ ConnascenceCLI imported successfully")
     print(f"  - CLI instance created: {type(cli).__name__}")
 
     # Test analyze method exists
-    if hasattr(cli, 'analyze_file'):
-        print(f"  - analyze_file method: EXISTS")
+    if hasattr(cli, "analyze_file"):
+        print("  - analyze_file method: EXISTS")
     else:
-        print(f"  - analyze_file method: MISSING")
+        print("  - analyze_file method: MISSING")
 
 except Exception as e:
     print(f"✗ Failed to import ConnascenceCLI: {e}")
@@ -77,7 +76,7 @@ print("-" * 60)
 try:
     from analyzer.check_connascence_minimal import main as minimal_main
 
-    print(f"✓ check_connascence_minimal imported successfully")
+    print("✓ check_connascence_minimal imported successfully")
     print(f"  - main function: {minimal_main.__name__}")
 
 except Exception as e:
@@ -91,12 +90,13 @@ print("-" * 60)
 
 try:
     import ast
-    from analyzer.detectors.position_detector import PositionDetector
+
     from analyzer.detectors.magic_literal_detector import MagicLiteralDetector
+    from analyzer.detectors.position_detector import PositionDetector
 
     # Parse test code
     tree = ast.parse(test_code)
-    source_lines = test_code.split('\n')
+    source_lines = test_code.split("\n")
 
     # Test PositionDetector
     pos_detector = PositionDetector(file_path=str(test_file), source_lines=source_lines)
@@ -113,6 +113,7 @@ try:
 except Exception as e:
     print(f"✗ Direct detector usage failed: {e}")
     import traceback
+
     traceback.print_exc()
 
 print()

@@ -3,7 +3,7 @@ Comprehensive Integration Tests for Enhanced Connascence Analyzer System
 
 Tests the complete integrated system including:
 - All 9 connascence types detection
-- NASA Power of Ten rule analysis  
+- NASA Power of Ten rule analysis
 - RefactoredDetector architecture
 - AST Optimizer patterns
 - Tree-Sitter integration

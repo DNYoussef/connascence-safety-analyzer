@@ -3,6 +3,7 @@ Algorithm Detector - Detects Connascence of Algorithm violations.
 
 Extracted from ConnascenceDetector to follow Single Responsibility Principle.
 """
+
 import ast
 import collections
 from typing import Dict, List

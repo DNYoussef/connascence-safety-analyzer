@@ -92,12 +92,12 @@ def compare_baselines(current: Dict[str, Any], previous: Dict[str, Any]) -> Dict
             "previous": previous_val,
             "absolute_change": change,
             "percent_change": change_percent,
-            "direction": "improving"
-            if (metric in ["nasa_score", "mece_score"] and change > 0)
-            or (metric in ["total_violations", "critical_violations", "god_objects"] and change < 0)
-            else "declining"
-            if change != 0
-            else "stable",
+            "direction": (
+                "improving"
+                if (metric in ["nasa_score", "mece_score"] and change > 0)
+                or (metric in ["total_violations", "critical_violations", "god_objects"] and change < 0)
+                else "declining" if change != 0 else "stable"
+            ),
         }
 
         # Mark significant changes (>10% change)

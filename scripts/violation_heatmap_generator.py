@@ -216,12 +216,12 @@ class ViolationHeatmapGenerator:
                 "folders_analyzed": len(folder_heatmap),
                 "top_files_analyzed": len(file_heatmap),
                 "violation_types_found": len(type_heatmap),
-                "highest_risk_folder": max(folder_heatmap.items(), key=lambda x: x[1]["total_violations"])[0]
-                if folder_heatmap
-                else None,
-                "most_impacted_type": max(type_heatmap.items(), key=lambda x: x[1]["impact_score"])[0]
-                if type_heatmap
-                else None,
+                "highest_risk_folder": (
+                    max(folder_heatmap.items(), key=lambda x: x[1]["total_violations"])[0] if folder_heatmap else None
+                ),
+                "most_impacted_type": (
+                    max(type_heatmap.items(), key=lambda x: x[1]["impact_score"])[0] if type_heatmap else None
+                ),
             },
         }
 

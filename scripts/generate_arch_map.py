@@ -55,11 +55,9 @@ for py_file in Path(".").rglob("*.py"):
                                 "file": str(py_file),
                                 "methods": len(methods),
                                 "loc": node.end_lineno - node.lineno if hasattr(node, "end_lineno") else 0,
-                                "priority": "critical"
-                                if len(methods) > 50
-                                else "high"
-                                if len(methods) > 30
-                                else "medium",
+                                "priority": (
+                                    "critical" if len(methods) > 50 else "high" if len(methods) > 30 else "medium"
+                                ),
                             }
                         )
     except:

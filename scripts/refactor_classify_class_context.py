@@ -10,7 +10,7 @@ from pathlib import Path
 context_analyzer_file = Path(__file__).parent.parent / "analyzer" / "context_analyzer.py"
 
 # Read the file
-with open(context_analyzer_file, 'r', encoding='utf-8') as f:
+with open(context_analyzer_file, encoding="utf-8") as f:
     content = f.read()
 
 # Helper functions to insert before _classify_class_context()
@@ -148,23 +148,18 @@ if start_idx == -1 or end_idx == -1:
     exit(1)
 
 # Create new content
-new_content = (
-    content[:start_idx] +
-    helper_functions +
-    new_function +
-    content[end_idx:]
-)
+new_content = content[:start_idx] + helper_functions + new_function + content[end_idx:]
 
 # Write the refactored file
-with open(context_analyzer_file, 'w', encoding='utf-8') as f:
+with open(context_analyzer_file, "w", encoding="utf-8") as f:
     f.write(new_content)
 
 print("[SUCCESS] Refactored _classify_class_context() function!")
-print(f"  Original: ~82 LOC")
-print(f"  Refactored: ~20 LOC")
-print(f"  Helper functions created: 4")
-print(f"    - _score_by_file_path(): ~15 LOC")
-print(f"    - _score_by_class_name(): ~15 LOC")
-print(f"    - _score_by_base_classes(): ~15 LOC")
-print(f"    - _score_by_methods(): ~30 LOC")
-print(f"  Lines saved: ~62 LOC from main function")
+print("  Original: ~82 LOC")
+print("  Refactored: ~20 LOC")
+print("  Helper functions created: 4")
+print("    - _score_by_file_path(): ~15 LOC")
+print("    - _score_by_class_name(): ~15 LOC")
+print("    - _score_by_base_classes(): ~15 LOC")
+print("    - _score_by_methods(): ~30 LOC")
+print("  Lines saved: ~62 LOC from main function")

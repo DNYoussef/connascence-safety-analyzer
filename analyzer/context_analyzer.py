@@ -194,7 +194,6 @@ class ContextAnalyzer:
             recommendations=recommendations,
         )
 
-
     def _score_by_file_path(self, file_path: str, scores: dict):
         """
         Score class context based on file path indicators.
@@ -310,7 +309,6 @@ class ContextAnalyzer:
         best_context = max(scores.items(), key=lambda x: x[1])
         return best_context[0] if best_context[1] > 0 else ClassContext.UNKNOWN
 
-
     def _count_methods(self, class_node: ast.ClassDef) -> int:
         """Count methods in a class, excluding special methods."""
         methods = [node for node in class_node.body if isinstance(node, ast.FunctionDef)]
@@ -380,9 +378,7 @@ class ContextAnalyzer:
 
         for node in ast.walk(method_node):
             if (
-                isinstance(node, (ast.If, ast.While, ast.For, ast.AsyncFor))
-                or isinstance(node, ast.ExceptHandler)
-                or isinstance(node, (ast.BoolOp, ast.Compare))
+                isinstance(node, (ast.If, ast.While, ast.For, ast.AsyncFor, ast.ExceptHandler, ast.BoolOp, ast.Compare))
             ):
                 complexity += 1
 

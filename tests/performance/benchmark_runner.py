@@ -701,11 +701,7 @@ if __name__ == "__main__":
                 summary["scalability_assessment"] = (
                     "excellent"
                     if max_speedup > 3.0
-                    else "good"
-                    if max_speedup > 2.0
-                    else "moderate"
-                    if max_speedup > 1.5
-                    else "poor"
+                    else "good" if max_speedup > 2.0 else "moderate" if max_speedup > 1.5 else "poor"
                 )
 
         return summary

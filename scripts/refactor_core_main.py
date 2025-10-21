@@ -10,7 +10,7 @@ from pathlib import Path
 core_file = Path(__file__).parent.parent / "analyzer" / "core.py"
 
 # Read the file
-with open(core_file, 'r', encoding='utf-8') as f:
+with open(core_file, encoding="utf-8") as f:
     lines = f.readlines()
 
 # Helper functions to insert before main()
@@ -359,7 +359,7 @@ new_main = '''def main():
 # Find the line number where main() starts (should be around line 510)
 main_start = None
 for i, line in enumerate(lines):
-    if line.strip().startswith('def main():'):
+    if line.strip().startswith("def main():"):
         main_start = i
         break
 
@@ -371,7 +371,7 @@ if main_start is None:
 main_end = None
 for i in range(main_start + 1, len(lines)):
     # Look for next function definition at the same indentation level
-    if lines[i].startswith('def ') or lines[i].startswith('# Deprecated'):
+    if lines[i].startswith("def ") or lines[i].startswith("# Deprecated"):
         main_end = i
         break
 
@@ -394,11 +394,11 @@ new_lines.append(new_main)
 new_lines.extend(lines[main_end:])
 
 # Write the refactored file
-with open(core_file, 'w', encoding='utf-8') as f:
+with open(core_file, "w", encoding="utf-8") as f:
     f.writelines(new_lines)
 
 print("[SUCCESS] Refactored analyzer/core.py main() function!")
-print(f"  Original: ~264 LOC")
-print(f"  Refactored: ~35 LOC")
-print(f"  Helper functions created: 10")
-print(f"  Lines saved: ~229 LOC")
+print("  Original: ~264 LOC")
+print("  Refactored: ~35 LOC")
+print("  Helper functions created: 10")
+print("  Lines saved: ~229 LOC")

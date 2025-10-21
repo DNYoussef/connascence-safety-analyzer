@@ -167,9 +167,11 @@ class SBOMGenerator:
                     "version": comp.version,
                     "purl": comp.purl,
                     "licenses": [{"license": {"id": lic}} for lic in comp.licenses] if comp.licenses else [],
-                    "hashes": [{"alg": alg.upper(), "content": hash_val} for alg, hash_val in comp.hashes.items()]
-                    if comp.hashes
-                    else [],
+                    "hashes": (
+                        [{"alg": alg.upper(), "content": hash_val} for alg, hash_val in comp.hashes.items()]
+                        if comp.hashes
+                        else []
+                    ),
                 }
                 for comp in self.components
             ],
@@ -210,15 +212,17 @@ class SBOMGenerator:
                 }
                 for comp in self.components
             ],
-            "relationships": [
-                {
-                    "spdxElementId": "SPDXRef-DOCUMENT",
-                    "relationshipType": "DESCRIBES",
-                    "relatedSpdxElement": f"SPDXRef-Package-{self.components[0].name}",
-                }
-            ]
-            if self.components
-            else [],
+            "relationships": (
+                [
+                    {
+                        "spdxElementId": "SPDXRef-DOCUMENT",
+                        "relationshipType": "DESCRIBES",
+                        "relatedSpdxElement": f"SPDXRef-Package-{self.components[0].name}",
+                    }
+                ]
+                if self.components
+                else []
+            ),
         }
 
         if output_path:

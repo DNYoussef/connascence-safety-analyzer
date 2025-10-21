@@ -1,4 +1,5 @@
 """Debug script to trace directory analysis execution."""
+
 import logging
 from pathlib import Path
 import sys

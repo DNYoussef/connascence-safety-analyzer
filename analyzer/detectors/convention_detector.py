@@ -1,7 +1,7 @@
 """
 Convention Detector
 
-Detects Connascence of Convention violations - naming conventions, style violations, 
+Detects Connascence of Convention violations - naming conventions, style violations,
 and documentation pattern inconsistencies.
 """
 
@@ -164,14 +164,7 @@ class ConventionDetector(DetectorBase):
 
     def _has_docstring(self, node: ast.FunctionDef | ast.ClassDef) -> bool:
         """Check if function or class has a docstring."""
-        if (
-            node.body
-            and isinstance(node.body[0], ast.Expr)
-            and isinstance(node.body[0].value, ast.Constant)
-            and isinstance(node.body[0].value.value, str)
-        ):
-            return True
-        return False
+        return bool(node.body and isinstance(node.body[0], ast.Expr) and isinstance(node.body[0].value, ast.Constant) and isinstance(node.body[0].value.value, str))
 
     def _create_naming_violation(self, node: ast.AST, name: str, name_type: str, message: str) -> None:
         """Create violation for naming convention issues."""

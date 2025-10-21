@@ -339,12 +339,14 @@ class CIDashboardGenerator:
                 {
                     "timestamp": self.dashboard_data["timestamp"],
                     "summary": self.dashboard_data["summary"],
-                    "overall_status": "PASSED"
-                    if (
-                        self.dashboard_data["summary"]["nasa_score"] >= 0.90
-                        and self.dashboard_data["summary"]["critical_violations"] <= 50
-                    )
-                    else "FAILED",
+                    "overall_status": (
+                        "PASSED"
+                        if (
+                            self.dashboard_data["summary"]["nasa_score"] >= 0.90
+                            and self.dashboard_data["summary"]["critical_violations"] <= 50
+                        )
+                        else "FAILED"
+                    ),
                     "policy": policy,
                 },
                 f,

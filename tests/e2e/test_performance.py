@@ -21,7 +21,6 @@ Tests throughput, latency, memory usage, and scalability characteristics.
 Uses memory coordination for tracking performance patterns and benchmarks.
 """
 
-from fixes.phase0.production_safe_assertions import ProductionAssert
 from concurrent.futures import ThreadPoolExecutor
 import json
 from pathlib import Path
@@ -34,6 +33,8 @@ from typing import Any, Dict, Optional
 
 import psutil
 import pytest
+
+from fixes.phase0.production_safe_assertions import ProductionAssert
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
@@ -57,127 +58,127 @@ class PerformanceBenchmarkCoordinator:
     def store_benchmark_result(self, benchmark_id: str, benchmark_data: Dict[str, Any]):
         """Store benchmark execution results."""
 
-        ProductionAssert.not_none(benchmark_id, 'benchmark_id')
+        ProductionAssert.not_none(benchmark_id, "benchmark_id")
 
-        ProductionAssert.not_none(benchmark_data, 'benchmark_data')
-        ProductionAssert.not_none(benchmark_id, 'benchmark_id')
+        ProductionAssert.not_none(benchmark_data, "benchmark_data")
+        ProductionAssert.not_none(benchmark_id, "benchmark_id")
 
-        ProductionAssert.not_none(benchmark_data, 'benchmark_data')
+        ProductionAssert.not_none(benchmark_data, "benchmark_data")
         self.benchmark_results[benchmark_id] = {
-            'data': benchmark_data,
-            'timestamp': time.time(),
-            'benchmark_type': benchmark_data.get('benchmark_type', 'unknown')
+            "data": benchmark_data,
+            "timestamp": time.time(),
+            "benchmark_type": benchmark_data.get("benchmark_type", "unknown"),
         }
 
     def store_performance_baseline(self, baseline_id: str, baseline_data: Dict[str, Any]):
         """Store performance baseline for comparison."""
 
-        ProductionAssert.not_none(baseline_id, 'baseline_id')
+        ProductionAssert.not_none(baseline_id, "baseline_id")
 
-        ProductionAssert.not_none(baseline_data, 'baseline_data')
-        ProductionAssert.not_none(baseline_id, 'baseline_id')
+        ProductionAssert.not_none(baseline_data, "baseline_data")
+        ProductionAssert.not_none(baseline_id, "baseline_id")
 
-        ProductionAssert.not_none(baseline_data, 'baseline_data')
+        ProductionAssert.not_none(baseline_data, "baseline_data")
         self.performance_baselines[baseline_id] = baseline_data
 
     def store_scalability_metrics(self, test_id: str, scalability_data: Dict[str, Any]):
         """Store scalability test results."""
 
-        ProductionAssert.not_none(test_id, 'test_id')
+        ProductionAssert.not_none(test_id, "test_id")
 
-        ProductionAssert.not_none(scalability_data, 'scalability_data')
-        ProductionAssert.not_none(test_id, 'test_id')
+        ProductionAssert.not_none(scalability_data, "scalability_data")
+        ProductionAssert.not_none(test_id, "test_id")
 
-        ProductionAssert.not_none(scalability_data, 'scalability_data')
+        ProductionAssert.not_none(scalability_data, "scalability_data")
         self.scalability_metrics[test_id] = scalability_data
 
     def store_memory_profile(self, profile_id: str, memory_data: Dict[str, Any]):
         """Store memory usage profiling data."""
 
-        ProductionAssert.not_none(profile_id, 'profile_id')
+        ProductionAssert.not_none(profile_id, "profile_id")
 
-        ProductionAssert.not_none(memory_data, 'memory_data')
-        ProductionAssert.not_none(profile_id, 'profile_id')
+        ProductionAssert.not_none(memory_data, "memory_data")
+        ProductionAssert.not_none(profile_id, "profile_id")
 
-        ProductionAssert.not_none(memory_data, 'memory_data')
+        ProductionAssert.not_none(memory_data, "memory_data")
         self.memory_profiles[profile_id] = memory_data
 
     def store_throughput_measurement(self, measurement_id: str, throughput_data: Dict[str, Any]):
         """Store throughput measurement results."""
 
-        ProductionAssert.not_none(measurement_id, 'measurement_id')
+        ProductionAssert.not_none(measurement_id, "measurement_id")
 
-        ProductionAssert.not_none(throughput_data, 'throughput_data')
-        ProductionAssert.not_none(measurement_id, 'measurement_id')
+        ProductionAssert.not_none(throughput_data, "throughput_data")
+        ProductionAssert.not_none(measurement_id, "measurement_id")
 
-        ProductionAssert.not_none(throughput_data, 'throughput_data')
+        ProductionAssert.not_none(throughput_data, "throughput_data")
         self.throughput_measurements[measurement_id] = throughput_data
 
     def store_latency_measurement(self, measurement_id: str, latency_data: Dict[str, Any]):
         """Store latency measurement results."""
 
-        ProductionAssert.not_none(measurement_id, 'measurement_id')
+        ProductionAssert.not_none(measurement_id, "measurement_id")
 
-        ProductionAssert.not_none(latency_data, 'latency_data')
-        ProductionAssert.not_none(measurement_id, 'measurement_id')
+        ProductionAssert.not_none(latency_data, "latency_data")
+        ProductionAssert.not_none(measurement_id, "measurement_id")
 
-        ProductionAssert.not_none(latency_data, 'latency_data')
+        ProductionAssert.not_none(latency_data, "latency_data")
         self.latency_measurements[measurement_id] = latency_data
 
     def store_regression_test(self, test_id: str, regression_data: Dict[str, Any]):
         """Store performance regression test results."""
 
-        ProductionAssert.not_none(test_id, 'test_id')
+        ProductionAssert.not_none(test_id, "test_id")
 
-        ProductionAssert.not_none(regression_data, 'regression_data')
-        ProductionAssert.not_none(test_id, 'test_id')
+        ProductionAssert.not_none(regression_data, "regression_data")
+        ProductionAssert.not_none(test_id, "test_id")
 
-        ProductionAssert.not_none(regression_data, 'regression_data')
+        ProductionAssert.not_none(regression_data, "regression_data")
         self.regression_tests[test_id] = regression_data
 
     def store_resource_utilization(self, utilization_id: str, resource_data: Dict[str, Any]):
         """Store resource utilization metrics."""
 
-        ProductionAssert.not_none(utilization_id, 'utilization_id')
+        ProductionAssert.not_none(utilization_id, "utilization_id")
 
-        ProductionAssert.not_none(resource_data, 'resource_data')
-        ProductionAssert.not_none(utilization_id, 'utilization_id')
+        ProductionAssert.not_none(resource_data, "resource_data")
+        ProductionAssert.not_none(utilization_id, "utilization_id")
 
-        ProductionAssert.not_none(resource_data, 'resource_data')
+        ProductionAssert.not_none(resource_data, "resource_data")
         self.resource_utilization[utilization_id] = resource_data
 
     def get_performance_summary(self) -> Dict[str, Any]:
         """Get comprehensive performance testing summary."""
         return {
-            'total_benchmarks': len(self.benchmark_results),
-            'performance_baselines': len(self.performance_baselines),
-            'scalability_tests': len(self.scalability_metrics),
-            'memory_profiles': len(self.memory_profiles),
-            'throughput_measurements': len(self.throughput_measurements),
-            'latency_measurements': len(self.latency_measurements),
-            'regression_tests': len(self.regression_tests),
-            'resource_utilization_tests': len(self.resource_utilization),
-            'overall_performance_score': self._calculate_performance_score(),
-            'performance_trends': self._analyze_performance_trends()
+            "total_benchmarks": len(self.benchmark_results),
+            "performance_baselines": len(self.performance_baselines),
+            "scalability_tests": len(self.scalability_metrics),
+            "memory_profiles": len(self.memory_profiles),
+            "throughput_measurements": len(self.throughput_measurements),
+            "latency_measurements": len(self.latency_measurements),
+            "regression_tests": len(self.regression_tests),
+            "resource_utilization_tests": len(self.resource_utilization),
+            "overall_performance_score": self._calculate_performance_score(),
+            "performance_trends": self._analyze_performance_trends(),
         }
 
     def compare_with_baseline(self, benchmark_id: str, baseline_id: str) -> Dict[str, Any]:
         """Compare benchmark result with baseline."""
         if benchmark_id not in self.benchmark_results or baseline_id not in self.performance_baselines:
-            return {'error': 'Missing benchmark or baseline data'}
+            return {"error": "Missing benchmark or baseline data"}
 
-        benchmark = self.benchmark_results[benchmark_id]['data']
+        benchmark = self.benchmark_results[benchmark_id]["data"]
         baseline = self.performance_baselines[baseline_id]
 
         comparison = {
-            'benchmark_id': benchmark_id,
-            'baseline_id': baseline_id,
-            'comparison_timestamp': time.time(),
-            'metrics_comparison': {}
+            "benchmark_id": benchmark_id,
+            "baseline_id": baseline_id,
+            "comparison_timestamp": time.time(),
+            "metrics_comparison": {},
         }
 
         # Compare common metrics
-        common_metrics = ['execution_time_ms', 'memory_peak_mb', 'violations_per_second', 'files_per_second']
+        common_metrics = ["execution_time_ms", "memory_peak_mb", "violations_per_second", "files_per_second"]
 
         for metric in common_metrics:
             if metric in benchmark and metric in baseline:
@@ -186,17 +187,19 @@ class PerformanceBenchmarkCoordinator:
 
                 if baseline_value > 0:
                     percent_change = ((benchmark_value - baseline_value) / baseline_value) * 100
-                    comparison['metrics_comparison'][metric] = {
-                        'benchmark_value': benchmark_value,
-                        'baseline_value': baseline_value,
-                        'percent_change': percent_change,
-                        'regression': percent_change > 10 if metric != 'memory_peak_mb' else percent_change > 20  # Different thresholds
+                    comparison["metrics_comparison"][metric] = {
+                        "benchmark_value": benchmark_value,
+                        "baseline_value": baseline_value,
+                        "percent_change": percent_change,
+                        "regression": (
+                            percent_change > 10 if metric != "memory_peak_mb" else percent_change > 20
+                        ),  # Different thresholds
                     }
 
         # Overall regression analysis
-        regressions = [m for m in comparison['metrics_comparison'].values() if m.get('regression', False)]
-        comparison['overall_regression'] = len(regressions) > 0
-        comparison['regression_count'] = len(regressions)
+        regressions = [m for m in comparison["metrics_comparison"].values() if m.get("regression", False)]
+        comparison["overall_regression"] = len(regressions) > 0
+        comparison["regression_count"] = len(regressions)
 
         return comparison
 
@@ -208,21 +211,21 @@ class PerformanceBenchmarkCoordinator:
         scores = []
 
         # Execution time scores (faster = better)
-        execution_times = [b['data'].get('execution_time_ms', 0) for b in self.benchmark_results.values()]
+        execution_times = [b["data"].get("execution_time_ms", 0) for b in self.benchmark_results.values()]
         if execution_times:
             avg_time = statistics.mean(execution_times)
             time_score = max(0, 1.0 - (avg_time / 60000))  # 60 seconds = 0 score
             scores.append(time_score * 0.4)
 
         # Memory efficiency scores (lower peak = better)
-        memory_peaks = [b['data'].get('memory_peak_mb', 0) for b in self.benchmark_results.values()]
+        memory_peaks = [b["data"].get("memory_peak_mb", 0) for b in self.benchmark_results.values()]
         if memory_peaks:
             avg_memory = statistics.mean(memory_peaks)
             memory_score = max(0, 1.0 - (avg_memory / 1024))  # 1GB = 0 score
             scores.append(memory_score * 0.3)
 
         # Throughput scores (higher = better)
-        throughputs = [b['data'].get('violations_per_second', 0) for b in self.benchmark_results.values()]
+        throughputs = [b["data"].get("violations_per_second", 0) for b in self.benchmark_results.values()]
         if throughputs:
             avg_throughput = statistics.mean(throughputs)
             throughput_score = min(1.0, avg_throughput / 100)  # 100 violations/sec = full score
@@ -233,27 +236,24 @@ class PerformanceBenchmarkCoordinator:
     def _analyze_performance_trends(self) -> Dict[str, Any]:
         """Analyze performance trends over time."""
         if len(self.benchmark_results) < 2:
-            return {'trend_analysis': 'insufficient_data'}
+            return {"trend_analysis": "insufficient_data"}
 
         # Sort benchmarks by timestamp
-        sorted_benchmarks = sorted(
-            self.benchmark_results.items(),
-            key=lambda x: x[1]['timestamp']
-        )
+        sorted_benchmarks = sorted(self.benchmark_results.items(), key=lambda x: x[1]["timestamp"])
 
         # Analyze trends in key metrics
-        execution_times = [b[1]['data'].get('execution_time_ms', 0) for b in sorted_benchmarks]
-        memory_usage = [b[1]['data'].get('memory_peak_mb', 0) for b in sorted_benchmarks]
+        execution_times = [b[1]["data"].get("execution_time_ms", 0) for b in sorted_benchmarks]
+        memory_usage = [b[1]["data"].get("memory_peak_mb", 0) for b in sorted_benchmarks]
 
         trends = {}
 
         if len(execution_times) >= 2:
-            time_trend = 'improving' if execution_times[-1] < execution_times[0] else 'degrading'
-            trends['execution_time_trend'] = time_trend
+            time_trend = "improving" if execution_times[-1] < execution_times[0] else "degrading"
+            trends["execution_time_trend"] = time_trend
 
         if len(memory_usage) >= 2:
-            memory_trend = 'improving' if memory_usage[-1] < memory_usage[0] else 'degrading'
-            trends['memory_trend'] = memory_trend
+            memory_trend = "improving" if memory_usage[-1] < memory_usage[0] else "degrading"
+            trends["memory_trend"] = memory_trend
 
         return trends
 
@@ -274,9 +274,9 @@ class PerformanceProfiler:
     def start_profiling(self, process_pid: Optional[int] = None):
         """Start resource monitoring."""
 
-        ProductionAssert.not_none(process_pid, 'process_pid')
+        ProductionAssert.not_none(process_pid, "process_pid")
 
-        ProductionAssert.not_none(process_pid, 'process_pid')
+        ProductionAssert.not_none(process_pid, "process_pid")
 
         if process_pid:
             try:
@@ -301,29 +301,29 @@ class PerformanceProfiler:
             self.monitoring_thread.join(timeout=2)
 
         if not self.resource_samples:
-            return {'error': 'No resource samples collected'}
+            return {"error": "No resource samples collected"}
 
         # Calculate statistics
-        cpu_percentages = [sample['cpu_percent'] for sample in self.resource_samples]
-        memory_mb = [sample['memory_mb'] for sample in self.resource_samples]
+        cpu_percentages = [sample["cpu_percent"] for sample in self.resource_samples]
+        memory_mb = [sample["memory_mb"] for sample in self.resource_samples]
 
         return {
-            'samples_collected': len(self.resource_samples),
-            'monitoring_duration_s': max(sample['timestamp'] for sample in self.resource_samples) -
-                                   min(sample['timestamp'] for sample in self.resource_samples),
-            'cpu_stats': {
-                'mean': statistics.mean(cpu_percentages),
-                'max': max(cpu_percentages),
-                'min': min(cpu_percentages),
-                'stdev': statistics.stdev(cpu_percentages) if len(cpu_percentages) > 1 else 0
+            "samples_collected": len(self.resource_samples),
+            "monitoring_duration_s": max(sample["timestamp"] for sample in self.resource_samples)
+            - min(sample["timestamp"] for sample in self.resource_samples),
+            "cpu_stats": {
+                "mean": statistics.mean(cpu_percentages),
+                "max": max(cpu_percentages),
+                "min": min(cpu_percentages),
+                "stdev": statistics.stdev(cpu_percentages) if len(cpu_percentages) > 1 else 0,
             },
-            'memory_stats': {
-                'mean_mb': statistics.mean(memory_mb),
-                'peak_mb': max(memory_mb),
-                'min_mb': min(memory_mb),
-                'stdev_mb': statistics.stdev(memory_mb) if len(memory_mb) > 1 else 0
+            "memory_stats": {
+                "mean_mb": statistics.mean(memory_mb),
+                "peak_mb": max(memory_mb),
+                "min_mb": min(memory_mb),
+                "stdev_mb": statistics.stdev(memory_mb) if len(memory_mb) > 1 else 0,
             },
-            'resource_efficiency': self._calculate_resource_efficiency()
+            "resource_efficiency": self._calculate_resource_efficiency(),
         }
 
     def _monitor_resources(self):
@@ -336,11 +336,11 @@ class PerformanceProfiler:
                     memory_mb = memory_info.rss / 1024 / 1024  # Convert to MB
 
                     sample = {
-                        'timestamp': time.time(),
-                        'cpu_percent': cpu_percent,
-                        'memory_mb': memory_mb,
-                        'memory_rss': memory_info.rss,
-                        'memory_vms': memory_info.vms
+                        "timestamp": time.time(),
+                        "cpu_percent": cpu_percent,
+                        "memory_mb": memory_mb,
+                        "memory_rss": memory_info.rss,
+                        "memory_vms": memory_info.vms,
                     }
 
                     self.resource_samples.append(sample)
@@ -357,8 +357,8 @@ class PerformanceProfiler:
         if not self.resource_samples:
             return 0.0
 
-        cpu_percentages = [sample['cpu_percent'] for sample in self.resource_samples]
-        memory_mb = [sample['memory_mb'] for sample in self.resource_samples]
+        cpu_percentages = [sample["cpu_percent"] for sample in self.resource_samples]
+        memory_mb = [sample["memory_mb"] for sample in self.resource_samples]
 
         # Efficiency based on reasonable resource usage
         avg_cpu = statistics.mean(cpu_percentages)
@@ -397,7 +397,8 @@ class TestPerformanceBenchmarks:
 
         # Create 5 small files with various violations
         for i in range(5):
-            (project_path / f"module_{i}.py").write_text(f"""
+            (project_path / f"module_{i}.py").write_text(
+                f"""
 # Module {i} with controlled violations
 
 def function_{i}(param1, param2, param3, param4, param5):  # Parameter bomb
@@ -427,13 +428,12 @@ class Class_{i}:
     def method_08(self): pass
     def method_09(self): pass
     def method_10(self): pass
-""")
+"""
+            )
 
-        perf_workflow_validator.add_step("create_small_project", {
-            'files_created': 5,
-            'estimated_violations': 25,
-            'project_size': 'small'
-        })
+        perf_workflow_validator.add_step(
+            "create_small_project", {"files_created": 5, "estimated_violations": 25, "project_size": "small"}
+        )
 
         # Start profiling
         performance_profiler.start_profiling()
@@ -443,20 +443,15 @@ class Class_{i}:
         output_file = project_path / "baseline_results.json"
 
         start_time = time.time()
-        exit_code = cli.run([
-            "scan", str(project_path),
-            "--format", "json",
-            "--output", str(output_file)
-        ])
+        exit_code = cli.run(["scan", str(project_path), "--format", "json", "--output", str(output_file)])
         execution_time = time.time() - start_time
 
         # Stop profiling
         resource_stats = performance_profiler.stop_profiling()
 
-        perf_workflow_validator.add_step("execute_baseline_analysis", {
-            'exit_code': exit_code,
-            'execution_time_ms': execution_time * 1000
-        })
+        perf_workflow_validator.add_step(
+            "execute_baseline_analysis", {"exit_code": exit_code, "execution_time_ms": execution_time * 1000}
+        )
 
         # Analyze results
         assert output_file.exists(), "Baseline analysis output not created"
@@ -464,24 +459,24 @@ class Class_{i}:
         with open(output_file) as f:
             results = json.load(f)
 
-        violations = results.get('violations', [])
+        violations = results.get("violations", [])
 
         # Calculate baseline metrics
         baseline_metrics = {
-            'benchmark_type': 'small_project_baseline',
-            'files_analyzed': results.get('total_files_analyzed', 0),
-            'violations_found': len(violations),
-            'execution_time_ms': execution_time * 1000,
-            'violations_per_second': len(violations) / max(execution_time, 0.001),
-            'files_per_second': results.get('total_files_analyzed', 0) / max(execution_time, 0.001),
-            'memory_peak_mb': resource_stats.get('memory_stats', {}).get('peak_mb', 0),
-            'cpu_avg_percent': resource_stats.get('cpu_stats', {}).get('mean', 0),
-            'resource_efficiency': resource_stats.get('resource_efficiency', 0),
-            'project_characteristics': {
-                'file_count': 5,
-                'estimated_loc': 300,  # Approximately 60 lines per file
-                'violation_density': len(violations) / results.get('total_files_analyzed', 1)
-            }
+            "benchmark_type": "small_project_baseline",
+            "files_analyzed": results.get("total_files_analyzed", 0),
+            "violations_found": len(violations),
+            "execution_time_ms": execution_time * 1000,
+            "violations_per_second": len(violations) / max(execution_time, 0.001),
+            "files_per_second": results.get("total_files_analyzed", 0) / max(execution_time, 0.001),
+            "memory_peak_mb": resource_stats.get("memory_stats", {}).get("peak_mb", 0),
+            "cpu_avg_percent": resource_stats.get("cpu_stats", {}).get("mean", 0),
+            "resource_efficiency": resource_stats.get("resource_efficiency", 0),
+            "project_characteristics": {
+                "file_count": 5,
+                "estimated_loc": 300,  # Approximately 60 lines per file
+                "violation_density": len(violations) / results.get("total_files_analyzed", 1),
+            },
         }
 
         # Store as baseline
@@ -492,18 +487,26 @@ class Class_{i}:
 
         # Cleanup
         import shutil
+
         shutil.rmtree(temp_dir)
 
         # Performance assertions
         assert execution_time < 10.0, f"Small project analysis too slow: {execution_time}s"
-        assert baseline_metrics['violations_per_second'] > 5, f"Low violation detection rate: {baseline_metrics['violations_per_second']}"
-        assert baseline_metrics['memory_peak_mb'] < 512, f"High memory usage for small project: {baseline_metrics['memory_peak_mb']}MB"
+        assert (
+            baseline_metrics["violations_per_second"] > 5
+        ), f"Low violation detection rate: {baseline_metrics['violations_per_second']}"
+        assert (
+            baseline_metrics["memory_peak_mb"] < 512
+        ), f"High memory usage for small project: {baseline_metrics['memory_peak_mb']}MB"
 
-        perf_workflow_validator.complete_scenario(True, {
-            'baseline_established': True,
-            'performance_acceptable': execution_time < 10.0,
-            'baseline_metrics': baseline_metrics
-        })
+        perf_workflow_validator.complete_scenario(
+            True,
+            {
+                "baseline_established": True,
+                "performance_acceptable": execution_time < 10.0,
+                "baseline_metrics": baseline_metrics,
+            },
+        )
 
     def test_medium_project_scalability(self, perf_workflow_validator, performance_profiler):
         """Test performance scalability with medium-sized projects."""
@@ -517,7 +520,8 @@ class Class_{i}:
         # Create 25 files with violations
         file_count = 25
         for i in range(file_count):
-            (project_path / f"module_{i:02d}.py").write_text(f"""
+            (project_path / f"module_{i:02d}.py").write_text(
+                f"""
 # Module {i} with various violation patterns
 
 def primary_function_{i}(param1, param2, param3, param4, param5, param6):  # Parameter bomb
@@ -583,13 +587,17 @@ class ProcessorClass_{i}:
     def manage_lifecycle_{i}(self): pass
     def coordinate_tasks_{i}(self): pass
     def synthesize_reports_{i}(self): pass  # 21 methods - god class
-""")
+"""
+            )
 
-        perf_workflow_validator.add_step("create_medium_project", {
-            'files_created': file_count,
-            'estimated_violations': file_count * 8,  # ~8 violations per file
-            'project_size': 'medium'
-        })
+        perf_workflow_validator.add_step(
+            "create_medium_project",
+            {
+                "files_created": file_count,
+                "estimated_violations": file_count * 8,  # ~8 violations per file
+                "project_size": "medium",
+            },
+        )
 
         # Start profiling
         performance_profiler.start_profiling()
@@ -599,12 +607,18 @@ class ProcessorClass_{i}:
         output_file = project_path / "scalability_results.json"
 
         start_time = time.time()
-        cli.run([
-            "scan", str(project_path),
-            "--policy", "service-defaults",
-            "--format", "json",
-            "--output", str(output_file)
-        ])
+        cli.run(
+            [
+                "scan",
+                str(project_path),
+                "--policy",
+                "service-defaults",
+                "--format",
+                "json",
+                "--output",
+                str(output_file),
+            ]
+        )
         execution_time = time.time() - start_time
 
         # Stop profiling
@@ -614,22 +628,22 @@ class ProcessorClass_{i}:
         with open(output_file) as f:
             results = json.load(f)
 
-        violations = results.get('violations', [])
+        violations = results.get("violations", [])
 
         # Calculate scalability metrics
         scalability_metrics = {
-            'benchmark_type': 'medium_project_scalability',
-            'files_analyzed': results.get('total_files_analyzed', 0),
-            'violations_found': len(violations),
-            'execution_time_ms': execution_time * 1000,
-            'violations_per_second': len(violations) / max(execution_time, 0.001),
-            'files_per_second': results.get('total_files_analyzed', 0) / max(execution_time, 0.001),
-            'memory_peak_mb': resource_stats.get('memory_stats', {}).get('peak_mb', 0),
-            'cpu_avg_percent': resource_stats.get('cpu_stats', {}).get('mean', 0),
-            'resource_efficiency': resource_stats.get('resource_efficiency', 0),
-            'scalability_factor': file_count / 5,  # Compared to small project baseline
-            'per_file_processing_time': execution_time / max(file_count, 1),
-            'memory_per_file_mb': resource_stats.get('memory_stats', {}).get('peak_mb', 0) / max(file_count, 1)
+            "benchmark_type": "medium_project_scalability",
+            "files_analyzed": results.get("total_files_analyzed", 0),
+            "violations_found": len(violations),
+            "execution_time_ms": execution_time * 1000,
+            "violations_per_second": len(violations) / max(execution_time, 0.001),
+            "files_per_second": results.get("total_files_analyzed", 0) / max(execution_time, 0.001),
+            "memory_peak_mb": resource_stats.get("memory_stats", {}).get("peak_mb", 0),
+            "cpu_avg_percent": resource_stats.get("cpu_stats", {}).get("mean", 0),
+            "resource_efficiency": resource_stats.get("resource_efficiency", 0),
+            "scalability_factor": file_count / 5,  # Compared to small project baseline
+            "per_file_processing_time": execution_time / max(file_count, 1),
+            "memory_per_file_mb": resource_stats.get("memory_stats", {}).get("peak_mb", 0) / max(file_count, 1),
         }
 
         perf_coordinator.store_scalability_metrics(scenario_id, scalability_metrics)
@@ -642,19 +656,29 @@ class ProcessorClass_{i}:
 
         # Cleanup
         import shutil
+
         shutil.rmtree(temp_dir)
 
         # Scalability assertions
         assert execution_time < 30.0, f"Medium project analysis too slow: {execution_time}s"
-        assert scalability_metrics['per_file_processing_time'] < 2.0, f"Per-file processing time too high: {scalability_metrics['per_file_processing_time']}s"
-        assert scalability_metrics['memory_per_file_mb'] < 20, f"Memory per file too high: {scalability_metrics['memory_per_file_mb']}MB"
-        assert scalability_metrics['violations_per_second'] > 10, f"Violation detection rate too low: {scalability_metrics['violations_per_second']}"
+        assert (
+            scalability_metrics["per_file_processing_time"] < 2.0
+        ), f"Per-file processing time too high: {scalability_metrics['per_file_processing_time']}s"
+        assert (
+            scalability_metrics["memory_per_file_mb"] < 20
+        ), f"Memory per file too high: {scalability_metrics['memory_per_file_mb']}MB"
+        assert (
+            scalability_metrics["violations_per_second"] > 10
+        ), f"Violation detection rate too low: {scalability_metrics['violations_per_second']}"
 
-        perf_workflow_validator.complete_scenario(True, {
-            'scalability_test_completed': True,
-            'performance_acceptable': execution_time < 30.0,
-            'scalability_metrics': scalability_metrics
-        })
+        perf_workflow_validator.complete_scenario(
+            True,
+            {
+                "scalability_test_completed": True,
+                "performance_acceptable": execution_time < 30.0,
+                "scalability_metrics": scalability_metrics,
+            },
+        )
 
     def test_large_project_stress_testing(self, perf_workflow_validator, performance_profiler):
         """Test performance under stress with large projects."""
@@ -669,7 +693,7 @@ class ProcessorClass_{i}:
         file_count = 100
 
         # Create directories for organization
-        for dept in ['core', 'services', 'utils', 'integrations', 'analytics']:
+        for dept in ["core", "services", "utils", "integrations", "analytics"]:
             dept_dir = project_path / dept
             dept_dir.mkdir()
 
@@ -677,7 +701,8 @@ class ProcessorClass_{i}:
             for i in range(20):
                 dept.upper()[0] + f"{i:02d}"
 
-                (dept_dir / f"{dept}_module_{i:02d}.py").write_text(f"""
+                (dept_dir / f"{dept}_module_{i:02d}.py").write_text(
+                    f"""
 # {dept.title()} Module {i} - Large project stress test
 
 def {dept}_primary_function_{i}(param1, param2, param3, param4, param5, param6, param7):  # Parameter bomb
@@ -820,15 +845,19 @@ class {dept.title()}MegaProcessor_{i}:
     def handle_webhook_callbacks_{i}(self): pass
     def manage_api_rate_limits_{i}(self): pass
     def cleanup_temporary_resources_{i}(self): pass  # 32 methods - definite god class
-""")
+"""
+                )
 
-        perf_workflow_validator.add_step("create_large_project", {
-            'files_created': file_count,
-            'departments': 5,
-            'estimated_violations': file_count * 15,  # ~15 violations per file
-            'project_size': 'large',
-            'stress_test': True
-        })
+        perf_workflow_validator.add_step(
+            "create_large_project",
+            {
+                "files_created": file_count,
+                "departments": 5,
+                "estimated_violations": file_count * 15,  # ~15 violations per file
+                "project_size": "large",
+                "stress_test": True,
+            },
+        )
 
         # Start profiling
         performance_profiler.start_profiling()
@@ -838,12 +867,18 @@ class {dept.title()}MegaProcessor_{i}:
         output_file = project_path / "stress_test_results.json"
 
         start_time = time.time()
-        cli.run([
-            "scan", str(project_path),
-            "--policy", "service-defaults",
-            "--format", "json",
-            "--output", str(output_file)
-        ])
+        cli.run(
+            [
+                "scan",
+                str(project_path),
+                "--policy",
+                "service-defaults",
+                "--format",
+                "json",
+                "--output",
+                str(output_file),
+            ]
+        )
         execution_time = time.time() - start_time
 
         # Stop profiling
@@ -853,37 +888,38 @@ class {dept.title()}MegaProcessor_{i}:
         with open(output_file) as f:
             results = json.load(f)
 
-        violations = results.get('violations', [])
+        violations = results.get("violations", [])
 
         # Calculate stress test metrics
         stress_metrics = {
-            'benchmark_type': 'large_project_stress_test',
-            'files_analyzed': results.get('total_files_analyzed', 0),
-            'violations_found': len(violations),
-            'execution_time_ms': execution_time * 1000,
-            'violations_per_second': len(violations) / max(execution_time, 0.001),
-            'files_per_second': results.get('total_files_analyzed', 0) / max(execution_time, 0.001),
-            'memory_peak_mb': resource_stats.get('memory_stats', {}).get('peak_mb', 0),
-            'memory_mean_mb': resource_stats.get('memory_stats', {}).get('mean_mb', 0),
-            'cpu_avg_percent': resource_stats.get('cpu_stats', {}).get('mean', 0),
-            'cpu_peak_percent': resource_stats.get('cpu_stats', {}).get('max', 0),
-            'resource_efficiency': resource_stats.get('resource_efficiency', 0),
-            'stress_intensity': file_count,
-            'per_file_processing_ms': (execution_time * 1000) / max(file_count, 1),
-            'memory_efficiency_mb_per_file': resource_stats.get('memory_stats', {}).get('peak_mb', 0) / max(file_count, 1),
-            'throughput_stability': self._calculate_throughput_stability(violations, execution_time)
+            "benchmark_type": "large_project_stress_test",
+            "files_analyzed": results.get("total_files_analyzed", 0),
+            "violations_found": len(violations),
+            "execution_time_ms": execution_time * 1000,
+            "violations_per_second": len(violations) / max(execution_time, 0.001),
+            "files_per_second": results.get("total_files_analyzed", 0) / max(execution_time, 0.001),
+            "memory_peak_mb": resource_stats.get("memory_stats", {}).get("peak_mb", 0),
+            "memory_mean_mb": resource_stats.get("memory_stats", {}).get("mean_mb", 0),
+            "cpu_avg_percent": resource_stats.get("cpu_stats", {}).get("mean", 0),
+            "cpu_peak_percent": resource_stats.get("cpu_stats", {}).get("max", 0),
+            "resource_efficiency": resource_stats.get("resource_efficiency", 0),
+            "stress_intensity": file_count,
+            "per_file_processing_ms": (execution_time * 1000) / max(file_count, 1),
+            "memory_efficiency_mb_per_file": resource_stats.get("memory_stats", {}).get("peak_mb", 0)
+            / max(file_count, 1),
+            "throughput_stability": self._calculate_throughput_stability(violations, execution_time),
         }
 
         perf_coordinator.store_benchmark_result(scenario_id, stress_metrics)
 
         # Store detailed resource utilization
         resource_utilization = {
-            'test_type': 'stress_test',
-            'resource_samples': len(resource_stats.get('samples_collected', 0)),
-            'monitoring_duration': resource_stats.get('monitoring_duration_s', 0),
-            'cpu_utilization': resource_stats.get('cpu_stats', {}),
-            'memory_utilization': resource_stats.get('memory_stats', {}),
-            'efficiency_score': resource_stats.get('resource_efficiency', 0)
+            "test_type": "stress_test",
+            "resource_samples": len(resource_stats.get("samples_collected", 0)),
+            "monitoring_duration": resource_stats.get("monitoring_duration_s", 0),
+            "cpu_utilization": resource_stats.get("cpu_stats", {}),
+            "memory_utilization": resource_stats.get("memory_stats", {}),
+            "efficiency_score": resource_stats.get("resource_efficiency", 0),
         }
 
         perf_coordinator.store_resource_utilization(scenario_id, resource_utilization)
@@ -892,20 +928,30 @@ class {dept.title()}MegaProcessor_{i}:
 
         # Cleanup
         import shutil
+
         shutil.rmtree(temp_dir)
 
         # Stress test assertions
         assert execution_time < 120.0, f"Large project stress test too slow: {execution_time}s"
-        assert stress_metrics['memory_peak_mb'] < 2048, f"Memory usage too high under stress: {stress_metrics['memory_peak_mb']}MB"
-        assert stress_metrics['files_per_second'] > 1.0, f"File processing rate too low: {stress_metrics['files_per_second']}"
-        assert stress_metrics['violations_per_second'] > 20, f"Violation detection rate too low under stress: {stress_metrics['violations_per_second']}"
+        assert (
+            stress_metrics["memory_peak_mb"] < 2048
+        ), f"Memory usage too high under stress: {stress_metrics['memory_peak_mb']}MB"
+        assert (
+            stress_metrics["files_per_second"] > 1.0
+        ), f"File processing rate too low: {stress_metrics['files_per_second']}"
+        assert (
+            stress_metrics["violations_per_second"] > 20
+        ), f"Violation detection rate too low under stress: {stress_metrics['violations_per_second']}"
 
-        perf_workflow_validator.complete_scenario(True, {
-            'stress_test_completed': True,
-            'performance_under_stress': execution_time < 120.0,
-            'memory_efficient_under_stress': stress_metrics['memory_peak_mb'] < 2048,
-            'stress_metrics': stress_metrics
-        })
+        perf_workflow_validator.complete_scenario(
+            True,
+            {
+                "stress_test_completed": True,
+                "performance_under_stress": execution_time < 120.0,
+                "memory_efficient_under_stress": stress_metrics["memory_peak_mb"] < 2048,
+                "stress_metrics": stress_metrics,
+            },
+        )
 
     def test_concurrent_analysis_performance(self, perf_workflow_validator, performance_profiler):
         """Test performance of concurrent analysis execution."""
@@ -928,7 +974,8 @@ class {dept.title()}MegaProcessor_{i}:
             file_count = 5 + i * 5
 
             for j in range(file_count):
-                (project_dir / f"module_{j}.py").write_text(f"""
+                (project_dir / f"module_{j}.py").write_text(
+                    f"""
 # Concurrent test module {i}-{j}
 
 def concurrent_function_{i}_{j}(param1, param2, param3, param4, param5):  # Parameter bomb
@@ -962,18 +1009,15 @@ class ConcurrentClass_{i}_{j}:
     def method_19(self): pass
     def method_20(self): pass
     def method_21(self): pass  # God class
-""")
+"""
+                )
 
-            projects.append({
-                'path': project_dir,
-                'file_count': file_count,
-                'project_id': i
-            })
+            projects.append({"path": project_dir, "file_count": file_count, "project_id": i})
 
-        perf_workflow_validator.add_step("create_concurrent_projects", {
-            'projects_created': project_count,
-            'total_files': sum(p['file_count'] for p in projects)
-        })
+        perf_workflow_validator.add_step(
+            "create_concurrent_projects",
+            {"projects_created": project_count, "total_files": sum(p["file_count"] for p in projects)},
+        )
 
         # Sequential execution baseline
         performance_profiler.start_profiling()
@@ -983,55 +1027,49 @@ class ConcurrentClass_{i}_{j}:
 
         for project in projects:
             cli = ConnascenceCLI()
-            output_file = project['path'] / "sequential_results.json"
+            output_file = project["path"] / "sequential_results.json"
 
-            exit_code = cli.run([
-                "scan", str(project['path']),
-                "--format", "json",
-                "--output", str(output_file)
-            ])
+            exit_code = cli.run(["scan", str(project["path"]), "--format", "json", "--output", str(output_file)])
 
             with open(output_file) as f:
                 results = json.load(f)
 
-            sequential_results.append({
-                'project_id': project['project_id'],
-                'violations': len(results.get('violations', [])),
-                'files_analyzed': results.get('total_files_analyzed', 0),
-                'exit_code': exit_code
-            })
+            sequential_results.append(
+                {
+                    "project_id": project["project_id"],
+                    "violations": len(results.get("violations", [])),
+                    "files_analyzed": results.get("total_files_analyzed", 0),
+                    "exit_code": exit_code,
+                }
+            )
 
         sequential_time = time.time() - sequential_start
         sequential_resource_stats = performance_profiler.stop_profiling()
 
-        perf_workflow_validator.add_step("sequential_execution", {
-            'execution_time_ms': sequential_time * 1000,
-            'projects_processed': len(sequential_results)
-        })
+        perf_workflow_validator.add_step(
+            "sequential_execution",
+            {"execution_time_ms": sequential_time * 1000, "projects_processed": len(sequential_results)},
+        )
 
         # Concurrent execution test
         performance_profiler.start_profiling()
 
         def analyze_project_concurrent(project):
-            ProductionAssert.not_none(project, 'project')
+            ProductionAssert.not_none(project, "project")
 
             cli = ConnascenceCLI()
-            output_file = project['path'] / "concurrent_results.json"
+            output_file = project["path"] / "concurrent_results.json"
 
-            exit_code = cli.run([
-                "scan", str(project['path']),
-                "--format", "json",
-                "--output", str(output_file)
-            ])
+            exit_code = cli.run(["scan", str(project["path"]), "--format", "json", "--output", str(output_file)])
 
             with open(output_file) as f:
                 results = json.load(f)
 
             return {
-                'project_id': project['project_id'],
-                'violations': len(results.get('violations', [])),
-                'files_analyzed': results.get('total_files_analyzed', 0),
-                'exit_code': exit_code
+                "project_id": project["project_id"],
+                "violations": len(results.get("violations", [])),
+                "files_analyzed": results.get("total_files_analyzed", 0),
+                "exit_code": exit_code,
             }
 
         concurrent_start = time.time()
@@ -1043,37 +1081,41 @@ class ConcurrentClass_{i}_{j}:
         concurrent_time = time.time() - concurrent_start
         concurrent_resource_stats = performance_profiler.stop_profiling()
 
-        perf_workflow_validator.add_step("concurrent_execution", {
-            'execution_time_ms': concurrent_time * 1000,
-            'projects_processed': len(concurrent_results)
-        })
+        perf_workflow_validator.add_step(
+            "concurrent_execution",
+            {"execution_time_ms": concurrent_time * 1000, "projects_processed": len(concurrent_results)},
+        )
 
         # Calculate concurrent performance metrics
         concurrent_metrics = {
-            'benchmark_type': 'concurrent_analysis_performance',
-            'projects_analyzed': project_count,
-            'sequential_time_ms': sequential_time * 1000,
-            'concurrent_time_ms': concurrent_time * 1000,
-            'speedup_factor': sequential_time / concurrent_time if concurrent_time > 0 else 1.0,
-            'efficiency': (sequential_time / concurrent_time) / 3 if concurrent_time > 0 else 0.0,  # 3 workers
-            'sequential_memory_peak_mb': sequential_resource_stats.get('memory_stats', {}).get('peak_mb', 0),
-            'concurrent_memory_peak_mb': concurrent_resource_stats.get('memory_stats', {}).get('peak_mb', 0),
-            'memory_overhead_factor': (
-                concurrent_resource_stats.get('memory_stats', {}).get('peak_mb', 0) /
-                max(sequential_resource_stats.get('memory_stats', {}).get('peak_mb', 1), 1)
+            "benchmark_type": "concurrent_analysis_performance",
+            "projects_analyzed": project_count,
+            "sequential_time_ms": sequential_time * 1000,
+            "concurrent_time_ms": concurrent_time * 1000,
+            "speedup_factor": sequential_time / concurrent_time if concurrent_time > 0 else 1.0,
+            "efficiency": (sequential_time / concurrent_time) / 3 if concurrent_time > 0 else 0.0,  # 3 workers
+            "sequential_memory_peak_mb": sequential_resource_stats.get("memory_stats", {}).get("peak_mb", 0),
+            "concurrent_memory_peak_mb": concurrent_resource_stats.get("memory_stats", {}).get("peak_mb", 0),
+            "memory_overhead_factor": (
+                concurrent_resource_stats.get("memory_stats", {}).get("peak_mb", 0)
+                / max(sequential_resource_stats.get("memory_stats", {}).get("peak_mb", 1), 1)
             ),
-            'total_violations_sequential': sum(r['violations'] for r in sequential_results),
-            'total_violations_concurrent': sum(r['violations'] for r in concurrent_results),
-            'results_consistency': sum(r['violations'] for r in sequential_results) == sum(r['violations'] for r in concurrent_results),
-            'concurrent_throughput': sum(r['violations'] for r in concurrent_results) / max(concurrent_time, 0.001),
-            'resource_utilization_efficiency': concurrent_resource_stats.get('resource_efficiency', 0)
+            "total_violations_sequential": sum(r["violations"] for r in sequential_results),
+            "total_violations_concurrent": sum(r["violations"] for r in concurrent_results),
+            "results_consistency": sum(r["violations"] for r in sequential_results)
+            == sum(r["violations"] for r in concurrent_results),
+            "concurrent_throughput": sum(r["violations"] for r in concurrent_results) / max(concurrent_time, 0.001),
+            "resource_utilization_efficiency": concurrent_resource_stats.get("resource_efficiency", 0),
         }
 
-        perf_coordinator.store_throughput_measurement(scenario_id, {
-            'sequential_throughput': sum(r['violations'] for r in sequential_results) / max(sequential_time, 0.001),
-            'concurrent_throughput': concurrent_metrics['concurrent_throughput'],
-            'throughput_improvement': concurrent_metrics['speedup_factor']
-        })
+        perf_coordinator.store_throughput_measurement(
+            scenario_id,
+            {
+                "sequential_throughput": sum(r["violations"] for r in sequential_results) / max(sequential_time, 0.001),
+                "concurrent_throughput": concurrent_metrics["concurrent_throughput"],
+                "throughput_improvement": concurrent_metrics["speedup_factor"],
+            },
+        )
 
         perf_coordinator.store_benchmark_result(scenario_id, concurrent_metrics)
 
@@ -1081,19 +1123,29 @@ class ConcurrentClass_{i}_{j}:
 
         # Cleanup
         import shutil
+
         shutil.rmtree(temp_base)
 
         # Concurrent performance assertions
-        assert concurrent_metrics['speedup_factor'] > 1.0, f"Concurrent execution should be faster: {concurrent_metrics['speedup_factor']}"
-        assert concurrent_metrics['results_consistency'], "Concurrent and sequential results should match"
-        assert concurrent_metrics['efficiency'] > 0.3, f"Concurrent efficiency too low: {concurrent_metrics['efficiency']}"
-        assert concurrent_metrics['memory_overhead_factor'] < 3.0, f"Memory overhead too high: {concurrent_metrics['memory_overhead_factor']}"
+        assert (
+            concurrent_metrics["speedup_factor"] > 1.0
+        ), f"Concurrent execution should be faster: {concurrent_metrics['speedup_factor']}"
+        assert concurrent_metrics["results_consistency"], "Concurrent and sequential results should match"
+        assert (
+            concurrent_metrics["efficiency"] > 0.3
+        ), f"Concurrent efficiency too low: {concurrent_metrics['efficiency']}"
+        assert (
+            concurrent_metrics["memory_overhead_factor"] < 3.0
+        ), f"Memory overhead too high: {concurrent_metrics['memory_overhead_factor']}"
 
-        perf_workflow_validator.complete_scenario(True, {
-            'concurrent_performance_tested': True,
-            'speedup_achieved': concurrent_metrics['speedup_factor'] > 1.0,
-            'concurrent_metrics': concurrent_metrics
-        })
+        perf_workflow_validator.complete_scenario(
+            True,
+            {
+                "concurrent_performance_tested": True,
+                "speedup_achieved": concurrent_metrics["speedup_factor"] > 1.0,
+                "concurrent_metrics": concurrent_metrics,
+            },
+        )
 
     def test_memory_usage_profiling(self, perf_workflow_validator):
         """Test detailed memory usage profiling."""
@@ -1106,37 +1158,25 @@ class ConcurrentClass_{i}_{j}:
 
         # Create files with different characteristics that might affect memory
         memory_test_cases = [
-            {
-                'name': 'small_simple',
-                'file_count': 5,
-                'complexity': 'low'
-            },
-            {
-                'name': 'medium_complex',
-                'file_count': 20,
-                'complexity': 'medium'
-            },
-            {
-                'name': 'large_dense',
-                'file_count': 50,
-                'complexity': 'high'
-            }
+            {"name": "small_simple", "file_count": 5, "complexity": "low"},
+            {"name": "medium_complex", "file_count": 20, "complexity": "medium"},
+            {"name": "large_dense", "file_count": 50, "complexity": "high"},
         ]
 
         memory_profiles = {}
 
         for test_case in memory_test_cases:
-            case_dir = project_path / test_case['name']
+            case_dir = project_path / test_case["name"]
             case_dir.mkdir()
 
             # Generate files based on complexity
-            for i in range(test_case['file_count']):
-                if test_case['complexity'] == 'low':
+            for i in range(test_case["file_count"]):
+                if test_case["complexity"] == "low":
                     content = f"""
 def simple_function_{i}(param1, param2, param3, param4): pass  # Parameter bomb
 magic_value = {i}  # Magic literal
 """
-                elif test_case['complexity'] == 'medium':
+                elif test_case["complexity"] == "medium":
                     content = f"""
 def medium_function_{i}(p1, p2, p3, p4, p5): pass  # Parameter bomb
 magic_a = {i * 10}  # Magic literal
@@ -1183,54 +1223,66 @@ class HighComplexityClass_{i}:
             resource_stats = profiler.stop_profiling()
 
             memory_profile = {
-                'test_case': test_case['name'],
-                'file_count': test_case['file_count'],
-                'complexity': test_case['complexity'],
-                'execution_time_ms': execution_time * 1000,
-                'memory_peak_mb': resource_stats.get('memory_stats', {}).get('peak_mb', 0),
-                'memory_mean_mb': resource_stats.get('memory_stats', {}).get('mean_mb', 0),
-                'memory_efficiency': resource_stats.get('memory_stats', {}).get('peak_mb', 0) / max(test_case['file_count'], 1),
-                'memory_growth_pattern': self._analyze_memory_growth(resource_stats),
-                'exit_code': exit_code
+                "test_case": test_case["name"],
+                "file_count": test_case["file_count"],
+                "complexity": test_case["complexity"],
+                "execution_time_ms": execution_time * 1000,
+                "memory_peak_mb": resource_stats.get("memory_stats", {}).get("peak_mb", 0),
+                "memory_mean_mb": resource_stats.get("memory_stats", {}).get("mean_mb", 0),
+                "memory_efficiency": resource_stats.get("memory_stats", {}).get("peak_mb", 0)
+                / max(test_case["file_count"], 1),
+                "memory_growth_pattern": self._analyze_memory_growth(resource_stats),
+                "exit_code": exit_code,
             }
 
-            memory_profiles[test_case['name']] = memory_profile
+            memory_profiles[test_case["name"]] = memory_profile
 
             perf_coordinator.store_memory_profile(f"{scenario_id}_{test_case['name']}", memory_profile)
             perf_workflow_validator.add_step(f"profile_{test_case['name']}", memory_profile)
 
         # Analyze memory scaling patterns
         memory_analysis = {
-            'profiles_completed': len(memory_profiles),
-            'memory_scaling_factor': self._calculate_memory_scaling(memory_profiles),
-            'memory_efficiency_trend': self._analyze_memory_efficiency_trend(memory_profiles),
-            'peak_memory_usage': max(p['memory_peak_mb'] for p in memory_profiles.values()),
-            'most_memory_efficient': min(memory_profiles.items(), key=lambda x: x[1]['memory_efficiency'])[0],
-            'memory_usage_predictable': self._assess_memory_predictability(memory_profiles)
+            "profiles_completed": len(memory_profiles),
+            "memory_scaling_factor": self._calculate_memory_scaling(memory_profiles),
+            "memory_efficiency_trend": self._analyze_memory_efficiency_trend(memory_profiles),
+            "peak_memory_usage": max(p["memory_peak_mb"] for p in memory_profiles.values()),
+            "most_memory_efficient": min(memory_profiles.items(), key=lambda x: x[1]["memory_efficiency"])[0],
+            "memory_usage_predictable": self._assess_memory_predictability(memory_profiles),
         }
 
-        perf_coordinator.store_benchmark_result(scenario_id, {
-            'benchmark_type': 'memory_usage_profiling',
-            'memory_profiles': memory_profiles,
-            'memory_analysis': memory_analysis
-        })
+        perf_coordinator.store_benchmark_result(
+            scenario_id,
+            {
+                "benchmark_type": "memory_usage_profiling",
+                "memory_profiles": memory_profiles,
+                "memory_analysis": memory_analysis,
+            },
+        )
 
         perf_workflow_validator.add_step("memory_analysis", memory_analysis)
 
         # Cleanup
         import shutil
+
         shutil.rmtree(temp_dir)
 
         # Memory profiling assertions
-        assert memory_analysis['peak_memory_usage'] < 1024, f"Peak memory usage too high: {memory_analysis['peak_memory_usage']}MB"
-        assert memory_analysis['memory_usage_predictable'], "Memory usage should be predictable"
-        assert all(p['memory_efficiency'] < 50 for p in memory_profiles.values()), "Memory efficiency per file should be reasonable"
+        assert (
+            memory_analysis["peak_memory_usage"] < 1024
+        ), f"Peak memory usage too high: {memory_analysis['peak_memory_usage']}MB"
+        assert memory_analysis["memory_usage_predictable"], "Memory usage should be predictable"
+        assert all(
+            p["memory_efficiency"] < 50 for p in memory_profiles.values()
+        ), "Memory efficiency per file should be reasonable"
 
-        perf_workflow_validator.complete_scenario(True, {
-            'memory_profiling_completed': True,
-            'memory_usage_acceptable': memory_analysis['peak_memory_usage'] < 1024,
-            'memory_analysis': memory_analysis
-        })
+        perf_workflow_validator.complete_scenario(
+            True,
+            {
+                "memory_profiling_completed": True,
+                "memory_usage_acceptable": memory_analysis["peak_memory_usage"] < 1024,
+                "memory_analysis": memory_analysis,
+            },
+        )
 
     def test_performance_regression_detection(self, perf_workflow_validator):
         """Test performance regression detection capabilities."""
@@ -1243,7 +1295,8 @@ class HighComplexityClass_{i}:
 
         # Create standardized test project
         for i in range(10):
-            (project_path / f"regression_test_{i}.py").write_text(f"""
+            (project_path / f"regression_test_{i}.py").write_text(
+                f"""
 def regression_function_{i}(param1, param2, param3, param4, param5):  # Parameter bomb
     magic_constant = {100 + i * 10}  # Magic literal
     secret_key = "regression_test_key_{i}"  # Magic string
@@ -1274,7 +1327,8 @@ class RegressionClass_{i}:
     def method_19(self): pass
     def method_20(self): pass
     def method_21(self): pass  # God class
-""")
+"""
+            )
 
         # Establish baseline
         baseline_runs = 3
@@ -1291,21 +1345,27 @@ class RegressionClass_{i}:
 
             resource_stats = profiler.stop_profiling()
 
-            baseline_results.append({
-                'run': run + 1,
-                'execution_time_ms': execution_time * 1000,
-                'memory_peak_mb': resource_stats.get('memory_stats', {}).get('peak_mb', 0),
-                'cpu_avg_percent': resource_stats.get('cpu_stats', {}).get('mean', 0)
-            })
+            baseline_results.append(
+                {
+                    "run": run + 1,
+                    "execution_time_ms": execution_time * 1000,
+                    "memory_peak_mb": resource_stats.get("memory_stats", {}).get("peak_mb", 0),
+                    "cpu_avg_percent": resource_stats.get("cpu_stats", {}).get("mean", 0),
+                }
+            )
 
         # Calculate baseline metrics
         baseline_metrics = {
-            'execution_time_ms': statistics.mean([r['execution_time_ms'] for r in baseline_results]),
-            'execution_time_stdev': statistics.stdev([r['execution_time_ms'] for r in baseline_results]) if len(baseline_results) > 1 else 0,
-            'memory_peak_mb': statistics.mean([r['memory_peak_mb'] for r in baseline_results]),
-            'memory_stdev': statistics.stdev([r['memory_peak_mb'] for r in baseline_results]) if len(baseline_results) > 1 else 0,
-            'cpu_avg_percent': statistics.mean([r['cpu_avg_percent'] for r in baseline_results]),
-            'baseline_runs': baseline_runs
+            "execution_time_ms": statistics.mean([r["execution_time_ms"] for r in baseline_results]),
+            "execution_time_stdev": (
+                statistics.stdev([r["execution_time_ms"] for r in baseline_results]) if len(baseline_results) > 1 else 0
+            ),
+            "memory_peak_mb": statistics.mean([r["memory_peak_mb"] for r in baseline_results]),
+            "memory_stdev": (
+                statistics.stdev([r["memory_peak_mb"] for r in baseline_results]) if len(baseline_results) > 1 else 0
+            ),
+            "cpu_avg_percent": statistics.mean([r["cpu_avg_percent"] for r in baseline_results]),
+            "baseline_runs": baseline_runs,
         }
 
         perf_coordinator.store_performance_baseline("regression_baseline", baseline_metrics)
@@ -1314,16 +1374,16 @@ class RegressionClass_{i}:
         # Simulate potential regression scenarios
         regression_scenarios = [
             {
-                'name': 'current_performance',
-                'description': 'Current performance should match baseline',
-                'expected_regression': False
+                "name": "current_performance",
+                "description": "Current performance should match baseline",
+                "expected_regression": False,
             }
         ]
 
         regression_results = {}
 
         for scenario in regression_scenarios:
-            scenario_name = scenario['name']
+            scenario_name = scenario["name"]
 
             # Run performance test
             profiler = PerformanceProfiler()
@@ -1337,34 +1397,33 @@ class RegressionClass_{i}:
             resource_stats = profiler.stop_profiling()
 
             scenario_metrics = {
-                'execution_time_ms': execution_time * 1000,
-                'memory_peak_mb': resource_stats.get('memory_stats', {}).get('peak_mb', 0),
-                'cpu_avg_percent': resource_stats.get('cpu_stats', {}).get('mean', 0)
+                "execution_time_ms": execution_time * 1000,
+                "memory_peak_mb": resource_stats.get("memory_stats", {}).get("peak_mb", 0),
+                "cpu_avg_percent": resource_stats.get("cpu_stats", {}).get("mean", 0),
             }
 
             # Compare with baseline
             comparison = perf_coordinator.compare_with_baseline(f"temp_{scenario_name}", "regression_baseline")
 
             # Store temporary result for comparison
-            perf_coordinator.store_benchmark_result(f"temp_{scenario_name}", {
-                'benchmark_type': 'regression_test',
-                **scenario_metrics
-            })
+            perf_coordinator.store_benchmark_result(
+                f"temp_{scenario_name}", {"benchmark_type": "regression_test", **scenario_metrics}
+            )
 
             regression_analysis = {
-                'scenario_name': scenario_name,
-                'scenario_metrics': scenario_metrics,
-                'baseline_comparison': comparison if 'error' not in comparison else None,
-                'regression_detected': False,
-                'performance_stable': True
+                "scenario_name": scenario_name,
+                "scenario_metrics": scenario_metrics,
+                "baseline_comparison": comparison if "error" not in comparison else None,
+                "regression_detected": False,
+                "performance_stable": True,
             }
 
             # Detect regressions
-            if comparison and 'error' not in comparison:
-                regressions = [m for m in comparison['metrics_comparison'].values() if m.get('regression', False)]
-                regression_analysis['regression_detected'] = len(regressions) > 0
-                regression_analysis['regression_details'] = regressions
-                regression_analysis['performance_stable'] = not regression_analysis['regression_detected']
+            if comparison and "error" not in comparison:
+                regressions = [m for m in comparison["metrics_comparison"].values() if m.get("regression", False)]
+                regression_analysis["regression_detected"] = len(regressions) > 0
+                regression_analysis["regression_details"] = regressions
+                regression_analysis["performance_stable"] = not regression_analysis["regression_detected"]
 
             regression_results[scenario_name] = regression_analysis
 
@@ -1373,28 +1432,32 @@ class RegressionClass_{i}:
 
         # Overall regression analysis
         overall_regression_analysis = {
-            'scenarios_tested': len(regression_scenarios),
-            'regressions_detected': sum(1 for r in regression_results.values() if r['regression_detected']),
-            'performance_stable_overall': all(r['performance_stable'] for r in regression_results.values()),
-            'baseline_established': True,
-            'regression_detection_functional': True
+            "scenarios_tested": len(regression_scenarios),
+            "regressions_detected": sum(1 for r in regression_results.values() if r["regression_detected"]),
+            "performance_stable_overall": all(r["performance_stable"] for r in regression_results.values()),
+            "baseline_established": True,
+            "regression_detection_functional": True,
         }
 
         perf_workflow_validator.add_step("overall_regression_analysis", overall_regression_analysis)
 
         # Cleanup
         import shutil
+
         shutil.rmtree(temp_dir)
 
         # Regression detection assertions
-        assert overall_regression_analysis['performance_stable_overall'], "Performance regressions detected"
-        assert overall_regression_analysis['baseline_established'], "Baseline should be established"
+        assert overall_regression_analysis["performance_stable_overall"], "Performance regressions detected"
+        assert overall_regression_analysis["baseline_established"], "Baseline should be established"
 
-        perf_workflow_validator.complete_scenario(True, {
-            'regression_detection_completed': True,
-            'performance_stable': overall_regression_analysis['performance_stable_overall'],
-            'overall_analysis': overall_regression_analysis
-        })
+        perf_workflow_validator.complete_scenario(
+            True,
+            {
+                "regression_detection_completed": True,
+                "performance_stable": overall_regression_analysis["performance_stable_overall"],
+                "overall_analysis": overall_regression_analysis,
+            },
+        )
 
     def test_performance_memory_coordination_validation(self):
         """Test performance benchmarking memory coordination system."""
@@ -1402,33 +1465,31 @@ class RegressionClass_{i}:
         test_benchmark_id = "performance_memory_test"
 
         # Store comprehensive test data
-        perf_coordinator.store_benchmark_result(test_benchmark_id, {
-            'benchmark_type': 'memory_validation',
-            'execution_time_ms': 5000,
-            'memory_peak_mb': 256,
-            'violations_per_second': 50
-        })
+        perf_coordinator.store_benchmark_result(
+            test_benchmark_id,
+            {
+                "benchmark_type": "memory_validation",
+                "execution_time_ms": 5000,
+                "memory_peak_mb": 256,
+                "violations_per_second": 50,
+            },
+        )
 
-        perf_coordinator.store_performance_baseline("test_baseline", {
-            'execution_time_ms': 4800,
-            'memory_peak_mb': 240,
-            'violations_per_second': 52
-        })
+        perf_coordinator.store_performance_baseline(
+            "test_baseline", {"execution_time_ms": 4800, "memory_peak_mb": 240, "violations_per_second": 52}
+        )
 
-        perf_coordinator.store_scalability_metrics("test_scalability", {
-            'scalability_factor': 5,
-            'files_per_second': 10
-        })
+        perf_coordinator.store_scalability_metrics(
+            "test_scalability", {"scalability_factor": 5, "files_per_second": 10}
+        )
 
-        perf_coordinator.store_memory_profile("test_memory_profile", {
-            'memory_efficiency': 12.5,
-            'memory_growth_pattern': 'linear'
-        })
+        perf_coordinator.store_memory_profile(
+            "test_memory_profile", {"memory_efficiency": 12.5, "memory_growth_pattern": "linear"}
+        )
 
-        perf_coordinator.store_throughput_measurement("test_throughput", {
-            'concurrent_throughput': 75,
-            'throughput_improvement': 1.5
-        })
+        perf_coordinator.store_throughput_measurement(
+            "test_throughput", {"concurrent_throughput": 75, "throughput_improvement": 1.5}
+        )
 
         # Validate comprehensive storage
         assert test_benchmark_id in perf_coordinator.benchmark_results
@@ -1439,17 +1500,17 @@ class RegressionClass_{i}:
 
         # Test summary generation
         summary = perf_coordinator.get_performance_summary()
-        assert summary['total_benchmarks'] > 0
-        assert summary['performance_baselines'] > 0
-        assert summary['scalability_tests'] > 0
-        assert summary['memory_profiles'] > 0
-        assert summary['throughput_measurements'] > 0
-        assert summary['overall_performance_score'] >= 0
+        assert summary["total_benchmarks"] > 0
+        assert summary["performance_baselines"] > 0
+        assert summary["scalability_tests"] > 0
+        assert summary["memory_profiles"] > 0
+        assert summary["throughput_measurements"] > 0
+        assert summary["overall_performance_score"] >= 0
 
         # Test comparison functionality
         comparison = perf_coordinator.compare_with_baseline(test_benchmark_id, "test_baseline")
-        assert 'metrics_comparison' in comparison
-        assert 'overall_regression' in comparison
+        assert "metrics_comparison" in comparison
+        assert "overall_regression" in comparison
 
     # Helper methods
     def _calculate_throughput_stability(self, violations, execution_time):
@@ -1471,23 +1532,23 @@ class RegressionClass_{i}:
 
     def _analyze_memory_growth(self, resource_stats):
         """Analyze memory growth pattern."""
-        if not resource_stats or 'samples_collected' not in resource_stats:
-            return 'unknown'
+        if not resource_stats or "samples_collected" not in resource_stats:
+            return "unknown"
 
         # Simple heuristic based on peak vs mean
-        peak_mb = resource_stats.get('memory_stats', {}).get('peak_mb', 0)
-        mean_mb = resource_stats.get('memory_stats', {}).get('mean_mb', 0)
+        peak_mb = resource_stats.get("memory_stats", {}).get("peak_mb", 0)
+        mean_mb = resource_stats.get("memory_stats", {}).get("mean_mb", 0)
 
         if peak_mb > 0 and mean_mb > 0:
             ratio = peak_mb / mean_mb
             if ratio < 1.2:
-                return 'stable'
+                return "stable"
             elif ratio < 1.5:
-                return 'moderate_growth'
+                return "moderate_growth"
             else:
-                return 'high_growth'
+                return "high_growth"
 
-        return 'unknown'
+        return "unknown"
 
     def _calculate_memory_scaling(self, memory_profiles):
         """Calculate memory scaling factor across profiles."""
@@ -1497,41 +1558,41 @@ class RegressionClass_{i}:
         profiles = list(memory_profiles.values())
 
         # Sort by file count
-        profiles.sort(key=lambda p: p['file_count'])
+        profiles.sort(key=lambda p: p["file_count"])
 
         # Calculate scaling between smallest and largest
         smallest = profiles[0]
         largest = profiles[-1]
 
-        file_ratio = largest['file_count'] / max(smallest['file_count'], 1)
-        memory_ratio = largest['memory_peak_mb'] / max(smallest['memory_peak_mb'], 1)
+        file_ratio = largest["file_count"] / max(smallest["file_count"], 1)
+        memory_ratio = largest["memory_peak_mb"] / max(smallest["memory_peak_mb"], 1)
 
         # Ideal scaling would be close to 1.0 (linear with file count)
         return memory_ratio / file_ratio if file_ratio > 0 else 1.0
 
     def _analyze_memory_efficiency_trend(self, memory_profiles):
         """Analyze memory efficiency trend across complexity levels."""
-        efficiencies = [p['memory_efficiency'] for p in memory_profiles.values()]
+        efficiencies = [p["memory_efficiency"] for p in memory_profiles.values()]
 
         if len(efficiencies) < 2:
-            return 'insufficient_data'
+            return "insufficient_data"
 
         # Check if efficiency degrades with complexity
-        low_complex = [p for p in memory_profiles.values() if p['complexity'] == 'low']
-        high_complex = [p for p in memory_profiles.values() if p['complexity'] == 'high']
+        low_complex = [p for p in memory_profiles.values() if p["complexity"] == "low"]
+        high_complex = [p for p in memory_profiles.values() if p["complexity"] == "high"]
 
         if low_complex and high_complex:
-            avg_low = statistics.mean([p['memory_efficiency'] for p in low_complex])
-            avg_high = statistics.mean([p['memory_efficiency'] for p in high_complex])
+            avg_low = statistics.mean([p["memory_efficiency"] for p in low_complex])
+            avg_high = statistics.mean([p["memory_efficiency"] for p in high_complex])
 
             if avg_high <= avg_low * 1.5:  # Within 50% is acceptable
-                return 'efficient'
+                return "efficient"
             elif avg_high <= avg_low * 3.0:  # Within 300% is moderate
-                return 'moderate'
+                return "moderate"
             else:
-                return 'inefficient'
+                return "inefficient"
 
-        return 'mixed'
+        return "mixed"
 
     def _assess_memory_predictability(self, memory_profiles):
         """Assess whether memory usage is predictable."""
@@ -1539,8 +1600,8 @@ class RegressionClass_{i}:
 
         # Check if memory scales reasonably with file count and complexity
         for profile in profiles:
-            expected_memory = profile['file_count'] * 5  # Rough estimate: 5MB per file
-            actual_memory = profile['memory_peak_mb']
+            expected_memory = profile["file_count"] * 5  # Rough estimate: 5MB per file
+            actual_memory = profile["memory_peak_mb"]
 
             # Allow up to 3x expected memory (very generous)
             if actual_memory > expected_memory * 3:
@@ -1558,31 +1619,21 @@ def test_performance_integration():
     # Test complete performance integration
     scenario_id = "performance_integration_test"
 
-    coordinator.store_benchmark_result(scenario_id, {
-        'integration_test': True,
-        'execution_time_ms': 2500,
-        'memory_peak_mb': 128
-    })
+    coordinator.store_benchmark_result(
+        scenario_id, {"integration_test": True, "execution_time_ms": 2500, "memory_peak_mb": 128}
+    )
 
-    coordinator.store_performance_baseline("integration_baseline", {
-        'execution_time_ms': 2400,
-        'memory_peak_mb': 120
-    })
+    coordinator.store_performance_baseline("integration_baseline", {"execution_time_ms": 2400, "memory_peak_mb": 120})
 
     # Validate integration
     assert scenario_id in coordinator.benchmark_results
     assert "integration_baseline" in coordinator.performance_baselines
 
     summary = coordinator.get_performance_summary()
-    assert summary['total_benchmarks'] > 0
+    assert summary["total_benchmarks"] > 0
 
     print("Performance benchmarking integration test completed successfully")
 
 
 if __name__ == "__main__":
-    pytest.main([
-        __file__,
-        "-v",
-        "--tb=short",
-        "-m", "e2e"
-    ])
+    pytest.main([__file__, "-v", "--tb=short", "-m", "e2e"])

@@ -3,6 +3,7 @@ God Object Detector - Detects classes that violate Single Responsibility Princip
 
 Extracted from ConnascenceDetector to follow Single Responsibility Principle.
 """
+
 import ast
 from typing import Dict, List
 

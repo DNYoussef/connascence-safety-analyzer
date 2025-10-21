@@ -10,7 +10,7 @@ from pathlib import Path
 core_file = Path(__file__).parent.parent / "analyzer" / "core.py"
 
 # Read the file
-with open(core_file, 'r', encoding='utf-8') as f:
+with open(core_file, encoding="utf-8") as f:
     content = f.read()
 
 # Helper functions to insert before create_parser()
@@ -159,24 +159,19 @@ if start_idx == -1 or end_idx == -1:
     exit(1)
 
 # Create new content
-new_content = (
-    content[:start_idx] +
-    helper_functions +
-    new_function +
-    content[end_idx:]
-)
+new_content = content[:start_idx] + helper_functions + new_function + content[end_idx:]
 
 # Write the refactored file
-with open(core_file, 'w', encoding='utf-8') as f:
+with open(core_file, "w", encoding="utf-8") as f:
     f.write(new_content)
 
 print("[SUCCESS] Refactored create_parser() function!")
-print(f"  Original: ~102 LOC")
-print(f"  Refactored: ~20 LOC")
-print(f"  Helper functions created: 5")
-print(f"    - _add_basic_arguments(): ~25 LOC")
-print(f"    - _add_analysis_arguments(): ~20 LOC")
-print(f"    - _add_output_control_arguments(): ~15 LOC")
-print(f"    - _add_exit_condition_arguments(): ~10 LOC")
-print(f"    - _add_enhanced_pipeline_arguments(): ~30 LOC")
-print(f"  Lines saved: ~82 LOC from main function")
+print("  Original: ~102 LOC")
+print("  Refactored: ~20 LOC")
+print("  Helper functions created: 5")
+print("    - _add_basic_arguments(): ~25 LOC")
+print("    - _add_analysis_arguments(): ~20 LOC")
+print("    - _add_output_control_arguments(): ~15 LOC")
+print("    - _add_exit_condition_arguments(): ~10 LOC")
+print("    - _add_enhanced_pipeline_arguments(): ~30 LOC")
+print("  Lines saved: ~82 LOC from main function")

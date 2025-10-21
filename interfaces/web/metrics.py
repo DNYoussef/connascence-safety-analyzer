@@ -130,9 +130,9 @@ class DashboardMetrics:
         self,
         operation_type: str,
         duration: float,
-        file_count: int = None,
-        violation_count: int = None,
-        memory_usage: float = None,
+        file_count: Optional[int] = None,
+        violation_count: Optional[int] = None,
+        memory_usage: Optional[float] = None,
     ):
         """Record performance metrics."""
         with sqlite3.connect(str(self.db_path)) as conn:
@@ -250,7 +250,7 @@ class DashboardMetrics:
                 "min_violations": min(violations),
             }
 
-    def get_performance_stats(self, operation_type: str = None) -> Dict[str, Any]:
+    def get_performance_stats(self, operation_type: Optional[str] = None) -> Dict[str, Any]:
         """Get performance statistics."""
         with sqlite3.connect(str(self.db_path)) as conn:
             where_clause = ""

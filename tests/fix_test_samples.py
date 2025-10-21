@@ -4,14 +4,13 @@ Script to fix test samples in test_connascence_preservation.py
 Applies Phase 2 Task 2 fixes for the 5 failing connascence types.
 """
 
-import re
 from pathlib import Path
 
 # Path to the test file
 test_file = Path(__file__).parent / "integration" / "test_connascence_preservation.py"
 
 # Read the file
-with open(test_file, 'r', encoding='utf-8') as f:
+with open(test_file, encoding="utf-8") as f:
     content = f.read()
 
 # Fix 1: CoE - Execution (use global variables)
@@ -204,7 +203,7 @@ def process_with_default(value):
 content = content.replace(old_coi, new_coi)
 
 # Write the updated file
-with open(test_file, 'w', encoding='utf-8') as f:
+with open(test_file, "w", encoding="utf-8") as f:
     f.write(content)
 
 print("[SUCCESS] Test samples fixed!")

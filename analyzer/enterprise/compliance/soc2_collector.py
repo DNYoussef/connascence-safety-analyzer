@@ -267,7 +267,7 @@ class SOC2Collector:
             self.collect_all_evidence()
 
         criteria_coverage = {}
-        for criterion in self.TSC_CRITERIA.keys():
+        for criterion in self.TSC_CRITERIA:
             count = len([e for e in self.evidence if e.control_id.startswith(criterion.split("-")[0])])
             criteria_coverage[criterion] = count
 

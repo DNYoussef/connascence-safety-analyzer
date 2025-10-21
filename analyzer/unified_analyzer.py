@@ -592,7 +592,7 @@ class UnifiedConnascenceAnalyzer:
             return self._analyze_project_batch(project_path, policy_preset, options)
 
         logger.info(f"Starting streaming analysis of {project_path}")
-        start_time = self._get_timestamp_ms()
+        self._get_timestamp_ms()
 
         # Start streaming processor if not already running
         if not self.stream_processor.is_running:
@@ -896,7 +896,7 @@ class UnifiedConnascenceAnalyzer:
         logger.info(f"Found {len(tree_sitter_violations)} NASA violations from Tree-Sitter")
         return tree_sitter_violations
 
-    def _run_dedicated_nasa_analysis(self, project_path: Path = None) -> List[Dict[str, Any]]:
+    def _run_dedicated_nasa_analysis(self, project_path: Optional[Path] = None) -> List[Dict[str, Any]]:
         """Run dedicated NASA Power of Ten analysis."""
         nasa_violations = []
 
@@ -992,10 +992,7 @@ class UnifiedConnascenceAnalyzer:
             return False
 
         # Skip files that start with test_ or end with _test.py (actual test files)
-        if filename.startswith("test_") or filename.endswith("_test.py"):
-            return False
-
-        return True
+        return not (filename.startswith("test_") or filename.endswith("_test.py"))
 
     def _run_duplication_analysis(self, project_path: Path) -> List[Dict[str, Any]]:
         """Run MECE duplication detection."""
@@ -1004,7 +1001,7 @@ class UnifiedConnascenceAnalyzer:
         dup_analysis = self.mece_analyzer.analyze_path(str(project_path), comprehensive=True)
         return dup_analysis.get("duplications", [])
 
-    def _run_smart_integration(self, project_path: Path, policy_preset: str, existing_violations: Dict = None):
+    def _run_smart_integration(self, project_path: Path, policy_preset: str, existing_violations: Optional[Dict] = None):
         """Run smart integration engine with enhanced correlation analysis."""
         if self.smart_engine:
             logger.info("Phase 5: Running smart integration engine with cross-phase correlation")
@@ -1050,7 +1047,7 @@ class UnifiedConnascenceAnalyzer:
             return None
 
     def _run_nasa_analysis(
-        self, connascence_violations: List[Dict[str, Any]], phase_metadata: Dict = None, project_path: Path = None
+        self, connascence_violations: List[Dict[str, Any]], phase_metadata: Optional[Dict] = None, project_path: Optional[Path] = None
     ) -> List[Dict[str, Any]]:
         """Run NASA compliance analysis with enhanced context awareness and Tree-Sitter backend."""
         nasa_violations = []
@@ -1635,8 +1632,8 @@ class UnifiedConnascenceAnalyzer:
         project_path: Path,
         policy_preset: str,
         analysis_time: int,
-        errors: List[StandardError] = None,
-        warnings: List[StandardError] = None,
+        errors: Optional[List[StandardError]] = None,
+        warnings: Optional[List[StandardError]] = None,
     ) -> UnifiedAnalysisResult:
         """Legacy method - delegates to aggregator component."""
         # NASA Rule 5: Input validation assertions
@@ -1659,8 +1656,8 @@ class UnifiedConnascenceAnalyzer:
         project_path: Path,
         policy_preset: str,
         analysis_time: int,
-        errors: List[StandardError] = None,
-        warnings: List[StandardError] = None,
+        errors: Optional[List[StandardError]] = None,
+        warnings: Optional[List[StandardError]] = None,
     ) -> UnifiedAnalysisResult:
         """Build result using aggregator component. NASA Rule 4 compliant."""
         # NASA Rule 5: Input validation assertions
@@ -1710,8 +1707,8 @@ class UnifiedConnascenceAnalyzer:
         project_path: Path,
         policy_preset: str,
         analysis_time: int,
-        errors: List[StandardError] = None,
-        warnings: List[StandardError] = None,
+        errors: Optional[List[StandardError]] = None,
+        warnings: Optional[List[StandardError]] = None,
     ) -> UnifiedAnalysisResult:
         """Build result directly without aggregator component."""
         # NASA Rule 5: Input validation assertions

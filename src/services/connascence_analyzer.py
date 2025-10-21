@@ -4,6 +4,7 @@ Connascence Analyzer Service - Main analysis orchestrator.
 Extracted from the monolithic check_connascence.py to follow Single Responsibility Principle.
 This service orchestrates the analysis pipeline using specialized detectors.
 """
+
 import ast
 from pathlib import Path
 from typing import Any, Dict, List, Optional

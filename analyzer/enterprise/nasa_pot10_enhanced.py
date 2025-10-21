@@ -16,8 +16,10 @@ import ast
 from collections import defaultdict
 from dataclasses import dataclass, field
 from datetime import datetime
+import functools
 import json
 import logging
+import operator
 from pathlib import Path
 import re
 import sys
@@ -105,7 +107,7 @@ class WeightedScoringEngine:
             bonus += 3.0
         if metrics.multi_category.testing_compliance >= 95.0:
             bonus += 1.5
-        if len([v for v in sum(metrics.violations_by_rule.values(), []) if v.auto_fixable]) >= 10:
+        if len([v for v in functools.reduce(operator.iadd, metrics.violations_by_rule.values(), []) if v.auto_fixable]) >= 10:
             bonus += 1.0
 
         return bonus
@@ -219,9 +221,9 @@ class EnhancedNASAPowerOfTenAnalyzer:
                         severity="critical",
                         weight=5.0,
                         description=f"Syntax error prevents compilation: {e}",
-                        code_snippet=lines[getattr(e, "lineno", 1) - 1]
-                        if len(lines) >= getattr(e, "lineno", 1)
-                        else "",
+                        code_snippet=(
+                            lines[getattr(e, "lineno", 1) - 1] if len(lines) >= getattr(e, "lineno", 1) else ""
+                        ),
                         suggested_fix="Fix syntax error to enable compilation",
                         auto_fixable=False,
                         confidence_score=1.0,
@@ -436,10 +438,10 @@ class EnhancedNASAPowerOfTenAnalyzer:
         return violations
 
     def _calculate_enhanced_metrics(self, metrics: EnhancedComplianceMetrics) -> None:
-        total_violations = sum(len(violations) for violations in metrics.violations_by_rule.values())
+        sum(len(violations) for violations in metrics.violations_by_rule.values())
 
         metrics.weighted_penalty_score = self.scoring_engine.calculate_weighted_penalty(
-            sum(metrics.violations_by_rule.values(), [])
+            functools.reduce(operator.iadd, metrics.violations_by_rule.values(), [])
         )
 
         for rule_num in range(1, 11):
