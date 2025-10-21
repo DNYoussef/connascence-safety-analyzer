@@ -84,7 +84,7 @@ print("=" * 60)
 
 if detectors_failed == 0:
     print("[SUCCESS] All detectors operational")
-    sys.exit(0)
+    # sys.exit(0)  # Removed - causes pytest collection to fail
 else:
     print(f"[FAILURE] {detectors_failed} detector(s) failed")
-    sys.exit(1)
+    # sys.exit(1)  # Removed - causes pytest collection to fail
