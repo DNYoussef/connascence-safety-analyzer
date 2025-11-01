@@ -78,6 +78,26 @@ code --install-extension connascence-safety-analyzer-*.vsix
 
 ---
 
+## 🔗 Integration with AI Development Systems
+
+The Connascence Safety Analyzer integrates seamlessly with intelligent AI development systems:
+
+**Memory MCP Triple System** - [https://github.com/DNYoussef/memory-mcp-triple-system](https://github.com/DNYoussef/memory-mcp-triple-system)
+- Persistent memory with automatic tagging protocol
+- Cross-session violation tracking and pattern detection
+- Triple-layer retention (24h/7d/30d+)
+- Mode-aware context adaptation
+
+**ruv-SPARC Three-Loop System** - [https://github.com/DNYoussef/ruv-sparc-three-loop-system](https://github.com/DNYoussef/ruv-sparc-three-loop-system)
+- 86+ specialized agents with SOPs
+- Agent access control (14 code quality agents have Connascence access)
+- Complete skill and command integration
+- Evidence-based prompting techniques
+
+**MCP Integration Guide**: See [docs/MCP-INTEGRATION.md](docs/MCP-INTEGRATION.md) for complete setup instructions.
+
+---
+
 ## 📊 What is Connascence?
 
 Connascence is a taxonomy of software coupling, providing a vocabulary for discussing different types of dependencies. Understanding connascence helps you:
