@@ -27,7 +27,7 @@ claude-flow
 claude-flow.bat
 claude-flow.ps1
 hive-mind-prompt-*.txt
-
+.claude-flow 
 # Python build artifacts
 __pycache__/
 *.py[cod]

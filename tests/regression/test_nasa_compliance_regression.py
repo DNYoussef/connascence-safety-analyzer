@@ -7,7 +7,7 @@ maintains NASA Power of Ten compliance. This is a regression test to ensure
 refactoring doesn't break compliance.
 
 NASA Rules Tested:
-- Rule 4: Functions ≤60 lines
+- Rule 4: Functions <=60 lines
 - Rule 5: Assertions for critical functions
 - Rule 7: No recursion (use iterative alternatives)
 - Rule 8: Fixed loop bounds (no while(true))
@@ -54,7 +54,7 @@ class NASAComplianceValidator:
 
     def check_rule4_function_length(self, file_path: Path) -> List[Dict]:
         """
-        Check NASA Rule 4: Functions should be ≤60 lines.
+        Check NASA Rule 4: Functions should be <=60 lines.
 
         Args:
             file_path: Python file to check

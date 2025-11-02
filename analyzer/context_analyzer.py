@@ -294,7 +294,7 @@ class ContextAnalyzer:
         """
         Classify the context/domain of a class using multiple indicators.
 
-        Refactored to comply with NASA Rule 4 (≤60 lines per function).
+        Refactored to comply with NASA Rule 4 (<=60 lines per function).
         Helper functions handle file path, class name, base classes, and method analysis.
         """
         scores = dict.fromkeys(ClassContext, 0)

@@ -15,9 +15,20 @@ import argparse
 import asyncio
 import json
 import logging
+import os
 from pathlib import Path
 import sys
 from typing import Any, Dict, Optional
+
+# Force UTF-8 encoding for Windows compatibility
+if sys.platform == "win32":
+    # Set environment variables for Python I/O encoding
+    os.environ.setdefault("PYTHONIOENCODING", "utf-8")
+    # Reconfigure stdout/stderr to use UTF-8
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    if hasattr(sys.stderr, "reconfigure"):
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))

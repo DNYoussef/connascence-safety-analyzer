@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Script to refactor analyzer/check_connascence.py _process_magic_literals()
-from 108 LOC to ≤60 LOC.
+from 108 LOC to <=60 LOC.
 """
 
 from pathlib import Path
@@ -129,7 +129,7 @@ new_function = '''    def _process_magic_literals(self):
         """
         Process magic literals with formal grammar context.
 
-        Refactored to comply with NASA Rule 4 (≤60 lines per function).
+        Refactored to comply with NASA Rule 4 (<=60 lines per function).
         Helper functions handle formal analysis, legacy processing, and global checks.
         """
         # NASA Rule 5: Input validation assertion

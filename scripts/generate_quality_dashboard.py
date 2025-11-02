@@ -144,13 +144,13 @@ class QualityDashboardGenerator:
 </head>
 <body>
     <div class="container">
-        <h1>🔍 Quality Dashboard</h1>
+        <h1> Quality Dashboard</h1>
         <p class="timestamp">Generated on {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}</p>
 
         <div class="grid">
             <!-- Test Coverage -->
             <div class="card">
-                <h2>📊 Test Coverage</h2>
+                <h2>DATA Test Coverage</h2>
                 <div class="metric">
                     <span class="metric-label">Coverage</span>
                     <span class="metric-value status-{coverage['status']}">{coverage['coverage']:.1f}%</span>
@@ -170,7 +170,7 @@ class QualityDashboardGenerator:
 
             <!-- Security Scan -->
             <div class="card">
-                <h2>🛡️ Security Scan</h2>
+                <h2>SECURITY Security Scan</h2>
                 <div class="metric">
                     <span class="metric-label">Total Issues</span>
                     <span class="metric-value">{security['total_issues']}</span>
@@ -195,7 +195,7 @@ class QualityDashboardGenerator:
 
             <!-- Dependency Audit -->
             <div class="card">
-                <h2>📦 Dependency Audit</h2>
+                <h2> Dependency Audit</h2>
                 <div class="metric">
                     <span class="metric-label">Total Vulnerabilities</span>
                     <span class="metric-value">{dependencies['total']}</span>
@@ -220,7 +220,7 @@ class QualityDashboardGenerator:
 
             <!-- Code Quality -->
             <div class="card">
-                <h2>✨ Code Quality</h2>
+                <h2> Code Quality</h2>
                 <div class="metric">
                     <span class="metric-label">Total Issues</span>
                     <span class="metric-value">{quality['total']}</span>
@@ -241,9 +241,9 @@ class QualityDashboardGenerator:
         </div>
 
         <div class="card">
-            <h2>📋 Overall Status</h2>
+            <h2> Overall Status</h2>
             <div class="metric">
-                <span class="metric-label">Coverage Gate (≥60%)</span>
+                <span class="metric-label">Coverage Gate (>=60%)</span>
                 <span class="badge badge-{coverage['status']}">{coverage['status'].upper()}</span>
             </div>
             <div class="metric">
@@ -255,7 +255,7 @@ class QualityDashboardGenerator:
                 <span class="badge badge-{dependencies['status']}">{dependencies['status'].upper()}</span>
             </div>
             <div class="metric">
-                <span class="metric-label">Quality Gate (≤10 errors)</span>
+                <span class="metric-label">Quality Gate (<=10 errors)</span>
                 <span class="badge badge-{quality['status']}">{quality['status'].upper()}</span>
             </div>
         </div>

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Script to refactor analyzer/context_analyzer.py _classify_class_context()
-from 82 LOC to ≤60 LOC.
+from 82 LOC to <=60 LOC.
 """
 
 from pathlib import Path
@@ -119,7 +119,7 @@ new_function = '''    def _classify_class_context(
         """
         Classify the context/domain of a class using multiple indicators.
 
-        Refactored to comply with NASA Rule 4 (≤60 lines per function).
+        Refactored to comply with NASA Rule 4 (<=60 lines per function).
         Helper functions handle file path, class name, base classes, and method analysis.
         """
         scores = dict.fromkeys(ClassContext, 0)

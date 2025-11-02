@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Script to refactor analyzer/core.py main() function from 264 LOC to ≤60 LOC.
+Script to refactor analyzer/core.py main() function from 264 LOC to <=60 LOC.
 Extracts helper functions while maintaining functionality.
 """
 
@@ -321,7 +321,7 @@ new_main = '''def main():
     """
     Main entry point for command-line execution.
 
-    Refactored to comply with NASA Rule 4 (≤60 lines per function).
+    Refactored to comply with NASA Rule 4 (<=60 lines per function).
     Helper functions handle distinct logical sections.
     """
     parser = create_parser()

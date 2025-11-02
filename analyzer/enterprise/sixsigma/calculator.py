@@ -317,7 +317,7 @@ class ProcessCapability:
         """
         Convert Cpk to approximate Sigma level
 
-        Sigma Level ≈ 3 * Cpk
+        Sigma Level  3 * Cpk
         """
         return round(3 * cpk, 1)
 

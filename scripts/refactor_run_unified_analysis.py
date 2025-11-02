@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Script to refactor analyzer/core.py _run_unified_analysis() from 87 LOC to ≤60 LOC.
+Script to refactor analyzer/core.py _run_unified_analysis() from 87 LOC to <=60 LOC.
 Extracts result handling into helper functions.
 """
 
@@ -116,7 +116,7 @@ new_function = '''    def _run_unified_analysis(
         """
         Run analysis using the unified analyzer pipeline.
 
-        Refactored to comply with NASA Rule 4 (≤60 lines per function).
+        Refactored to comply with NASA Rule 4 (<=60 lines per function).
         Helper functions handle file/directory analysis, result formatting, and errors.
         """
         try:

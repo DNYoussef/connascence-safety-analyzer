@@ -265,7 +265,7 @@ class ConnascenceAnalyzer:
         """
         Run analysis using the unified analyzer pipeline.
 
-        Refactored to comply with NASA Rule 4 (≤60 lines per function).
+        Refactored to comply with NASA Rule 4 (<=60 lines per function).
         Helper functions handle file/directory analysis, result formatting, and errors.
         """
         try:
@@ -539,7 +539,7 @@ def create_parser() -> argparse.ArgumentParser:
     """
     Create command-line argument parser.
 
-    Refactored to comply with NASA Rule 4 (≤60 lines per function).
+    Refactored to comply with NASA Rule 4 (<=60 lines per function).
     Helper functions organize arguments into logical groups.
     """
     parser = argparse.ArgumentParser(
@@ -855,7 +855,7 @@ def main():
     """
     Main entry point for command-line execution.
 
-    Refactored to comply with NASA Rule 4 (≤60 lines per function).
+    Refactored to comply with NASA Rule 4 (<=60 lines per function).
     Helper functions handle distinct logical sections.
     """
     parser = create_parser()

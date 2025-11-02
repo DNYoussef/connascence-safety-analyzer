@@ -658,7 +658,7 @@ class ConnascenceDetector(ast.NodeVisitor):
         """
         Process magic literals with formal grammar context.
 
-        Refactored to comply with NASA Rule 4 (≤60 lines per function).
+        Refactored to comply with NASA Rule 4 (<=60 lines per function).
         Helper functions handle formal analysis, legacy processing, and global checks.
         """
         # NASA Rule 5: Input validation assertion
