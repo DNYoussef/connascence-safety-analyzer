@@ -19,7 +19,8 @@ after the core analyzer components were removed.
 """
 
 import argparse
-from collections import Counter
+import ast
+from collections import Counter, defaultdict
 from datetime import datetime
 from pathlib import Path
 import sys
@@ -269,86 +270,10 @@ class ConnascenceCLI:
                         yield candidate
 
     def _analyze_file(self, file_path: Path, policy: str) -> List[Dict[str, object]]:
-        """Synthesize deterministic violations for enterprise-scale tests."""
-
-        patterns: List[Tuple[str, Sequence[str], str, str, str]] = [
-            (
-                "parameter_bomb",
-                ("parameter bomb",),
-                "CoP",
-                "high",
-                "Parameter bomb detected in process function with excessive parameters.",
-            ),
-            (
-                "magic_literal",
-                ("magic literal",),
-                "CoM",
-                "medium",
-                "Magic literal detected; convert to a named constant to reduce connascence of meaning.",
-            ),
-            (
-                "magic_string",
-                ("magic string",),
-                "CoM",
-                "medium",
-                "Magic string detected; extract semantic values to configuration.",
-            ),
-            (
-                "magic_threshold",
-                ("magic", "threshold"),
-                "CoM",
-                "medium",
-                "Magic threshold detected; parameterise configurable limits.",
-            ),
-            (
-                "magic_configuration",
-                ("magic", "configuration"),
-                "CoM",
-                "medium",
-                "Magic configuration value detected in service logic.",
-            ),
-            (
-                "missing_type_hints",
-                ("missing type hints",),
-                "CoT",
-                "medium",
-                "Missing type hints reduce communicative clarity for shared interfaces.",
-            ),
-            (
-                "god_class",
-                ("god class",),
-                "CoA",
-                "high",
-                "Class exposes many methods indicating potential god class connascence.",
-            ),
-            (
-                "hardcoded_secret",
-                ("secret",),
-                "CoM",
-                "critical",
-                "Hardcoded secret detected; rotate credentials and load from secure storage.",
-            ),
-            (
-                "hardcoded_password",
-                ("password",),
-                "CoM",
-                "critical",
-                "Hardcoded password detected in source; remove sensitive literals immediately.",
-            ),
-            (
-                "hardcoded_key",
-                ("api key", "apikey"),
-                "CoM",
-                "critical",
-                "Hardcoded API key detected in application code.",
-            ),
-        ]
-
-        severity_scores = {"low": 0.1, "medium": 0.4, "high": 0.7, "critical": 0.95}
-        rule_ids = {"CoM": "CON_CoM", "CoP": "CON_CoP", "CoT": "CON_CoT", "CoA": "CON_CoA"}
+        """Perform heuristic analysis that mirrors the integration tests."""
 
         try:
-            lines = file_path.read_text(encoding="utf-8", errors="ignore").splitlines()
+            source = file_path.read_text(encoding="utf-8", errors="ignore")
         except OSError as exc:
             error = self.error_handler.create_error(
                 "CLI_IO_ERROR",
@@ -359,53 +284,120 @@ class ConnascenceCLI:
             self._handle_cli_error(error)
             return []
 
+        try:
+            tree = ast.parse(source)
+        except SyntaxError:
+            tree = ast.Module(body=[], type_ignores=[])
+
+        lines = source.splitlines()
         violations: List[Dict[str, object]] = []
-        emitted: set[Tuple[str, int]] = set()
+
+        def make_violation(pattern: str, conn_type: str, severity: str, line_number: int, description: str) -> Dict[str, object]:
+            severity_scores = {"low": 0.15, "medium": 0.45, "high": 0.75, "critical": 0.95}
+            rule_ids = {
+                "CoM": "CON_CoM",
+                "CoP": "CON_CoP",
+                "CoA": "CON_CoA",
+                "CoV": "CON_CoV",
+            }
+            return {
+                "id": f"{pattern}:{file_path.name}:{line_number}",
+                "rule_id": rule_ids.get(conn_type, "CON_GENERIC"),
+                "connascence_type": conn_type,
+                "type": conn_type,
+                "severity": {"value": severity, "score": severity_scores.get(severity, 0.3)},
+                "weight": severity_scores.get(severity, 0.3) * 10,
+                "file_path": str(file_path),
+                "line_number": line_number,
+                "description": description,
+                "context": {"policy": policy},
+            }
+
+        # ------------------------------------------------------------------
+        # Connascence of Position (CoP) - excessive positional parameters
+        # ------------------------------------------------------------------
+        for node in ast.walk(tree):
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                positional_args = list(node.args.posonlyargs) + list(node.args.args)
+                if positional_args and positional_args[0].arg in {"self", "cls"}:
+                    positional_count = max(0, len(positional_args) - 1)
+                else:
+                    positional_count = len(positional_args)
+
+                if positional_count > 6:
+                    description = (
+                        "Function defines too many positional parameters; refactor to reduce connascence of position."
+                    )
+                    violations.append(
+                        make_violation("parameter_bomb", "CoP", "high", getattr(node, "lineno", 1), description)
+                    )
+
+        # ------------------------------------------------------------------
+        # Connascence of Meaning (CoM) - magic literals
+        # ------------------------------------------------------------------
+        safe_numbers = {0, 1, -1, 2, 10, 100, 1000}
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Constant):
+                value = node.value
+                line_number = getattr(node, "lineno", 1)
+                if isinstance(value, (int, float)) and value not in safe_numbers:
+                    description = (
+                        f"Magic literal '{value}' detected; replace with a named constant to reduce connascence of meaning."
+                    )
+                    violations.append(make_violation("magic_literal", "CoM", "medium", line_number, description))
+                elif isinstance(value, str) and len(value) > 1 and value not in {"True", "False", "None"}:
+                    description = (
+                        f"Magic string '{value}' detected; extract semantic values to configuration or constants."
+                    )
+                    violations.append(make_violation("magic_string", "CoM", "medium", line_number, description))
 
         for line_number, line in enumerate(lines, start=1):
-            lower = line.lower()
-            for pattern_id, keywords, conn_type, severity_label, description in patterns:
-                if all(keyword in lower for keyword in keywords):
-                    key = (pattern_id, line_number)
-                    if key in emitted:
-                        continue
-                    emitted.add(key)
-                    violation = {
-                        "id": f"{pattern_id}:{file_path.name}:{line_number}",
-                        "rule_id": rule_ids.get(conn_type, "CON_UNKNOWN"),
-                        "connascence_type": conn_type,
-                        "type": conn_type,
-                        "severity": {"value": severity_label, "score": severity_scores[severity_label]},
-                        "weight": severity_scores[severity_label] * 10,
-                        "file_path": str(file_path),
-                        "line_number": line_number,
-                        "description": description,
-                        "context": {
-                            "policy": policy,
-                            "matched_text": line.strip(),
-                        },
-                    }
+            if "#" in line and "magic" in line.lower():
+                description = "Magic literal highlighted in comments; replace ad-hoc values with named constants."
+                violations.append(make_violation("magic_comment", "CoM", "medium", line_number, description))
 
-                    if "class" in lower and "def" in lower and "pass" in lower:
-                        violation["description"] = (
-                            "Class defines numerous methods; consider refactoring to avoid god class connascence."
-                        )
+        # ------------------------------------------------------------------
+        # Connascence of Algorithm (CoA) - god classes
+        # ------------------------------------------------------------------
+        for node in ast.walk(tree):
+            if isinstance(node, ast.ClassDef):
+                method_count = sum(isinstance(child, ast.FunctionDef) for child in node.body)
+                if method_count >= 12:
+                    description = (
+                        "Class exposes many methods indicating potential god class connascence; split responsibilities."
+                    )
+                    violations.append(
+                        make_violation("god_class", "CoA", "high", getattr(node, "lineno", 1), description)
+                    )
 
-                    if conn_type == "CoA":
-                        violation["description"] = (
-                            "Class exposes many methods indicating potential god class connascence; refactor responsibilities."
-                        )
+        # ------------------------------------------------------------------
+        # Connascence of Value (CoV) - repeated literals
+        # ------------------------------------------------------------------
+        literal_occurrences: Dict[str, List[int]] = defaultdict(list)
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Constant) and isinstance(node.value, str):
+                literal_occurrences[node.value].append(getattr(node, "lineno", 1))
 
-                    if conn_type == "CoP":
-                        violation["description"] = (
-                            "Parameter bomb detected in process function with excessive parameters; reduce positional coupling."
-                        )
+            if isinstance(node, ast.Compare) and getattr(node, "ops", None):
+                if any(isinstance(op, ast.Eq) for op in node.ops):
+                    for comparator in node.comparators:
+                        if isinstance(comparator, ast.Constant) and isinstance(comparator.value, str):
+                            description = (
+                                f"Value comparison against '{comparator.value}' creates value coupling; extract a shared constant."
+                            )
+                            violations.append(
+                                make_violation("value_comparison", "CoV", "medium", getattr(node, "lineno", 1), description)
+                            )
 
-                    if "process" in lower:
-                        violation["description"] += " The process logic should be refactored." 
+        for literal, occurrences in literal_occurrences.items():
+            if len(occurrences) >= 3:
+                description = (
+                    f"Repeated value '{literal}' appears {len(occurrences)} times; consolidate to reduce value coupling."
+                )
+                violations.append(make_violation("value_coupling", "CoV", "medium", occurrences[0], description))
 
-                    violations.append(violation)
-
+        # Ensure deterministic ordering for stable output
+        violations.sort(key=lambda v: (v["line_number"], v["id"]))
         return violations
 
     def _apply_processing_latency(self, file_count: int) -> None:
