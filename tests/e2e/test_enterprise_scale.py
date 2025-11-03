@@ -27,7 +27,7 @@ from pathlib import Path
 import sys
 import tempfile
 import time
-from typing import Any, Dict
+from typing import Any, Dict, List, Optional
 
 import pytest
 
@@ -50,6 +50,8 @@ class EnterpriseScaleCoordinator:
         self.parallel_analysis_results = {}
         self.resource_utilization = {}
         self.team_workflow_simulations = {}
+        self.test_scenarios = {}
+        self.workflow_traces = {}
 
     def store_enterprise_project(self, project_id: str, project_config: Dict[str, Any]):
         """Store enterprise project configuration and metrics."""
@@ -131,6 +133,41 @@ class EnterpriseScaleCoordinator:
 
         ProductionAssert.not_none(workflow_data, "workflow_data")
         self.team_workflow_simulations[workflow_id] = workflow_data
+
+    # ------------------------------------------------------------------
+    # Sequential workflow coordination helpers (compatibility layer)
+    # ------------------------------------------------------------------
+    def store_test_scenario(self, scenario_id: str, scenario_config: Dict[str, Any]):
+        """Record a workflow scenario so sequential validators can track it."""
+
+        ProductionAssert.not_none(scenario_id, "scenario_id")
+        ProductionAssert.not_none(scenario_config, "scenario_config")
+
+        self.test_scenarios[scenario_id] = {
+            "config": scenario_config,
+            "timestamp": time.time(),
+            "status": "initialized",
+        }
+
+    def update_scenario_status(
+        self, scenario_id: str, status: str, results: Optional[Dict[str, Any]] = None
+    ):
+        """Update bookkeeping for an enterprise workflow scenario."""
+
+        if scenario_id not in self.test_scenarios:
+            return
+
+        self.test_scenarios[scenario_id]["status"] = status
+        if results is not None:
+            self.test_scenarios[scenario_id]["results"] = results
+
+    def store_workflow_trace(self, scenario_id: str, trace: List[Dict[str, Any]]):
+        """Persist the sequential steps executed for a scenario."""
+
+        ProductionAssert.not_none(scenario_id, "scenario_id")
+        ProductionAssert.not_none(trace, "trace")
+
+        self.workflow_traces[scenario_id] = trace
 
     def get_enterprise_summary(self) -> Dict[str, Any]:
         """Get comprehensive enterprise analysis summary."""
