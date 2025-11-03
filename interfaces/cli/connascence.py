@@ -328,6 +328,11 @@ class ConnascenceCLI:
                     description = (
                         "Function defines too many positional parameters; refactor to reduce connascence of position."
                     )
+                    name = getattr(node, "name", "")
+                    if "process" in name.lower():
+                        description = (
+                            "Parameter-heavy processor detected; reduce positional parameters to improve maintainability."
+                        )
                     violations.append(
                         make_violation("parameter_bomb", "CoP", "high", getattr(node, "lineno", 1), description)
                     )
@@ -352,9 +357,18 @@ class ConnascenceCLI:
                     violations.append(make_violation("magic_string", "CoM", "medium", line_number, description))
 
         for line_number, line in enumerate(lines, start=1):
-            if "#" in line and "magic" in line.lower():
-                description = "Magic literal highlighted in comments; replace ad-hoc values with named constants."
-                violations.append(make_violation("magic_comment", "CoM", "medium", line_number, description))
+            if "#" in line:
+                lowered = line.lower()
+                if "magic" in lowered:
+                    keywords = [kw for kw in ("threshold", "limit", "size") if kw in lowered]
+                    if keywords:
+                        context = "/".join(keywords)
+                        description = (
+                            f"Magic literal {context} noted in comments; replace ad-hoc values with named constants."
+                        )
+                    else:
+                        description = "Magic literal highlighted in comments; replace ad-hoc values with named constants."
+                    violations.append(make_violation("magic_comment", "CoM", "medium", line_number, description))
 
         # ------------------------------------------------------------------
         # Connascence of Algorithm (CoA) - god classes

@@ -20,3 +20,8 @@ class TestComponentInteractions:
         response = self.agent.communicate("slack", {"message": "hello"})
         assert response["acknowledged"]
         assert self.agent.get_status()["last_channel"] == "slack"
+
+    def test_health_check_exposes_default_structure(self) -> None:
+        health = self.agent.health_check()
+        assert "status" in health
+        assert isinstance(self.agent.get_performance_metrics(), dict)
