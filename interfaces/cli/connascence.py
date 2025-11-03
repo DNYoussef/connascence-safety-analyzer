@@ -109,6 +109,37 @@ class ConnascenceCLI:
         """Run the CLI with given arguments."""
         parsed_args = self.parse_args(args)
 
+        # Backwards compatibility: allow an optional ``scan`` command prefix
+        # before the actual paths. Earlier test suites and integrations invoke
+        # the CLI as ``connascence scan <path>`` even though the parser only
+        # accepts positional paths. We normalise the arguments here so that the
+        # legacy command style is treated the same as calling the CLI directly
+        # with file-system paths.
+        if getattr(parsed_args, "paths", None):
+            first_token = parsed_args.paths[0]
+            looks_like_command = first_token.lower() == "scan"
+            # Treat it as a command only when additional positional arguments
+            # are provided or when there is no path on disk literally named
+            # "scan". This preserves support for directories legitimately
+            # called ``scan``.
+            if looks_like_command and (
+                len(parsed_args.paths) > 1 or not Path(first_token).exists()
+            ):
+                parsed_args.paths = parsed_args.paths[1:]
+                parsed_args.invoked_command = "scan"
+
+        # If ``scan`` was provided without any subsequent paths, surface the
+        # same error message that a missing positional argument would trigger.
+        if getattr(parsed_args, "invoked_command", None) == "scan" and not parsed_args.paths:
+            error = self.error_handler.create_error(
+                "CLI_ARGUMENT_INVALID",
+                "No paths specified for analysis",
+                ERROR_SEVERITY["HIGH"],
+                {"required_argument": "paths"},
+            )
+            self._handle_cli_error(error)
+            return EXIT_INVALID_ARGUMENTS
+
         # Handle policy listing
         if parsed_args.list_policies:
             print("Available policy names:")
