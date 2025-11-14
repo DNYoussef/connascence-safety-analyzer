@@ -61,10 +61,10 @@ schedule:
       - CLARITY032  # Swallowed exceptions
 
   week_3:
-    name: "Medium Severity + NASA Compliance"
-    duration: "2025-11-27 to 2025-12-03"
-    description: "Add medium severity violations, full NASA standard checks"
-    fail_on: medium
+    name: "Gate 2: CRITICAL + HIGH Enforcement (ACTIVE)"
+    duration: "2025-11-13 to 2025-11-19"
+    description: "Week 3 Phase 2 Complete - God object eliminated, thin helpers fixed, NASA compliance 100%"
+    fail_on: high
     analyzers:
       clarity_linter: true
       connascence_analyzer: true
