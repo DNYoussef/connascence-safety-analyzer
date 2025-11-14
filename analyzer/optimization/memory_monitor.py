@@ -238,7 +238,11 @@ class MemoryMonitor:
         self._alert_callbacks: List[Callable[[str, Dict], None]] = []
 
         # Process monitoring
-        self._process = psutil.Process(os.getpid())
+        try:
+            self._process = psutil.Process(os.getpid())
+        except (psutil.NoSuchProcess, psutil.AccessDenied):
+            # Fallback for testing environments or restricted access
+            self._process = None
         self._start_time = time.time()
         self._emergency_cleanup_callbacks: List[Callable[[], None]] = []
 
@@ -294,8 +298,14 @@ class MemoryMonitor:
         """Take memory usage snapshot and analyze."""
         try:
             # Get process memory info
-            memory_info = self._process.memory_info()
-            memory_percent = self._process.memory_percent()
+            if self._process:
+                memory_info = self._process.memory_info()
+                memory_percent = self._process.memory_percent()
+            else:
+                # Fallback when process is not available
+                import resource
+                memory_info = type('MemInfo', (), {'rss': 0, 'vms': 0})()
+                memory_percent = 0.0
 
             # Get system memory info
             system_memory = psutil.virtual_memory()

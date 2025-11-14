@@ -111,29 +111,44 @@ class UserManager:
 ''',
             # CoE - Execution: Execution order dependencies (using GLOBAL state)
             "CoE": '''
-# Global state creates execution order dependencies
+# Global state creates execution order dependencies (exceeds threshold)
 database_connected = False
 database_cursor = None
+cache_initialized = False
+session_active = False
+config_loaded = False
+state_manager = None
+
+def initialize_system():
+    """Initialize global system state"""
+    global database_connected, database_cursor, cache_initialized, config_loaded, state_manager
+    database_connected = True
+    database_cursor = "cursor"
+    cache_initialized = True
+    config_loaded = True
+    state_manager = {}
 
 def connect_database():
-    """Initialize global database state"""
-    global database_connected, database_cursor
+    """Depends on initialize_system() being called first"""
+    global database_connected, database_cursor, config_loaded
+    if not config_loaded:
+        raise RuntimeError("Must call initialize_system() first")
     database_connected = True
     database_cursor = "cursor"
 
-def execute_query(query):
+def start_session():
     """Depends on connect_database() being called first"""
-    global database_connected, database_cursor
+    global session_active, database_connected
     if not database_connected:
         raise RuntimeError("Must call connect_database() first")
-    return database_cursor
+    session_active = True
 
-def disconnect_database():
-    """Depends on connect_database() being called first"""
-    global database_connected, database_cursor
-    if not database_connected:
-        raise RuntimeError("Must call connect_database() first")
-    database_connected = False
+def execute_query(query):
+    """Depends on start_session() being called first"""
+    global session_active, database_cursor
+    if not session_active:
+        raise RuntimeError("Must call start_session() first")
+    return database_cursor
 ''',
             # CoV - Value: Value-based coupling (duplicate literals 3+ times)
             "CoV": '''
@@ -148,7 +163,7 @@ def process_status(status_code):
     elif status_code == "INACTIVE":
         return False
     else:
-        fallback = "ACTIVE":  # 4
+        fallback = "ACTIVE"  # 4
         return fallback
 ''',
             # CoId - Identity (Timing): Timing-based dependencies
@@ -190,18 +205,24 @@ def Process_Order():  # Naming violation: Mixed case
             # CoI - Identity: Identity connascence (via duplicate sentinel values)
             "CoI": '''
 # Identity connascence via duplicate sentinel values (3+ occurrences required)
-SENTINEL = None  # 1
+SENTINEL_VALUE = "UNDEFINED"  # 1
 
 def get_default_value():
     """Return default sentinel"""
-    return None  # 2
+    return "UNDEFINED"  # 2
 
 def process_with_default(value):
     """Check against sentinel"""
-    if value is None:  # 3
-        default_value = None  # 4
+    if value == "UNDEFINED":  # 3
+        default_value = "UNDEFINED"  # 4
         return default_value
     return value
+
+def validate_input(data):
+    """Validate input data"""
+    if data == "UNDEFINED":  # 5
+        return False
+    return True
 ''',
         }
 

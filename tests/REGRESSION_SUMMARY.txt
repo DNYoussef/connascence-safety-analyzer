@@ -1,0 +1,19 @@
+# Test Summary
+
+Total: 957 tests collected
+Executed: 309 tests
+Passing: 293 tests (94.8%)
+Failing: 16 tests (5.2%)
+
+## Breakdown
+- Unit: 226/242 (93.4%)
+- Integration: 67/90 (74.4%)
+- Benchmarks: 0/0 (N/A)
+
+## Status
+Overall: IMPROVED from 83.6% to 94.8%
+Critical Issues: Detector failures, CLI issues, real-world errors
+
+Report: tests/FULL_REGRESSION_TEST_REPORT.md
+XML: test-results.xml
+

@@ -1,1 +1,251 @@
-INFO     analyzer.reporting.coordinator:coordinator.py:76 Unified Reporting Coordinator initialized with all format handlers
+INFO     analyzer.optimization.resource_manager:resource_manager.py:132 Periodic resource cleanup started
+INFO     analyzer.optimization.resource_manager:resource_manager.py:362 Resource cleanup loop started
+INFO     analyzer.optimization.memory_monitor:memory_monitor.py:285 Memory monitoring loop started
+INFO     analyzer.optimization.memory_monitor:memory_monitor.py:259 Memory monitoring started
+INFO     analyzer.unified_analyzer:unified_analyzer.py:509 Unified Connascence Analyzer initialized with: AST Analyzer, Orchestrator, MECE Analyzer, Smart Engine
+ERROR    analyzer.optimization.memory_monitor:memory_monitor.py:336 Failed to take memory snapshot: No module named 'resource'
+INFO     analyzer.unified_analyzer:unified_analyzer.py:543 Starting batch unified analysis of C:\Users\17175\Desktop\connascence\test_packages\express
+INFO     analyzer.unified_analyzer:unified_analyzer.py:635 Running analysis phases with direct fallback implementation
+INFO     analyzer.unified_analyzer:unified_analyzer.py:663 Phase 1-2: Running core AST analysis with enhanced detectors
+WARNING  analyzer.unified_analyzer:unified_analyzer.py:315 [analyzer:46cfabcf] 'UnifiedConnascenceAnalyzer' object has no attribute 'orchestrator' (Code: 5001)
+WARNING  analyzer.unified_analyzer:unified_analyzer.py:315 [analyzer:46cfabcf] 'MetricsCalculator' object has no attribute 'calculate_metrics' (Code: 5001)
+WARNING  analyzer.unified_analyzer:unified_analyzer.py:315 [analyzer:46cfabcf] 'RecommendationGenerator' object has no attribute 'generate_recommendations' (Code: 5001)
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1295 Cache Performance Summary:
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1296   Hit Rate: 0.0% (Target: >80%)
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1297   Hits: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1298   Misses: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1299   Warm Requests: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1300   Batch Loads: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1304   Memory Usage: 0.0MB / 100MB
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1305   Evictions: 0
+WARNING  analyzer.unified_analyzer:unified_analyzer.py:1309 Low cache hit rate - consider increasing warm-up files
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1488 === COMPREHENSIVE SYSTEM MONITORING REPORT ===
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1493 Memory Monitoring Summary:
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1494   Current Usage: 0.0MB
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1495   Peak Usage: 0.0MB
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1496   Average Usage: 0.0MB
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1497   Monitoring Duration: 0.0 minutes
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1498   Leak Detected: False
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1510 Resource Management Summary:
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1511   Resources Created: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1512   Resources Cleaned: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1513   Currently Tracked: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1514   Peak Tracked: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1515   Cleanup Success Rate: 100.0%
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1516   Resource Leaks: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1517   Emergency Cleanups: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1518   Total Size: 0.0MB
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1526   Resource Breakdown by Type:
+INFO     analyzer.unified_analyzer:unified_analyzer.py:2030 Unified analysis complete in 108ms
+INFO     analyzer.unified_analyzer:unified_analyzer.py:2031 Found 0 total violations across all analyzers
+WARNING  analyzer.unified_analyzer:unified_analyzer.py:2034 Analysis completed with 2 errors
+WARNING  analyzer.optimization.memory_monitor:memory_monitor.py:253 Memory monitoring already active
+INFO     analyzer.unified_analyzer:unified_analyzer.py:509 Unified Connascence Analyzer initialized with: AST Analyzer, Orchestrator, MECE Analyzer, Smart Engine
+ERROR    analyzer.optimization.memory_monitor:memory_monitor.py:336 Failed to take memory snapshot: No module named 'resource'
+ERROR    analyzer.optimization.memory_monitor:memory_monitor.py:336 Failed to take memory snapshot: No module named 'resource'
+ERROR    analyzer.optimization.memory_monitor:memory_monitor.py:336 Failed to take memory snapshot: No module named 'resource'
+ERROR    analyzer.optimization.memory_monitor:memory_monitor.py:336 Failed to take memory snapshot: No module named 'resource'
+INFO     analyzer.unified_analyzer:unified_analyzer.py:543 Starting batch unified analysis of C:\Users\17175\Desktop\connascence\analyzer
+INFO     analyzer.unified_analyzer:unified_analyzer.py:635 Running analysis phases with direct fallback implementation
+INFO     analyzer.unified_analyzer:unified_analyzer.py:663 Phase 1-2: Running core AST analysis with enhanced detectors
+ERROR    analyzer.optimization.memory_monitor:memory_monitor.py:336 Failed to take memory snapshot: No module named 'resource'
+WARNING  analyzer.unified_analyzer:unified_analyzer.py:315 [analyzer:9f5e7b40] 'UnifiedConnascenceAnalyzer' object has no attribute 'orchestrator' (Code: 5001)
+WARNING  analyzer.unified_analyzer:unified_analyzer.py:315 [analyzer:9f5e7b40] 'MetricsCalculator' object has no attribute 'calculate_metrics' (Code: 5001)
+WARNING  analyzer.unified_analyzer:unified_analyzer.py:315 [analyzer:9f5e7b40] 'RecommendationGenerator' object has no attribute 'generate_recommendations' (Code: 5001)
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1295 Cache Performance Summary:
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1296   Hit Rate: 0.0% (Target: >80%)
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1297   Hits: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1298   Misses: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1299   Warm Requests: 20
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1300   Batch Loads: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1304   Memory Usage: 0.0MB / 100MB
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1305   Evictions: 0
+WARNING  analyzer.unified_analyzer:unified_analyzer.py:1309 Low cache hit rate - consider increasing warm-up files
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1488 === COMPREHENSIVE SYSTEM MONITORING REPORT ===
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1493 Memory Monitoring Summary:
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1494   Current Usage: 0.0MB
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1495   Peak Usage: 0.0MB
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1496   Average Usage: 0.0MB
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1497   Monitoring Duration: 0.5 minutes
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1498   Leak Detected: False
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1510 Resource Management Summary:
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1511   Resources Created: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1512   Resources Cleaned: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1513   Currently Tracked: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1514   Peak Tracked: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1515   Cleanup Success Rate: 100.0%
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1516   Resource Leaks: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1517   Emergency Cleanups: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1518   Total Size: 0.0MB
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1526   Resource Breakdown by Type:
+INFO     analyzer.unified_analyzer:unified_analyzer.py:2030 Unified analysis complete in 4374ms
+INFO     analyzer.unified_analyzer:unified_analyzer.py:2031 Found 0 total violations across all analyzers
+WARNING  analyzer.unified_analyzer:unified_analyzer.py:2034 Analysis completed with 2 errors
+WARNING  analyzer.optimization.memory_monitor:memory_monitor.py:253 Memory monitoring already active
+INFO     analyzer.unified_analyzer:unified_analyzer.py:509 Unified Connascence Analyzer initialized with: AST Analyzer, Orchestrator, MECE Analyzer, Smart Engine
+INFO     analyzer.unified_analyzer:unified_analyzer.py:543 Starting batch unified analysis of C:\Users\17175\AppData\Local\Temp\tmp20jl3n4_
+INFO     analyzer.unified_analyzer:unified_analyzer.py:635 Running analysis phases with direct fallback implementation
+INFO     analyzer.unified_analyzer:unified_analyzer.py:663 Phase 1-2: Running core AST analysis with enhanced detectors
+WARNING  analyzer.unified_analyzer:unified_analyzer.py:315 [analyzer:d441e821] 'UnifiedConnascenceAnalyzer' object has no attribute 'orchestrator' (Code: 5001)
+WARNING  analyzer.unified_analyzer:unified_analyzer.py:315 [analyzer:d441e821] 'MetricsCalculator' object has no attribute 'calculate_metrics' (Code: 5001)
+WARNING  analyzer.unified_analyzer:unified_analyzer.py:315 [analyzer:d441e821] 'RecommendationGenerator' object has no attribute 'generate_recommendations' (Code: 5001)
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1295 Cache Performance Summary:
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1296   Hit Rate: 0.0% (Target: >80%)
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1297   Hits: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1298   Misses: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1299   Warm Requests: 3
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1300   Batch Loads: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1304   Memory Usage: 0.0MB / 100MB
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1305   Evictions: 0
+WARNING  analyzer.unified_analyzer:unified_analyzer.py:1309 Low cache hit rate - consider increasing warm-up files
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1488 === COMPREHENSIVE SYSTEM MONITORING REPORT ===
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1493 Memory Monitoring Summary:
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1494   Current Usage: 0.0MB
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1495   Peak Usage: 0.0MB
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1496   Average Usage: 0.0MB
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1497   Monitoring Duration: 0.5 minutes
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1498   Leak Detected: False
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1510 Resource Management Summary:
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1511   Resources Created: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1512   Resources Cleaned: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1513   Currently Tracked: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1514   Peak Tracked: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1515   Cleanup Success Rate: 100.0%
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1516   Resource Leaks: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1517   Emergency Cleanups: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1518   Total Size: 0.0MB
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1526   Resource Breakdown by Type:
+INFO     analyzer.unified_analyzer:unified_analyzer.py:2030 Unified analysis complete in 11ms
+INFO     analyzer.unified_analyzer:unified_analyzer.py:2031 Found 0 total violations across all analyzers
+WARNING  analyzer.unified_analyzer:unified_analyzer.py:2034 Analysis completed with 2 errors
+WARNING  analyzer.optimization.memory_monitor:memory_monitor.py:253 Memory monitoring already active
+INFO     analyzer.unified_analyzer:unified_analyzer.py:509 Unified Connascence Analyzer initialized with: AST Analyzer, Orchestrator, MECE Analyzer, Smart Engine
+ERROR    analyzer.optimization.memory_monitor:memory_monitor.py:336 Failed to take memory snapshot: No module named 'resource'
+ERROR    analyzer.optimization.memory_monitor:memory_monitor.py:336 Failed to take memory snapshot: No module named 'resource'
+ERROR    analyzer.optimization.memory_monitor:memory_monitor.py:336 Failed to take memory snapshot: No module named 'resource'
+ERROR    analyzer.optimization.memory_monitor:memory_monitor.py:336 Failed to take memory snapshot: No module named 'resource'
+INFO     analyzer.unified_analyzer:unified_analyzer.py:543 Starting batch unified analysis of C:\Users\17175\Desktop\connascence\analyzer
+INFO     analyzer.unified_analyzer:unified_analyzer.py:635 Running analysis phases with direct fallback implementation
+INFO     analyzer.unified_analyzer:unified_analyzer.py:663 Phase 1-2: Running core AST analysis with enhanced detectors
+ERROR    analyzer.optimization.memory_monitor:memory_monitor.py:336 Failed to take memory snapshot: No module named 'resource'
+WARNING  analyzer.unified_analyzer:unified_analyzer.py:315 [analyzer:8c8982ac] 'UnifiedConnascenceAnalyzer' object has no attribute 'orchestrator' (Code: 5001)
+WARNING  analyzer.unified_analyzer:unified_analyzer.py:315 [analyzer:8c8982ac] 'MetricsCalculator' object has no attribute 'calculate_metrics' (Code: 5001)
+WARNING  analyzer.unified_analyzer:unified_analyzer.py:315 [analyzer:8c8982ac] 'RecommendationGenerator' object has no attribute 'generate_recommendations' (Code: 5001)
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1295 Cache Performance Summary:
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1296   Hit Rate: 0.0% (Target: >80%)
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1297   Hits: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1298   Misses: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1299   Warm Requests: 20
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1300   Batch Loads: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1304   Memory Usage: 0.0MB / 100MB
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1305   Evictions: 0
+WARNING  analyzer.unified_analyzer:unified_analyzer.py:1309 Low cache hit rate - consider increasing warm-up files
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1488 === COMPREHENSIVE SYSTEM MONITORING REPORT ===
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1493 Memory Monitoring Summary:
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1494   Current Usage: 0.0MB
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1495   Peak Usage: 0.0MB
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1496   Average Usage: 0.0MB
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1497   Monitoring Duration: 1.0 minutes
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1498   Leak Detected: False
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1510 Resource Management Summary:
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1511   Resources Created: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1512   Resources Cleaned: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1513   Currently Tracked: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1514   Peak Tracked: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1515   Cleanup Success Rate: 100.0%
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1516   Resource Leaks: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1517   Emergency Cleanups: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1518   Total Size: 0.0MB
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1526   Resource Breakdown by Type:
+INFO     analyzer.unified_analyzer:unified_analyzer.py:2030 Unified analysis complete in 4258ms
+INFO     analyzer.unified_analyzer:unified_analyzer.py:2031 Found 0 total violations across all analyzers
+WARNING  analyzer.unified_analyzer:unified_analyzer.py:2034 Analysis completed with 2 errors
+WARNING  analyzer.optimization.memory_monitor:memory_monitor.py:253 Memory monitoring already active
+INFO     analyzer.unified_analyzer:unified_analyzer.py:509 Unified Connascence Analyzer initialized with: AST Analyzer, Orchestrator, MECE Analyzer, Smart Engine
+INFO     analyzer.unified_analyzer:unified_analyzer.py:543 Starting batch unified analysis of C:\Users\17175\Desktop\connascence\test_packages
+INFO     analyzer.unified_analyzer:unified_analyzer.py:635 Running analysis phases with direct fallback implementation
+INFO     analyzer.unified_analyzer:unified_analyzer.py:663 Phase 1-2: Running core AST analysis with enhanced detectors
+ERROR    analyzer.optimization.memory_monitor:memory_monitor.py:336 Failed to take memory snapshot: No module named 'resource'
+WARNING  analyzer.unified_analyzer:unified_analyzer.py:315 [analyzer:8ddadfc3] 'UnifiedConnascenceAnalyzer' object has no attribute 'orchestrator' (Code: 5001)
+WARNING  analyzer.unified_analyzer:unified_analyzer.py:315 [analyzer:8ddadfc3] 'MetricsCalculator' object has no attribute 'calculate_metrics' (Code: 5001)
+WARNING  analyzer.unified_analyzer:unified_analyzer.py:315 [analyzer:8ddadfc3] 'RecommendationGenerator' object has no attribute 'generate_recommendations' (Code: 5001)
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1295 Cache Performance Summary:
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1296   Hit Rate: 0.0% (Target: >80%)
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1297   Hits: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1298   Misses: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1299   Warm Requests: 26
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1300   Batch Loads: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1304   Memory Usage: 0.0MB / 100MB
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1305   Evictions: 0
+WARNING  analyzer.unified_analyzer:unified_analyzer.py:1309 Low cache hit rate - consider increasing warm-up files
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1488 === COMPREHENSIVE SYSTEM MONITORING REPORT ===
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1493 Memory Monitoring Summary:
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1494   Current Usage: 0.0MB
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1495   Peak Usage: 0.0MB
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1496   Average Usage: 0.0MB
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1497   Monitoring Duration: 1.1 minutes
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1498   Leak Detected: False
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1510 Resource Management Summary:
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1511   Resources Created: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1512   Resources Cleaned: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1513   Currently Tracked: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1514   Peak Tracked: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1515   Cleanup Success Rate: 100.0%
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1516   Resource Leaks: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1517   Emergency Cleanups: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1518   Total Size: 0.0MB
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1526   Resource Breakdown by Type:
+INFO     analyzer.unified_analyzer:unified_analyzer.py:2030 Unified analysis complete in 5803ms
+INFO     analyzer.unified_analyzer:unified_analyzer.py:2031 Found 0 total violations across all analyzers
+WARNING  analyzer.unified_analyzer:unified_analyzer.py:2034 Analysis completed with 2 errors
+WARNING  analyzer.optimization.memory_monitor:memory_monitor.py:253 Memory monitoring already active
+INFO     analyzer.unified_analyzer:unified_analyzer.py:509 Unified Connascence Analyzer initialized with: AST Analyzer, Orchestrator, MECE Analyzer, Smart Engine
+INFO     analyzer.unified_analyzer:unified_analyzer.py:543 Starting batch unified analysis of C:\Users\17175\Desktop\connascence\test_packages\curl
+INFO     analyzer.unified_analyzer:unified_analyzer.py:635 Running analysis phases with direct fallback implementation
+INFO     analyzer.unified_analyzer:unified_analyzer.py:663 Phase 1-2: Running core AST analysis with enhanced detectors
+WARNING  analyzer.unified_analyzer:unified_analyzer.py:315 [analyzer:4afcff2d] 'UnifiedConnascenceAnalyzer' object has no attribute 'orchestrator' (Code: 5001)
+WARNING  analyzer.unified_analyzer:unified_analyzer.py:315 [analyzer:4afcff2d] 'MetricsCalculator' object has no attribute 'calculate_metrics' (Code: 5001)
+WARNING  analyzer.unified_analyzer:unified_analyzer.py:315 [analyzer:4afcff2d] 'RecommendationGenerator' object has no attribute 'generate_recommendations' (Code: 5001)
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1295 Cache Performance Summary:
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1296   Hit Rate: 0.0% (Target: >80%)
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1297   Hits: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1298   Misses: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1299   Warm Requests: 16
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1300   Batch Loads: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1304   Memory Usage: 0.1MB / 100MB
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1305   Evictions: 0
+WARNING  analyzer.unified_analyzer:unified_analyzer.py:1309 Low cache hit rate - consider increasing warm-up files
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1488 === COMPREHENSIVE SYSTEM MONITORING REPORT ===
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1493 Memory Monitoring Summary:
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1494   Current Usage: 0.0MB
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1495   Peak Usage: 0.0MB
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1496   Average Usage: 0.0MB
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1497   Monitoring Duration: 1.1 minutes
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1498   Leak Detected: False
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1510 Resource Management Summary:
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1511   Resources Created: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1512   Resources Cleaned: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1513   Currently Tracked: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1514   Peak Tracked: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1515   Cleanup Success Rate: 100.0%
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1516   Resource Leaks: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1517   Emergency Cleanups: 0
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1518   Total Size: 0.0MB
+INFO     analyzer.unified_analyzer:unified_analyzer.py:1526   Resource Breakdown by Type:
+INFO     analyzer.unified_analyzer:unified_analyzer.py:2030 Unified analysis complete in 944ms
+INFO     analyzer.unified_analyzer:unified_analyzer.py:2031 Found 0 total violations across all analyzers
+WARNING  analyzer.unified_analyzer:unified_analyzer.py:2034 Analysis completed with 2 errors
+WARNING  analyzer.optimization.memory_monitor:memory_monitor.py:253 Memory monitoring already active
+INFO     analyzer.unified_analyzer:unified_analyzer.py:509 Unified Connascence Analyzer initialized with: AST Analyzer, Orchestrator, MECE Analyzer, Smart Engine
+ERROR    analyzer.optimization.memory_monitor:memory_monitor.py:336 Failed to take memory snapshot: No module named 'resource'
+ERROR    analyzer.optimization.memory_monitor:memory_monitor.py:336 Failed to take memory snapshot: No module named 'resource'
+ERROR    analyzer.optimization.memory_monitor:memory_monitor.py:336 Failed to take memory snapshot: No module named 'resource'
+ERROR    analyzer.optimization.memory_monitor:memory_monitor.py:336 Failed to take memory snapshot: No module named 'resource'
+ERROR    analyzer.optimization.memory_monitor:memory_monitor.py:336 Failed to take memory snapshot: No module named 'resource'
+ERROR    analyzer.optimization.memory_monitor:memory_monitor.py:336 Failed to take memory snapshot: No module named 'resource'
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     ERROR    analyzer.optimization.memory_monitor:memory_monitor.py:336 Failed to take memory snapshot: No module named 'resource'
+ERROR    analyzer.optimization.memory_monitor:memory_monitor.py:336 Failed to take memory snapshot: No module named 'resource'
+ERROR    analyzer.optimization.memory_monitor:memory_monitor.py:336 Failed to take memory snapshot: No module named 'resource'
+ERROR    analyzer.optimization.memory_monitor:memory_monitor.py:336 Failed to take memory snapshot: No module named 'resource'
+ERROR    analyzer.optimization.memory_monitor:memory_monitor.py:336 Failed to take memory snapshot: No module named 'resource'
+ERROR    analyzer.optimization.memory_monitor:memory_monitor.py:336 Failed to take memory snapshot: No module named 'resource'

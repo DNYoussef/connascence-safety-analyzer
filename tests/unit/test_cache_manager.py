@@ -24,27 +24,6 @@ from analyzer.architecture.cache_manager import CacheManager
 
 
 @pytest.fixture
-def mock_file_cache():
-    """
-    Create mock FileContentCache for testing.
-
-    Returns:
-        Mock FileContentCache with standard methods and attributes
-    """
-    cache = Mock()
-    cache._content_cache = {}
-    cache._ast_cache = {}
-    cache._stats = Mock()
-    cache._stats.memory_usage = 50 * 1024 * 1024  # 50MB
-    cache._stats.max_memory = 100 * 1024 * 1024  # 100MB
-    cache.get_ast_tree = Mock(return_value=None)
-    cache.get_file_content = Mock(return_value=None)
-    cache.get_file_lines = Mock(return_value=[])
-    cache.clear_cache = Mock()
-    return cache
-
-
-@pytest.fixture
 def cache_manager(mock_file_cache):
     """
     Create CacheManager instance with mocked dependencies.
@@ -55,21 +34,11 @@ def cache_manager(mock_file_cache):
     Returns:
         Configured CacheManager for testing
     """
-    with patch('analyzer.architecture.cache_manager.FileContentCache',
+    # Patch at the location where FileContentCache is imported
+    with patch('analyzer.optimization.file_cache.FileContentCache',
                return_value=mock_file_cache):
         manager = CacheManager(config={"max_memory": 100 * 1024 * 1024})
         return manager
-
-
-@pytest.fixture
-def sample_ast():
-    """
-    Create sample AST module for testing.
-
-    Returns:
-        ast.Module instance with basic structure
-    """
-    return ast.parse("x = 42\nprint(x)")
 
 
 @pytest.fixture
@@ -114,7 +83,7 @@ class TestCacheManagerInitialization:
 
     def test_init_default_config(self, mock_file_cache):
         """Test initialization with default configuration."""
-        with patch('analyzer.architecture.cache_manager.FileContentCache',
+        with patch('analyzer.optimization.file_cache.FileContentCache',
                    return_value=mock_file_cache):
             manager = CacheManager()
 
@@ -133,7 +102,7 @@ class TestCacheManagerInitialization:
             "warm_file_count": 20
         }
 
-        with patch('analyzer.architecture.cache_manager.FileContentCache',
+        with patch('analyzer.optimization.file_cache.FileContentCache',
                    return_value=mock_file_cache):
             manager = CacheManager(config=config)
 
@@ -142,7 +111,7 @@ class TestCacheManagerInitialization:
 
     def test_init_without_file_cache(self):
         """Test initialization when FileContentCache is unavailable."""
-        with patch('analyzer.architecture.cache_manager.FileContentCache',
+        with patch('analyzer.optimization.file_cache.FileContentCache',
                    side_effect=ImportError("Module not found")):
             manager = CacheManager()
 
@@ -473,7 +442,8 @@ class TestBatchPreload:
         small_file.write_text("x = 1" * 100)
 
         large_file = tmp_path / "large.py"
-        large_file.write_text("x = 1" * 200000)  # >1MB
+        # Create file >1MB (1024*1024 = 1048576 bytes)
+        large_file.write_text("x" * 2000000)  # 2MB
 
         cache_manager.batch_preload([small_file, large_file])
 
@@ -614,22 +584,26 @@ class TestOptimization:
 class TestEdgeCases:
     """Test edge cases and error conditions."""
 
-    def test_operations_without_cache_available(self):
+    def test_operations_without_cache_available(self, tmp_path):
         """Test all operations gracefully handle unavailable cache."""
-        with patch('analyzer.architecture.cache_manager.FileContentCache',
+        with patch('analyzer.optimization.file_cache.FileContentCache',
                    side_effect=ImportError("Module not found")):
             manager = CacheManager()
 
+            # Create test file for operations
+            test_file = tmp_path / "test.py"
+            test_file.write_text("x = 1")
+
             # All operations should handle missing cache gracefully
-            assert manager.get_cached_ast(Path("test.py")) is None
-            assert manager.get_cached_content(Path("test.py")) is None
-            assert manager.get_cached_lines(Path("test.py")) == []
+            assert manager.get_cached_ast(test_file) is None
+            assert manager.get_cached_content(test_file) is None
+            assert manager.get_cached_lines(test_file) == []
 
             # These should not raise exceptions
-            manager.cache_ast(Path("test.py"), ast.parse("x=1"))
-            manager.invalidate(Path("test.py"))
+            manager.cache_ast(test_file, ast.parse("x=1"))
+            manager.invalidate(test_file)
             manager.clear_all()
-            manager.warm_cache(Path("."))
+            manager.warm_cache(tmp_path)
             manager.log_performance()
 
     def test_empty_cache_statistics(self, cache_manager):
