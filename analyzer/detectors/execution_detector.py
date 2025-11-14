@@ -16,6 +16,8 @@ from .base import DetectorBase
 class ExecutionDetector(DetectorBase):
     """Detects execution-based coupling and control flow dependencies."""
 
+    SUPPORTED_EXTENSIONS = [".py"]
+
     def __init__(self, file_path: str, source_lines: List[str]):
         super().__init__(file_path, source_lines)
 

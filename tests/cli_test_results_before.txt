@@ -1,0 +1,307 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.5, pytest-7.4.3, pluggy-1.5.0 -- C:\Python312\python.exe
+cachedir: .pytest_cache
+hypothesis profile 'default'
+benchmark: 4.0.0 (defaults: timer=time.perf_counter disable_gc=False min_rounds=5 min_time=0.000005 max_time=1.0 calibration_precision=10 warmup=False warmup_iterations=100000)
+metadata: {'Python': '3.12.5', 'Platform': 'Windows-10-10.0.19045-SP0', 'Packages': {'pytest': '7.4.3', 'pluggy': '1.5.0'}, 'Plugins': {'anyio': '4.11.0', 'Faker': '18.13.0', 'hypothesis': '6.138.2', 'langsmith': '0.4.21', 'asyncio': '0.21.1', 'bandit': '0.6.1', 'benchmark': '4.0.0', 'cov': '4.1.0', 'env': '1.1.5', 'flask': '1.3.0', 'json-report': '1.5.0', 'metadata': '3.1.1', 'mock': '3.14.0', 'randomly': '3.16.0', 'timeout': '2.3.1', 'xdist': '3.6.1'}, 'JAVA_HOME': 'C:\\Program Files\\AdoptOpenJDK\\jre-8.0.265.01-hotspot\\'}
+Using --randomly-seed=3104351658
+rootdir: C:\Users\17175\Desktop\connascence\tests
+configfile: pytest.ini
+plugins: anyio-4.11.0, Faker-18.13.0, hypothesis-6.138.2, langsmith-0.4.21, asyncio-0.21.1, bandit-0.6.1, benchmark-4.0.0, cov-4.1.0, env-1.1.5, flask-1.3.0, json-report-1.5.0, metadata-3.1.1, mock-3.14.0, randomly-3.16.0, timeout-2.3.1, xdist-3.6.1
+asyncio: mode=Mode.STRICT
+collecting ... collected 20 items
+
+tests\test_cli.py::TestConnascenceCLI::test_parser_creation PASSED       [  5%]
+tests\test_cli.py::TestConnascenceCLI::test_baseline_command_parsing FAILED [ 10%]
+tests\test_cli.py::TestConnascenceCLI::test_scan_command_parsing FAILED  [ 15%]
+tests\test_cli.py::TestConnascenceCLI::test_autofix_command_parsing FAILED [ 20%]
+tests\test_cli.py::TestCLIExecution::test_cli_help FAILED                [ 25%]
+tests\test_cli.py::TestCLIExecution::test_cli_version FAILED             [ 30%]
+tests\test_cli.py::TestCLIScanCommand::test_scan_with_violations FAILED  [ 35%]
+tests\test_cli.py::TestCLIScanCommand::test_scan_json_output FAILED      [ 40%]
+tests\test_cli.py::TestCLIScanCommand::test_scan_with_policy FAILED      [ 45%]
+tests\test_cli.py::TestCLIScanCommand::test_scan_basic_execution FAILED  [ 50%]
+tests\test_cli.py::TestCLISubcommands::test_baseline_snapshot_command FAILED [ 55%]
+tests\test_cli.py::TestCLISubcommands::test_scan_diff_command FAILED     [ 60%]
+tests\test_cli.py::TestCLISubcommands::test_mcp_serve_command FAILED     [ 65%]
+tests\test_cli.py::TestCLIAutofixCommand::test_autofix_preview_mode FAILED [ 70%]
+tests\test_cli.py::TestCLIAutofixCommand::test_autofix_apply_mode FAILED [ 75%]
+tests\test_cli.py::TestCLIAutofixCommand::test_autofix_confidence_filtering FAILED [ 80%]
+tests\test_cli.py::TestCLIAutofixCommand::test_autofix_without_force_flag FAILED [ 85%]
+tests\test_cli.py::TestCLIIntegration::test_end_to_end_scan FAILED       [ 90%]
+tests\test_cli.py::TestCLIIntegration::test_cli_error_handling FAILED    [ 95%]
+tests\test_cli.py::TestCLIIntegration::test_verbose_logging PASSED       [100%]
+Run started:2025-11-13 22:15:43.536583
+
+Test results:
+	No issues identified.
+
+Code scanned:
+	Total lines of code: 0
+	Total lines skipped (#nosec): 0
+
+Run metrics:
+	Total issues (by severity):
+		Undefined: 0
+		Low: 0
+		Medium: 0
+		High: 0
+	Total issues (by confidence):
+		Undefined: 0
+		Low: 0
+		Medium: 0
+		High: 0
+Files skipped (0):
+
+
+================================== FAILURES ===================================
+______________ TestConnascenceCLI.test_baseline_command_parsing _______________
+C:\Python312\Lib\argparse.py:1932: in parse_known_args
+    namespace, args = self._parse_known_args(args, namespace)
+C:\Python312\Lib\argparse.py:2135: in _parse_known_args
+    positionals_end_index = consume_positionals(start_index)
+C:\Python312\Lib\argparse.py:2112: in consume_positionals
+    take_action(action, args)
+C:\Python312\Lib\argparse.py:1992: in take_action
+    argument_values = self._get_values(action, argument_strings)
+C:\Python312\Lib\argparse.py:2539: in _get_values
+    self._check_value(action, value)
+C:\Python312\Lib\argparse.py:2594: in _check_value
+    raise ArgumentError(action, msg % args)
+E   argparse.ArgumentError: argument action: invalid choice: 'snapshot' (choose from 'status', 'create', 'update')
+
+During handling of the above exception, another exception occurred:
+tests\test_cli.py:135: in test_baseline_command_parsing
+    args = parser.parse_args(["baseline", "snapshot", "--message", "Initial baseline"])
+C:\Python312\Lib\argparse.py:1896: in parse_args
+    args, argv = self.parse_known_args(args, namespace)
+C:\Python312\Lib\argparse.py:1932: in parse_known_args
+    namespace, args = self._parse_known_args(args, namespace)
+C:\Python312\Lib\argparse.py:2135: in _parse_known_args
+    positionals_end_index = consume_positionals(start_index)
+C:\Python312\Lib\argparse.py:2112: in consume_positionals
+    take_action(action, args)
+C:\Python312\Lib\argparse.py:2008: in take_action
+    action(self, namespace, argument_values, option_string)
+C:\Python312\Lib\argparse.py:1268: in __call__
+    subnamespace, arg_strings = parser.parse_known_args(arg_strings, None)
+C:\Python312\Lib\argparse.py:1934: in parse_known_args
+    self.error(str(err))
+C:\Python312\Lib\argparse.py:2671: in error
+    self.exit(2, _('%(prog)s: error: %(message)s\n') % args)
+C:\Python312\Lib\argparse.py:2658: in exit
+    _sys.exit(status)
+E   SystemExit: 2
+---------------------------- Captured stderr call -----------------------------
+usage: connascence baseline [-h] {status,create,update}
+connascence baseline: error: argument action: invalid choice: 'snapshot' (choose from 'status', 'create', 'update')
+________________ TestConnascenceCLI.test_scan_command_parsing _________________
+tests\test_cli.py:67: in test_scan_command_parsing
+    assert args.path == "/path/to/code"
+E   AttributeError: 'Namespace' object has no attribute 'path'. Did you mean: 'paths'?
+_______________ TestConnascenceCLI.test_autofix_command_parsing _______________
+tests\test_cli.py:104: in test_autofix_command_parsing
+    args = parser.parse_args(["autofix", "--preview"])
+C:\Python312\Lib\argparse.py:1900: in parse_args
+    self.error(msg)
+C:\Python312\Lib\argparse.py:2671: in error
+    self.exit(2, _('%(prog)s: error: %(message)s\n') % args)
+C:\Python312\Lib\argparse.py:2658: in exit
+    _sys.exit(status)
+E   SystemExit: 2
+---------------------------- Captured stderr call -----------------------------
+usage: connascence [-h] [--config CONFIG] [--verbose] [--version]
+                   [--skip-license-check] [--list-policies]
+                   {scan,scan-diff,baseline,autofix,explain,mcp,license} ...
+connascence: error: unrecognized arguments: --preview
+_______________________ TestCLIExecution.test_cli_help ________________________
+tests\test_cli.py:555: in test_cli_help
+    assert "connascence" in result.stdout.lower()
+E   AssertionError: assert 'connascence' in 'warning: optimization components not available for benchmarking\nwarning: optimization components not available for benchmarking\nwarning: streaming components not available for benchmarking\n'
+E    +  where 'warning: optimization components not available for benchmarking\nwarning: optimization components not available for benchmarking\nwarning: streaming components not available for benchmarking\n' = <built-in method lower of str object at 0x000002D74671C5D0>()
+E    +    where <built-in method lower of str object at 0x000002D74671C5D0> = 'Warning: Optimization components not available for benchmarking\nWarning: Optimization components not available for benchmarking\nWarning: Streaming components not available for benchmarking\n'.lower
+E    +      where 'Warning: Optimization components not available for benchmarking\nWarning: Optimization components not available for benchmarking\nWarning: Streaming components not available for benchmarking\n' = CompletedProcess(args=['python', '-m', 'cli.connascence', '--help'], returncode=0, stdout='Warning: Optimization components not available for benchmarking\nWarning: Optimization components not available for benchmarking\nWarning: Streaming components not available for benchmarking\n', stderr='').stdout
+______________________ TestCLIExecution.test_cli_version ______________________
+tests\test_cli.py:574: in test_cli_version
+    assert "connascence" in result.stdout.lower()
+E   AssertionError: assert 'connascence' in 'warning: optimization components not available for benchmarking\nwarning: optimization components not available for benchmarking\nwarning: streaming components not available for benchmarking\n'
+E    +  where 'warning: optimization components not available for benchmarking\nwarning: optimization components not available for benchmarking\nwarning: streaming components not available for benchmarking\n' = <built-in method lower of str object at 0x000002D74671D2F0>()
+E    +    where <built-in method lower of str object at 0x000002D74671D2F0> = 'Warning: Optimization components not available for benchmarking\nWarning: Optimization components not available for benchmarking\nWarning: Streaming components not available for benchmarking\n'.lower
+E    +      where 'Warning: Optimization components not available for benchmarking\nWarning: Optimization components not available for benchmarking\nWarning: Streaming components not available for benchmarking\n' = CompletedProcess(args=['python', '-m', 'cli.connascence', '--version'], returncode=0, stdout='Warning: Optimization components not available for benchmarking\nWarning: Optimization components not available for benchmarking\nWarning: Streaming components not available for benchmarking\n', stderr='').stdout
+________________ TestCLIScanCommand.test_scan_with_violations _________________
+C:\Python312\Lib\unittest\mock.py:1390: in patched
+    with self.decoration_helper(patched,
+C:\Python312\Lib\contextlib.py:137: in __enter__
+    return next(self.gen)
+C:\Python312\Lib\unittest\mock.py:1372: in decoration_helper
+    arg = exit_stack.enter_context(patching)
+C:\Python312\Lib\contextlib.py:526: in enter_context
+    result = _enter(cm)
+C:\Python312\Lib\unittest\mock.py:1461: in __enter__
+    original, local = self.get_original()
+C:\Python312\Lib\unittest\mock.py:1434: in get_original
+    raise AttributeError(
+E   AttributeError: <module 'cli.connascence' from 'C:\\Users\\17175\\Desktop\\connascence\\cli\\connascence.py'> does not have the attribute 'ConnascenceASTAnalyzer'
+__________________ TestCLIScanCommand.test_scan_json_output ___________________
+C:\Python312\Lib\unittest\mock.py:1390: in patched
+    with self.decoration_helper(patched,
+C:\Python312\Lib\contextlib.py:137: in __enter__
+    return next(self.gen)
+C:\Python312\Lib\unittest\mock.py:1372: in decoration_helper
+    arg = exit_stack.enter_context(patching)
+C:\Python312\Lib\contextlib.py:526: in enter_context
+    result = _enter(cm)
+C:\Python312\Lib\unittest\mock.py:1461: in __enter__
+    original, local = self.get_original()
+C:\Python312\Lib\unittest\mock.py:1434: in get_original
+    raise AttributeError(
+E   AttributeError: <module 'cli.connascence' from 'C:\\Users\\17175\\Desktop\\connascence\\cli\\connascence.py'> does not have the attribute 'JSONReporter'
+__________________ TestCLIScanCommand.test_scan_with_policy ___________________
+C:\Python312\Lib\unittest\mock.py:1390: in patched
+    with self.decoration_helper(patched,
+C:\Python312\Lib\contextlib.py:137: in __enter__
+    return next(self.gen)
+C:\Python312\Lib\unittest\mock.py:1372: in decoration_helper
+    arg = exit_stack.enter_context(patching)
+C:\Python312\Lib\contextlib.py:526: in enter_context
+    result = _enter(cm)
+C:\Python312\Lib\unittest\mock.py:1461: in __enter__
+    original, local = self.get_original()
+C:\Python312\Lib\unittest\mock.py:1434: in get_original
+    raise AttributeError(
+E   AttributeError: <module 'cli.connascence' from 'C:\\Users\\17175\\Desktop\\connascence\\cli\\connascence.py'> does not have the attribute 'ConnascenceASTAnalyzer'
+________________ TestCLIScanCommand.test_scan_basic_execution _________________
+C:\Python312\Lib\unittest\mock.py:1390: in patched
+    with self.decoration_helper(patched,
+C:\Python312\Lib\contextlib.py:137: in __enter__
+    return next(self.gen)
+C:\Python312\Lib\unittest\mock.py:1372: in decoration_helper
+    arg = exit_stack.enter_context(patching)
+C:\Python312\Lib\contextlib.py:526: in enter_context
+    result = _enter(cm)
+C:\Python312\Lib\unittest\mock.py:1461: in __enter__
+    original, local = self.get_original()
+C:\Python312\Lib\unittest\mock.py:1434: in get_original
+    raise AttributeError(
+E   AttributeError: <module 'cli.connascence' from 'C:\\Users\\17175\\Desktop\\connascence\\cli\\connascence.py'> does not have the attribute 'ConnascenceASTAnalyzer'
+______________ TestCLISubcommands.test_baseline_snapshot_command ______________
+C:\Python312\Lib\unittest\mock.py:1390: in patched
+    with self.decoration_helper(patched,
+C:\Python312\Lib\contextlib.py:137: in __enter__
+    return next(self.gen)
+C:\Python312\Lib\unittest\mock.py:1372: in decoration_helper
+    arg = exit_stack.enter_context(patching)
+C:\Python312\Lib\contextlib.py:526: in enter_context
+    result = _enter(cm)
+C:\Python312\Lib\unittest\mock.py:1461: in __enter__
+    original, local = self.get_original()
+C:\Python312\Lib\unittest\mock.py:1434: in get_original
+    raise AttributeError(
+E   AttributeError: <module 'cli.connascence' from 'C:\\Users\\17175\\Desktop\\connascence\\cli\\connascence.py'> does not have the attribute 'BaselineManager'
+__________________ TestCLISubcommands.test_scan_diff_command __________________
+C:\Python312\Lib\unittest\mock.py:1390: in patched
+    with self.decoration_helper(patched,
+C:\Python312\Lib\contextlib.py:137: in __enter__
+    return next(self.gen)
+C:\Python312\Lib\unittest\mock.py:1372: in decoration_helper
+    arg = exit_stack.enter_context(patching)
+C:\Python312\Lib\contextlib.py:526: in enter_context
+    result = _enter(cm)
+C:\Python312\Lib\unittest\mock.py:1445: in __enter__
+    self.target = self.getter()
+C:\Python312\Lib\pkgutil.py:528: in resolve_name
+    result = getattr(result, p)
+E   AttributeError: module 'cli.connascence' has no attribute 'subprocess'
+__________________ TestCLISubcommands.test_mcp_serve_command __________________
+tests\test_cli.py:532: in test_mcp_serve_command
+    args = parser.parse_args(["mcp", "serve", "--port", "8080"])
+C:\Python312\Lib\argparse.py:1900: in parse_args
+    self.error(msg)
+C:\Python312\Lib\argparse.py:2671: in error
+    self.exit(2, _('%(prog)s: error: %(message)s\n') % args)
+C:\Python312\Lib\argparse.py:2658: in exit
+    _sys.exit(status)
+E   SystemExit: 2
+---------------------------- Captured stderr call -----------------------------
+usage: connascence [-h] [--config CONFIG] [--verbose] [--version]
+                   [--skip-license-check] [--list-policies]
+                   {scan,scan-diff,baseline,autofix,explain,mcp,license} ...
+connascence: error: unrecognized arguments: --port 8080
+_______________ TestCLIAutofixCommand.test_autofix_preview_mode _______________
+C:\Python312\Lib\unittest\mock.py:1390: in patched
+    with self.decoration_helper(patched,
+C:\Python312\Lib\contextlib.py:137: in __enter__
+    return next(self.gen)
+C:\Python312\Lib\unittest\mock.py:1372: in decoration_helper
+    arg = exit_stack.enter_context(patching)
+C:\Python312\Lib\contextlib.py:526: in enter_context
+    result = _enter(cm)
+C:\Python312\Lib\unittest\mock.py:1461: in __enter__
+    original, local = self.get_original()
+C:\Python312\Lib\unittest\mock.py:1434: in get_original
+    raise AttributeError(
+E   AttributeError: <module 'cli.connascence' from 'C:\\Users\\17175\\Desktop\\connascence\\cli\\connascence.py'> does not have the attribute 'SafeAutofixer'
+________________ TestCLIAutofixCommand.test_autofix_apply_mode ________________
+C:\Python312\Lib\unittest\mock.py:1390: in patched
+    with self.decoration_helper(patched,
+C:\Python312\Lib\contextlib.py:137: in __enter__
+    return next(self.gen)
+C:\Python312\Lib\unittest\mock.py:1372: in decoration_helper
+    arg = exit_stack.enter_context(patching)
+C:\Python312\Lib\contextlib.py:526: in enter_context
+    result = _enter(cm)
+C:\Python312\Lib\unittest\mock.py:1461: in __enter__
+    original, local = self.get_original()
+C:\Python312\Lib\unittest\mock.py:1434: in get_original
+    raise AttributeError(
+E   AttributeError: <module 'cli.connascence' from 'C:\\Users\\17175\\Desktop\\connascence\\cli\\connascence.py'> does not have the attribute 'AutofixEngine'
+___________ TestCLIAutofixCommand.test_autofix_confidence_filtering ___________
+C:\Python312\Lib\unittest\mock.py:1390: in patched
+    with self.decoration_helper(patched,
+C:\Python312\Lib\contextlib.py:137: in __enter__
+    return next(self.gen)
+C:\Python312\Lib\unittest\mock.py:1372: in decoration_helper
+    arg = exit_stack.enter_context(patching)
+C:\Python312\Lib\contextlib.py:526: in enter_context
+    result = _enter(cm)
+C:\Python312\Lib\unittest\mock.py:1461: in __enter__
+    original, local = self.get_original()
+C:\Python312\Lib\unittest\mock.py:1434: in get_original
+    raise AttributeError(
+E   AttributeError: <module 'cli.connascence' from 'C:\\Users\\17175\\Desktop\\connascence\\cli\\connascence.py'> does not have the attribute 'AutofixEngine'
+____________ TestCLIAutofixCommand.test_autofix_without_force_flag ____________
+tests\test_cli.py:335: in test_autofix_without_force_flag
+    with patch.object(self.cli, "_load_or_scan_violations") as mock_load:
+C:\Python312\Lib\unittest\mock.py:1461: in __enter__
+    original, local = self.get_original()
+C:\Python312\Lib\unittest\mock.py:1434: in get_original
+    raise AttributeError(
+E   AttributeError: <interfaces.cli.connascence.ConnascenceCLI object at 0x000002D7468521E0> does not have the attribute '_load_or_scan_violations'
+___________________ TestCLIIntegration.test_end_to_end_scan ___________________
+tests\test_cli.py:445: in test_end_to_end_scan
+    result = cli._handle_scan(args)
+E   AttributeError: 'ConnascenceCLI' object has no attribute '_handle_scan'
+_________________ TestCLIIntegration.test_cli_error_handling __________________
+tests\test_cli.py:467: in test_cli_error_handling
+    result = cli._handle_scan(args)
+E   AttributeError: 'ConnascenceCLI' object has no attribute '_handle_scan'
+=========================== short test summary info ===========================
+FAILED tests\test_cli.py::TestConnascenceCLI::test_baseline_command_parsing
+FAILED tests\test_cli.py::TestConnascenceCLI::test_scan_command_parsing - Att...
+FAILED tests\test_cli.py::TestConnascenceCLI::test_autofix_command_parsing - ...
+FAILED tests\test_cli.py::TestCLIExecution::test_cli_help - AssertionError: a...
+FAILED tests\test_cli.py::TestCLIExecution::test_cli_version - AssertionError...
+FAILED tests\test_cli.py::TestCLIScanCommand::test_scan_with_violations - Att...
+FAILED tests\test_cli.py::TestCLIScanCommand::test_scan_json_output - Attribu...
+FAILED tests\test_cli.py::TestCLIScanCommand::test_scan_with_policy - Attribu...
+FAILED tests\test_cli.py::TestCLIScanCommand::test_scan_basic_execution - Att...
+FAILED tests\test_cli.py::TestCLISubcommands::test_baseline_snapshot_command
+FAILED tests\test_cli.py::TestCLISubcommands::test_scan_diff_command - Attrib...
+FAILED tests\test_cli.py::TestCLISubcommands::test_mcp_serve_command - System...
+FAILED tests\test_cli.py::TestCLIAutofixCommand::test_autofix_preview_mode - ...
+FAILED tests\test_cli.py::TestCLIAutofixCommand::test_autofix_apply_mode - At...
+FAILED tests\test_cli.py::TestCLIAutofixCommand::test_autofix_confidence_filtering
+FAILED tests\test_cli.py::TestCLIAutofixCommand::test_autofix_without_force_flag
+FAILED tests\test_cli.py::TestCLIIntegration::test_end_to_end_scan - Attribut...
+FAILED tests\test_cli.py::TestCLIIntegration::test_cli_error_handling - Attri...
+======================== 18 failed, 2 passed in 6.33s =========================

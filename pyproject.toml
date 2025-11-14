@@ -257,6 +257,10 @@ markers = [
     "property: marks tests as property-based tests",
     "e2e: marks tests as end-to-end tests",
     "performance: marks tests as performance tests",
+    "cli: marks tests for CLI interface",
+    "mcp_server: marks tests for MCP server integration",
+    "vscode: marks tests for VSCode extension",
+    "web_dashboard: marks tests for web dashboard",
 ]
 
 [tool.coverage.run]

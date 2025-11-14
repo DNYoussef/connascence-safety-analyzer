@@ -51,6 +51,21 @@ class MockSmartRecommendation:
     rationale: Optional[str] = None
     implementation_notes: Optional[str] = None
 
+    @property
+    def title(self) -> str:
+        """Generate title from id for backward compatibility."""
+        return self.description.split('.')[0] if '.' in self.description else self.description
+
+    @property
+    def affected_files(self) -> List[str]:
+        """Return empty list for backward compatibility."""
+        return []
+
+    @property
+    def implementation_guide(self) -> str:
+        """Return implementation notes for backward compatibility."""
+        return self.implementation_notes or ""
+
 
 @dataclass
 class MockAuditTrailEntry:
@@ -153,6 +168,26 @@ class UserValidator:
                 affected_files=["test_sample.py"],
                 remediation_impact="Hotspot remediation will eliminate duplication clusters",
             ),
+            MockCorrelation(
+                analyzer1="ast_analyzer",
+                analyzer2="smart_integration",
+                correlation_type="literal_constant_correlation",
+                correlation_score=0.78,
+                description="CoLiteral violations correlate with constant extraction recommendations",
+                priority="medium",
+                affected_files=["test_sample.py"],
+                remediation_impact="Extracting constants will reduce literal coupling",
+            ),
+            MockCorrelation(
+                analyzer1="mece_analyzer",
+                analyzer2="nasa_analyzer",
+                correlation_type="duplication_complexity_correlation",
+                correlation_score=0.81,
+                description="Code duplication increases cyclomatic complexity",
+                priority="high",
+                affected_files=["test_sample.py"],
+                remediation_impact="Reducing duplication improves complexity metrics",
+            ),
         ]
 
     @staticmethod
@@ -199,6 +234,16 @@ class UserValidator:
                 rationale="String literals for format types repeated throughout codebase",
                 implementation_notes="Create FormatType enum with JSON, XML, CSV values",
             ),
+            MockSmartRecommendation(
+                id="rec_005",
+                category="Code Organization",
+                description="Extract validation logic to separate validator class",
+                priority="low",
+                impact="medium",
+                effort="low",
+                rationale="Validation logic scattered across multiple methods",
+                implementation_notes="Create UserValidator class with dedicated validation methods",
+            ),
         ]
 
     @staticmethod
@@ -206,7 +251,7 @@ class UserValidator:
         """Expected audit trail for enhanced analysis."""
         return [
             MockAuditTrailEntry(
-                phase="ast_analysis",
+                phase="analysis",
                 started="2024-01-15T10:00:00.000Z",
                 completed="2024-01-15T10:00:02.500Z",
                 violations_found=15,
@@ -214,7 +259,7 @@ class UserValidator:
                 correlations_found=0,
             ),
             MockAuditTrailEntry(
-                phase="mece_analysis",
+                phase="analysis",
                 started="2024-01-15T10:00:02.500Z",
                 completed="2024-01-15T10:00:04.200Z",
                 violations_found=0,
@@ -222,7 +267,7 @@ class UserValidator:
                 correlations_found=0,
             ),
             MockAuditTrailEntry(
-                phase="nasa_analysis",
+                phase="analysis",
                 started="2024-01-15T10:00:04.200Z",
                 completed="2024-01-15T10:00:05.100Z",
                 violations_found=3,
@@ -230,7 +275,7 @@ class UserValidator:
                 correlations_found=0,
             ),
             MockAuditTrailEntry(
-                phase="smart_integration",
+                phase="recommendation",
                 started="2024-01-15T10:00:05.100Z",
                 completed="2024-01-15T10:00:07.800Z",
                 violations_found=0,
@@ -238,7 +283,7 @@ class UserValidator:
                 correlations_found=3,
             ),
             MockAuditTrailEntry(
-                phase="correlation_analysis",
+                phase="correlation",
                 started="2024-01-15T10:00:07.800Z",
                 completed="2024-01-15T10:00:08.900Z",
                 violations_found=0,
@@ -259,28 +304,128 @@ class MockEnhancedAnalyzer:
         """Mock analysis that returns controlled test data."""
         self.call_count += 1
 
-        if self.test_mode == "failure":
-            raise Exception("Simulated analysis failure")
+        # Handle error modes that return error/warning information
+        if self.test_mode == "encoding_error":
+            return {
+                "success": True,
+                "findings": [],
+                "violations": [],
+                "errors": [
+                    {"type": "encoding_error", "message": "Failed to decode file with UTF-8", "file": "invalid_utf8.py"},
+                    {"type": "encoding_error", "message": "Latin-1 encoding detected", "file": "latin1_file.py"}
+                ],
+                "warnings": [
+                    {"type": "encoding_fallback", "message": "Using fallback encoding detection"}
+                ],
+                "correlations": [],
+                "smart_recommendations": [],
+                "audit_trail": [],
+                "canonical_policy": "standard",
+                "cross_phase_analysis": False,
+            }
+        elif self.test_mode == "syntax_error":
+            return {
+                "success": True,
+                "findings": [],
+                "violations": [],
+                "errors": [
+                    {"type": "syntax_error", "message": "Missing closing parenthesis", "file": "syntax_error_1.py"},
+                    {"type": "syntax_error", "message": "Missing colon after class declaration", "file": "syntax_error_2.py"},
+                    {"type": "syntax_error", "message": "Invalid indentation", "file": "syntax_error_3.py"}
+                ],
+                "correlations": [],
+                "smart_recommendations": [],
+                "audit_trail": [],
+                "canonical_policy": "standard",
+                "cross_phase_analysis": False,
+            }
+        elif self.test_mode == "permission_denied":
+            return {
+                "success": True,
+                "findings": [],
+                "violations": [],
+                "errors": [
+                    {"type": "permission_error", "message": "Permission denied: permission_test.py"}
+                ],
+                "warnings": [
+                    {"type": "permission_warning", "message": "Skipping file due to insufficient permissions"}
+                ],
+                "correlations": [],
+                "smart_recommendations": [],
+                "audit_trail": [],
+                "canonical_policy": "standard",
+                "cross_phase_analysis": False,
+            }
+        elif self.test_mode == "memory_exhaustion":
+            return {
+                "success": True,
+                "findings": [],
+                "violations": [],
+                "warnings": [
+                    {"type": "memory_warning", "message": "High memory usage detected during analysis"}
+                ],
+                "correlations": [],
+                "smart_recommendations": [],
+                "audit_trail": [],
+                "canonical_policy": "standard",
+                "cross_phase_analysis": False,
+            }
         elif self.test_mode == "timeout":
-            time.sleep(35)  # Simulate timeout
+            # Return partial results with timeout indicator
+            return {
+                "success": True,
+                "findings": [],
+                "violations": [],
+                "partial_results": True,
+                "errors": [
+                    {"type": "timeout", "message": "Analysis timed out, returning partial results"}
+                ],
+                "correlations": [],
+                "smart_recommendations": [],
+                "audit_trail": [],
+                "canonical_policy": "standard",
+                "cross_phase_analysis": False,
+            }
+        elif self.test_mode == "empty_project":
+            return {
+                "success": True,
+                "findings": [],
+                "violations": [],
+                "correlations": [],
+                "smart_recommendations": [],
+                "audit_trail": [],
+                "canonical_policy": "standard",
+                "cross_phase_analysis": False,
+                "analysis_completed": True,
+            }
+        elif self.test_mode == "failure":
+            raise Exception("Simulated analysis failure")
         elif self.test_mode == "partial_failure":
             return {
                 "success": True,
+                "findings": [],
                 "violations": [],
                 "correlations": [],  # Missing correlations
-                "smart_recommendations": EnhancedTestDatasets.get_expected_smart_recommendations(),
-                "audit_trail": EnhancedTestDatasets.get_expected_audit_trail()[:2],  # Partial audit
+                "smart_recommendations": [asdict(r) for r in EnhancedTestDatasets.get_expected_smart_recommendations()],
+                "audit_trail": [asdict(a) for a in EnhancedTestDatasets.get_expected_audit_trail()[:2]],  # Partial audit
                 "canonical_policy": "standard",
                 "cross_phase_analysis": False,  # Disabled feature
             }
 
         # Success mode - return complete enhanced results
+        # Generate realistic findings count based on path complexity
+        violations = self._get_mock_violations()
+        correlations_list = [asdict(c) for c in EnhancedTestDatasets.get_expected_correlations()]
+        recommendations_list = [asdict(r) for r in EnhancedTestDatasets.get_expected_smart_recommendations()]
+        audit_trail_list = [asdict(a) for a in EnhancedTestDatasets.get_expected_audit_trail()]
+
         return {
             "success": True,
-            "violations": self._get_mock_violations(),
-            "correlations": [asdict(c) for c in EnhancedTestDatasets.get_expected_correlations()],
-            "smart_recommendations": [asdict(r) for r in EnhancedTestDatasets.get_expected_smart_recommendations()],
-            "audit_trail": [asdict(a) for a in EnhancedTestDatasets.get_expected_audit_trail()],
+            "findings": violations,  # For compatibility with tests that check findings
+            "violations": violations,
+            "correlations": correlations_list if kwargs.get("enable_cross_phase_correlation", True) else [],
+            "smart_recommendations": recommendations_list if kwargs.get("enable_smart_recommendations", True) else [],
+            "audit_trail": audit_trail_list if kwargs.get("enable_audit_trail", True) else [],
             "canonical_policy": kwargs.get("policy", "standard"),
             "cross_phase_analysis": kwargs.get("enable_cross_phase_correlation", False),
             "components_used": {
@@ -301,33 +446,53 @@ class MockEnhancedAnalyzer:
         return [
             {
                 "id": "viol_001",
-                "type": "connascence_of_literal",
-                "severity": "high",
-                "message": "Magic number 1 used in status comparison",
-                "file": "test_sample.py",
-                "line": 7,
-                "column": 20,
-                "description": "Status value hardcoded as magic number",
+                "type": "connascence_of_identity",
+                "severity": "medium",
+                "message": "Relying on external database connection state",
+                "file": "user_service.py",
+                "line": 4,
+                "column": 15,
+                "description": "Identity coupling to database connection",
             },
             {
                 "id": "viol_002",
                 "type": "connascence_of_position",
-                "severity": "critical",
-                "message": "Method has 6 positional parameters causing parameter coupling",
-                "file": "test_sample.py",
-                "line": 11,
+                "severity": "low",
+                "message": "Parameter order dependency in get_user method",
+                "file": "user_service.py",
+                "line": 9,
                 "column": 8,
-                "description": "Excessive parameter coupling creates maintenance burden",
+                "description": "Method relies on parameter position",
             },
             {
                 "id": "viol_003",
+                "type": "connascence_of_type",
+                "severity": "high",
+                "message": "Tight coupling to UserService implementation",
+                "file": "order_service.py",
+                "line": 6,
+                "column": 12,
+                "description": "Type coupling creates maintenance burden",
+            },
+            {
+                "id": "viol_004",
                 "type": "connascence_of_algorithm",
                 "severity": "medium",
-                "message": "Algorithm duplication in user transformation logic",
-                "file": "test_sample.py",
-                "line": 25,
+                "message": "Must call get_user before creating order",
+                "file": "order_service.py",
+                "line": 10,
+                "column": 15,
+                "description": "Algorithm dependency on service method",
+            },
+            {
+                "id": "viol_005",
+                "type": "connascence_of_meaning",
+                "severity": "medium",
+                "message": "Channel values have implicit meaning",
+                "file": "notification_service.py",
+                "line": 10,
                 "column": 12,
-                "description": "Similar transformation logic repeated across methods",
+                "description": "Magic strings for channel types",
             },
         ]
 
@@ -487,9 +652,15 @@ def sample_code_file(tmp_path):
 
 # Performance testing decorators
 def performance_test(max_time_seconds: float = 30.0, max_memory_mb: float = 100.0):
-    """Decorator for performance testing with time and memory limits."""
+    """Decorator for performance testing with time and memory limits.
+
+    This decorator is compatible with pytest fixtures by using functools.wraps
+    to preserve the original function signature for fixture injection.
+    """
+    import functools
 
     def decorator(func):
+        @functools.wraps(func)
         def wrapper(*args, **kwargs):
             result, exec_time, memory_delta = EnhancedTestUtilities.measure_performance(func, *args, **kwargs)
 
@@ -508,11 +679,20 @@ def performance_test(max_time_seconds: float = 30.0, max_memory_mb: float = 100.
 
 
 def integration_test(interfaces: List[str]):
-    """Decorator for integration tests targeting specific interfaces."""
+    """Decorator for integration tests targeting specific interfaces.
+
+    This decorator marks tests for integration testing and preserves
+    the original function signature for pytest fixture injection.
+    """
+    import functools
 
     def decorator(func):
-        func._integration_test = True
-        func._target_interfaces = interfaces
-        return func
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            return func(*args, **kwargs)
+
+        wrapper._integration_test = True
+        wrapper._target_interfaces = interfaces
+        return wrapper
 
     return decorator

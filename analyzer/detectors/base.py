@@ -149,3 +149,21 @@ class DetectorBase(ABC):
     def get_pool_metrics(self) -> Dict[str, Any]:
         """Get detector-specific pool metrics."""
         return {"reuse_count": self._pool_reuse_count, "detector_type": self.__class__.__name__}
+
+    def should_analyze_file(self, file_path: str) -> bool:
+        """
+        Determine if detector should analyze given file.
+
+        NASA Rule 4: Function under 60 lines
+        NASA Rule 5: Input validation
+
+        Args:
+            file_path: Path to file to check
+
+        Returns:
+            True if detector should analyze this file type
+        """
+        assert isinstance(file_path, str), "file_path must be string"
+
+        supported_extensions = getattr(self, "SUPPORTED_EXTENSIONS", [".py"])
+        return any(file_path.endswith(ext) for ext in supported_extensions)

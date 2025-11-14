@@ -16,6 +16,8 @@ from .base import DetectorBase
 class AlgorithmDetector(DetectorBase):
     """Detects duplicate algorithms across functions."""
 
+    SUPPORTED_EXTENSIONS = [".py", ".js", ".ts"]
+
     def __init__(self, file_path: str, source_lines: List[str]):
         super().__init__(file_path, source_lines)
         self.function_hashes: Dict[str, List[Tuple[str, ast.FunctionDef]]] = collections.defaultdict(list)

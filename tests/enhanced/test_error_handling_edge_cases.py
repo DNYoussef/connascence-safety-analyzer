@@ -363,7 +363,7 @@ class DataProcessor{i}:
 
             # Add many entries
             for j in range(200):
-                large_data_structure += f'            "key_{j}": ["item_{k}" for k in range(100)],\n'
+                large_data_structure += f'            "key_{j}": ["item_{{k}}" for k in range(100)],\n'
 
             large_data_structure += """        }
 
@@ -632,7 +632,7 @@ class TimeoutTestClass{i}:
         # CofE: Execution - complex processing for timeout test
         data = []
         for j in range(100):
-            data.append({{"key_{i}_{j}": "value_{i}_{j}"}})
+            data.append({{"key_{i}_{{j}}": "value_{i}_{{j}}"}})
         return data
 """
             test_file.write_text(test_content, encoding="utf-8")

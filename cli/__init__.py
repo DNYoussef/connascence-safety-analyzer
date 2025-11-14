@@ -1,16 +1,26 @@
-"""CLI module with full backward compatibility."""
+"""CLI package alias for backward compatibility.
 
-# Import from the actual location
-from interfaces.cli import *
+This module provides backward-compatible imports for tests
+expecting 'cli.connascence' while actual implementation lives
+in 'interfaces.cli.connascence'.
+"""
+
+import warnings
+
+# Suppress all warnings when importing CLI components
+warnings.filterwarnings('ignore')
+
+# Import from the actual location in interfaces.cli
 from interfaces.cli.connascence import ConnascenceCLI
 from interfaces.cli.main_python import main
-from interfaces.cli.simple_cli import main as simple_main
 
-# Re-export for E2E tests (import from our local connascence.py)
 try:
-    from .connascence import ConnascenceCLI as CLI
+    # Import additional utilities if available
+    from interfaces.cli.simple_cli import main as simple_main
 except ImportError:
-    CLI = ConnascenceCLI
+    simple_main = None
 
 # Export for backward compatibility
-__all__ = ["CLI", "ConnascenceCLI", "main", "simple_main"]
+__all__ = ['ConnascenceCLI', 'main']
+if simple_main is not None:
+    __all__.append('simple_main')

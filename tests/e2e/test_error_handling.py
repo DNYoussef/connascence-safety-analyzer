@@ -21,6 +21,8 @@ Validates all exit codes, error recovery, and graceful degradation.
 Uses memory coordination for tracking error patterns and recovery metrics.
 """
 
+from __future__ import annotations
+
 import os
 from pathlib import Path
 import sys

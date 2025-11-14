@@ -20,6 +20,8 @@ Tests complete CLI workflows from input to final report generation.
 Uses memory coordination for scenario tracking and sequential thinking.
 """
 
+from __future__ import annotations
+
 import json
 from pathlib import Path
 import sys

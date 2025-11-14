@@ -115,11 +115,11 @@ class NotificationService:
                     },
                 ],
                 expected_findings=[
-                    {"type": "CofE_Identity", "severity": "medium", "file": "user_service.py"},
-                    {"type": "CofE_Position", "severity": "low", "file": "user_service.py"},
-                    {"type": "CofE_Type", "severity": "high", "file": "order_service.py"},
-                    {"type": "CofE_Algorithm", "severity": "medium", "file": "order_service.py"},
-                    {"type": "CofE_Meaning", "severity": "medium", "file": "notification_service.py"},
+                    {"type": "connascence_of_identity", "severity": "medium", "file": "user_service.py"},
+                    {"type": "connascence_of_position", "severity": "low", "file": "user_service.py"},
+                    {"type": "connascence_of_type", "severity": "high", "file": "order_service.py"},
+                    {"type": "connascence_of_algorithm", "severity": "medium", "file": "order_service.py"},
+                    {"type": "connascence_of_meaning", "severity": "medium", "file": "notification_service.py"},
                 ],
                 expected_correlations=[
                     MockCorrelation(
@@ -141,16 +141,20 @@ class NotificationService:
                 ],
                 expected_recommendations=[
                     MockSmartRecommendation(
-                        "introduce_user_status_enum",
-                        "Create UserStatus enum to reduce meaning connascence",
-                        "medium",
-                        ["user_service.py", "order_service.py"],
+                        id="introduce_user_status_enum",
+                        category="Type Safety",
+                        description="Create UserStatus enum to reduce meaning connascence",
+                        priority="medium",
+                        impact="medium",
+                        effort="low",
                     ),
                     MockSmartRecommendation(
-                        "implement_service_interface",
-                        "Extract UserService interface to reduce type connascence",
-                        "high",
-                        ["order_service.py"],
+                        id="implement_service_interface",
+                        category="Architectural Patterns",
+                        description="Extract UserService interface to reduce type connascence",
+                        priority="high",
+                        impact="high",
+                        effort="medium",
                     ),
                 ],
                 performance_requirements={
@@ -206,10 +210,10 @@ class ModernAdapter:
                     },
                 ],
                 expected_findings=[
-                    {"type": "CofE_Meaning", "severity": "high", "file": "legacy_processor.py"},
-                    {"type": "CofE_Algorithm", "severity": "medium", "file": "legacy_processor.py"},
-                    {"type": "CofE_Type", "severity": "high", "file": "modern_adapter.py"},
-                    {"type": "CofE_Execution", "severity": "medium", "file": "modern_adapter.py"},
+                    {"type": "connascence_of_meaning", "severity": "high", "file": "legacy_processor.py"},
+                    {"type": "connascence_of_algorithm", "severity": "medium", "file": "legacy_processor.py"},
+                    {"type": "connascence_of_type", "severity": "high", "file": "modern_adapter.py"},
+                    {"type": "connascence_of_execution", "severity": "medium", "file": "modern_adapter.py"},
                 ],
                 expected_correlations=[
                     MockCorrelation(
@@ -223,13 +227,20 @@ class ModernAdapter:
                 ],
                 expected_recommendations=[
                     MockSmartRecommendation(
-                        "extract_processor_interface",
-                        "Create ProcessorInterface to decouple adapter",
-                        "critical",
-                        ["legacy_processor.py", "modern_adapter.py"],
+                        id="extract_processor_interface",
+                        category="Architectural Patterns",
+                        description="Create ProcessorInterface to decouple adapter",
+                        priority="critical",
+                        impact="high",
+                        effort="medium",
                     ),
                     MockSmartRecommendation(
-                        "introduce_format_enum", "Replace string formats with enum", "high", ["legacy_processor.py"]
+                        id="introduce_format_enum",
+                        category="Type Safety",
+                        description="Replace string formats with enum",
+                        priority="high",
+                        impact="medium",
+                        effort="low",
                     ),
                 ],
                 performance_requirements={

@@ -15,6 +15,8 @@ from .base import DetectorBase
 class MagicLiteralDetector(DetectorBase):
     """Detects magic literals that should be named constants."""
 
+    SUPPORTED_EXTENSIONS = [".py", ".js", ".ts", ".java"]
+
     def __init__(self, file_path: str, source_lines: List[str]):
         super().__init__(file_path, source_lines)
         self.magic_literals: List[Tuple[ast.AST, Any, Dict]] = []

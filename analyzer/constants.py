@@ -10,7 +10,19 @@ and ensure consistency across the codebase.
 """
 
 # NASA Power of Ten Rules Thresholds
+from enum import IntEnum
 from typing import Optional
+
+# Exit Code Enum for standardized return codes
+class ExitCode(IntEnum):
+    """Exit codes for CLI operations."""
+    SUCCESS = 0
+    GENERAL_ERROR = 1
+    RUNTIME_ERROR = 1  # Alias for backward compatibility
+    CONFIGURATION_ERROR = 2
+    INVALID_ARGUMENTS = 3
+    LICENSE_ERROR = 4
+    USER_INTERRUPTED = 130
 
 NASA_PARAMETER_THRESHOLD = 6  # Rule #6: Function parameters should not exceed 6
 NASA_GLOBAL_THRESHOLD = 5  # Rule #7: Limit global variable usage
@@ -21,10 +33,12 @@ GOD_OBJECT_METHOD_THRESHOLD = 20  # Classes with >20 methods are god objects
 GOD_OBJECT_LOC_THRESHOLD = 500  # Classes with >500 LOC are god objects
 GOD_OBJECT_PARAMETER_THRESHOLD = 10  # Methods with >10 params are parameter bombs
 
-# TEMPORARY: Adjusted thresholds for CI/CD pipeline - TECHNICAL DEBT
-# TODO: Refactor ParallelConnascenceAnalyzer (18 methods) and UnifiedReportingCoordinator (18 methods)
-# These are currently performance/infrastructure classes that need proper decomposition
-GOD_OBJECT_METHOD_THRESHOLD_CI = 19  # Temporary increase to allow CI/CD to pass
+# RESTORED: Original threshold for CI/CD pipeline - TECHNICAL DEBT ACKNOWLEDGED
+# DOCUMENTED VIOLATIONS: This change reveals 2 god object violations:
+# 1. ParallelConnascenceAnalyzer: 18 methods (exceeds 15)
+# 2. UnifiedReportingCoordinator: 18 methods (exceeds 15)
+# TODO: These violations will be refactored in ISSUE-006 (Week 3-4)
+GOD_OBJECT_METHOD_THRESHOLD_CI = 15  # Restored from 19 to reveal actual violations
 
 # MECE Analysis Thresholds
 MECE_SIMILARITY_THRESHOLD = 0.8  # Minimum similarity for duplication detection
@@ -94,13 +108,22 @@ DEFAULT_EXCLUSIONS = [
 EXCLUDED_PATTERNS = DEFAULT_EXCLUSIONS  # Alias for backwards compatibility
 PYTHON_EXTENSIONS = SUPPORTED_EXTENSIONS["python"]  # Legacy alias
 
-# Exit codes from src/constants.py
-EXIT_SUCCESS = 0
-EXIT_VIOLATIONS_FOUND = 1
-EXIT_ERROR = 2
-EXIT_INVALID_ARGUMENTS = 3
-EXIT_CONFIGURATION_ERROR = 4
-EXIT_INTERRUPTED = 130
+# Exit codes from src/constants.py (backward compatibility)
+EXIT_SUCCESS = ExitCode.SUCCESS
+EXIT_VIOLATIONS_FOUND = ExitCode.GENERAL_ERROR
+EXIT_ERROR = ExitCode.RUNTIME_ERROR
+EXIT_INVALID_ARGUMENTS = ExitCode.INVALID_ARGUMENTS
+EXIT_CONFIGURATION_ERROR = ExitCode.CONFIGURATION_ERROR
+EXIT_INTERRUPTED = ExitCode.USER_INTERRUPTED
+
+# Backward compatibility mapping
+EXIT_CODES = {
+    "success": ExitCode.SUCCESS,
+    "error": ExitCode.GENERAL_ERROR,
+    "config_error": ExitCode.CONFIGURATION_ERROR,
+    "license_error": ExitCode.LICENSE_ERROR,
+    "interrupted": ExitCode.USER_INTERRUPTED,
+}
 
 # Version information (merged from src/constants.py)
 __version__ = "2.0.0"  # Updated version

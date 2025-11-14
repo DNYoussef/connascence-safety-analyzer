@@ -151,7 +151,12 @@ class PolicyManager:
 
     def get_preset(self, name: str) -> ThresholdConfig:
         """Get a policy preset by name with unified resolution."""
-        # Resolve to unified name first
+        # First check if preset name exists (before resolution)
+        if name not in self.presets and not validate_policy_name(name):
+            available_policies = list_available_policies(include_legacy=True)
+            raise ValueError(f"Preset not found: {name}. Available policies: {', '.join(available_policies)}")
+
+        # Resolve to unified name
         unified_name = resolve_policy_name(name, warn_deprecated=True)
 
         # Check if unified preset exists

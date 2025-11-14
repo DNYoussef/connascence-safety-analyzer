@@ -20,18 +20,20 @@ Tests real repository analysis workflows with various project types.
 Uses memory coordination for tracking analysis patterns and performance.
 """
 
+from __future__ import annotations
+
 import json
 from pathlib import Path
 import sys
 import tempfile
 import time
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import pytest
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from interfaces.cli.connascence import ConnascenceCLI
+from cli.connascence import ConnascenceCLI
 from tests.e2e.test_cli_workflows import SequentialWorkflowValidator
 
 
@@ -45,6 +47,8 @@ class RepositoryAnalysisCoordinator:
         self.violation_densities = {}
         self.complexity_metrics = {}
         self.repository_comparisons = {}
+        self.test_scenarios = {}
+        self.performance_metrics = {}
 
     def store_repository_profile(self, repo_id: str, profile: Dict[str, Any]):
         """Store repository analysis profile."""
@@ -72,17 +76,40 @@ class RepositoryAnalysisCoordinator:
         """Store complexity analysis metrics."""
         self.complexity_metrics[repo_id] = metrics
 
+    def store_test_scenario(self, scenario_id: str, config: Dict[str, Any]):
+        """Store test scenario configuration (compatibility with SequentialWorkflowValidator)."""
+        self.test_scenarios[scenario_id] = {"config": config, "timestamp": time.time(), "status": "initialized"}
+
+    def update_scenario_status(self, scenario_id: str, status: str, results: Optional[Dict] = None):
+        """Update scenario status and results (compatibility with SequentialWorkflowValidator)."""
+        if scenario_id in self.test_scenarios:
+            self.test_scenarios[scenario_id]["status"] = status
+            if results:
+                self.test_scenarios[scenario_id]["results"] = results
+
+    def store_performance_metrics(self, scenario_id: str, metrics: Dict[str, Any]):
+        """Store performance metrics for scenario (compatibility with SequentialWorkflowValidator)."""
+        self.performance_metrics[scenario_id] = metrics
+
     def compare_repositories(self, repo_ids: List[str]) -> Dict[str, Any]:
         """Compare multiple repository analysis results."""
         comparison = {"repositories": repo_ids, "comparison_timestamp": time.time(), "metrics": {}}
 
+        # Mapping of metric types to actual attribute names
+        metric_to_attr = {
+            "violation_density": "violation_densities",
+            "complexity": "complexity_metrics",
+            "patterns": "analysis_patterns"
+        }
+
         for metric_type in ["violation_density", "complexity", "patterns"]:
             comparison["metrics"][metric_type] = {}
+            attr_name = metric_to_attr[metric_type]
+            storage = getattr(self, attr_name, {})
+
             for repo_id in repo_ids:
-                if repo_id in self.violation_densities:
-                    comparison["metrics"][metric_type][repo_id] = getattr(self, f'{metric_type.replace("_", "_")}').get(
-                        repo_id, {}
-                    )
+                if repo_id in storage:
+                    comparison["metrics"][metric_type][repo_id] = storage.get(repo_id, {})
 
         self.repository_comparisons[f"comparison_{len(self.repository_comparisons)}"] = comparison
         return comparison

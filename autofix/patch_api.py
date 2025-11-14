@@ -32,6 +32,25 @@ class PatchSuggestion:
             self.rollback_info = {}
 
 
+@dataclass
+class AutofixResult:
+    """Result of an autofix operation."""
+    patches_generated: int = 0
+    patches_applied: int = 0
+    violations_fixed: list = None
+    warnings: list = None
+    errors: list = None
+    confidence_score: float = 0.0
+
+    def __post_init__(self):
+        if self.violations_fixed is None:
+            self.violations_fixed = []
+        if self.warnings is None:
+            self.warnings = []
+        if self.errors is None:
+            self.errors = []
+
+
 # Import the real implementations from core module
 
 

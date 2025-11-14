@@ -15,6 +15,8 @@ from .base import DetectorBase
 class TimingDetector(DetectorBase):
     """Detects timing-based coupling and sleep dependencies."""
 
+    SUPPORTED_EXTENSIONS = [".py"]
+
     def detect_violations(self, tree: ast.AST) -> List[ConnascenceViolation]:
         """
         Detect timing violations in the AST tree.

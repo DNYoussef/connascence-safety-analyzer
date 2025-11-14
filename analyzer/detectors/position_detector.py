@@ -22,6 +22,8 @@ class PositionDetector(DetectorBase):
     standardized parameter handling.
     """
 
+    SUPPORTED_EXTENSIONS = [".py", ".js", ".ts"]
+
     def __init__(self, file_path: str, source_lines: List[str]):
         super().__init__(file_path, source_lines)
 

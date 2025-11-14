@@ -21,6 +21,8 @@ Tests throughput, latency, memory usage, and scalability characteristics.
 Uses memory coordination for tracking performance patterns and benchmarks.
 """
 
+from __future__ import annotations
+
 from concurrent.futures import ThreadPoolExecutor
 import json
 from pathlib import Path

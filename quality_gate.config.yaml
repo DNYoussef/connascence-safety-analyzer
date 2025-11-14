@@ -1,0 +1,365 @@
+# Quality Gate Progressive Configuration
+# 6-week dogfooding schedule with increasing strictness
+
+metadata:
+  name: "Progressive Quality Gate"
+  version: "1.0.0"
+  description: "6-week progressive quality gate for dogfooding Connascence Analyzer"
+  start_date: "2025-11-13"
+
+# Progressive schedule
+schedule:
+  week_1:
+    name: "Baseline & Critical Only"
+    duration: "2025-11-13 to 2025-11-19"
+    description: "Establish baseline, block only critical violations"
+    fail_on: critical
+    analyzers:
+      clarity_linter: true
+      connascence_analyzer: true
+      nasa_standards: false
+    thresholds:
+      max_critical: 0
+      max_high: null  # No limit
+      max_medium: null
+      max_low: null
+    actions:
+      create_issues: true
+      block_pr: true
+      require_fixes: true
+    focus_areas:
+      - CLARITY023  # Circular dependencies
+      - CLARITY031  # Missing error handling
+      - CLARITY050  # Production code in tests
+      - God Objects (>26 methods)
+      - Parameter Bombs (>6 params)
+
+  week_2:
+    name: "High Severity Enforcement"
+    duration: "2025-11-20 to 2025-11-26"
+    description: "Enforce high severity violations, continue blocking critical"
+    fail_on: high
+    analyzers:
+      clarity_linter: true
+      connascence_analyzer: true
+      nasa_standards: true
+    thresholds:
+      max_critical: 0
+      max_high: 5  # Allow up to 5 high violations temporarily
+      max_medium: null
+      max_low: null
+    actions:
+      create_issues: true
+      block_pr: true
+      require_fixes: true
+    focus_areas:
+      - CLARITY001  # Function length
+      - CLARITY002  # Method complexity
+      - CLARITY004  # Parameter bomb
+      - CLARITY021  # God Object
+      - CLARITY031  # Missing error handling
+      - CLARITY032  # Swallowed exceptions
+
+  week_3:
+    name: "Medium Severity + NASA Compliance"
+    duration: "2025-11-27 to 2025-12-03"
+    description: "Add medium severity violations, full NASA standard checks"
+    fail_on: medium
+    analyzers:
+      clarity_linter: true
+      connascence_analyzer: true
+      nasa_standards: true
+    thresholds:
+      max_critical: 0
+      max_high: 0
+      max_medium: 10  # Allow up to 10 medium violations temporarily
+      max_low: null
+    actions:
+      create_issues: true
+      block_pr: true
+      require_fixes: true
+    focus_areas:
+      - CLARITY003  # Deep nesting
+      - CLARITY005  # Missing documentation
+      - CLARITY011  # Unclear variable names
+      - CLARITY022  # Long files
+      - CLARITY024  # High coupling
+      - All NASA JPL rules
+
+  week_4:
+    name: "Testing & Coverage"
+    duration: "2025-12-04 to 2025-12-10"
+    description: "Enforce testing standards and coverage requirements"
+    fail_on: medium
+    analyzers:
+      clarity_linter: true
+      connascence_analyzer: true
+      nasa_standards: true
+    thresholds:
+      max_critical: 0
+      max_high: 0
+      max_medium: 5
+      max_low: null
+      min_test_coverage: 80
+      min_branch_coverage: 75
+    actions:
+      create_issues: true
+      block_pr: true
+      require_fixes: true
+      require_tests: true
+    focus_areas:
+      - CLARITY041  # Missing unit tests
+      - CLARITY042  # Low test coverage
+      - CLARITY043  # Missing edge case tests
+      - CLARITY044  # Flaky test patterns
+      - Test quality metrics
+
+  week_5:
+    name: "Full Enforcement"
+    duration: "2025-12-11 to 2025-12-17"
+    description: "Enforce all severity levels, strict thresholds"
+    fail_on: any
+    analyzers:
+      clarity_linter: true
+      connascence_analyzer: true
+      nasa_standards: true
+    thresholds:
+      max_critical: 0
+      max_high: 0
+      max_medium: 0
+      max_low: 20  # Allow minor low violations
+      min_test_coverage: 85
+      min_branch_coverage: 80
+    actions:
+      create_issues: true
+      block_pr: true
+      require_fixes: true
+      require_tests: true
+      require_documentation: true
+    focus_areas:
+      - All CLARITY rules
+      - All Connascence types
+      - Full NASA compliance
+      - Code documentation
+      - Architecture patterns
+
+  week_6:
+    name: "Production Ready"
+    duration: "2025-12-18 to 2025-12-24"
+    description: "Production-ready standards, zero tolerance for violations"
+    fail_on: any
+    analyzers:
+      clarity_linter: true
+      connascence_analyzer: true
+      nasa_standards: true
+    thresholds:
+      max_critical: 0
+      max_high: 0
+      max_medium: 0
+      max_low: 0  # Zero tolerance
+      min_test_coverage: 90
+      min_branch_coverage: 85
+      min_nasa_compliance: 95
+    actions:
+      create_issues: true
+      block_pr: true
+      require_fixes: true
+      require_tests: true
+      require_documentation: true
+      require_review: true
+    focus_areas:
+      - Zero violations across all categories
+      - Full test coverage
+      - Complete documentation
+      - NASA compliance >95%
+      - Production readiness checks
+
+# Analyzer configurations
+analyzers:
+  clarity_linter:
+    enabled: true
+    config_file: "clarity_linter.yaml"
+    output_format: ["sarif", "json", "markdown"]
+    fail_fast: false
+    parallel: true
+
+  connascence_analyzer:
+    enabled: true
+    detectors:
+      - CoN  # Name
+      - CoT  # Type
+      - CoM  # Meaning
+      - CoP  # Position
+      - CoA  # Algorithm
+      - CoE  # Execution
+      - CoV  # Value
+      - CoI  # Identity
+      - CoC  # Complexity
+    severity_mapping:
+      CoN: medium
+      CoT: high
+      CoM: high
+      CoP: high
+      CoA: medium
+      CoE: critical
+      CoV: high
+      CoI: critical
+      CoC: high
+
+  nasa_standards:
+    enabled: true
+    standards:
+      - NASA-STD-8739.8
+      - NASA-JPL-RULES
+    rules:
+      - JPL-1   # Restrict to simple control flow
+      - JPL-2   # Give all loops a fixed upper bound
+      - JPL-3   # Don't use dynamic memory after init
+      - JPL-4   # No function >60 lines
+      - JPL-5   # Min 2 assertions per function
+      - JPL-6   # Declare data objects at smallest scope
+      - JPL-7   # Check return values
+      - JPL-8   # Limit preprocessor use
+      - JPL-9   # Limit pointer use
+      - JPL-10  # Compile with all warnings enabled
+
+# Reporting configuration
+reporting:
+  formats:
+    - sarif
+    - json
+    - markdown
+    - html
+    - csv
+
+  destinations:
+    - github_code_scanning
+    - github_checks
+    - pr_comments
+    - slack_webhook
+
+  metrics:
+    - total_violations
+    - violations_by_severity
+    - violations_by_category
+    - violations_by_file
+    - trend_analysis
+    - nasa_compliance_score
+    - test_coverage
+    - code_quality_score
+
+  history:
+    enabled: true
+    storage: ".quality-gate-history.json"
+    retention_days: 180
+
+# Integration settings
+integrations:
+  github:
+    enabled: true
+    create_issues: true
+    block_merge: true
+    require_approval: true
+    label_prefix: "quality-gate"
+    assignees: []
+    reviewers: []
+
+  slack:
+    enabled: false
+    webhook_url: null
+    notify_on:
+      - critical_violations
+      - quality_gate_fail
+      - weekly_summary
+
+  email:
+    enabled: false
+    recipients: []
+    notify_on:
+      - critical_violations
+      - quality_gate_fail
+
+# Exemptions and overrides
+exemptions:
+  files:
+    - "tests/**/*"
+    - "examples/**/*"
+    - "docs/**/*"
+    - "**/*.generated.*"
+    - "**/*_pb2.py"
+
+  rules:
+    # Allow longer test functions
+    CLARITY001:
+      files: ["tests/**/*"]
+      reason: "Test functions can be longer for comprehensive testing"
+
+    # Allow more parameters in test fixtures
+    CLARITY004:
+      files: ["tests/**/*", "conftest.py"]
+      reason: "Test fixtures may need many parameters"
+
+  temporary:
+    # Temporary exemptions with expiration dates
+    - rule: CLARITY021
+      files: ["legacy_system.py"]
+      expires: "2025-12-31"
+      reason: "Legacy code scheduled for refactor in Q1 2026"
+
+# Auto-fix configuration
+autofix:
+  enabled: true
+  rules:
+    CLARITY011:  # Unclear variable names
+      enabled: true
+      confidence_threshold: 0.8
+      require_review: true
+
+    CLARITY012:  # Magic numbers
+      enabled: true
+      confidence_threshold: 0.9
+      require_review: false
+
+    CLARITY013:  # Naming inconsistency
+      enabled: true
+      confidence_threshold: 0.7
+      require_review: true
+
+  strategy: "create_pr"  # Options: create_pr, commit_directly, suggest_only
+  branch_prefix: "autofix/"
+  require_approval: true
+
+# Success criteria
+success_criteria:
+  week_1:
+    - zero_critical_violations
+    - baseline_established
+
+  week_2:
+    - zero_critical_violations
+    - high_violations_under_threshold
+    - nasa_checks_passing
+
+  week_3:
+    - zero_critical_violations
+    - zero_high_violations
+    - medium_violations_under_threshold
+    - nasa_compliance_70_percent
+
+  week_4:
+    - zero_critical_violations
+    - zero_high_violations
+    - test_coverage_80_percent
+    - branch_coverage_75_percent
+
+  week_5:
+    - zero_critical_high_medium_violations
+    - test_coverage_85_percent
+    - documentation_complete
+    - nasa_compliance_90_percent
+
+  week_6:
+    - zero_violations_all_severities
+    - test_coverage_90_percent
+    - nasa_compliance_95_percent
+    - production_ready_checklist_complete

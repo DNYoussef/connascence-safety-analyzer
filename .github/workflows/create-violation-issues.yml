@@ -1,0 +1,321 @@
+name: Auto-Create Violation Issues
+# Weekly automated scan that creates GitHub issues for quality violations
+
+on:
+  schedule:
+    - cron: '0 2 * * 1'  # Every Monday at 2 AM UTC
+  workflow_dispatch:
+    inputs:
+      severity_threshold:
+        description: 'Minimum severity to create issues for'
+        required: false
+        default: 'high'
+        type: choice
+        options:
+          - critical
+          - high
+          - medium
+          - low
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: read
+
+jobs:
+  scan-and-create-issues:
+    name: Scan and Create Issues
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -e .
+
+      - name: Run Full Quality Scan
+        id: scan
+        run: |
+          # Run Clarity Linter
+          python -m clarity_linter \
+            --config clarity_linter.yaml \
+            --output-format json \
+            --output-file clarity_violations.json \
+            --severity-threshold ${{ github.event.inputs.severity_threshold || 'high' }} \
+            --verbose
+
+          # Run Connascence Analysis
+          python -m connascence_analyzer analyze \
+            --path . \
+            --output-format json \
+            --output-file connascence_violations.json \
+            --include-nasa-checks
+
+          # Run NASA Compliance Check
+          python -m connascence_analyzer nasa-check \
+            --path . \
+            --output nasa_violations.json
+
+      - name: Group Violations by File and Rule
+        id: group
+        run: |
+          python -c "
+          import json
+          from pathlib import Path
+          from collections import defaultdict
+
+          # Load violations
+          clarity = json.loads(Path('clarity_violations.json').read_text()) if Path('clarity_violations.json').exists() else {}
+          connascence = json.loads(Path('connascence_violations.json').read_text()) if Path('connascence_violations.json').exists() else {}
+
+          all_violations = []
+          all_violations.extend(clarity.get('violations', []))
+          all_violations.extend(connascence.get('violations', []))
+
+          # Group by file and rule
+          grouped = defaultdict(lambda: defaultdict(list))
+          for v in all_violations:
+              file_path = v.get('file', 'unknown')
+              rule_id = v.get('rule_id', 'unknown')
+              grouped[file_path][rule_id].append(v)
+
+          Path('grouped_violations.json').write_text(json.dumps(dict(grouped), indent=2))
+          "
+
+      - name: Create Issues for Violations
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const fs = require('fs');
+            const grouped = JSON.parse(fs.readFileSync('grouped_violations.json', 'utf8'));
+
+            // Severity priorities for labels
+            const severityLabels = {
+              critical: 'severity: critical',
+              high: 'severity: high',
+              medium: 'severity: medium',
+              low: 'severity: low'
+            };
+
+            // Category labels
+            const categoryLabels = {
+              readability: 'category: readability',
+              complexity: 'category: complexity',
+              design: 'category: design',
+              reliability: 'category: reliability',
+              testing: 'category: testing',
+              architecture: 'category: architecture',
+              naming: 'category: naming',
+              clarity: 'category: clarity',
+              documentation: 'category: documentation',
+              organization: 'category: organization'
+            };
+
+            // Get existing issues to avoid duplicates
+            const existingIssues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: 'quality-gate,automated',
+              state: 'open'
+            });
+
+            const existingTitles = new Set(existingIssues.data.map(i => i.title));
+
+            // Create issues for each file/rule combination
+            for (const [file, rules] of Object.entries(grouped)) {
+              for (const [ruleId, violations] of Object.entries(rules)) {
+                const firstViolation = violations[0];
+                const title = `[Quality] ${ruleId}: ${firstViolation.message} in ${file}`;
+
+                // Skip if issue already exists
+                if (existingTitles.has(title)) {
+                  console.log(`Skipping duplicate issue: ${title}`);
+                  continue;
+                }
+
+                // Build issue body
+                const body = [
+                  '## Quality Violation Detected',
+                  '',
+                  `**File:** \`${file}\``,
+                  `**Rule:** ${ruleId}`,
+                  `**Severity:** ${firstViolation.severity}`,
+                  `**Category:** ${firstViolation.category}`,
+                  `**Occurrences:** ${violations.length}`,
+                  '',
+                  '### Description',
+                  firstViolation.description || 'No description available',
+                  '',
+                  '### Violations',
+                  '',
+                ];
+
+                // List all violations (max 10)
+                violations.slice(0, 10).forEach((v, i) => {
+                  body.push(`#### ${i + 1}. Line ${v.line}`);
+                  body.push('```');
+                  body.push(v.code_snippet || 'No code snippet available');
+                  body.push('```');
+                  body.push('');
+                });
+
+                if (violations.length > 10) {
+                  body.push(`_... and ${violations.length - 10} more occurrences_`);
+                  body.push('');
+                }
+
+                // Add fix suggestion
+                if (firstViolation.fix_suggestion) {
+                  body.push('### Suggested Fix');
+                  body.push(firstViolation.fix_suggestion);
+                  body.push('');
+                }
+
+                // Add NASA mapping if available
+                if (firstViolation.nasa_mapping) {
+                  body.push('### NASA Standard Mapping');
+                  body.push(`**Standard:** ${firstViolation.nasa_mapping}`);
+                  body.push('');
+                }
+
+                // Add connascence type if available
+                if (firstViolation.connascence_type) {
+                  body.push('### Connascence Type');
+                  body.push(`**Type:** ${firstViolation.connascence_type}`);
+                  body.push('');
+                }
+
+                // Add metadata
+                body.push('---');
+                body.push('_This issue was automatically created by the Quality Gate system._');
+                body.push(`_Scan Date: ${new Date().toISOString()}_`);
+
+                // Collect labels
+                const labels = ['quality-gate', 'automated', 'needs-triage'];
+                if (severityLabels[firstViolation.severity]) {
+                  labels.push(severityLabels[firstViolation.severity]);
+                }
+                if (categoryLabels[firstViolation.category]) {
+                  labels.push(categoryLabels[firstViolation.category]);
+                }
+
+                // Create issue
+                try {
+                  const issue = await github.rest.issues.create({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    title: title,
+                    body: body.join('\n'),
+                    labels: labels
+                  });
+                  console.log(`Created issue #${issue.data.number}: ${title}`);
+                } catch (error) {
+                  console.error(`Failed to create issue: ${error.message}`);
+                }
+              }
+            }
+
+      - name: Create Summary Issue
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const fs = require('fs');
+            const grouped = JSON.parse(fs.readFileSync('grouped_violations.json', 'utf8'));
+
+            // Calculate statistics
+            let totalViolations = 0;
+            let filesAffected = Object.keys(grouped).length;
+            let ruleTypes = new Set();
+            const severityCounts = { critical: 0, high: 0, medium: 0, low: 0 };
+
+            for (const [file, rules] of Object.entries(grouped)) {
+              for (const [ruleId, violations] of Object.entries(rules)) {
+                totalViolations += violations.length;
+                ruleTypes.add(ruleId);
+                violations.forEach(v => {
+                  if (v.severity in severityCounts) {
+                    severityCounts[v.severity]++;
+                  }
+                });
+              }
+            }
+
+            // Build summary body
+            const body = [
+              '# Weekly Quality Gate Scan Summary',
+              '',
+              `**Scan Date:** ${new Date().toISOString()}`,
+              '',
+              '## Statistics',
+              '',
+              `- **Total Violations:** ${totalViolations}`,
+              `- **Files Affected:** ${filesAffected}`,
+              `- **Rule Types:** ${ruleTypes.size}`,
+              '',
+              '### Violations by Severity',
+              '',
+              `- **Critical:** ${severityCounts.critical}`,
+              `- **High:** ${severityCounts.high}`,
+              `- **Medium:** ${severityCounts.medium}`,
+              `- **Low:** ${severityCounts.low}`,
+              '',
+              '## Top Violating Files',
+              '',
+            ];
+
+            // Sort files by violation count
+            const sortedFiles = Object.entries(grouped)
+              .map(([file, rules]) => ({
+                file,
+                count: Object.values(rules).reduce((sum, v) => sum + v.length, 0)
+              }))
+              .sort((a, b) => b.count - a.count)
+              .slice(0, 10);
+
+            sortedFiles.forEach(({file, count}, i) => {
+              body.push(`${i + 1}. \`${file}\` - ${count} violations`);
+            });
+
+            body.push('');
+            body.push('## Actions Taken');
+            body.push('');
+            body.push(`Created ${filesAffected} individual issues for tracked violations.`);
+            body.push('');
+            body.push('---');
+            body.push('_This summary was automatically generated by the Quality Gate system._');
+
+            // Create summary issue
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Quality Gate Weekly Scan - ${new Date().toISOString().split('T')[0]}`,
+              body: body.join('\n'),
+              labels: ['quality-gate', 'automated', 'summary']
+            });
+
+      - name: Upload Scan Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: weekly-scan-results
+          path: |
+            clarity_violations.json
+            connascence_violations.json
+            nasa_violations.json
+            grouped_violations.json
+          retention-days: 90

@@ -22,6 +22,8 @@ class ValuesDetector(DetectorBase):
     Simplified implementation focusing on duplicate literals and magic numbers.
     """
 
+    SUPPORTED_EXTENSIONS = [".py"]
+
     def __init__(self, file_path: str, source_lines: List[str]):
         super().__init__(file_path, source_lines)
 

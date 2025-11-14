@@ -20,6 +20,7 @@ from .enhanced_metrics import EnhancedMetricsCalculator
 # Import existing architecture components
 from .orchestrator import AnalysisOrchestrator
 from .recommendation_engine import RecommendationEngine
+from .report_generator import ReportGenerator
 
 __all__ = [
     "AnalysisOrchestrator",
@@ -27,6 +28,7 @@ __all__ = [
     "DetectorPool",
     "EnhancedMetricsCalculator",
     "RecommendationEngine",
+    "ReportGenerator",
     "ViolationAggregator",
     "get_detector_pool",
 ]

@@ -1,0 +1,560 @@
+# Clarity Linter Configuration
+# Language-agnostic code clarity and maintainability analyzer
+# Version: 1.0.0
+
+metadata:
+  name: "Clarity Linter"
+  version: "1.0.0"
+  description: "Language-agnostic code clarity and maintainability analyzer"
+  author: "Connascence Systems"
+  license: "MIT"
+
+# Global configuration
+config:
+  severity_levels:
+    critical: 90      # Block PR/CI
+    high: 70          # Warning with fix required
+    medium: 50        # Warning
+    low: 30           # Info
+    info: 0           # Informational only
+
+  default_thresholds:
+    max_function_length: 50
+    max_file_length: 500
+    max_complexity: 10
+    max_nesting: 4
+    max_parameters: 6
+    min_test_coverage: 80
+
+  output_formats:
+    - sarif          # GitHub Code Scanning
+    - json           # Machine-readable
+    - markdown       # Human-readable
+    - github_check   # GitHub Check API
+
+# Rule Definitions
+rules:
+  # CLARITY001-010: Function & Method Clarity
+  CLARITY001:
+    name: "Function Length Violation"
+    description: "Functions should be concise and focused (max 50 lines)"
+    severity: high
+    category: readability
+    threshold: 50
+    detection:
+      type: line_count
+      scope: function
+      exclude_comments: true
+      exclude_blank_lines: true
+    fix_suggestion: "Break large function into smaller, focused functions with clear responsibilities"
+    nasa_mapping: "NASA-STD-8739.8 Section 4.2.1"
+    connascence_type: "CoP (Connascence of Position)"
+
+  CLARITY002:
+    name: "Method Complexity Violation"
+    description: "Methods with high cyclomatic complexity are hard to understand"
+    severity: high
+    category: complexity
+    threshold: 10
+    detection:
+      type: cyclomatic_complexity
+      scope: function
+      count_branches: true
+      count_loops: true
+    fix_suggestion: "Simplify control flow, extract conditional logic into well-named helper methods"
+    nasa_mapping: "NASA-STD-8739.8 Section 4.2.3"
+    connascence_type: "CoC (Connascence of Complexity)"
+
+  CLARITY003:
+    name: "Deep Nesting Violation"
+    description: "Excessive nesting makes code difficult to follow (max 4 levels)"
+    severity: medium
+    category: readability
+    threshold: 4
+    detection:
+      type: nesting_depth
+      scope: function
+      count_blocks: true
+      include_conditionals: true
+      include_loops: true
+    fix_suggestion: "Use early returns, extract nested logic into functions, apply guard clauses"
+    nasa_mapping: "NASA JPL Rule 6"
+    connascence_type: "CoC (Connascence of Complexity)"
+
+  CLARITY004:
+    name: "Parameter Bomb"
+    description: "Too many parameters reduce clarity (max 6 parameters)"
+    severity: high
+    category: design
+    threshold: 6
+    detection:
+      type: parameter_count
+      scope: function
+      include_optional: true
+      include_variadic: false
+    fix_suggestion: "Group related parameters into objects/structs, use builder pattern"
+    nasa_mapping: "NASA JPL Rule 3"
+    connascence_type: "CoP (Connascence of Position)"
+
+  CLARITY005:
+    name: "Missing Function Documentation"
+    description: "Functions should have clear documentation explaining purpose and usage"
+    severity: medium
+    category: documentation
+    threshold: 0
+    detection:
+      type: documentation_presence
+      scope: function
+      check_docstring: true
+      check_inline_comments: false
+      min_description_length: 20
+    fix_suggestion: "Add docstring with purpose, parameters, return value, and examples"
+    nasa_mapping: "NASA-STD-8739.8 Section 5.1"
+    connascence_type: "CoM (Connascence of Meaning)"
+
+  # CLARITY011-020: Naming & Semantics
+  CLARITY011:
+    name: "Unclear Variable Name"
+    description: "Variable names should be self-documenting and meaningful"
+    severity: medium
+    category: naming
+    threshold: 0
+    detection:
+      type: name_quality
+      scope: variable
+      min_length: 3
+      check_abbreviations: true
+      check_single_letter: true
+      allowed_single_letter: ["i", "j", "k", "x", "y", "z"]
+      check_hungarian_notation: true
+    fix_suggestion: "Use descriptive names that convey purpose (e.g., userCount not uc, totalPrice not tp)"
+    nasa_mapping: "NASA-STD-8739.8 Section 4.3.1"
+    connascence_type: "CoM (Connascence of Meaning)"
+
+  CLARITY012:
+    name: "Magic Number Literal"
+    description: "Unexplained numeric literals should be named constants"
+    severity: medium
+    category: clarity
+    threshold: 0
+    detection:
+      type: magic_literal
+      scope: all
+      exclude_values: [0, 1, -1, 2, 10, 100]
+      check_strings: false
+      check_floats: true
+    fix_suggestion: "Extract to named constant with clear purpose (e.g., MAX_RETRIES = 3)"
+    nasa_mapping: "NASA JPL Rule 9"
+    connascence_type: "CoM (Connascence of Meaning)"
+
+  CLARITY013:
+    name: "Inconsistent Naming Convention"
+    description: "Maintain consistent naming style within scope"
+    severity: low
+    category: naming
+    threshold: 0
+    detection:
+      type: naming_consistency
+      scope: file
+      check_case_style: true
+      check_prefix_suffix: true
+      language_specific: true
+    fix_suggestion: "Follow language conventions (camelCase for JS, snake_case for Python, etc.)"
+    nasa_mapping: "NASA-STD-8739.8 Section 4.3"
+    connascence_type: "CoN (Connascence of Name)"
+
+  CLARITY014:
+    name: "Misleading Function Name"
+    description: "Function name doesn't match implementation behavior"
+    severity: high
+    category: naming
+    threshold: 0
+    detection:
+      type: semantic_mismatch
+      scope: function
+      check_verb_prefix: true
+      check_return_type: true
+      check_side_effects: true
+    fix_suggestion: "Rename to accurately reflect behavior (e.g., getUserOrCreate not getUser if it creates)"
+    nasa_mapping: "NASA-STD-8739.8 Section 4.3.2"
+    connascence_type: "CoM (Connascence of Meaning)"
+
+  # CLARITY021-030: Code Structure & Organization
+  CLARITY021:
+    name: "God Object/Class"
+    description: "Classes should have single responsibility (max 15 methods)"
+    severity: high
+    category: design
+    threshold: 15
+    detection:
+      type: method_count
+      scope: class
+      include_private: true
+      include_static: true
+    fix_suggestion: "Split into focused classes following Single Responsibility Principle"
+    nasa_mapping: "NASA-STD-8739.8 Section 4.4.1"
+    connascence_type: "CoC (Connascence of Complexity)"
+
+  CLARITY022:
+    name: "Long File Violation"
+    description: "Files should be focused and manageable (max 500 lines)"
+    severity: medium
+    category: organization
+    threshold: 500
+    detection:
+      type: line_count
+      scope: file
+      exclude_comments: true
+      exclude_blank_lines: true
+    fix_suggestion: "Split into multiple focused modules/files by responsibility"
+    nasa_mapping: "NASA-STD-8739.8 Section 4.4.2"
+    connascence_type: "CoC (Connascence of Complexity)"
+
+  CLARITY023:
+    name: "Circular Dependency"
+    description: "Modules should have clear dependency hierarchy"
+    severity: critical
+    category: architecture
+    threshold: 0
+    detection:
+      type: dependency_cycle
+      scope: project
+      check_imports: true
+      max_cycle_length: 2
+    fix_suggestion: "Refactor to remove cycles, extract shared dependencies, use dependency inversion"
+    nasa_mapping: "NASA-STD-8739.8 Section 4.5.1"
+    connascence_type: "CoI (Connascence of Identity)"
+
+  CLARITY024:
+    name: "High Coupling"
+    description: "Module has too many external dependencies"
+    severity: medium
+    category: architecture
+    threshold: 10
+    detection:
+      type: coupling_count
+      scope: module
+      count_imports: true
+      exclude_stdlib: false
+    fix_suggestion: "Reduce dependencies, use interfaces/abstractions, apply dependency injection"
+    nasa_mapping: "NASA-STD-8739.8 Section 4.5.2"
+    connascence_type: "CoI (Connascence of Identity)"
+
+  CLARITY025:
+    name: "Missing Abstraction"
+    description: "Repeated patterns should be abstracted"
+    severity: low
+    category: design
+    threshold: 3
+    detection:
+      type: code_duplication
+      scope: project
+      min_duplicate_lines: 5
+      similarity_threshold: 0.85
+    fix_suggestion: "Extract common logic into reusable functions/classes"
+    nasa_mapping: "NASA-STD-8739.8 Section 4.6"
+    connascence_type: "CoA (Connascence of Algorithm)"
+
+  # CLARITY031-040: Error Handling & Edge Cases
+  CLARITY031:
+    name: "Missing Error Handling"
+    description: "Operations that can fail should have explicit error handling"
+    severity: high
+    category: reliability
+    threshold: 0
+    detection:
+      type: error_handling_check
+      scope: function
+      check_try_catch: true
+      check_null_checks: true
+      check_async_errors: true
+    fix_suggestion: "Add try-catch blocks, null checks, or error return values"
+    nasa_mapping: "NASA JPL Rule 10"
+    connascence_type: "CoT (Connascence of Timing)"
+
+  CLARITY032:
+    name: "Swallowed Exception"
+    description: "Exceptions should be properly handled or logged"
+    severity: high
+    category: reliability
+    threshold: 0
+    detection:
+      type: empty_catch_block
+      scope: function
+      check_logging: true
+      allow_specific_exceptions: false
+    fix_suggestion: "Log error details, handle gracefully, or propagate with context"
+    nasa_mapping: "NASA JPL Rule 11"
+    connascence_type: "CoT (Connascence of Timing)"
+
+  CLARITY033:
+    name: "Missing Null/Undefined Check"
+    description: "Accessing properties without null safety checks"
+    severity: medium
+    category: reliability
+    threshold: 0
+    detection:
+      type: null_safety
+      scope: expression
+      check_property_access: true
+      check_method_calls: true
+      check_array_access: true
+    fix_suggestion: "Add null checks, use optional chaining, or provide default values"
+    nasa_mapping: "NASA JPL Rule 13"
+    connascence_type: "CoE (Connascence of Execution)"
+
+  CLARITY034:
+    name: "Unhandled Promise Rejection"
+    description: "Async operations should have rejection handlers"
+    severity: high
+    category: reliability
+    threshold: 0
+    detection:
+      type: promise_handling
+      scope: expression
+      check_catch: true
+      check_await: true
+      check_then: true
+    fix_suggestion: "Add .catch() handler or use try-catch with async/await"
+    nasa_mapping: "NASA-STD-8739.8 Section 4.7.2"
+    connascence_type: "CoT (Connascence of Timing)"
+
+  # CLARITY041-050: Testing & Quality Assurance
+  CLARITY041:
+    name: "Missing Unit Tests"
+    description: "Functions should have corresponding unit tests"
+    severity: medium
+    category: testing
+    threshold: 0
+    detection:
+      type: test_coverage
+      scope: function
+      min_coverage: 80
+      check_branches: true
+    fix_suggestion: "Add unit tests covering main paths and edge cases"
+    nasa_mapping: "NASA-STD-8739.8 Section 5.2.1"
+    connascence_type: "CoV (Connascence of Value)"
+
+  CLARITY042:
+    name: "Low Test Coverage"
+    description: "Module should maintain minimum test coverage (80%)"
+    severity: medium
+    category: testing
+    threshold: 80
+    detection:
+      type: coverage_percentage
+      scope: module
+      include_branches: true
+      include_lines: true
+    fix_suggestion: "Add tests for uncovered code paths and edge cases"
+    nasa_mapping: "NASA-STD-8739.8 Section 5.2.2"
+    connascence_type: "CoV (Connascence of Value)"
+
+  CLARITY043:
+    name: "Missing Edge Case Tests"
+    description: "Tests should cover boundary conditions and edge cases"
+    severity: low
+    category: testing
+    threshold: 0
+    detection:
+      type: edge_case_coverage
+      scope: function
+      check_null_values: true
+      check_empty_collections: true
+      check_boundary_values: true
+    fix_suggestion: "Add tests for null, empty, min/max values, and error conditions"
+    nasa_mapping: "NASA-STD-8739.8 Section 5.2.3"
+    connascence_type: "CoV (Connascence of Value)"
+
+  CLARITY044:
+    name: "Flaky Test Pattern"
+    description: "Tests should be deterministic and repeatable"
+    severity: medium
+    category: testing
+    threshold: 0
+    detection:
+      type: test_reliability
+      scope: test
+      check_timing_dependencies: true
+      check_random_values: true
+      check_external_dependencies: true
+    fix_suggestion: "Mock external dependencies, use fixed seeds, avoid time-based assertions"
+    nasa_mapping: "NASA-STD-8739.8 Section 5.2.4"
+    connascence_type: "CoT (Connascence of Timing)"
+
+  CLARITY050:
+    name: "Production Code in Tests"
+    description: "Test files should not be imported by production code"
+    severity: critical
+    category: architecture
+    threshold: 0
+    detection:
+      type: import_direction
+      scope: project
+      check_test_imports: true
+      test_patterns: ["test_*.py", "*_test.js", "*.spec.ts"]
+    fix_suggestion: "Move shared code to proper modules, use test fixtures properly"
+    nasa_mapping: "NASA-STD-8739.8 Section 5.3"
+    connascence_type: "CoI (Connascence of Identity)"
+
+# Language-specific configurations
+languages:
+  python:
+    enabled: true
+    file_extensions: [".py", ".pyw"]
+    max_function_length: 50
+    max_class_methods: 15
+    naming_conventions:
+      function: snake_case
+      class: PascalCase
+      constant: UPPER_SNAKE_CASE
+      variable: snake_case
+
+  javascript:
+    enabled: true
+    file_extensions: [".js", ".jsx", ".mjs"]
+    max_function_length: 50
+    max_class_methods: 15
+    naming_conventions:
+      function: camelCase
+      class: PascalCase
+      constant: UPPER_SNAKE_CASE
+      variable: camelCase
+
+  typescript:
+    enabled: true
+    file_extensions: [".ts", ".tsx"]
+    max_function_length: 50
+    max_class_methods: 15
+    naming_conventions:
+      function: camelCase
+      class: PascalCase
+      constant: UPPER_SNAKE_CASE
+      variable: camelCase
+      interface: PascalCase
+
+  java:
+    enabled: true
+    file_extensions: [".java"]
+    max_function_length: 60
+    max_class_methods: 20
+    naming_conventions:
+      function: camelCase
+      class: PascalCase
+      constant: UPPER_SNAKE_CASE
+      variable: camelCase
+
+  go:
+    enabled: true
+    file_extensions: [".go"]
+    max_function_length: 50
+    max_class_methods: 15
+    naming_conventions:
+      function: camelCase
+      class: PascalCase
+      constant: UPPER_SNAKE_CASE
+      variable: camelCase
+
+  rust:
+    enabled: true
+    file_extensions: [".rs"]
+    max_function_length: 50
+    max_class_methods: 15
+    naming_conventions:
+      function: snake_case
+      class: PascalCase
+      constant: UPPER_SNAKE_CASE
+      variable: snake_case
+
+  cpp:
+    enabled: true
+    file_extensions: [".cpp", ".cc", ".cxx", ".h", ".hpp"]
+    max_function_length: 60
+    max_class_methods: 20
+    naming_conventions:
+      function: snake_case
+      class: PascalCase
+      constant: UPPER_SNAKE_CASE
+      variable: snake_case
+
+# Integration settings
+integrations:
+  github:
+    enabled: true
+    check_runs: true
+    code_scanning: true
+    pr_comments: true
+    status_checks: true
+
+  gitlab:
+    enabled: true
+    merge_request_comments: true
+    code_quality_reports: true
+
+  sonarqube:
+    enabled: false
+    export_format: sonar_json
+
+  sarif:
+    enabled: true
+    output_file: "clarity_results.sarif"
+    version: "2.1.0"
+
+# Exclusions
+exclusions:
+  directories:
+    - node_modules
+    - venv
+    - .venv
+    - dist
+    - build
+    - __pycache__
+    - .git
+    - .github
+    - .pytest_cache
+    - coverage
+    - .mypy_cache
+    - .ruff_cache
+
+  files:
+    - "*.min.js"
+    - "*.bundle.js"
+    - "*.d.ts"
+    - "*_pb2.py"
+    - "*.generated.*"
+
+  patterns:
+    - "test_*.py"
+    - "*_test.go"
+    - "*.spec.ts"
+    - "*.test.js"
+
+# Reporting
+reporting:
+  formats:
+    - sarif
+    - json
+    - markdown
+    - html
+
+  output_directory: ".clarity-reports"
+
+  github_annotations: true
+
+  summary_metrics:
+    - total_violations
+    - violations_by_severity
+    - violations_by_rule
+    - violations_by_file
+    - fix_suggestions_count
+    - nasa_compliance_score
+    - connascence_types_detected
+
+  trends:
+    enabled: true
+    history_file: ".clarity-history.json"
+    track_metrics:
+      - total_violations
+      - critical_count
+      - high_count
+      - fix_rate

@@ -15,6 +15,7 @@ from .base import DetectorBase
 class GodObjectDetector(DetectorBase):
     """Detects classes that violate Single Responsibility Principle."""
 
+    SUPPORTED_EXTENSIONS = [".py", ".js", ".ts"]
     DEFAULT_METHOD_THRESHOLD = 18
     DEFAULT_LOC_THRESHOLD = 700
 

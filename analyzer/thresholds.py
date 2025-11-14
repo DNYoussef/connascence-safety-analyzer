@@ -5,6 +5,7 @@ Connascence Type Definitions and Thresholds
 Defines the various types of connascence and their severity thresholds.
 """
 
+from dataclasses import dataclass
 from enum import Enum
 
 
@@ -86,3 +87,15 @@ NASA_POT_MAPPINGS = {
     "POT10_9": ConnascenceType.IDENTITY,  # Object identity
     "POT10_10": ConnascenceType.NAME,  # Naming conventions
 }
+
+
+@dataclass
+class ThresholdConfig:
+    """Configuration for analysis thresholds."""
+
+    max_positional_params: int = 6
+    max_cyclomatic_complexity: int = 10
+    god_class_methods: int = 15
+    max_method_lines: int = 50
+    max_nesting_depth: int = 4
+    min_magic_literal_threshold: float = 10.0

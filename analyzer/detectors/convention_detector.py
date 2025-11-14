@@ -17,6 +17,8 @@ from .base import DetectorBase
 class ConventionDetector(DetectorBase):
     """Detects convention-based coupling and naming inconsistencies."""
 
+    SUPPORTED_EXTENSIONS = [".py"]
+
     def __init__(self, file_path: str, source_lines: List[str]):
         super().__init__(file_path, source_lines)
 

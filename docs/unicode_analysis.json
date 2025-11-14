@@ -1,0 +1,271 @@
+{
+  "timestamp": "2025-11-02T08:04:08.219578",
+  "summary": {
+    "files_processed": 810,
+    "files_modified": 0,
+    "files_with_unicode": 83,
+    "unicode_characters_found": 836,
+    "unicode_characters_removed": 0
+  },
+  "violations": [
+    {
+      "file": "analyzer\\check_connascence.py",
+      "line": 661,
+      "column": 47,
+      "char": "\u2264",
+      "unicode_code": "U+2264",
+      "replacement": "<=",
+      "context": "Refactored to comply with NASA Rule 4 (\u226460 lines p..."
+    },
+    {
+      "file": "analyzer\\context_analyzer.py",
+      "line": 297,
+      "column": 47,
+      "char": "\u2264",
+      "unicode_code": "U+2264",
+      "replacement": "<=",
+      "context": "Refactored to comply with NASA Rule 4 (\u226460 lines p..."
+    },
+    {
+      "file": "analyzer\\core.py",
+      "line": 268,
+      "column": 47,
+      "char": "\u2264",
+      "unicode_code": "U+2264",
+      "replacement": "<=",
+      "context": "Refactored to comply with NASA Rule 4 (\u226460 lines p..."
+    },
+    {
+      "file": "analyzer\\core.py",
+      "line": 542,
+      "column": 43,
+      "char": "\u2264",
+      "unicode_code": "U+2264",
+      "replacement": "<=",
+      "context": "Refactored to comply with NASA Rule 4 (\u226460 lines p..."
+    },
+    {
+      "file": "analyzer\\core.py",
+      "line": 858,
+      "column": 43,
+      "char": "\u2264",
+      "unicode_code": "U+2264",
+      "replacement": "<=",
+      "context": "Refactored to comply with NASA Rule 4 (\u226460 lines p..."
+    },
+    {
+      "file": "scripts\\generate_quality_dashboard.py",
+      "line": 147,
+      "column": 12,
+      "char": "\ud83d\udd0d",
+      "unicode_code": "U+1F50D",
+      "replacement": "",
+      "context": "<h1>\ud83d\udd0d Quality Dashboard</h1>"
+    },
+    {
+      "file": "scripts\\generate_quality_dashboard.py",
+      "line": 153,
+      "column": 20,
+      "char": "\ud83d\udcca",
+      "unicode_code": "U+1F4CA",
+      "replacement": "DATA",
+      "context": "<h2>\ud83d\udcca Test Coverage</h2>"
+    },
+    {
+      "file": "scripts\\generate_quality_dashboard.py",
+      "line": 173,
+      "column": 20,
+      "char": "\ud83d\udee1",
+      "unicode_code": "U+1F6E1",
+      "replacement": "SECURITY",
+      "context": "<h2>\ud83d\udee1\ufe0f Security Scan</h2>"
+    },
+    {
+      "file": "scripts\\generate_quality_dashboard.py",
+      "line": 173,
+      "column": 21,
+      "char": "\ufe0f",
+      "unicode_code": "U+FE0F",
+      "replacement": "",
+      "context": "<h2>\ud83d\udee1\ufe0f Security Scan</h2>"
+    },
+    {
+      "file": "scripts\\generate_quality_dashboard.py",
+      "line": 198,
+      "column": 20,
+      "char": "\ud83d\udce6",
+      "unicode_code": "U+1F4E6",
+      "replacement": "",
+      "context": "<h2>\ud83d\udce6 Dependency Audit</h2>"
+    },
+    {
+      "file": "scripts\\generate_quality_dashboard.py",
+      "line": 223,
+      "column": 20,
+      "char": "\u2728",
+      "unicode_code": "U+2728",
+      "replacement": "",
+      "context": "<h2>\u2728 Code Quality</h2>"
+    },
+    {
+      "file": "scripts\\generate_quality_dashboard.py",
+      "line": 244,
+      "column": 16,
+      "char": "\ud83d\udccb",
+      "unicode_code": "U+1F4CB",
+      "replacement": "",
+      "context": "<h2>\ud83d\udccb Overall Status</h2>"
+    },
+    {
+      "file": "scripts\\generate_quality_dashboard.py",
+      "line": 246,
+      "column": 58,
+      "char": "\u2265",
+      "unicode_code": "U+2265",
+      "replacement": ">=",
+      "context": "<span class=\"metric-label\">Coverage Gate (\u226560%)</s..."
+    },
+    {
+      "file": "scripts\\generate_quality_dashboard.py",
+      "line": 258,
+      "column": 57,
+      "char": "\u2264",
+      "unicode_code": "U+2264",
+      "replacement": "<=",
+      "context": "<span class=\"metric-label\">Quality Gate (\u226410 error..."
+    },
+    {
+      "file": "scripts\\refactor_classify_class_context.py",
+      "line": 4,
+      "column": 15,
+      "char": "\u2264",
+      "unicode_code": "U+2264",
+      "replacement": "<=",
+      "context": "from 82 LOC to \u226460 LOC."
+    },
+    {
+      "file": "scripts\\refactor_classify_class_context.py",
+      "line": 122,
+      "column": 47,
+      "char": "\u2264",
+      "unicode_code": "U+2264",
+      "replacement": "<=",
+      "context": "Refactored to comply with NASA Rule 4 (\u226460 lines p..."
+    },
+    {
+      "file": "scripts\\refactor_core_main.py",
+      "line": 3,
+      "column": 68,
+      "char": "\u2264",
+      "unicode_code": "U+2264",
+      "replacement": "<=",
+      "context": "Script to refactor analyzer/core.py main() functio..."
+    },
+    {
+      "file": "scripts\\refactor_core_main.py",
+      "line": 324,
+      "column": 43,
+      "char": "\u2264",
+      "unicode_code": "U+2264",
+      "replacement": "<=",
+      "context": "Refactored to comply with NASA Rule 4 (\u226460 lines p..."
+    },
+    {
+      "file": "scripts\\refactor_create_parser.py",
+      "line": 3,
+      "column": 68,
+      "char": "\u2264",
+      "unicode_code": "U+2264",
+      "replacement": "<=",
+      "context": "Script to refactor analyzer/core.py create_parser(..."
+    },
+    {
+      "file": "scripts\\refactor_create_parser.py",
+      "line": 132,
+      "column": 43,
+      "char": "\u2264",
+      "unicode_code": "U+2264",
+      "replacement": "<=",
+      "context": "Refactored to comply with NASA Rule 4 (\u226460 lines p..."
+    },
+    {
+      "file": "scripts\\refactor_process_magic_literals.py",
+      "line": 4,
+      "column": 16,
+      "char": "\u2264",
+      "unicode_code": "U+2264",
+      "replacement": "<=",
+      "context": "from 108 LOC to \u226460 LOC."
+    },
+    {
+      "file": "scripts\\refactor_process_magic_literals.py",
+      "line": 132,
+      "column": 47,
+      "char": "\u2264",
+      "unicode_code": "U+2264",
+      "replacement": "<=",
+      "context": "Refactored to comply with NASA Rule 4 (\u226460 lines p..."
+    },
+    {
+      "file": "scripts\\refactor_run_unified_analysis.py",
+      "line": 3,
+      "column": 75,
+      "char": "\u2264",
+      "unicode_code": "U+2264",
+      "replacement": "<=",
+      "context": "Script to refactor analyzer/core.py _run_unified_a..."
+    },
+    {
+      "file": "scripts\\refactor_run_unified_analysis.py",
+      "line": 119,
+      "column": 47,
+      "char": "\u2264",
+      "unicode_code": "U+2264",
+      "replacement": "<=",
+      "context": "Refactored to comply with NASA Rule 4 (\u226460 lines p..."
+    },
+    {
+      "file": "analyzer\\enterprise\\sixsigma\\calculator.py",
+      "line": 320,
+      "column": 20,
+      "char": "\u2248",
+      "unicode_code": "U+2248",
+      "replacement": "",
+      "context": "Sigma Level \u2248 3 * Cpk"
+    },
+    {
+      "file": "tests\\regression\\test_nasa_compliance_regression.py",
+      "line": 10,
+      "column": 20,
+      "char": "\u2264",
+      "unicode_code": "U+2264",
+      "replacement": "<=",
+      "context": "- Rule 4: Functions \u226460 lines"
+    },
+    {
+      "file": "tests\\regression\\test_nasa_compliance_regression.py",
+      "line": 57,
+      "column": 47,
+      "char": "\u2264",
+      "unicode_code": "U+2264",
+      "replacement": "<=",
+      "context": "Check NASA Rule 4: Functions should be \u226460 lines."
+    }
+  ],
+  "configuration": {
+    "include_types": [
+      "py"
+    ],
+    "exclude_dirs": [
+      ".git",
+      "__pycache__",
+      ".pytest_cache",
+      "node_modules",
+      ".venv",
+      "venv"
+    ],
+    "check_mode": true,
+    "dry_run_mode": false,
+    "fix_mode": false
+  }
+}

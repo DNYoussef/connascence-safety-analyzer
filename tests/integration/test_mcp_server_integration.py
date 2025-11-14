@@ -26,6 +26,7 @@ import time
 from typing import Any, Dict
 
 import pytest
+import pytest_asyncio
 
 # Memory coordination for test results
 TEST_MEMORY = {}
@@ -197,7 +198,7 @@ void long_function() {
         yield workspace
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def mcp_server_mock():
     """Mock MCP server with realistic responses"""
 
@@ -491,8 +492,10 @@ async def mcp_server_mock():
 
     server = MockMCPServer()
     await server.start()
-    yield server
-    await server.stop()
+    try:
+        yield server
+    finally:
+        await server.stop()
 
 
 class TestMCPServerIntegration:

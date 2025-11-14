@@ -437,11 +437,14 @@ def _add_basic_arguments(parser: argparse.ArgumentParser):
 
     NASA Rule 4: Function under 60 lines
     """
-    parser.add_argument("--path", "-p", type=str, default=".", help="Path to analyze (default: current directory)")
+    # Use separate destinations for positional and optional path arguments
+    # This allows --path to override positional without default value conflicts
+    parser.add_argument("positional_path", nargs="?", default=argparse.SUPPRESS, metavar="path", help="Path to analyze (default: current directory)")
+    parser.add_argument("--path", "-p", dest="optional_path", type=str, help="Path to analyze (alternative to positional)")
 
     # Get available policies for help text
     policy_help = (
-        "Analysis policy to use. Unified: nasa-compliance, strict, standard, lenient (legacy names also accepted)"
+        "Analysis policy to use. Unified: nasa-compliance, strict, standard, lenient (legacy names also accepted, default: default)"
     )
     try:
         if "list_available_policies" in globals() and list_available_policies:
@@ -450,7 +453,7 @@ def _add_basic_arguments(parser: argparse.ArgumentParser):
     except:
         pass
 
-    parser.add_argument("--policy", type=str, default="standard", help=policy_help)
+    parser.add_argument("--policy", type=str, default="default", help=policy_help)
     parser.add_argument(
         "--format", "-f", type=str, default="json", choices=["json", "yaml", "sarif"], help="Output format"
     )
@@ -478,7 +481,7 @@ def _add_analysis_arguments(parser: argparse.ArgumentParser):
         help="Similarity threshold for duplication detection (0.0-1.0, default: 0.7)",
     )
     parser.add_argument("--strict-mode", action="store_true", help="Enable strict analysis mode")
-    parser.add_argument("--exclude", type=str, nargs="*", default=[], help="Paths to exclude from analysis")
+    parser.add_argument("--exclude", action="append", default=[], help="Paths to exclude from analysis (can be used multiple times)")
 
 
 def _add_output_control_arguments(parser: argparse.ArgumentParser):
@@ -537,7 +540,7 @@ def _add_enhanced_pipeline_arguments(parser: argparse.ArgumentParser):
 
 def create_parser() -> argparse.ArgumentParser:
     """
-    Create command-line argument parser.
+    Create command-line argument parser with custom path resolution.
 
     Refactored to comply with NASA Rule 4 (<=60 lines per function).
     Helper functions organize arguments into logical groups.
@@ -552,6 +555,20 @@ def create_parser() -> argparse.ArgumentParser:
     _add_output_control_arguments(parser)
     _add_exit_condition_arguments(parser)
     _add_enhanced_pipeline_arguments(parser)
+
+    # Wrap parse_args to handle path resolution
+    original_parse_args = parser.parse_args
+    def custom_parse_args(args=None, namespace=None):
+        result = original_parse_args(args, namespace)
+        # Resolve path from either --path or positional argument
+        if hasattr(result, 'optional_path') and result.optional_path:
+            result.path = result.optional_path
+        elif hasattr(result, 'positional_path'):
+            result.path = result.positional_path
+        else:
+            result.path = "."
+        return result
+    parser.parse_args = custom_parse_args
 
     return parser
 
@@ -861,6 +878,11 @@ def main():
     parser = create_parser()
     args = parser.parse_args()
 
+    # Validate path exists (path resolution done in parser)
+    if not Path(args.path).exists():
+        print(f"Error: Path does not exist: {args.path}", file=sys.stderr)
+        sys.exit(2)
+
     analyzer = ConnascenceAnalyzer()
     policy = "nasa_jpl_pot10" if args.nasa_validation else args.policy
 
@@ -885,6 +907,9 @@ def main():
         # Check exit conditions
         _check_exit_conditions(args, result)
 
+    except KeyboardInterrupt:
+        print("\nAnalysis interrupted by user", file=sys.stderr)
+        sys.exit(130)
     except Exception as e:
         _handle_error(e, args)
 
