@@ -1,0 +1,44 @@
+Unified analyzer not available, using fallback mode
+Analysis failed: compliance 75% < 95%
+Warning: Optimization components not available for benchmarking
+Warning: Optimization components not available for benchmarking
+Warning: Streaming components not available for benchmarking
+[WARNING] Unified analyzer not available, using fallback mode
+[WARNING] Unified duplication analyzer not available
+{
+  "god_objects": [],
+  "mece_analysis": {
+    "duplications": [],
+    "score": 0.75
+  },
+  "metrics": {
+    "analysis_time": 0.5,
+    "files_analyzed": 5,
+    "timestamp": 1763155789.175151
+  },
+  "nasa_compliance": {
+    "score": 0.85,
+    "violations": []
+  },
+  "path": "analyzer/",
+  "policy": "default",
+  "success": true,
+  "summary": {
+    "critical_violations": 0,
+    "overall_quality_score": 0.75,
+    "total_violations": 1
+  },
+  "violations": [
+    {
+      "analysis_mode": "fallback",
+      "description": "Mock: Magic literal detected (fallback mode)",
+      "file_path": "analyzer//mock_file.py",
+      "id": "mock_1",
+      "line_number": 42,
+      "rule_id": "CON_CoM",
+      "severity": "medium",
+      "type": "CoM",
+      "weight": 2.0
+    }
+  ]
+}
