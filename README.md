@@ -28,14 +28,27 @@ pip install -e ".[dev]"
 connascence analyze myfile.py
 
 # Analyze entire project
-connascence analyze .
+connascence analyze-workspace .
 
 # With safety profile
 connascence analyze . --profile strict
 
-# Generate HTML report
-connascence analyze . --format html --output report.html
+# Validate NASA compliance for one file
+connascence validate-safety src/flight.py --profile nasa-compliance
+
+# Generate refactoring suggestions for a hotspot line
+connascence suggest-refactoring src/utils.py --line 42
 ```
+
+### CLI verbs at a glance
+
+| Command | Description |
+|---------|-------------|
+| `analyze <file>` | AST-based connascence analysis for a single file or module |
+| `analyze-workspace <root>` | Recursively analyze a workspace (defaults to `*.py` patterns) |
+| `validate-safety <file>` | Run a safety profile/NASA compliance check and return structured violations |
+| `suggest-refactoring <file>` | Generate prioritized refactoring techniques for the most severe findings |
+| `scan` | **Legacy alias** for compatibility – prints a deprecation warning |
 
 ### VSCode Extension
 

@@ -19,9 +19,11 @@ after the core analyzer components were removed.
 """
 
 import argparse
+import json
 from pathlib import Path
 import sys
-from typing import List, Optional
+import time
+from typing import Dict, Iterable, List, Optional
 
 # License validation availability flag
 LICENSE_VALIDATION_AVAILABLE = False
@@ -48,6 +50,11 @@ except ImportError:
     ANALYZER_AVAILABLE = False
     ConnascenceASTAnalyzer = None
     ThresholdConfig = None
+
+try:
+    from policy.manager import PolicyManager
+except ImportError:
+    PolicyManager = None
 
 try:
     from analyzer.unified_analyzer import ErrorHandler, StandardError
@@ -91,6 +98,7 @@ class ConnascenceCLI:
         self.autofix_handler = MockHandler()
         self.mcp_handler = MockHandler()
         self.license_validator = None
+        self.policy_manager = PolicyManager() if PolicyManager else None
 
     def _create_parser(self) -> argparse.ArgumentParser:
         """Create argument parser for CLI."""
@@ -124,6 +132,84 @@ class ConnascenceCLI:
         scan_parser.add_argument("--incremental", action="store_true", help="Incremental scan mode")
         scan_parser.add_argument("--budget-check", action="store_true", dest="budget_check", help="Check budget compliance")
         scan_parser.add_argument("--dry-run", action="store_true", help="Dry run mode")
+
+        # Analyze command (new default)
+        analyze_parser = subparsers.add_parser("analyze", help="Analyze a single file or directory")
+        analyze_parser.add_argument("target", help="Path to file or directory to analyze")
+        analyze_parser.add_argument(
+            "--profile",
+            "--policy",
+            dest="profile",
+            default="service-defaults",
+            help=(
+                "Safety profile to apply (unified policy names). "
+                f"Available: {', '.join(UNIFIED_POLICY_NAMES)}"
+            ),
+        )
+        analyze_parser.add_argument("--format", choices=["json", "text"], default="json", help="Output format")
+        analyze_parser.add_argument("--output", "-o", type=str, help="Output file path")
+        analyze_parser.add_argument(
+            "--recursive",
+            action="store_true",
+            help="Analyze directories recursively (legacy workspace alias)",
+        )
+
+        # Analyze workspace command
+        analyze_workspace_parser = subparsers.add_parser(
+            "analyze-workspace", help="Analyze entire workspace recursively"
+        )
+        analyze_workspace_parser.add_argument("workspace", help="Workspace root to analyze")
+        analyze_workspace_parser.add_argument(
+            "--profile",
+            "--policy",
+            dest="profile",
+            default="service-defaults",
+            help="Safety profile to apply (unified policy names)",
+        )
+        analyze_workspace_parser.add_argument(
+            "--file-patterns",
+            nargs="+",
+            default=None,
+            help="Glob patterns to include (default: *.py)",
+        )
+        analyze_workspace_parser.add_argument(
+            "--format", choices=["json", "text"], default="json", help="Output format"
+        )
+        analyze_workspace_parser.add_argument("--output", "-o", type=str, help="Output file path")
+
+        # Safety validation command
+        validate_parser = subparsers.add_parser(
+            "validate-safety", help="Validate a file against a safety profile"
+        )
+        validate_parser.add_argument("target", help="File to validate")
+        validate_parser.add_argument(
+            "--profile",
+            "--policy",
+            dest="profile",
+            default="nasa-compliance",
+            help="Safety profile to enforce",
+        )
+        validate_parser.add_argument(
+            "--format", choices=["json", "text"], default="json", help="Output format"
+        )
+
+        # Refactoring suggestions command
+        suggest_parser = subparsers.add_parser(
+            "suggest-refactoring", help="Generate refactoring suggestions for a file"
+        )
+        suggest_parser.add_argument("target", help="File to analyze")
+        suggest_parser.add_argument("--line", type=int, help="Focus on a specific line")
+        suggest_parser.add_argument(
+            "--profile",
+            "--policy",
+            dest="profile",
+            default="service-defaults",
+            help="Safety profile to guide prioritization",
+        )
+        suggest_parser.add_argument(
+            "--format", choices=["json", "text"], default="json", help="Output format"
+        )
+        suggest_parser.add_argument("--limit", type=int, default=5, help="Maximum suggestions to return")
 
         # Scan-diff command
         diff_parser = subparsers.add_parser("scan-diff", help="Scan diff between commits")
@@ -239,6 +325,12 @@ class ConnascenceCLI:
                 print(f"Note: Using unified policy name '{unified_policy}' for '{parsed_args.policy}'")
             parsed_args.policy = unified_policy
 
+        if hasattr(parsed_args, "profile"):
+            resolved = self._resolve_profile(parsed_args.profile)
+            if not resolved:
+                return ExitCode.CONFIGURATION_ERROR
+            parsed_args.profile = resolved
+
         if parsed_args.verbose:
             print("Running connascence analysis...")
             if hasattr(parsed_args, "policy"):
@@ -275,9 +367,21 @@ class ConnascenceCLI:
         # Route to command handlers with error handling
         try:
             if parsed_args.command == "scan":
+                print(
+                    "[deprecated] 'scan' will be removed in a future release. Use 'analyze' or 'analyze-workspace' instead.",
+                    file=sys.stderr,
+                )
                 return self._handle_scan(parsed_args)
             elif parsed_args.command == "scan-diff":
                 return self._handle_scan_diff(parsed_args)
+            elif parsed_args.command == "analyze":
+                return self._handle_analyze(parsed_args)
+            elif parsed_args.command == "analyze-workspace":
+                return self._handle_analyze_workspace(parsed_args)
+            elif parsed_args.command == "validate-safety":
+                return self._handle_validate_safety(parsed_args)
+            elif parsed_args.command == "suggest-refactoring":
+                return self._handle_suggest_refactoring(parsed_args)
             elif parsed_args.command == "baseline":
                 return self._handle_baseline(parsed_args)
             elif parsed_args.command == "autofix":
@@ -552,6 +656,357 @@ class ConnascenceCLI:
             if confidence >= min_confidence:
                 filtered.append(patch)
         return filtered
+
+    # ---------------------------------------------------------------------
+    # New analysis helpers
+    # ---------------------------------------------------------------------
+
+    def _resolve_profile(self, profile: Optional[str]) -> Optional[str]:
+        profile = profile or "service-defaults"
+        if not validate_policy_name(profile):
+            error = self.error_handler.create_error(
+                "POLICY_INVALID",
+                f"Unknown safety profile '{profile}'",
+                ERROR_SEVERITY["HIGH"],
+                {"policy": profile, "available_policies": list_available_policies(include_legacy=True)},
+            )
+            self._handle_cli_error(error)
+            return None
+
+        unified = resolve_policy_name(profile, warn_deprecated=True)
+        if unified != profile:
+            print(f"Note: Using unified profile '{unified}' for '{profile}'")
+        return unified
+
+    def _get_threshold_config(self, profile: str) -> ThresholdConfig:
+        if self.policy_manager:
+            try:
+                return self.policy_manager.get_preset(profile)
+            except ValueError as exc:
+                error = self.error_handler.create_error(
+                    "POLICY_INVALID",
+                    str(exc),
+                    ERROR_SEVERITY["HIGH"],
+                    {"policy": profile},
+                )
+                self._handle_cli_error(error)
+                return ThresholdConfig()
+
+        return ThresholdConfig()
+
+    def _require_analyzer(self) -> bool:
+        if ANALYZER_AVAILABLE and ConnascenceASTAnalyzer is not None and ThresholdConfig is not None:
+            return True
+
+        print(
+            "Error: Analyzer components are not available in this environment.",
+            file=sys.stderr,
+        )
+        return False
+
+    def _handle_analyze(self, args: argparse.Namespace) -> int:
+        if not self._require_analyzer():
+            return ExitCode.RUNTIME_ERROR
+
+        target = Path(args.target)
+        if not target.exists():
+            print(f"Error: Path does not exist: {target}", file=sys.stderr)
+            return ExitCode.CONFIGURATION_ERROR
+
+        if target.is_dir() or getattr(args, "recursive", False):
+            return self._run_workspace_analysis(target, args.profile, args.format, args.output, None)
+
+        return self._run_file_analysis(target, args.profile, args.format, args.output)
+
+    def _handle_analyze_workspace(self, args: argparse.Namespace) -> int:
+        if not self._require_analyzer():
+            return ExitCode.RUNTIME_ERROR
+
+        workspace = Path(args.workspace)
+        if not workspace.exists() or not workspace.is_dir():
+            print(f"Error: Workspace path does not exist or is not a directory: {workspace}", file=sys.stderr)
+            return ExitCode.CONFIGURATION_ERROR
+
+        return self._run_workspace_analysis(
+            workspace,
+            args.profile,
+            args.format,
+            args.output,
+            args.file_patterns,
+        )
+
+    def _handle_validate_safety(self, args: argparse.Namespace) -> int:
+        if not self._require_analyzer():
+            return ExitCode.RUNTIME_ERROR
+
+        target = Path(args.target)
+        if not target.exists() or not target.is_file():
+            print(f"Error: Cannot validate non-existent file: {target}", file=sys.stderr)
+            return ExitCode.CONFIGURATION_ERROR
+
+        thresholds = self._get_threshold_config(args.profile)
+        analyzer = ConnascenceASTAnalyzer(thresholds=thresholds)
+        violations = analyzer.analyze_file(target)
+        payload = {
+            "compliant": len(violations) == 0,
+            "profile": args.profile,
+            "violations": [self._convert_violation(v, default_file=str(target)) for v in violations],
+        }
+
+        self._emit_result(payload, args.format, None)
+        return ExitCode.SUCCESS if payload["compliant"] else ExitCode.GENERAL_ERROR
+
+    def _handle_suggest_refactoring(self, args: argparse.Namespace) -> int:
+        if not self._require_analyzer():
+            return ExitCode.RUNTIME_ERROR
+
+        target = Path(args.target)
+        if not target.exists() or not target.is_file():
+            print(f"Error: Cannot generate suggestions for non-existent file: {target}", file=sys.stderr)
+            return ExitCode.CONFIGURATION_ERROR
+
+        thresholds = self._get_threshold_config(args.profile)
+        analyzer = ConnascenceASTAnalyzer(thresholds=thresholds)
+        violations = analyzer.analyze_file(target)
+        suggestions = self._build_refactoring_suggestions(violations, args.line, args.limit)
+        payload = {
+            "path": str(target),
+            "profile": args.profile,
+            "suggestions": suggestions,
+        }
+
+        self._emit_result(payload, args.format, None)
+        return ExitCode.SUCCESS
+
+    def _run_file_analysis(
+        self,
+        target: Path,
+        profile: str,
+        fmt: str,
+        output_path: Optional[str],
+    ) -> int:
+        thresholds = self._get_threshold_config(profile)
+        analyzer = ConnascenceASTAnalyzer(thresholds=thresholds)
+        start = time.time()
+        violations = analyzer.analyze_file(target)
+        payload = self._format_analysis_result(
+            violations,
+            files_analyzed=1,
+            profile=profile,
+            target=str(target),
+            analysis_time=time.time() - start,
+        )
+
+        self._emit_result(payload, fmt, output_path)
+        return ExitCode.SUCCESS
+
+    def _run_workspace_analysis(
+        self,
+        workspace: Path,
+        profile: str,
+        fmt: str,
+        output_path: Optional[str],
+        patterns: Optional[Iterable[str]],
+    ) -> int:
+        thresholds = self._get_threshold_config(profile)
+        analyzer = ConnascenceASTAnalyzer(thresholds=thresholds)
+        files: Dict[str, Dict[str, object]] = {}
+        total_score = 0.0
+
+        for file_path in self._iter_workspace_files(workspace, patterns):
+            start = time.time()
+            violations = analyzer.analyze_file(file_path)
+            file_payload = self._format_analysis_result(
+                violations,
+                files_analyzed=1,
+                profile=profile,
+                target=str(file_path),
+                analysis_time=time.time() - start,
+            )
+            files[str(file_path)] = file_payload
+            total_score += file_payload.get("quality_score", 0.0)
+
+        analyzed_files = len(files)
+        workspace_payload = {
+            "files": files,
+            "profile": profile,
+            "files_analyzed": analyzed_files,
+            "overall_score": round(total_score / analyzed_files, 2) if analyzed_files else 100.0,
+        }
+
+        self._emit_result(workspace_payload, fmt, output_path)
+        return ExitCode.SUCCESS
+
+    def _iter_workspace_files(self, workspace: Path, patterns: Optional[Iterable[str]]) -> Iterable[Path]:
+        glob_patterns = list(patterns) if patterns else ["*.py"]
+        seen = set()
+        for pattern in glob_patterns:
+            for path in workspace.rglob(pattern):
+                if not path.is_file():
+                    continue
+                real_path = path.resolve()
+                if real_path in seen:
+                    continue
+                seen.add(real_path)
+                yield path
+
+    def _format_analysis_result(
+        self,
+        violations,
+        files_analyzed: int,
+        profile: str,
+        target: Optional[str] = None,
+        analysis_time: Optional[float] = None,
+    ) -> Dict[str, object]:
+        severity_map = {"critical": "critical", "high": "major", "medium": "minor", "low": "info"}
+        severity_summary = {"critical": 0, "major": 0, "minor": 0, "info": 0}
+        findings = []
+        normalized_violations = list(violations or [])
+
+        for idx, violation in enumerate(normalized_violations):
+            finding = self._convert_violation(violation, idx, target)
+            finding_severity = severity_map.get(getattr(violation, "severity", "medium").lower(), "info")
+            severity_summary[finding_severity] += 1
+            finding["severity"] = finding_severity
+            findings.append(finding)
+
+        total_weight = sum(getattr(v, "weight", 1.0) or 1.0 for v in normalized_violations)
+        quality_score = round(max(0.0, 100.0 - (total_weight * 5.0)), 2)
+        result: Dict[str, object] = {
+            "target": target,
+            "profile": profile,
+            "quality_score": quality_score,
+            "findings": findings,
+            "summary": {"totalIssues": len(findings), "issuesBySeverity": severity_summary},
+            "files_analyzed": files_analyzed,
+        }
+
+        if analysis_time is not None:
+            result["analysis_time_ms"] = int(analysis_time * 1000)
+
+        return result
+
+    def _convert_violation(
+        self,
+        violation,
+        idx: int = 0,
+        default_file: Optional[str] = None,
+    ) -> Dict[str, object]:
+        violation_id = getattr(violation, "id", None) or f"{getattr(violation, 'type', 'violation')}-{idx}"
+        conn_type = getattr(violation, "connascence_type", None) or getattr(violation, "type", "")
+        severity = getattr(violation, "severity", "medium")
+        severity_map = {"critical": "critical", "high": "major", "medium": "minor", "low": "info"}
+        severity_value = severity_map.get(str(severity).lower(), "info")
+        description = getattr(violation, "description", "") or f"Detected {conn_type or 'connascence'}"
+        recommendation = getattr(violation, "recommendation", "")
+        line_number = getattr(violation, "line_number", 0) or 0
+        if line_number <= 0:
+            line_number = 1
+
+        return {
+            "id": violation_id,
+            "type": conn_type or getattr(violation, "type", "unknown"),
+            "severity": severity_value,
+            "message": description,
+            "file": getattr(violation, "file_path", "") or default_file,
+            "line": line_number,
+            "column": getattr(violation, "column", 0) or 0,
+            "suggestion": recommendation,
+        }
+
+    def _build_refactoring_suggestions(
+        self,
+        violations,
+        focus_line: Optional[int],
+        limit: int,
+    ) -> List[Dict[str, object]]:
+        if not violations:
+            return [
+                {
+                    "technique": "Review design",
+                    "description": "No connascence findings detected. Review architecture or run workspace analysis for context.",
+                    "confidence": 0.4,
+                    "preview": "File appears clean",
+                }
+            ]
+
+        severity_rank = {"critical": 0, "high": 1, "medium": 2, "low": 3}
+
+        def sort_key(v):
+            severity = getattr(v, "severity", "medium").lower()
+            severity_score = severity_rank.get(severity, 3)
+            if focus_line is None:
+                return (severity_score, getattr(v, "line_number", 0))
+            return (abs((getattr(v, "line_number", 0) or 0) - focus_line), severity_score)
+
+        prioritized = sorted(violations, key=sort_key)
+        suggestions = []
+        for violation in prioritized[: max(1, limit)]:
+            conn_type = getattr(violation, "connascence_type", None) or getattr(violation, "type", "unknown")
+            description = getattr(violation, "description", "") or f"Reduce {conn_type}"
+            line_number = getattr(violation, "line_number", 0) or 0
+            preview_line = line_number if line_number > 0 else "unknown"
+            suggestions.append(
+                {
+                    "technique": f"Reduce {conn_type}",
+                    "description": description,
+                    "confidence": max(0.3, 1.0 - (severity_rank.get(getattr(violation, "severity", "medium"), 3) * 0.2)),
+                    "preview": f"Line {preview_line}: {description[:80]}",
+                }
+            )
+
+        return suggestions
+
+    def _emit_result(self, payload: Dict[str, object], fmt: str, output_path: Optional[str]):
+        if fmt == "json":
+            serialized = json.dumps(payload, indent=2)
+            if output_path:
+                Path(output_path).write_text(serialized, encoding="utf-8")
+                print(f"Results written to {output_path}")
+            else:
+                print(serialized)
+            return
+
+        self._print_text_summary(payload)
+        if output_path:
+            Path(output_path).write_text(json.dumps(payload, indent=2), encoding="utf-8")
+            print(f"Detailed JSON written to {output_path}")
+
+    def _print_text_summary(self, payload: Dict[str, object]):
+        if "findings" in payload:
+            print(f"Analyzed {payload.get('target', 'input')} with profile {payload.get('profile')}")
+            summary = payload.get("summary", {})
+            print(f"Total findings: {summary.get('totalIssues', 0)} | Quality Score: {payload.get('quality_score', 0)}")
+            issues = summary.get("issuesBySeverity", {})
+            print(
+                "Severity breakdown: "
+                f"critical={issues.get('critical', 0)}, "
+                f"major={issues.get('major', 0)}, "
+                f"minor={issues.get('minor', 0)}, "
+                f"info={issues.get('info', 0)}"
+            )
+            return
+
+        if "files" in payload:
+            print(
+                f"Analyzed workspace with {payload.get('files_analyzed', 0)} files | "
+                f"Overall score: {payload.get('overall_score', 0)}"
+            )
+            return
+
+        if "violations" in payload and "compliant" in payload:
+            status = "COMPLIANT" if payload.get("compliant") else "NON-COMPLIANT"
+            print(f"Safety validation: {status} for profile {payload.get('profile')}")
+            print(f"Violations: {len(payload.get('violations', []))}")
+            return
+
+        if "suggestions" in payload:
+            print(f"Suggestions for {payload.get('path')}: {len(payload.get('suggestions', []))} items")
+            for suggestion in payload.get("suggestions", []):
+                print(f"- {suggestion.get('technique')}: {suggestion.get('description')}")
+            return
+
+        print(json.dumps(payload, indent=2))
 
 
 def main(args: Optional[List[str]] = None) -> int:
