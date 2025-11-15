@@ -21,6 +21,7 @@ after the core analyzer components were removed.
 import argparse
 import json
 from pathlib import Path
+import subprocess
 import sys
 import time
 from typing import Dict, Iterable, List, Optional
@@ -254,7 +255,14 @@ class ConnascenceCLI:
 
         # MCP serve subcommand
         serve_parser = mcp_subparsers.add_parser("serve", help="Start MCP server")
-        serve_parser.add_argument("--port", type=int, default=8080, help="Server port")
+        serve_parser.add_argument("--host", default="127.0.0.1", help="Host/IP to bind (default: 127.0.0.1)")
+        serve_parser.add_argument("--port", type=int, default=8765, help="Server port (default: 8765)")
+        serve_parser.add_argument(
+            "--env",
+            action="append",
+            default=[],
+            help="Environment variable override passed to the MCP server (KEY=VALUE)",
+        )
 
         # MCP status subcommand
         status_parser = mcp_subparsers.add_parser("status", help="Show MCP server status")
@@ -627,11 +635,24 @@ class ConnascenceCLI:
         """Handle MCP command execution."""
         command = getattr(args, 'mcp_command', None)
         if command == 'serve':
-            port = getattr(args, 'port', 8080)
-            print(f"Starting MCP server on port {port}")
-        elif command == 'status':
-            print("MCP server status: not running")
-        return 0
+            host = getattr(args, 'host', '127.0.0.1')
+            port = getattr(args, 'port', 8765)
+            env_args = getattr(args, 'env', []) or []
+
+            cmd = [sys.executable, '-m', 'mcp.cli', 'serve', '--host', host, '--port', str(port)]
+            for env_var in env_args:
+                cmd.extend(['--env', env_var])
+
+            result = subprocess.run(cmd, check=False)
+            return result.returncode
+
+        if command == 'status':
+            cmd = [sys.executable, '-m', 'mcp.cli', 'health-check']
+            result = subprocess.run(cmd, check=False)
+            return result.returncode
+
+        print("Unknown MCP subcommand", file=sys.stderr)
+        return ExitCode.ERROR
 
     def _load_or_scan_violations(self, args: argparse.Namespace = None):
         """Load violations from scan or existing results."""

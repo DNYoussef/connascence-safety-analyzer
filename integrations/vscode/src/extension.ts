@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { spawn, ChildProcessWithoutNullStreams } from 'child_process';
 import { ConnascenceAnalyzer } from './analyzer';
 import { MCPClient } from './mcpClient';
 import { DiagnosticProvider } from './diagnostics';
@@ -10,6 +11,7 @@ let mcpClient: MCPClient;
 let diagnosticProvider: DiagnosticProvider;
 let violationsProvider: ViolationsProvider;
 let metricsProvider: MetricsProvider;
+let mcpProcess: ChildProcessWithoutNullStreams | null = null;
 
 export function activate(context: vscode.ExtensionContext) {
     console.log('Connascence Analyzer extension is activating');
@@ -28,6 +30,9 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.window.registerTreeDataProvider('connascenceExplorer', violationsProvider);
     vscode.window.registerTreeDataProvider('connascenceMetrics', metricsProvider);
     vscode.window.registerTreeDataProvider('connascenceActions', actionsProvider);
+
+    const mcpOutputChannel = vscode.window.createOutputChannel('Connascence MCP');
+    context.subscriptions.push(mcpOutputChannel);
 
     // Register commands
     const analyzeCommand = vscode.commands.registerCommand('connascence.analyze', async () => {
@@ -179,6 +184,50 @@ export function activate(context: vscode.ExtensionContext) {
     );
 
     // Register disposables
+    const startMcpBackendCommand = vscode.commands.registerCommand('connascence.startMcpBackend', async () => {
+        if (mcpProcess) {
+            vscode.window.showInformationMessage('Connascence MCP backend is already running.');
+            mcpOutputChannel.show(true);
+            return;
+        }
+
+        const pythonBinary = process.env.CONNASCENCE_PYTHON || 'python';
+        const config = vscode.workspace.getConfiguration('connascence');
+        const port = config.get('mcpServerPort', 8765);
+        const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || context.extensionPath;
+        const args = ['-m', 'mcp.cli', 'serve', '--host', '127.0.0.1', '--port', String(port)];
+
+        mcpOutputChannel.appendLine(`[MCP] Launching server via ${pythonBinary} ${args.join(' ')}`);
+        mcpProcess = spawn(pythonBinary, args, { cwd: workspaceRoot, env: { ...process.env } });
+
+        mcpProcess.stdout.on('data', (data: Buffer) => {
+            mcpOutputChannel.appendLine(`[MCP] ${data.toString().trim()}`);
+        });
+        mcpProcess.stderr.on('data', (data: Buffer) => {
+            mcpOutputChannel.appendLine(`[MCP][stderr] ${data.toString().trim()}`);
+        });
+        mcpProcess.on('error', (error) => {
+            mcpOutputChannel.appendLine(`[MCP] Failed to start backend: ${error.message}`);
+            vscode.window.showErrorMessage(`Failed to start MCP backend: ${error.message}`);
+            mcpProcess = null;
+        });
+        mcpProcess.on('exit', (code) => {
+            mcpOutputChannel.appendLine(`[MCP] Backend exited with code ${code}`);
+            mcpProcess = null;
+        });
+
+        vscode.window.showInformationMessage(`Starting Connascence MCP backend on port ${port}`);
+        mcpOutputChannel.show(true);
+
+        // Attempt to connect once the backend starts listening
+        setTimeout(() => {
+            mcpClient.connect().catch(err => {
+                console.error('Failed to connect to MCP server after launch:', err);
+                vscode.window.showErrorMessage('Unable to connect to MCP backend. Check the MCP output channel for details.');
+            });
+        }, 500);
+    });
+
     context.subscriptions.push(
         analyzeCommand,
         showReportCommand,
@@ -187,9 +236,17 @@ export function activate(context: vscode.ExtensionContext) {
         refreshViolationsCommand,
         openViolationCommand,
         fixViolationCommand,
+        startMcpBackendCommand,
         diagnosticProvider,
         mcpClient
     );
+
+    context.subscriptions.push(new vscode.Disposable(() => {
+        if (mcpProcess) {
+            mcpProcess.kill();
+            mcpProcess = null;
+        }
+    }));
 
     // Auto-analyze on save if enabled
     const saveListener = vscode.workspace.onDidSaveTextDocument(async (document) => {

@@ -27,6 +27,7 @@
     "onLanguage:typescript",
     "onCommand:connascence.analyze",
     "onCommand:connascence.showReport",
+    "onCommand:connascence.startMcpBackend",
     "onView:connascenceExplorer"
   ],
   "main": "./out/extension.js",
@@ -104,6 +105,12 @@
         "title": "Fix This Violation",
         "category": "Connascence",
         "icon": "$(check)"
+      },
+      {
+        "command": "connascence.startMcpBackend",
+        "title": "Start MCP Backend",
+        "category": "Connascence",
+        "icon": "$(debug-start)"
       }
     ],
     "menus": {
