@@ -1,6 +1,6 @@
 """Type definitions for analyzer utilities."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field, InitVar
 from pathlib import Path
 from typing import Any, Dict, Optional
 
@@ -15,11 +15,16 @@ class ConnascenceViolation:
     file_path: Path
     line_number: int
     column_number: Optional[int] = None
+    column: InitVar[Optional[int]] = None  # Backwards compatibility alias
     message: str = ""
     context: Dict[str, Any] = None
     recommendation: str = ""
 
-    def __post_init__(self):
+    def __post_init__(self, column: Optional[int]):
+        # Handle backwards compatibility: column -> column_number
+        if column is not None and self.column_number is None:
+            self.column_number = column
+
         if self.context is None:
             self.context = {}
 
