@@ -107,6 +107,10 @@ export class ConnascenceExtension {
         );
     }
 
+    public getConnascenceService(): ConnascenceService {
+        return this.connascenceService;
+    }
+
     public activate(): void {
         this.logger.info('Activating Connascence extension components...');
         

@@ -34,6 +34,16 @@ let aiFixSuggestions: AIFixSuggestionsProvider;
 let connascenceService: ConnascenceService;
 let enhancedPipelineProvider: EnhancedPipelineProvider;
 
+function ensureConnascenceService(serviceOverride?: ConnascenceService): ConnascenceService {
+    const activeService = serviceOverride ?? connascenceService;
+    if (!activeService) {
+        const error = new Error('Connascence service has not been initialized');
+        logger?.error('Connascence service requested before initialization', error);
+        throw error;
+    }
+    return activeService;
+}
+
 export function activate(context: vscode.ExtensionContext) {
     // Initialize logger and telemetry
     logger = new ExtensionLogger('Connascence');
@@ -45,23 +55,24 @@ export function activate(context: vscode.ExtensionContext) {
     try {
         // Initialize core services
         // These will be initialized after extension is created
-        connascenceService = null as any;
         extension = new ConnascenceExtension(context, logger, telemetry);
-        
+        connascenceService = extension.getConnascenceService();
+        const service = ensureConnascenceService();
+
         // Initialize all feature managers
-        initializeFeatureManagers(context);
-        
+        initializeFeatureManagers(context, service);
+
         // Initialize tree data providers
-        initializeTreeProviders(context);
-        
+        initializeTreeProviders(context, service);
+
         // Register all commands
-        registerAllCommands(context);
-        
+        registerAllCommands(context, service);
+
         // Activate main extension
         extension.activate();
-        
+
         // Start background analysis after activation
-        startBackgroundServices(context);
+        startBackgroundServices(context, service);
         
         telemetry.logEvent('extension.activate.success');
         logger.info('🔗✨ Connascence Analyzer extension activated successfully - Ready to break chains!');
@@ -81,9 +92,10 @@ export function activate(context: vscode.ExtensionContext) {
     }
 }
 
-function initializeFeatureManagers(context: vscode.ExtensionContext) {
-    logger.info('🔧 Initializing feature managers...');
-    
+function initializeFeatureManagers(context: vscode.ExtensionContext, service: ConnascenceService) {
+    const activeService = ensureConnascenceService(service);
+    logger.info(`🔧 Initializing feature managers with ${activeService.constructor.name}...`);
+
     // Initialize enhanced pipeline provider first
     enhancedPipelineProvider = EnhancedPipelineProvider.getInstance();
     context.subscriptions.push(enhancedPipelineProvider);
@@ -105,13 +117,14 @@ function initializeFeatureManagers(context: vscode.ExtensionContext) {
     logger.info('✅ Feature managers initialized with enhanced pipeline support');
 }
 
-function initializeTreeProviders(context: vscode.ExtensionContext) {
+function initializeTreeProviders(context: vscode.ExtensionContext, service: ConnascenceService) {
+    const activeService = ensureConnascenceService(service);
     logger.info('🌳 Initializing tree data providers...');
-    
+
     // Initialize dashboard provider
-    dashboardProvider = new ConnascenceDashboardProvider(connascenceService);
+    dashboardProvider = new ConnascenceDashboardProvider(activeService);
     vscode.window.registerTreeDataProvider('connascenceDashboard', dashboardProvider);
-    
+
     // Initialize analysis results provider
     analysisResultsProvider = new AnalysisResultsProvider();
     vscode.window.registerTreeDataProvider('connascenceAnalysisResults', analysisResultsProvider);
@@ -119,8 +132,9 @@ function initializeTreeProviders(context: vscode.ExtensionContext) {
     logger.info('✅ Tree data providers registered');
 }
 
-function registerAllCommands(context: vscode.ExtensionContext) {
-    logger.info('📋 Registering commands...');
+function registerAllCommands(context: vscode.ExtensionContext, service: ConnascenceService) {
+    const activeService = ensureConnascenceService(service);
+    logger.info(`📋 Registering commands (service ready: ${activeService.constructor.name})...`);
     
     // Notification management commands
     const notificationControlsCommand = vscode.commands.registerCommand('connascence.manageNotifications', () => {
@@ -224,7 +238,8 @@ function registerAllCommands(context: vscode.ExtensionContext) {
     logger.info('✅ Commands registered');
 }
 
-function startBackgroundServices(context: vscode.ExtensionContext) {
+function startBackgroundServices(context: vscode.ExtensionContext, service: ConnascenceService) {
+    const activeService = ensureConnascenceService(service);
     logger.info('🚀 Starting background services for immediate loading...');
     
     // Initialize workspace analysis if files are already open
@@ -237,7 +252,7 @@ function startBackgroundServices(context: vscode.ExtensionContext) {
     }
     
     // Start workspace scanning for supported files
-    startWorkspaceScanning();
+    startWorkspaceScanning(activeService);
     
     // Register event handlers for immediate file processing
     const documentOpenHandler = vscode.workspace.onDidOpenTextDocument((document) => {
@@ -265,8 +280,9 @@ function startBackgroundServices(context: vscode.ExtensionContext) {
     logger.info('✅ Background services initialized');
 }
 
-function startWorkspaceScanning() {
-    logger.info('🔍 Starting workspace scanning for supported files...');
+function startWorkspaceScanning(service: ConnascenceService) {
+    const activeService = ensureConnascenceService(service);
+    logger.info(`🔍 Starting workspace scanning for supported files using ${activeService.constructor.name}...`);
     
     // Scan for supported file types in background
     Promise.resolve(vscode.workspace.findFiles('**/*.{py,c,cpp,h,hpp,js,ts}', '**/node_modules/**', 100))
