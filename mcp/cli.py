@@ -119,6 +119,66 @@ async def health_check_command(args: argparse.Namespace) -> int:
         return 1
 
 
+async def mcp_server_command(args: argparse.Namespace) -> int:
+    """Run the MCP server over stdio for Claude / VSCode."""
+    try:
+        server = create_enhanced_mcp_server(args.config)
+        await run_stdio_server(server, once=args.once)
+        return 0
+    except Exception as e:
+        logger.error(f"Failed to start MCP server: {e}")
+        return 1
+
+
+async def run_stdio_server(server, once: bool = False) -> None:
+    """Simple stdio transport so Claude Desktop / VSCode can talk to the server."""
+
+    readiness = {
+        "event": "server_ready",
+        "info": get_server_info(),
+        "health": await server.health_check(client_id="mcp-stdio"),
+    }
+    print(json.dumps(readiness, indent=2))
+    sys.stdout.flush()
+
+    if once:
+        return
+
+    loop = asyncio.get_event_loop()
+
+    while True:
+        line = await loop.run_in_executor(None, sys.stdin.readline)
+        if not line:
+            await asyncio.sleep(0.1)
+            continue
+
+        payload = line.strip()
+        if not payload:
+            continue
+
+        try:
+            request = json.loads(payload)
+        except json.JSONDecodeError:
+            print(json.dumps({"event": "error", "error": "invalid_json", "payload": payload}))
+            sys.stdout.flush()
+            continue
+
+        tool = request.get("tool")
+        if not tool:
+            print(json.dumps({"event": "error", "error": "missing_tool"}))
+            sys.stdout.flush()
+            continue
+
+        arguments = request.get("arguments", {})
+        if not isinstance(arguments, dict):
+            arguments = {}
+        client_id = request.get("client_id", "stdio-client")
+
+        result = await server.call_tool(tool, {**arguments, "client_id": client_id})
+        print(json.dumps({"event": "tool_result", "tool": tool, "result": result}))
+        sys.stdout.flush()
+
+
 def server_info_command(args: argparse.Namespace) -> int:
     """Handle server info command."""
     try:
@@ -213,6 +273,14 @@ Examples:
     # Server info command
     subparsers.add_parser("info", help="Get server information")
 
+    # MCP stdio server command
+    mcp_server_parser = subparsers.add_parser("mcp-server", help="Run MCP server over stdio")
+    mcp_server_parser.add_argument(
+        "--once",
+        action="store_true",
+        help="Emit readiness payload and exit (useful for automated health checks)",
+    )
+
     return parser
 
 
@@ -234,6 +302,8 @@ async def main() -> int:
         return await analyze_workspace_command(args)
     elif args.command == "health-check":
         return await health_check_command(args)
+    elif args.command == "mcp-server":
+        return await mcp_server_command(args)
     elif args.command == "info":
         return server_info_command(args)
     else:

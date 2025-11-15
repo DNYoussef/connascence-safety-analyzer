@@ -16,6 +16,7 @@ of concerns and avoiding tight coupling.
 """
 
 from dataclasses import asdict, dataclass
+import asyncio
 import logging
 from pathlib import Path
 
@@ -26,6 +27,7 @@ import traceback
 from typing import Any, Dict, List, Optional
 
 from fixes.phase0.production_safe_assertions import ProductionAssert
+from mcp.analysis_bridge import AnalyzerBridge
 
 sys.path.append(str(Path(__file__).parent.parent))
 
@@ -82,6 +84,9 @@ class AnalysisResponse:
     summary: Dict[str, Any]
     integrations: Dict[str, Any]
     metadata: Dict[str, Any]
+    nasa_compliance: Dict[str, Any]
+    mece_analysis: Dict[str, Any]
+    metrics: Dict[str, Any]
     error_message: Optional[str] = None
     execution_time: float = 0.0
 
@@ -116,8 +121,9 @@ class EnhancedConnascenceMCPServer:
         self.allowed_paths = self.config.get("allowed_paths", [])
         self.max_file_size = self.config.get("max_file_size", MCPConstants.DEFAULT_MAX_FILE_SIZE)
 
-        # Load analyzer and integrations
-        self.analyzer = self._load_analyzer()
+        # Load analyzer bridge and integrations
+        self.analysis_bridge = AnalyzerBridge()
+        self.analyzer = self.analysis_bridge._analyzer
         self.integrations = self._load_integrations()
 
         # Register tools
@@ -183,79 +189,6 @@ class EnhancedConnascenceMCPServer:
 
         audit_enabled = self.config.get("audit_enabled", MCPConstants.DEFAULT_AUDIT_ENABLED)
         return AuditLogger(enabled=audit_enabled)
-
-    def _load_analyzer(self):
-        """Load analyzer using fallback import strategy."""
-        if IMPORT_MANAGER is not None:
-            try:
-                from core.unified_imports import ImportSpec
-
-                # Try SmartIntegrationEngine first (the real analyzer)
-                spec = ImportSpec(
-                    module_name="analyzer.smart_integration_engine",
-                    attribute_name="SmartIntegrationEngine",
-                    fallback_modules=["analyzer.unified_analyzer"],
-                    required=False,
-                )
-                analyzer_result = IMPORT_MANAGER.import_module(spec)
-
-                if analyzer_result.has_module:
-                    # Create instance and add analyze_file method to match interface
-                    engine_instance = analyzer_result.module()
-
-                    def analyze_file_wrapper(file_path, **kwargs):
-                        ProductionAssert.not_none(file_path, "file_path")
-
-                        result = engine_instance.comprehensive_analysis(file_path)
-                        return {
-                            "violations": result.get("violations", []),
-                            "summary": result.get("summary", {"total_violations": 0}),
-                            "success": True,
-                        }
-
-                    engine_instance.analyze_file = analyze_file_wrapper
-                    return engine_instance
-            except Exception as e:
-                logger.warning(f"Failed to load analyzer via unified imports: {e}")
-
-        # Try direct imports as fallback
-        try:
-            from analyzer.smart_integration_engine import SmartIntegrationEngine
-
-            engine_instance = SmartIntegrationEngine()
-
-            def analyze_file_wrapper(file_path, **kwargs):
-                ProductionAssert.not_none(file_path, "file_path")
-
-                result = engine_instance.comprehensive_analysis(file_path)
-                return {
-                    "violations": result.get("violations", []),
-                    "summary": result.get("summary", {"total_violations": 0}),
-                    "success": True,
-                }
-
-            engine_instance.analyze_file = analyze_file_wrapper
-            return engine_instance
-        except ImportError:
-            pass
-
-        try:
-            from analyzer.unified_analyzer import UnifiedAnalyzer
-
-            analyzer_instance = UnifiedAnalyzer()
-            return analyzer_instance
-        except ImportError:
-            pass
-
-        # Create mock analyzer for fallback
-        class MockAnalyzer:
-            def analyze_file(self, file_path, **kwargs):
-                ProductionAssert.not_none(file_path, "file_path")
-
-                return {"violations": [], "summary": {"total_violations": 0}, "success": True}
-
-        logger.warning("Using mock analyzer - full analysis not available")
-        return MockAnalyzer()
 
     def _load_integrations(self):
         """Load consolidated integrations."""
@@ -380,11 +313,21 @@ class EnhancedConnascenceMCPServer:
     # MCP TOOL IMPLEMENTATIONS
     # =================================================================
 
-    async def analyze_file(self, file_path: str, **kwargs) -> Dict[str, Any]:
+    async def analyze_file(
+        self,
+        file_path: str,
+        *,
+        client_id: str = "mcp-cli",
+        _apply_guard: bool = True,
+        **kwargs,
+    ) -> Dict[str, Any]:
         """Analyze a single file for connascence violations."""
         start_time = time.time()
 
         try:
+            if _apply_guard:
+                self._guard_request(MCPConstants.TOOL_ANALYZE_FILE, client_id, {"file_path": file_path})
+
             # Create analysis request
             request = AnalysisRequest(
                 file_path=file_path,
@@ -428,11 +371,22 @@ class EnhancedConnascenceMCPServer:
 
             return self._create_error_response(AnalysisRequest(file_path=file_path), error_msg, start_time).to_dict()
 
-    async def analyze_workspace(self, workspace_path: str, **kwargs) -> Dict[str, Any]:
+    async def analyze_workspace(
+        self,
+        workspace_path: str,
+        *,
+        client_id: str = "mcp-cli",
+        **kwargs,
+    ) -> Dict[str, Any]:
         """Analyze entire workspace for connascence violations."""
         start_time = time.time()
 
         try:
+            self._guard_request(
+                MCPConstants.TOOL_ANALYZE_WORKSPACE,
+                client_id,
+                {"workspace_path": workspace_path},
+            )
             workspace_path = Path(workspace_path)
             if not workspace_path.exists():
                 return {
@@ -454,29 +408,20 @@ class EnhancedConnascenceMCPServer:
                 files_to_analyze = files_to_analyze[:max_files]
                 logger.warning(f"Limited analysis to {max_files} files")
 
-            # Analyze each file
-            results = []
-            total_violations = 0
+            bridge_result = await asyncio.to_thread(
+                self.analysis_bridge.analyze_workspace,
+                workspace_path,
+                files_to_analyze,
+                kwargs.get("analysis_type", "full"),
+            )
 
-            for file_path in files_to_analyze:
-                try:
-                    file_result = await self.analyze_file(str(file_path), **kwargs)
-                    results.append(file_result)
-                    if file_result.get("success", False):
-                        total_violations += len(file_result.get("violations", []))
-                except Exception as e:
-                    logger.error(f"Failed to analyze {file_path}: {e}")
-                    results.append({"file_path": str(file_path), "success": False, "error": str(e), "violations": []})
-
-            # Create workspace summary
-            summary = {
-                "total_files_analyzed": len(files_to_analyze),
-                "total_violations": total_violations,
-                "files_with_violations": sum(1 for r in results if r.get("success", False) and r.get("violations")),
+            bridge_result["metrics"] = {
+                "files_considered": len(files_to_analyze),
+                "file_patterns": file_patterns,
                 "execution_time": time.time() - start_time,
             }
 
-            return {"success": True, "workspace_path": str(workspace_path), "summary": summary, "file_results": results}
+            return bridge_result
 
         except Exception as e:
             error_msg = f"Workspace analysis failed: {e!s}"
@@ -489,11 +434,18 @@ class EnhancedConnascenceMCPServer:
                 "execution_time": time.time() - start_time,
             }
 
-    async def get_violations(self, file_path: str, **kwargs) -> Dict[str, Any]:
+    async def get_violations(
+        self,
+        file_path: str,
+        *,
+        client_id: str = "mcp-cli",
+        **kwargs,
+    ) -> Dict[str, Any]:
         """Get violations by type or severity."""
         try:
+            self._guard_request("get_violations", client_id, {"file_path": file_path})
             # First analyze the file
-            analysis_result = await self.analyze_file(file_path, format="json")
+            analysis_result = await self.analyze_file(file_path, client_id=client_id, _apply_guard=False, format="json")
 
             if not analysis_result.get("success", False):
                 return analysis_result
@@ -528,41 +480,43 @@ class EnhancedConnascenceMCPServer:
             logger.error(error_msg)
             return {"success": False, "error": error_msg}
 
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self, *, client_id: str = "mcp-cli") -> Dict[str, Any]:
         """Check health status of analyzer and integrations."""
         try:
-            health_status = {
-                "server": {
-                    "name": self.name,
-                    "version": self.version,
-                    "status": "healthy",
-                    "uptime": time.time(),  # Simplified uptime
-                },
-                "analyzer": {"available": self.analyzer is not None, "type": type(self.analyzer).__name__},
-                "integrations": {},
-                "configuration": {
-                    "rate_limit": MCPConstants.DEFAULT_RATE_LIMIT,
-                    "audit_enabled": MCPConstants.DEFAULT_AUDIT_ENABLED,
-                    "max_file_size": self.max_file_size,
-                },
-                "import_status": IMPORT_MANAGER.get_import_status() if IMPORT_MANAGER else "fallback_mode",
-            }
+            self._guard_request(MCPConstants.TOOL_HEALTH_CHECK, client_id)
+            analyzer_snapshot = self.analysis_bridge.health_snapshot()
 
-            # Check integration health
+            integrations_health: Dict[str, Any] = {}
             for name, integration in self.integrations.items():
                 try:
                     is_available = integration.is_available() if hasattr(integration, "is_available") else True
                     version = integration.get_version() if hasattr(integration, "get_version") else "unknown"
-
-                    health_status["integrations"][name] = {
+                    integrations_health[name] = {
                         "available": is_available,
                         "version": version,
                         "type": type(integration).__name__,
                     }
-                except Exception as e:
-                    health_status["integrations"][name] = {"available": False, "error": str(e)}
+                except Exception as exc:
+                    integrations_health[name] = {"available": False, "error": str(exc)}
 
-            return {"success": True, "timestamp": time.time(), "health": health_status}
+            return {
+                "success": True,
+                "timestamp": time.time(),
+                "server": {
+                    "name": self.name,
+                    "version": self.version,
+                    "status": "healthy",
+                    "description": MCPConstants.SERVER_DESCRIPTION,
+                },
+                "analyzer": analyzer_snapshot,
+                "integrations": integrations_health,
+                "configuration": {
+                    "rate_limit": self.rate_limiter.max_requests,
+                    "audit_enabled": self.audit_logger.enabled,
+                    "max_file_size_kb": self.max_file_size,
+                    "import_status": IMPORT_MANAGER.get_import_status() if IMPORT_MANAGER else "fallback_mode",
+                },
+            }
 
         except Exception as e:
             error_msg = f"Health check failed: {e!s}"
@@ -595,52 +549,25 @@ class EnhancedConnascenceMCPServer:
 
     async def _perform_analysis(self, request: AnalysisRequest) -> AnalysisResponse:
         """Perform the actual analysis."""
-        violations = []
-        integrations_results = {}
-
         try:
-            # Core connascence analysis
-            if hasattr(self.analyzer, "analyze_file"):
-                core_result = self.analyzer.analyze_file(request.file_path)
-                if isinstance(core_result, dict):
-                    violations.extend(core_result.get("violations", []))
+            core_result = await asyncio.to_thread(
+                self.analysis_bridge.analyze_file,
+                request.file_path,
+                request.analysis_type,
+            )
 
-            # Run integrations if requested
-            if request.include_integrations:
-                for name, integration in self.integrations.items():
-                    try:
-                        if hasattr(integration, "run_analysis"):
-                            result = integration.run_analysis(request.file_path)
-                            integrations_results[name] = {
-                                "success": result.success if hasattr(result, "success") else True,
-                                "issues": result.issues if hasattr(result, "issues") else [],
-                            }
-                    except Exception as e:
-                        logger.warning(f"Integration {name} failed: {e}")
-                        integrations_results[name] = {"success": False, "error": str(e)}
-
-            # Create summary
-            summary = {
-                "total_violations": len(violations),
-                "by_severity": self._count_by_severity(violations),
-                "by_type": self._count_by_type(violations),
-            }
-
-            # Create metadata
-            metadata = {
-                "analysis_type": request.analysis_type,
-                "file_path": request.file_path,
-                "timestamp": time.time(),
-                "server_version": self.version,
-            }
+            integrations_results = self._run_integrations(request) if request.include_integrations else {}
 
             return AnalysisResponse(
                 success=True,
                 file_path=request.file_path,
-                violations=violations,
-                summary=summary,
+                violations=core_result.get("violations", []),
+                summary=core_result.get("summary", {}),
                 integrations=integrations_results,
-                metadata=metadata,
+                metadata=core_result.get("metadata", {}),
+                nasa_compliance=core_result.get("nasa_compliance", {}),
+                mece_analysis=core_result.get("mece_analysis", {}),
+                metrics=core_result.get("metrics", {}),
             )
 
         except Exception as e:
@@ -651,6 +578,9 @@ class EnhancedConnascenceMCPServer:
                 summary={},
                 integrations={},
                 metadata={"error": str(e)},
+                nasa_compliance={},
+                mece_analysis={},
+                metrics={},
                 error_message=str(e),
             )
 
@@ -671,6 +601,24 @@ class EnhancedConnascenceMCPServer:
             counts[violation_type] = counts.get(violation_type, 0) + 1
         return counts
 
+    def _run_integrations(self, request: AnalysisRequest) -> Dict[str, Any]:
+        """Run configured integrations for a file analysis."""
+        integration_results: Dict[str, Any] = {}
+        for name, integration in self.integrations.items():
+            try:
+                if hasattr(integration, "run_analysis"):
+                    result = integration.run_analysis(request.file_path)
+                    integration_results[name] = {
+                        "success": getattr(result, "success", True),
+                        "issues": getattr(result, "issues", []),
+                    }
+                else:
+                    integration_results[name] = {"success": True, "issues": []}
+            except Exception as exc:
+                logger.warning("Integration %s failed: %s", name, exc)
+                integration_results[name] = {"success": False, "error": str(exc)}
+        return integration_results
+
     def _create_error_response(
         self, request: AnalysisRequest, error_message: str, start_time: float
     ) -> AnalysisResponse:
@@ -682,8 +630,35 @@ class EnhancedConnascenceMCPServer:
             summary={},
             integrations={},
             metadata={"error": error_message},
+            nasa_compliance={},
+            mece_analysis={},
+            metrics={},
             error_message=error_message,
             execution_time=time.time() - start_time,
+        )
+
+    def _guard_request(
+        self,
+        tool_name: str,
+        client_id: str,
+        context: Optional[Dict[str, Any]] = None,
+    ) -> None:
+        """Apply shared rate limiting + audit logging."""
+
+        ProductionAssert.not_none(tool_name, "tool_name")
+        ProductionAssert.not_none(client_id, "client_id")
+
+        if not self.rate_limiter.check_rate_limit(client_id):
+            raise RuntimeError("Rate limit exceeded")
+
+        self.audit_logger.log(
+            "tool_request",
+            {
+                "tool": tool_name,
+                "client_id": client_id,
+                "context": context or {},
+                "timestamp": time.time(),
+            },
         )
 
     # =================================================================
@@ -700,21 +675,17 @@ class EnhancedConnascenceMCPServer:
             return {"success": False, "error": f"Tool '{name}' not found"}
 
         try:
-            # Rate limiting check
-            if not self.rate_limiter.is_allowed():
-                return {"success": False, "error": "Rate limit exceeded"}
-
-            self.rate_limiter.record_request()
+            client_id = arguments.pop("client_id", "mcp-tool")
 
             # Route to appropriate method
             if name == MCPConstants.TOOL_ANALYZE_FILE:
-                return await self.analyze_file(**arguments)
+                return await self.analyze_file(client_id=client_id, **arguments)
             elif name == MCPConstants.TOOL_ANALYZE_WORKSPACE:
-                return await self.analyze_workspace(**arguments)
+                return await self.analyze_workspace(client_id=client_id, **arguments)
             elif name == MCPConstants.TOOL_GET_VIOLATIONS:
-                return await self.get_violations(**arguments)
+                return await self.get_violations(client_id=client_id, **arguments)
             elif name == MCPConstants.TOOL_HEALTH_CHECK:
-                return await self.health_check()
+                return await self.health_check(client_id=client_id)
             else:
                 return {"success": False, "error": f"Tool '{name}' not implemented"}
 
