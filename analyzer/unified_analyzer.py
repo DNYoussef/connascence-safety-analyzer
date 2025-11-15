@@ -374,18 +374,26 @@ class ComponentInitializer:
 
 # Legacy MetricsCalculator class for backward compatibility
 class MetricsCalculator:
-    """Legacy metrics calculator - delegates to EnhancedMetricsCalculator for compatibility."""
+    """Legacy metrics calculator - delegates to MetricsCollector for compatibility."""
 
     def __init__(self):
-        pass  # Simplified implementation
+        from .architecture.metrics_collector import MetricsCollector
+        self.collector = MetricsCollector()
+
+    def calculate_metrics(self, violations, nasa_integration=None):
+        """Calculate metrics from violations dictionary. NASA Rule 4 compliant."""
+        return self.collector.collect_violation_metrics(violations)
 
     def calculate_comprehensive_metrics(
         self, connascence_violations, duplication_clusters, nasa_violations, nasa_integration=None
     ):
-        """Calculate comprehensive quality metrics - delegates to enhanced calculator."""
-        return self.enhanced_calculator.calculate_comprehensive_metrics(
-            connascence_violations, duplication_clusters, nasa_violations, nasa_integration
-        )
+        """Calculate comprehensive quality metrics - delegates to collector."""
+        violations = {
+            "connascence": connascence_violations,
+            "duplication": duplication_clusters,
+            "nasa": nasa_violations
+        }
+        return self.collector.collect_violation_metrics(violations)
 
 
 # Legacy RecommendationGenerator class for backward compatibility
@@ -393,13 +401,23 @@ class RecommendationGenerator:
     """Legacy recommendation generator - delegates to RecommendationEngine for compatibility."""
 
     def __init__(self):
-        pass  # Simplified implementation
+        from .architecture.recommendation_engine import RecommendationEngine
+        self.engine = RecommendationEngine()
+
+    def generate_recommendations(self, violations, nasa_integration=None):
+        """Generate recommendations from violations dictionary. NASA Rule 4 compliant."""
+        connascence_violations = violations.get("connascence", [])
+        duplication_clusters = violations.get("duplication", [])
+        nasa_violations = violations.get("nasa", [])
+        return self.engine.generate_unified_recommendations(
+            connascence_violations, duplication_clusters, nasa_violations, nasa_integration
+        )
 
     def generate_unified_recommendations(
         self, connascence_violations, duplication_clusters, nasa_violations, nasa_integration=None
     ):
         """Generate comprehensive improvement recommendations - delegates to engine."""
-        return self.recommendation_engine.generate_unified_recommendations(
+        return self.engine.generate_unified_recommendations(
             connascence_violations, duplication_clusters, nasa_violations, nasa_integration
         )
 
@@ -641,7 +659,7 @@ class UnifiedConnascenceAnalyzer:
         duplication_violations = []
         if self.mece_analyzer:
             try:
-                mece_results = self.mece_analyzer.analyze_directory(str(project_path))
+                mece_results = self.mece_analyzer.analyze_directory(project_path)
                 duplication_violations = [self._violation_to_dict(v) for v in mece_results]
             except Exception as e:
                 logger.warning(f"MECE analysis failed: {e}")
@@ -666,7 +684,7 @@ class UnifiedConnascenceAnalyzer:
         connascence_violations = [self._violation_to_dict(v) for v in ast_results]
 
         # Also run god object analysis from orchestrator
-        god_results = self.orchestrator.analyze_directory(str(project_path))
+        god_results = self.god_object_orchestrator.analyze_directory(project_path)
         connascence_violations.extend([self._violation_to_dict(v) for v in god_results])
 
         # Run refactored detector architecture (includes 5 specialized detectors + identity)

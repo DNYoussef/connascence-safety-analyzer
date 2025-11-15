@@ -151,13 +151,13 @@ original_detect = detector.detect_violations
 
 
 def traced_detect(tree):
-    print(f"   → detect_violations() called with tree type: {type(tree)}")
+    print(f"   => detect_violations() called with tree type: {type(tree)}")
     try:
         result = original_detect(tree)
-        print(f"   ← detect_violations() returned: {type(result)} with {len(result)} items")
+        print(f"   <= detect_violations() returned: {type(result)} with {len(result)} items")
         return result
     except Exception as e:
-        print(f"   ← detect_violations() raised exception: {e}")
+        print(f"   <= detect_violations() raised exception: {e}")
         raise
 
 

@@ -30,7 +30,7 @@ class PerformanceMonitor:
         self.end_time = None
         self.start_memory = None
         self.end_memory = None
-        self.process = psutil.Process()
+        self.process = psutil.Process(os.getpid())
 
     def __enter__(self):
         """Start performance monitoring."""
@@ -276,7 +276,7 @@ class SimpleClass:
 
     def test_memory_cleanup_after_analysis(self):
         """Test that memory is properly cleaned up after analysis."""
-        initial_memory = psutil.Process().memory_info().rss
+        initial_memory = psutil.Process(os.getpid()).memory_info().rss
 
         # Run several analysis operations
         for i in range(10):
@@ -286,7 +286,7 @@ class SimpleClass:
         # Force garbage collection
         gc.collect()
 
-        final_memory = psutil.Process().memory_info().rss
+        final_memory = psutil.Process(os.getpid()).memory_info().rss
         memory_increase = (final_memory - initial_memory) / (1024 * 1024)  # MB
 
         # Memory increase should be minimal after cleanup

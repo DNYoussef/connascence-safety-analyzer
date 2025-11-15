@@ -236,7 +236,7 @@ class TestCrossComponentValidation:
 
     @pytest.mark.asyncio
     async def test_analyzer_to_mcp_integration(self, cross_component_coordinator, integrated_test_environment):
-        """Test analyzer → MCP server integration"""
+        """Test analyzer -> MCP server integration"""
 
         # Create validation chain
         cross_component_coordinator.create_validation_chain("analyzer_mcp_chain", ["analyzer", "mcp_server"])
@@ -291,7 +291,7 @@ class TestCrossComponentValidation:
 
     @pytest.mark.asyncio
     async def test_mcp_to_autofix_integration(self, cross_component_coordinator, integrated_test_environment):
-        """Test MCP server → autofix engine integration"""
+        """Test MCP server -> autofix engine integration"""
 
         cross_component_coordinator.create_validation_chain("mcp_autofix_chain", ["mcp_server", "autofix"])
 
@@ -346,7 +346,7 @@ class TestCrossComponentValidation:
 
     @pytest.mark.asyncio
     async def test_cli_to_vscode_integration(self, cross_component_coordinator, integrated_test_environment):
-        """Test CLI → VS Code extension integration"""
+        """Test CLI -> VS Code extension integration"""
 
         cross_component_coordinator.create_validation_chain("cli_vscode_chain", ["cli", "vscode_extension"])
 
@@ -384,7 +384,7 @@ class TestCrossComponentValidation:
             },
         )
 
-        # Step 3: Test CLI autofix → VS Code quick fix integration
+        # Step 3: Test CLI autofix -> VS Code quick fix integration
         integrated_test_environment.cli_interface.run_autofix(["--violation-id", "cli_001", "--safety-level", "safe"])
 
         vscode_quickfix_result = await integrated_test_environment.vscode_extension.apply_quick_fix(

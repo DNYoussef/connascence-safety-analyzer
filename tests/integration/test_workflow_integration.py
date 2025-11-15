@@ -613,7 +613,7 @@ class TestCompleteWorkflowIntegration:
     async def test_cli_to_analysis_workflow(
         self, workflow_coordinator, comprehensive_test_workspace, mock_analysis_engine
     ):
-        """Test CLI → Analysis Engine → Report Generation workflow"""
+        """Test CLI -> Analysis Engine -> Report Generation workflow"""
 
         start_time = time.time()
 
@@ -693,7 +693,7 @@ class TestCompleteWorkflowIntegration:
     async def test_analysis_to_autofix_workflow(
         self, workflow_coordinator, comprehensive_test_workspace, mock_analysis_engine, mock_autofix_engine
     ):
-        """Test Analysis → Autofix Generation → Application workflow"""
+        """Test Analysis -> Autofix Generation -> Application workflow"""
 
         # Stage 1: Analysis
         analysis_result = await mock_analysis_engine.analyze_path(comprehensive_test_workspace)
@@ -778,7 +778,7 @@ class TestCompleteWorkflowIntegration:
 
     @pytest.mark.asyncio
     async def test_mcp_integration_workflow(self, workflow_coordinator, comprehensive_test_workspace, mock_mcp_server):
-        """Test MCP Server → Tool Calls → Response Aggregation workflow"""
+        """Test MCP Server -> Tool Calls -> Response Aggregation workflow"""
 
         # Stage 1: MCP Server Initialization
         assert mock_mcp_server.is_running is True
@@ -853,7 +853,7 @@ class TestCompleteWorkflowIntegration:
         mock_autofix_engine,
         mock_mcp_server,
     ):
-        """Test complete end-to-end workflow: CLI → Analysis → MCP → Autofix → Validation"""
+        """Test complete end-to-end workflow: CLI -> Analysis -> MCP -> Autofix -> Validation"""
 
         workflow_start_time = time.time()
 

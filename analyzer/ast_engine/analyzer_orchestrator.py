@@ -7,7 +7,7 @@ import argparse
 import json
 from pathlib import Path
 import sys
-from typing import List
+from typing import List, Union
 
 from utils.types import ConnascenceViolation
 
@@ -88,10 +88,11 @@ class AnalyzerOrchestrator:
         """Legacy orchestrate method for backward compatibility."""
         return []
 
-    def analyze_directory(self, path: str, policy: str = "default") -> List[ConnascenceViolation]:
+    def analyze_directory(self, path: Union[str, Path], policy: str = "default") -> List[ConnascenceViolation]:
         """Analyze a directory using all available analyzers."""
+        from analyzer.utils.path_validator import ensure_path
         violations = []
-        path_obj = Path(path)
+        path_obj = ensure_path(path)
 
         if not path_obj.exists():
             return violations

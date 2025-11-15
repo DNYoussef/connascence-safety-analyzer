@@ -783,7 +783,7 @@ class ResourceMonitor:
 
     def _monitor_resources(self):
         """Monitor resources in background."""
-        process = psutil.Process()
+        process = psutil.Process(os.getpid())
 
         while self.monitoring_active:
             try:

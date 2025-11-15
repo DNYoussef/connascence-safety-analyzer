@@ -38,7 +38,7 @@ import pytest
 
 from fixes.phase0.production_safe_assertions import ProductionAssert
 
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+# sys.path is already configured by conftest.py - no need to insert again
 
 from interfaces.cli.connascence import ConnascenceCLI
 
@@ -368,7 +368,7 @@ class TestConnascenceCLIPreservation:
         print(f"All passed: {summary['all_passed']}")
         print("\nPer-type results:")
         for test_type, result in summary["results"].items():
-            status = "✅ PASS" if result["passed"] else "❌ FAIL"
+            status = "[PASS]" if result["passed"] else "[FAIL]"
             print(
                 f"  {test_type}: {status} ({result.get('violations_found', result.get('total_violations', 0))} violations)"
             )
@@ -390,7 +390,7 @@ def test_cli_preservation_integration(cli_tester):
     assert summary["all_passed"], f"Some CLI tests failed: {summary['results']}"
     assert summary["pass_rate"] == 100.0, f"Pass rate: {summary['pass_rate']}%"
 
-    print(f"\n✅ CLI preserved connascence detection ({summary['tests_passed']}/{summary['total_tests']} tests passed)")
+    print(f"\n[OK] CLI preserved connascence detection ({summary['tests_passed']}/{summary['total_tests']} tests passed)")
 
 
 if __name__ == "__main__":

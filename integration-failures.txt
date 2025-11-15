@@ -1,0 +1,746 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.5, pytest-9.0.1, pluggy-1.5.0 -- C:\Python312\python.exe
+cachedir: .pytest_cache
+hypothesis profile 'default'
+benchmark: 4.0.0 (defaults: timer=time.perf_counter disable_gc=False min_rounds=5 min_time=0.000005 max_time=1.0 calibration_precision=10 warmup=False warmup_iterations=100000)
+metadata: {'Python': '3.12.5', 'Platform': 'Windows-10-10.0.19045-SP0', 'Packages': {'pytest': '9.0.1', 'pluggy': '1.5.0'}, 'Plugins': {'anyio': '4.11.0', 'Faker': '18.13.0', 'hypothesis': '6.138.2', 'langsmith': '0.4.21', 'asyncio': '1.3.0', 'bandit': '0.6.1', 'benchmark': '4.0.0', 'cov': '4.1.0', 'env': '1.1.5', 'flask': '1.3.0', 'json-report': '1.5.0', 'metadata': '3.1.1', 'mock': '3.14.0', 'randomly': '3.16.0', 'timeout': '2.3.1', 'xdist': '3.6.1'}, 'JAVA_HOME': 'C:\\Program Files\\AdoptOpenJDK\\jre-8.0.265.01-hotspot\\'}
+Using --randomly-seed=2319026589
+rootdir: C:\Users\17175\Desktop\connascence\tests
+configfile: pytest.ini
+plugins: anyio-4.11.0, Faker-18.13.0, hypothesis-6.138.2, langsmith-0.4.21, asyncio-1.3.0, bandit-0.6.1, benchmark-4.0.0, cov-4.1.0, env-1.1.5, flask-1.3.0, json-report-1.5.0, metadata-3.1.1, mock-3.14.0, randomly-3.16.0, timeout-2.3.1, xdist-3.6.1
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 100 items
+
+tests\integration\test_cross_component_validation.py::TestCrossComponentValidation::test_error_propagation_across_components PASSED [  1%]
+tests\integration\test_cross_component_validation.py::TestCrossComponentValidation::test_complete_system_integration PASSED [  2%]
+tests\integration\test_cross_component_validation.py::TestCrossComponentValidation::test_analyzer_to_mcp_integration PASSED [  3%]
+tests\integration\test_cross_component_validation.py::TestCrossComponentValidation::test_integration_coverage_calculation PASSED [  4%]
+tests\integration\test_cross_component_validation.py::TestCrossComponentValidation::test_grammar_layer_cross_component PASSED [  5%]
+tests\integration\test_cross_component_validation.py::TestCrossComponentValidation::test_mcp_to_autofix_integration PASSED [  6%]
+tests\integration\test_cross_component_validation.py::TestCrossComponentValidation::test_cli_to_vscode_integration PASSED [  7%]
+tests\integration\test_cross_component_validation.py::TestCrossComponentValidation::test_security_integration_chain PASSED [  8%]
+tests\integration\test_complete_system.py::TestAsyncIntegration::test_vs_code_extension_async PASSED [  9%]
+tests\integration\test_complete_system.py::TestAsyncIntegration::test_mcp_async_calls PASSED [ 10%]
+tests\integration\test_complete_system.py::TestCompleteSystemIntegration::test_security_integration PASSED [ 11%]
+tests\integration\test_complete_system.py::TestCompleteSystemIntegration::test_error_handling_and_recovery PASSED [ 12%]
+tests\integration\test_complete_system.py::TestCompleteSystemIntegration::test_end_to_end_workflow PASSED [ 13%]
+tests\integration\test_complete_system.py::TestCompleteSystemIntegration::test_demo_scenarios_integration PASSED [ 14%]
+tests\integration\test_complete_system.py::TestCompleteSystemIntegration::test_performance_requirements PASSED [ 15%]
+tests\integration\test_complete_system.py::TestCompleteSystemIntegration::test_sales_artifact_generation PASSED [ 16%]
+tests\integration\test_complete_system.py::TestCompleteSystemIntegration::test_vs_code_extension_integration PASSED [ 17%]
+tests\integration\test_complete_system.py::TestCompleteSystemIntegration::test_nasa_safety_profile PASSED [ 18%]
+tests\integration\test_complete_system.py::TestCompleteSystemIntegration::test_grammar_layer_integration PASSED [ 19%]
+tests\integration\test_complete_system.py::TestCompleteSystemIntegration::test_mcp_server_integration PASSED [ 20%]
+tests\integration\test_complete_system.py::TestCompleteSystemIntegration::test_cli_basic_functionality PASSED [ 21%]
+tests\integration\test_connascence_preservation.py::TestConnascenceTypePreservation::test_all_9_types_validated FAILED [ 22%]
+tests\integration\test_connascence_preservation.py::TestConnascenceTypePreservation::test_coa_algorithm_detector_works PASSED [ 23%]
+tests\integration\test_connascence_preservation.py::TestConnascenceTypePreservation::test_con_name_detector_works PASSED [ 24%]
+tests\integration\test_connascence_preservation.py::TestConnascenceTypePreservation::test_com_meaning_detector_works PASSED [ 25%]
+tests\integration\test_connascence_preservation.py::TestConnascenceTypePreservation::test_cop_position_detector_works PASSED [ 26%]
+tests\integration\test_connascence_preservation.py::TestConnascenceTypePreservation::test_coe_execution_detector_works FAILED [ 27%]
+tests\integration\test_connascence_preservation.py::TestConnascenceTypePreservation::test_coid_timing_detector_works PASSED [ 28%]
+tests\integration\test_connascence_preservation.py::TestConnascenceTypePreservation::test_cov_value_detector_works FAILED [ 29%]
+tests\integration\test_connascence_preservation.py::TestConnascenceTypePreservation::test_coi_identity_detector_works FAILED [ 30%]
+tests\integration\test_connascence_preservation.py::TestConnascenceTypePreservation::test_comprehensive_integration_scenario PASSED [ 31%]
+tests\integration\test_connascence_preservation.py::TestConnascenceTypePreservation::test_cot_type_detector_works PASSED [ 32%]
+tests\integration\test_connascence_preservation.py::test_connascence_preservation_integration FAILED [ 33%]
+tests\integration\test_real_world_scenarios.py::TestRealWorldScenarios::test_curl_package_analysis ERROR [ 34%]
+tests\integration\test_real_world_scenarios.py::TestRealWorldScenarios::test_large_codebase_performance ERROR [ 35%]
+tests\integration\test_real_world_scenarios.py::TestRealWorldScenarios::test_regression_baseline_comparison ERROR [ 36%]
+tests\integration\test_real_world_scenarios.py::TestRealWorldScenarios::test_nasa_compliance_validation ERROR [ 37%]
+tests\integration\test_real_world_scenarios.py::TestRealWorldScenarios::test_python_project_analysis ERROR [ 38%]
+tests\integration\test_real_world_scenarios.py::TestRealWorldScenarios::test_god_object_detection_real_code ERROR [ 39%]
+tests\integration\test_real_world_scenarios.py::TestRealWorldScenarios::test_mece_analysis_real_code ERROR [ 40%]
+tests\integration\test_real_world_scenarios.py::TestRealWorldScenarios::test_express_package_analysis ERROR [ 41%]
+tests\integration\test_real_world_scenarios.py::TestRealWorldScenarios::test_error_handling_invalid_files ERROR [ 42%]
+tests\integration\test_real_world_scenarios.py::TestRealWorldScenarios::test_multi_language_project ERROR [ 43%]
+tests\integration\test_unified_coordinator_workflow.py::TestUnifiedCoordinatorBatchAnalysis::test_batch_analysis_multiple_files FAILED [ 44%]
+tests\integration\test_unified_coordinator_workflow.py::TestUnifiedCoordinatorBatchAnalysis::test_batch_analysis_parallel_phases FAILED [ 45%]
+tests\integration\test_unified_coordinator_workflow.py::TestUnifiedCoordinatorBackwardCompatibility::test_analyze_file_alias PASSED [ 46%]
+tests\integration\test_unified_coordinator_workflow.py::TestUnifiedCoordinatorBackwardCompatibility::test_analyze_directory_alias PASSED [ 47%]
+tests\integration\test_unified_coordinator_workflow.py::TestUnifiedCoordinatorEdgeCases::test_missing_analyzers PASSED [ 48%]
+tests\integration\test_unified_coordinator_workflow.py::TestUnifiedCoordinatorEdgeCases::test_phase_failure_recovery PASSED [ 49%]
+tests\integration\test_unified_coordinator_workflow.py::TestUnifiedCoordinatorEdgeCases::test_empty_directory PASSED [ 50%]
+tests\integration\test_unified_coordinator_workflow.py::TestUnifiedCoordinatorComponentIntegration::test_report_generation_integration PASSED [ 51%]
+tests\integration\test_unified_coordinator_workflow.py::TestUnifiedCoordinatorComponentIntegration::test_metrics_integration PASSED [ 52%]
+tests\integration\test_unified_coordinator_workflow.py::TestUnifiedCoordinatorComponentIntegration::test_cache_integration FAILED [ 53%]
+tests\integration\test_unified_coordinator_workflow.py::TestUnifiedCoordinatorComponentIntegration::test_complete_pipeline_integration PASSED [ 54%]
+tests\integration\test_unified_coordinator_workflow.py::TestUnifiedCoordinatorSingleFileAnalysis::test_single_file_error_handling PASSED [ 55%]
+tests\integration\test_unified_coordinator_workflow.py::TestUnifiedCoordinatorSingleFileAnalysis::test_single_file_with_cache FAILED [ 56%]
+tests\integration\test_unified_coordinator_workflow.py::TestUnifiedCoordinatorSingleFileAnalysis::test_analyze_single_file_workflow PASSED [ 57%]
+tests\integration\test_unified_coordinator_workflow.py::TestUnifiedCoordinatorReportFormats::test_dashboard_summary_generation PASSED [ 58%]
+tests\integration\test_unified_coordinator_workflow.py::TestUnifiedCoordinatorReportFormats::test_sarif_report_generation PASSED [ 59%]
+tests\integration\test_unified_coordinator_workflow.py::TestUnifiedCoordinatorReportFormats::test_json_report_generation PASSED [ 60%]
+tests\integration\test_unified_coordinator_workflow.py::TestUnifiedCoordinatorReportFormats::test_markdown_report_generation PASSED [ 61%]
+tests\integration\test_unified_coordinator_workflow.py::TestUnifiedCoordinatorDirectoryAnalysis::test_directory_analysis_performance FAILED [ 62%]
+tests\integration\test_unified_coordinator_workflow.py::TestUnifiedCoordinatorDirectoryAnalysis::test_analyze_directory_workflow FAILED [ 63%]
+tests\integration\test_unified_coordinator_workflow.py::TestUnifiedCoordinatorDirectoryAnalysis::test_directory_analysis_with_filters PASSED [ 64%]
+tests\integration\test_unified_coordinator_workflow.py::TestUnifiedCoordinatorStreamingAnalysis::test_streaming_analysis_progressive_results FAILED [ 65%]
+tests\integration\test_workflow_integration.py::TestWorkflowPerformanceAndScalability::test_concurrent_workflow_execution PASSED [ 66%]
+tests\integration\test_workflow_integration.py::TestWorkflowPerformanceAndScalability::test_workflow_scalability_limits PASSED [ 67%]
+tests\integration\test_workflow_integration.py::TestCompleteWorkflowIntegration::test_mcp_integration_workflow FAILED [ 68%]
+tests\integration\test_workflow_integration.py::TestCompleteWorkflowIntegration::test_cli_to_analysis_workflow PASSED [ 69%]
+tests\integration\test_workflow_integration.py::TestCompleteWorkflowIntegration::test_analysis_to_autofix_workflow FAILED [ 70%]
+tests\integration\test_workflow_integration.py::TestCompleteWorkflowIntegration::test_complete_end_to_end_workflow FAILED [ 71%]
+tests\integration\test_workflow_integration.py::TestCompleteWorkflowIntegration::test_workflow_memory_coordination FAILED [ 72%]
+tests\integration\test_mcp_server_integration.py::TestMCPServerRealWorldScenarios::test_vs_code_extension_integration_scenario PASSED [ 73%]
+tests\integration\test_mcp_server_integration.py::TestMCPServerRealWorldScenarios::test_ci_cd_pipeline_integration_scenario PASSED [ 74%]
+tests\integration\test_mcp_server_integration.py::TestMCPServerIntegration::test_scan_path_tool_comprehensive PASSED [ 75%]
+tests\integration\test_mcp_server_integration.py::TestMCPServerIntegration::test_error_handling_and_recovery PASSED [ 76%]
+tests\integration\test_mcp_server_integration.py::TestMCPServerIntegration::test_concurrent_requests_handling PASSED [ 77%]
+tests\integration\test_mcp_server_integration.py::TestMCPServerIntegration::test_integration_test_coverage_calculation PASSED [ 78%]
+tests\integration\test_mcp_server_integration.py::TestMCPServerIntegration::test_autofix_workflow_integration PASSED [ 79%]
+tests\integration\test_mcp_server_integration.py::TestMCPServerIntegration::test_grammar_validation_integration PASSED [ 80%]
+tests\integration\test_mcp_server_integration.py::TestMCPServerIntegration::test_performance_benchmarks PASSED [ 81%]
+tests\integration\test_mcp_server_integration.py::TestMCPServerIntegration::test_server_startup_and_shutdown PASSED [ 82%]
+tests\integration\test_connascence_cli_preservation.py::TestConnascenceCLIPreservation::test_cli_detects_coa_algorithm_violations FAILED [ 83%]
+tests\integration\test_connascence_cli_preservation.py::TestConnascenceCLIPreservation::test_cli_detects_multiple_types FAILED [ 84%]
+tests\integration\test_connascence_cli_preservation.py::TestConnascenceCLIPreservation::test_cli_detects_cop_position_violations FAILED [ 85%]
+tests\integration\test_connascence_cli_preservation.py::TestConnascenceCLIPreservation::test_cli_detects_com_meaning_violations FAILED [ 86%]
+tests\integration\test_connascence_cli_preservation.py::TestConnascenceCLIPreservation::test_cli_preservation_gate FAILED [ 87%]
+tests\integration\test_connascence_cli_preservation.py::test_cli_preservation_integration FAILED [ 88%]
+tests\integration\test_autofix_engine_integration.py::TestAutofixWorkflowIntegration::test_mcp_to_autofix_integration PASSED [ 89%]
+tests\integration\test_autofix_engine_integration.py::TestAutofixWorkflowIntegration::test_cli_to_autofix_workflow PASSED [ 90%]
+tests\integration\test_autofix_engine_integration.py::TestAutofixEngineIntegration::test_safety_validation_integration PASSED [ 91%]
+tests\integration\test_autofix_engine_integration.py::TestAutofixEngineIntegration::test_sequential_thinking_coordination PASSED [ 92%]
+tests\integration\test_autofix_engine_integration.py::TestAutofixEngineIntegration::test_parameter_bomb_fix_generation PASSED [ 93%]
+tests\integration\test_autofix_engine_integration.py::TestAutofixEngineIntegration::test_autofix_error_handling PASSED [ 94%]
+tests\integration\test_autofix_engine_integration.py::TestAutofixEngineIntegration::test_autofix_effectiveness_calculation PASSED [ 95%]
+tests\integration\test_autofix_engine_integration.py::TestAutofixEngineIntegration::test_type_hint_fix_generation PASSED [ 96%]
+tests\integration\test_autofix_engine_integration.py::TestAutofixEngineIntegration::test_fix_application_simulation PASSED [ 97%]
+tests\integration\test_autofix_engine_integration.py::TestAutofixEngineIntegration::test_god_class_fix_generation PASSED [ 98%]
+tests\integration\test_autofix_engine_integration.py::TestAutofixEngineIntegration::test_magic_literal_fix_generation PASSED [ 99%]
+tests\integration\test_autofix_engine_integration.py::TestAutofixEngineIntegration::test_batch_fix_generation PASSED [100%]
+Run started:2025-11-14 03:35:15.948608
+
+Test results:
+	No issues identified.
+
+Code scanned:
+	Total lines of code: 0
+	Total lines skipped (#nosec): 0
+
+Run metrics:
+	Total issues (by severity):
+		Undefined: 0
+		Low: 0
+		Medium: 0
+		High: 0
+	Total issues (by confidence):
+		Undefined: 0
+		Low: 0
+		Medium: 0
+		High: 0
+Files skipped (0):
+Module reporting was never imported. (module-not-imported); see https://coverage.readthedocs.io/en/7.11.0/messages.html#warning-module-not-imported
+
+
+=================================== ERRORS ====================================
+_____ ERROR at setup of TestRealWorldScenarios.test_curl_package_analysis _____
+tests\integration\test_real_world_scenarios.py:33: in setup_method
+    self.analyzer = ConnascenceAnalyzer()
+                    ^^^^^^^^^^^^^^^^^^^^^
+analyzer\core.py:121: in __init__
+    self.unified_analyzer = UnifiedConnascenceAnalyzer()
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+analyzer\unified_analyzer.py:464: in __init__
+    self.memory_monitor = get_global_memory_monitor()
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+analyzer\optimization\memory_monitor.py:473: in get_global_memory_monitor
+    _global_monitor = MemoryMonitor()
+                      ^^^^^^^^^^^^^^^
+analyzer\optimization\memory_monitor.py:241: in __init__
+    self._process = psutil.Process(os.getpid())
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psutil.py:229: in __init__
+    raise NoSuchProcess(self.pid)
+E   psutil.NoSuchProcess: 61152
+__ ERROR at setup of TestRealWorldScenarios.test_large_codebase_performance ___
+tests\integration\test_real_world_scenarios.py:33: in setup_method
+    self.analyzer = ConnascenceAnalyzer()
+                    ^^^^^^^^^^^^^^^^^^^^^
+analyzer\core.py:121: in __init__
+    self.unified_analyzer = UnifiedConnascenceAnalyzer()
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+analyzer\unified_analyzer.py:464: in __init__
+    self.memory_monitor = get_global_memory_monitor()
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+analyzer\optimization\memory_monitor.py:473: in get_global_memory_monitor
+    _global_monitor = MemoryMonitor()
+                      ^^^^^^^^^^^^^^^
+analyzer\optimization\memory_monitor.py:241: in __init__
+    self._process = psutil.Process(os.getpid())
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psutil.py:229: in __init__
+    raise NoSuchProcess(self.pid)
+E   psutil.NoSuchProcess: 61152
+_ ERROR at setup of TestRealWorldScenarios.test_regression_baseline_comparison _
+tests\integration\test_real_world_scenarios.py:33: in setup_method
+    self.analyzer = ConnascenceAnalyzer()
+                    ^^^^^^^^^^^^^^^^^^^^^
+analyzer\core.py:121: in __init__
+    self.unified_analyzer = UnifiedConnascenceAnalyzer()
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+analyzer\unified_analyzer.py:464: in __init__
+    self.memory_monitor = get_global_memory_monitor()
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+analyzer\optimization\memory_monitor.py:473: in get_global_memory_monitor
+    _global_monitor = MemoryMonitor()
+                      ^^^^^^^^^^^^^^^
+analyzer\optimization\memory_monitor.py:241: in __init__
+    self._process = psutil.Process(os.getpid())
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psutil.py:229: in __init__
+    raise NoSuchProcess(self.pid)
+E   psutil.NoSuchProcess: 61152
+__ ERROR at setup of TestRealWorldScenarios.test_nasa_compliance_validation ___
+tests\integration\test_real_world_scenarios.py:33: in setup_method
+    self.analyzer = ConnascenceAnalyzer()
+                    ^^^^^^^^^^^^^^^^^^^^^
+analyzer\core.py:121: in __init__
+    self.unified_analyzer = UnifiedConnascenceAnalyzer()
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+analyzer\unified_analyzer.py:464: in __init__
+    self.memory_monitor = get_global_memory_monitor()
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+analyzer\optimization\memory_monitor.py:473: in get_global_memory_monitor
+    _global_monitor = MemoryMonitor()
+                      ^^^^^^^^^^^^^^^
+analyzer\optimization\memory_monitor.py:241: in __init__
+    self._process = psutil.Process(os.getpid())
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psutil.py:229: in __init__
+    raise NoSuchProcess(self.pid)
+E   psutil.NoSuchProcess: 61152
+____ ERROR at setup of TestRealWorldScenarios.test_python_project_analysis ____
+tests\integration\test_real_world_scenarios.py:33: in setup_method
+    self.analyzer = ConnascenceAnalyzer()
+                    ^^^^^^^^^^^^^^^^^^^^^
+analyzer\core.py:121: in __init__
+    self.unified_analyzer = UnifiedConnascenceAnalyzer()
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+analyzer\unified_analyzer.py:464: in __init__
+    self.memory_monitor = get_global_memory_monitor()
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+analyzer\optimization\memory_monitor.py:473: in get_global_memory_monitor
+    _global_monitor = MemoryMonitor()
+                      ^^^^^^^^^^^^^^^
+analyzer\optimization\memory_monitor.py:241: in __init__
+    self._process = psutil.Process(os.getpid())
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psutil.py:229: in __init__
+    raise NoSuchProcess(self.pid)
+E   psutil.NoSuchProcess: 61152
+_ ERROR at setup of TestRealWorldScenarios.test_god_object_detection_real_code _
+tests\integration\test_real_world_scenarios.py:33: in setup_method
+    self.analyzer = ConnascenceAnalyzer()
+                    ^^^^^^^^^^^^^^^^^^^^^
+analyzer\core.py:121: in __init__
+    self.unified_analyzer = UnifiedConnascenceAnalyzer()
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+analyzer\unified_analyzer.py:464: in __init__
+    self.memory_monitor = get_global_memory_monitor()
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+analyzer\optimization\memory_monitor.py:473: in get_global_memory_monitor
+    _global_monitor = MemoryMonitor()
+                      ^^^^^^^^^^^^^^^
+analyzer\optimization\memory_monitor.py:241: in __init__
+    self._process = psutil.Process(os.getpid())
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psutil.py:229: in __init__
+    raise NoSuchProcess(self.pid)
+E   psutil.NoSuchProcess: 61152
+____ ERROR at setup of TestRealWorldScenarios.test_mece_analysis_real_code ____
+tests\integration\test_real_world_scenarios.py:33: in setup_method
+    self.analyzer = ConnascenceAnalyzer()
+                    ^^^^^^^^^^^^^^^^^^^^^
+analyzer\core.py:121: in __init__
+    self.unified_analyzer = UnifiedConnascenceAnalyzer()
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+analyzer\unified_analyzer.py:464: in __init__
+    self.memory_monitor = get_global_memory_monitor()
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+analyzer\optimization\memory_monitor.py:473: in get_global_memory_monitor
+    _global_monitor = MemoryMonitor()
+                      ^^^^^^^^^^^^^^^
+analyzer\optimization\memory_monitor.py:241: in __init__
+    self._process = psutil.Process(os.getpid())
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psutil.py:229: in __init__
+    raise NoSuchProcess(self.pid)
+E   psutil.NoSuchProcess: 61152
+___ ERROR at setup of TestRealWorldScenarios.test_express_package_analysis ____
+tests\integration\test_real_world_scenarios.py:33: in setup_method
+    self.analyzer = ConnascenceAnalyzer()
+                    ^^^^^^^^^^^^^^^^^^^^^
+analyzer\core.py:121: in __init__
+    self.unified_analyzer = UnifiedConnascenceAnalyzer()
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+analyzer\unified_analyzer.py:464: in __init__
+    self.memory_monitor = get_global_memory_monitor()
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+analyzer\optimization\memory_monitor.py:473: in get_global_memory_monitor
+    _global_monitor = MemoryMonitor()
+                      ^^^^^^^^^^^^^^^
+analyzer\optimization\memory_monitor.py:241: in __init__
+    self._process = psutil.Process(os.getpid())
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psutil.py:229: in __init__
+    raise NoSuchProcess(self.pid)
+E   psutil.NoSuchProcess: 61152
+_ ERROR at setup of TestRealWorldScenarios.test_error_handling_invalid_files __
+tests\integration\test_real_world_scenarios.py:33: in setup_method
+    self.analyzer = ConnascenceAnalyzer()
+                    ^^^^^^^^^^^^^^^^^^^^^
+analyzer\core.py:121: in __init__
+    self.unified_analyzer = UnifiedConnascenceAnalyzer()
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+analyzer\unified_analyzer.py:464: in __init__
+    self.memory_monitor = get_global_memory_monitor()
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+analyzer\optimization\memory_monitor.py:473: in get_global_memory_monitor
+    _global_monitor = MemoryMonitor()
+                      ^^^^^^^^^^^^^^^
+analyzer\optimization\memory_monitor.py:241: in __init__
+    self._process = psutil.Process(os.getpid())
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psutil.py:229: in __init__
+    raise NoSuchProcess(self.pid)
+E   psutil.NoSuchProcess: 61152
+____ ERROR at setup of TestRealWorldScenarios.test_multi_language_project _____
+tests\integration\test_real_world_scenarios.py:33: in setup_method
+    self.analyzer = ConnascenceAnalyzer()
+                    ^^^^^^^^^^^^^^^^^^^^^
+analyzer\core.py:121: in __init__
+    self.unified_analyzer = UnifiedConnascenceAnalyzer()
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+analyzer\unified_analyzer.py:464: in __init__
+    self.memory_monitor = get_global_memory_monitor()
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+analyzer\optimization\memory_monitor.py:473: in get_global_memory_monitor
+    _global_monitor = MemoryMonitor()
+                      ^^^^^^^^^^^^^^^
+analyzer\optimization\memory_monitor.py:241: in __init__
+    self._process = psutil.Process(os.getpid())
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psutil.py:229: in __init__
+    raise NoSuchProcess(self.pid)
+E   psutil.NoSuchProcess: 61152
+================================== FAILURES ===================================
+_________ TestConnascenceTypePreservation.test_all_9_types_validated __________
+tests\integration\test_connascence_preservation.py:466: in test_all_9_types_validated
+    assert summary["all_passed"], (
+E   AssertionError: CRITICAL: 3 connascence types FAILED! Failed types: ['CoE', 'CoV', 'CoI']
+E   assert False
+---------------------------- Captured stdout call -----------------------------
+
+================================================================================
+CONNASCENCE TYPE PRESERVATION TEST SUMMARY
+================================================================================
+Total types tested: 9/9
+Types passed: 6
+Types failed: 3
+Pass rate: 66.7%
+All passed: False
+Coverage complete: True
+
+FAILED TYPES:
+  - CoE: ExecutionDetector - None
+    Violations found: 0
+  - CoV: ValuesDetector - invalid syntax (<unknown>, line 13)
+    Violations found: 0
+  - CoI: ValuesDetector - None
+    Violations found: 0
+================================================================================
+______ TestConnascenceTypePreservation.test_coe_execution_detector_works ______
+tests\integration\test_connascence_preservation.py:379: in test_coe_execution_detector_works
+    assert result["passed"], (
+E   AssertionError: CoE detector failed: None - Found 0 violations (expected >0)
+E   assert False
+________ TestConnascenceTypePreservation.test_cov_value_detector_works ________
+tests\integration\test_connascence_preservation.py:389: in test_cov_value_detector_works
+    assert result["passed"], (
+E   AssertionError: CoV detector failed: invalid syntax (<unknown>, line 13) - Found 0 violations (expected >0)
+E   assert False
+______ TestConnascenceTypePreservation.test_coi_identity_detector_works _______
+tests\integration\test_connascence_preservation.py:429: in test_coi_identity_detector_works
+    assert result["passed"], (
+E   AssertionError: CoI detector failed: None - Found 0 violations (expected >0)
+E   assert False
+__________________ test_connascence_preservation_integration __________________
+tests\integration\test_connascence_preservation.py:553: in test_connascence_preservation_integration
+    assert summary["all_passed"], f"Some types failed: {summary['failed_types']}"
+E   AssertionError: Some types failed: [{'type': 'CoE', 'detector': 'ExecutionDetector', 'error': None, 'violations_found': 0}, {'type': 'CoV', 'detector': 'ValuesDetector', 'error': 'invalid syntax (<unknown>, line 13)', 'violations_found': 0}, {'type': 'CoI', 'detector': 'ValuesDetector', 'error': None, 'violations_found': 0}]
+E   assert False
+___ TestUnifiedCoordinatorBatchAnalysis.test_batch_analysis_multiple_files ____
+tests\integration\test_unified_coordinator_workflow.py:431: in test_batch_analysis_multiple_files
+    assert violations["connascence"]
+E   assert []
+------------------------------ Captured log call ------------------------------
+INFO     analyzer.architecture.orchestrator:orchestrator.py:88 Phase 1-2: Starting core AST analysis
+ERROR    analyzer.architecture.orchestrator:orchestrator.py:99 AST analysis phase failed: unsupported operand type(s) for /: 'str' and 'str'
+INFO     analyzer.architecture.orchestrator:orchestrator.py:113 Phase 3-4: Starting MECE duplication analysis
+ERROR    analyzer.architecture.orchestrator:orchestrator.py:123 Duplication analysis phase failed: unsupported operand type(s) for /: 'str' and 'str'
+INFO     analyzer.architecture.orchestrator:orchestrator.py:134 Phase 5: Running smart integration engine
+INFO     analyzer.architecture.orchestrator:orchestrator.py:159 Phase 6: Running NASA compliance analysis
+___ TestUnifiedCoordinatorBatchAnalysis.test_batch_analysis_parallel_phases ___
+tests\integration\test_unified_coordinator_workflow.py:458: in test_batch_analysis_parallel_phases
+    assert len(completed_phases) == 4  # All 4 phases
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: assert 2 == 4
+E    +  where 2 = len([{'phase': 'smart_integration', 'completed': '2025-11-13T22:35:05.200590', 'violations_found': 1, 'status': 'completed'}, {'phase': 'nasa_analysis', 'completed': '2025-11-13T22:35:05.205578', 'violations_found': 3, 'status': 'completed'}])
+------------------------------ Captured log call ------------------------------
+INFO     analyzer.architecture.orchestrator:orchestrator.py:88 Phase 1-2: Starting core AST analysis
+ERROR    analyzer.architecture.orchestrator:orchestrator.py:99 AST analysis phase failed: unsupported operand type(s) for /: 'str' and 'str'
+INFO     analyzer.architecture.orchestrator:orchestrator.py:113 Phase 3-4: Starting MECE duplication analysis
+ERROR    analyzer.architecture.orchestrator:orchestrator.py:123 Duplication analysis phase failed: unsupported operand type(s) for /: 'str' and 'str'
+INFO     analyzer.architecture.orchestrator:orchestrator.py:134 Phase 5: Running smart integration engine
+INFO     analyzer.architecture.orchestrator:orchestrator.py:159 Phase 6: Running NASA compliance analysis
+______ TestUnifiedCoordinatorComponentIntegration.test_cache_integration ______
+tests\integration\test_unified_coordinator_workflow.py:514: in test_cache_integration
+    assert len(violations["connascence"]) > 0
+E   assert 0 > 0
+E    +  where 0 = len([])
+----------------------------- Captured log setup ------------------------------
+INFO     analyzer.architecture.cache_manager:cache_manager.py:81 CacheManager initialized (cache_available=True)
+------------------------------ Captured log call ------------------------------
+INFO     analyzer.architecture.cache_manager:cache_manager.py:341 Cache warmed: 4 files pre-loaded
+INFO     analyzer.architecture.orchestrator:orchestrator.py:88 Phase 1-2: Starting core AST analysis
+ERROR    analyzer.architecture.orchestrator:orchestrator.py:99 AST analysis phase failed: unsupported operand type(s) for /: 'str' and 'str'
+INFO     analyzer.architecture.orchestrator:orchestrator.py:113 Phase 3-4: Starting MECE duplication analysis
+ERROR    analyzer.architecture.orchestrator:orchestrator.py:123 Duplication analysis phase failed: unsupported operand type(s) for /: 'str' and 'str'
+INFO     analyzer.architecture.orchestrator:orchestrator.py:134 Phase 5: Running smart integration engine
+INFO     analyzer.architecture.orchestrator:orchestrator.py:159 Phase 6: Running NASA compliance analysis
+____ TestUnifiedCoordinatorSingleFileAnalysis.test_single_file_with_cache _____
+tests\integration\test_unified_coordinator_workflow.py:317: in test_single_file_with_cache
+    assert len(violations["connascence"]) > 0
+E   assert 0 > 0
+E    +  where 0 = len([])
+----------------------------- Captured log setup ------------------------------
+INFO     analyzer.architecture.cache_manager:cache_manager.py:81 CacheManager initialized (cache_available=True)
+------------------------------ Captured log call ------------------------------
+INFO     analyzer.architecture.cache_manager:cache_manager.py:341 Cache warmed: 4 files pre-loaded
+INFO     analyzer.architecture.orchestrator:orchestrator.py:88 Phase 1-2: Starting core AST analysis
+ERROR    analyzer.architecture.orchestrator:orchestrator.py:99 AST analysis phase failed: unsupported operand type(s) for /: 'str' and 'str'
+INFO     analyzer.architecture.orchestrator:orchestrator.py:113 Phase 3-4: Starting MECE duplication analysis
+ERROR    analyzer.architecture.orchestrator:orchestrator.py:123 Duplication analysis phase failed: unsupported operand type(s) for /: 'str' and 'str'
+INFO     analyzer.architecture.orchestrator:orchestrator.py:134 Phase 5: Running smart integration engine
+INFO     analyzer.architecture.orchestrator:orchestrator.py:159 Phase 6: Running NASA compliance analysis
+_ TestUnifiedCoordinatorDirectoryAnalysis.test_directory_analysis_performance _
+tests\integration\test_unified_coordinator_workflow.py:411: in test_directory_analysis_performance
+    assert "started" in entry or "completed" in entry
+E   assert ('started' in {'phase': 'ast_analysis', 'error': "unsupported operand type(s) for /: 'str' and 'str'", 'timestamp': '2025-11-13T22:35:05.687321', 'status': 'failed'} or 'completed' in {'phase': 'ast_analysis', 'error': "unsupported operand type(s) for /: 'str' and 'str'", 'timestamp': '2025-11-13T22:35:05.687321', 'status': 'failed'})
+------------------------------ Captured log call ------------------------------
+INFO     analyzer.architecture.orchestrator:orchestrator.py:88 Phase 1-2: Starting core AST analysis
+ERROR    analyzer.architecture.orchestrator:orchestrator.py:99 AST analysis phase failed: unsupported operand type(s) for /: 'str' and 'str'
+INFO     analyzer.architecture.orchestrator:orchestrator.py:113 Phase 3-4: Starting MECE duplication analysis
+ERROR    analyzer.architecture.orchestrator:orchestrator.py:123 Duplication analysis phase failed: unsupported operand type(s) for /: 'str' and 'str'
+INFO     analyzer.architecture.orchestrator:orchestrator.py:134 Phase 5: Running smart integration engine
+INFO     analyzer.architecture.orchestrator:orchestrator.py:159 Phase 6: Running NASA compliance analysis
+___ TestUnifiedCoordinatorDirectoryAnalysis.test_analyze_directory_workflow ___
+tests\integration\test_unified_coordinator_workflow.py:353: in test_analyze_directory_workflow
+    assert violations["connascence"]
+E   assert []
+------------------------------ Captured log call ------------------------------
+INFO     analyzer.architecture.orchestrator:orchestrator.py:88 Phase 1-2: Starting core AST analysis
+ERROR    analyzer.architecture.orchestrator:orchestrator.py:99 AST analysis phase failed: unsupported operand type(s) for /: 'str' and 'str'
+INFO     analyzer.architecture.orchestrator:orchestrator.py:113 Phase 3-4: Starting MECE duplication analysis
+ERROR    analyzer.architecture.orchestrator:orchestrator.py:123 Duplication analysis phase failed: unsupported operand type(s) for /: 'str' and 'str'
+INFO     analyzer.architecture.orchestrator:orchestrator.py:134 Phase 5: Running smart integration engine
+INFO     analyzer.architecture.orchestrator:orchestrator.py:159 Phase 6: Running NASA compliance analysis
+_ TestUnifiedCoordinatorStreamingAnalysis.test_streaming_analysis_progressive_results _
+tests\integration\test_unified_coordinator_workflow.py:489: in test_streaming_analysis_progressive_results
+    assert len(phases_completed) == 4
+E   AssertionError: assert 2 == 4
+E    +  where 2 = len(['smart_integration', 'nasa_analysis'])
+------------------------------ Captured log call ------------------------------
+INFO     analyzer.architecture.orchestrator:orchestrator.py:88 Phase 1-2: Starting core AST analysis
+ERROR    analyzer.architecture.orchestrator:orchestrator.py:99 AST analysis phase failed: unsupported operand type(s) for /: 'str' and 'str'
+INFO     analyzer.architecture.orchestrator:orchestrator.py:113 Phase 3-4: Starting MECE duplication analysis
+ERROR    analyzer.architecture.orchestrator:orchestrator.py:123 Duplication analysis phase failed: unsupported operand type(s) for /: 'str' and 'str'
+INFO     analyzer.architecture.orchestrator:orchestrator.py:134 Phase 5: Running smart integration engine
+INFO     analyzer.architecture.orchestrator:orchestrator.py:159 Phase 6: Running NASA compliance analysis
+________ TestCompleteWorkflowIntegration.test_mcp_integration_workflow ________
+tests\integration\test_workflow_integration.py:784: in test_mcp_integration_workflow
+    assert mock_mcp_server.is_running is True
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'async_generator' object has no attribute 'is_running'. Did you mean: 'ag_running'?
+______ TestCompleteWorkflowIntegration.test_analysis_to_autofix_workflow ______
+tests\integration\test_workflow_integration.py:769: in test_analysis_to_autofix_workflow
+    assert metrics["stages_completed"] == 4
+E   assert 7 == 4
+______ TestCompleteWorkflowIntegration.test_complete_end_to_end_workflow ______
+tests\integration\test_workflow_integration.py:898: in test_complete_end_to_end_workflow
+    mcp_scan_result = await mock_mcp_server.call_tool(
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'async_generator' object has no attribute 'call_tool'
+______ TestCompleteWorkflowIntegration.test_workflow_memory_coordination ______
+tests\integration\test_workflow_integration.py:1097: in test_workflow_memory_coordination
+    assert metrics["stages_completed"] == len(stages_with_dependencies)
+E   AssertionError: assert 7 == 5
+E    +  where 5 = len([('initialization', []), ('analysis', ['initialization']), ('processing', ['analysis']), ('validation', ['processing', 'analysis']), ('reporting', ['validation'])])
+__ TestConnascenceCLIPreservation.test_cli_detects_coa_algorithm_violations ___
+tests\integration\test_connascence_cli_preservation.py:330: in test_cli_detects_coa_algorithm_violations
+    assert result["passed"], (
+E   AssertionError: CLI failed to detect CoA violations: Found 0 violations (expected >0)
+E   assert False
+---------------------------- Captured stdout call -----------------------------
+Note: Using unified policy name 'standard' for 'service-defaults'
+Results written to C:\Users\17175\AppData\Local\Temp\connascence_regression_xbgi4a_l\test_coa_results.json
+_______ TestConnascenceCLIPreservation.test_cli_detects_multiple_types ________
+tests\integration\test_connascence_cli_preservation.py:346: in test_cli_detects_multiple_types
+    assert result["passed"], (
+E   AssertionError: CLI failed to detect sufficient violations: Found 0 (expected >=10)
+E   assert False
+---------------------------- Captured stdout call -----------------------------
+Note: Using unified policy name 'standard' for 'service-defaults'
+Results written to C:\Users\17175\AppData\Local\Temp\connascence_regression_7z8d4po8\test_multi_results.json
+
+Multi-type detection results:
+  CoP violations: 0
+  CoM violations: 0
+  CoA violations: 0
+  CoV violations: 0
+  Types detected: 0/4
+  Total violations: 0
+___ TestConnascenceCLIPreservation.test_cli_detects_cop_position_violations ___
+tests\integration\test_connascence_cli_preservation.py:314: in test_cli_detects_cop_position_violations
+    assert result["passed"], (
+E   AssertionError: CLI failed to detect CoP violations: Found 0 violations (expected >0)
+E   assert False
+---------------------------- Captured stdout call -----------------------------
+Note: Using unified policy name 'standard' for 'service-defaults'
+Results written to C:\Users\17175\AppData\Local\Temp\connascence_regression_to_y5z7j\test_cop_results.json
+___ TestConnascenceCLIPreservation.test_cli_detects_com_meaning_violations ____
+tests\integration\test_connascence_cli_preservation.py:322: in test_cli_detects_com_meaning_violations
+    assert result["passed"], (
+E   AssertionError: CLI failed to detect CoM violations: Found 1 violations (expected >=4)
+E   assert False
+---------------------------- Captured stdout call -----------------------------
+Note: Using unified policy name 'standard' for 'service-defaults'
+Results written to C:\Users\17175\AppData\Local\Temp\connascence_regression_fqdbd48y\test_com_results.json
+__________ TestConnascenceCLIPreservation.test_cli_preservation_gate __________
+tests\integration\test_connascence_cli_preservation.py:378: in test_cli_preservation_gate
+    assert summary["all_passed"], (
+E   AssertionError: CRITICAL: 4 CLI tests FAILED! CLI may not be backward compatible.
+E   assert False
+---------------------------- Captured stdout call -----------------------------
+Note: Using unified policy name 'standard' for 'service-defaults'\nResults written to C:\\Users\\17175\\AppData\\Local\\Temp\\connascence_regression_krgogyi6\\test_cop_results.json\nNote: Using unified policy name 'standard' for 'service-defaults'\nResults written to C:\\Users\\17175\\AppData\\Local\\Temp\\connascence_regression_krgogyi6\\test_com_results.json\nNote: Using unified policy name 'standard' for 'service-defaults'\nResults written to C:\\Users\\17175\\AppData\\Local\\Temp\\connascence_regression_krgogyi6\\test_coa_results.json\nNote: Using unified policy name 'standard' for 'service-defaults'\nResults written to C:\\Users\\17175\\AppData\\Local\\Temp\\connascence_regression_krgogyi6\\test_multi_results.json\n\n================================================================================\nCONNASCENCE CLI PRESERVATION TEST SUMMARY\n================================================================================\nTotal tests: 4\nTests passed: 0\nTests failed: 4\nPass rate: 0.0%\nAll passed: False\n\nPer-type results:\n  CoP: \u274c FAIL (0 violations)\n  CoM: \u274c FAIL (1 violations)\n  CoA: \u274c FAIL (0 violations)\n  Multi: \u274c FAIL (0 violations)\n================================================================================
+______________________ test_cli_preservation_integration ______________________
+tests\integration\test_connascence_cli_preservation.py:390: in test_cli_preservation_integration
+    assert summary["all_passed"], f"Some CLI tests failed: {summary['results']}"
+E   AssertionError: Some CLI tests failed: {'CoP': {'type': 'CoP', 'violations_found': 0, 'total_violations': 0, 'passed': False, 'exit_code': 0}, 'CoM': {'type': 'CoM', 'violations_found': 1, 'total_violations': 1, 'passed': False, 'exit_code': 1}, 'CoA': {'type': 'CoA', 'violations_found': 0, 'total_violations': 0, 'passed': False, 'exit_code': 0}, 'Multi': {'type': 'Multi-Type', 'total_violations': 0, 'cop_violations': 0, 'com_violations': 0, 'coa_violations': 0, 'cov_violations': 0, 'passed': False, 'exit_code': 0, 'types_detected': 0}}
+E   assert False
+---------------------------- Captured stdout call -----------------------------
+Note: Using unified policy name 'standard' for 'service-defaults'
+Results written to C:\Users\17175\AppData\Local\Temp\connascence_regression_yzwsimql\test_cop_results.json
+Note: Using unified policy name 'standard' for 'service-defaults'
+Results written to C:\Users\17175\AppData\Local\Temp\connascence_regression_yzwsimql\test_com_results.json
+Note: Using unified policy name 'standard' for 'service-defaults'
+Results written to C:\Users\17175\AppData\Local\Temp\connascence_regression_yzwsimql\test_coa_results.json
+Note: Using unified policy name 'standard' for 'service-defaults'
+Results written to C:\Users\17175\AppData\Local\Temp\connascence_regression_yzwsimql\test_multi_results.json
+============================== warnings summary ===============================
+tests\integration\test_data_fixtures.py:36
+  cannot collect test class 'TestScenario' because it has a __init__ constructor (from: integration/test_data_fixtures.py)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+
+---------- coverage: platform win32, python 3.12.5-final-0 -----------
+Name                                                     Stmts   Miss Branch BrPart   Cover   Missing
+-----------------------------------------------------------------------------------------------------
+analyzer\__init__.py                                         2      0      0      0 100.00%
+analyzer\__main__.py                                         1      1      0      0   0.00%   5
+analyzer\agents\__init__.py                                  2      2      0      0   0.00%   1-3
+analyzer\agents\realtime_auditor.py                        197    197     76      0   0.00%   25-359
+analyzer\architecture\__init__.py                            8      0      0      0 100.00%
+analyzer\architecture\aggregator.py                        117     90     28      0  18.62%   26, 44-70, 75-87, 91-97, 101-107, 111-119, 124-127, 144-152, 157-171, 175-182, 186-193, 207, 234-246, 254-255, 259-268, 272-278, 282-290, 294-301, 305, 313, 317
+analyzer\architecture\cache_manager.py                     170    100     64      7  36.32%   63-66, 96-120, 134-148, 162-178, 192-203, 214-231, 240-252, 273->281, 314, 322->321, 337->336, 345-346, 357-370, 397->401, 404-405, 409, 419-443, 451-459
+analyzer\architecture\configuration_manager.py             141    113     36      0  15.82%   27-29, 37-55, 60-78, 83-94, 98-112, 116-128, 132-149, 153-158, 162-169, 173-187, 191-206, 210, 228, 237, 246, 254, 263, 272-295, 299, 303, 307
+analyzer\architecture\detector_pool.py                     172    138     52      0  15.18%   25-33, 45-49, 62-70, 79-95, 99-104, 134-138, 142-167, 171-177, 187-207, 217-241, 250-258, 267-285, 294-298, 302-303, 307-309, 313-334, 338-342, 350-354, 364-366
+analyzer\architecture\enhanced_metrics.py                  158    132     46      0  12.75%   26-28, 42-77, 81-92, 96-120, 124-132, 136-149, 153-178, 182-202, 209-220, 226-239, 243-254, 258-277, 290, 309-328, 332-342, 346-353, 357, 361-362, 366, 370-380
+analyzer\architecture\metrics_collector.py                 244    128     80      9  39.81%   180->178, 198-217, 226, 277-295, 347-349, 352-354, 357-359, 379-400, 404-418, 429-451, 463-478, 487-502, 514-526, 532-546, 585, 591-593, 597-602, 618-632, 657-661, 673
+analyzer\architecture\orchestrator.py                      160     22     26      5  85.48%   58-60, 94, 147-149, 169-171, 223->228, 230-232, 245->251, 253-255, 266-267, 293-294, 307, 343, 347
+analyzer\architecture\recommendation_engine.py             139    118     48      0  11.23%   24-25, 39-63, 67, 81-97, 101-114, 118-133, 137-154, 158-171, 175-192, 196-212, 218-236, 240-252, 256-268, 272-280, 285-311, 315, 319
+analyzer\architecture\report_generator.py                  133     35     26     11  69.81%   92, 94, 123, 129-131, 145-147, 176, 181, 186->190, 192-194, 229->238, 240-242, 263-286, 342-344, 365-366, 397, 399, 422-423
+analyzer\architecture\stream_processor.py                  188    188     48      0   0.00%   21-496
+analyzer\ast_engine\__init__.py                              2      0      0      0 100.00%
+analyzer\ast_engine\__main__.py                              1      1      0      0   0.00%   5
+analyzer\ast_engine\analyzer_orchestrator.py                83     65     20      0  17.48%   19, 23-40, 44-74, 81, 85, 89, 93-107, 111-116, 121-162
+analyzer\ast_engine\core_analyzer.py                       159    110     60      0  22.37%   61, 66, 71, 76, 81, 86-90, 103-104, 118-146, 158-160, 172-190, 196-223, 227-258, 262-289, 293-316, 320-341, 345-360, 367-368
+analyzer\check_connascence.py                              490    430    218      0   8.47%   30-31, 63-84, 89-98, 102-113, 118-139, 144-173, 178-242, 247-253, 258-265, 270-276, 281-318, 331-358, 369-390, 394-402, 410-424, 428-437, 441-443, 450-462, 466-469, 473-476, 481-504, 509-516, 520-527, 532-535, 558-571, 604-613, 638-655, 665-687, 692-693, 707-748, 752-769, 773-789, 793-817, 821-846, 855-880, 892-909, 913-925, 929-952, 956, 960-988, 993-1059
+analyzer\check_connascence_minimal.py                       87     87     20      0   0.00%   8-175
+analyzer\clarity_linter\__init__.py                        115    115     26      0   0.00%   11-334
+analyzer\clarity_linter\base.py                             66     66      4      0   0.00%   11-280
+analyzer\clarity_linter\config_loader.py                    54     54      4      0   0.00%   10-227
+analyzer\clarity_linter\models.py                           57     57     14      0   0.00%   10-224
+analyzer\clarity_linter\sarif_exporter.py                   51     51      2      0   0.00%   10-271
+analyzer\constants.py                                      137     30     18      5  72.26%   243, 247, 253->257, 260-266, 286-291, 305, 320-327, 816-880, 890, 905-915
+analyzer\context_analyzer.py                               302     70    178     43  68.96%   61, 206-215, 232-233, 242-250, 275->288, 285, 289, 334, 348, 399, 403, 412, 413->416, 417, 419, 421, 436, 438, 458, 461, 480-482, 489, 495, 502, 511, 517->515, 545, 549, 551, 557-560, 563-564, 568, 571-572, 575-576, 592-595, 597-599, 601->603, 605-607, 609-612, 614-615, 619, 621, 627
+analyzer\core.py                                           400    316     96      6  18.15%   38-44, 52-53, 61-67, 76, 90-91, 103-104, 117, 122-128, 132-169, 177-201, 211, 252, 271-285, 291-332, 337-339, 364-391, 395-410, 414, 418-421, 442-460, 469-484, 493-501, 510-512, 521-538, 548-573, 583-612, 622-628, 637-671, 680-706, 715-743, 748-760, 765-775, 780-789, 798-833, 842-868, 878-914, 920-922, 928-931
+analyzer\detectors\__init__.py                              10      0      0      0 100.00%
+analyzer\detectors\algorithm_detector.py                    89     72     40      0  13.18%   22-23, 37-53, 58-65, 70-82, 87-110, 115-122, 127-134, 139-142, 149-154, 184-212
+analyzer\detectors\base.py                                  53     21      8      2  59.02%   32, 50, 72, 114-121, 125-127, 131-132, 141-147, 151, 166-169
+analyzer\detectors\convention_detector.py                   74     17     36      8  70.00%   60, 77->83, 85-86, 94, 100-109, 121, 129->128, 134-138, 150-165, 194
+analyzer\detectors\execution_detector.py                   119     32     60     15  69.27%   57, 61, 86, 87->exit, 97->exit, 103, 107, 115, 120->119, 123->119, 129-131, 139-147, 153-154, 161->160, 165-166, 172-183, 206-223, 227, 247, 267, 283, 299
+analyzer\detectors\god_object_detector.py                   39      3     10      2  89.80%   65-67, 108, 111->exit
+analyzer\detectors\magic_literal_detector.py               111     31     54     18  65.45%   76->exit, 80-83, 87-94, 102-103, 109, 118, 122, 124, 160-168, 192, 194, 196, 198, 202, 204, 220, 222, 227, 230, 236->242, 238
+analyzer\detectors\position_detector.py                     61     21     20      4  59.26%   66-100, 145, 149, 154, 158
+analyzer\detectors\timing_detector.py                       43     11     16      4  67.80%   56-57, 63, 70-77, 97-99, 116, 120
+analyzer\detectors\values_detector.py                       44      7     18      3  83.87%   66->exit, 81, 86, 90-108
+analyzer\dup_detection\__init__.py                           2      0      0      0 100.00%
+analyzer\dup_detection\__main__.py                           1      1      0      0   0.00%   5
+analyzer\dup_detection\mece_analyzer.py                    194    147     56      0  18.80%   23-40, 75, 79-114, 118-127, 131-150, 154-167, 179-193, 197-198, 202-239, 244-261, 265-286, 290-305, 309, 329-332, 337-359
+analyzer\duplication_helper.py                              31     27     14      0   8.89%   12-65, 85-92, 97-116
+analyzer\duplication_unified.py                            238    182     96      0  16.77%   29-33, 66-71, 91-120, 124-179, 183-256, 260-266, 270-299, 306-313, 324-343, 351-363, 375-382, 386-391, 395-405, 409-422, 427-450, 455-480
+analyzer\enterprise\__init__.py                              3      3      0      0   0.00%   14-28
+analyzer\enterprise\compliance\__init__.py                   4      4      0      0   0.00%   1-5
+analyzer\enterprise\compliance\iso27001_mapper.py          131    131     30      0   0.00%   24-374
+analyzer\enterprise\compliance\nist_ssdf_aligner.py        148    148     36      0   0.00%   23-390
+analyzer\enterprise\compliance\soc2_collector.py           131    131     28      0   0.00%   25-339
+analyzer\enterprise\nasa_pot10_enhanced.py                 282    282     78      0   0.00%   15-690
+analyzer\enterprise\sixsigma\__init__.py                     4      4      0      0   0.00%   3-7
+analyzer\enterprise\sixsigma\analyzer.py                   174    174     66      0   0.00%   8-484
+analyzer\enterprise\sixsigma\calculator.py                 215    215     86      0   0.00%   7-457
+analyzer\enterprise\sixsigma\ctq_calculator.py             179    179     46      0   0.00%   18-376
+analyzer\enterprise\sixsigma\dpmo_calculator.py             83     83     24      0   0.00%   15-132
+analyzer\enterprise\sixsigma\integration.py                137    137     42      0   0.00%   8-355
+analyzer\enterprise\sixsigma\telemetry.py                  154    154     58      0   0.00%   8-399
+analyzer\enterprise\supply_chain\__init__.py                 3      3      0      0   0.00%   1-4
+analyzer\enterprise\supply_chain\sbom_generator.py         147    147     44      0   0.00%   20-291
+analyzer\enterprise\supply_chain\slsa_attestation.py       189    189     52      0   0.00%   25-348
+analyzer\formal_grammar.py                                 366    245    110     12  28.78%   91-93, 97-119, 123-134, 138-148, 152-201, 208-213, 218-246, 251-287, 292-308, 313-335, 364-371, 376-383, 388-401, 406-413, 418-425, 430-438, 443-466, 471-500, 512, 516, 541-543, 547-549, 553-555, 565, 569, 573, 577, 581, 587, 590, 596-613, 617, 624-626, 631-665, 669-684, 688, 698, 702-728, 732-769, 773-776, 783, 791-798, 802-812, 816
+analyzer\formatters\__init__.py                              2      0      0      0 100.00%
+analyzer\formatters\sarif.py                                37      8      8      2  73.33%   93->91, 152-161
+analyzer\formatters\sarif_rules.py                           5      0      0      0 100.00%
+analyzer\language_strategies.py                            154    154     38      0   0.00%   6-347
+analyzer\ml_modules\__init__.py                              4      4      0      0   0.00%   1-5
+analyzer\ml_modules\compliance_forecaster.py               201    201     70      0   0.00%   18-357
+analyzer\ml_modules\quality_predictor.py                   167    167     44      0   0.00%   23-291
+analyzer\ml_modules\theater_classifier.py                  191    191     38      0   0.00%   24-355
+analyzer\nasa_engine\__init__.py                             2      0      0      0 100.00%
+analyzer\nasa_engine\nasa_analyzer.py                      253    215     94      0  10.95%   30-31, 40-57, 62-78, 83-96, 101-128, 133-183, 188-201, 205-207, 212-229, 234-250, 255-271, 276-298, 303-325, 330-350, 355-405, 410-417, 422-439, 444-451, 456-463, 468-480, 485-495, 500-509, 514-523, 529-537
+analyzer\optimization\__init__.py                            4      0      0      0 100.00%
+analyzer\optimization\ast_optimizer.py                     250    175     88      0  22.19%   78-115, 123-129, 139-154, 158, 162-164, 171-182, 188-236, 241-262, 272-289, 318-339, 344-366, 371-388, 397-404, 410-413, 419-423, 429-434, 443, 456-463, 468-475, 489-493, 503-520, 525-531, 543-553, 573-595, 601-604
+analyzer\optimization\file_cache.py                        183     97     50      4  39.48%   39-40, 56->58, 58->exit, 114, 133-134, 151-152, 164-203, 216-256, 268-271, 283-287, 292-302, 306-312, 316-317, 327-334, 338-339, 349, 354, 366-371, 378-379, 385, 390, 395, 400
+analyzer\optimization\incremental_analyzer.py              281    281     62      0   0.00%   10-679
+analyzer\optimization\memory_monitor.py                    248    152     54      1  32.12%   54-56, 115-133, 137-143, 147-159, 168-184, 188-200, 242-243, 247-255, 259-267, 271-272, 276-277, 281-291, 295-326, 330-344, 355-373, 377-383, 387-397, 401-403, 416-420, 439-450, 454-455, 459, 475, 480-481, 488-490, 495-496, 504-506, 509-511, 514-516
+analyzer\optimization\performance_benchmark.py             283    253     66      0   8.60%   18-20, 44-45, 53-54, 58-88, 92-132, 136-184, 188-237, 241-296, 300-326, 330-411, 415-456, 461-477
+analyzer\optimization\resource_manager.py                  315    246     82      0  17.38%   47-54, 72-75, 80, 98-119, 123-132, 136-144, 169-211, 223, 227-252, 264-272, 284-300, 312-328, 332-358, 362-372, 377-397, 401-402, 406-407, 411-412, 416-432, 436-437, 452-464, 491-511, 515-516, 520-521, 530-551, 557-585, 591-612, 624-629, 634-635, 640-641, 648-652
+analyzer\optimization\streaming_performance_monitor.py     186    127     34      0  26.82%   81-107, 111-121, 125-148, 152-172, 176-180, 184-196, 200-203, 207-212, 216-232, 236-269, 273, 277-287, 291-294, 298-300, 304-306, 310-314, 318-322, 333-336, 341-342, 347-348, 353-354, 359-360
+analyzer\optimization\unified_visitor.py                   200    145     60      0  21.15%   18-23, 78-85, 94-106, 110-118, 122-131, 135-140, 144-149, 153-158, 162-168, 172-177, 183-190, 194-204, 208-213, 217-220, 224-231, 235-240, 244-247, 251-254, 258-262, 266-270, 276-289, 293-300, 304-308, 312-314, 318-322, 326, 330-332, 336-338, 342-344, 348-356, 360-362
+analyzer\performance\__init__.py                             2      2      0      0   0.00%   18-20
+analyzer\performance\parallel_analyzer.py                  304    304     70      0   0.00%   27-807
+analyzer\quality_gates\__init__.py                           2      2      0      0   0.00%   6-12
+analyzer\quality_gates\unified_quality_gate.py             194    194     44      0   0.00%   9-647
+analyzer\refactored_detector.py                            126     96     36      0  18.52%   32-34, 45-58, 62, 66-67, 71-72, 76-78, 82-85, 89-91, 110-133, 143-161, 170-191, 199-211, 220-228, 237-258, 262-283, 292-297, 302, 306-308
+analyzer\reporting\__init__.py                               2      1      0      0  50.00%   20
+analyzer\reporting\coordinator.py                          261    252     82      0   2.62%   46-718
+analyzer\reporting\json.py                                  61     44     16      2  24.68%   35-45, 49, 67-94, 113, 139-158, 176, 180-181, 188-216
+analyzer\reporting\markdown.py                             142    102     66      7  22.60%   46, 65-66, 68-69, 71-72, 89-125, 129-165, 173-216, 225-272
+analyzer\reporting\sarif.py                                 71     50     14      0  24.71%   37-40, 44-50, 54, 88, 116-241, 245-297, 301-302, 307-318, 323-324, 328-346, 359-372, 377-406, 410-443
+analyzer\smart_integration_engine.py                       284    242    102      0  10.88%   17-53, 57-78, 82-97, 101-140, 144-203, 212-234, 238-242, 258-262, 279-282, 300-303, 325-339, 343-352, 356-374, 378-407, 411-432, 436-452, 456-472, 476-492, 497-519, 523-533, 538-559, 566-571, 576-582, 587-599, 604-616, 622-628, 632, 640-647, 651-659, 663-672, 684, 692, 703-706
+analyzer\streaming\__init__.py                               5      0      0      0 100.00%
+analyzer\streaming\dashboard_reporter.py                   243    176     56      0  22.41%   41, 100-134, 143-175, 179-194, 198-209, 213-220, 226-239, 243-253, 263, 275-277, 291-299, 309-313, 338-360, 369-397, 406-426, 436-492, 496-511, 516-532, 536-543, 547-568, 572-585, 589-593, 604-607, 612-613, 618-619
+analyzer\streaming\incremental_cache.py                    287    224    112      0  15.79%   31-34, 56-58, 75-80, 97, 119-149, 171-251, 267-292, 314-338, 342-364, 368-401, 405-407, 412-417, 430-440, 444-463, 467-501, 505-509, 525-536, 540-541, 553-563, 570-574
+analyzer\streaming\result_aggregator.py                    237    180     74      0  18.33%   37-40, 86-119, 128-155, 167-184, 188-201, 217-255, 259-264, 268-280, 292-308, 312-313, 323-333, 337-339, 346-398, 403-426, 430-449, 456-465, 469-485, 489-505, 509, 514-518, 529-532, 537-538, 543-544, 549-550
+analyzer\streaming\stream_processor.py                     392    311    102      0  16.40%   34-61, 80-86, 102-103, 142-153, 157-158, 162-163, 167-168, 172-173, 177-180, 184-232, 236-246, 273-317, 321-332, 336-355, 359-383, 387-393, 397-409, 421-422, 426-431, 435-451, 459-495, 499-514, 518-519, 523-547, 551-577, 581-625, 629-638, 642, 654-664, 669-675, 679-699, 703-704, 708-709, 713-719, 723-729, 742-743, 747, 755, 774-785
+analyzer\theater_detection\__init__.py                       4      4      0      0   0.00%   6-10
+analyzer\theater_detection\core.py                         103    103     34      0   0.00%   15-207
+analyzer\theater_detection\detector.py                     282    282    142      0   0.00%   8-715
+analyzer\theater_detection\patterns.py                     189    189     92      0   0.00%   8-502
+analyzer\theater_detection\validation.py                   141    141     66      0   0.00%   8-276
+analyzer\theater_detection\validator.py                    249    249    144      0   0.00%   7-525
+analyzer\thresholds.py                                      34      2      0      0  94.12%   69, 74
+analyzer\unified_analyzer.py                              1109    891    298      2  15.64%   51-52, 72-73, 87-88, 111, 123-125, 131-132, 150, 176, 218, 222, 226-228, 255-259, 278-295, 302-320, 329-332, 337-342, 347-352, 357-362, 367-372, 380, 386, 396, 402, 450, 465-509, 523-535, 541-584, 590-608, 614-630, 635-659, 663-680, 684-737, 741-803, 807, 817, 830-897, 901-963, 968-995, 999-1002, 1008-1049, 1058-1124, 1128-1136, 1140, 1159-1191, 1195-1219, 1223-1231, 1235-1249, 1253-1267, 1271-1280, 1284-1285, 1289-1311, 1319-1328, 1339-1352, 1356-1375, 1379-1398, 1402-1410, 1414-1423, 1427-1439, 1443-1465, 1469-1483, 1487-1534, 1543-1576, 1585-1608, 1612-1618, 1622-1630, 1645-1654, 1669-1674, 1681-1683, 1720-1736, 1763-1767, 1771-1839, 1843, 1856, 1886-1890, 1903, 1913, 1917-1919, 1923-1925, 1929-1930, 1935-1950, 1954, 1961-1973, 1977, 1982-1995, 1999, 2004-2017, 2027-2034, 2039-2050, 2055-2061, 2076-2079, 2108-2117, 2123-2137, 2141-2149, 2155-2156, 2162-2163, 2171-2322, 2339, 2361-2367, 2373, 2378-2380, 2386-2435
+analyzer\utils\__init__.py                                   0      0      0      0 100.00%
+analyzer\utils\ast_utils.py                                 44      2      8      2  92.31%   126->128, 128->131, 174-175
+analyzer\utils\code_utils.py                                12      1      4      1  87.50%   28
+analyzer\utils\common_patterns.py                          226    226     74      0   0.00%   9-479
+analyzer\utils\config_manager.py                           114    114     16      0   0.00%   9-330
+analyzer\utils\connascence_validator.py                    191    191     76      0   0.00%   9-418
+analyzer\utils\detector_result.py                           58     58     10      0   0.00%   11-185
+analyzer\utils\error_handling.py                           187    187     40      0   0.00%   9-450
+analyzer\utils\types.py                                     19     19      2      0   0.00%   3-28
+analyzer\utils\violation_factory.py                         54     15     10      5  68.75%   95->97, 98, 99->103, 103->105, 105->108, 163-173, 197-207
+autofix\__init__.py                                          0      0      0      0 100.00%
+autofix\class_splits.py                                    206    206     80      0   0.00%   21-396
+autofix\core.py                                            243    243     78      0   0.00%   14-477
+autofix\god_objects.py                                       5      5      0      0   0.00%   15-22
+autofix\magic_literals.py                                  151    151     70      0   0.00%   21-298
+autofix\param_bombs.py                                     182    182     68      0   0.00%   21-329
+autofix\patch_api.py                                        44     44      8      0   0.00%   14-81
+autofix\patch_generator.py                                 230    230     76      0   0.00%   27-608
+autofix\tier_classifier.py                                  95     95     38      0   0.00%   32-369
+autofix\type_hints.py                                      192    192     88      0   0.00%   21-356
+cli\__init__.py                                             11      2      2      1  76.92%   20-21, 25->exit
+cli\__main__.py                                             18     18      0      0   0.00%   3-27
+cli\connascence.py                                          70     31     10      2  56.25%   19-22, 39-42, 70-71, 78, 81-82, 87, 90, 95, 106-114, 120-125, 130, 133, 143->exit
+mcp\__init__.py                                              2      0      0      0 100.00%
+mcp\cli.py                                                 126    126     22      0   0.00%   14-254
+mcp\enhanced_server.py                                     340    340     80      0   0.00%   18-761
+mcp\server.py                                              325    265     94      0  14.32%   41-88, 97-98, 101, 105, 108-113, 116-124, 130-132, 143-144, 147-150, 155-159, 166-188, 193-259, 263-319, 323, 328-345, 349-367, 371-399, 411-440, 444-481, 485-497, 501, 514-599, 615, 619, 625-627, 634-646, 651-696, 707-727, 736, 745-768, 780, 784, 805-809, 813-820, 824-829, 833-841, 845, 850-854
+policy\__init__.py                                           5      0      0      0 100.00%
+policy\baselines.py                                        255    185     48      0  23.10%   51, 64, 89, 101, 122-154, 170-179, 190-217, 221-222, 226-235, 241-275, 297-324, 328-336, 340-348, 352-357, 361-365, 369, 380-384, 400-404, 412-413, 420-439, 443, 456, 462-485, 501-502, 506-521, 526-538, 543-547, 552-584, 590-595, 599
+policy\budgets.py                                          179    132     56      0  20.00%   75-83, 87-106, 111-118, 124-175, 189-206, 210-217, 221-250, 254-279, 286-289, 293, 297-303, 309-341, 351-359, 371-382, 386-395, 399, 403-405, 410-411, 416-419
+policy\drift.py                                            196    196     42      0   0.00%   30-459
+policy\manager.py                                          222    175    104      0  14.42%   25-27, 69-135, 140-150, 155-172, 180-183, 187, 191-217, 221-239, 243-250, 254-278, 282-286, 292-351, 356-384, 389-397, 407-426, 430-467, 480-486, 490
+policy\presets\__init__.py                                   0      0      0      0 100.00%
+policy\presets\general_safety_rules.py                       3      0      0      0 100.00%
+policy\waivers.py                                          239    175     66      0  20.98%   42-44, 95-101, 105-124, 131-140, 144-173, 177-198, 202-228, 242-265, 269-282, 286-299, 303-306, 310-313, 317, 325-334, 338-352, 356-379, 389-416, 420-424, 438-440, 447-448, 451-453
+-----------------------------------------------------------------------------------------------------
+TOTAL                                                    19229  15780   5926    183  15.14%
+Coverage HTML written to dir enterprise-package/artifacts/coverage
+Coverage XML written to file tests/results/coverage.xml
+
+FAIL Required test coverage of 85% not reached. Total coverage: 15.77%
+=========================== short test summary info ===========================
+FAILED tests\integration\test_connascence_preservation.py::TestConnascenceTypePreservation::test_all_9_types_validated - AssertionError: CRITICAL: 3 connascence types FAILED! Failed types: ['CoE', 'CoV', 'CoI']
+assert False
+FAILED tests\integration\test_connascence_preservation.py::TestConnascenceTypePreservation::test_coe_execution_detector_works - AssertionError: CoE detector failed: None - Found 0 violations (expected >0)
+assert False
+FAILED tests\integration\test_connascence_preservation.py::TestConnascenceTypePreservation::test_cov_value_detector_works - AssertionError: CoV detector failed: invalid syntax (<unknown>, line 13) - Found 0 violations (expected >0)
+assert False
+FAILED tests\integration\test_connascence_preservation.py::TestConnascenceTypePreservation::test_coi_identity_detector_works - AssertionError: CoI detector failed: None - Found 0 violations (expected >0)
+assert False
+FAILED tests\integration\test_connascence_preservation.py::test_connascence_preservation_integration - AssertionError: Some types failed: [{'type': 'CoE', 'detector': 'ExecutionDetector', 'error': None, 'violations_found': 0}, {'type': 'CoV', 'detector': 'ValuesDetector', 'error': 'invalid syntax (<unknown>, line 13)', 'violations_found': 0}, {'type': 'CoI', 'detector': 'ValuesDetector', 'error': None, 'violations_found': 0}]
+assert False
+FAILED tests\integration\test_unified_coordinator_workflow.py::TestUnifiedCoordinatorBatchAnalysis::test_batch_analysis_multiple_files - assert []
+FAILED tests\integration\test_unified_coordinator_workflow.py::TestUnifiedCoordinatorBatchAnalysis::test_batch_analysis_parallel_phases - AssertionError: assert 2 == 4
+ +  where 2 = len([{'phase': 'smart_integration', 'completed': '2025-11-13T22:35:05.200590', 'violations_found': 1, 'status': 'completed'}, {'phase': 'nasa_analysis', 'completed': '2025-11-13T22:35:05.205578', 'violations_found': 3, 'status': 'completed'}])
+FAILED tests\integration\test_unified_coordinator_workflow.py::TestUnifiedCoordinatorComponentIntegration::test_cache_integration - assert 0 > 0
+ +  where 0 = len([])
+FAILED tests\integration\test_unified_coordinator_workflow.py::TestUnifiedCoordinatorSingleFileAnalysis::test_single_file_with_cache - assert 0 > 0
+ +  where 0 = len([])
+FAILED tests\integration\test_unified_coordinator_workflow.py::TestUnifiedCoordinatorDirectoryAnalysis::test_directory_analysis_performance - assert ('started' in {'phase': 'ast_analysis', 'error': "unsupported operand type(s) for /: 'str' and 'str'", 'timestamp': '2025-11-13T22:35:05.687321', 'status': 'failed'} or 'completed' in {'phase': 'ast_analysis', 'error': "unsupported operand type(s) for /: 'str' and 'str'", 'timestamp': '2025-11-13T22:35:05.687321', 'status': 'failed'})
+FAILED tests\integration\test_unified_coordinator_workflow.py::TestUnifiedCoordinatorDirectoryAnalysis::test_analyze_directory_workflow - assert []
+FAILED tests\integration\test_unified_coordinator_workflow.py::TestUnifiedCoordinatorStreamingAnalysis::test_streaming_analysis_progressive_results - AssertionError: assert 2 == 4
+ +  where 2 = len(['smart_integration', 'nasa_analysis'])
+FAILED tests\integration\test_workflow_integration.py::TestCompleteWorkflowIntegration::test_mcp_integration_workflow - AttributeError: 'async_generator' object has no attribute 'is_running'. Did you mean: 'ag_running'?
+FAILED tests\integration\test_workflow_integration.py::TestCompleteWorkflowIntegration::test_analysis_to_autofix_workflow - assert 7 == 4
+FAILED tests\integration\test_workflow_integration.py::TestCompleteWorkflowIntegration::test_complete_end_to_end_workflow - AttributeError: 'async_generator' object has no attribute 'call_tool'
+FAILED tests\integration\test_workflow_integration.py::TestCompleteWorkflowIntegration::test_workflow_memory_coordination - AssertionError: assert 7 == 5
+ +  where 5 = len([('initialization', []), ('analysis', ['initialization']), ('processing', ['analysis']), ('validation', ['processing', 'analysis']), ('reporting', ['validation'])])
+FAILED tests\integration\test_connascence_cli_preservation.py::TestConnascenceCLIPreservation::test_cli_detects_coa_algorithm_violations - AssertionError: CLI failed to detect CoA violations: Found 0 violations (expected >0)
+assert False
+FAILED tests\integration\test_connascence_cli_preservation.py::TestConnascenceCLIPreservation::test_cli_detects_multiple_types - AssertionError: CLI failed to detect sufficient violations: Found 0 (expected >=10)
+assert False
+FAILED tests\integration\test_connascence_cli_preservation.py::TestConnascenceCLIPreservation::test_cli_detects_cop_position_violations - AssertionError: CLI failed to detect CoP violations: Found 0 violations (expected >0)
+assert False
+FAILED tests\integration\test_connascence_cli_preservation.py::TestConnascenceCLIPreservation::test_cli_detects_com_meaning_violations - AssertionError: CLI failed to detect CoM violations: Found 1 violations (expected >=4)
+assert False
+FAILED tests\integration\test_connascence_cli_preservation.py::TestConnascenceCLIPreservation::test_cli_preservation_gate - AssertionError: CRITICAL: 4 CLI tests FAILED! CLI may not be backward compatible.
+assert False
+FAILED tests\integration\test_connascence_cli_preservation.py::test_cli_preservation_integration - AssertionError: Some CLI tests failed: {'CoP': {'type': 'CoP', 'violations_found': 0, 'total_violations': 0, 'passed': False, 'exit_code': 0}, 'CoM': {'type': 'CoM', 'violations_found': 1, 'total_violations': 1, 'passed': False, 'exit_code': 1}, 'CoA': {'type': 'CoA', 'violations_found': 0, 'total_violations': 0, 'passed': False, 'exit_code': 0}, 'Multi': {'type': 'Multi-Type', 'total_violations': 0, 'cop_violations': 0, 'com_violations': 0, 'coa_violations': 0, 'cov_violations': 0, 'passed': False, 'exit_code': 0, 'types_detected': 0}}
+assert False
+ERROR tests\integration\test_real_world_scenarios.py::TestRealWorldScenarios::test_curl_package_analysis - psutil.NoSuchProcess: 61152
+ERROR tests\integration\test_real_world_scenarios.py::TestRealWorldScenarios::test_large_codebase_performance - psutil.NoSuchProcess: 61152
+ERROR tests\integration\test_real_world_scenarios.py::TestRealWorldScenarios::test_regression_baseline_comparison - psutil.NoSuchProcess: 61152
+ERROR tests\integration\test_real_world_scenarios.py::TestRealWorldScenarios::test_nasa_compliance_validation - psutil.NoSuchProcess: 61152
+ERROR tests\integration\test_real_world_scenarios.py::TestRealWorldScenarios::test_python_project_analysis - psutil.NoSuchProcess: 61152
+ERROR tests\integration\test_real_world_scenarios.py::TestRealWorldScenarios::test_god_object_detection_real_code - psutil.NoSuchProcess: 61152
+ERROR tests\integration\test_real_world_scenarios.py::TestRealWorldScenarios::test_mece_analysis_real_code - psutil.NoSuchProcess: 61152
+ERROR tests\integration\test_real_world_scenarios.py::TestRealWorldScenarios::test_express_package_analysis - psutil.NoSuchProcess: 61152
+ERROR tests\integration\test_real_world_scenarios.py::TestRealWorldScenarios::test_error_handling_invalid_files - psutil.NoSuchProcess: 61152
+ERROR tests\integration\test_real_world_scenarios.py::TestRealWorldScenarios::test_multi_language_project - psutil.NoSuchProcess: 61152
+============ 22 failed, 68 passed, 1 warning, 10 errors in 34.03s =============

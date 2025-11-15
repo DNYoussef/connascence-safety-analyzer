@@ -543,7 +543,7 @@ class PerformanceProfiler:
         try:
             import psutil
 
-            process = psutil.Process()
+            process = psutil.Process(os.getpid())
             return process.memory_info().rss
         except ImportError:
             import resource

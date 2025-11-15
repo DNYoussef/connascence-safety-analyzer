@@ -140,7 +140,11 @@ class MemoryLeakDetector:
             # Get current memory if no samples yet
             import psutil
 
-            self.streaming_session_start_memory = psutil.Process().memory_info().rss / (1024 * 1024)
+            try:
+                self.streaming_session_start_memory = psutil.Process(os.getpid()).memory_info().rss / (1024 * 1024)
+            except (psutil.NoSuchProcess, psutil.AccessDenied) as e:
+                logger.debug(f"Unable to get current process memory: {e}")
+                self.streaming_session_start_memory = 0.0
 
     def get_streaming_memory_stats(self) -> Dict[str, float]:
         """Get streaming-specific memory statistics."""
@@ -299,11 +303,17 @@ class MemoryMonitor:
         try:
             # Get process memory info
             if self._process:
-                memory_info = self._process.memory_info()
-                memory_percent = self._process.memory_percent()
+                try:
+                    memory_info = self._process.memory_info()
+                    memory_percent = self._process.memory_percent()
+                except (psutil.NoSuchProcess, psutil.AccessDenied) as e:
+                    logger.debug(f"Process no longer exists or access denied: {e}")
+                    # Fallback to default values
+                    memory_info = type('MemInfo', (), {'rss': 0, 'vms': 0})()
+                    memory_percent = 0.0
+                    self._process = None  # Clear invalid process reference
             else:
                 # Fallback when process is not available
-                import resource
                 memory_info = type('MemInfo', (), {'rss': 0, 'vms': 0})()
                 memory_percent = 0.0
 
@@ -516,11 +526,20 @@ class MemoryWatcher:
         self.start_memory = 0.0
 
     def __enter__(self):
-        self.start_memory = psutil.Process().memory_info().rss / (1024 * 1024)
+        try:
+            self.start_memory = psutil.Process(os.getpid()).memory_info().rss / (1024 * 1024)
+        except (psutil.NoSuchProcess, psutil.AccessDenied) as e:
+            logger.debug(f"Unable to get start memory for {self.name}: {e}")
+            self.start_memory = 0.0
+
         self.monitor.start_monitoring()
         return self.monitor
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.monitor.stop_monitoring()
-        end_memory = psutil.Process().memory_info().rss / (1024 * 1024)
-        logger.info(f"{self.name} memory usage: {end_memory - self.start_memory:.1f}MB")
+
+        try:
+            end_memory = psutil.Process(os.getpid()).memory_info().rss / (1024 * 1024)
+            logger.info(f"{self.name} memory usage: {end_memory - self.start_memory:.1f}MB")
+        except (psutil.NoSuchProcess, psutil.AccessDenied) as e:
+            logger.debug(f"Unable to get end memory for {self.name}: {e}")

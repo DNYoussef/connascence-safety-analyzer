@@ -576,7 +576,7 @@ class IntegrationTestValidator:
     def validate_analyzer_mcp_integration(
         analyzer_result: Dict[str, Any], mcp_result: Dict[str, Any]
     ) -> Dict[str, bool]:
-        """Validate analyzer → MCP server integration"""
+        """Validate analyzer -> MCP server integration"""
         return {
             "data_transfer_successful": (
                 len(analyzer_result.get("findings", [])) == mcp_result.get("findings_processed", 0)
@@ -587,7 +587,7 @@ class IntegrationTestValidator:
 
     @staticmethod
     def validate_mcp_autofix_integration(mcp_result: Dict[str, Any], autofix_result: Dict[str, Any]) -> Dict[str, bool]:
-        """Validate MCP server → autofix engine integration"""
+        """Validate MCP server -> autofix engine integration"""
         return {
             "fix_proposals_generated": len(autofix_result.get("fixes", [])) > 0,
             "confidence_scores_present": all("confidence" in fix for fix in autofix_result.get("fixes", [])),
@@ -637,7 +637,7 @@ async def run_integration_scenario(scenario_name: str, components: Dict[str, Any
     try:
         # Execute scenario based on components required
         if "analyzer" in scenario.components and "mcp_server" in scenario.components:
-            # Run analyzer → MCP integration
+            # Run analyzer -> MCP integration
             workspace = TEST_DATA_MANAGER.create_test_workspace(f"{scenario_name}_execution")
             TEST_DATA_MANAGER.populate_workspace_with_violations(
                 workspace, scenario.test_data.get("violation_types", ["CoM"])

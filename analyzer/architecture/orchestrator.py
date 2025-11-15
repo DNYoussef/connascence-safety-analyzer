@@ -114,7 +114,7 @@ class AnalysisOrchestrator:
             self._record_phase_start(phase_name, phase_metadata)
 
             if "mece_analyzer" in analyzers:
-                dup_analysis = analyzers["mece_analyzer"].analyze_path(str(project_path), comprehensive=True)
+                dup_analysis = analyzers["mece_analyzer"].analyze_path(project_path, comprehensive=True)
                 violations["duplication"] = dup_analysis.get("duplications", [])
 
             self._record_phase_completion(phase_name, phase_metadata, len(violations["duplication"]))
@@ -226,7 +226,7 @@ class AnalysisOrchestrator:
 
         # Run orchestrator analysis
         if "orchestrator_analyzer" in analyzers:
-            god_results = analyzers["orchestrator_analyzer"].analyze_directory(str(project_path))
+            god_results = analyzers["orchestrator_analyzer"].analyze_directory(project_path)
             all_violations.extend([self._violation_to_dict(v) for v in god_results])
 
         return all_violations

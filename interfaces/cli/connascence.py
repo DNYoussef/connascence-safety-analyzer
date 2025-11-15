@@ -36,11 +36,22 @@ from analyzer.constants import (
     EXIT_INTERRUPTED,
     EXIT_INVALID_ARGUMENTS,
     ExitCode,
+    SEVERITY_LEVELS,
     UNIFIED_POLICY_NAMES,
     list_available_policies,
     resolve_policy_name,
     validate_policy_name,
 )
+
+# Import analyzer components at module level to avoid import-time issues
+try:
+    from analyzer.ast_engine.core_analyzer import ConnascenceASTAnalyzer
+    from analyzer.thresholds import ThresholdConfig
+    ANALYZER_AVAILABLE = True
+except ImportError:
+    ANALYZER_AVAILABLE = False
+    ConnascenceASTAnalyzer = None
+    ThresholdConfig = None
 
 try:
     from analyzer.unified_analyzer import ErrorHandler, StandardError
@@ -378,26 +389,51 @@ class ConnascenceCLI:
         if not paths_to_scan:
             paths_to_scan = ['.']
 
+        # Validate format argument (already validated by argparse choices)
+        # Validate severity argument if provided
+        if hasattr(args, 'severity') and args.severity:
+            valid_severities = list(SEVERITY_LEVELS.values())
+            if args.severity.upper() not in valid_severities:
+                print(f"Error: Invalid severity level '{args.severity}'. Valid values: {', '.join(valid_severities)}", file=sys.stderr)
+                return EXIT_CONFIGURATION_ERROR
+
         # Validate paths exist
         for path in paths_to_scan:
             if not Path(path).exists() and path != '.':
                 print(f"Error: Path does not exist: {path}", file=sys.stderr)
-                return 1
+                return EXIT_CONFIGURATION_ERROR
 
         # Try to use analyzer if available (for test compatibility)
         violations = []
         try:
-            # Import analyzer dynamically for testing
-            from cli.connascence import ConnascenceASTAnalyzer
-            policy = getattr(args, 'policy', 'service-defaults')
-            analyzer = ConnascenceASTAnalyzer(policy_preset=policy)
+            # Check if analyzer is available at module level
+            if not ANALYZER_AVAILABLE or ConnascenceASTAnalyzer is None:
+                raise ImportError("Analyzer not available")
+
+            # Real analyzer uses thresholds, not policy_preset
+            analyzer = ConnascenceASTAnalyzer(thresholds=ThresholdConfig())
 
             # Analyze each path
             for path in paths_to_scan:
-                path_violations = analyzer.analyze_directory(path)
-                violations.extend(path_violations)
-        except Exception:
-            # If analyzer not available, use mock
+                path_obj = Path(path)
+
+                # Check if path is a file or directory
+                if path_obj.is_file():
+                    # Single file analysis
+                    result = analyzer.analyze_file(path_obj)
+                    violations.extend(result)
+                else:
+                    # Directory analysis
+                    result = analyzer.analyze_directory(path_obj)
+                    # Extract violations from AnalysisResult object
+                    if hasattr(result, 'violations'):
+                        violations.extend(result.violations)
+                    else:
+                        # Fallback for list return type
+                        violations.extend(result)
+        except Exception as e:
+            # If analyzer fails, log error and return empty
+            print(f"Error: Analysis failed: {type(e).__name__}: {e}", file=sys.stderr)
             violations = []
 
         # Generate output based on format

@@ -91,9 +91,6 @@ TIMEOUT_SECONDS = 3600
 # String Constants
 # ======================================================================
 
-1_0_0 = '1.0.0'
-2_0_0 = '2.0.0'
-2_1_0 = '2.1.0'
 ACCEPT = 'Accept'
 ADVISORY = 'ADVISORY'
 ALGORITHM_COUPLING = 'algorithm_coupling'

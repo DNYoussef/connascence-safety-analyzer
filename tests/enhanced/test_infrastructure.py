@@ -559,7 +559,7 @@ class EnhancedTestUtilities:
     @staticmethod
     def measure_performance(func, *args, **kwargs) -> Tuple[Any, float, float]:
         """Measure function performance (execution time and memory usage)."""
-        process = psutil.Process()
+        process = psutil.Process(os.getpid())
 
         # Get initial memory usage
         initial_memory = process.memory_info().rss / 1024 / 1024  # MB

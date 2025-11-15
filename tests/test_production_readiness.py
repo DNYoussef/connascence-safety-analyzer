@@ -142,7 +142,7 @@ def test_function():
         import psutil
 
         # Get baseline memory
-        process = psutil.Process()
+        process = psutil.Process(os.getpid())
         baseline_memory = process.memory_info().rss / (1024 * 1024)  # MB
 
         # Create multiple large test files

@@ -150,7 +150,7 @@ class PerformanceBenchmarkSuite:
         try:
             import psutil
 
-            process = psutil.Process()
+            process = psutil.Process(os.getpid())
             return process.memory_info().rss / 1024 / 1024
         except ImportError:
             return 0.0
@@ -706,7 +706,7 @@ class Component{i}:
             # Web dashboard interface formatting (includes chart processing)
             correlations = result.get("correlations", [])
             chart_data = {
-                "labels": [f"{c.get('analyzer1', '')} → {c.get('analyzer2', '')}" for c in correlations],
+                "labels": [f"{c.get('analyzer1', '')} -> {c.get('analyzer2', '')}" for c in correlations],
                 "datasets": [
                     {
                         "data": [c.get("correlation_score", 0) * 100 for c in correlations],

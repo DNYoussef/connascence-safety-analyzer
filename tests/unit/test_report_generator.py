@@ -71,8 +71,17 @@ class MockViolation:
     file_path: str
     line_number: int
     description: str
+    id: str = "test_violation"
+    column: int = 0
+    end_line: int = 0
+    end_column: int = 0
+    function_name: str = ""
+    class_name: str = ""
     recommendation: str = ""
     weight: float = 1.0
+    locality: str = "local"
+    code_snippet: str = ""
+    context: Dict = None
 
 
 @dataclass
@@ -84,6 +93,9 @@ class MockAnalysisResult:
     total_files_analyzed: int
     project_root: str = "/test/project"
     timestamp: int = 1234567890
+    file_stats: Dict = None
+    budget_status: str = "within_budget"
+    baseline_comparison: Dict = None
 
 
 @pytest.fixture
@@ -94,34 +106,37 @@ def sample_violations_dicts():
             "id": "test_1",
             "rule_id": "CON_CoM",
             "connascence_type": "CoM",
-            "severity": {"value": "medium"},
+            "severity": "medium",
             "description": "Magic literal 100 should be constant",
             "file_path": "/test/sample.py",
             "line_number": 10,
             "weight": 2.5,
             "recommendation": "Extract to named constant",
+            "locality": "local",
         },
         {
             "id": "test_2",
             "rule_id": "CON_CoP",
             "connascence_type": "CoP",
-            "severity": {"value": "high"},
+            "severity": "high",
             "description": "Function has 6 parameters (max: 3)",
             "file_path": "/test/sample.py",
             "line_number": 15,
             "weight": 4.0,
             "recommendation": "Use parameter object",
+            "locality": "local",
         },
         {
             "id": "test_3",
             "rule_id": "CON_CoA",
             "connascence_type": "CoA",
-            "severity": {"value": "critical"},
+            "severity": "critical",
             "description": "God class with 30 methods (max: 20)",
             "file_path": "/test/large.py",
             "line_number": 5,
             "weight": 5.0,
             "recommendation": "Split into smaller classes",
+            "locality": "local",
         },
     ]
 
@@ -743,12 +758,13 @@ class TestHelperMethods:
             "violations": [
                 {
                     "type": "CoM",
-                    "severity": {"value": "medium"},  # Must be dict with value key
+                    "severity": "medium",  # String value for dict format
                     "file_path": "/test/file.py",
                     "line_number": 10,
                     "description": "Test violation",
                     "recommendation": "Fix it",
                     "weight": 2.0,
+                    "locality": "local",
                 }
             ],
             "policy_preset": "default",
@@ -769,12 +785,13 @@ class TestHelperMethods:
             "connascence_violations": [  # Alternative key
                 {
                     "type": "CoP",
-                    "severity": {"value": "high"},  # Must be dict with value key
+                    "severity": "high",  # String value for dict format
                     "file_path": "/test/file.py",
                     "line_number": 20,
                     "description": "Parameter bomb",
                     "recommendation": "Refactor",
                     "weight": 3.0,
+                    "locality": "local",
                 }
             ],
             "policy_preset": "strict",
@@ -863,11 +880,12 @@ class TestEdgeCases:
                 "id": f"test_{i}",
                 "rule_id": "CON_CoM",
                 "connascence_type": "CoM",
-                "severity": {"value": "medium"},
+                "severity": "medium",
                 "description": f"Violation {i}",
                 "file_path": f"/test/file{i}.py",
                 "line_number": i,
                 "weight": 1.0,
+                "locality": "local",
             }
             for i in range(100)
         ]
@@ -895,11 +913,12 @@ class TestEdgeCases:
                 "id": "test_unicode",
                 "rule_id": "CON_CoM",
                 "connascence_type": "CoM",
-                "severity": {"value": "medium"},
+                "severity": "medium",
                 "description": "File contains unicode: cafe",  # ASCII safe
                 "file_path": "/test/file.py",
                 "line_number": 1,
                 "weight": 1.0,
+                "locality": "local",
             }
         ]
 

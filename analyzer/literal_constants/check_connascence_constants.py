@@ -19,8 +19,6 @@ MIN_50 = 50
 # String Constants
 # ======================================================================
 
-2F = '.2f'
-3D = '3d'
 ADDITIONAL_EXCLUSION_PATTERNS = 'Additional exclusion patterns'
 ANALYSIS_COMPLETED_IN = 'Analysis completed in '
 ANALYSIS_CONTEXT = 'analysis_context'

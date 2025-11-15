@@ -219,7 +219,7 @@ class TestPerformanceBaselines:
         ]
 
         print("\n" + "=" * 60)
-        print("SCALABILITY TEST (1x → 10x → 50x code size)")
+        print("SCALABILITY TEST (1x -> 10x -> 50x code size)")
         print("=" * 60)
 
         for detector_name, detector_class in detectors:
@@ -248,7 +248,7 @@ class TestPerformanceBaselines:
             # Linear scaling: 10x code should take ~10x time
             # Quadratic would be ~100x
             # Allow up to 20x (still much better than quadratic)
-            assert scaling_1x_to_10x < 20, f"{detector_name} scales poorly (1x→10x): {scaling_1x_to_10x:.2f}x"
+            assert scaling_1x_to_10x < 20, f"{detector_name} scales poorly (1x->10x): {scaling_1x_to_10x:.2f}x"
 
         print("=" * 60)
 

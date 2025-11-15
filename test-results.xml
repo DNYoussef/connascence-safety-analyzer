@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="1" failures="0" skipped="4" tests="5" time="17.019" timestamp="2025-11-13T22:35:41.390328-05:00" hostname="DESKTOP-I78AK0M"><testcase classname="" name="fixtures.test_connascence_compliance" time="0.000"><error message="collection failure">tests\fixtures\test_connascence_compliance.py:28: in &lt;module&gt;
+    from interfaces.core.interface_base import InterfaceBase as AgentInterface
+interfaces\core\__init__.py:10: in &lt;module&gt;
+    from .shared_components import SharedAnalysisEngine, SharedFormatter, SharedValidation
+interfaces\core\shared_components.py:80: in &lt;module&gt;
+    analysis_engine = SharedAnalysisEngine()
+                      ^^^^^^^^^^^^^^^^^^^^^^
+interfaces\core\shared_components.py:21: in __init__
+    self.analyzer = ConnascenceAnalyzer()
+                    ^^^^^^^^^^^^^^^^^^^^^
+analyzer\core.py:121: in __init__
+    self.unified_analyzer = UnifiedConnascenceAnalyzer()
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+analyzer\unified_analyzer.py:464: in __init__
+    self.memory_monitor = get_global_memory_monitor()
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+analyzer\optimization\memory_monitor.py:473: in get_global_memory_monitor
+    _global_monitor = MemoryMonitor()
+                      ^^^^^^^^^^^^^^^
+analyzer\optimization\memory_monitor.py:241: in __init__
+    self._process = psutil.Process(os.getpid())
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psutil.py:229: in __init__
+    raise NoSuchProcess(self.pid)
+E   psutil.NoSuchProcess: 60588</error></testcase><testcase classname="" name="fixtures.test_connascence_refactoring" time="0.000"><skipped message="collection skipped">('C:\\Users\\17175\\Desktop\\connascence\\tests\\fixtures\\test_connascence_refactoring.py', 26, 'Skipped: Refactoring tests depend on unimplemented src modules')</skipped></testcase><testcase classname="" name="test_license_validation" time="0.000"><skipped message="collection skipped">('C:\\Users\\17175\\Desktop\\connascence\\tests\\test_license_validation.py', 38, 'Skipped: License validation system not implemented')</skipped></testcase><testcase classname="" name="test_license_validation_standalone" time="0.000"><skipped message="collection skipped">('C:\\Users\\17175\\Desktop\\connascence\\tests\\test_license_validation_standalone.py', 41, 'Skipped: License validation system not implemented')</skipped></testcase><testcase classname="" name="test_refactored_architecture" time="0.000"><skipped message="collection skipped">('C:\\Users\\17175\\Desktop\\connascence\\tests\\test_refactored_architecture.py', 28, 'Skipped: Test depends on unimplemented src modules')</skipped></testcase></testsuite></testsuites>

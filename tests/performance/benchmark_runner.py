@@ -828,7 +828,7 @@ if __name__ == "__main__":
             f.write("Performance Targets:\n")
             targets = perf_summary.get("performance_targets_met", {})
             for target, met in targets.items():
-                status = "✓ PASS" if met else "✗ FAIL"
+                status = "[PASS]" if met else "[FAIL]"
                 f.write(f"  {target.replace('_', ' ').title()}: {status}\n")
             f.write("\n")
 
@@ -856,7 +856,7 @@ class ResourceMonitor:
         self.resource_samples = []
 
         # Record initial memory
-        process = psutil.Process()
+        process = psutil.Process(os.getpid())
         self.initial_memory = process.memory_info().rss / 1024 / 1024
 
         # Start monitoring thread
@@ -893,7 +893,7 @@ class ResourceMonitor:
 
     def _monitor_loop(self):
         """Monitor resources in background."""
-        process = psutil.Process()
+        process = psutil.Process(os.getpid())
 
         while self.monitoring_active:
             try:

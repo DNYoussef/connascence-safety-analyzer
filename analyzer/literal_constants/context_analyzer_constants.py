@@ -30,7 +30,6 @@ MAX_COMPLEXITY_THRESHOLD = 100.0
 # String Constants
 # ======================================================================
 
-2F = '.2f'
 AA_PP_II = '.*[Aa][Pp][Ii].*'
 AIOHTTP = 'aiohttp'
 ANALYSIS_OF_INDIVIDUAL_METHODS_FOR_RESPO = 'Analysis of individual methods for responsibility tracking.'

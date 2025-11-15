@@ -55,7 +55,7 @@ try:
     from analyzer.check_connascence import ConnascenceCLI
 
     cli = ConnascenceCLI()
-    print("✓ ConnascenceCLI imported successfully")
+    print("[PASS] ConnascenceCLI imported successfully")
     print(f"  - CLI instance created: {type(cli).__name__}")
 
     # Test analyze method exists
@@ -65,7 +65,7 @@ try:
         print("  - analyze_file method: MISSING")
 
 except Exception as e:
-    print(f"✗ Failed to import ConnascenceCLI: {e}")
+    print(f"[FAIL] Failed to import ConnascenceCLI: {e}")
 
 print()
 
@@ -76,11 +76,11 @@ print("-" * 60)
 try:
     from analyzer.check_connascence_minimal import main as minimal_main
 
-    print("✓ check_connascence_minimal imported successfully")
+    print("[PASS] check_connascence_minimal imported successfully")
     print(f"  - main function: {minimal_main.__name__}")
 
 except Exception as e:
-    print(f"✗ Failed to import check_connascence_minimal: {e}")
+    print(f"[FAIL] Failed to import check_connascence_minimal: {e}")
 
 print()
 
@@ -101,17 +101,17 @@ try:
     # Test PositionDetector
     pos_detector = PositionDetector(file_path=str(test_file), source_lines=source_lines)
     pos_violations = pos_detector.detect_violations(tree)
-    print(f"✓ PositionDetector: {len(pos_violations)} violations found")
+    print(f"[PASS] PositionDetector: {len(pos_violations)} violations found")
 
     # Test MagicLiteralDetector
     magic_detector = MagicLiteralDetector(file_path=str(test_file), source_lines=source_lines)
     magic_violations = magic_detector.detect_violations(tree)
-    print(f"✓ MagicLiteralDetector: {len(magic_violations)} violations found")
+    print(f"[PASS] MagicLiteralDetector: {len(magic_violations)} violations found")
 
     print(f"  - Total violations: {len(pos_violations) + len(magic_violations)}")
 
 except Exception as e:
-    print(f"✗ Direct detector usage failed: {e}")
+    print(f"[FAIL] Direct detector usage failed: {e}")
     import traceback
 
     traceback.print_exc()

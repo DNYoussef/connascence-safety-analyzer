@@ -663,7 +663,7 @@ class Module{i}:
         try:
             import psutil
 
-            process = psutil.Process()
+            process = psutil.Process(os.getpid())
             return process.memory_info().rss / 1024 / 1024  # Convert to MB
         except ImportError:
             return 0.0  # Fallback if psutil not available

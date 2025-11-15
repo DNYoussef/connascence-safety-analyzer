@@ -1,0 +1,522 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.5, pytest-9.0.1, pluggy-1.5.0 -- C:\Python312\python.exe
+cachedir: .pytest_cache
+hypothesis profile 'default'
+benchmark: 4.0.0 (defaults: timer=time.perf_counter disable_gc=False min_rounds=5 min_time=0.000005 max_time=1.0 calibration_precision=10 warmup=False warmup_iterations=100000)
+metadata: {'Python': '3.12.5', 'Platform': 'Windows-10-10.0.19045-SP0', 'Packages': {'pytest': '9.0.1', 'pluggy': '1.5.0'}, 'Plugins': {'anyio': '4.11.0', 'Faker': '18.13.0', 'hypothesis': '6.138.2', 'langsmith': '0.4.21', 'asyncio': '1.3.0', 'bandit': '0.6.1', 'benchmark': '4.0.0', 'cov': '4.1.0', 'env': '1.1.5', 'flask': '1.3.0', 'json-report': '1.5.0', 'metadata': '3.1.1', 'mock': '3.14.0', 'randomly': '3.16.0', 'timeout': '2.3.1', 'xdist': '3.6.1'}, 'JAVA_HOME': 'C:\\Program Files\\AdoptOpenJDK\\jre-8.0.265.01-hotspot\\'}
+Using --randomly-seed=4099331915
+rootdir: C:\Users\17175\Desktop\connascence\tests
+configfile: pytest.ini
+plugins: anyio-4.11.0, Faker-18.13.0, hypothesis-6.138.2, langsmith-0.4.21, asyncio-1.3.0, bandit-0.6.1, benchmark-4.0.0, cov-4.1.0, env-1.1.5, flask-1.3.0, json-report-1.5.0, metadata-3.1.1, mock-3.14.0, randomly-3.16.0, timeout-2.3.1, xdist-3.6.1
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 242 items
+
+tests\unit\test_metrics_collector.py::TestEdgeCases::test_multiple_collectors_independent PASSED [  0%]
+tests\unit\test_metrics_collector.py::TestEdgeCases::test_very_large_connascence_index PASSED [  0%]
+tests\unit\test_metrics_collector.py::TestEdgeCases::test_zero_analysis_time PASSED [  1%]
+tests\unit\test_metrics_collector.py::TestEdgeCases::test_snapshot_with_all_defaults PASSED [  1%]
+tests\unit\test_metrics_collector.py::TestSnapshotCreation::test_create_snapshot_basic PASSED [  2%]
+tests\unit\test_metrics_collector.py::TestSnapshotCreation::test_create_snapshot_none_assertion PASSED [  2%]
+tests\unit\test_metrics_collector.py::TestSnapshotCreation::test_create_snapshot_missing_fields_uses_defaults PASSED [  2%]
+tests\unit\test_metrics_collector.py::TestSnapshotCreation::test_create_snapshot_history_limit PASSED [  3%]
+tests\unit\test_metrics_collector.py::TestSnapshotCreation::test_create_snapshot_adds_to_history PASSED [  3%]
+tests\unit\test_metrics_collector.py::TestSeverityNormalization::test_normalize_severity[HIGH-high] PASSED [  4%]
+tests\unit\test_metrics_collector.py::TestSeverityNormalization::test_normalize_severity[high-high] PASSED [  4%]
+tests\unit\test_metrics_collector.py::TestSeverityNormalization::test_normalize_severity[critical-critical] PASSED [  4%]
+tests\unit\test_metrics_collector.py::TestSeverityNormalization::test_normalize_severity[invalid-medium] PASSED [  5%]
+tests\unit\test_metrics_collector.py::TestSeverityNormalization::test_normalize_severity[-medium] PASSED [  5%]
+tests\unit\test_metrics_collector.py::TestSeverityNormalization::test_normalize_severity[low-low] PASSED [  6%]
+tests\unit\test_metrics_collector.py::TestSeverityNormalization::test_normalize_severity[ERROR-high] PASSED [  6%]
+tests\unit\test_metrics_collector.py::TestSeverityNormalization::test_normalize_severity[unknown-medium] PASSED [  7%]
+tests\unit\test_metrics_collector.py::TestSeverityNormalization::test_normalize_severity[info-info] PASSED [  7%]
+tests\unit\test_metrics_collector.py::TestSeverityNormalization::test_normalize_severity[LOW-low] PASSED [  7%]
+tests\unit\test_metrics_collector.py::TestSeverityNormalization::test_normalize_severity[error-high] PASSED [  8%]
+tests\unit\test_metrics_collector.py::TestSeverityNormalization::test_normalize_severity[notice-low] PASSED [  8%]
+tests\unit\test_metrics_collector.py::TestSeverityNormalization::test_normalize_severity[warning-medium] PASSED [  9%]
+tests\unit\test_metrics_collector.py::TestSeverityNormalization::test_normalize_severity[WARNING-medium] PASSED [  9%]
+tests\unit\test_metrics_collector.py::TestSeverityNormalization::test_normalize_severity[Critical-critical] PASSED [  9%]
+tests\unit\test_metrics_collector.py::TestSeverityNormalization::test_normalize_severity[medium-medium] PASSED [ 10%]
+tests\unit\test_metrics_collector.py::TestSeverityNormalization::test_normalize_severity[INFO-info] PASSED [ 10%]
+tests\unit\test_metrics_collector.py::TestSeverityNormalization::test_normalize_severity[NOTICE-low] PASSED [ 11%]
+tests\unit\test_metrics_collector.py::TestSeverityNormalization::test_normalize_severity[MEDIUM-medium] PASSED [ 11%]
+tests\unit\test_metrics_collector.py::TestSeverityNormalization::test_normalize_severity[CRITICAL-critical] PASSED [ 11%]
+tests\unit\test_metrics_collector.py::TestDynamicWeights::test_dynamic_weights_low_nasa_score PASSED [ 12%]
+tests\unit\test_metrics_collector.py::TestDynamicWeights::test_dynamic_weights_normal_scores PASSED [ 12%]
+tests\unit\test_metrics_collector.py::TestDynamicWeights::test_dynamic_weights_low_duplication_score PASSED [ 13%]
+tests\unit\test_metrics_collector.py::TestDynamicWeights::test_dynamic_weights_high_connascence PASSED [ 13%]
+tests\unit\test_metrics_collector.py::TestDynamicWeights::test_dynamic_weights_all_problems PASSED [ 14%]
+tests\unit\test_metrics_collector.py::TestQualityScoreCalculation::test_quality_score_mixed PASSED [ 14%]
+tests\unit\test_metrics_collector.py::TestQualityScoreCalculation::test_quality_score_none_assertion PASSED [ 14%]
+tests\unit\test_metrics_collector.py::TestQualityScoreCalculation::test_quality_score_perfect PASSED [ 15%]
+tests\unit\test_metrics_collector.py::TestQualityScoreCalculation::test_quality_score_missing_fields_uses_defaults PASSED [ 15%]
+tests\unit\test_metrics_collector.py::TestQualityScoreCalculation::test_quality_score_poor PASSED [ 16%]
+tests\unit\test_metrics_collector.py::TestMetricsCollectorInit::test_custom_initialization PASSED [ 16%]
+tests\unit\test_metrics_collector.py::TestMetricsCollectorInit::test_quality_weights_default PASSED [ 16%]
+tests\unit\test_metrics_collector.py::TestMetricsCollectorInit::test_none_config_uses_default PASSED [ 17%]
+tests\unit\test_metrics_collector.py::TestMetricsCollectorInit::test_default_initialization PASSED [ 17%]
+tests\unit\test_metrics_collector.py::TestBaselineComparison::test_baseline_status_thresholds[0.05-improved] PASSED [ 18%]
+tests\unit\test_metrics_collector.py::TestBaselineComparison::test_get_baseline_comparison_degraded PASSED [ 18%]
+tests\unit\test_metrics_collector.py::TestBaselineComparison::test_baseline_status_thresholds[-0.05-degraded] PASSED [ 19%]
+tests\unit\test_metrics_collector.py::TestBaselineComparison::test_get_baseline_comparison_no_history PASSED [ 19%]
+tests\unit\test_metrics_collector.py::TestBaselineComparison::test_baseline_status_thresholds[0.15-significantly_improved] PASSED [ 19%]
+tests\unit\test_metrics_collector.py::TestBaselineComparison::test_get_baseline_comparison_no_baseline PASSED [ 20%]
+tests\unit\test_metrics_collector.py::TestBaselineComparison::test_baseline_status_thresholds[-0.01-stable] PASSED [ 20%]
+tests\unit\test_metrics_collector.py::TestBaselineComparison::test_baseline_status_thresholds[-0.15-significantly_degraded] PASSED [ 21%]
+tests\unit\test_metrics_collector.py::TestBaselineComparison::test_baseline_status_thresholds[0.01-stable] PASSED [ 21%]
+tests\unit\test_metrics_collector.py::TestBaselineComparison::test_set_baseline PASSED [ 21%]
+tests\unit\test_metrics_collector.py::TestBaselineComparison::test_get_baseline_comparison_improved PASSED [ 22%]
+tests\unit\test_metrics_collector.py::TestPerformanceTracking::test_track_performance_rating_acceptable PASSED [ 22%]
+tests\unit\test_metrics_collector.py::TestPerformanceTracking::test_track_performance_rating_good PASSED [ 23%]
+tests\unit\test_metrics_collector.py::TestPerformanceTracking::test_track_performance_basic PASSED [ 23%]
+tests\unit\test_metrics_collector.py::TestPerformanceTracking::test_track_performance_zero_files PASSED [ 23%]
+tests\unit\test_metrics_collector.py::TestPerformanceTracking::test_track_performance_rating_slow PASSED [ 24%]
+tests\unit\test_metrics_collector.py::TestPerformanceTracking::test_track_performance_history_limit PASSED [ 24%]
+tests\unit\test_metrics_collector.py::TestPerformanceTracking::test_track_performance_negative_time_assertion PASSED [ 25%]
+tests\unit\test_metrics_collector.py::TestPerformanceTracking::test_track_performance_increments_count PASSED [ 25%]
+tests\unit\test_metrics_collector.py::TestPerformanceTracking::test_track_performance_adds_to_history PASSED [ 26%]
+tests\unit\test_metrics_collector.py::TestPerformanceTracking::test_track_performance_rating_excellent PASSED [ 26%]
+tests\unit\test_metrics_collector.py::TestPerformanceTracking::test_track_performance_negative_files_assertion PASSED [ 26%]
+tests\unit\test_metrics_collector.py::TestMetricsSummary::test_metrics_summary_with_baseline PASSED [ 27%]
+tests\unit\test_metrics_collector.py::TestMetricsSummary::test_metrics_summary_no_data PASSED [ 27%]
+tests\unit\test_metrics_collector.py::TestMetricsSummary::test_metrics_summary_with_data PASSED [ 28%]
+tests\unit\test_metrics_collector.py::TestIntegration::test_full_workflow FAILED [ 28%]
+tests\unit\test_metrics_collector.py::TestIntegration::test_continuous_monitoring_scenario PASSED [ 28%]
+tests\unit\test_metrics_collector.py::TestPerformance::test_snapshot_creation_performance PASSED [ 29%]
+tests\unit\test_metrics_collector.py::TestPerformance::test_collect_metrics_performance PASSED [ 29%]
+tests\unit\test_metrics_collector.py::TestCountViolationsBySeverity::test_count_missing_severity PASSED [ 30%]
+tests\unit\test_metrics_collector.py::TestCountViolationsBySeverity::test_count_empty_list PASSED [ 30%]
+tests\unit\test_metrics_collector.py::TestCountViolationsBySeverity::test_count_by_severity PASSED [ 30%]
+tests\unit\test_metrics_collector.py::TestConnascenceIndex::test_connascence_index_missing_fields PASSED [ 31%]
+tests\unit\test_metrics_collector.py::TestConnascenceIndex::test_connascence_index_single_violation PASSED [ 31%]
+tests\unit\test_metrics_collector.py::TestConnascenceIndex::test_connascence_index_empty PASSED [ 32%]
+tests\unit\test_metrics_collector.py::TestConnascenceIndex::test_connascence_index_multiple_violations PASSED [ 32%]
+tests\unit\test_metrics_collector.py::TestCollectViolationMetrics::test_collect_metrics_none_assertion PASSED [ 33%]
+tests\unit\test_metrics_collector.py::TestCollectViolationMetrics::test_collect_metrics_large_dataset FAILED [ 33%]
+tests\unit\test_metrics_collector.py::TestCollectViolationMetrics::test_collect_metrics_with_violations FAILED [ 33%]
+tests\unit\test_metrics_collector.py::TestCollectViolationMetrics::test_collect_metrics_missing_keys[duplication] PASSED [ 34%]
+tests\unit\test_metrics_collector.py::TestCollectViolationMetrics::test_collect_metrics_missing_keys[connascence] PASSED [ 34%]
+tests\unit\test_metrics_collector.py::TestCollectViolationMetrics::test_collect_metrics_empty_violations PASSED [ 35%]
+tests\unit\test_metrics_collector.py::TestCollectViolationMetrics::test_collect_metrics_timing PASSED [ 35%]
+tests\unit\test_metrics_collector.py::TestCollectViolationMetrics::test_collect_metrics_missing_keys[nasa] PASSED [ 35%]
+tests\unit\test_metrics_collector.py::TestExportMetricsHistory::test_export_metrics_history PASSED [ 36%]
+tests\unit\test_metrics_collector.py::TestExportMetricsHistory::test_export_empty_history PASSED [ 36%]
+tests\unit\test_metrics_collector.py::TestDuplicationScore::test_duplication_score_multiple_clusters PASSED [ 37%]
+tests\unit\test_metrics_collector.py::TestDuplicationScore::test_duplication_score_no_clusters PASSED [ 37%]
+tests\unit\test_metrics_collector.py::TestDuplicationScore::test_duplication_score_cannot_go_negative PASSED [ 38%]
+tests\unit\test_metrics_collector.py::TestDuplicationScore::test_duplication_score_single_cluster PASSED [ 38%]
+tests\unit\test_metrics_collector.py::TestDuplicationScore::test_duplication_score_size_multiplier_capped PASSED [ 38%]
+tests\unit\test_metrics_collector.py::TestNASAComplianceScore::test_nasa_score_cannot_go_negative PASSED [ 39%]
+tests\unit\test_metrics_collector.py::TestNASAComplianceScore::test_nasa_score_multiple_violations PASSED [ 39%]
+tests\unit\test_metrics_collector.py::TestNASAComplianceScore::test_nasa_score_missing_context PASSED [ 40%]
+tests\unit\test_metrics_collector.py::TestNASAComplianceScore::test_nasa_score_single_violation PASSED [ 40%]
+tests\unit\test_metrics_collector.py::TestNASAComplianceScore::test_nasa_score_no_violations PASSED [ 40%]
+tests\unit\test_metrics_collector.py::TestTrendAnalysis::test_trend_analysis_insufficient_data PASSED [ 41%]
+tests\unit\test_metrics_collector.py::TestTrendAnalysis::test_trend_analysis_no_data PASSED [ 41%]
+tests\unit\test_metrics_collector.py::TestTrendAnalysis::test_trend_analysis_excellent_progress PASSED [ 42%]
+tests\unit\test_metrics_collector.py::TestTrendAnalysis::test_trend_analysis_stable PASSED [ 42%]
+tests\unit\test_metrics_collector.py::TestTrendAnalysis::test_trend_analysis_degrading PASSED [ 42%]
+tests\unit\test_metrics_collector.py::TestTrendAnalysis::test_trend_analysis_needs_attention PASSED [ 43%]
+tests\unit\test_metrics_collector.py::TestTrendAnalysis::test_trend_analysis_improving PASSED [ 43%]
+tests\unit\test_cache_manager.py::TestEdgeCases::test_empty_cache_statistics PASSED [ 44%]
+tests\unit\test_cache_manager.py::TestEdgeCases::test_full_cache_scenario PASSED [ 44%]
+tests\unit\test_cache_manager.py::TestEdgeCases::test_operations_without_cache_available PASSED [ 45%]
+tests\unit\test_cache_manager.py::TestCacheInvalidation::test_invalidate_nonexistent_file PASSED [ 45%]
+tests\unit\test_cache_manager.py::TestCacheInvalidation::test_clear_all_caches PASSED [ 45%]
+tests\unit\test_cache_manager.py::TestCacheInvalidation::test_invalidate_single_file PASSED [ 46%]
+tests\unit\test_cache_manager.py::TestOptimization::test_optimize_for_future_runs PASSED [ 46%]
+tests\unit\test_cache_manager.py::TestOptimization::test_optimize_no_patterns PASSED [ 47%]
+tests\unit\test_cache_manager.py::TestCacheStatistics::test_get_hit_rate_zero_accesses PASSED [ 47%]
+tests\unit\test_cache_manager.py::TestCacheStatistics::test_get_hit_rate_perfect PASSED [ 47%]
+tests\unit\test_cache_manager.py::TestCacheStatistics::test_get_cache_stats_basic PASSED [ 48%]
+tests\unit\test_cache_manager.py::TestCacheStatistics::test_get_hit_rate_partial PASSED [ 48%]
+tests\unit\test_cache_manager.py::TestCacheStatistics::test_get_cache_stats_with_memory PASSED [ 49%]
+tests\unit\test_cache_manager.py::TestCacheASTOperations::test_get_cached_ast_multiple_accesses PASSED [ 49%]
+tests\unit\test_cache_manager.py::TestCacheASTOperations::test_cache_ast_nonexistent_file PASSED [ 50%]
+tests\unit\test_cache_manager.py::TestCacheASTOperations::test_get_cached_ast_nonexistent_file PASSED [ 50%]
+tests\unit\test_cache_manager.py::TestCacheASTOperations::test_cache_ast_invalid_tree_type PASSED [ 50%]
+tests\unit\test_cache_manager.py::TestCacheASTOperations::test_get_cached_ast_exception_handling PASSED [ 51%]
+tests\unit\test_cache_manager.py::TestCacheASTOperations::test_cache_ast_success PASSED [ 51%]
+tests\unit\test_cache_manager.py::TestCacheASTOperations::test_get_cached_ast_hit PASSED [ 52%]
+tests\unit\test_cache_manager.py::TestCacheASTOperations::test_get_cached_ast_miss PASSED [ 52%]
+tests\unit\test_cache_manager.py::TestCacheManagerInitialization::test_init_custom_config PASSED [ 52%]
+tests\unit\test_cache_manager.py::TestCacheManagerInitialization::test_init_default_config PASSED [ 53%]
+tests\unit\test_cache_manager.py::TestCacheManagerInitialization::test_init_without_file_cache PASSED [ 53%]
+tests\unit\test_cache_manager.py::TestFilePrioritization::test_calculate_priority_max_score PASSED [ 54%]
+tests\unit\test_cache_manager.py::TestFilePrioritization::test_calculate_priority_utility_pattern PASSED [ 54%]
+tests\unit\test_cache_manager.py::TestFilePrioritization::test_calculate_priority_important_directory PASSED [ 54%]
+tests\unit\test_cache_manager.py::TestFilePrioritization::test_calculate_priority_high_priority_file PASSED [ 55%]
+tests\unit\test_cache_manager.py::TestFilePrioritization::test_calculate_priority_small_file_boost PASSED [ 55%]
+tests\unit\test_cache_manager.py::TestBatchPreload::test_batch_preload_handles_errors PASSED [ 56%]
+tests\unit\test_cache_manager.py::TestBatchPreload::test_batch_preload_multiple_files PASSED [ 56%]
+tests\unit\test_cache_manager.py::TestBatchPreload::test_batch_preload_skips_large_files PASSED [ 57%]
+tests\unit\test_cache_manager.py::TestCacheContentOperations::test_get_cached_content_miss PASSED [ 57%]
+tests\unit\test_cache_manager.py::TestCacheContentOperations::test_get_cached_lines_miss PASSED [ 57%]
+tests\unit\test_cache_manager.py::TestCacheContentOperations::test_get_cached_content_hit PASSED [ 58%]
+tests\unit\test_cache_manager.py::TestCacheContentOperations::test_get_cached_lines_hit PASSED [ 58%]
+tests\unit\test_cache_manager.py::TestCacheWarming::test_warm_cache_skips_large_files PASSED [ 59%]
+tests\unit\test_cache_manager.py::TestCacheWarming::test_warm_cache_common_files PASSED [ 59%]
+tests\unit\test_cache_manager.py::TestCacheWarming::test_warm_cache_respects_file_limit PASSED [ 59%]
+tests\unit\test_cache_manager.py::TestCacheWarming::test_warm_cache_nonexistent_directory PASSED [ 60%]
+tests\unit\test_cache_manager.py::TestCacheWarming::test_warm_cache_exception_handling PASSED [ 60%]
+tests\unit\test_cache_manager.py::TestPerformanceLogging::test_log_performance_basic PASSED [ 61%]
+tests\unit\test_cache_manager.py::TestPerformanceLogging::test_log_performance_low_hit_rate_warning PASSED [ 61%]
+tests\unit\test_cache_manager.py::TestPerformanceLogging::test_log_performance_excellent_rate PASSED [ 61%]
+tests\unit\test_report_generator.py::TestEdgeCases::test_empty_violations_list PASSED [ 62%]
+tests\unit\test_report_generator.py::TestEdgeCases::test_unicode_in_violations PASSED [ 62%]
+tests\unit\test_report_generator.py::TestEdgeCases::test_large_violations_list PASSED [ 63%]
+tests\unit\test_report_generator.py::TestIntegrationScenarios::test_summary_with_all_formats FAILED [ 63%]
+tests\unit\test_report_generator.py::TestIntegrationScenarios::test_complete_workflow FAILED [ 64%]
+tests\unit\test_report_generator.py::TestJSONReportGeneration::test_generate_json_error_handling_invalid_path PASSED [ 64%]
+tests\unit\test_report_generator.py::TestJSONReportGeneration::test_generate_json_from_dict PASSED [ 64%]
+tests\unit\test_report_generator.py::TestJSONReportGeneration::test_generate_json_with_file_output PASSED [ 65%]
+tests\unit\test_report_generator.py::TestJSONReportGeneration::test_generate_json_with_fallback_serialization PASSED [ 65%]
+tests\unit\test_report_generator.py::TestJSONReportGeneration::test_generate_json_with_custom_formatting PASSED [ 66%]
+tests\unit\test_report_generator.py::TestJSONReportGeneration::test_generate_json_from_object FAILED [ 66%]
+tests\unit\test_report_generator.py::TestMultiFormatGeneration::test_generate_all_formats_creates_directory FAILED [ 66%]
+tests\unit\test_report_generator.py::TestMultiFormatGeneration::test_generate_all_formats_file_content_validity FAILED [ 67%]
+tests\unit\test_report_generator.py::TestMultiFormatGeneration::test_generate_all_formats_basic FAILED [ 67%]
+tests\unit\test_report_generator.py::TestMultiFormatGeneration::test_generate_all_formats_custom_basename FAILED [ 68%]
+tests\unit\test_report_generator.py::TestSARIFReportGeneration::test_generate_sarif_results_mapping PASSED [ 68%]
+tests\unit\test_report_generator.py::TestSARIFReportGeneration::test_generate_sarif_error_invalid_path PASSED [ 69%]
+tests\unit\test_report_generator.py::TestSARIFReportGeneration::test_generate_sarif_with_file_output PASSED [ 69%]
+tests\unit\test_report_generator.py::TestSARIFReportGeneration::test_generate_sarif_validation_structure PASSED [ 69%]
+tests\unit\test_report_generator.py::TestSARIFReportGeneration::test_generate_sarif_basic PASSED [ 70%]
+tests\unit\test_report_generator.py::TestSARIFReportGeneration::test_generate_sarif_with_source_root PASSED [ 70%]
+tests\unit\test_report_generator.py::TestHelperMethods::test_generate_markdown_from_dict FAILED [ 71%]
+tests\unit\test_report_generator.py::TestHelperMethods::test_generate_markdown_from_dict_with_violations FAILED [ 71%]
+tests\unit\test_report_generator.py::TestHelperMethods::test_generate_markdown_from_dict_connascence_violations_key FAILED [ 71%]
+tests\unit\test_report_generator.py::TestHelperMethods::test_write_to_file_success PASSED [ 72%]
+tests\unit\test_report_generator.py::TestHelperMethods::test_write_to_file_creates_parent_dirs PASSED [ 72%]
+tests\unit\test_report_generator.py::TestHelperMethods::test_write_to_file_error_handling PASSED [ 73%]
+tests\unit\test_report_generator.py::TestConfigurationOptions::test_custom_json_formatting PASSED [ 73%]
+tests\unit\test_report_generator.py::TestConfigurationOptions::test_version_propagation PASSED [ 73%]
+tests\unit\test_report_generator.py::TestConfigurationOptions::test_custom_markdown_limits PASSED [ 74%]
+tests\unit\test_report_generator.py::TestSummaryFormatting::test_format_summary_with_zero_violations PASSED [ 74%]
+tests\unit\test_report_generator.py::TestSummaryFormatting::test_format_summary_basic PASSED [ 75%]
+tests\unit\test_report_generator.py::TestSummaryFormatting::test_format_summary_structure PASSED [ 75%]
+tests\unit\test_report_generator.py::TestSummaryFormatting::test_format_summary_with_missing_fields PASSED [ 76%]
+tests\unit\test_report_generator.py::TestReportGeneratorInit::test_init_with_custom_config PASSED [ 76%]
+tests\unit\test_report_generator.py::TestReportGeneratorInit::test_init_with_default_config PASSED [ 76%]
+tests\unit\test_report_generator.py::TestMarkdownReportGeneration::test_generate_markdown_with_file_output PASSED [ 77%]
+tests\unit\test_report_generator.py::TestMarkdownReportGeneration::test_generate_markdown_error_invalid_path PASSED [ 77%]
+tests\unit\test_report_generator.py::TestMarkdownReportGeneration::test_generate_markdown_from_dict FAILED [ 78%]
+tests\unit\test_report_generator.py::TestMarkdownReportGeneration::test_generate_markdown_from_object PASSED [ 78%]
+tests\unit\test_report_generator.py::TestMarkdownReportGeneration::test_generate_markdown_error_unsupported_type PASSED [ 78%]
+tests\unit\test_stream_processor.py::TestStreamProcessorStatistics::test_get_stats_with_processor PASSED [ 79%]
+tests\unit\test_stream_processor.py::TestStreamProcessorStatistics::test_is_running_property_false PASSED [ 79%]
+tests\unit\test_stream_processor.py::TestStreamProcessorStatistics::test_is_running_property_no_processor PASSED [ 80%]
+tests\unit\test_stream_processor.py::TestStreamProcessorStatistics::test_get_stats_basic PASSED [ 80%]
+tests\unit\test_stream_processor.py::TestStreamProcessorStatistics::test_get_stats_handles_processor_exceptions PASSED [ 80%]
+tests\unit\test_stream_processor.py::TestStreamProcessorStatistics::test_get_stats_with_cache PASSED [ 81%]
+tests\unit\test_stream_processor.py::TestStreamProcessorStatistics::test_is_running_property_true PASSED [ 81%]
+tests\unit\test_stream_processor.py::TestStreamProcessorStatistics::test_is_running_property_handles_exceptions FAILED [ 82%]
+tests\unit\test_stream_processor.py::TestStreamProcessorFileChangeDetection::test_detect_changes_without_cache PASSED [ 82%]
+tests\unit\test_stream_processor.py::TestStreamProcessorFileChangeDetection::test_detect_changes_handles_exceptions PASSED [ 83%]
+tests\unit\test_stream_processor.py::TestStreamProcessorFileChangeDetection::test_detect_changes_validates_files_not_none PASSED [ 83%]
+tests\unit\test_stream_processor.py::TestStreamProcessorFileChangeDetection::test_detect_changes_with_cache PASSED [ 83%]
+tests\unit\test_stream_processor.py::TestStreamProcessorInitialization::test_init_with_default_values PASSED [ 84%]
+tests\unit\test_stream_processor.py::TestStreamProcessorInitialization::test_init_with_callbacks PASSED [ 84%]
+tests\unit\test_stream_processor.py::TestStreamProcessorInitialization::test_init_validates_config_is_dict PASSED [ 85%]
+tests\unit\test_stream_processor.py::TestStreamProcessorInitialization::test_init_validates_config_not_none PASSED [ 85%]
+tests\unit\test_stream_processor.py::TestStreamProcessorInitialization::test_init_with_valid_config PASSED [ 85%]
+tests\unit\test_stream_processor.py::TestStreamProcessorIntegration::test_batch_processing_with_change_detection PASSED [ 86%]
+tests\unit\test_stream_processor.py::TestStreamProcessorIntegration::test_full_streaming_lifecycle PASSED [ 86%]
+tests\unit\test_stream_processor.py::TestStreamProcessorStreamProcessing::test_process_stream_no_changes PASSED [ 87%]
+tests\unit\test_stream_processor.py::TestStreamProcessorStreamProcessing::test_process_stream_validates_file_changes PASSED [ 87%]
+tests\unit\test_stream_processor.py::TestStreamProcessorStreamProcessing::test_process_stream_success PASSED [ 88%]
+tests\unit\test_stream_processor.py::TestStreamProcessorStreamProcessing::test_process_stream_not_initialized PASSED [ 88%]
+tests\unit\test_stream_processor.py::TestStreamProcessorStreamProcessing::test_process_stream_handles_exceptions PASSED [ 88%]
+tests\unit\test_stream_processor.py::TestStreamProcessorDirectoryWatching::test_watch_directory_nonexistent PASSED [ 89%]
+tests\unit\test_stream_processor.py::TestStreamProcessorDirectoryWatching::test_watch_directory_not_initialized PASSED [ 89%]
+tests\unit\test_stream_processor.py::TestStreamProcessorDirectoryWatching::test_watch_directory_success PASSED [ 90%]
+tests\unit\test_stream_processor.py::TestStreamProcessorDirectoryWatching::test_watch_directory_handles_exceptions PASSED [ 90%]
+tests\unit\test_stream_processor.py::TestStreamProcessorDirectoryWatching::test_watch_directory_validates_directory PASSED [ 90%]
+tests\unit\test_stream_processor.py::TestStreamProcessorBatchProcessing::test_batch_analyze_single_batch PASSED [ 91%]
+tests\unit\test_stream_processor.py::TestStreamProcessorBatchProcessing::test_batch_analyze_empty_files PASSED [ 91%]
+tests\unit\test_stream_processor.py::TestStreamProcessorBatchProcessing::test_analyze_batch_placeholder PASSED [ 92%]
+tests\unit\test_stream_processor.py::TestStreamProcessorBatchProcessing::test_batch_analyze_handles_exceptions PASSED [ 92%]
+tests\unit\test_stream_processor.py::TestStreamProcessorBatchProcessing::test_batch_analyze_validates_parameters PASSED [ 92%]
+tests\unit\test_stream_processor.py::TestStreamProcessorBatchProcessing::test_batch_analyze_success PASSED [ 93%]
+tests\unit\test_stream_processor.py::TestStreamProcessorFactory::test_create_stream_processor_coordinator_with_factory PASSED [ 93%]
+tests\unit\test_stream_processor.py::TestStreamProcessorFactory::test_create_stream_processor_coordinator_custom_config PASSED [ 94%]
+tests\unit\test_stream_processor.py::TestStreamProcessorFactory::test_create_stream_processor_coordinator_defaults PASSED [ 94%]
+tests\unit\test_stream_processor.py::TestStreamProcessorFactory::test_create_stream_processor_coordinator_init_failure PASSED [ 95%]
+tests\unit\test_stream_processor.py::TestStreamProcessorLifecycle::test_start_streaming_handles_exceptions PASSED [ 95%]
+tests\unit\test_stream_processor.py::TestStreamProcessorLifecycle::test_stop_streaming_success PASSED [ 95%]
+tests\unit\test_stream_processor.py::TestStreamProcessorLifecycle::test_stop_streaming_handles_exceptions PASSED [ 96%]
+tests\unit\test_stream_processor.py::TestStreamProcessorLifecycle::test_start_streaming_not_initialized PASSED [ 96%]
+tests\unit\test_stream_processor.py::TestStreamProcessorLifecycle::test_initialize_already_initialized PASSED [ 97%]
+tests\unit\test_stream_processor.py::TestStreamProcessorLifecycle::test_initialize_handles_exceptions PASSED [ 97%]
+tests\unit\test_stream_processor.py::TestStreamProcessorLifecycle::test_start_streaming_validates_directories PASSED [ 97%]
+tests\unit\test_stream_processor.py::TestStreamProcessorLifecycle::test_initialize_success PASSED [ 98%]
+tests\unit\test_stream_processor.py::TestStreamProcessorLifecycle::test_initialize_when_streaming_unavailable PASSED [ 98%]
+tests\unit\test_stream_processor.py::TestStreamProcessorLifecycle::test_stop_streaming_no_processor PASSED [ 99%]
+tests\unit\test_stream_processor.py::TestStreamProcessorLifecycle::test_start_streaming_nonexistent_directory PASSED [ 99%]
+tests\unit\test_stream_processor.py::TestStreamProcessorLifecycle::test_start_streaming_success PASSED [100%]
+Run started:2025-11-14 03:36:11.960381
+
+Test results:
+	No issues identified.
+
+Code scanned:
+	Total lines of code: 0
+	Total lines skipped (#nosec): 0
+
+Run metrics:
+	Total issues (by severity):
+		Undefined: 0
+		Low: 0
+		Medium: 0
+		High: 0
+	Total issues (by confidence):
+		Undefined: 0
+		Low: 0
+		Medium: 0
+		High: 0
+Files skipped (0):
+Module reporting was never imported. (module-not-imported); see https://coverage.readthedocs.io/en/7.11.0/messages.html#warning-module-not-imported
+
+
+================================== FAILURES ===================================
+_____________________ TestIntegration.test_full_workflow ______________________
+tests\unit\test_metrics_collector.py:1325: in test_full_workflow
+    assert len(exported) == 2
+E   AssertionError: assert 3 == 2
+E    +  where 3 = len([{'timestamp': '2025-11-13T22:36:08.625163', 'quality_score': 0.731, 'violations': 7, 'critical': 1, 'high': 2, 'nasa_score': 0.675, 'duplication_score': 0.962, 'files_analyzed': 0}, {'timestamp': '2025-11-13T22:36:08.625163', 'quality_score': 0.731, 'violations': 7, 'critical': 1, 'high': 2, 'nasa_score': 0.675, 'duplication_score': 0.962, 'files_analyzed': 0}, {'timestamp': '2025-11-13T22:36:08.625163', 'quality_score': 0.88, 'violations': 1, 'critical': 1, 'high': 0, 'nasa_score': 1.0, 'duplication_score': 1.0, 'files_analyzed': 0}])
+------------------------------ Captured log call ------------------------------
+INFO     analyzer.architecture.metrics_collector:metrics_collector.py:593 Baseline metrics established: quality=0.731
+_______ TestCollectViolationMetrics.test_collect_metrics_large_dataset ________
+tests\unit\test_metrics_collector.py:252: in test_collect_metrics_large_dataset
+    assert metrics["total_violations"] == 80  # 50 + 30
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   assert 100 == 80
+______ TestCollectViolationMetrics.test_collect_metrics_with_violations _______
+tests\unit\test_metrics_collector.py:213: in test_collect_metrics_with_violations
+    assert metrics["total_violations"] == 5  # 3 connascence + 2 nasa
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   assert 7 == 5
+___________ TestIntegrationScenarios.test_summary_with_all_formats ____________
+tests\unit\test_report_generator.py:967: in test_summary_with_all_formats
+    generator.generate_all_formats(
+analyzer\architecture\report_generator.py:325: in generate_all_formats
+    self.generate_json(result, json_path)
+analyzer\architecture\report_generator.py:123: in generate_json
+    json_content = self.json_reporter.generate(result)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+analyzer\reporting\json.py:38: in generate
+    "summary": self._create_summary(result),
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+analyzer\reporting\json.py:84: in _create_summary
+    locality_key = violation.locality
+                   ^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'MockViolation' object has no attribute 'locality'
+------------------------------ Captured log call ------------------------------
+INFO     analyzer.architecture.report_generator:report_generator.py:96 ReportGenerator initialized (version=1.0.0)
+ERROR    analyzer.architecture.report_generator:report_generator.py:146 JSON report generation failed: 'MockViolation' object has no attribute 'locality'
+ERROR    analyzer.architecture.report_generator:report_generator.py:343 Multi-format report generation failed: 'MockViolation' object has no attribute 'locality'
+_______________ TestIntegrationScenarios.test_complete_workflow _______________
+tests\unit\test_report_generator.py:936: in test_complete_workflow
+    output_paths = generator.generate_all_formats(
+analyzer\architecture\report_generator.py:325: in generate_all_formats
+    self.generate_json(result, json_path)
+analyzer\architecture\report_generator.py:123: in generate_json
+    json_content = self.json_reporter.generate(result)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+analyzer\reporting\json.py:38: in generate
+    "summary": self._create_summary(result),
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+analyzer\reporting\json.py:84: in _create_summary
+    locality_key = violation.locality
+                   ^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'MockViolation' object has no attribute 'locality'
+------------------------------ Captured log call ------------------------------
+INFO     analyzer.architecture.report_generator:report_generator.py:96 ReportGenerator initialized (version=1.5.0)
+ERROR    analyzer.architecture.report_generator:report_generator.py:146 JSON report generation failed: 'MockViolation' object has no attribute 'locality'
+ERROR    analyzer.architecture.report_generator:report_generator.py:343 Multi-format report generation failed: 'MockViolation' object has no attribute 'locality'
+___________ TestJSONReportGeneration.test_generate_json_from_object ___________
+tests\unit\test_report_generator.py:259: in test_generate_json_from_object
+    json_output = generator.generate_json(sample_result_object)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+analyzer\architecture\report_generator.py:123: in generate_json
+    json_content = self.json_reporter.generate(result)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+analyzer\reporting\json.py:38: in generate
+    "summary": self._create_summary(result),
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+analyzer\reporting\json.py:84: in _create_summary
+    locality_key = violation.locality
+                   ^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'MockViolation' object has no attribute 'locality'
+------------------------------ Captured log call ------------------------------
+INFO     analyzer.architecture.report_generator:report_generator.py:96 ReportGenerator initialized (version=1.0.0)
+ERROR    analyzer.architecture.report_generator:report_generator.py:146 JSON report generation failed: 'MockViolation' object has no attribute 'locality'
+____ TestMultiFormatGeneration.test_generate_all_formats_creates_directory ____
+tests\unit\test_report_generator.py:557: in test_generate_all_formats_creates_directory
+    output_paths = generator.generate_all_formats(
+analyzer\architecture\report_generator.py:325: in generate_all_formats
+    self.generate_json(result, json_path)
+analyzer\architecture\report_generator.py:123: in generate_json
+    json_content = self.json_reporter.generate(result)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+analyzer\reporting\json.py:38: in generate
+    "summary": self._create_summary(result),
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+analyzer\reporting\json.py:84: in _create_summary
+    locality_key = violation.locality
+                   ^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'MockViolation' object has no attribute 'locality'
+------------------------------ Captured log call ------------------------------
+INFO     analyzer.architecture.report_generator:report_generator.py:96 ReportGenerator initialized (version=1.0.0)
+ERROR    analyzer.architecture.report_generator:report_generator.py:146 JSON report generation failed: 'MockViolation' object has no attribute 'locality'
+ERROR    analyzer.architecture.report_generator:report_generator.py:343 Multi-format report generation failed: 'MockViolation' object has no attribute 'locality'
+__ TestMultiFormatGeneration.test_generate_all_formats_file_content_validity __
+tests\unit\test_report_generator.py:579: in test_generate_all_formats_file_content_validity
+    output_paths = generator.generate_all_formats(
+analyzer\architecture\report_generator.py:325: in generate_all_formats
+    self.generate_json(result, json_path)
+analyzer\architecture\report_generator.py:123: in generate_json
+    json_content = self.json_reporter.generate(result)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+analyzer\reporting\json.py:38: in generate
+    "summary": self._create_summary(result),
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+analyzer\reporting\json.py:84: in _create_summary
+    locality_key = violation.locality
+                   ^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'MockViolation' object has no attribute 'locality'
+------------------------------ Captured log call ------------------------------
+INFO     analyzer.architecture.report_generator:report_generator.py:96 ReportGenerator initialized (version=1.0.0)
+ERROR    analyzer.architecture.report_generator:report_generator.py:146 JSON report generation failed: 'MockViolation' object has no attribute 'locality'
+ERROR    analyzer.architecture.report_generator:report_generator.py:343 Multi-format report generation failed: 'MockViolation' object has no attribute 'locality'
+__________ TestMultiFormatGeneration.test_generate_all_formats_basic __________
+tests\unit\test_report_generator.py:502: in test_generate_all_formats_basic
+    output_paths = generator.generate_all_formats(
+analyzer\architecture\report_generator.py:325: in generate_all_formats
+    self.generate_json(result, json_path)
+analyzer\architecture\report_generator.py:123: in generate_json
+    json_content = self.json_reporter.generate(result)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+analyzer\reporting\json.py:38: in generate
+    "summary": self._create_summary(result),
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+analyzer\reporting\json.py:84: in _create_summary
+    locality_key = violation.locality
+                   ^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'MockViolation' object has no attribute 'locality'
+------------------------------ Captured log call ------------------------------
+INFO     analyzer.architecture.report_generator:report_generator.py:96 ReportGenerator initialized (version=1.0.0)
+ERROR    analyzer.architecture.report_generator:report_generator.py:146 JSON report generation failed: 'MockViolation' object has no attribute 'locality'
+ERROR    analyzer.architecture.report_generator:report_generator.py:343 Multi-format report generation failed: 'MockViolation' object has no attribute 'locality'
+_____ TestMultiFormatGeneration.test_generate_all_formats_custom_basename _____
+tests\unit\test_report_generator.py:533: in test_generate_all_formats_custom_basename
+    output_paths = generator.generate_all_formats(
+analyzer\architecture\report_generator.py:325: in generate_all_formats
+    self.generate_json(result, json_path)
+analyzer\architecture\report_generator.py:123: in generate_json
+    json_content = self.json_reporter.generate(result)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+analyzer\reporting\json.py:38: in generate
+    "summary": self._create_summary(result),
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+analyzer\reporting\json.py:84: in _create_summary
+    locality_key = violation.locality
+                   ^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'MockViolation' object has no attribute 'locality'
+------------------------------ Captured log call ------------------------------
+INFO     analyzer.architecture.report_generator:report_generator.py:96 ReportGenerator initialized (version=1.0.0)
+ERROR    analyzer.architecture.report_generator:report_generator.py:146 JSON report generation failed: 'MockViolation' object has no attribute 'locality'
+ERROR    analyzer.architecture.report_generator:report_generator.py:343 Multi-format report generation failed: 'MockViolation' object has no attribute 'locality'
+_____________ TestHelperMethods.test_generate_markdown_from_dict ______________
+tests\unit\test_report_generator.py:732: in test_generate_markdown_from_dict
+    markdown = generator._generate_markdown_from_dict(sample_result_dict)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+analyzer\architecture\report_generator.py:441: in _generate_markdown_from_dict
+    return self.markdown_reporter.generate(simple_result)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+analyzer\reporting\markdown.py:42: in generate
+    sections.append(self._create_summary(result))
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+analyzer\reporting\markdown.py:92: in _create_summary
+    by_severity[severity] = by_severity.get(severity, 0) + 1
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: unhashable type: 'dict'
+------------------------------ Captured log call ------------------------------
+INFO     analyzer.architecture.report_generator:report_generator.py:96 ReportGenerator initialized (version=1.0.0)
+_____ TestHelperMethods.test_generate_markdown_from_dict_with_violations ______
+tests\unit\test_report_generator.py:759: in test_generate_markdown_from_dict_with_violations
+    markdown = generator._generate_markdown_from_dict(result_dict)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+analyzer\architecture\report_generator.py:441: in _generate_markdown_from_dict
+    return self.markdown_reporter.generate(simple_result)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+analyzer\reporting\markdown.py:42: in generate
+    sections.append(self._create_summary(result))
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+analyzer\reporting\markdown.py:92: in _create_summary
+    by_severity[severity] = by_severity.get(severity, 0) + 1
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: unhashable type: 'dict'
+------------------------------ Captured log call ------------------------------
+INFO     analyzer.architecture.report_generator:report_generator.py:96 ReportGenerator initialized (version=1.0.0)
+_ TestHelperMethods.test_generate_markdown_from_dict_connascence_violations_key _
+tests\unit\test_report_generator.py:785: in test_generate_markdown_from_dict_connascence_violations_key
+    markdown = generator._generate_markdown_from_dict(result_dict)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+analyzer\architecture\report_generator.py:441: in _generate_markdown_from_dict
+    return self.markdown_reporter.generate(simple_result)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+analyzer\reporting\markdown.py:42: in generate
+    sections.append(self._create_summary(result))
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+analyzer\reporting\markdown.py:92: in _create_summary
+    by_severity[severity] = by_severity.get(severity, 0) + 1
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: unhashable type: 'dict'
+------------------------------ Captured log call ------------------------------
+INFO     analyzer.architecture.report_generator:report_generator.py:96 ReportGenerator initialized (version=1.0.0)
+________ TestMarkdownReportGeneration.test_generate_markdown_from_dict ________
+tests\unit\test_report_generator.py:342: in test_generate_markdown_from_dict
+    markdown_output = generator.generate_markdown(sample_result_dict)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+analyzer\architecture\report_generator.py:179: in generate_markdown
+    markdown_content = self._generate_markdown_from_dict(result)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+analyzer\architecture\report_generator.py:441: in _generate_markdown_from_dict
+    return self.markdown_reporter.generate(simple_result)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+analyzer\reporting\markdown.py:42: in generate
+    sections.append(self._create_summary(result))
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+analyzer\reporting\markdown.py:92: in _create_summary
+    by_severity[severity] = by_severity.get(severity, 0) + 1
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: unhashable type: 'dict'
+------------------------------ Captured log call ------------------------------
+INFO     analyzer.architecture.report_generator:report_generator.py:96 ReportGenerator initialized (version=1.0.0)
+ERROR    analyzer.architecture.report_generator:report_generator.py:193 Markdown report generation failed: unhashable type: 'dict'
+__ TestStreamProcessorStatistics.test_is_running_property_handles_exceptions __
+tests\unit\test_stream_processor.py:578: in test_is_running_property_handles_exceptions
+    assert processor.is_running is False
+E   assert <property object at 0x000001F4FFD43240> is False
+E    +  where <property object at 0x000001F4FFD43240> = <analyzer.architecture.stream_processor.StreamProcessor object at 0x000001F4FFC4ACF0>.is_running
+------------------------------ Captured log call ------------------------------
+INFO     analyzer.architecture.stream_processor:stream_processor.py:90 StreamProcessor initialized with queue_size=1000, workers=4, cache_size=10000
+=========================== short test summary info ===========================
+FAILED tests\unit\test_metrics_collector.py::TestIntegration::test_full_workflow - AssertionError: assert 3 == 2
+ +  where 3 = len([{'timestamp': '2025-11-13T22:36:08.625163', 'quality_score': 0.731, 'violations': 7, 'critical': 1, 'high': 2, 'nasa_score': 0.675, 'duplication_score': 0.962, 'files_analyzed': 0}, {'timestamp': '2025-11-13T22:36:08.625163', 'quality_score': 0.731, 'violations': 7, 'critical': 1, 'high': 2, 'nasa_score': 0.675, 'duplication_score': 0.962, 'files_analyzed': 0}, {'timestamp': '2025-11-13T22:36:08.625163', 'quality_score': 0.88, 'violations': 1, 'critical': 1, 'high': 0, 'nasa_score': 1.0, 'duplication_score': 1.0, 'files_analyzed': 0}])
+FAILED tests\unit\test_metrics_collector.py::TestCollectViolationMetrics::test_collect_metrics_large_dataset - assert 100 == 80
+FAILED tests\unit\test_metrics_collector.py::TestCollectViolationMetrics::test_collect_metrics_with_violations - assert 7 == 5
+FAILED tests\unit\test_report_generator.py::TestIntegrationScenarios::test_summary_with_all_formats - AttributeError: 'MockViolation' object has no attribute 'locality'
+FAILED tests\unit\test_report_generator.py::TestIntegrationScenarios::test_complete_workflow - AttributeError: 'MockViolation' object has no attribute 'locality'
+FAILED tests\unit\test_report_generator.py::TestJSONReportGeneration::test_generate_json_from_object - AttributeError: 'MockViolation' object has no attribute 'locality'
+FAILED tests\unit\test_report_generator.py::TestMultiFormatGeneration::test_generate_all_formats_creates_directory - AttributeError: 'MockViolation' object has no attribute 'locality'
+FAILED tests\unit\test_report_generator.py::TestMultiFormatGeneration::test_generate_all_formats_file_content_validity - AttributeError: 'MockViolation' object has no attribute 'locality'
+FAILED tests\unit\test_report_generator.py::TestMultiFormatGeneration::test_generate_all_formats_basic - AttributeError: 'MockViolation' object has no attribute 'locality'
+FAILED tests\unit\test_report_generator.py::TestMultiFormatGeneration::test_generate_all_formats_custom_basename - AttributeError: 'MockViolation' object has no attribute 'locality'
+FAILED tests\unit\test_report_generator.py::TestHelperMethods::test_generate_markdown_from_dict - TypeError: unhashable type: 'dict'
+FAILED tests\unit\test_report_generator.py::TestHelperMethods::test_generate_markdown_from_dict_with_violations - TypeError: unhashable type: 'dict'
+FAILED tests\unit\test_report_generator.py::TestHelperMethods::test_generate_markdown_from_dict_connascence_violations_key - TypeError: unhashable type: 'dict'
+FAILED tests\unit\test_report_generator.py::TestMarkdownReportGeneration::test_generate_markdown_from_dict - TypeError: unhashable type: 'dict'
+FAILED tests\unit\test_stream_processor.py::TestStreamProcessorStatistics::test_is_running_property_handles_exceptions - assert <property object at 0x000001F4FFD43240> is False
+ +  where <property object at 0x000001F4FFD43240> = <analyzer.architecture.stream_processor.StreamProcessor object at 0x000001F4FFC4ACF0>.is_running
+======================= 15 failed, 227 passed in 10.45s =======================

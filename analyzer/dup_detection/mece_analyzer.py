@@ -74,6 +74,35 @@ class MECEAnalyzer:
         """Legacy analyze method for backward compatibility."""
         return []
 
+    def analyze_directory(self, directory_path: str, **kwargs) -> List[Dict[str, Any]]:
+        """
+        Analyze directory for duplication violations.
+        Returns list of duplication cluster violations for unified_analyzer compatibility.
+        NASA Rule 4 compliant.
+        """
+        result = self.analyze_path(directory_path, comprehensive=kwargs.get("comprehensive", False))
+
+        if not result.get("success", False):
+            return []
+
+        # Convert duplications to violation format expected by unified_analyzer
+        duplications = result.get("duplications", [])
+        violations = []
+
+        for dup in duplications:
+            violations.append({
+                "type": "duplication",
+                "severity": dup.get("severity", "medium"),
+                "file_path": str(directory_path),
+                "line_number": 0,
+                "message": dup.get("description", "Code duplication detected"),
+                "similarity_score": dup.get("similarity_score", 0.0),
+                "functions": dup.get("functions", []),
+                "context": dup
+            })
+
+        return violations
+
     def analyze_path(self, path: str, comprehensive: bool = False) -> Dict[str, Any]:
         """Analyze path for real MECE violations and duplications."""
         path_obj = Path(path)

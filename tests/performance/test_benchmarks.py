@@ -18,6 +18,7 @@ Tests performance characteristics and ensures the system
 meets performance requirements for various codebase sizes.
 """
 
+import os
 import time
 
 import psutil
@@ -48,7 +49,7 @@ def function_{i}(a, b, c):
 
         # Measure analysis time
         start_time = time.time()
-        start_memory = psutil.Process().memory_info().rss
+        start_memory = psutil.Process(os.getpid()).memory_info().rss
 
         all_violations = []
         for code, filename in code_samples:
@@ -56,7 +57,7 @@ def function_{i}(a, b, c):
             all_violations.extend(violations)
 
         end_time = time.time()
-        end_memory = psutil.Process().memory_info().rss
+        end_memory = psutil.Process(os.getpid()).memory_info().rss
 
         analysis_time = end_time - start_time
         memory_used = (end_memory - start_memory) / 1024 / 1024  # MB
@@ -117,7 +118,7 @@ def utility_function_{i}(param1, param2, param3, param4):  # Missing types, many
 
         # Measure analysis time
         start_time = time.time()
-        start_memory = psutil.Process().memory_info().rss
+        start_memory = psutil.Process(os.getpid()).memory_info().rss
 
         all_violations = []
         for code, filename in code_samples:
@@ -125,7 +126,7 @@ def utility_function_{i}(param1, param2, param3, param4):  # Missing types, many
             all_violations.extend(violations)
 
         end_time = time.time()
-        end_memory = psutil.Process().memory_info().rss
+        end_memory = psutil.Process(os.getpid()).memory_info().rss
 
         analysis_time = end_time - start_time
         memory_used = (end_memory - start_memory) / 1024 / 1024  # MB
@@ -203,12 +204,12 @@ def process_batch_{i}(items, config, options, timeout, retries, flags):  # Too m
 
         # Measure analysis time
         start_time = time.time()
-        start_memory = psutil.Process().memory_info().rss
+        start_memory = psutil.Process(os.getpid()).memory_info().rss
 
         violations = analyzer.analyze_string(large_code, "large_file.py")
 
         end_time = time.time()
-        end_memory = psutil.Process().memory_info().rss
+        end_memory = psutil.Process(os.getpid()).memory_info().rss
 
         analysis_time = end_time - start_time
         memory_used = (end_memory - start_memory) / 1024 / 1024  # MB
@@ -279,7 +280,7 @@ def function_{i}(param1, param2, param3):
 """
             code_samples.append((code, f"file_{i}.py"))
 
-        initial_memory = psutil.Process().memory_info().rss
+        initial_memory = psutil.Process(os.getpid()).memory_info().rss
         memory_measurements = []
 
         # Analyze files and measure memory after each batch
@@ -290,7 +291,7 @@ def function_{i}(param1, param2, param3):
             for code, filename in batch:
                 analyzer.analyze_string(code, filename)
 
-            current_memory = psutil.Process().memory_info().rss
+            current_memory = psutil.Process(os.getpid()).memory_info().rss
             memory_used = (current_memory - initial_memory) / 1024 / 1024  # MB
             memory_measurements.append(memory_used)
 

@@ -426,7 +426,7 @@ class ConnascenceMCPServer:
         }
 
         explanation_data = explanations.get(rule_id, explanations["CON_CoM"])
-        result = {"success": True, "rule_id": rule_id, **explanation_data}
+        result = {"success": True, "rule_id": rule_id, "violation_id": rule_id, **explanation_data}
 
         if include_examples:
             result["examples"] = [
@@ -731,7 +731,7 @@ class ConnascenceMCPServer:
                 "available_policies": list_available_policies(include_legacy=True),
             }
 
-    async def get_metrics(self, arguments: Dict[str, Any]):
+    async def get_metrics(self, arguments: Dict[str, Any] = None):
         """Get server metrics."""
         return {
             "success": True,
