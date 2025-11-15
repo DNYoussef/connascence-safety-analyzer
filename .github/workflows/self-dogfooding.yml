@@ -63,13 +63,41 @@ jobs:
           --threshold 0.8 \
           --output ../self_mece_analysis.json || echo "MECE self-analysis completed with warnings"
         cd ..
-          
+
         # God object detection using consolidated analyzer
         cd analyzer && python core.py \
           --path ../analyzer \
           --format json \
           --output ../self_god_objects.json || echo "God object self-analysis completed with warnings"
         cd ..
+        echo "::endgroup::"
+
+    - name: 🔍 Clarity Linter Self-Analysis
+      run: |
+        echo "::group::Self Analysis - Clarity & Cognitive Load"
+        # Run clarity linter on our own codebase
+        python scripts/run_clarity001.py \
+          --path analyzer \
+          --output self_clarity_analysis.json || echo "Clarity analysis completed with warnings"
+        echo "::endgroup::"
+
+    - name: 🔗 Full Connascence Self-Analysis
+      run: |
+        echo "::group::Self Analysis - Connascence Detection"
+        # Full connascence analysis (all 9 types)
+        cd analyzer && python connascence_analyzer.py \
+          --path .. \
+          --output ../self_connascence_analysis.json || echo "Connascence analysis completed with warnings"
+        cd ..
+        echo "::endgroup::"
+
+    - name: 📊 Six Sigma Quality Metrics
+      run: |
+        echo "::group::Self Analysis - Six Sigma Metrics"
+        # Six Sigma quality metrics
+        python -m analyzer.six_sigma.metrics_calculator \
+          --input self_analysis_nasa.json \
+          --output self_six_sigma_metrics.json || echo "Six Sigma analysis completed with warnings"
         echo "::endgroup::"
 
     - name: 📊 Validate Demo Claims
@@ -95,11 +123,14 @@ jobs:
     - name: 📈 Update Self-Analysis Metrics
       run: |
         echo "::group::Update Historical Self-Analysis"
-        # Update our own analysis baseline
+        # Update our own analysis baseline with ALL 7 analyzers
         python -m dashboard.metrics --update-trends \
           --nasa-results self_analysis_nasa.json \
-          --connascence-results self_god_objects.json \
-          --mece-results self_mece_analysis.json || echo "Metrics update completed with warnings"
+          --connascence-results self_connascence_analysis.json \
+          --god-objects-results self_god_objects.json \
+          --mece-results self_mece_analysis.json \
+          --clarity-results self_clarity_analysis.json \
+          --six-sigma-results self_six_sigma_metrics.json || echo "Metrics update completed with warnings"
           
         # Compare with previous self-analysis from docs/reports/
         if [ -f "docs/reports/self-analysis/baseline_report.md" ]; then
@@ -115,27 +146,36 @@ jobs:
       run: |
         echo "::group::Quality Gate Self-Assessment"
         
-        # Extract metrics from our self-analysis
+        # Extract metrics from ALL 7 analyzers
         NASA_SCORE=$(python -c "import json; data=json.load(open('self_analysis_nasa.json')); print(data.get('nasa_compliance', {}).get('score', 0.0))")
         TOTAL_VIOLATIONS=$(python -c "import json; data=json.load(open('self_analysis_nasa.json')); print(len(data.get('violations', [])))")
         CRITICAL_VIOLATIONS=$(python -c "import json; data=json.load(open('self_analysis_nasa.json')); print(len([v for v in data.get('violations', []) if v.get('severity') == 'critical']))")
         GOD_OBJECTS=$(python -c "import json; data=json.load(open('self_god_objects.json')); print(len([v for v in data.get('violations', []) if 'God Object' in v.get('description', '')]))")
         MECE_SCORE=$(python -c "import json; data=json.load(open('self_mece_analysis.json')); print(data.get('mece_score', 0.0))")
+        CLARITY_SCORE=$(python -c "import json; f=open('self_clarity_analysis.json'); data=json.load(f); print(data.get('clarity_score', 0.0)) if 'clarity_score' in data else print(0.0)")
+        CONNASCENCE_COUNT=$(python -c "import json; f=open('self_connascence_analysis.json'); data=json.load(f); print(len(data.get('violations', []))) if 'violations' in data else print(0)")
+        SIX_SIGMA_DPMO=$(python -c "import json; f=open('self_six_sigma_metrics.json'); data=json.load(f); print(data.get('dpmo', 0)) if 'dpmo' in data else print(0)")
         
-        echo "Self-Analysis Results:"
-        echo "===================="
-        echo "NASA Compliance Score: $NASA_SCORE"
-        echo "Total Violations: $TOTAL_VIOLATIONS"
-        echo "Critical Violations: $CRITICAL_VIOLATIONS"
-        echo "God Objects: $GOD_OBJECTS"
-        echo "MECE Score: $MECE_SCORE"
+        echo "Self-Analysis Results (ALL 7 Analyzers):"
+        echo "========================================"
+        echo "1. NASA Compliance Score: $NASA_SCORE"
+        echo "2. Total NASA Violations: $TOTAL_VIOLATIONS"
+        echo "3. Critical Violations: $CRITICAL_VIOLATIONS"
+        echo "4. God Objects: $GOD_OBJECTS"
+        echo "5. MECE Score: $MECE_SCORE"
+        echo "6. Clarity Score: $CLARITY_SCORE"
+        echo "7. Connascence Violations: $CONNASCENCE_COUNT"
+        echo "8. Six Sigma DPMO: $SIX_SIGMA_DPMO"
         
-        # Set outputs for later use
+        # Set outputs for later use (all 7 analyzers)
         echo "nasa_score=$NASA_SCORE" >> $GITHUB_OUTPUT
         echo "total_violations=$TOTAL_VIOLATIONS" >> $GITHUB_OUTPUT
         echo "critical_violations=$CRITICAL_VIOLATIONS" >> $GITHUB_OUTPUT
         echo "god_objects=$GOD_OBJECTS" >> $GITHUB_OUTPUT
         echo "mece_score=$MECE_SCORE" >> $GITHUB_OUTPUT
+        echo "clarity_score=$CLARITY_SCORE" >> $GITHUB_OUTPUT
+        echo "connascence_count=$CONNASCENCE_COUNT" >> $GITHUB_OUTPUT
+        echo "six_sigma_dpmo=$SIX_SIGMA_DPMO" >> $GITHUB_OUTPUT
         
         # Self-assessment quality gates (more lenient for development)
         SELF_NASA_THRESHOLD=0.85
@@ -214,6 +254,9 @@ jobs:
           self_analysis_nasa.json
           self_mece_analysis.json
           self_god_objects.json
+          self_clarity_analysis.json
+          self_connascence_analysis.json
+          self_six_sigma_metrics.json
           tool_correlation_self_test.json
           self_analysis_dashboard.html
           updated_baseline_report.md
@@ -275,11 +318,28 @@ jobs:
         {
           "timestamp": "$TIMESTAMP",
           "commit_sha": "${{ github.sha }}",
-          "nasa_compliance_score": ${{ steps.self-quality-gates.outputs.nasa_score }},
-          "total_violations": ${{ steps.self-quality-gates.outputs.total_violations }},
-          "critical_violations": ${{ steps.self-quality-gates.outputs.critical_violations }},
-          "god_objects": ${{ steps.self-quality-gates.outputs.god_objects }},
-          "mece_score": ${{ steps.self-quality-gates.outputs.mece_score }},
+          "analyzers": {
+            "nasa": {
+              "compliance_score": ${{ steps.self-quality-gates.outputs.nasa_score }},
+              "total_violations": ${{ steps.self-quality-gates.outputs.total_violations }},
+              "critical_violations": ${{ steps.self-quality-gates.outputs.critical_violations }}
+            },
+            "god_objects": {
+              "count": ${{ steps.self-quality-gates.outputs.god_objects }}
+            },
+            "mece": {
+              "score": ${{ steps.self-quality-gates.outputs.mece_score }}
+            },
+            "clarity": {
+              "score": ${{ steps.self-quality-gates.outputs.clarity_score }}
+            },
+            "connascence": {
+              "violation_count": ${{ steps.self-quality-gates.outputs.connascence_count }}
+            },
+            "six_sigma": {
+              "dpmo": ${{ steps.self-quality-gates.outputs.six_sigma_dpmo }}
+            }
+          },
           "self_assessment_passed": ${{ steps.self-quality-gates.outputs.self_assessment_passed }}
         }
         EOF
@@ -297,12 +357,26 @@ jobs:
       run: |
         echo "## 🔬 Self-Dogfooding Analysis Summary" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
-        echo "### 📊 Key Metrics" >> $GITHUB_STEP_SUMMARY
-        echo "- **NASA Compliance:** ${{ steps.self-quality-gates.outputs.nasa_score }}" >> $GITHUB_STEP_SUMMARY
+        echo "### 📊 Key Metrics (ALL 7 Analyzers)" >> $GITHUB_STEP_SUMMARY
+        echo "#### 1. NASA Safety Analyzer" >> $GITHUB_STEP_SUMMARY
+        echo "- **Compliance Score:** ${{ steps.self-quality-gates.outputs.nasa_score }}" >> $GITHUB_STEP_SUMMARY
         echo "- **Total Violations:** ${{ steps.self-quality-gates.outputs.total_violations }}" >> $GITHUB_STEP_SUMMARY
         echo "- **Critical Violations:** ${{ steps.self-quality-gates.outputs.critical_violations }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "#### 2. Safety Violation Detector" >> $GITHUB_STEP_SUMMARY
         echo "- **God Objects:** ${{ steps.self-quality-gates.outputs.god_objects }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "#### 3. MECE Analyzer" >> $GITHUB_STEP_SUMMARY
         echo "- **MECE Score:** ${{ steps.self-quality-gates.outputs.mece_score }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "#### 4. Clarity Linter" >> $GITHUB_STEP_SUMMARY
+        echo "- **Clarity Score:** ${{ steps.self-quality-gates.outputs.clarity_score }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "#### 5. Connascence Analyzer" >> $GITHUB_STEP_SUMMARY
+        echo "- **Violations:** ${{ steps.self-quality-gates.outputs.connascence_count }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "#### 6. Six Sigma Metrics" >> $GITHUB_STEP_SUMMARY
+        echo "- **DPMO:** ${{ steps.self-quality-gates.outputs.six_sigma_dpmo }}" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         
         if [[ "${{ steps.self-quality-gates.outputs.self_assessment_passed }}" == "true" ]]; then
