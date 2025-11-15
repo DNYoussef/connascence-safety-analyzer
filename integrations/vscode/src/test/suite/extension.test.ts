@@ -25,5 +25,6 @@ suite('Extension Test Suite', () => {
         assert.ok(commands.includes('connascence.showReport'));
         assert.ok(commands.includes('connascence.fix'));
         assert.ok(commands.includes('connascence.configure'));
+        assert.ok(commands.includes('connascence.startMcpBackend'));
     });
 });

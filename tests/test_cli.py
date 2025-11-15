@@ -23,6 +23,7 @@ import contextlib
 import json
 from pathlib import Path
 import subprocess
+import sys
 import tempfile
 from unittest.mock import Mock, patch
 
@@ -523,20 +524,47 @@ class TestCLISubcommands:
             result = mock_handler(args)
             assert result == 0
 
-    @patch("mcp.server")
-    def test_mcp_serve_command(self, mock_mcp_server):
-        """Test MCP server command."""
-        mock_mcp_server.serve.return_value = None
+    @patch("interfaces.cli.connascence.subprocess.run")
+    def test_mcp_serve_command(self, mock_run):
+        """Test MCP serve command spawns the enhanced MCP CLI."""
+        mock_run.return_value.returncode = 0
 
         parser = self.cli.create_parser()
-        args = parser.parse_args(["mcp", "serve", "--port", "8080"])
+        args = parser.parse_args(
+            ["mcp", "serve", "--host", "0.0.0.0", "--port", "9000", "--env", "PYTHONUNBUFFERED=1"]
+        )
 
-        # Mock the MCP handler
-        with patch.object(self.cli, "_handle_mcp") as mock_handler:
-            mock_handler.return_value = 0
+        result = self.cli._handle_mcp(args)
 
-            result = mock_handler(args)
-            assert result == 0
+        assert result == 0
+        mock_run.assert_called_with(
+            [
+                sys.executable,
+                "-m",
+                "mcp.cli",
+                "serve",
+                "--host",
+                "0.0.0.0",
+                "--port",
+                "9000",
+                "--env",
+                "PYTHONUNBUFFERED=1",
+            ],
+            check=False,
+        )
+
+    @patch("interfaces.cli.connascence.subprocess.run")
+    def test_mcp_status_command(self, mock_run):
+        """Test MCP status command calls health-check."""
+        mock_run.return_value.returncode = 0
+
+        parser = self.cli.create_parser()
+        args = parser.parse_args(["mcp", "status"])
+
+        result = self.cli._handle_mcp(args)
+
+        assert result == 0
+        mock_run.assert_called_with([sys.executable, "-m", "mcp.cli", "health-check"], check=False)
 
 
 # Integration test with actual CLI execution (optional, slower)

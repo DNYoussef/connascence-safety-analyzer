@@ -17,8 +17,9 @@ import json
 import logging
 import os
 from pathlib import Path
+import signal
 import sys
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 # Force UTF-8 encoding for Windows compatibility
 if sys.platform == "win32":
@@ -148,6 +149,22 @@ def load_config(config_path: Optional[str]) -> Dict[str, Any]:
         return {}
 
 
+def parse_env_overrides(values: Optional[List[str]]) -> Dict[str, str]:
+    """Parse KEY=VALUE strings into a dictionary."""
+    overrides: Dict[str, str] = {}
+    if not values:
+        return overrides
+
+    for entry in values:
+        if "=" not in entry:
+            logger.warning("Ignoring malformed env override '%s' (expected KEY=VALUE)", entry)
+            continue
+
+        key, value = entry.split("=", 1)
+        overrides[key.strip()] = value
+    return overrides
+
+
 def create_parser() -> argparse.ArgumentParser:
     """Create command line argument parser."""
     parser = argparse.ArgumentParser(
@@ -207,6 +224,17 @@ Examples:
     )
     analyze_workspace_parser.add_argument("--output", "-o", type=str, help="Output file path")
 
+    # Serve command
+    serve_parser = subparsers.add_parser("serve", help="Start MCP WebSocket server")
+    serve_parser.add_argument("--host", default="127.0.0.1", help="Host/IP address to bind (default: 127.0.0.1)")
+    serve_parser.add_argument("--port", type=int, default=8765, help="Port to bind (default: 8765)")
+    serve_parser.add_argument(
+        "--env",
+        action="append",
+        default=[],
+        help="Environment variable override in KEY=VALUE format (can be provided multiple times)",
+    )
+
     # Health check command
     subparsers.add_parser("health-check", help="Check server health status")
 
@@ -214,6 +242,41 @@ Examples:
     subparsers.add_parser("info", help="Get server information")
 
     return parser
+
+
+async def serve_command(args: argparse.Namespace) -> int:
+    """Start the MCP WebSocket server."""
+    from mcp.websocket_server import MCPWebSocketServer
+
+    env_overrides = parse_env_overrides(args.env)
+    if env_overrides:
+        os.environ.update(env_overrides)
+        logger.debug("Applied env overrides: %s", ", ".join(env_overrides.keys()))
+
+    server = MCPWebSocketServer(host=args.host, port=args.port, config=args.config)
+
+    stop_event = asyncio.Event()
+
+    def _handle_shutdown_signal(signame: str) -> None:
+        logger.info("Received %s, shutting down MCP server", signame)
+        stop_event.set()
+
+    loop = asyncio.get_running_loop()
+    for sig in (signal.SIGINT, signal.SIGTERM):
+        try:
+            loop.add_signal_handler(sig, _handle_shutdown_signal, sig.name)
+        except NotImplementedError:  # pragma: no cover - Windows/embedded platforms
+            pass
+
+    await server.start()
+    logger.info("Connascence MCP server ready on ws://%s:%s", args.host, args.port)
+    logger.info("Press Ctrl+C to stop the server")
+
+    try:
+        await stop_event.wait()
+    finally:
+        await server.stop()
+    return 0
 
 
 async def main() -> int:
@@ -232,6 +295,8 @@ async def main() -> int:
         return await analyze_file_command(args)
     elif args.command == "analyze-workspace":
         return await analyze_workspace_command(args)
+    elif args.command == "serve":
+        return await serve_command(args)
     elif args.command == "health-check":
         return await health_check_command(args)
     elif args.command == "info":

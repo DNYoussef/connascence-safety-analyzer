@@ -12,6 +12,27 @@ The Connascence Safety Analyzer can be run as an MCP (Model Context Protocol) se
 
 ## Quick Setup
 
+### Start the MCP backend from the CLI
+
+The analyzer CLI now bundles a launcher for the enhanced MCP backend:
+
+```bash
+# Start the websocket MCP server on the default port (8765)
+connascence mcp serve
+
+# Override host/port or pass environment variables through to the server
+connascence mcp serve --host 0.0.0.0 --port 9001 --env PYTHONUNBUFFERED=1 --env CONNASCENCE_PROFILE=vs-code
+
+# Check health from the same CLI (uses python -m mcp.cli health-check under the hood)
+connascence mcp status
+```
+
+Under the covers the CLI shells out to `python -m mcp.cli serve`, so you can invoke the Python module directly if you prefer:
+
+```bash
+python -m mcp.cli serve --port 9001
+```
+
 ### Claude Code / Claude Desktop Configuration
 
 Add to your MCP configuration (`C:\Users\<username>\AppData\Roaming\Claude\claude_desktop_config.json` on Windows):

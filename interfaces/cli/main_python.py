@@ -49,6 +49,7 @@ Usage Examples:
 import argparse
 import logging
 from pathlib import Path
+import subprocess
 import sys
 from typing import List, Optional
 
@@ -474,8 +475,14 @@ Examples:
             default="stdio",
             help="Transport protocol (default: stdio)",
         )
-        serve_parser.add_argument("--host", default="localhost", help="Host to bind to (for sse/websocket)")
-        serve_parser.add_argument("--port", type=int, default=8080, help="Port to bind to (for sse/websocket)")
+        serve_parser.add_argument("--host", default="127.0.0.1", help="Host to bind to (default: 127.0.0.1)")
+        serve_parser.add_argument("--port", type=int, default=8765, help="Port to bind to (default: 8765)")
+        serve_parser.add_argument(
+            "--env",
+            action="append",
+            default=[],
+            help="Environment override forwarded to the MCP server (KEY=VALUE)",
+        )
 
     def _add_license_parser(self, subparsers):
         """Add the license validation subcommand parser."""
@@ -801,8 +808,26 @@ Examples:
 
     def _handle_mcp(self, args):
         """Handle MCP server command."""
-        print(f"MCP action: {args.mcp_action}")
-        return ExitCode.SUCCESS
+        action = getattr(args, "mcp_action", None)
+
+        if action == "serve":
+            host = getattr(args, "host", "127.0.0.1")
+            port = getattr(args, "port", 8765)
+            env_args = getattr(args, "env", []) or []
+
+            cmd = [sys.executable, "-m", "mcp.cli", "serve", "--host", host, "--port", str(port)]
+            for env_var in env_args:
+                cmd.extend(["--env", env_var])
+
+            result = subprocess.run(cmd, check=False)
+            return result.returncode
+
+        if action == "status":
+            result = subprocess.run([sys.executable, "-m", "mcp.cli", "health-check"], check=False)
+            return result.returncode
+
+        print(f"Unknown MCP action: {action}")
+        return ExitCode.ERROR
 
     def _handle_license(self, args):
         """Handle license validation command."""
