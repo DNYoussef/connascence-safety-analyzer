@@ -32,9 +32,9 @@ logger = logging.getLogger(__name__)
 class MemoryThreshold:
     """Memory threshold configuration."""
 
-    warning_mb: int = 200  # Warning threshold in MB
-    critical_mb: int = 500  # Critical threshold in MB
-    maximum_mb: int = 1000  # Maximum allowed memory in MB
+    warning_mb: int = 400  # Warning threshold in MB (increased for self-dogfooding workflow)
+    critical_mb: int = 800  # Critical threshold in MB
+    maximum_mb: int = 1500  # Maximum allowed memory in MB
     growth_rate_mb_s: float = 10.0  # Maximum growth rate MB/s
 
 
