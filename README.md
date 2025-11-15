@@ -52,16 +52,31 @@ code --install-extension connascence-safety-analyzer-*.vsix
 
 ## ✨ Features
 
-### Core Analysis
+### Comprehensive Analysis Suite
+
+**7 Integrated Analyzers:**
+1. **Connascence Analyzer** - 9 types of implicit coupling detection
+2. **NASA Safety Analyzer** - Power of 10 rules compliance (aerospace standards)
+3. **MECE Analyzer** - Code organization and logical completeness
+4. **Duplication Analyzer** - Semantic similarity and code clone detection
+5. **Clarity Linter** - Cognitive load and code readability scoring
+6. **Safety Violation Detector** - God objects, parameter bombs, deep nesting
+7. **Six Sigma Quality Metrics** - Statistical process control and quality gates
+
+### Core Analysis Capabilities
 - **9 Types of Connascence Detection**: CoP, CoN, CoT, CoM, CoA, CoE, CoI, CoV, CoId
 - **Real-time Analysis**: Instant feedback as you code (VSCode extension)
 - **Intelligent Caching**: 50-90% faster re-analysis through content-based caching
 - **Graceful Degradation**: MCP protocol with automatic CLI fallback
 
 ### Safety & Compliance
-- **NASA Power of 10 Rules**: Critical safety standards enforcement
+- **Connascence Detection**: 9 types (CoP, CoN, CoT, CoM, CoA, CoE, CoI, CoV, CoId)
+- **NASA Power of 10 Rules**: Critical safety standards enforcement (10 rules)
 - **MECE Analysis**: Mutually Exclusive, Collectively Exhaustive code organization
-- **Six Sigma Integration**: DPMO, CTQ, and quality metrics
+- **Duplication Detection**: Semantic similarity and code clone detection
+- **Clarity Linting**: Cognitive load analysis with rubric-based scoring
+- **Safety Violation Detection**: Parameter bombs, god objects, deep nesting
+- **Six Sigma Quality Metrics**: DPMO, CTQ, process capability analysis
 - **Configurable Profiles**: Strict, Standard, Lenient, NASA-compliant
 
 ### Enterprise Features

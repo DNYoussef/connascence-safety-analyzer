@@ -1,6 +1,7 @@
 
 # Claude Flow generated files
 .claude-flow/
+.claude-flow
 .claude/settings.local.json
 config/.mcp.json
 config/claude-flow.config.json
