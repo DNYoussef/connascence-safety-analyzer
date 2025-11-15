@@ -9,15 +9,18 @@ NASA Rule 4/5/6 compliant implementation.
 import ast
 from typing import List
 
-from utils.types import ConnascenceViolation
-
 try:
+    from .utils.types import ConnascenceViolation
     from .optimization.unified_visitor import ASTNodeData, UnifiedASTVisitor
     from .utils.code_utils import get_code_snippet_for_node
 except ImportError:
     # Fallback for script execution
-    from optimization.unified_visitor import ASTNodeData, UnifiedASTVisitor
+    import sys
+    from pathlib import Path
 
+    sys.path.insert(0, str(Path(__file__).parent))
+    from utils.types import ConnascenceViolation
+    from optimization.unified_visitor import ASTNodeData, UnifiedASTVisitor
     from utils.code_utils import get_code_snippet_for_node
 try:
     from .detectors import (

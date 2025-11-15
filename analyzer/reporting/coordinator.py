@@ -27,10 +27,12 @@ This provides a single entry point for generating reports in any format
 while maintaining compatibility with all existing components.
 """
 
+from __future__ import annotations
+
 import logging
 from pathlib import Path
 import sys
-from typing import Any, Dict, List, Optional, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
 # Add parent directories to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
@@ -40,8 +42,9 @@ from analyzer.reporting.json import JSONReporter
 from analyzer.reporting.markdown import MarkdownReporter
 from analyzer.reporting.sarif import SARIFReporter
 
-# Import unified analyzer
-from analyzer.unified_analyzer import UnifiedAnalysisResult
+# Import unified analyzer (TYPE_CHECKING only to avoid circular import)
+if TYPE_CHECKING:
+    from analyzer.unified_analyzer import UnifiedAnalysisResult
 
 logger = logging.getLogger(__name__)
 

@@ -1,5 +1,1 @@
-INFO     analyzer.optimization.resource_manager:resource_manager.py:362 Resource cleanup loop started
-INFO     analyzer.optimization.resource_manager:resource_manager.py:132 Periodic resource cleanup started
-INFO     analyzer.optimization.memory_monitor:memory_monitor.py:289 Memory monitoring loop started
-INFO     analyzer.optimization.memory_monitor:memory_monitor.py:263 Memory monitoring started
-INFO     analyzer.unified_analyzer:unified_analyzer.py:527 Unified Connascence Analyzer initialized with: AST Analyzer, Orchestrator, MECE Analyzer, Smart Engine
+INFO     analyzer.reporting.coordinator:coordinator.py:79 Unified Reporting Coordinator initialized with all format handlers
