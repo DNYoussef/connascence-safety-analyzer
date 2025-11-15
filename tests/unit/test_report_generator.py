@@ -33,20 +33,18 @@ Test Coverage:
 NASA Rule 4: All test functions under 60 lines
 """
 
+from dataclasses import dataclass
 import json
+from pathlib import Path
 import sys
 import tempfile
-from dataclasses import dataclass
-from pathlib import Path
 from typing import Any, Dict, List
-from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from analyzer.architecture.report_generator import ReportGenerator
-
 
 # Test Fixtures
 # =============

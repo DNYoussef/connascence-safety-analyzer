@@ -25,11 +25,12 @@ Usage:
 """
 
 import ast
-import re
-import sys
 from collections import defaultdict
 from pathlib import Path
-from typing import Dict, List, Set, Tuple, Optional
+import re
+import sys
+from typing import Dict, List, Optional, Tuple
+
 
 class ConstantImporter:
     """Manages importing and using extracted constants."""
@@ -51,7 +52,7 @@ class ConstantImporter:
             module_constants = {}
 
             try:
-                with open(constants_file, 'r', encoding='utf-8') as f:
+                with open(constants_file, encoding='utf-8') as f:
                     content = f.read()
 
                 # Parse constant assignments
@@ -119,7 +120,7 @@ class ConstantReplacer:
         print("-" * 80)
 
         try:
-            with open(filepath, 'r', encoding='utf-8') as f:
+            with open(filepath, encoding='utf-8') as f:
                 original_content = f.read()
 
             # Parse AST

@@ -30,7 +30,6 @@ Purpose: Regression gate before SPEK integration
 
 import json
 from pathlib import Path
-import sys
 import tempfile
 from typing import Dict
 
@@ -39,7 +38,6 @@ import pytest
 from fixes.phase0.production_safe_assertions import ProductionAssert
 
 # sys.path is already configured by conftest.py - no need to insert again
-
 from interfaces.cli.connascence import ConnascenceCLI
 
 

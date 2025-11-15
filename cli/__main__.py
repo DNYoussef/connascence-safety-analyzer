@@ -1,8 +1,8 @@
 """CLI module entry point for python -m cli.connascence."""
 
+import os
 import sys
 import warnings
-import os
 
 # Suppress import warnings from other modules
 warnings.filterwarnings('ignore')

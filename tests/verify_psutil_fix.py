@@ -6,19 +6,21 @@ This script validates that all psutil operations in memory_monitor.py
 are properly wrapped with exception handling.
 """
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'analyzer'))
 
+import time
+
 from optimization.memory_monitor import (
+    MemoryLeakDetector,
     MemoryMonitor,
     MemoryWatcher,
-    MemoryLeakDetector,
     get_global_memory_monitor,
 )
+
 import psutil
-import time
 
 
 def test_memory_leak_detector_streaming():

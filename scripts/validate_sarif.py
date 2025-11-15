@@ -10,7 +10,7 @@ if not sarif_path.exists():
     print("[FAIL] SARIF file not found")
     exit(1)
 
-with open(sarif_path, 'r', encoding='utf-8') as f:
+with open(sarif_path, encoding='utf-8') as f:
     data = json.load(f)
 
 print("=" * 80)

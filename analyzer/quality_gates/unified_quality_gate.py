@@ -6,12 +6,12 @@ This module provides a unified interface for running all quality checks
 and producing consolidated reports with actionable insights.
 """
 
-import json
-import sys
 from dataclasses import dataclass, field
 from datetime import datetime
+import json
 from pathlib import Path
-from typing import Dict, List, Optional, Set, Tuple
+import sys
+from typing import Dict, List, Optional
 
 import yaml
 
@@ -113,7 +113,7 @@ class UnifiedQualityGate:
     def _load_config(self) -> Dict:
         """Load configuration from YAML file"""
         if self.config_path and self.config_path.exists():
-            with open(self.config_path, "r") as f:
+            with open(self.config_path) as f:
                 return yaml.safe_load(f)
         return self._get_default_config()
 

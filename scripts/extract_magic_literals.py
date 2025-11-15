@@ -16,11 +16,12 @@ Features:
 """
 
 import ast
-import re
-import sys
 from collections import defaultdict
 from pathlib import Path
-from typing import Dict, List, Set, Tuple
+import re
+import sys
+from typing import Dict, List
+
 
 class MagicLiteralDetector(ast.NodeVisitor):
     """Detects magic literals in Python AST."""
@@ -79,7 +80,7 @@ class MagicLiteralDetector(ast.NodeVisitor):
 def analyze_file(filepath: Path) -> Dict:
     """Analyze a file for magic literals."""
     try:
-        with open(filepath, 'r', encoding='utf-8') as f:
+        with open(filepath, encoding='utf-8') as f:
             source = f.read()
 
         tree = ast.parse(source, filename=str(filepath))

@@ -21,10 +21,10 @@ meets performance requirements for various codebase sizes.
 import os
 import time
 
-import psutil
 import pytest
 
 from analyzer.ast_engine.core_analyzer import ConnascenceASTAnalyzer
+import psutil
 
 
 class TestPerformanceBenchmarks:

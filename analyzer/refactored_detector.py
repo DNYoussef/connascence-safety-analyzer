@@ -17,6 +17,7 @@ try:
 except ImportError:
     # Fallback for script execution
     from optimization.unified_visitor import ASTNodeData, UnifiedASTVisitor
+
     from utils.code_utils import get_code_snippet_for_node
 try:
     from .detectors import (

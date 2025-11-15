@@ -11,11 +11,11 @@ Handles violation metrics collection, performance tracking, quality scoring,
 and trend analysis.
 """
 
+from dataclasses import dataclass, field
+from datetime import datetime
 import logging
 import time
-from datetime import datetime
 from typing import Any, Dict, List, Optional
-from dataclasses import dataclass, field
 
 logger = logging.getLogger(__name__)
 

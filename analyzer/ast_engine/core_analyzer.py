@@ -23,13 +23,12 @@ AST module to analyze code and detect various forms of connascence including:
 """
 
 import ast
-import hashlib
-import os
-import time
-import uuid
 from dataclasses import dataclass, field
+import hashlib
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set
+import time
+from typing import Dict, List, Optional
+import uuid
 
 from utils.types import ConnascenceViolation
 
@@ -155,7 +154,7 @@ class ConnascenceASTAnalyzer:
         Returns:
             List of ConnascenceViolation objects
         """
-        with open(file_path, "r", encoding="utf-8") as f:
+        with open(file_path, encoding="utf-8") as f:
             code = f.read()
         return self.analyze_string(code, str(file_path))
 

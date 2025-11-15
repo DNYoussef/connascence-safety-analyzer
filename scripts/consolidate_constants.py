@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Consolidate duplicate constants across modules."""
 
-import re
 from collections import defaultdict
 from pathlib import Path
+import re
+
 
 def scan_constants_modules(base_dir: Path):
     """Scan all constants modules and find duplicates."""
@@ -20,7 +21,7 @@ def scan_constants_modules(base_dir: Path):
     for filepath in constants_files:
         module_name = filepath.stem
         try:
-            with open(filepath, 'r', encoding='utf-8') as f:
+            with open(filepath, encoding='utf-8') as f:
                 content = f.read()
 
             # Extract constant assignments

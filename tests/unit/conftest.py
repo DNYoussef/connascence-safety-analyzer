@@ -5,9 +5,9 @@ Provides common test fixtures and utilities for all unit test modules.
 """
 
 import ast
+from unittest.mock import Mock
+
 import pytest
-from pathlib import Path
-from unittest.mock import Mock, MagicMock
 
 
 @pytest.fixture

@@ -9,7 +9,7 @@ import re
 file_path = "analyzer/optimization/memory_monitor.py"
 
 # Read the file
-with open(file_path, 'r') as f:
+with open(file_path) as f:
     content = f.read()
 
 # Pattern to find the problematic section
@@ -37,7 +37,7 @@ else:
     print("SUCCESS: Fixed psutil initialization in memory_monitor.py")
 
     # Now fix the methods that use self._process
-    with open(file_path, 'r') as f:
+    with open(file_path) as f:
         content = f.read()
 
     # Fix memory_info and memory_percent calls

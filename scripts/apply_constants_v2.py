@@ -17,10 +17,9 @@ This version:
 """
 
 import ast
-import sys
 from pathlib import Path
-from typing import Dict, List, Tuple
 import re
+from typing import Dict
 
 # For now, let's use a SIMPLE, SAFE approach:
 # Only replace literals that are STANDALONE (not part of larger expressions)
@@ -34,7 +33,7 @@ def find_constants_mapping(constants_dir: Path) -> Dict[str, str]:
             continue
 
         try:
-            with open(const_file, 'r', encoding='utf-8') as f:
+            with open(const_file, encoding='utf-8') as f:
                 content = f.read()
 
             # Parse: CONST_NAME = value
@@ -59,7 +58,7 @@ def apply_constants_safely(filepath: Path, constants_mapping: Dict, dry_run=True
     print(f"\nProcessing: {filepath}")
     print("-" * 80)
 
-    with open(filepath, 'r', encoding='utf-8') as f:
+    with open(filepath, encoding='utf-8') as f:
         original = f.read()
 
     # Parse AST

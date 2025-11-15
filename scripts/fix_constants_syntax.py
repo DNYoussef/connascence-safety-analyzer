@@ -13,13 +13,12 @@ Usage:
     python scripts/fix_constants_syntax.py --all  # Fix all affected files
 """
 
-import ast
 import keyword
+from pathlib import Path
 import py_compile
 import re
 import shutil
 import sys
-from pathlib import Path
 from typing import List, Tuple
 
 # List of files with known syntax errors
@@ -97,7 +96,7 @@ def fix_constants_file(filepath: Path, dry_run: bool = False) -> Tuple[int, List
 
     # Read original content
     try:
-        with open(filepath, 'r', encoding='utf-8') as f:
+        with open(filepath, encoding='utf-8') as f:
             original_lines = f.readlines()
     except Exception as e:
         print(f"[FAIL] Cannot read file: {e}")

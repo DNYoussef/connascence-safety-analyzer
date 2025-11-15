@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """Analyze critical violations from dogfooding results."""
 
-import json
 import collections
+import json
 from pathlib import Path
 
 # Read JSON with UTF-8 encoding
 json_path = Path("docs/self-analysis-day2-retry.json")
-with open(json_path, 'r', encoding='utf-8', errors='ignore') as f:
+with open(json_path, encoding='utf-8', errors='ignore') as f:
     data = json.load(f)
 
 violations = data.get("violations", [])

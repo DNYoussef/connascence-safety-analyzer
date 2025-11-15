@@ -30,6 +30,8 @@ try:
     from ..streaming.incremental_cache import IncrementalCache, get_global_incremental_cache
     from ..streaming.stream_processor import (
         StreamProcessor as LowLevelStreamProcessor,
+    )
+    from ..streaming.stream_processor import (
         create_stream_processor,
     )
 

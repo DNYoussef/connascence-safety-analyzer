@@ -12,10 +12,9 @@ Usage:
     python scripts/fix_constants_simple.py --all
 """
 
-import sys
 from pathlib import Path
-import re
 import py_compile
+import sys
 
 AFFECTED_FILES = [
     "analyzer/literal_constants/check_connascence_constants.py",
@@ -36,7 +35,7 @@ def fix_file(filepath: Path) -> int:
     """Remove lines with invalid identifiers. Returns number of lines removed."""
     print(f"\nProcessing: {filepath}")
 
-    with open(filepath, 'r', encoding='utf-8') as f:
+    with open(filepath, encoding='utf-8') as f:
         lines = f.readlines()
 
     fixed_lines = []

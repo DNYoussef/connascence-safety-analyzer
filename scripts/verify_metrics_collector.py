@@ -6,8 +6,8 @@ Metrics Collector Verification Script
 Verifies that the MetricsCollector extraction is complete and functional.
 """
 
-import sys
 from pathlib import Path
+import sys
 
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -347,8 +347,9 @@ def verify_nasa_compliance():
     print("\n10. Verifying NASA Rule 4 compliance...")
 
     try:
-        from analyzer.architecture.metrics_collector import MetricsCollector
         import inspect
+
+        from analyzer.architecture.metrics_collector import MetricsCollector
 
         collector = MetricsCollector()
 

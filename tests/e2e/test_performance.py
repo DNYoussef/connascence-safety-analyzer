@@ -33,10 +33,10 @@ import threading
 import time
 from typing import Any, Dict, Optional
 
-import psutil
 import pytest
 
 from fixes.phase0.production_safe_assertions import ProductionAssert
+import psutil
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 

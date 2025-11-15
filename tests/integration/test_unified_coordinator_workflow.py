@@ -21,20 +21,19 @@ Target Coverage: 85%+ workflow coverage
 Test Focus: Complete analysis pipeline from input to reports
 """
 
-import asyncio
 import json
+from pathlib import Path
 import tempfile
 import time
-from pathlib import Path
-from typing import Any, Dict, List
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 
 import pytest
 
-# Import components under test
-from analyzer.architecture.orchestrator import AnalysisOrchestrator
 from analyzer.architecture.cache_manager import CacheManager
 from analyzer.architecture.metrics_collector import MetricsCollector
+
+# Import components under test
+from analyzer.architecture.orchestrator import AnalysisOrchestrator
 from analyzer.architecture.report_generator import ReportGenerator
 
 

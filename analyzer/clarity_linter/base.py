@@ -8,8 +8,8 @@ NASA Rule 4 Compliant: All functions under 60 lines
 NASA Rule 5 Compliant: Input assertions
 """
 
-import ast
 from abc import ABC, abstractmethod
+import ast
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -176,7 +176,7 @@ class BaseClarityDetector(ABC):
         assert context_lines >= 0, "context_lines must be non-negative"
 
         try:
-            with open(file_path, 'r', encoding='utf-8') as f:
+            with open(file_path, encoding='utf-8') as f:
                 lines = f.readlines()
 
             start_line = max(0, line_number - context_lines - 1)

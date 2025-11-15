@@ -7,7 +7,7 @@ and documentation pattern inconsistencies.
 
 import ast
 import re
-from typing import List
+from typing import List, Union
 
 from utils.types import ConnascenceViolation
 
@@ -164,7 +164,7 @@ class ConventionDetector(DetectorBase):
             )
             self.violations.append(violation)
 
-    def _has_docstring(self, node: ast.FunctionDef | ast.ClassDef) -> bool:
+    def _has_docstring(self, node: Union[ast.FunctionDef, ast.ClassDef]) -> bool:
         """Check if function or class has a docstring."""
         return bool(
             node.body

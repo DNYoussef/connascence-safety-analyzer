@@ -1,10 +1,10 @@
 """Minimal psutil compatibility layer for test environments."""
 from __future__ import annotations
 
-import os
-import time
 from collections import namedtuple
 from dataclasses import dataclass
+import os
+import time
 from typing import Optional
 
 __all__ = [
@@ -69,7 +69,7 @@ _last_cpu_snapshot: Optional[tuple[int, int, float]] = None
 def _read_system_cpu_times() -> tuple[int, int]:
     """Read aggregate CPU times (total jiffies, idle jiffies)."""
     try:
-        with open("/proc/stat", "r", encoding="utf-8") as proc_stat:
+        with open("/proc/stat", encoding="utf-8") as proc_stat:
             first_line = proc_stat.readline()
     except OSError as exc:
         raise AccessDenied(os.getpid()) from exc
@@ -116,7 +116,7 @@ def _read_meminfo() -> dict[str, int]:
     """Parse /proc/meminfo into a dictionary of byte values."""
     meminfo: dict[str, int] = {}
     try:
-        with open("/proc/meminfo", "r", encoding="utf-8") as meminfo_file:
+        with open("/proc/meminfo", encoding="utf-8") as meminfo_file:
             for line in meminfo_file:
                 if ":" not in line:
                     continue
@@ -148,7 +148,7 @@ def _read_process_io(pid: int) -> tuple[int, int]:
     """Read per-process IO counters from /proc."""
     read_bytes = write_bytes = 0
     try:
-        with open(f"/proc/{pid}/io", "r", encoding="utf-8") as io_file:
+        with open(f"/proc/{pid}/io", encoding="utf-8") as io_file:
             for line in io_file:
                 if ":" not in line:
                     continue
@@ -179,7 +179,7 @@ def _read_cpu_mhz() -> float:
     # Try cpufreq scaling interface first
     scaling_path = "/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq"
     try:
-        with open(scaling_path, "r", encoding="utf-8") as freq_file:
+        with open(scaling_path, encoding="utf-8") as freq_file:
             value = freq_file.read().strip()
             if value:
                 return float(value) / 1000.0
@@ -188,7 +188,7 @@ def _read_cpu_mhz() -> float:
 
     # Fallback to /proc/cpuinfo
     try:
-        with open("/proc/cpuinfo", "r", encoding="utf-8") as cpuinfo:
+        with open("/proc/cpuinfo", encoding="utf-8") as cpuinfo:
             for line in cpuinfo:
                 if line.lower().startswith("cpu mhz"):
                     parts = line.split(":", 1)
@@ -233,7 +233,7 @@ class Process:
         status_path = f"/proc/{self.pid}/status"
         rss = vms = 0
         try:
-            with open(status_path, "r", encoding="utf-8") as status_file:
+            with open(status_path, encoding="utf-8") as status_file:
                 for line in status_file:
                     if line.startswith("VmRSS:"):
                         parts = line.split()
@@ -248,7 +248,7 @@ class Process:
     def _read_cpu_times(self) -> float:
         stat_path = f"/proc/{self.pid}/stat"
         try:
-            with open(stat_path, "r", encoding="utf-8") as stat_file:
+            with open(stat_path, encoding="utf-8") as stat_file:
                 contents = stat_file.read().strip()
         except FileNotFoundError as exc:
             raise NoSuchProcess(self.pid) from exc

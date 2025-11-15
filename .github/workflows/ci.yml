@@ -114,13 +114,14 @@ jobs:
         connascence scan . --nasa-validation --policy nasa-compliance --fail-on-critical --format sarif --output ci_results.sarif
 
     - name: Upload SARIF results
-      uses: github/codeql-action/upload-sarif@v2
+      uses: github/codeql-action/upload-sarif@v3
       if: always()
       with:
         sarif_file: ci_results.sarif
 
   vscode-extension:
     runs-on: ubuntu-latest
+    if: ${{ hashFiles('interfaces/vscode/package.json') != '' }}
 
     steps:
     - uses: actions/checkout@v3

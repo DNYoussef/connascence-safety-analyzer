@@ -76,7 +76,7 @@ class ClarityConfigLoader:
             return ClarityConfigLoader._get_default_config()
 
         try:
-            with open(config_path, 'r', encoding='utf-8') as f:
+            with open(config_path, encoding='utf-8') as f:
                 config = yaml.safe_load(f)
 
             # NASA Rule 5: Validate loaded config

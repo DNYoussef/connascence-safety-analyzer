@@ -34,9 +34,8 @@ import threading
 import time
 from typing import Any, Dict, List, Optional, Tuple, Union
 
-import psutil
-
 from fixes.phase0.production_safe_assertions import ProductionAssert
+import psutil
 
 # Add parent directories to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))

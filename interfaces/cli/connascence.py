@@ -30,14 +30,10 @@ LICENSE_VALIDATION_AVAILABLE = False
 sys.path.append(str(Path(__file__).parent.parent.parent))
 from analyzer.constants import (
     ERROR_SEVERITY,
-    EXIT_CODES,
     EXIT_CONFIGURATION_ERROR,
-    EXIT_ERROR,
-    EXIT_INTERRUPTED,
-    EXIT_INVALID_ARGUMENTS,
-    ExitCode,
     SEVERITY_LEVELS,
     UNIFIED_POLICY_NAMES,
+    ExitCode,
     list_available_policies,
     resolve_policy_name,
     validate_policy_name,

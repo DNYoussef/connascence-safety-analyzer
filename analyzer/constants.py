@@ -13,6 +13,7 @@ and ensure consistency across the codebase.
 from enum import IntEnum
 from typing import Optional
 
+
 # Exit Code Enum for standardized return codes
 class ExitCode(IntEnum):
     """Exit codes for CLI operations."""

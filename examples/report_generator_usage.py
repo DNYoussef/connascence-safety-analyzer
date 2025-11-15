@@ -11,6 +11,7 @@ generating analysis reports in multiple formats.
 """
 
 from pathlib import Path
+
 from analyzer.architecture.report_generator import ReportGenerator
 
 

@@ -8,7 +8,7 @@ We need to use duplicate non-excluded values (3+ occurrences) for ValuesDetector
 
 file_path = "tests/integration/test_connascence_preservation.py"
 
-with open(file_path, 'r') as f:
+with open(file_path) as f:
     content = f.read()
 
 # Replace CoI sample with code that uses duplicate non-excluded sentinel values

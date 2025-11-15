@@ -8,7 +8,7 @@ CoI (Identity): ValuesDetector should detect duplicate None values (needs invest
 
 file_path = "tests/integration/test_connascence_preservation.py"
 
-with open(file_path, 'r') as f:
+with open(file_path) as f:
     content = f.read()
 
 # Fix CoE - Add more global variables to exceed threshold (needs >3 assignments or >5 vars)

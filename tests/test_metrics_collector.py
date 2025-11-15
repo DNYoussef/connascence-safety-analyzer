@@ -6,6 +6,7 @@ and performance tracking functionality.
 """
 
 import pytest
+
 from analyzer.architecture.metrics_collector import MetricsCollector, MetricsSnapshot
 
 

@@ -1,8 +1,9 @@
 """
 Simple async test to validate pytest-asyncio is working correctly.
 """
-import pytest
 import asyncio
+
+import pytest
 
 
 @pytest.mark.asyncio

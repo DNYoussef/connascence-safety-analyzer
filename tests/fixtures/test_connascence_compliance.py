@@ -27,7 +27,6 @@ import pytest
 from fixes.phase0.production_safe_assertions import ProductionAssert
 from interfaces.core.interface_base import InterfaceBase as AgentInterface
 
-
 COMPLIANCE_TARGET_DIR = Path(__file__).parent / "compliance_targets"
 
 
@@ -537,7 +536,6 @@ class TestDocumentationCompliance:
     @pytest.fixture
     def test_files(self):
         """Provide test files for documentation compliance testing."""
-        import pathlib
 
         if not COMPLIANCE_TARGET_DIR.exists():
             return []

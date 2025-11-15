@@ -28,8 +28,6 @@ except ImportError:
     import sys
 
     sys.path.insert(0, str(Path(__file__).parent.parent))
-    from detectors.base import DetectorBase
-
     from detectors import (
         AlgorithmDetector,
         ConventionDetector,
@@ -40,6 +38,7 @@ except ImportError:
         TimingDetector,
         ValuesDetector,
     )
+    from detectors.base import DetectorBase
 try:
     from utils.types import ConnascenceViolation  # noqa: F401
 except ImportError:

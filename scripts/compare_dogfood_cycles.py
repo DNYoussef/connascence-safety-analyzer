@@ -4,19 +4,19 @@ Dogfooding Cycle Comparison Script
 Compares two large JSON files from connascence analysis cycles
 """
 
-import json
-import sys
-from pathlib import Path
-from collections import defaultdict, Counter
+from collections import Counter
 from datetime import datetime
-from typing import Dict, List, Any, Tuple
+import json
+from pathlib import Path
+import sys
+from typing import Any, Dict, List
 
 
 def load_json_safely(filepath: Path) -> Dict:
     """Load large JSON file safely with error handling"""
     try:
         print(f"Loading {filepath.name} ({filepath.stat().st_size / (1024*1024):.1f} MB)...")
-        with open(filepath, 'r', encoding='utf-8') as f:
+        with open(filepath, encoding='utf-8') as f:
             data = json.load(f)
         print(f"Successfully loaded {filepath.name}")
         return data

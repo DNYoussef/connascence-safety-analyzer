@@ -4,9 +4,9 @@ Script to identify truly uncovered lines in architecture components.
 Clears corrupted coverage database and generates fresh report.
 """
 
+from pathlib import Path
 import subprocess
 import sys
-from pathlib import Path
 
 # Change to project root
 project_root = Path(__file__).parent.parent.parent

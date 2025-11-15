@@ -8,9 +8,10 @@ Usage:
     python scripts/verify-issue-002-simple.py
 """
 
-import sys
-import subprocess
 from pathlib import Path
+import subprocess
+import sys
+
 
 def main():
     """Run E2E collection verification."""

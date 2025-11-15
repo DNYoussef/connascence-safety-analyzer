@@ -24,10 +24,8 @@ NASA Compliance:
 - Error condition testing
 """
 
-import asyncio
 from pathlib import Path
-from typing import Any, Dict, List
-from unittest.mock import AsyncMock, MagicMock, Mock, patch
+from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 

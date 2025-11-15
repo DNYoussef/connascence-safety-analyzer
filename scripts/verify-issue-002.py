@@ -8,9 +8,9 @@ Usage:
     python scripts/verify-issue-002.py
 """
 
-import sys
-import subprocess
 from pathlib import Path
+import subprocess
+import sys
 
 # ANSI color codes for output
 GREEN = '\033[92m'

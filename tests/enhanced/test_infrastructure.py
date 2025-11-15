@@ -20,8 +20,9 @@ from pathlib import Path
 import time
 from typing import Any, Dict, List, Optional, Tuple
 
-import psutil
 import pytest
+
+import psutil
 
 
 @dataclass

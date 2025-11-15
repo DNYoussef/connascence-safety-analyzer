@@ -8,7 +8,7 @@ Fix connascence preservation test issues.
 file_path = "tests/integration/test_connascence_preservation.py"
 
 # Read the file
-with open(file_path, 'r') as f:
+with open(file_path) as f:
     content = f.read()
 
 # Fix 1: CoV syntax error - remove colon from line 151

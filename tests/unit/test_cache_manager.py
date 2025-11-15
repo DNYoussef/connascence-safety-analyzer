@@ -15,10 +15,9 @@ NASA Compliance: Rule 4 (functions under 60 lines), Rule 5 (assertions)
 
 import ast
 import logging
+from unittest.mock import patch
+
 import pytest
-from pathlib import Path
-from typing import Dict, Any
-from unittest.mock import Mock, MagicMock, patch, PropertyMock
 
 from analyzer.architecture.cache_manager import CacheManager
 

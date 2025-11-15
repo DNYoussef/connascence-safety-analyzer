@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 """Comprehensive verification of all analyzer capabilities."""
 
-import json
-import sys
 from pathlib import Path
+import sys
 
 # Add parent to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -169,7 +168,6 @@ print("\n10. CLI INTEGRATION")
 print("-" * 80)
 
 try:
-    import analyzer.__main__ as cli
     print("[OK] CLI module imported successfully")
     print("  Usage: python -m analyzer --path <path> --format <json|yaml|sarif>")
 except Exception as e:

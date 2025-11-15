@@ -18,11 +18,10 @@ Test Scenarios:
 """
 
 import ast
-import os
+from pathlib import Path
 import sys
 import tempfile
 import time
-from pathlib import Path
 from typing import List, Tuple
 
 import pytest
@@ -32,7 +31,6 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from analyzer.architecture.cache_manager import CacheManager
 from analyzer.optimization.file_cache import FileContentCache
-
 
 # ============================================================================
 # Test Fixtures and Utilities
@@ -391,8 +389,8 @@ class TestMemoryUsage:
 
     def test_memory_growth_1000_files(self, benchmark):
         """Test memory growth with 1000 files (stress test)."""
-        import tempfile
         import shutil
+        import tempfile
 
         temp_dir = Path(tempfile.mkdtemp())
 

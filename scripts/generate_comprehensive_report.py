@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Generate comprehensive dogfooding report from all analyzer outputs."""
 
-import json
 from collections import Counter
-from pathlib import Path
 from datetime import datetime
+import json
+from pathlib import Path
 
 # Read JSON analysis
 json_path = Path("docs/dogfooding/full-analysis.json")
@@ -12,7 +12,7 @@ if not json_path.exists():
     print("[FAIL] Analysis file not found")
     exit(1)
 
-with open(json_path, 'r', encoding='utf-8', errors='ignore') as f:
+with open(json_path, encoding='utf-8', errors='ignore') as f:
     data = json.load(f)
 
 # Extract data

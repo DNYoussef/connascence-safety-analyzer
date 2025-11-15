@@ -14,12 +14,12 @@ This script orchestrates ALL analyzer capabilities in a single comprehensive ana
 """
 
 import argparse
+from datetime import datetime
 import json
 import logging
+from pathlib import Path
 import sys
 import time
-from datetime import datetime
-from pathlib import Path
 
 # Setup logging
 logging.basicConfig(
@@ -32,6 +32,7 @@ logger = logging.getLogger(__name__)
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from analyzer.unified_analyzer import UnifiedConnascenceAnalyzer
+
 
 def print_banner():
     """Print analysis banner."""

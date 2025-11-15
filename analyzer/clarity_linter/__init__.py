@@ -23,11 +23,11 @@ from analyzer.clarity_linter.sarif_exporter import SARIFExporter
 
 # Import the 5 clarity detectors
 try:
+    from analyzer.detectors.clarity_call_chain import CallChainDepthDetector
+    from analyzer.detectors.clarity_comment_issues import CommentIssuesDetector
+    from analyzer.detectors.clarity_poor_naming import PoorNamingDetector
     from analyzer.detectors.clarity_thin_helper import ThinHelperDetector
     from analyzer.detectors.clarity_useless_indirection import UselessIndirectionDetector
-    from analyzer.detectors.clarity_call_chain import CallChainDepthDetector
-    from analyzer.detectors.clarity_poor_naming import PoorNamingDetector
-    from analyzer.detectors.clarity_comment_issues import CommentIssuesDetector
     DETECTORS_AVAILABLE = True
 except ImportError:
     DETECTORS_AVAILABLE = False
@@ -231,7 +231,7 @@ class ClarityLinter:
 
         try:
             # Read and parse file
-            with open(file_path, 'r', encoding='utf-8') as f:
+            with open(file_path, encoding='utf-8') as f:
                 source_code = f.read()
 
             tree = ast.parse(source_code, filename=str(file_path))

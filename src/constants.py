@@ -8,8 +8,8 @@ This module re-exports constants from analyzer.constants for backward compatibil
 All new code should import from analyzer.constants directly.
 """
 
-import sys
 from pathlib import Path
+import sys
 
 # Add parent directory to path to import from analyzer
 sys.path.insert(0, str(Path(__file__).parent.parent))

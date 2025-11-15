@@ -5,10 +5,9 @@ expecting 'cli.connascence' while actual implementation lives
 in 'interfaces.cli.connascence'.
 """
 
-import sys
 
 # Import the actual CLI class from interfaces
-from interfaces.cli.connascence import ConnascenceCLI, LICENSE_VALIDATION_AVAILABLE, main
+from interfaces.cli.connascence import LICENSE_VALIDATION_AVAILABLE, ConnascenceCLI, main
 
 # Additional exports for comprehensive backward compatibility
 try:

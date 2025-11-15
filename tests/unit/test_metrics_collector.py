@@ -16,12 +16,10 @@ Test coverage for all 23 metrics methods including:
 Target: 95%+ coverage for MetricsCollector
 """
 
-import pytest
-import time
-from datetime import datetime
-from typing import Dict, List, Any
-from analyzer.architecture.metrics_collector import MetricsCollector, MetricsSnapshot
 
+import pytest
+
+from analyzer.architecture.metrics_collector import MetricsCollector, MetricsSnapshot
 
 # ============================================================================
 # FIXTURES

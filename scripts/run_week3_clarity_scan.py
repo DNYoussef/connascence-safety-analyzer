@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """Run Clarity Linter scan to identify Week 3 violations (thin helpers, mega-functions)"""
 
-import sys
 from pathlib import Path
+import sys
 
 # Add parent to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from analyzer.clarity_linter import ClarityLinter
+
 
 def main():
     print("=" * 80)

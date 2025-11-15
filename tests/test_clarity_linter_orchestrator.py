@@ -8,14 +8,14 @@ NASA Rule 4 Compliant: All test functions under 60 lines
 
 import ast
 from pathlib import Path
-import pytest
-import tempfile
 from typing import List
 
-from analyzer.clarity_linter import ClarityLinter, BaseClarityDetector, ClarityViolation
+import pytest
+
+from analyzer.clarity_linter import BaseClarityDetector, ClarityLinter, ClarityViolation
 from analyzer.clarity_linter.config_loader import ClarityConfigLoader
-from analyzer.clarity_linter.sarif_exporter import SARIFExporter
 from analyzer.clarity_linter.models import ClaritySummary
+from analyzer.clarity_linter.sarif_exporter import SARIFExporter
 
 
 class MockDetector(BaseClarityDetector):

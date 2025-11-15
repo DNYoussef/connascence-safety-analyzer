@@ -13,7 +13,6 @@ Comprehensive tests for Web dashboard enhanced pipeline integration:
 - WebSocket integration for enhanced data streaming
 """
 
-from unittest.mock import Mock, patch
 
 import pytest
 

@@ -15,12 +15,12 @@ from pathlib import Path
 import time
 from typing import Any, Dict, List
 
-import psutil
 import pytest
 
 from analyzer.check_connascence import ConnascenceAnalyzer as LegacyAnalyzer
 from analyzer.constants import MAX_ANALYSIS_TIME_SECONDS
 from analyzer.core import ConnascenceAnalyzer
+import psutil
 
 
 class PerformanceMonitor:
