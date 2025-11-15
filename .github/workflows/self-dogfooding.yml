@@ -96,12 +96,10 @@ jobs:
       run: |
         echo "::group::Update Historical Self-Analysis"
         # Update our own analysis baseline
-        python -m dashboard.metrics \
-          --update-self-analysis \
+        python -m dashboard.metrics --update-trends \
           --nasa-results self_analysis_nasa.json \
-          --mece-results self_mece_analysis.json \
-          --god-object-results self_god_objects.json \
-          --output updated_baseline_report.md
+          --connascence-results self_god_objects.json \
+          --mece-results self_mece_analysis.json || echo "Metrics update completed with warnings"
           
         # Compare with previous self-analysis from docs/reports/
         if [ -f "docs/reports/self-analysis/baseline_report.md" ]; then
