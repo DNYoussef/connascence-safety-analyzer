@@ -353,13 +353,6 @@ class DetectorPool:
                     self._create_detector_instance(detector_name)
 
 
-# Global pool instance
-_global_pool = None
-
-
 def get_detector_pool() -> DetectorPool:
-    """Get the global detector pool instance."""
-    global _global_pool
-    if _global_pool is None:
-        _global_pool = DetectorPool()
-    return _global_pool
+    """Get the global detector pool instance (uses class singleton)."""
+    return DetectorPool()
