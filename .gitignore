@@ -101,7 +101,9 @@ fixes/
 
 # Demo and test artifacts
 demo_results/
-DEMO_ARTIFACTS/
+DEMO_ARTIFACTS/*
+!DEMO_ARTIFACTS/validation_reports/
+!DEMO_ARTIFACTS/validation_reports/.gitkeep
 test_output/
 dogfood/
 test_packages/
