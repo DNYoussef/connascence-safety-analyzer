@@ -4,6 +4,32 @@
 
 The connascence analyzer now provides a simple, flake8-style command-line interface that's easy to use while preserving all advanced functionality.
 
+## Modern Subcommands (shared with VSCode)
+
+Use the explicit verbs below for parity with the VSCode extension and the MCP bridge:
+
+| Command | When to use it |
+|---------|----------------|
+| `connascence analyze <file>` | Run AST connascence analysis for a single file or module |
+| `connascence analyze-workspace <root>` | Recursively analyze an entire workspace (defaults to Python files) |
+| `connascence validate-safety <file>` | Enforce a safety profile/NASA preset and emit violations |
+| `connascence suggest-refactoring <file>` | Generate prioritized refactoring techniques for the current file |
+| `connascence scan ...` | **Legacy alias** kept for backwards compatibility (prints a warning) |
+
+```bash
+# File analysis returned as JSON (default)
+connascence analyze src/service.py --profile strict --format json
+
+# Workspace analysis with explicit patterns and report output
+connascence analyze-workspace . --file-patterns "*.py" "*.pyi" --output workspace-report.json
+
+# NASA compliance validation (non-zero exit code if violations remain)
+connascence validate-safety avionics/control.py --profile nasa-compliance
+
+# Refactoring hints near a selected line
+connascence suggest-refactoring src/utils.py --line 128 --limit 3
+```
+
 ## Basic Usage (Flake8-style)
 
 ### Simple Commands
