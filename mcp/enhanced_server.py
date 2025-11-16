@@ -15,7 +15,7 @@ This provides a clean API for code analysis while maintaining separation
 of concerns and avoiding tight coupling.
 """
 
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 import asyncio
 import logging
 from pathlib import Path
@@ -79,20 +79,18 @@ class AnalysisResponse:
     """Response from code analysis."""
 
     success: bool
-    file_path: str
-    violations: List[Dict[str, Any]]
-    summary: Dict[str, Any]
-    integrations: Dict[str, Any]
-    metadata: Dict[str, Any]
-    nasa_compliance: Dict[str, Any]
-    mece_analysis: Dict[str, Any]
-    metrics: Dict[str, Any]
-    error_message: Optional[str] = None
+    payload: Dict[str, Any]
     execution_time: float = 0.0
+    error_message: Optional[str] = None
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for JSON serialization."""
-        return asdict(self)
+        data = dict(self.payload)
+        data["success"] = self.success
+        data["execution_time"] = self.execution_time
+        if self.error_message:
+            data["error"] = self.error_message
+        return data
 
 
 class EnhancedConnascenceMCPServer:
@@ -123,7 +121,6 @@ class EnhancedConnascenceMCPServer:
 
         # Load analyzer bridge and integrations
         self.analysis_bridge = AnalyzerBridge()
-        self.analyzer = self.analysis_bridge._analyzer
         self.integrations = self._load_integrations()
 
         # Register tools
@@ -358,7 +355,7 @@ class EnhancedConnascenceMCPServer:
                 {
                     "file_path": file_path,
                     "success": analysis_result.success,
-                    "violation_count": len(analysis_result.violations),
+                    "violation_count": len(analysis_result.payload.get("findings", [])),
                     "execution_time": analysis_result.execution_time,
                 },
             )
@@ -408,20 +405,25 @@ class EnhancedConnascenceMCPServer:
                 files_to_analyze = files_to_analyze[:max_files]
                 logger.warning(f"Limited analysis to {max_files} files")
 
+            analysis_type = kwargs.get("analysis_type", "full")
             bridge_result = await asyncio.to_thread(
                 self.analysis_bridge.analyze_workspace,
                 workspace_path,
                 files_to_analyze,
-                kwargs.get("analysis_type", "full"),
+                analysis_type,
             )
 
-            bridge_result["metrics"] = {
+            return {
+                "success": True,
+                **bridge_result,
+                "analysis_type": analysis_type,
                 "files_considered": len(files_to_analyze),
-                "file_patterns": file_patterns,
-                "execution_time": time.time() - start_time,
+                "metrics": {
+                    "files_considered": len(files_to_analyze),
+                    "file_patterns": file_patterns,
+                    "execution_time": time.time() - start_time,
+                },
             }
-
-            return bridge_result
 
         except Exception as e:
             error_msg = f"Workspace analysis failed: {e!s}"
@@ -445,12 +447,14 @@ class EnhancedConnascenceMCPServer:
         try:
             self._guard_request("get_violations", client_id, {"file_path": file_path})
             # First analyze the file
-            analysis_result = await self.analyze_file(file_path, client_id=client_id, _apply_guard=False, format="json")
+            analysis_result = await self.analyze_file(
+                file_path, client_id=client_id, _apply_guard=False, format="json"
+            )
 
             if not analysis_result.get("success", False):
                 return analysis_result
 
-            violations = analysis_result.get("violations", [])
+            violations = analysis_result.get("findings", [])
 
             # Apply filters
             violation_type = kwargs.get("violation_type")
@@ -470,7 +474,7 @@ class EnhancedConnascenceMCPServer:
             return {
                 "success": True,
                 "file_path": file_path,
-                "violations": violations,
+                "findings": violations,
                 "total_found": len(violations),
                 "filters_applied": {"violation_type": violation_type, "severity": severity, "limit": limit},
             }
@@ -550,37 +554,21 @@ class EnhancedConnascenceMCPServer:
     async def _perform_analysis(self, request: AnalysisRequest) -> AnalysisResponse:
         """Perform the actual analysis."""
         try:
-            core_result = await asyncio.to_thread(
+            core_payload = await asyncio.to_thread(
                 self.analysis_bridge.analyze_file,
                 request.file_path,
                 request.analysis_type,
             )
 
-            integrations_results = self._run_integrations(request) if request.include_integrations else {}
+            if request.include_integrations:
+                core_payload["integrations"] = self._run_integrations(request)
 
-            return AnalysisResponse(
-                success=True,
-                file_path=request.file_path,
-                violations=core_result.get("violations", []),
-                summary=core_result.get("summary", {}),
-                integrations=integrations_results,
-                metadata=core_result.get("metadata", {}),
-                nasa_compliance=core_result.get("nasa_compliance", {}),
-                mece_analysis=core_result.get("mece_analysis", {}),
-                metrics=core_result.get("metrics", {}),
-            )
+            return AnalysisResponse(success=True, payload=core_payload)
 
         except Exception as e:
             return AnalysisResponse(
                 success=False,
-                file_path=request.file_path,
-                violations=[],
-                summary={},
-                integrations={},
-                metadata={"error": str(e)},
-                nasa_compliance={},
-                mece_analysis={},
-                metrics={},
+                payload={"target": request.file_path, "findings": [], "summary": {}},
                 error_message=str(e),
             )
 
@@ -625,14 +613,7 @@ class EnhancedConnascenceMCPServer:
         """Create error response."""
         return AnalysisResponse(
             success=False,
-            file_path=request.file_path,
-            violations=[],
-            summary={},
-            integrations={},
-            metadata={"error": error_message},
-            nasa_compliance={},
-            mece_analysis={},
-            metrics={},
+            payload={"target": request.file_path, "findings": [], "summary": {}},
             error_message=error_message,
             execution_time=time.time() - start_time,
         )
