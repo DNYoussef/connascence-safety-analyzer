@@ -167,6 +167,12 @@
         "icon": "$(clear-all)"
       },
       {
+        "command": "connascence.showHealthStatus",
+        "title": "Show Analyzer Health",
+        "category": "Connascence: Utilities",
+        "icon": "$(heartbeat)"
+      },
+      {
         "command": "connascence.refreshAnalysis",
         "title": "Refresh Analysis",
         "category": "Connascence: Utilities",
@@ -239,6 +245,9 @@
         {
           "command": "connascence.refreshAnalysis",
           "when": "workspaceFolderCount > 0"
+        },
+        {
+          "command": "connascence.showHealthStatus"
         }
       ],
       "editor/context": [

@@ -1,11 +1,13 @@
 import * as vscode from 'vscode';
-import { ConnascenceService } from '../services/connascenceService';
+import { ConnascenceService, BackendHealthState } from '../services/connascenceService';
 import { ConfigurationService } from '../services/configurationService';
 
 export class StatusBarManager {
     private statusBarItem: vscode.StatusBarItem;
     private isAnalyzing = false;
     private currentProfile: string;
+    private backendState?: BackendHealthState;
+    private backendListener?: vscode.Disposable;
 
     constructor(
         private connascenceService: ConnascenceService,
@@ -19,6 +21,11 @@ export class StatusBarManager {
         this.currentProfile = this.configService.getSafetyProfile();
         this.updateDisplay();
         this.statusBarItem.show();
+
+        this.backendListener = this.connascenceService.onBackendStateChanged(state => {
+            this.backendState = state;
+            this.updateDisplay();
+        });
 
         // Listen for configuration changes
         this.configService.onConfigurationChanged(() => {
@@ -49,6 +56,7 @@ export class StatusBarManager {
     }
 
     dispose(): void {
+        this.backendListener?.dispose();
         this.statusBarItem.dispose();
     }
 
@@ -194,6 +202,10 @@ export class StatusBarManager {
     }
 
     private createTooltip(): string {
+        const backendLine = this.backendState
+            ? `Backend: ${this.backendState.activeBackend.toUpperCase()} (MCP ${this.backendState.mcpConnected ? '✅' : '❌'}, CLI ${this.backendState.cliAvailable ? '✅' : '❌'}, Python ${this.backendState.pythonAvailable ? '✅' : '❌'})`
+            : 'Backend: Initializing';
+
         const lines = [
             'Connascence Safety Analyzer',
             '',
@@ -202,13 +214,14 @@ export class StatusBarManager {
             `Connascence Index: ${this.qualityMetrics.connascenceIndex.toFixed(1)}`,
             `Total Violations: ${this.qualityMetrics.totalViolations}`,
             `Quality Score: ${this.qualityMetrics.qualityScore.toFixed(1)}/100`,
+            backendLine,
             '',
             `Active Profile: ${this.formatProfile(this.currentProfile)}`,
             `Real-time Analysis: ${this.configService.isRealTimeAnalysisEnabled() ? 'On' : 'Off'}`,
             `Grammar Validation: ${this.configService.isGrammarValidationEnabled() ? 'On' : 'Off'}`,
             `Framework: ${this.configService.getFrameworkProfile()}`,
             '',
-            'Click to view quality dashboard'
+            'Click to check analyzer health'
         ];
 
         return lines.join('\n');

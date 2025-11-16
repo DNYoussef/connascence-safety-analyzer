@@ -68,6 +68,9 @@ export function activate(context: vscode.ExtensionContext) {
         // Register all commands
         registerAllCommands(context, service);
 
+        // Wire normalized analysis stream
+        bindAnalysisStreams(context, service);
+
         // Activate main extension
         extension.activate();
 
@@ -212,11 +215,16 @@ function registerAllCommands(context: vscode.ExtensionContext, service: Connasce
         vscode.window.showInformationMessage(`🔗 Visual highlighting ${!currentValue ? 'enabled' : 'disabled'}`);
     });
     
-    const refreshHighlightingCommand = vscode.commands.registerCommand('connascence.refreshHighlighting', () => {
-        // Refresh highlighting for all visible editors
+    const refreshHighlightingCommand = vscode.commands.registerCommand('connascence.refreshHighlighting', async () => {
+        const service = ensureConnascenceService();
         for (const editor of vscode.window.visibleTextEditors) {
-            // This would be called by the diagnostics provider
-            vscode.commands.executeCommand('connascence.analyzeFile', editor.document.uri);
+            const latest = service.getLatestAnalysisForFile(editor.document.fileName);
+            if (latest) {
+                visualHighlighting.applyHighlighting(editor, latest.analysis.findings);
+            } else {
+                const analysis = await service.analyzeFile(editor.document.fileName);
+                visualHighlighting.applyHighlighting(editor, analysis.findings);
+            }
         }
     });
     
@@ -278,6 +286,26 @@ function startBackgroundServices(context: vscode.ExtensionContext, service: Conn
     
     context.subscriptions.push(documentOpenHandler, documentChangeHandler);
     logger.info('✅ Background services initialized');
+}
+
+function bindAnalysisStreams(context: vscode.ExtensionContext, service: ConnascenceService) {
+    const disposable = service.onAnalysisResult((payload) => {
+        if (payload.scope === 'file') {
+            const editor = vscode.window.visibleTextEditors.find(e => e.document.uri.fsPath === payload.filePath);
+            if (editor) {
+                visualHighlighting.applyHighlighting(editor, payload.analysis.findings);
+            }
+            analysisResultsProvider.ingestFileResult(payload.filePath, payload.analysis.findings);
+            notificationManager.handleAnalysisPayload(payload);
+            aiFixSuggestions.cacheFindings(payload.filePath, payload.analysis.findings);
+        } else {
+            analysisResultsProvider.ingestWorkspaceResults(payload.fileResults);
+        }
+
+        dashboardProvider.handleNormalizedResult(payload);
+    });
+
+    context.subscriptions.push(disposable);
 }
 
 function startWorkspaceScanning(service: ConnascenceService) {

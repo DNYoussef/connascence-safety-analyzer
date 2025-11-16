@@ -57,7 +57,8 @@ export class CommandManager implements vscode.Disposable {
         this.commands.set('connascence.refreshFindings', this.refreshFindings.bind(this));
         this.commands.set('connascence.clearFindings', this.clearFindings.bind(this));
         this.commands.set('connascence.clearCache', this.clearCache.bind(this));
-        
+        this.commands.set('connascence.showHealthStatus', this.showHealthStatus.bind(this));
+
         // Information commands
         this.commands.set('connascence.explainFinding', this.explainFinding.bind(this));
         this.commands.set('connascence.showError', this.showError.bind(this));
@@ -463,7 +464,8 @@ export class CommandManager implements vscode.Disposable {
         // Clear any cached analysis results
         this.diagnosticsProvider.clearAllDiagnostics();
         this.treeProvider.refresh();
-        
+        this.connascenceService.clearCachedResults();
+
         vscode.window.showInformationMessage('Analysis cache cleared');
     }
 
@@ -493,6 +495,23 @@ export class CommandManager implements vscode.Disposable {
 
     private async showDocumentation(): Promise<void> {
         await vscode.env.openExternal(vscode.Uri.parse('https://docs.connascence.io'));
+    }
+
+    private async showHealthStatus(): Promise<void> {
+        const status = this.connascenceService.getBackendHealth();
+        const message = `Backend: ${status.activeBackend.toUpperCase()} • MCP ${status.mcpConnected ? '✅' : '❌'} • CLI ${status.cliAvailable ? '✅' : '❌'} • Python ${status.pythonAvailable ? '✅' : '❌'} • Cache ${status.cacheAvailable ? '✅' : '❌'}`;
+        const actions: string[] = ['Refresh'];
+        if (!status.cliAvailable && !status.pythonAvailable) {
+            actions.unshift('Open Setup Guide');
+        }
+
+        const selection = await vscode.window.showInformationMessage(message, ...actions);
+        if (selection === 'Open Setup Guide') {
+            await vscode.env.openExternal(vscode.Uri.parse('https://github.com/DNYoussef/connascence-safety-analyzer/blob/main/docs/README-VSCODE-EXTENSION.md#quick-start'));
+        } else if (selection === 'Refresh') {
+            await this.connascenceService.refreshAnalyzerStatus();
+            vscode.window.showInformationMessage('Connascence analyzer health refreshed');
+        }
     }
 
     // Helper methods

@@ -3,8 +3,9 @@ import * as path from 'path';
 import { spawn } from 'child_process';
 import { ConfigurationService } from './configurationService';
 import { TelemetryService } from './telemetryService';
-import { ConnascenceApiClient } from './connascenceApiClient';
+import { AnalyzerUnavailableError, ConnascenceApiClient, AnalyzerAvailability } from './connascenceApiClient';
 import { MCPClient } from './mcpClient';
+import { AnalysisCache } from '../utils/cache';
 
 export interface AnalysisResult {
     findings: Finding[];
@@ -122,6 +123,39 @@ export interface SmartIntegrationResult {
     riskAssessment: RiskAssessment;
 }
 
+export type AnalysisBackend = 'mcp' | 'cli' | 'python' | 'cache' | 'fallback';
+
+export interface FileNormalizedAnalysis {
+    scope: 'file';
+    backend: AnalysisBackend;
+    filePath: string;
+    uri: vscode.Uri;
+    analysis: AnalysisResult;
+    timestamp: number;
+    cacheHit: boolean;
+}
+
+export interface WorkspaceNormalizedAnalysis {
+    scope: 'workspace';
+    backend: AnalysisBackend;
+    workspacePath: string;
+    summary: WorkspaceAnalysisResult['summary'];
+    fileResults: { [filePath: string]: AnalysisResult };
+    timestamp: number;
+}
+
+export type NormalizedAnalysisPayload = FileNormalizedAnalysis | WorkspaceNormalizedAnalysis;
+
+export interface BackendHealthState {
+    activeBackend: AnalysisBackend;
+    mcpConnected: boolean;
+    cliAvailable: boolean;
+    pythonAvailable: boolean;
+    cacheAvailable: boolean;
+    lastError?: string;
+    lastChecked: number;
+}
+
 export interface CorrelationResult {
     analyzer1: string;
     analyzer2: string;
@@ -175,6 +209,13 @@ export class ConnascenceService {
     private meceAnalysisEnabled: boolean = true;
     private nasaComplianceEnabled: boolean = true;
     private smartIntegrationEnabled: boolean = true;
+    private analysisCache = new AnalysisCache();
+    private latestResults: Map<string, FileNormalizedAnalysis> = new Map();
+    private analysisEmitter = new vscode.EventEmitter<NormalizedAnalysisPayload>();
+    public readonly onAnalysisResult = this.analysisEmitter.event;
+    private backendEmitter = new vscode.EventEmitter<BackendHealthState>();
+    public readonly onBackendStateChanged = this.backendEmitter.event;
+    private backendState: BackendHealthState;
 
     constructor(
         private configService: ConfigurationService,
@@ -182,8 +223,63 @@ export class ConnascenceService {
         private context: vscode.ExtensionContext
     ) {
         this.apiClient = new ConnascenceApiClient();
+        this.backendState = this.createBackendState('fallback');
         this.initializeAdvancedCapabilities();
         this.initializeMCPClient();
+        this.refreshBackendState();
+    }
+
+    private createBackendState(activeBackend: AnalysisBackend, error?: string): BackendHealthState {
+        const availability = this.apiClient.getAnalyzerAvailability();
+        return {
+            activeBackend,
+            mcpConnected: !!(this.mcpClient && this.mcpClient.isServerConnected()),
+            cliAvailable: availability.mode === 'cli',
+            pythonAvailable: availability.mode === 'python',
+            cacheAvailable: true,
+            lastError: error,
+            lastChecked: Date.now()
+        };
+    }
+
+    private refreshBackendState(error?: string, activeOverride?: AnalysisBackend): void {
+        const availability = this.apiClient.getAnalyzerAvailability();
+        const activeBackend = activeOverride ?? this.determineActiveBackend(availability);
+        this.backendState = {
+            activeBackend,
+            mcpConnected: !!(this.mcpClient && this.mcpClient.isServerConnected()),
+            cliAvailable: availability.mode === 'cli',
+            pythonAvailable: availability.mode === 'python',
+            cacheAvailable: true,
+            lastError: error,
+            lastChecked: Date.now()
+        };
+        this.backendEmitter.fire(this.backendState);
+    }
+
+    private determineActiveBackend(availability: AnalyzerAvailability): AnalysisBackend {
+        if (this.mcpClient && this.mcpClient.isServerConnected()) {
+            return 'mcp';
+        }
+        if (availability.mode === 'cli') {
+            return 'cli';
+        }
+        if (availability.mode === 'python') {
+            return 'python';
+        }
+        if (this.latestResults.size > 0) {
+            return 'cache';
+        }
+        return 'fallback';
+    }
+
+    public getBackendHealth(): BackendHealthState {
+        return { ...this.backendState };
+    }
+
+    public async refreshAnalyzerStatus(): Promise<void> {
+        this.apiClient.refreshAnalyzerAvailability();
+        this.refreshBackendState();
     }
 
     /**
@@ -194,9 +290,11 @@ export class ConnascenceService {
             this.mcpClient = new MCPClient(this.context);
             await this.mcpClient.connect();
             console.log('[ConnascenceService] MCP client connected successfully');
+            this.refreshBackendState();
         } catch (error) {
             console.warn('[ConnascenceService] MCP client initialization failed, using CLI fallback:', error);
             this.mcpClient = null;
+            this.refreshBackendState(error instanceof Error ? error.message : String(error));
         }
     }
 
@@ -217,28 +315,55 @@ export class ConnascenceService {
 
     async analyzeFile(filePath: string): Promise<AnalysisResult> {
         this.telemetryService.logEvent('file.analysis.started', { file: path.basename(filePath) });
-        
+
         try {
+            const normalizedPath = path.resolve(filePath);
+
+            const cachedResult = await this.analysisCache.getCachedResult(normalizedPath);
+            if (cachedResult) {
+                this.telemetryService.logEvent('file.analysis.cache_hit', { file: path.basename(filePath) });
+                const cachePayload = this.createFilePayload(normalizedPath, cachedResult, 'cache', true);
+                this.publishFileAnalysis(cachePayload);
+                return cachedResult;
+            }
+
             const startTime = Date.now();
-            
-            // Get basic analysis from API client
-            const baseResult = await this.apiClient.analyzeFile(filePath);
-            
+
+            const { analysis: baseResult, backend } = await this.routeFileAnalysis(filePath);
+
             // Enhance with advanced analyzer capabilities
             const enhancedResult = await this.enhanceAnalysisResult(baseResult, filePath, {
                 analysisType: 'single-file',
                 startTime
             });
-            
-            this.telemetryService.logEvent('file.analysis.completed', { 
+
+            if (backend !== 'fallback') {
+                await this.analysisCache.setCachedResult(normalizedPath, enhancedResult);
+            }
+
+            this.telemetryService.logEvent('file.analysis.completed', {
                 file: path.basename(filePath),
                 findings: enhancedResult.findings.length,
                 qualityScore: enhancedResult.qualityScore,
-                analysisTime: Date.now() - startTime
+                analysisTime: Date.now() - startTime,
+                backend
             });
-            
+
+            const payload = this.createFilePayload(normalizedPath, enhancedResult, backend, false);
+            this.publishFileAnalysis(payload);
+
             return enhancedResult;
         } catch (error) {
+            if (error instanceof AnalyzerUnavailableError) {
+                const normalizedPath = path.resolve(filePath);
+                const warning = error.message;
+                this.promptAnalyzerSetup(warning);
+                this.refreshBackendState(warning, 'fallback');
+                const fallbackResult = this.createUnavailableResult(filePath, warning);
+                const payload = this.createFilePayload(normalizedPath, fallbackResult, 'fallback', false);
+                this.publishFileAnalysis(payload);
+                return fallbackResult;
+            }
             const errorMessage = error instanceof Error ? error.message : String(error);
             this.telemetryService.logEvent('file.analysis.error', { error: errorMessage });
             throw error;
@@ -247,49 +372,197 @@ export class ConnascenceService {
 
     async analyzeWorkspace(workspacePath: string): Promise<WorkspaceAnalysisResult> {
         this.telemetryService.logEvent('workspace.analysis.started');
-        
+
         try {
             const startTime = Date.now();
-            
-            // Get base workspace analysis
-            const baseResult = await this.apiClient.analyzeWorkspace(workspacePath);
-            
-            // Enhance each file result with advanced capabilities
+            const { result: baseResult, backend } = await this.routeWorkspaceAnalysis(workspacePath);
+
             const enhancedFileResults: { [filePath: string]: AnalysisResult } = {};
-            
+
             for (const [filePath, fileResult] of Object.entries(baseResult.fileResults)) {
-                enhancedFileResults[filePath] = await this.enhanceAnalysisResult(
-                    fileResult, filePath, {
-                        analysisType: 'workspace',
-                        startTime,
-                        workspacePath
-                    }
-                );
+                const enhanced = await this.enhanceAnalysisResult(fileResult, filePath, {
+                    analysisType: 'workspace',
+                    startTime,
+                    workspacePath
+                });
+                enhancedFileResults[filePath] = enhanced;
+
+                const normalizedPath = path.resolve(filePath);
+                if (backend !== 'fallback') {
+                    await this.analysisCache.setCachedResult(normalizedPath, enhanced);
+                }
+                const filePayload = this.createFilePayload(normalizedPath, enhanced, backend, false);
+                this.publishFileAnalysis(filePayload);
             }
-            
-            // Calculate enhanced workspace metrics
+
             const enhancedSummary = await this.calculateWorkspaceSummary(
                 enhancedFileResults, workspacePath, startTime
             );
-            
-            const analysisTime = Date.now() - startTime;
-            
+
+            this.analysisEmitter.fire({
+                scope: 'workspace',
+                backend,
+                workspacePath,
+                summary: enhancedSummary,
+                fileResults: enhancedFileResults,
+                timestamp: Date.now()
+            });
+
             this.telemetryService.logEvent('workspace.analysis.completed', {
                 filesAnalyzed: Object.keys(enhancedFileResults).length,
                 totalIssues: enhancedSummary.totalIssues,
                 qualityScore: enhancedSummary.qualityScore,
-                analysisTime
+                analysisTime: Date.now() - startTime,
+                backend
             });
-            
+
             return {
                 fileResults: enhancedFileResults,
                 summary: enhancedSummary
             };
         } catch (error) {
+            if (error instanceof AnalyzerUnavailableError) {
+                this.promptAnalyzerSetup(error.message);
+                this.refreshBackendState(error.message, 'fallback');
+                const fallback = this.createFallbackWorkspaceResult(workspacePath);
+                this.analysisEmitter.fire({
+                    scope: 'workspace',
+                    backend: 'fallback',
+                    workspacePath,
+                    summary: fallback.summary,
+                    fileResults: fallback.fileResults,
+                    timestamp: Date.now()
+                });
+                return fallback;
+            }
             const errorMessage = error instanceof Error ? error.message : String(error);
             this.telemetryService.logEvent('workspace.analysis.error', { error: errorMessage });
             throw error;
         }
+    }
+
+    private async routeFileAnalysis(filePath: string): Promise<{ analysis: AnalysisResult; backend: AnalysisBackend }> {
+        if (this.mcpClient && this.mcpClient.isServerConnected()) {
+            const analysis = await this.analyzeMCP(filePath);
+            this.refreshBackendState(undefined, 'mcp');
+            return { analysis, backend: 'mcp' };
+        }
+
+        const availability = this.apiClient.getAnalyzerAvailability();
+        const analysis = await this.apiClient.analyzeFile(filePath);
+        const backend: AnalysisBackend = (analysis as any)?.fallback_mode
+            ? 'fallback'
+            : availability.mode === 'cli'
+                ? 'cli'
+                : 'python';
+        this.refreshBackendState(undefined, backend);
+        return { analysis, backend };
+    }
+
+    private async routeWorkspaceAnalysis(workspacePath: string): Promise<{ result: WorkspaceAnalysisResult; backend: AnalysisBackend }> {
+        if (this.mcpClient && this.mcpClient.isServerConnected()) {
+            const result = await this.analyzeWorkspaceMCP(workspacePath);
+            this.refreshBackendState(undefined, 'mcp');
+            return { result, backend: 'mcp' };
+        }
+
+        const availability = this.apiClient.getAnalyzerAvailability();
+        const result = await this.apiClient.analyzeWorkspace(workspacePath);
+        const backend: AnalysisBackend = availability.mode === 'cli' ? 'cli' : 'python';
+        this.refreshBackendState(undefined, backend);
+        return { result, backend };
+    }
+
+    private createFilePayload(filePath: string, analysis: AnalysisResult, backend: AnalysisBackend, cacheHit: boolean): FileNormalizedAnalysis {
+        return {
+            scope: 'file',
+            backend,
+            filePath,
+            uri: vscode.Uri.file(filePath),
+            analysis,
+            timestamp: Date.now(),
+            cacheHit
+        };
+    }
+
+    private publishFileAnalysis(payload: FileNormalizedAnalysis): void {
+        this.latestResults.set(path.resolve(payload.filePath), payload);
+        this.analysisEmitter.fire(payload);
+    }
+
+    private createUnavailableResult(filePath: string, reason: string): AnalysisResult {
+        const finding: Finding = {
+            id: `tooling_${Date.now()}`,
+            type: 'tooling_issue',
+            severity: 'major',
+            message: `${reason}. Refer to docs/README-VSCODE-EXTENSION.md#quick-start to finish setup.`,
+            file: filePath,
+            line: 1
+        };
+
+        return {
+            findings: [finding],
+            qualityScore: 0,
+            summary: {
+                totalIssues: 1,
+                issuesBySeverity: {
+                    critical: 0,
+                    major: 1,
+                    minor: 0,
+                    info: 0
+                }
+            }
+        };
+    }
+
+    private createFallbackWorkspaceResult(workspacePath: string): WorkspaceAnalysisResult {
+        return {
+            fileResults: {},
+            summary: {
+                filesAnalyzed: 0,
+                totalIssues: 0,
+                qualityScore: 0
+            }
+        };
+    }
+
+    private promptAnalyzerSetup(message: string): void {
+        const action = 'Open Setup Guide';
+        vscode.window.showErrorMessage(`Connascence: ${message}`, action).then(selection => {
+            if (selection === action) {
+                vscode.env.openExternal(vscode.Uri.parse('https://github.com/DNYoussef/connascence-safety-analyzer/blob/main/docs/README-VSCODE-EXTENSION.md#quick-start'));
+            }
+        });
+    }
+
+    public getLatestAnalysisForFile(filePath: string): FileNormalizedAnalysis | undefined {
+        return this.latestResults.get(path.resolve(filePath));
+    }
+
+    public findMatchingFinding(filePath: string, diagnostic: vscode.Diagnostic): Finding | undefined {
+        const latest = this.getLatestAnalysisForFile(filePath);
+        if (!latest) {
+            return undefined;
+        }
+
+        const code = typeof diagnostic.code === 'string'
+            ? diagnostic.code
+            : typeof diagnostic.code === 'object' && diagnostic.code !== null && 'value' in diagnostic.code
+                ? String((diagnostic.code as any).value)
+                : undefined;
+
+        return latest.analysis.findings.find(finding => {
+            const sameLine = finding.line - 1 === diagnostic.range.start.line;
+            if (code) {
+                return finding.id === code || finding.code === code;
+            }
+            return sameLine && finding.message === diagnostic.message;
+        });
+    }
+
+    public clearCachedResults(): void {
+        this.analysisCache.clear();
+        this.latestResults.clear();
     }
 
     async validateSafety(filePath: string, profile: string): Promise<SafetyValidationResult> {

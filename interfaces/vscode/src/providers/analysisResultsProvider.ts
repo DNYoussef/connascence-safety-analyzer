@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { Finding } from '../services/connascenceService';
+import { AnalysisResult, Finding } from '../services/connascenceService';
 
 export class AnalysisResultItem extends vscode.TreeItem {
     constructor(
@@ -239,6 +239,24 @@ export class AnalysisResultsProvider implements vscode.TreeDataProvider<Analysis
     updateResults(results: Map<string, Finding[]>) {
         this.analysisResults = results;
         this.totalFindings = Array.from(results.values()).reduce((sum, findings) => sum + findings.length, 0);
+        this.lastAnalysisTime = new Date();
+        this.applyFilters();
+        this.refresh();
+    }
+
+    ingestFileResult(filePath: string, findings: Finding[]): void {
+        this.analysisResults.set(filePath, findings);
+        this.totalFindings = Array.from(this.analysisResults.values()).reduce((sum, fileFindings) => sum + fileFindings.length, 0);
+        this.lastAnalysisTime = new Date();
+        this.applyFilters();
+        this.refresh();
+    }
+
+    ingestWorkspaceResults(results: { [filePath: string]: AnalysisResult }): void {
+        for (const [filePath, analysis] of Object.entries(results)) {
+            this.analysisResults.set(filePath, analysis.findings);
+        }
+        this.totalFindings = Array.from(this.analysisResults.values()).reduce((sum, fileFindings) => sum + fileFindings.length, 0);
         this.lastAnalysisTime = new Date();
         this.applyFilters();
         this.refresh();
