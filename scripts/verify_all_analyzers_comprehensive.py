@@ -16,10 +16,14 @@ Analyzers Tested:
 from datetime import datetime
 import json
 from pathlib import Path
+import shutil
 import subprocess
 import sys
 import traceback
 from typing import Dict, List, Tuple
+
+REPO_ROOT = Path(__file__).resolve().parent.parent
+SCRIPTS_DIR = Path(__file__).resolve().parent
 
 
 # ANSI color codes for output
@@ -135,7 +139,7 @@ class ClarityAnalyzerTest(AnalyzerTest):
 
     def run(self, test_dir: str) -> bool:
         """Run clarity analyzer test"""
-        script_path = Path(test_dir).parent / "scripts" / "run_clarity001.py"
+        script_path = SCRIPTS_DIR / "run_clarity001.py"
 
         if not script_path.exists():
             self.errors.append(f"Script not found: {script_path}")
@@ -264,9 +268,9 @@ class ConnascenceAnalyzerTest(AnalyzerTest):
         try:
             # Find connascence analyzer script
             possible_paths = [
-                Path(test_dir).parent / "scripts" / "analyze_connascence.py",
-                Path(test_dir).parent / "analyzer" / "connascence_analyzer.py",
-                Path(test_dir).parent / "src" / "connascence_analyzer.py"
+                SCRIPTS_DIR / "analyze_connascence.py",
+                REPO_ROOT / "analyzer" / "connascence_analyzer.py",
+                REPO_ROOT / "src" / "connascence_analyzer.py"
             ]
 
             script_path = None
@@ -318,7 +322,7 @@ class GodObjectDetectionTest(AnalyzerTest):
 
     def run(self, test_dir: str) -> bool:
         """Run god object detection test"""
-        script_path = Path(test_dir).parent / "scripts" / "detect_god_objects.py"
+        script_path = SCRIPTS_DIR / "detect_god_objects.py"
 
         if not script_path.exists():
             # Try alternative location
@@ -373,7 +377,7 @@ class MECEAnalyzerTest(AnalyzerTest):
 
     def run(self, test_dir: str) -> bool:
         """Run MECE analyzer test"""
-        script_path = Path(test_dir).parent / "scripts" / "analyze_mece.py"
+        script_path = SCRIPTS_DIR / "analyze_mece.py"
 
         if not script_path.exists():
             # Try alternative locations
@@ -435,7 +439,7 @@ class SixSigmaAnalyzerTest(AnalyzerTest):
 
     def run(self, test_dir: str) -> bool:
         """Run Six Sigma analyzer test"""
-        script_path = Path(test_dir).parent / "scripts" / "analyze_six_sigma.py"
+        script_path = SCRIPTS_DIR / "analyze_six_sigma.py"
 
         if not script_path.exists():
             self.errors.append("Six Sigma analyzer script not found")
@@ -486,7 +490,7 @@ class NASASafetyAnalyzerTest(AnalyzerTest):
 
     def run(self, test_dir: str) -> bool:
         """Run NASA safety analyzer test"""
-        script_path = Path(test_dir).parent / "scripts" / "analyze_nasa_safety.py"
+        script_path = SCRIPTS_DIR / "analyze_nasa_safety.py"
 
         if not script_path.exists():
             self.errors.append("NASA safety analyzer script not found")
@@ -543,7 +547,7 @@ class EnterpriseIntegrationTest(AnalyzerTest):
 
     def run(self, test_dir: str) -> bool:
         """Run enterprise integration test"""
-        script_path = Path(test_dir).parent / "scripts" / "run_enterprise_pipeline.py"
+        script_path = SCRIPTS_DIR / "run_enterprise_pipeline.py"
 
         if not script_path.exists():
             # Try alternative
@@ -622,7 +626,9 @@ def create_test_files(test_dir: Path):
 
     print_info(f"Creating test files in {test_dir}")
 
-    # Create test directory
+    # Reset test directory each run to avoid stale artifacts
+    if test_dir.exists():
+        shutil.rmtree(test_dir)
     test_dir.mkdir(parents=True, exist_ok=True)
 
     # Test file 1: Clarity violations (thin helpers, call chains)
@@ -1033,10 +1039,10 @@ def main():
 
     print_section("COMPREHENSIVE ANALYZER VERIFICATION")
 
-    # Setup paths
-    base_dir = Path("/c/Users/17175/Desktop/connascence")
-    test_dir = base_dir / "test_files"
-    scripts_dir = base_dir / "scripts"
+    # Setup paths dynamically relative to repository
+    base_dir = REPO_ROOT
+    test_dir = base_dir / "analysis" / "test_files"
+    scripts_dir = SCRIPTS_DIR
 
     print_info(f"Base directory: {base_dir}")
     print_info(f"Test directory: {test_dir}")
