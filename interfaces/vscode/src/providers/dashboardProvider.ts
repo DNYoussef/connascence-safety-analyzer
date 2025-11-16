@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
-import { ConnascenceService, Finding } from '../services/connascenceService';
+import * as path from 'path';
+import { ConnascenceService, Finding, NormalizedAnalysisPayload } from '../services/connascenceService';
 
 export class DashboardItem extends vscode.TreeItem {
     constructor(
@@ -125,6 +126,45 @@ export class ConnascenceDashboardProvider implements vscode.TreeDataProvider<Das
         if (findings) {
             this.allFindings = findings;
         }
+        this.refresh();
+    }
+
+    handleNormalizedResult(payload: NormalizedAnalysisPayload): void {
+        if (payload.scope === 'file') {
+            this.mergeFindings(payload.filePath, payload.analysis.findings);
+            const entry = {
+                name: path.basename(payload.filePath),
+                path: payload.filePath,
+                issues: payload.analysis.summary.totalIssues,
+                criticalIssues: payload.analysis.findings.filter(f => f.severity === 'critical').length,
+                backend: payload.backend
+            };
+
+            const recent = this.analysisResults?.recentFiles || [];
+            const updated = [entry, ...recent.filter((file: any) => file.path !== payload.filePath)].slice(0, 20);
+            this.analysisResults = { ...(this.analysisResults || {}), recentFiles: updated };
+            this.qualityMetrics = {
+                ...(this.qualityMetrics || {}),
+                totalIssues: payload.analysis.summary.totalIssues,
+                qualityScore: payload.analysis.qualityScore,
+                safetyViolations: payload.analysis.nasaCompliance?.violations?.length || 0
+            };
+        } else {
+            this.analysisResults = { ...(this.analysisResults || {}), recentFiles: Object.entries(payload.fileResults).map(([filePath, analysis]) => ({
+                name: path.basename(filePath),
+                path: filePath,
+                issues: analysis.summary.totalIssues,
+                criticalIssues: analysis.findings.filter(f => f.severity === 'critical').length,
+                backend: payload.backend
+            })) };
+            this.allFindings = Object.values(payload.fileResults).flatMap(result => result.findings);
+            this.qualityMetrics = {
+                ...(this.qualityMetrics || {}),
+                totalIssues: payload.summary.totalIssues,
+                qualityScore: payload.summary.qualityScore
+            };
+        }
+
         this.refresh();
     }
     
@@ -312,6 +352,13 @@ export class ConnascenceDashboardProvider implements vscode.TreeDataProvider<Das
         if (score >= 70) return 'Fair';
         if (score >= 60) return 'Poor';
         return 'Critical';
+    }
+
+    private mergeFindings(filePath: string, findings: Finding[]): void {
+        this.allFindings = [
+            ...this.allFindings.filter(f => f.file !== filePath),
+            ...findings
+        ];
     }
 
     private getSafetyComplianceChildren(): DashboardItem[] {

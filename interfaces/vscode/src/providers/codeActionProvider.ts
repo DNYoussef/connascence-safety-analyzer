@@ -1,7 +1,10 @@
 import * as vscode from 'vscode';
 import { ConnascenceService } from '../services/connascenceService';
+import { AIFixSuggestionsProvider } from '../features/aiFixSuggestions';
 
 export class ConnascenceCodeActionProvider implements vscode.CodeActionProvider {
+    private aiFixSuggestions = AIFixSuggestionsProvider.getInstance();
+
     constructor(private connascenceService: ConnascenceService) {}
 
     async provideCodeActions(
@@ -27,6 +30,9 @@ export class ConnascenceCodeActionProvider implements vscode.CodeActionProvider 
             // Refactoring actions
             const refactorActions = await this.createRefactorActions(document, diagnostic, range);
             actions.push(...refactorActions);
+
+            const aiActions = await this.createAISuggestions(document, diagnostic);
+            actions.push(...aiActions);
         }
 
         return actions;
@@ -106,5 +112,25 @@ export class ConnascenceCodeActionProvider implements vscode.CodeActionProvider 
         }
 
         return actions;
+    }
+
+    private async createAISuggestions(document: vscode.TextDocument, diagnostic: vscode.Diagnostic): Promise<vscode.CodeAction[]> {
+        const finding = this.connascenceService.findMatchingFinding(document.fileName, diagnostic);
+        if (!finding) {
+            return [];
+        }
+
+        try {
+            const suggestions = await this.aiFixSuggestions.generateFixSuggestions(finding, document);
+            return suggestions.map(suggestion => {
+                const action = new vscode.CodeAction(suggestion.title, suggestion.kind);
+                action.diagnostics = [diagnostic];
+                action.edit = suggestion.edit;
+                return action;
+            });
+        } catch (error) {
+            console.error('Failed to generate AI suggestions:', error);
+            return [];
+        }
     }
 }

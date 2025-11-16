@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import * as path from 'path';
 import { Finding } from '../services/connascenceService';
 
 export interface FixSuggestion {
@@ -13,6 +14,7 @@ export interface FixSuggestion {
 
 export class AIFixSuggestionsProvider {
     private static instance: AIFixSuggestionsProvider;
+    private cachedFindings: Map<string, Finding[]> = new Map();
 
     private constructor() {}
 
@@ -21,6 +23,14 @@ export class AIFixSuggestionsProvider {
             AIFixSuggestionsProvider.instance = new AIFixSuggestionsProvider();
         }
         return AIFixSuggestionsProvider.instance;
+    }
+
+    public cacheFindings(filePath: string, findings: Finding[]): void {
+        this.cachedFindings.set(path.resolve(filePath), findings);
+    }
+
+    public getCachedFindings(filePath: string): Finding[] | undefined {
+        return this.cachedFindings.get(path.resolve(filePath));
     }
 
     public async generateFixSuggestions(finding: Finding, document: vscode.TextDocument): Promise<FixSuggestion[]> {

@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
-import { Finding } from '../services/connascenceService';
+import * as path from 'path';
+import { Finding, FileNormalizedAnalysis } from '../services/connascenceService';
 
 export interface NotificationFilter {
     enabled: boolean;
@@ -349,6 +350,39 @@ export class NotificationManager {
         vscode.window.showInformationMessage('🔊 All notification suppressions cleared');
     }
 
+    public handleAnalysisPayload(payload: FileNormalizedAnalysis): void {
+        const relevant = this.getFilteredFindings(payload.analysis.findings);
+        if (!relevant.length) {
+            return;
+        }
+
+        const top = this.getHighestSeverityFinding(relevant);
+        if (!['critical', 'major'].includes(top.severity)) {
+            return;
+        }
+
+        const backendLabel = payload.backend.toUpperCase();
+        const fileName = path.basename(payload.filePath);
+        const emoji = top.severity === 'critical' ? '🚨' : '⚠️';
+        const message = `${emoji} ${relevant.length} findings (${backendLabel}) in ${fileName}`;
+        const openAction = 'Open File';
+        const notification = top.severity === 'critical'
+            ? vscode.window.showErrorMessage(message, openAction)
+            : vscode.window.showWarningMessage(message, openAction);
+
+        notification.then(selection => {
+            if (selection === openAction) {
+                vscode.window.showTextDocument(payload.uri, {
+                    preview: false,
+                    selection: new vscode.Range(
+                        new vscode.Position(top.line - 1, (top.column || 1) - 1),
+                        new vscode.Position(top.line - 1, (top.column || 1) + 10)
+                    )
+                });
+            }
+        });
+    }
+
     private saveUserPreferences(): void {
         const config = vscode.workspace.getConfiguration('connascence');
         const userFilters: { [key: string]: Partial<NotificationFilter> } = {};
@@ -368,6 +402,12 @@ export class NotificationManager {
         const index1 = severityOrder.indexOf(severity1);
         const index2 = severityOrder.indexOf(severity2);
         return index1 - index2;
+    }
+
+    private getHighestSeverityFinding(findings: Finding[]): Finding {
+        return findings.reduce((previous, current) => {
+            return this.compareSeverity(previous.severity, current.severity) >= 0 ? previous : current;
+        });
     }
 
     public showFilterManagementQuickPick(): void {

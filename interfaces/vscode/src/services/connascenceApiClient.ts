@@ -1,16 +1,47 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { spawn } from 'child_process';
+import { spawn, spawnSync } from 'child_process';
 import { AnalysisResult, Finding, PerformanceMetrics, DuplicationCluster, NASAComplianceResult, SmartIntegrationResult } from './connascenceService';
+
+export type AnalyzerChannel = 'cli' | 'python' | 'legacy' | 'none';
+
+export interface AnalyzerAvailability {
+    mode: AnalyzerChannel;
+    cliCommand?: string;
+    pythonPath?: string;
+    lastChecked: number;
+    reasons: string[];
+}
+
+export class AnalyzerUnavailableError extends Error {
+    constructor(message: string, public readonly reasons: string[] = []) {
+        super(message);
+        this.name = 'AnalyzerUnavailableError';
+    }
+}
 
 /**
  * Client for integrating with the main connascence analysis system
  */
 export class ConnascenceApiClient {
     private workspaceRoot: string | undefined;
+    private analyzerAvailability: AnalyzerAvailability;
 
     constructor() {
         this.workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+        this.analyzerAvailability = this.detectAnalyzerAvailability();
+    }
+
+    public getAnalyzerAvailability(forceRefresh: boolean = false): AnalyzerAvailability {
+        if (forceRefresh) {
+            this.analyzerAvailability = this.detectAnalyzerAvailability();
+        }
+        return this.analyzerAvailability;
+    }
+
+    public refreshAnalyzerAvailability(): AnalyzerAvailability {
+        this.analyzerAvailability = this.detectAnalyzerAvailability();
+        return this.analyzerAvailability;
     }
 
     /**
@@ -19,7 +50,7 @@ export class ConnascenceApiClient {
     public async analyzeFile(filePath: string): Promise<AnalysisResult> {
         try {
             const startTime = Date.now();
-            
+
             // Run unified analyzer for comprehensive results
             const result = await this.runUnifiedAnalyzer({
                 inputPath: filePath,
@@ -37,6 +68,62 @@ export class ConnascenceApiClient {
             
             // Fallback to simplified analysis
             return this.fallbackAnalyzeFile(filePath);
+        }
+    }
+
+    private detectAnalyzerAvailability(): AnalyzerAvailability {
+        const reasons: string[] = [];
+        const cliCandidates = this.getCliCommandCandidates();
+        for (const candidate of cliCandidates) {
+            if (this.isCommandAvailable(candidate)) {
+                return { mode: 'cli', cliCommand: candidate, lastChecked: Date.now(), reasons };
+            }
+            reasons.push(`Command '${candidate}' not available in PATH`);
+        }
+
+        const pythonPath = this.getPythonPath();
+        if (this.verifyPythonEntry(pythonPath)) {
+            return { mode: 'python', pythonPath, lastChecked: Date.now(), reasons };
+        }
+        reasons.push('Python entry point cli.connascence is not importable');
+
+        return { mode: 'none', lastChecked: Date.now(), reasons };
+    }
+
+    private ensureAnalyzerAvailable(): AnalyzerAvailability {
+        const availability = this.getAnalyzerAvailability();
+        if (availability.mode === 'none') {
+            throw new AnalyzerUnavailableError(
+                'Connascence analyzer CLI not detected. Follow the VS Code README Quick Start to add the wrapper to PATH or install the connascence-analyzer Python package.',
+                availability.reasons
+            );
+        }
+        return availability;
+    }
+
+    private getCliCommandCandidates(): string[] {
+        const candidates = ['connascence'];
+        if (process.platform === 'win32') {
+            candidates.push('connascence.exe', 'connascence.bat', 'connascence.cmd');
+        }
+        return candidates;
+    }
+
+    private isCommandAvailable(command: string): boolean {
+        try {
+            const result = spawnSync(command, ['--version'], { encoding: 'utf8', stdio: 'ignore' });
+            return result.status === 0;
+        } catch (error) {
+            return false;
+        }
+    }
+
+    private verifyPythonEntry(pythonPath: string): boolean {
+        try {
+            const result = spawnSync(pythonPath, ['-m', 'cli.connascence', '--version'], { encoding: 'utf8', stdio: 'ignore' });
+            return result.status === 0;
+        } catch (error) {
+            return false;
         }
     }
 
@@ -308,23 +395,32 @@ export class ConnascenceApiClient {
     }
 
     private async runCliAnalyzer(options: any): Promise<any> {
-        const pythonPath = this.getPythonPath();
-        const args = this.buildCliArgs(options);
+        const availability = this.ensureAnalyzerAvailable();
+        const useBinary = availability.mode === 'cli';
+        const command = useBinary
+            ? availability.cliCommand!
+            : availability.pythonPath || this.getPythonPath();
+        const args = this.buildCliArgs(options, useBinary ? 'binary' : 'module');
 
+        return this.spawnCliProcess(command, args, options);
+    }
+
+    private spawnCliProcess(command: string, args: string[], options: any): Promise<any> {
         return new Promise((resolve) => {
-            const process = spawn(pythonPath, args, {
+            const child = spawn(command, args, {
                 cwd: this.workspaceRoot,
-                timeout: 30000
+                timeout: 30000,
+                shell: process.platform === 'win32'
             });
 
             let stdout = '';
             let stderr = '';
 
-            process.stdout.on('data', (data) => {
+            child.stdout.on('data', (data) => {
                 stdout += data.toString();
             });
 
-            process.stderr.on('data', (data) => {
+            child.stderr.on('data', (data) => {
                 stderr += data.toString();
             });
 
@@ -333,7 +429,7 @@ export class ConnascenceApiClient {
                 resolve(this.getFallbackAnalysisResult(options));
             };
 
-            process.on('close', (code) => {
+            child.on('close', (code) => {
                 if (code === 0) {
                     try {
                         resolve(JSON.parse(stdout));
@@ -345,14 +441,14 @@ export class ConnascenceApiClient {
                 }
             });
 
-            process.on('error', (error) => {
+            child.on('error', (error) => {
                 handleFailure(`CLI analyzer failed: ${error.message}`);
             });
 
             setTimeout(() => {
-                if (!process.killed) {
+                if (!child.killed) {
                     handleFailure('CLI analyzer timeout');
-                    process.kill();
+                    child.kill();
                 }
             }, 35000);
         });
@@ -421,8 +517,11 @@ export class ConnascenceApiClient {
         });
     }
 
-    private buildCliArgs(options: any): string[] {
-        const args = ['-m', 'cli.connascence'];
+    private buildCliArgs(options: any, target: 'module' | 'binary' = 'module'): string[] {
+        const args: string[] = [];
+        if (target === 'module') {
+            args.push('-m', 'cli.connascence');
+        }
         const profile = options.safetyProfile || this.getSafetyProfile();
 
         if (options.mode === 'workspace') {
