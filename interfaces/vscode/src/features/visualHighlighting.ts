@@ -1,20 +1,48 @@
 import * as vscode from 'vscode';
-import { Finding } from '../services/connascenceService';
+import * as path from 'path';
+import { ConnascenceService, Finding, NormalizedAnalysisPayload } from '../services/connascenceService';
 
-export class VisualHighlightingManager {
+export class VisualHighlightingManager implements vscode.Disposable {
     private decorationTypes: Map<string, vscode.TextEditorDecorationType> = new Map();
     private activeDecorations: Map<string, vscode.TextEditorDecorationType[]> = new Map();
+    private latestFindings: Map<string, Finding[]> = new Map();
+    private disposables: vscode.Disposable[] = [];
 
-    constructor() {
+    constructor(private readonly connascenceService: ConnascenceService) {
         this.initializeDecorationTypes();
-        
+
         // Listen for configuration changes
-        vscode.workspace.onDidChangeConfiguration((event) => {
-            if (event.affectsConfiguration('connascence.enableVisualHighlighting') || 
+        this.disposables.push(vscode.workspace.onDidChangeConfiguration((event) => {
+            if (event.affectsConfiguration('connascence.enableVisualHighlighting') ||
                 event.affectsConfiguration('connascence.highlightingIntensity')) {
                 this.updateDecorationTypes();
             }
-        });
+        }));
+
+        this.disposables.push(vscode.window.onDidChangeActiveTextEditor(editor => {
+            if (editor) {
+                const cached = this.latestFindings.get(path.resolve(editor.document.uri.fsPath));
+                if (cached) {
+                    this.applyHighlighting(editor, cached);
+                }
+            }
+        }));
+
+        if (this.connascenceService) {
+            this.disposables.push(this.connascenceService.onAnalysisUpdated(event => this.handleAnalysisUpdate(event)));
+        }
+    }
+
+    private handleAnalysisUpdate(event: NormalizedAnalysisPayload) {
+        const normalizedPath = path.resolve(event.filePath);
+        this.latestFindings.set(normalizedPath, event.result.findings);
+        const targetEditor = vscode.window.visibleTextEditors.find(editor =>
+            path.resolve(editor.document.uri.fsPath) === normalizedPath
+        );
+
+        if (targetEditor) {
+            this.applyHighlighting(targetEditor, event.result.findings);
+        }
     }
 
     private initializeDecorationTypes() {
@@ -349,10 +377,12 @@ export class VisualHighlightingManager {
         const config = vscode.workspace.getConfiguration('connascence');
         const enabled = config.get<boolean>('enableVisualHighlighting', true);
         const showEmojis = config.get<boolean>('showEmojis', true);
-        
+
         if (!enabled) {
             return;
         }
+
+        this.latestFindings.set(path.resolve(editor.document.uri.fsPath), findings);
 
         // Clear existing decorations for this editor
         this.clearDecorations(editor);
@@ -451,6 +481,11 @@ export class VisualHighlightingManager {
     }
 
     public dispose() {
+        this.clearAllDecorations();
+        for (const disposable of this.disposables) {
+            disposable.dispose();
+        }
+        this.disposables = [];
         for (const decoration of this.decorationTypes.values()) {
             decoration.dispose();
         }

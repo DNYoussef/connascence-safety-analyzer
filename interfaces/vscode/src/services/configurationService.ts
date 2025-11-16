@@ -75,6 +75,10 @@ export class ConfigurationService {
         return this.getConfig('serverUrl', 'http://localhost:8080');
     }
 
+    getCliCommand(): string {
+        return this.getConfig('cliCommand', 'connascence');
+    }
+
     useMCPServer(): boolean {
         return this.getConfig('authenticateWithServer', false);
     }

@@ -48,6 +48,12 @@ npm install && npm run package
 code --install-extension connascence-safety-analyzer-*.vsix
 ```
 
+#### Analyzer health + backend selection
+
+- Use the **Connascence: Show Analyzer Health** command (Command Palette) or click the Connascence status bar item to see whether the extension is using MCP, the Python analyzer, the packaged CLI, or cached/fallback results.
+- The status bar now highlights the current backend (MCP/CLI/Python/Cache/Fallback) so you can finish PATH/wrapper setup quickly.
+- Configure the CLI executable that should be used when MCP/Python aren’t available via the new `connascence.cliCommand` setting (defaults to `connascence`).
+
 ---
 
 ## ✨ Features
@@ -200,6 +206,7 @@ reporting:
   "connascence.safetyProfile": "standard",
   "connascence.realtimeAnalysis": true,
   "connascence.useMCP": false,
+  "connascence.cliCommand": "connascence",
   "connascence.debounceMs": 1000,
   "connascence.enableVisualHighlighting": true
 }

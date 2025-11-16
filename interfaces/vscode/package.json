@@ -167,6 +167,12 @@
         "icon": "$(clear-all)"
       },
       {
+        "command": "connascence.showAnalyzerHealth",
+        "title": "Show Analyzer Health",
+        "category": "Connascence: Diagnostics",
+        "icon": "$(pulse)"
+      },
+      {
         "command": "connascence.refreshAnalysis",
         "title": "Refresh Analysis",
         "category": "Connascence: Utilities",
@@ -438,6 +444,11 @@
           "type": "string",
           "default": "http://localhost:8080",
           "description": "Connascence MCP server URL"
+        },
+        "connascence.cliCommand": {
+          "type": "string",
+          "default": "connascence",
+          "description": "Command or path to the Connascence CLI executable used when the MCP server or Python analyzer is unavailable"
         },
         "connascence.authenticateWithServer": {
           "type": "boolean",

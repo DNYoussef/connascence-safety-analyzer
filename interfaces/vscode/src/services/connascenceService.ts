@@ -3,8 +3,9 @@ import * as path from 'path';
 import { spawn } from 'child_process';
 import { ConfigurationService } from './configurationService';
 import { TelemetryService } from './telemetryService';
-import { ConnascenceApiClient } from './connascenceApiClient';
+import { ConnascenceApiClient, AnalyzerAvailability, AnalyzerMissingError } from './connascenceApiClient';
 import { MCPClient } from './mcpClient';
+import { AnalysisCache } from '../utils/cache';
 
 export interface AnalysisResult {
     findings: Finding[];
@@ -168,6 +169,25 @@ export interface WorkspaceAnalysisResult {
     };
 }
 
+export type BackendMode = 'mcp' | 'python' | 'cli' | 'cache' | 'fallback';
+
+export interface NormalizedAnalysisPayload {
+    filePath: string;
+    result: AnalysisResult;
+    backend: BackendMode;
+    timestamp: number;
+    fromCache: boolean;
+    availability?: AnalyzerAvailability;
+}
+
+export interface BackendStatus {
+    active: BackendMode;
+    availability: AnalyzerAvailability;
+    mcpConnected: boolean;
+    lastError?: string;
+    timestamp: number;
+}
+
 export class ConnascenceService {
     private apiClient: ConnascenceApiClient;
     private mcpClient: MCPClient | null = null;
@@ -175,6 +195,13 @@ export class ConnascenceService {
     private meceAnalysisEnabled: boolean = true;
     private nasaComplianceEnabled: boolean = true;
     private smartIntegrationEnabled: boolean = true;
+    private analysisCache = new AnalysisCache();
+    private analysisEmitter = new vscode.EventEmitter<NormalizedAnalysisPayload>();
+    public readonly onAnalysisUpdated = this.analysisEmitter.event;
+    private backendStatusEmitter = new vscode.EventEmitter<BackendStatus>();
+    public readonly onBackendStatusChanged = this.backendStatusEmitter.event;
+    private latestResults: Map<string, NormalizedAnalysisPayload> = new Map();
+    private backendStatus: BackendStatus;
 
     constructor(
         private configService: ConfigurationService,
@@ -184,6 +211,26 @@ export class ConnascenceService {
         this.apiClient = new ConnascenceApiClient();
         this.initializeAdvancedCapabilities();
         this.initializeMCPClient();
+        this.backendStatus = {
+            active: 'fallback',
+            availability: this.createUnavailableAvailability(),
+            mcpConnected: false,
+            timestamp: Date.now()
+        };
+    }
+
+    public getBackendStatus(): BackendStatus {
+        return this.backendStatus;
+    }
+
+    public getLatestAnalysisSnapshot(filePath: string): NormalizedAnalysisPayload | undefined {
+        return this.latestResults.get(path.resolve(filePath));
+    }
+
+    public async refreshAnalyzerAvailability(): Promise<AnalyzerAvailability> {
+        const availability = await this.apiClient.getAnalyzerAvailability(true);
+        this.updateBackendStatus(this.backendStatus.active, undefined, availability);
+        return availability;
     }
 
     /**
@@ -194,9 +241,11 @@ export class ConnascenceService {
             this.mcpClient = new MCPClient(this.context);
             await this.mcpClient.connect();
             console.log('[ConnascenceService] MCP client connected successfully');
+            this.updateBackendStatus(this.backendStatus.active);
         } catch (error) {
             console.warn('[ConnascenceService] MCP client initialization failed, using CLI fallback:', error);
             this.mcpClient = null;
+            this.updateBackendStatus('fallback', 'MCP client unavailable');
         }
     }
 
@@ -217,87 +266,183 @@ export class ConnascenceService {
 
     async analyzeFile(filePath: string): Promise<AnalysisResult> {
         this.telemetryService.logEvent('file.analysis.started', { file: path.basename(filePath) });
-        
-        try {
-            const startTime = Date.now();
-            
-            // Get basic analysis from API client
-            const baseResult = await this.apiClient.analyzeFile(filePath);
-            
-            // Enhance with advanced analyzer capabilities
-            const enhancedResult = await this.enhanceAnalysisResult(baseResult, filePath, {
-                analysisType: 'single-file',
-                startTime
-            });
-            
-            this.telemetryService.logEvent('file.analysis.completed', { 
-                file: path.basename(filePath),
-                findings: enhancedResult.findings.length,
-                qualityScore: enhancedResult.qualityScore,
-                analysisTime: Date.now() - startTime
-            });
-            
-            return enhancedResult;
-        } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : String(error);
-            this.telemetryService.logEvent('file.analysis.error', { error: errorMessage });
-            throw error;
+
+        const cachedResult = await this.analysisCache.getCachedResult(filePath);
+        if (cachedResult) {
+            this.broadcastAnalysis(filePath, cachedResult, 'cache', true);
+            return cachedResult;
         }
+
+        const startTime = Date.now();
+        let backend: BackendMode = 'fallback';
+        let availability: AnalyzerAvailability | undefined;
+        let baseResult: AnalysisResult;
+
+        try {
+            if (this.shouldUseMCP()) {
+                backend = 'mcp';
+                baseResult = await this.analyzeMCP(filePath);
+            } else {
+                availability = await this.apiClient.getAnalyzerAvailability();
+                if (availability.python.available) {
+                    backend = 'python';
+                    baseResult = await this.apiClient.analyzeFile(filePath);
+                } else if (availability.cli.available) {
+                    backend = 'cli';
+                    baseResult = await this.analyzeCLI(filePath, availability.cli.command);
+                } else {
+                    throw new AnalyzerMissingError('Local analyzer binaries not found', availability);
+                }
+            }
+        } catch (error) {
+            if (error instanceof AnalyzerMissingError) {
+                availability = error.availability;
+                backend = 'fallback';
+                this.notifyMissingAnalyzer(error);
+                this.updateBackendStatus('fallback', error.message, availability);
+            } else {
+                backend = 'fallback';
+                const errorMessage = error instanceof Error ? error.message : String(error);
+                this.telemetryService.logEvent('file.analysis.error', { error: errorMessage });
+                this.updateBackendStatus('fallback', errorMessage, availability);
+            }
+            baseResult = await this.createBasicFallbackResult(filePath);
+        }
+
+        // Enhance with advanced analyzer capabilities
+        const enhancedResult = await this.enhanceAnalysisResult(baseResult, filePath, {
+            analysisType: 'single-file',
+            startTime
+        });
+
+        await this.analysisCache.setCachedResult(filePath, enhancedResult);
+
+        this.telemetryService.logEvent('file.analysis.completed', {
+            file: path.basename(filePath),
+            findings: enhancedResult.findings.length,
+            qualityScore: enhancedResult.qualityScore,
+            analysisTime: Date.now() - startTime,
+            backend
+        });
+
+        this.broadcastAnalysis(filePath, enhancedResult, backend, false, availability);
+
+        return enhancedResult;
     }
 
     async analyzeWorkspace(workspacePath: string): Promise<WorkspaceAnalysisResult> {
         this.telemetryService.logEvent('workspace.analysis.started');
-        
+
+        const startTime = Date.now();
+        let backend: BackendMode = 'fallback';
+        let availability: AnalyzerAvailability | undefined;
+        let baseResult: WorkspaceAnalysisResult | null = null;
+
         try {
-            const startTime = Date.now();
-            
-            // Get base workspace analysis
-            const baseResult = await this.apiClient.analyzeWorkspace(workspacePath);
-            
-            // Enhance each file result with advanced capabilities
-            const enhancedFileResults: { [filePath: string]: AnalysisResult } = {};
-            
-            for (const [filePath, fileResult] of Object.entries(baseResult.fileResults)) {
-                enhancedFileResults[filePath] = await this.enhanceAnalysisResult(
-                    fileResult, filePath, {
-                        analysisType: 'workspace',
-                        startTime,
-                        workspacePath
-                    }
-                );
+            if (this.shouldUseMCP()) {
+                backend = 'mcp';
+                baseResult = await this.analyzeWorkspaceMCP(workspacePath);
+            } else {
+                availability = await this.apiClient.getAnalyzerAvailability();
+                if (availability.python.available) {
+                    backend = 'python';
+                    baseResult = await this.apiClient.analyzeWorkspace(workspacePath);
+                } else if (availability.cli.available) {
+                    backend = 'cli';
+                    baseResult = await this.analyzeWorkspaceCLI(workspacePath, availability.cli.command);
+                } else {
+                    throw new AnalyzerMissingError('Local analyzer binaries not found', availability);
+                }
             }
-            
-            // Calculate enhanced workspace metrics
-            const enhancedSummary = await this.calculateWorkspaceSummary(
-                enhancedFileResults, workspacePath, startTime
-            );
-            
-            const analysisTime = Date.now() - startTime;
-            
-            this.telemetryService.logEvent('workspace.analysis.completed', {
-                filesAnalyzed: Object.keys(enhancedFileResults).length,
-                totalIssues: enhancedSummary.totalIssues,
-                qualityScore: enhancedSummary.qualityScore,
-                analysisTime
-            });
-            
-            return {
-                fileResults: enhancedFileResults,
-                summary: enhancedSummary
-            };
         } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : String(error);
-            this.telemetryService.logEvent('workspace.analysis.error', { error: errorMessage });
-            throw error;
+            if (error instanceof AnalyzerMissingError) {
+                availability = error.availability;
+                backend = 'fallback';
+                this.notifyMissingAnalyzer(error);
+                this.updateBackendStatus('fallback', error.message, availability);
+            } else {
+                backend = 'fallback';
+                const errorMessage = error instanceof Error ? error.message : String(error);
+                this.telemetryService.logEvent('workspace.analysis.error', { error: errorMessage });
+                this.updateBackendStatus('fallback', errorMessage, availability);
+            }
+
+            return {
+                fileResults: {},
+                summary: {
+                    filesAnalyzed: 0,
+                    totalIssues: 0,
+                    qualityScore: 100
+                }
+            };
         }
+
+        if (!baseResult) {
+            return {
+                fileResults: {},
+                summary: { filesAnalyzed: 0, totalIssues: 0, qualityScore: 100 }
+            };
+        }
+
+        const enhancedFileResults: { [filePath: string]: AnalysisResult } = {};
+
+        for (const [filePath, fileResult] of Object.entries(baseResult.fileResults)) {
+            const enhanced = await this.enhanceAnalysisResult(
+                fileResult,
+                filePath,
+                {
+                    analysisType: 'workspace',
+                    startTime,
+                    workspacePath
+                }
+            );
+            enhancedFileResults[filePath] = enhanced;
+            await this.analysisCache.setCachedResult(filePath, enhanced);
+            this.broadcastAnalysis(filePath, enhanced, backend, false, availability);
+        }
+
+        const enhancedSummary = await this.calculateWorkspaceSummary(
+            enhancedFileResults, workspacePath, startTime
+        );
+
+        const analysisTime = Date.now() - startTime;
+
+        this.telemetryService.logEvent('workspace.analysis.completed', {
+            filesAnalyzed: Object.keys(enhancedFileResults).length,
+            totalIssues: enhancedSummary.totalIssues,
+            qualityScore: enhancedSummary.qualityScore,
+            analysisTime,
+            backend
+        });
+
+        return {
+            fileResults: enhancedFileResults,
+            summary: enhancedSummary
+        };
     }
 
     async validateSafety(filePath: string, profile: string): Promise<SafetyValidationResult> {
         this.telemetryService.logEvent('safety.validation.started', { profile });
-        
+
+        if (this.shouldUseMCP()) {
+            try {
+                return await this.validateSafetyMCP(filePath, profile);
+            } catch (error) {
+                const errorMessage = error instanceof Error ? error.message : String(error);
+                this.telemetryService.logEvent('safety.validation.error', { error: errorMessage, backend: 'mcp' });
+            }
+        }
+
         try {
             return await this.apiClient.validateSafety(filePath, profile);
         } catch (error) {
+            if (error instanceof AnalyzerMissingError) {
+                const availability = error.availability;
+                if (availability.cli.available) {
+                    return await this.validateSafetyCLI(filePath, profile, availability.cli.command);
+                }
+                this.notifyMissingAnalyzer(error);
+            }
             const errorMessage = error instanceof Error ? error.message : String(error);
             this.telemetryService.logEvent('safety.validation.error', { error: errorMessage });
             throw error;
@@ -306,10 +451,26 @@ export class ConnascenceService {
 
     async suggestRefactoring(filePath: string, selection?: { start: { line: number; character: number }, end: { line: number; character: number } }): Promise<RefactoringSuggestion[]> {
         this.telemetryService.logEvent('refactoring.suggestion.requested');
-        
+
+        if (this.shouldUseMCP()) {
+            try {
+                return await this.suggestRefactoringMCP(filePath, selection);
+            } catch (error) {
+                const errorMessage = error instanceof Error ? error.message : String(error);
+                this.telemetryService.logEvent('refactoring.suggestion.error', { error: errorMessage, backend: 'mcp' });
+            }
+        }
+
         try {
             return await this.apiClient.suggestRefactoring(filePath, selection);
         } catch (error) {
+            if (error instanceof AnalyzerMissingError) {
+                const availability = error.availability;
+                if (availability.cli.available) {
+                    return await this.suggestRefactoringCLI(filePath, selection, availability.cli.command);
+                }
+                this.notifyMissingAnalyzer(error);
+            }
             const errorMessage = error instanceof Error ? error.message : String(error);
             this.telemetryService.logEvent('refactoring.suggestion.error', { error: errorMessage });
             throw error;
@@ -318,10 +479,26 @@ export class ConnascenceService {
 
     async getAutofixes(filePath: string): Promise<AutoFix[]> {
         this.telemetryService.logEvent('autofix.requested');
-        
+
+        if (this.shouldUseMCP()) {
+            try {
+                return await this.getAutofixesMCP(filePath);
+            } catch (error) {
+                const errorMessage = error instanceof Error ? error.message : String(error);
+                this.telemetryService.logEvent('autofix.error', { error: errorMessage, backend: 'mcp' });
+            }
+        }
+
         try {
             return await this.apiClient.getAutofixes(filePath);
         } catch (error) {
+            if (error instanceof AnalyzerMissingError) {
+                const availability = error.availability;
+                if (availability.cli.available) {
+                    return await this.getAutofixesCLI(filePath, availability.cli.command);
+                }
+                this.notifyMissingAnalyzer(error);
+            }
             const errorMessage = error instanceof Error ? error.message : String(error);
             this.telemetryService.logEvent('autofix.error', { error: errorMessage });
             throw error;
@@ -330,10 +507,26 @@ export class ConnascenceService {
 
     async generateReport(workspacePath: string): Promise<any> {
         this.telemetryService.logEvent('report.generation.started');
-        
+
+        if (this.shouldUseMCP()) {
+            try {
+                return await this.generateReportMCP(workspacePath);
+            } catch (error) {
+                const errorMessage = error instanceof Error ? error.message : String(error);
+                this.telemetryService.logEvent('report.generation.error', { error: errorMessage, backend: 'mcp' });
+            }
+        }
+
         try {
             return await this.apiClient.generateReport(workspacePath);
         } catch (error) {
+            if (error instanceof AnalyzerMissingError) {
+                const availability = error.availability;
+                if (availability.cli.available) {
+                    return await this.generateReportCLI(workspacePath, availability.cli.command);
+                }
+                this.notifyMissingAnalyzer(error);
+            }
             const errorMessage = error instanceof Error ? error.message : String(error);
             this.telemetryService.logEvent('report.generation.error', { error: errorMessage });
             throw error;
@@ -479,9 +672,9 @@ export class ConnascenceService {
     }
 
     // CLI implementations
-    private async analyzeCLI(filePath: string): Promise<AnalysisResult> {
+    private async analyzeCLI(filePath: string, cliCommand?: string): Promise<AnalysisResult> {
         const safetyProfile = this.configService.getSafetyProfile();
-        const cmd = 'connascence';
+        const cmd = cliCommand || this.getCliCommand();
         const args = ['analyze', filePath, '--profile', safetyProfile, '--format', 'json'];
 
         return new Promise((resolve, reject) => {
@@ -512,9 +705,9 @@ export class ConnascenceService {
         });
     }
 
-    private async analyzeWorkspaceCLI(workspacePath: string): Promise<WorkspaceAnalysisResult> {
+    private async analyzeWorkspaceCLI(workspacePath: string, cliCommand?: string): Promise<WorkspaceAnalysisResult> {
         const safetyProfile = this.configService.getSafetyProfile();
-        const cmd = 'connascence';
+        const cmd = cliCommand || this.getCliCommand();
         const args = ['analyze', workspacePath, '--profile', safetyProfile, '--format', 'json', '--recursive'];
 
         return new Promise((resolve, reject) => {
@@ -545,8 +738,8 @@ export class ConnascenceService {
         });
     }
 
-    private async validateSafetyCLI(filePath: string, profile: string): Promise<SafetyValidationResult> {
-        const cmd = 'connascence';
+    private async validateSafetyCLI(filePath: string, profile: string, cliCommand?: string): Promise<SafetyValidationResult> {
+        const cmd = cliCommand || this.getCliCommand();
         const args = ['validate-safety', filePath, '--profile', profile, '--format', 'json'];
 
         return new Promise((resolve, reject) => {
@@ -576,8 +769,8 @@ export class ConnascenceService {
         });
     }
 
-    private async suggestRefactoringCLI(filePath: string, selection?: any): Promise<RefactoringSuggestion[]> {
-        const cmd = 'connascence';
+    private async suggestRefactoringCLI(filePath: string, selection?: any, cliCommand?: string): Promise<RefactoringSuggestion[]> {
+        const cmd = cliCommand || this.getCliCommand();
         const args = ['suggest-refactoring', filePath, '--format', 'json'];
         
         if (selection) {
@@ -612,8 +805,8 @@ export class ConnascenceService {
         });
     }
 
-    private async getAutofixesCLI(filePath: string): Promise<AutoFix[]> {
-        const cmd = 'connascence';
+    private async getAutofixesCLI(filePath: string, cliCommand?: string): Promise<AutoFix[]> {
+        const cmd = cliCommand || this.getCliCommand();
         const args = ['autofix', filePath, '--dry-run', '--format', 'json'];
 
         return new Promise((resolve, reject) => {
@@ -644,8 +837,8 @@ export class ConnascenceService {
         });
     }
 
-    private async generateReportCLI(workspacePath: string): Promise<any> {
-        const cmd = 'connascence';
+    private async generateReportCLI(workspacePath: string, cliCommand?: string): Promise<any> {
+        const cmd = cliCommand || this.getCliCommand();
         const args = ['report', workspacePath, '--format', 'json'];
 
         return new Promise((resolve, reject) => {
@@ -674,6 +867,14 @@ export class ConnascenceService {
                 reject(new Error(`Failed to generate report: ${err.message}`));
             });
         });
+    }
+
+    private getCliCommand(): string {
+        return this.configService.getCliCommand();
+    }
+
+    private shouldUseMCP(): boolean {
+        return this.configService.useMCPServer() && !!(this.mcpClient && this.mcpClient.isServerConnected());
     }
 
     private transformCLIResult(result: any): AnalysisResult {
@@ -736,6 +937,22 @@ export class ConnascenceService {
             }
             return acc;
         }, { critical: 0, major: 0, minor: 0, info: 0 });
+    }
+
+    private calculateBasicQualityScore(findings: Finding[]): number {
+        if (findings.length === 0) {
+            return 100;
+        }
+
+        const weights: Record<string, number> = {
+            critical: 10,
+            major: 5,
+            minor: 2,
+            info: 1
+        };
+
+        const totalWeight = findings.reduce((sum, finding) => sum + (weights[finding.severity] || 1), 0);
+        return Math.max(0, 100 - totalWeight);
     }
 
     /**
@@ -1385,7 +1602,7 @@ export class ConnascenceService {
 
     private generateFallbackSmartIntegration(result: AnalysisResult): SmartIntegrationResult {
         const criticalFindings = result.findings.filter(f => f.severity === 'critical');
-        
+
         return {
             crossAnalyzerCorrelation: [],
             intelligentRecommendations: criticalFindings.slice(0, 3).map(f => ({
@@ -1411,6 +1628,114 @@ export class ConnascenceService {
                     description: f.message
                 })),
                 mitigation: ['Review and fix critical violations', 'Implement code quality gates']
+            }
+        };
+    }
+
+    private broadcastAnalysis(filePath: string, result: AnalysisResult, backend: BackendMode, fromCache: boolean, availability?: AnalyzerAvailability): void {
+        const normalizedPath = path.resolve(filePath);
+        const payload: NormalizedAnalysisPayload = {
+            filePath: normalizedPath,
+            result,
+            backend,
+            fromCache,
+            timestamp: Date.now(),
+            availability
+        };
+        this.latestResults.set(normalizedPath, payload);
+        this.analysisEmitter.fire(payload);
+        this.updateBackendStatus(backend, undefined, availability);
+    }
+
+    private updateBackendStatus(mode: BackendMode, error?: string, availability?: AnalyzerAvailability): void {
+        this.backendStatus = {
+            active: mode,
+            availability: availability || this.backendStatus.availability,
+            mcpConnected: this.mcpClient?.isServerConnected() || false,
+            lastError: error,
+            timestamp: Date.now()
+        };
+        this.backendStatusEmitter.fire(this.backendStatus);
+    }
+
+    private createUnavailableAvailability(): AnalyzerAvailability {
+        return {
+            python: { available: false, reason: 'Not yet detected' },
+            cli: { available: false, reason: 'Not yet detected' },
+            lastChecked: Date.now()
+        };
+    }
+
+    private notifyMissingAnalyzer(error: AnalyzerMissingError): void {
+        const details: string[] = [];
+        if (!error.availability.python.available && error.availability.python.reason) {
+            details.push(`Python: ${error.availability.python.reason}`);
+        }
+        if (!error.availability.cli.available && error.availability.cli.reason) {
+            details.push(`CLI: ${error.availability.cli.reason}`);
+        }
+        const message = details.length > 0
+            ? `Connascence analyzer unavailable. ${details.join(' • ')}`
+            : error.message;
+
+        vscode.window.showErrorMessage(message, 'View Setup Guide').then(selection => {
+            if (selection === 'View Setup Guide') {
+                const readmeUri = vscode.Uri.joinPath(this.context.extensionUri, 'README.md');
+                vscode.workspace.openTextDocument(readmeUri)
+                    .then(doc => vscode.window.showTextDocument(doc), () => vscode.commands.executeCommand('vscode.open', readmeUri));
+            }
+        });
+    }
+
+    private async createBasicFallbackResult(filePath: string): Promise<AnalysisResult> {
+        const findings: Finding[] = [];
+
+        try {
+            const fs = require('fs').promises;
+            const content = await fs.readFile(filePath, 'utf8');
+            const lines = content.split('\n');
+
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+                const lineNumber = i + 1;
+
+                const magicNumbers = line.match(/\b(\d{2,})\b/g);
+                if (magicNumbers) {
+                    findings.push({
+                        id: `magic_number_${lineNumber}`,
+                        type: 'connascence_of_meaning',
+                        severity: 'minor',
+                        message: `Magic number found: ${magicNumbers[0]}`,
+                        file: filePath,
+                        line: lineNumber,
+                        suggestion: 'Extract to a named constant'
+                    });
+                }
+
+                if (line.includes('def ') && (line.match(/,/g) || []).length >= 4) {
+                    findings.push({
+                        id: `long_params_${lineNumber}`,
+                        type: 'connascence_of_position',
+                        severity: 'major',
+                        message: 'Function has too many parameters',
+                        file: filePath,
+                        line: lineNumber,
+                        suggestion: 'Use a parameter object or break down the function'
+                    });
+                }
+            }
+        } catch (error) {
+            console.error('Fallback analysis failed:', error);
+        }
+
+        const qualityScore = this.calculateBasicQualityScore(findings);
+
+        return {
+            findings,
+            qualityScore,
+            summary: {
+                totalIssues: findings.length,
+                issuesBySeverity: this.calculateSeveritySummary(findings)
             }
         };
     }

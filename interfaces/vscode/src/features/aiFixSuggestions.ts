@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
-import { Finding } from '../services/connascenceService';
+import * as path from 'path';
+import { ConnascenceService, Finding, NormalizedAnalysisPayload } from '../services/connascenceService';
 
 export interface FixSuggestion {
     title: string;
@@ -13,6 +14,8 @@ export interface FixSuggestion {
 
 export class AIFixSuggestionsProvider {
     private static instance: AIFixSuggestionsProvider;
+    private latestFindings: Map<string, Finding[]> = new Map();
+    private serviceSubscription?: vscode.Disposable;
 
     private constructor() {}
 
@@ -23,9 +26,18 @@ export class AIFixSuggestionsProvider {
         return AIFixSuggestionsProvider.instance;
     }
 
+    public attachService(service: ConnascenceService): void {
+        if (this.serviceSubscription) {
+            this.serviceSubscription.dispose();
+        }
+        this.serviceSubscription = service.onAnalysisUpdated((event: NormalizedAnalysisPayload) => {
+            this.latestFindings.set(path.resolve(event.filePath), event.result.findings);
+        });
+    }
+
     public async generateFixSuggestions(finding: Finding, document: vscode.TextDocument): Promise<FixSuggestion[]> {
         const suggestions: FixSuggestion[] = [];
-        
+
         // Add rule-based suggestions first
         suggestions.push(...this.getRuleBasedSuggestions(finding, document));
         
@@ -38,6 +50,19 @@ export class AIFixSuggestionsProvider {
             suggestions.push(...aiSuggestions);
         }
         
+        const related = this.latestFindings.get(path.resolve(document.uri.fsPath));
+        if (related && related.length > 1) {
+            suggestions.push({
+                title: `📊 Review ${related.length} related findings`,
+                description: 'Open the dashboard to address all connascence issues together',
+                kind: vscode.CodeActionKind.Empty,
+                edit: new vscode.WorkspaceEdit(),
+                isAIGenerated: false,
+                confidence: 0.55,
+                violationType: finding.type
+            });
+        }
+
         return suggestions.sort((a, b) => b.confidence - a.confidence);
     }
 

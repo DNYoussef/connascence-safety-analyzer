@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
-import { Finding } from '../services/connascenceService';
+import * as path from 'path';
+import { ConnascenceService, Finding, NormalizedAnalysisPayload } from '../services/connascenceService';
 
 export interface NotificationFilter {
     enabled: boolean;
@@ -14,6 +15,7 @@ export class NotificationManager {
     private static instance: NotificationManager;
     private filters: Map<string, NotificationFilter> = new Map();
     private suppressedUntil: Map<string, number> = new Map(); // Temporarily suppress notifications
+    private serviceSubscription?: vscode.Disposable;
 
     private constructor() {
         this.initializeDefaultFilters();
@@ -32,6 +34,57 @@ export class NotificationManager {
             NotificationManager.instance = new NotificationManager();
         }
         return NotificationManager.instance;
+    }
+
+    public attachService(service: ConnascenceService): void {
+        if (this.serviceSubscription) {
+            this.serviceSubscription.dispose();
+        }
+        this.serviceSubscription = service.onAnalysisUpdated(event => this.handleAnalysisEvent(event));
+    }
+
+    private handleAnalysisEvent(event: NormalizedAnalysisPayload): void {
+        const filtered = this.getFilteredFindings(event.result.findings);
+        if (filtered.length === 0) {
+            return;
+        }
+
+        const highest = filtered.reduce((prev, current) =>
+            this.getSeverityPriority(current.severity) >= this.getSeverityPriority(prev.severity) ? current : prev,
+            filtered[0]
+        );
+
+        if (this.getSeverityPriority(highest.severity) < 3) {
+            return;
+        }
+
+        const suppressionKey = `${highest.type}_${highest.file}_${highest.line}`;
+        const suppressedUntil = this.suppressedUntil.get(suppressionKey);
+        if (suppressedUntil && suppressedUntil > Date.now()) {
+            return;
+        }
+
+        const fileName = path.basename(highest.file);
+        const mode = event.backend.toUpperCase();
+        const message = `${fileName}:${highest.line} ${highest.message} (via ${mode})`;
+
+        const buttons: Array<'Open File' | 'Snooze 10m'> = ['Open File', 'Snooze 10m'];
+        const promise = this.getSeverityPriority(highest.severity) === 4
+            ? vscode.window.showErrorMessage<'Open File' | 'Snooze 10m'>(`Connascence ${highest.severity.toUpperCase()}: ${message}`, ...buttons)
+            : vscode.window.showWarningMessage<'Open File' | 'Snooze 10m'>(`Connascence ${highest.severity.toUpperCase()}: ${message}`, ...buttons);
+
+        promise.then(selection => {
+            if (selection === 'Open File') {
+                vscode.window.showTextDocument(vscode.Uri.file(highest.file), {
+                    selection: new vscode.Range(highest.line - 1, (highest.column || 1) - 1, highest.line - 1, (highest.column || 1) + 10)
+                });
+            } else if (selection === 'Snooze 10m') {
+                this.suppressedUntil.set(suppressionKey, Date.now() + 10 * 60 * 1000);
+            }
+        });
+
+        // Prevent repeated notifications immediately
+        this.suppressedUntil.set(suppressionKey, Date.now() + 2 * 60 * 1000);
     }
 
     private initializeDefaultFilters() {
@@ -368,6 +421,19 @@ export class NotificationManager {
         const index1 = severityOrder.indexOf(severity1);
         const index2 = severityOrder.indexOf(severity2);
         return index1 - index2;
+    }
+
+    private getSeverityPriority(severity: string): number {
+        switch (severity) {
+            case 'critical':
+                return 4;
+            case 'major':
+                return 3;
+            case 'minor':
+                return 2;
+            default:
+                return 1;
+        }
     }
 
     public showFilterManagementQuickPick(): void {

@@ -339,4 +339,8 @@ export class ConnascenceExtension {
         this.disposables = [];
         this.logger.info('Connascence extension disposed');
     }
+
+    public getConnascenceService(): ConnascenceService {
+        return this.connascenceService;
+    }
 }

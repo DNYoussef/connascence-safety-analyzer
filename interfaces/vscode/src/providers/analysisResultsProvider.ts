@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
-import { Finding } from '../services/connascenceService';
+import * as path from 'path';
+import { ConnascenceService, Finding, NormalizedAnalysisPayload } from '../services/connascenceService';
 
 export class AnalysisResultItem extends vscode.TreeItem {
     constructor(
@@ -93,8 +94,17 @@ export class AnalysisResultsProvider implements vscode.TreeDataProvider<Analysis
     private showSummary: boolean = true;
     private totalFindings: number = 0;
     private lastAnalysisTime: Date | null = null;
+    private serviceSubscription?: vscode.Disposable;
 
-    constructor() {}
+    constructor(private connascenceService?: ConnascenceService) {
+        if (connascenceService) {
+            this.serviceSubscription = connascenceService.onAnalysisUpdated(event => this.ingestAnalysis(event));
+        }
+    }
+
+    dispose(): void {
+        this.serviceSubscription?.dispose();
+    }
 
     // Search and filter methods
     setFilter(filter: AnalysisFilter): void {
@@ -106,6 +116,7 @@ export class AnalysisResultsProvider implements vscode.TreeDataProvider<Analysis
     clearFilter(): void {
         this.currentFilter = {};
         this.filteredResults = new Map(this.analysisResults);
+        this.totalFindings = Array.from(this.filteredResults.values()).reduce((sum, fileFindings) => sum + fileFindings.length, 0);
         this.refresh();
     }
 
@@ -156,6 +167,16 @@ export class AnalysisResultsProvider implements vscode.TreeDataProvider<Analysis
                 this.filteredResults.set(filePath, filteredFindings);
             }
         }
+
+        this.totalFindings = Array.from(this.filteredResults.values()).reduce((sum, fileFindings) => sum + fileFindings.length, 0);
+    }
+
+    private ingestAnalysis(event: NormalizedAnalysisPayload): void {
+        const normalizedPath = path.resolve(event.filePath);
+        this.analysisResults.set(normalizedPath, event.result.findings);
+        this.lastAnalysisTime = new Date(event.timestamp);
+        this.applyFilters();
+        this.refresh();
     }
 
     private filterFindings(findings: Finding[]): Finding[] {

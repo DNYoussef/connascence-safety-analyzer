@@ -57,6 +57,7 @@ export class CommandManager implements vscode.Disposable {
         this.commands.set('connascence.refreshFindings', this.refreshFindings.bind(this));
         this.commands.set('connascence.clearFindings', this.clearFindings.bind(this));
         this.commands.set('connascence.clearCache', this.clearCache.bind(this));
+        this.commands.set('connascence.showAnalyzerHealth', this.showAnalyzerHealth.bind(this));
         
         // Information commands
         this.commands.set('connascence.explainFinding', this.explainFinding.bind(this));
@@ -493,6 +494,25 @@ export class CommandManager implements vscode.Disposable {
 
     private async showDocumentation(): Promise<void> {
         await vscode.env.openExternal(vscode.Uri.parse('https://docs.connascence.io'));
+    }
+
+    private async showAnalyzerHealth(): Promise<void> {
+        const status = this.connascenceService.getBackendStatus();
+        const availability = await this.connascenceService.refreshAnalyzerAvailability();
+
+        const lines = [
+            `Active backend: ${status.active.toUpperCase()}`,
+            `MCP connected: ${status.mcpConnected ? 'Yes' : 'No'}`,
+            `Python analyzer: ${availability.python.available ? availability.python.entryPoint || 'Detected' : availability.python.reason || 'Unavailable'}`,
+            `CLI analyzer: ${availability.cli.available ? availability.cli.command || 'Detected' : availability.cli.reason || 'Unavailable'}`,
+            status.lastError ? `Last error: ${status.lastError}` : 'Last error: None'
+        ];
+
+        vscode.window.showInformationMessage(lines.join('\n'), { modal: true }, 'Re-run Detection').then(async selection => {
+            if (selection === 'Re-run Detection') {
+                await this.connascenceService.refreshAnalyzerAvailability();
+            }
+        });
     }
 
     // Helper methods

@@ -47,6 +47,7 @@ export function activate(context: vscode.ExtensionContext) {
         // These will be initialized after extension is created
         connascenceService = null as any;
         extension = new ConnascenceExtension(context, logger, telemetry);
+        connascenceService = extension.getConnascenceService();
         
         // Initialize all feature managers
         initializeFeatureManagers(context);
@@ -83,39 +84,43 @@ export function activate(context: vscode.ExtensionContext) {
 
 function initializeFeatureManagers(context: vscode.ExtensionContext) {
     logger.info('🔧 Initializing feature managers...');
-    
+
     // Initialize enhanced pipeline provider first
     enhancedPipelineProvider = EnhancedPipelineProvider.getInstance();
     context.subscriptions.push(enhancedPipelineProvider);
-    
+
     // Initialize visual highlighting
-    visualHighlighting = new VisualHighlightingManager();
+    visualHighlighting = new VisualHighlightingManager(connascenceService);
     context.subscriptions.push(visualHighlighting as any);
-    
+
     // Initialize notification manager
     notificationManager = NotificationManager.getInstance();
-    
+    notificationManager.attachService(connascenceService);
+
     // Initialize broken chain logo
     brokenChainLogo = BrokenChainLogoManager.getInstance();
     context.subscriptions.push(brokenChainLogo as any);
-    
+
     // Initialize AI fix suggestions
     aiFixSuggestions = AIFixSuggestionsProvider.getInstance();
+    aiFixSuggestions.attachService(connascenceService);
     
     logger.info('✅ Feature managers initialized with enhanced pipeline support');
 }
 
 function initializeTreeProviders(context: vscode.ExtensionContext) {
     logger.info('🌳 Initializing tree data providers...');
-    
+
     // Initialize dashboard provider
     dashboardProvider = new ConnascenceDashboardProvider(connascenceService);
     vscode.window.registerTreeDataProvider('connascenceDashboard', dashboardProvider);
-    
+    context.subscriptions.push(dashboardProvider);
+
     // Initialize analysis results provider
-    analysisResultsProvider = new AnalysisResultsProvider();
+    analysisResultsProvider = new AnalysisResultsProvider(connascenceService);
     vscode.window.registerTreeDataProvider('connascenceAnalysisResults', analysisResultsProvider);
-    
+    context.subscriptions.push(analysisResultsProvider);
+
     logger.info('✅ Tree data providers registered');
 }
 

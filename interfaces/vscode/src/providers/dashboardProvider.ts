@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { ConnascenceService, Finding } from '../services/connascenceService';
+import { ConnascenceService, Finding, NormalizedAnalysisPayload, BackendStatus } from '../services/connascenceService';
 
 export class DashboardItem extends vscode.TreeItem {
     constructor(
@@ -81,8 +81,31 @@ export class ConnascenceDashboardProvider implements vscode.TreeDataProvider<Das
     private reportHistory: any[] = [];
     private currentFilter: DashboardFilter = {};
     private allFindings: Finding[] = [];
+    private backendStatus: BackendStatus | null = null;
+    private findingsByFile: Map<string, Finding[]> = new Map();
+    private serviceSubscriptions: vscode.Disposable[] = [];
+    private lastAnalysisTime: Date | null = null;
 
-    constructor(private connascenceService: ConnascenceService) {}
+    constructor(private connascenceService: ConnascenceService) {
+        if (this.connascenceService) {
+            this.serviceSubscriptions.push(
+                this.connascenceService.onAnalysisUpdated(event => this.handleAnalysisUpdate(event))
+            );
+            this.serviceSubscriptions.push(
+                this.connascenceService.onBackendStatusChanged(status => {
+                    this.backendStatus = status;
+                    this.refresh();
+                })
+            );
+        }
+    }
+
+    dispose(): void {
+        for (const disposable of this.serviceSubscriptions) {
+            disposable.dispose();
+        }
+        this.serviceSubscriptions = [];
+    }
 
     // Search and filter methods
     setFilter(filter: DashboardFilter): void {
@@ -226,7 +249,18 @@ export class ConnascenceDashboardProvider implements vscode.TreeDataProvider<Das
                 'quickActions'
             )
         ];
-        
+
+        if (this.backendStatus) {
+            elements.unshift(new DashboardItem(
+                `Analyzer Health: ${this.backendStatus.active.toUpperCase()}`,
+                vscode.TreeItemCollapsibleState.None,
+                this.getHealthDescription(),
+                'health',
+                { command: 'connascence.showAnalyzerHealth', title: 'Show Analyzer Health' },
+                new vscode.ThemeIcon(this.backendStatus.active === 'mcp' ? 'cloud' : 'circuit-board')
+            ));
+        }
+
         // Add progress indicator if analysis is running
         if (this.analysisProgress.isRunning) {
             elements.unshift(new DashboardItem(
@@ -240,6 +274,26 @@ export class ConnascenceDashboardProvider implements vscode.TreeDataProvider<Das
         }
         
         return elements;
+    }
+
+    private handleAnalysisUpdate(event: NormalizedAnalysisPayload): void {
+        this.findingsByFile.set(event.filePath, event.result.findings);
+        this.allFindings = Array.from(this.findingsByFile.values()).flat();
+        this.analysisResults = event.result;
+        this.lastAnalysisTime = new Date(event.timestamp);
+        this.refresh();
+    }
+
+    private getHealthDescription(): string {
+        if (!this.backendStatus) {
+            return 'Analyzer health unknown';
+        }
+
+        const { availability, mcpConnected } = this.backendStatus;
+        const pythonStatus = availability.python.available ? 'Python analyzer ready' : availability.python.reason || 'Python missing';
+        const cliStatus = availability.cli.available ? 'CLI available' : availability.cli.reason || 'CLI missing';
+        const mcpStatus = mcpConnected ? 'MCP connected' : 'MCP offline';
+        return `${pythonStatus} • ${cliStatus} • ${mcpStatus}`;
     }
 
     private getQualityOverviewChildren(): DashboardItem[] {

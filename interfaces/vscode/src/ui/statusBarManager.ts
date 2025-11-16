@@ -1,11 +1,13 @@
 import * as vscode from 'vscode';
-import { ConnascenceService } from '../services/connascenceService';
+import { ConnascenceService, BackendMode, BackendStatus } from '../services/connascenceService';
 import { ConfigurationService } from '../services/configurationService';
 
 export class StatusBarManager {
     private statusBarItem: vscode.StatusBarItem;
     private isAnalyzing = false;
     private currentProfile: string;
+    private backendMode: BackendMode = 'fallback';
+    private backendStatusMessage: string = 'Analyzer health unknown';
 
     constructor(
         private connascenceService: ConnascenceService,
@@ -27,6 +29,12 @@ export class StatusBarManager {
                 this.currentProfile = newProfile;
                 this.updateDisplay();
             }
+        });
+
+        this.connascenceService.onBackendStatusChanged((status: BackendStatus) => {
+            this.backendMode = status.active;
+            this.backendStatusMessage = this.describeBackendStatus(status);
+            this.updateDisplay();
         });
     }
 
@@ -128,10 +136,26 @@ export class StatusBarManager {
             const gateStatusIcon = this.getQualityGateIcon();
             
             // Include quality gate status in display
-            this.statusBarItem.text = `${profileIcon}${gateStatusIcon} Connascence: ${this.formatProfile(this.currentProfile)}`;
-            this.statusBarItem.tooltip = this.createTooltip();
+            const backendLabel = this.getBackendLabel();
+            this.statusBarItem.text = `${profileIcon}${gateStatusIcon} Connascence: ${this.formatProfile(this.currentProfile)} · ${backendLabel}`;
+            this.statusBarItem.tooltip = `${this.createTooltip()}\nBackend: ${backendLabel}\n${this.backendStatusMessage}`;
             this.statusBarItem.backgroundColor = this.getQualityGateColor();
-            this.statusBarItem.command = 'connascence.showDashboard'; // Changed to show dashboard instead
+            this.statusBarItem.command = 'connascence.showAnalyzerHealth';
+        }
+    }
+
+    private getBackendLabel(): string {
+        switch (this.backendMode) {
+            case 'mcp':
+                return 'MCP';
+            case 'cli':
+                return 'CLI';
+            case 'python':
+                return 'Python';
+            case 'cache':
+                return 'Cache';
+            default:
+                return 'Fallback';
         }
     }
 
@@ -208,9 +232,16 @@ export class StatusBarManager {
             `Grammar Validation: ${this.configService.isGrammarValidationEnabled() ? 'On' : 'Off'}`,
             `Framework: ${this.configService.getFrameworkProfile()}`,
             '',
-            'Click to view quality dashboard'
+            'Click to view analyzer health summary'
         ];
 
         return lines.join('\n');
+    }
+
+    private describeBackendStatus(status: BackendStatus): string {
+        const pythonStatus = status.availability.python.available ? 'Python analyzer ready' : status.availability.python.reason || 'Python missing';
+        const cliStatus = status.availability.cli.available ? 'CLI available' : status.availability.cli.reason || 'CLI missing';
+        const mcpStatus = status.mcpConnected ? 'MCP connected' : 'MCP offline';
+        return `${pythonStatus} • ${cliStatus} • ${mcpStatus}`;
     }
 }

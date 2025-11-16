@@ -1,13 +1,37 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { spawn } from 'child_process';
+import { spawn, spawnSync } from 'child_process';
 import { AnalysisResult, Finding, PerformanceMetrics, DuplicationCluster, NASAComplianceResult, SmartIntegrationResult } from './connascenceService';
+
+export interface AnalyzerAvailability {
+    python: {
+        available: boolean;
+        entryPoint?: string;
+        pythonPath?: string;
+        reason?: string;
+    };
+    cli: {
+        available: boolean;
+        command?: string;
+        resolvedPath?: string;
+        reason?: string;
+    };
+    lastChecked: number;
+}
+
+export class AnalyzerMissingError extends Error {
+    constructor(message: string, public readonly availability: AnalyzerAvailability) {
+        super(message);
+        this.name = 'AnalyzerMissingError';
+    }
+}
 
 /**
  * Client for integrating with the main connascence analysis system
  */
 export class ConnascenceApiClient {
     private workspaceRoot: string | undefined;
+    private cachedAvailability: AnalyzerAvailability | null = null;
 
     constructor() {
         this.workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
@@ -33,8 +57,11 @@ export class ConnascenceApiClient {
             return analysisResult;
             
         } catch (error) {
+            if (error instanceof AnalyzerMissingError) {
+                throw error;
+            }
             console.error('Failed to analyze file with unified system:', error);
-            
+
             // Fallback to simplified analysis
             return this.fallbackAnalyzeFile(filePath);
         }
@@ -66,6 +93,9 @@ export class ConnascenceApiClient {
             return this.convertUnifiedWorkspaceResult(result, startTime);
             
         } catch (error) {
+            if (error instanceof AnalyzerMissingError) {
+                throw error;
+            }
             console.error('Failed to analyze workspace with unified system:', error);
             throw error;
         }
@@ -105,6 +135,9 @@ export class ConnascenceApiClient {
             };
             
         } catch (error) {
+            if (error instanceof AnalyzerMissingError) {
+                throw error;
+            }
             console.error('Safety validation failed, using fallback:', error);
             // Fallback to basic validation
             return {
@@ -169,6 +202,9 @@ export class ConnascenceApiClient {
             return suggestions;
             
         } catch (error) {
+            if (error instanceof AnalyzerMissingError) {
+                throw error;
+            }
             console.error('Failed to get refactoring suggestions:', error);
             return [];
         }
@@ -222,6 +258,9 @@ export class ConnascenceApiClient {
             return fixes;
             
         } catch (error) {
+            if (error instanceof AnalyzerMissingError) {
+                throw error;
+            }
             console.error('Failed to get autofixes:', error);
             return [];
         }
@@ -269,6 +308,9 @@ export class ConnascenceApiClient {
             };
             
         } catch (error) {
+            if (error instanceof AnalyzerMissingError) {
+                throw error;
+            }
             console.error('Failed to generate report:', error);
             // Return fallback report structure
             return {
@@ -300,16 +342,17 @@ export class ConnascenceApiClient {
      * Run unified analyzer with all advanced capabilities and robust error handling
      */
     private async runUnifiedAnalyzer(options: any): Promise<any> {
-        const analyzerPath = this.getUnifiedAnalyzerPath();
-        const pythonPath = this.getPythonPath();
-        
-        // Check if analyzer file exists
-        const fs = require('fs');
-        if (!fs.existsSync(analyzerPath)) {
-            console.warn(`Analyzer not found at ${analyzerPath}, using fallback`);
-            return this.getFallbackAnalysisResult(options);
+        const availability = await this.getAnalyzerAvailability();
+        if (!availability.python.available) {
+            throw new AnalyzerMissingError(
+                availability.python.reason || 'Python analyzer entry point not available',
+                availability
+            );
         }
-        
+
+        const analyzerPath = availability.python.entryPoint || this.getUnifiedAnalyzerPath();
+        const pythonPath = availability.python.pythonPath || this.getPythonPath();
+
         const args = [
             analyzerPath,
             '--path', options.inputPath,
@@ -377,6 +420,10 @@ export class ConnascenceApiClient {
             });
             
             process.on('error', (error) => {
+                if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+                    reject(new AnalyzerMissingError('Python executable not found', availability));
+                    return;
+                }
                 console.warn(`Failed to run analyzer: ${error.message}, using fallback`);
                 resolve(this.getFallbackAnalysisResult(options));
             });
@@ -972,11 +1019,11 @@ export class ConnascenceApiClient {
     private getPythonPath(): string {
         const config = vscode.workspace.getConfiguration('connascence');
         const configuredPath = config.get<string>('pythonPath');
-        
+
         if (configuredPath) {
             return configuredPath;
         }
-        
+
         // Try common Python paths
         const commonPaths = [
             'python3',
@@ -987,8 +1034,97 @@ export class ConnascenceApiClient {
             'C:\\Python310\\python.exe',
             'C:\\Python311\\python.exe'
         ];
-        
+
         // For now, default to 'python'
         return 'python';
+    }
+
+    public async getAnalyzerAvailability(forceRefresh: boolean = false): Promise<AnalyzerAvailability> {
+        if (this.cachedAvailability && !forceRefresh && (Date.now() - this.cachedAvailability.lastChecked) < 15000) {
+            return this.cachedAvailability;
+        }
+
+        const python = this.detectPythonAnalyzer();
+        const cli = this.detectCliAnalyzer();
+
+        this.cachedAvailability = {
+            python,
+            cli,
+            lastChecked: Date.now()
+        };
+
+        return this.cachedAvailability;
+    }
+
+    public async ensureAnalyzerAvailability(): Promise<void> {
+        const availability = await this.getAnalyzerAvailability();
+        if (!availability.python.available && !availability.cli.available) {
+            throw new AnalyzerMissingError('No analyzer entry points are available', availability);
+        }
+    }
+
+    private detectPythonAnalyzer(): AnalyzerAvailability['python'] {
+        const fs = require('fs');
+        const analyzerPath = this.getUnifiedAnalyzerPath();
+        if (!fs.existsSync(analyzerPath)) {
+            return {
+                available: false,
+                entryPoint: analyzerPath,
+                reason: 'Unified analyzer script is missing. Run the setup instructions from the README.'
+            };
+        }
+
+        const pythonPath = this.getPythonPath();
+        try {
+            const versionCheck = spawnSync(pythonPath, ['--version']);
+            if (versionCheck.error) {
+                return {
+                    available: false,
+                    entryPoint: analyzerPath,
+                    pythonPath,
+                    reason: `Python executable '${pythonPath}' is not available on PATH`
+                };
+            }
+            return {
+                available: true,
+                entryPoint: analyzerPath,
+                pythonPath
+            };
+        } catch (error) {
+            return {
+                available: false,
+                entryPoint: analyzerPath,
+                pythonPath,
+                reason: (error as Error).message
+            };
+        }
+    }
+
+    private detectCliAnalyzer(): AnalyzerAvailability['cli'] {
+        const config = vscode.workspace.getConfiguration('connascence');
+        const command = config.get<string>('cliCommand', 'connascence');
+        const locator = process.platform === 'win32' ? 'where' : 'which';
+        try {
+            const detection = spawnSync(locator, [command], { encoding: 'utf8' });
+            if (detection.status === 0) {
+                const resolvedPath = detection.stdout.split(/\r?\n/).filter(Boolean)[0];
+                return {
+                    available: true,
+                    command,
+                    resolvedPath
+                };
+            }
+            return {
+                available: false,
+                command,
+                reason: `Command '${command}' is not on PATH. Follow the CLI installation section in the README.`
+            };
+        } catch (error) {
+            return {
+                available: false,
+                command,
+                reason: (error as Error).message
+            };
+        }
     }
 }
