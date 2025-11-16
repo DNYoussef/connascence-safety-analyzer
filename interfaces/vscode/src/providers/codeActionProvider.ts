@@ -40,6 +40,15 @@ export class ConnascenceCodeActionProvider implements vscode.CodeActionProvider 
             vscode.CodeActionKind.QuickFix
         );
 
+        const normalizedFindings = this.connascenceService.getNormalizedFindings(document.fileName);
+        const diagnosticId = typeof diagnostic.code === 'object'
+            ? (diagnostic.code as { value?: string }).value
+            : diagnostic.code;
+        const normalized = normalizedFindings?.find(f => f.id === diagnosticId);
+        if (normalized?.emoji) {
+            action.title = `${normalized.emoji} Fix: ${diagnostic.message}`;
+        }
+
         action.diagnostics = [diagnostic];
         action.isPreferred = true;
 

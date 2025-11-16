@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { Finding } from '../services/connascenceService';
+import { Finding, NormalizedFinding } from '../services/connascenceService';
 
 export class AnalysisResultItem extends vscode.TreeItem {
     constructor(
@@ -86,10 +86,10 @@ export class AnalysisResultsProvider implements vscode.TreeDataProvider<Analysis
     private _onDidChangeTreeData: vscode.EventEmitter<AnalysisResultItem | undefined | null | void> = new vscode.EventEmitter<AnalysisResultItem | undefined | null | void>();
     readonly onDidChangeTreeData: vscode.Event<AnalysisResultItem | undefined | null | void> = this._onDidChangeTreeData.event;
 
-    private analysisResults: Map<string, Finding[]> = new Map();
+    private analysisResults: Map<string, (Finding | NormalizedFinding)[]> = new Map();
     private groupBy: 'file' | 'severity' | 'type' = 'file';
     private currentFilter: AnalysisFilter = {};
-    private filteredResults: Map<string, Finding[]> = new Map();
+    private filteredResults: Map<string, (Finding | NormalizedFinding)[]> = new Map();
     private showSummary: boolean = true;
     private totalFindings: number = 0;
     private lastAnalysisTime: Date | null = null;
@@ -158,7 +158,7 @@ export class AnalysisResultsProvider implements vscode.TreeDataProvider<Analysis
         }
     }
 
-    private filterFindings(findings: Finding[]): Finding[] {
+    private filterFindings(findings: (Finding | NormalizedFinding)[]): Finding[] {
         let filtered = [...findings];
 
         // Search query filter
@@ -236,7 +236,7 @@ export class AnalysisResultsProvider implements vscode.TreeDataProvider<Analysis
         this._onDidChangeTreeData.fire();
     }
 
-    updateResults(results: Map<string, Finding[]>) {
+    updateResults(results: Map<string, (Finding | NormalizedFinding)[]>) {
         this.analysisResults = results;
         this.totalFindings = Array.from(results.values()).reduce((sum, findings) => sum + findings.length, 0);
         this.lastAnalysisTime = new Date();
@@ -574,7 +574,7 @@ export class AnalysisResultsProvider implements vscode.TreeDataProvider<Analysis
         });
     }
 
-    private getFindingElements(findings: Finding[]): AnalysisResultItem[] {
+    private getFindingElements(findings: (Finding | NormalizedFinding)[]): AnalysisResultItem[] {
         return findings.map(finding => {
             const fileName = finding.file.split('/').pop() || finding.file;
             const item = new AnalysisResultItem(

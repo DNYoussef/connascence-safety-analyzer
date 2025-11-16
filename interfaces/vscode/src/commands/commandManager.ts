@@ -57,7 +57,8 @@ export class CommandManager implements vscode.Disposable {
         this.commands.set('connascence.refreshFindings', this.refreshFindings.bind(this));
         this.commands.set('connascence.clearFindings', this.clearFindings.bind(this));
         this.commands.set('connascence.clearCache', this.clearCache.bind(this));
-        
+        this.commands.set('connascence.showHealth', this.showHealthSummary.bind(this));
+
         // Information commands
         this.commands.set('connascence.explainFinding', this.explainFinding.bind(this));
         this.commands.set('connascence.showError', this.showError.bind(this));
@@ -493,6 +494,20 @@ export class CommandManager implements vscode.Disposable {
 
     private async showDocumentation(): Promise<void> {
         await vscode.env.openExternal(vscode.Uri.parse('https://docs.connascence.io'));
+    }
+
+    private async showHealthSummary(): Promise<void> {
+        const health = this.connascenceService.getHealthStatus();
+        const lines = [
+            `Backend: ${health.backend.toUpperCase()}`,
+            `MCP connected: ${health.mcpConnected ? 'Yes' : 'No'}`,
+            `CLI available: ${health.cliAvailable ? `Yes (${health.cliPath || 'PATH'})` : 'No'}`,
+            `Python analyzer: ${health.pythonAvailable ? `Yes (${health.pythonPath || 'workspace'})` : 'No'}`,
+            health.lastError ? `Last error: ${health.lastError}` : undefined,
+            health.message
+        ].filter(Boolean).join('\n');
+
+        vscode.window.showInformationMessage(`Connascence Analyzer Health\n${lines}`);
     }
 
     // Helper methods

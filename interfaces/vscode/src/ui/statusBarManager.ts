@@ -1,11 +1,14 @@
 import * as vscode from 'vscode';
-import { ConnascenceService } from '../services/connascenceService';
+import { ConnascenceService, AnalyzerBackend, AnalyzerHealth } from '../services/connascenceService';
 import { ConfigurationService } from '../services/configurationService';
 
 export class StatusBarManager {
     private statusBarItem: vscode.StatusBarItem;
     private isAnalyzing = false;
     private currentProfile: string;
+    private backendMode: AnalyzerBackend = 'python';
+    private backendMessage: string = 'Analyzer initializing';
+    private healthSubscription?: vscode.Disposable;
 
     constructor(
         private connascenceService: ConnascenceService,
@@ -19,6 +22,8 @@ export class StatusBarManager {
         this.currentProfile = this.configService.getSafetyProfile();
         this.updateDisplay();
         this.statusBarItem.show();
+
+        this.healthSubscription = this.connascenceService.onHealthChanged((health) => this.handleHealthUpdate(health));
 
         // Listen for configuration changes
         this.configService.onConfigurationChanged(() => {
@@ -49,6 +54,7 @@ export class StatusBarManager {
     }
 
     dispose(): void {
+        this.healthSubscription?.dispose();
         this.statusBarItem.dispose();
     }
 
@@ -126,12 +132,13 @@ export class StatusBarManager {
         } else {
             const profileIcon = this.getProfileIcon(this.currentProfile);
             const gateStatusIcon = this.getQualityGateIcon();
-            
+            const backendIcon = this.getBackendIcon();
+
             // Include quality gate status in display
-            this.statusBarItem.text = `${profileIcon}${gateStatusIcon} Connascence: ${this.formatProfile(this.currentProfile)}`;
+            this.statusBarItem.text = `${backendIcon}${profileIcon}${gateStatusIcon} Connascence: ${this.formatProfile(this.currentProfile)}`;
             this.statusBarItem.tooltip = this.createTooltip();
             this.statusBarItem.backgroundColor = this.getQualityGateColor();
-            this.statusBarItem.command = 'connascence.showDashboard'; // Changed to show dashboard instead
+            this.statusBarItem.command = 'connascence.showHealth';
         }
     }
 
@@ -207,10 +214,30 @@ export class StatusBarManager {
             `Real-time Analysis: ${this.configService.isRealTimeAnalysisEnabled() ? 'On' : 'Off'}`,
             `Grammar Validation: ${this.configService.isGrammarValidationEnabled() ? 'On' : 'Off'}`,
             `Framework: ${this.configService.getFrameworkProfile()}`,
+            `Backend: ${this.backendMode.toUpperCase()}${this.backendMessage ? ' - ' + this.backendMessage : ''}`,
             '',
-            'Click to view quality dashboard'
+            'Click to view analyzer health'
         ];
 
         return lines.join('\n');
+    }
+
+    private getBackendIcon(): string {
+        switch (this.backendMode) {
+            case 'mcp':
+                return '$(server) ';
+            case 'cli':
+                return '$(terminal) ';
+            case 'cache':
+                return '$(history) ';
+            default:
+                return '$(debug-alt-small) ';
+        }
+    }
+
+    private handleHealthUpdate(health: AnalyzerHealth): void {
+        this.backendMode = health.backend;
+        this.backendMessage = health.message;
+        this.updateDisplay();
     }
 }

@@ -13,6 +13,7 @@ export interface FixSuggestion {
 
 export class AIFixSuggestionsProvider {
     private static instance: AIFixSuggestionsProvider;
+    private activeFindings: Finding[] = [];
 
     private constructor() {}
 
@@ -39,6 +40,10 @@ export class AIFixSuggestionsProvider {
         }
         
         return suggestions.sort((a, b) => b.confidence - a.confidence);
+    }
+
+    public updateActiveFindings(findings: Finding[]): void {
+        this.activeFindings = findings;
     }
 
     private getRuleBasedSuggestions(finding: Finding, document: vscode.TextDocument): FixSuggestion[] {

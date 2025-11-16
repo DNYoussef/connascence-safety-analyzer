@@ -155,6 +155,12 @@
         "icon": "$(debug-breakpoint-log)"
       },
       {
+        "command": "connascence.showHealth",
+        "title": "Show Analyzer Health",
+        "category": "Connascence: Diagnostics",
+        "icon": "$(pulse)"
+      },
+      {
         "command": "connascence.showWelcome",
         "title": "Show Welcome Screen",
         "category": "Connascence",

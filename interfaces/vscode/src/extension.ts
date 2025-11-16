@@ -65,6 +65,9 @@ export function activate(context: vscode.ExtensionContext) {
         // Initialize tree data providers
         initializeTreeProviders(context, service);
 
+        // Wire normalized analysis events
+        wireAnalysisEventBus(context, service);
+
         // Register all commands
         registerAllCommands(context, service);
 
@@ -278,6 +281,35 @@ function startBackgroundServices(context: vscode.ExtensionContext, service: Conn
     
     context.subscriptions.push(documentOpenHandler, documentChangeHandler);
     logger.info('✅ Background services initialized');
+}
+
+function wireAnalysisEventBus(context: vscode.ExtensionContext, service: ConnascenceService) {
+    const activeService = ensureConnascenceService(service);
+    const subscription = activeService.onAnalysisCompleted(event => {
+        const editors = vscode.window.visibleTextEditors.filter(editor => editor.document.uri.fsPath === event.filePath);
+        for (const editor of editors) {
+            visualHighlighting?.applyHighlighting(editor, event.normalizedFindings);
+        }
+
+        notificationManager?.publishFindings(event.normalizedFindings, { backend: event.backend, fromCache: event.fromCache });
+        aiFixSuggestions?.updateActiveFindings(event.normalizedFindings);
+
+        const normalizedMap = activeService.getAllNormalizedResults();
+        analysisResultsProvider?.updateResults(normalizedMap);
+
+        const flattened = Array.from(normalizedMap.values()).flat();
+        if (dashboardProvider) {
+            const metrics = {
+                backend: event.backend,
+                qualityScore: event.result.qualityScore,
+                totalIssues: event.result.summary?.totalIssues || event.normalizedFindings.length,
+                fromCache: event.fromCache
+            };
+            dashboardProvider.updateData(metrics, event.result, flattened);
+        }
+    });
+
+    context.subscriptions.push(subscription);
 }
 
 function startWorkspaceScanning(service: ConnascenceService) {

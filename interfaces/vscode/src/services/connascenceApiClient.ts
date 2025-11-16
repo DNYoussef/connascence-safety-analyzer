@@ -2,10 +2,19 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import { spawn } from 'child_process';
 import { AnalysisResult, Finding, PerformanceMetrics, DuplicationCluster, NASAComplianceResult, SmartIntegrationResult } from './connascenceService';
+const which = require('which');
 
 /**
  * Client for integrating with the main connascence analysis system
  */
+export interface AnalyzerAvailability {
+    cliAvailable: boolean;
+    cliPath?: string;
+    pythonAvailable: boolean;
+    pythonEntry?: string;
+    issues: string[];
+}
+
 export class ConnascenceApiClient {
     private workspaceRoot: string | undefined;
 
@@ -302,12 +311,13 @@ export class ConnascenceApiClient {
     private async runUnifiedAnalyzer(options: any): Promise<any> {
         const analyzerPath = this.getUnifiedAnalyzerPath();
         const pythonPath = this.getPythonPath();
-        
+
+        const availability = await this.getAnalyzerAvailability();
+
         // Check if analyzer file exists
         const fs = require('fs');
         if (!fs.existsSync(analyzerPath)) {
-            console.warn(`Analyzer not found at ${analyzerPath}, using fallback`);
-            return this.getFallbackAnalysisResult(options);
+            throw this.buildAnalyzerMissingError('Python entry point not found', availability);
         }
         
         const args = [
@@ -367,15 +377,15 @@ export class ConnascenceApiClient {
                         const result = JSON.parse(stdout);
                         resolve(result);
                     } catch (parseError) {
-                        console.warn(`Failed to parse analyzer output, using fallback: ${parseError}`);
-                        resolve(this.getFallbackAnalysisResult(options));
-                    }
-                } else {
+                    console.warn(`Failed to parse analyzer output, using fallback: ${parseError}`);
+                    resolve(this.getFallbackAnalysisResult(options));
+                }
+            } else {
                     console.warn(`Analyzer failed with code ${code}: ${stderr}, using fallback`);
                     resolve(this.getFallbackAnalysisResult(options));
                 }
             });
-            
+
             process.on('error', (error) => {
                 console.warn(`Failed to run analyzer: ${error.message}, using fallback`);
                 resolve(this.getFallbackAnalysisResult(options));
@@ -836,9 +846,77 @@ export class ConnascenceApiClient {
         if (this.workspaceRoot) {
             return path.join(this.workspaceRoot, 'analyzer', 'unified_analyzer.py');
         }
-        
+
         // Fallback to relative path from extension
         return path.join(__dirname, '..', '..', '..', 'analyzer', 'unified_analyzer.py');
+    }
+
+    public async getAnalyzerAvailability(): Promise<AnalyzerAvailability> {
+        const issues: string[] = [];
+        const fs = require('fs');
+
+        const cliPath = this.findCliBinary();
+        if (!cliPath) {
+            issues.push('CLI binary `connascence` not found in PATH');
+        }
+
+        const pythonEntry = this.findPythonEntryPoint(fs);
+        if (!pythonEntry) {
+            issues.push('Python analyzer entry point missing');
+        }
+
+        return {
+            cliAvailable: Boolean(cliPath),
+            cliPath: cliPath || undefined,
+            pythonAvailable: Boolean(pythonEntry),
+            pythonEntry: pythonEntry || undefined,
+            issues
+        };
+    }
+
+    private findCliBinary(): string | null {
+        try {
+            const cli = which.sync('connascence', { nothrow: true });
+            if (cli) {
+                return cli;
+            }
+            if (process.platform === 'win32') {
+                const exe = which.sync('connascence.exe', { nothrow: true });
+                if (exe) {
+                    return exe;
+                }
+                const wrapper = which.sync('connascence-wrapper.bat', { nothrow: true });
+                if (wrapper) {
+                    return wrapper;
+                }
+            }
+        } catch (error) {
+            console.warn('Failed to resolve connascence CLI path:', error);
+        }
+        return null;
+    }
+
+    private findPythonEntryPoint(fs: any): string | null {
+        const unifiedPath = this.getUnifiedAnalyzerPath();
+        const legacyPath = this.getAnalyzerPath();
+
+        if (fs.existsSync(unifiedPath)) {
+            return unifiedPath;
+        }
+
+        if (fs.existsSync(legacyPath)) {
+            return legacyPath;
+        }
+
+        return null;
+    }
+
+    private buildAnalyzerMissingError(reason: string, availability: AnalyzerAvailability): Error {
+        const instructions = availability.cliAvailable
+            ? `Python analyzer missing but CLI detected at ${availability.cliPath}. Update the extension settings to prefer the CLI backend or add the analyzer scripts per README instructions.`
+            : 'Connascence analyzer not found. Install the CLI wrapper (see README Step 1) or ensure the Python analyzer is present in the workspace.';
+
+        return new Error(`${reason}. ${instructions}`);
     }
 
     // Additional configuration helpers for advanced features

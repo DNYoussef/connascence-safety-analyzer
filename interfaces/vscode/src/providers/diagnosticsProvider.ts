@@ -1,19 +1,44 @@
 import * as vscode from 'vscode';
-import { ConnascenceService, AnalysisResult, Finding } from '../services/connascenceService';
+import {
+    ConnascenceService,
+    AnalysisResult,
+    Finding,
+    NormalizedAnalysisEvent,
+    NormalizedFinding
+} from '../services/connascenceService';
 import { AnalysisCache } from '../utils/cache';
+
+interface DiagnosticsCacheEntry {
+    result: AnalysisResult;
+    normalizedFindings: NormalizedFinding[];
+}
 
 export class ConnascenceDiagnosticsProvider {
     private diagnosticsCollection: vscode.DiagnosticCollection;
     private cache = new AnalysisCache();
+    private disposables: vscode.Disposable[] = [];
+    private suppressedEventFiles = new Set<string>();
 
     constructor(private connascenceService: ConnascenceService) {
         this.diagnosticsCollection = vscode.languages.createDiagnosticCollection('connascence');
+        const subscription = this.connascenceService.onAnalysisCompleted(event => {
+            if (this.suppressedEventFiles.has(event.filePath)) {
+                return;
+            }
+            void this.handleAnalysisEvent(event);
+        });
+        this.disposables.push(subscription);
     }
 
     async updateDiagnostics(uri: vscode.Uri, results: AnalysisResult): Promise<void> {
-        const diagnostics = this.findingsToDiagnostics(results.findings, uri);
-        this.diagnosticsCollection.set(uri, diagnostics);
-        await this.cache.setCachedResult(uri.fsPath, results);
+        const normalized = this.connascenceService.getNormalizedFindings(uri.fsPath);
+        if (normalized && normalized.length > 0) {
+            await this.applyNormalizedDiagnostics(uri, normalized, results);
+            return;
+        }
+
+        const fallback = this.buildFallbackNormalized(results.findings, uri);
+        await this.applyNormalizedDiagnostics(uri, fallback, results);
     }
 
     async updateFile(document: vscode.TextDocument): Promise<void> {
@@ -22,12 +47,17 @@ export class ConnascenceDiagnosticsProvider {
         }
 
         try {
+            this.suppressedEventFiles.add(document.fileName);
             const results = await this.connascenceService.analyzeFile(document.fileName);
-            await this.updateDiagnostics(document.uri, results);
+            const normalized = this.connascenceService.getNormalizedFindings(document.fileName)
+                ?? this.buildFallbackNormalized(results.findings, document.uri);
+            await this.applyNormalizedDiagnostics(document.uri, normalized, results);
         } catch (error) {
             console.error('Failed to update diagnostics:', error);
             // Clear diagnostics on error
             this.diagnosticsCollection.set(document.uri, []);
+        } finally {
+            this.suppressedEventFiles.delete(document.fileName);
         }
     }
 
@@ -46,12 +76,17 @@ export class ConnascenceDiagnosticsProvider {
     }
 
     async getCachedResults(uri: vscode.Uri): Promise<AnalysisResult | undefined> {
-        return await this.cache.getCachedResult(uri.fsPath);
+        const entry = await this.cache.getCachedResult(uri.fsPath) as DiagnosticsCacheEntry | undefined;
+        return entry?.result;
     }
 
     dispose(): void {
         this.diagnosticsCollection.dispose();
         this.cache.clear();
+        for (const disposable of this.disposables) {
+            disposable.dispose();
+        }
+        this.disposables = [];
     }
 
     private findingsToDiagnostics(findings: Finding[], uri: vscode.Uri): vscode.Diagnostic[] {
@@ -61,13 +96,15 @@ export class ConnascenceDiagnosticsProvider {
     private findingToDiagnostic(finding: Finding, uri: vscode.Uri): vscode.Diagnostic {
         const line = Math.max(0, finding.line - 1); // VS Code uses 0-based line numbers
         const character = Math.max(0, (finding.column || 1) - 1);
-        
+
         // Create range - try to be smart about the end position
         const range = this.createDiagnosticRange(line, character, finding.type);
-        
+
+        const message = this.formatDiagnosticMessage(finding);
+
         const diagnostic = new vscode.Diagnostic(
             range,
-            finding.message,
+            message,
             this.severityToVSCodeSeverity(finding.severity)
         );
 
@@ -157,8 +194,13 @@ export class ConnascenceDiagnosticsProvider {
     // Batch operations for performance
     async updateMultipleDiagnostics(updates: { uri: vscode.Uri; results: AnalysisResult }[]): Promise<void> {
         const batch = await Promise.all(updates.map(async ({ uri, results }) => {
-            const diagnostics = this.findingsToDiagnostics(results.findings, uri);
-            await this.cache.setCachedResult(uri.fsPath, results);
+            const normalized = this.connascenceService.getNormalizedFindings(uri.fsPath)
+                ?? this.buildFallbackNormalized(results.findings, uri);
+            const diagnostics = this.findingsToDiagnostics(normalized, uri);
+            await this.cache.setCachedResult(uri.fsPath, {
+                result: results,
+                normalizedFindings: normalized
+            });
             return { uri, diagnostics };
         }));
 
@@ -179,10 +221,11 @@ export class ConnascenceDiagnosticsProvider {
         const findingsBySeverity: { [severity: string]: number } = {};
         const findingsByType: { [type: string]: number } = {};
 
-        for (const results of this.cache.values()) {
-            totalFindings += results.findings.length;
-            
-            for (const finding of results.findings) {
+        const entries = this.cache.values() as DiagnosticsCacheEntry[];
+        for (const entry of entries) {
+            totalFindings += entry.normalizedFindings.length;
+
+            for (const finding of entry.normalizedFindings) {
                 findingsBySeverity[finding.severity] = (findingsBySeverity[finding.severity] || 0) + 1;
                 findingsByType[finding.type] = (findingsByType[finding.type] || 0) + 1;
             }
@@ -199,28 +242,71 @@ export class ConnascenceDiagnosticsProvider {
     // Filter diagnostics based on configuration
     applyFilter(severityFilter?: string[], typeFilter?: string[]): void {
         const keys = this.cache.keys();
-        
+
         for (const filePath of keys) {
-            const results = this.cache.get(filePath);
-            if (!results) continue;
-            
+            const entry = this.cache.get(filePath) as DiagnosticsCacheEntry | undefined;
+            if (!entry) continue;
+
             const uri = vscode.Uri.file(filePath);
-            let filteredFindings = results.findings;
+            let filteredFindings = entry.normalizedFindings;
 
             if (severityFilter && severityFilter.length > 0) {
-                filteredFindings = filteredFindings.filter((f: Finding) => 
+                filteredFindings = filteredFindings.filter((f: Finding) =>
                     severityFilter.includes(f.severity)
                 );
             }
 
             if (typeFilter && typeFilter.length > 0) {
-                filteredFindings = filteredFindings.filter((f: Finding) => 
-                    typeFilter.some(type => f.type.includes(type))
+                filteredFindings = filteredFindings.filter((f: Finding) =>
+                    typeFilter.some(type => f.type.includes(type) || (f as NormalizedFinding).normalizedType?.includes(type))
                 );
             }
 
             const diagnostics = this.findingsToDiagnostics(filteredFindings, uri);
             this.diagnosticsCollection.set(uri, diagnostics);
         }
+    }
+
+    private async handleAnalysisEvent(event: NormalizedAnalysisEvent): Promise<void> {
+        try {
+            const uri = vscode.Uri.file(event.filePath);
+            await this.applyNormalizedDiagnostics(uri, event.normalizedFindings, event.result);
+        } catch (error) {
+            console.error('Failed to apply diagnostics from normalized findings:', error);
+        }
+    }
+
+    private async applyNormalizedDiagnostics(
+        uri: vscode.Uri,
+        normalizedFindings: NormalizedFinding[],
+        result: AnalysisResult
+    ): Promise<void> {
+        const diagnostics = this.findingsToDiagnostics(normalizedFindings, uri);
+        this.diagnosticsCollection.set(uri, diagnostics);
+        await this.cache.setCachedResult(uri.fsPath, {
+            result,
+            normalizedFindings
+        });
+    }
+
+    private buildFallbackNormalized(findings: Finding[], uri: vscode.Uri): NormalizedFinding[] {
+        const backend = this.connascenceService.getHealthStatus().backend;
+        return findings.map(finding => ({
+            ...finding,
+            normalizedType: finding.type,
+            emoji: '🔗',
+            category: 'general',
+            backend,
+            fileUri: uri,
+            rawSeverity: finding.severity
+        }));
+    }
+
+    private formatDiagnosticMessage(finding: Finding): string {
+        const normalized = finding as Partial<NormalizedFinding>;
+        if (normalized.emoji) {
+            return `${normalized.emoji} ${finding.message}`;
+        }
+        return finding.message;
     }
 }

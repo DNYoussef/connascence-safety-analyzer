@@ -3,8 +3,9 @@ import * as path from 'path';
 import { spawn } from 'child_process';
 import { ConfigurationService } from './configurationService';
 import { TelemetryService } from './telemetryService';
-import { ConnascenceApiClient } from './connascenceApiClient';
+import { ConnascenceApiClient, AnalyzerAvailability } from './connascenceApiClient';
 import { MCPClient } from './mcpClient';
+import { AnalysisCache } from '../utils/cache';
 
 export interface AnalysisResult {
     findings: Finding[];
@@ -122,6 +123,43 @@ export interface SmartIntegrationResult {
     riskAssessment: RiskAssessment;
 }
 
+export type AnalyzerBackend = 'mcp' | 'cli' | 'python' | 'cache';
+
+export interface NormalizedFinding extends Finding {
+    normalizedType: string;
+    emoji: string;
+    category: 'connascence' | 'nasa' | 'god_object' | 'general';
+    backend: AnalyzerBackend;
+    fileUri: vscode.Uri;
+    rawSeverity?: string;
+}
+
+export interface NormalizedAnalysisEvent {
+    filePath: string;
+    backend: AnalyzerBackend;
+    fromCache: boolean;
+    normalizedFindings: NormalizedFinding[];
+    result: AnalysisResult;
+    timestamp: number;
+}
+
+export interface AnalyzerHealth {
+    backend: AnalyzerBackend;
+    cliAvailable: boolean;
+    pythonAvailable: boolean;
+    mcpConnected: boolean;
+    cliPath?: string;
+    pythonPath?: string;
+    message: string;
+    lastError?: string;
+}
+
+interface CachedAnalysisEntry {
+    result: AnalysisResult;
+    backend: AnalyzerBackend;
+    normalized: NormalizedFinding[];
+}
+
 export interface CorrelationResult {
     analyzer1: string;
     analyzer2: string;
@@ -175,6 +213,22 @@ export class ConnascenceService {
     private meceAnalysisEnabled: boolean = true;
     private nasaComplianceEnabled: boolean = true;
     private smartIntegrationEnabled: boolean = true;
+    private resultCache = new AnalysisCache();
+    private normalizedResults: Map<string, NormalizedFinding[]> = new Map();
+    private analysisEventEmitter = new vscode.EventEmitter<NormalizedAnalysisEvent>();
+    public readonly onAnalysisCompleted = this.analysisEventEmitter.event;
+    private healthEmitter = new vscode.EventEmitter<AnalyzerHealth>();
+    public readonly onHealthChanged = this.healthEmitter.event;
+    private healthState: AnalyzerHealth = {
+        backend: 'python',
+        cliAvailable: false,
+        pythonAvailable: false,
+        mcpConnected: false,
+        message: 'Analyzer not initialized'
+    };
+    private backendMode: AnalyzerBackend = 'python';
+    private availabilityCache: { timestamp: number; data: AnalyzerAvailability } | null = null;
+    private cliBinary: string | undefined;
 
     constructor(
         private configService: ConfigurationService,
@@ -184,6 +238,7 @@ export class ConnascenceService {
         this.apiClient = new ConnascenceApiClient();
         this.initializeAdvancedCapabilities();
         this.initializeMCPClient();
+        void this.refreshAnalyzerAvailability();
     }
 
     /**
@@ -217,70 +272,139 @@ export class ConnascenceService {
 
     async analyzeFile(filePath: string): Promise<AnalysisResult> {
         this.telemetryService.logEvent('file.analysis.started', { file: path.basename(filePath) });
-        
+        await this.refreshAnalyzerAvailability();
+
+        const cacheEnabled = this.isCachingEnabled();
+        if (cacheEnabled) {
+            const cached = await this.resultCache.getCachedResult(filePath) as CachedAnalysisEntry | undefined;
+            if (cached) {
+                this.updateBackendMode('cache');
+                this.normalizedResults.set(filePath, cached.normalized);
+                this.emitAnalysisEvent(filePath, 'cache', cached.result, cached.normalized, true);
+                return cached.result;
+            }
+        }
+
         try {
             const startTime = Date.now();
-            
-            // Get basic analysis from API client
-            const baseResult = await this.apiClient.analyzeFile(filePath);
-            
-            // Enhance with advanced analyzer capabilities
+            const backendOrder = await this.getBackendPreferenceOrder();
+            let baseResult: AnalysisResult | null = null;
+            let backendUsed: AnalyzerBackend | null = null;
+            const backendErrors: string[] = [];
+
+            for (const backend of backendOrder) {
+                try {
+                    baseResult = await this.runBackendAnalysis(backend, filePath);
+                    backendUsed = backend;
+                    this.updateBackendMode(backend);
+                    break;
+                } catch (error) {
+                    const message = error instanceof Error ? error.message : String(error);
+                    backendErrors.push(`${backend}: ${message}`);
+                    this.telemetryService.logEvent('analysis.backend.failed', { backend, error: message });
+                }
+            }
+
+            if (!baseResult || !backendUsed) {
+                const message = backendErrors.join(' | ') || 'No analysis backend available';
+                this.updateAnalyzerHealth({ lastError: message });
+                throw new Error(message);
+            }
+
             const enhancedResult = await this.enhanceAnalysisResult(baseResult, filePath, {
                 analysisType: 'single-file',
                 startTime
             });
-            
-            this.telemetryService.logEvent('file.analysis.completed', { 
+
+            const normalized = this.normalizeFindings(enhancedResult.findings, filePath, backendUsed);
+            this.normalizedResults.set(filePath, normalized);
+            if (cacheEnabled) {
+                await this.resultCache.setCachedResult(filePath, { result: enhancedResult, backend: backendUsed, normalized }, []);
+            }
+            this.emitAnalysisEvent(filePath, backendUsed, enhancedResult, normalized, false);
+
+            this.telemetryService.logEvent('file.analysis.completed', {
                 file: path.basename(filePath),
                 findings: enhancedResult.findings.length,
                 qualityScore: enhancedResult.qualityScore,
-                analysisTime: Date.now() - startTime
+                analysisTime: Date.now() - startTime,
+                backend: backendUsed
             });
-            
+
             return enhancedResult;
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : String(error);
             this.telemetryService.logEvent('file.analysis.error', { error: errorMessage });
+            this.updateAnalyzerHealth({ lastError: errorMessage });
             throw error;
         }
     }
 
     async analyzeWorkspace(workspacePath: string): Promise<WorkspaceAnalysisResult> {
         this.telemetryService.logEvent('workspace.analysis.started');
-        
+        await this.refreshAnalyzerAvailability();
+
         try {
             const startTime = Date.now();
-            
-            // Get base workspace analysis
-            const baseResult = await this.apiClient.analyzeWorkspace(workspacePath);
-            
-            // Enhance each file result with advanced capabilities
+            const cacheEnabled = this.isCachingEnabled();
+            const backendOrder = await this.getBackendPreferenceOrder();
+            let backendUsed: AnalyzerBackend | null = null;
+            let baseResult: WorkspaceAnalysisResult | null = null;
+            const backendErrors: string[] = [];
+
+            for (const backend of backendOrder) {
+                try {
+                    baseResult = await this.runWorkspaceBackendAnalysis(backend, workspacePath);
+                    backendUsed = backend;
+                    this.updateBackendMode(backend);
+                    break;
+                } catch (error) {
+                    const message = error instanceof Error ? error.message : String(error);
+                    backendErrors.push(`${backend}: ${message}`);
+                    this.telemetryService.logEvent('analysis.workspace.backend.failed', { backend, error: message });
+                }
+            }
+
+            if (!baseResult || !backendUsed) {
+                const message = backendErrors.join(' | ') || 'No analysis backend available';
+                this.updateAnalyzerHealth({ lastError: message });
+                throw new Error(message);
+            }
+
             const enhancedFileResults: { [filePath: string]: AnalysisResult } = {};
-            
+
             for (const [filePath, fileResult] of Object.entries(baseResult.fileResults)) {
-                enhancedFileResults[filePath] = await this.enhanceAnalysisResult(
+                const enhanced = await this.enhanceAnalysisResult(
                     fileResult, filePath, {
                         analysisType: 'workspace',
                         startTime,
                         workspacePath
                     }
                 );
+                enhancedFileResults[filePath] = enhanced;
+
+                const normalized = this.normalizeFindings(enhanced.findings, filePath, backendUsed);
+                this.normalizedResults.set(filePath, normalized);
+                if (cacheEnabled) {
+                    await this.resultCache.setCachedResult(filePath, { result: enhanced, backend: backendUsed, normalized }, []);
+                }
+                this.emitAnalysisEvent(filePath, backendUsed, enhanced, normalized, false);
             }
-            
-            // Calculate enhanced workspace metrics
+
             const enhancedSummary = await this.calculateWorkspaceSummary(
                 enhancedFileResults, workspacePath, startTime
             );
-            
+
             const analysisTime = Date.now() - startTime;
-            
+
             this.telemetryService.logEvent('workspace.analysis.completed', {
                 filesAnalyzed: Object.keys(enhancedFileResults).length,
                 totalIssues: enhancedSummary.totalIssues,
                 qualityScore: enhancedSummary.qualityScore,
-                analysisTime
+                analysisTime,
+                backend: backendUsed
             });
-            
+
             return {
                 fileResults: enhancedFileResults,
                 summary: enhancedSummary
@@ -288,6 +412,7 @@ export class ConnascenceService {
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : String(error);
             this.telemetryService.logEvent('workspace.analysis.error', { error: errorMessage });
+            this.updateAnalyzerHealth({ lastError: errorMessage });
             throw error;
         }
     }
@@ -330,7 +455,7 @@ export class ConnascenceService {
 
     async generateReport(workspacePath: string): Promise<any> {
         this.telemetryService.logEvent('report.generation.started');
-        
+
         try {
             return await this.apiClient.generateReport(workspacePath);
         } catch (error) {
@@ -338,6 +463,198 @@ export class ConnascenceService {
             this.telemetryService.logEvent('report.generation.error', { error: errorMessage });
             throw error;
         }
+    }
+
+    public getAllNormalizedResults(): Map<string, NormalizedFinding[]> {
+        return new Map(this.normalizedResults);
+    }
+
+    public getNormalizedFindings(filePath: string): NormalizedFinding[] | undefined {
+        return this.normalizedResults.get(filePath);
+    }
+
+    public getHealthStatus(): AnalyzerHealth {
+        return { ...this.healthState };
+    }
+
+    private async getBackendPreferenceOrder(): Promise<AnalyzerBackend[]> {
+        const availability = await this.refreshAnalyzerAvailability();
+        const order: AnalyzerBackend[] = [];
+
+        if (this.configService.useMCPServer() && this.mcpClient?.isServerConnected()) {
+            order.push('mcp');
+            this.updateAnalyzerHealth({ mcpConnected: true });
+        } else {
+            this.updateAnalyzerHealth({ mcpConnected: false });
+        }
+
+        if (availability.cliAvailable) {
+            order.push('cli');
+        }
+
+        if (availability.pythonAvailable) {
+            order.push('python');
+        }
+
+        if (order.length === 0) {
+            throw new Error('No Connascence analyzer backend available. Update PATH/wrapper per README instructions.');
+        }
+
+        return order;
+    }
+
+    private async runBackendAnalysis(backend: AnalyzerBackend, filePath: string): Promise<AnalysisResult> {
+        switch (backend) {
+            case 'mcp':
+                return this.analyzeMCP(filePath);
+            case 'cli':
+                return this.analyzeCLI(filePath);
+            case 'python':
+                return this.apiClient.analyzeFile(filePath);
+            default:
+                throw new Error(`Unsupported backend: ${backend}`);
+        }
+    }
+
+    private async runWorkspaceBackendAnalysis(backend: AnalyzerBackend, workspacePath: string): Promise<WorkspaceAnalysisResult> {
+        switch (backend) {
+            case 'mcp':
+                return this.analyzeWorkspaceMCP(workspacePath);
+            case 'cli':
+                return this.analyzeWorkspaceCLI(workspacePath);
+            case 'python':
+                return this.apiClient.analyzeWorkspace(workspacePath);
+            default:
+                throw new Error(`Unsupported backend: ${backend}`);
+        }
+    }
+
+    private isCachingEnabled(): boolean {
+        try {
+            const perfConfig = this.configService.getPerformanceAnalysisConfig();
+            if (typeof perfConfig.enableCaching === 'boolean') {
+                return perfConfig.enableCaching;
+            }
+        } catch {
+            // Ignore config errors and default to enabled
+        }
+        return true;
+    }
+
+    private normalizeFindings(findings: Finding[], filePath: string, backend: AnalyzerBackend): NormalizedFinding[] {
+        const metadata = this.getFindingTypeMetadata();
+        return findings.map(finding => {
+            const normalizedType = this.normalizeFindingType(finding.type);
+            const meta = metadata[normalizedType] || { emoji: '🔗', category: 'general' as const };
+            return {
+                ...finding,
+                normalizedType,
+                emoji: meta.emoji,
+                category: meta.category,
+                backend,
+                fileUri: vscode.Uri.file(filePath),
+                rawSeverity: finding.severity
+            };
+        });
+    }
+
+    private normalizeFindingType(type: string): string {
+        const normalized = type.toLowerCase()
+            .replace(/\s+/g, '_')
+            .replace(/[^a-z0-9_]/g, '');
+
+        const map: { [key: string]: string } = {
+            'name': 'connascence_of_name',
+            'type': 'connascence_of_type',
+            'meaning': 'connascence_of_meaning',
+            'position': 'connascence_of_position',
+            'algorithm': 'connascence_of_algorithm',
+            'execution': 'connascence_of_execution',
+            'timing': 'connascence_of_timing',
+            'value': 'connascence_of_value',
+            'identity': 'connascence_of_identity',
+            'con_name': 'connascence_of_name',
+            'con_type': 'connascence_of_type',
+            'con_meaning': 'connascence_of_meaning',
+            'con_position': 'connascence_of_position',
+            'con_algorithm': 'connascence_of_algorithm',
+            'con_execution': 'connascence_of_execution',
+            'con_timing': 'connascence_of_timing',
+            'con_value': 'connascence_of_value',
+            'con_identity': 'connascence_of_identity'
+        };
+
+        return map[normalized] || normalized;
+    }
+
+    private getFindingTypeMetadata(): Record<string, { emoji: string; category: 'connascence' | 'nasa' | 'god_object' | 'general' }> {
+        return {
+            'connascence_of_name': { emoji: '🔗💔', category: 'connascence' },
+            'connascence_of_type': { emoji: '⛓️💥', category: 'connascence' },
+            'connascence_of_meaning': { emoji: '🔐💢', category: 'connascence' },
+            'connascence_of_position': { emoji: '🔗📍', category: 'connascence' },
+            'connascence_of_algorithm': { emoji: '⚙️🔗', category: 'connascence' },
+            'connascence_of_execution': { emoji: '🏃‍♂️🔗', category: 'connascence' },
+            'connascence_of_timing': { emoji: '⏰🔗', category: 'connascence' },
+            'connascence_of_value': { emoji: '💎🔗', category: 'connascence' },
+            'connascence_of_identity': { emoji: '🆔🔗', category: 'connascence' },
+            'nasa_rule_1': { emoji: '🚀⚠️', category: 'nasa' },
+            'nasa_rule_2': { emoji: '🛰️🔄', category: 'nasa' },
+            'nasa_rule_3': { emoji: '🚀💾', category: 'nasa' },
+            'nasa_rule_4': { emoji: '🌌📏', category: 'nasa' },
+            'nasa_rule_5': { emoji: '🛸✅', category: 'nasa' },
+            'nasa_rule_6': { emoji: '🌠🔒', category: 'nasa' },
+            'nasa_rule_7': { emoji: '🚀↩️', category: 'nasa' },
+            'nasa_rule_8': { emoji: '🌌⚡', category: 'nasa' },
+            'nasa_rule_9': { emoji: '🛰️👉', category: 'nasa' },
+            'nasa_rule_10': { emoji: '🚀🔍', category: 'nasa' },
+            'god_object': { emoji: '👑⚡', category: 'god_object' },
+            'god_class': { emoji: '🏛️⚠️', category: 'god_object' },
+            'god_function': { emoji: '⚡🔥', category: 'god_object' },
+            'large_class': { emoji: '🏗️📈', category: 'god_object' },
+            'complex_method': { emoji: '🧩🔀', category: 'god_object' }
+        };
+    }
+
+    private emitAnalysisEvent(filePath: string, backend: AnalyzerBackend, result: AnalysisResult, normalized: NormalizedFinding[], fromCache: boolean): void {
+        this.analysisEventEmitter.fire({
+            filePath,
+            backend,
+            fromCache,
+            normalizedFindings: normalized,
+            result,
+            timestamp: Date.now()
+        });
+    }
+
+    private async refreshAnalyzerAvailability(force: boolean = false): Promise<AnalyzerAvailability> {
+        const now = Date.now();
+        if (!force && this.availabilityCache && (now - this.availabilityCache.timestamp) < 30000) {
+            return this.availabilityCache.data;
+        }
+
+        const availability = await this.apiClient.getAnalyzerAvailability();
+        this.availabilityCache = { timestamp: now, data: availability };
+        if (availability.cliPath) {
+            this.cliBinary = availability.cliPath;
+        }
+        this.updateAnalyzerHealth({
+            cliAvailable: availability.cliAvailable,
+            pythonAvailable: availability.pythonAvailable,
+            cliPath: availability.cliPath,
+            pythonPath: availability.pythonEntry
+        });
+        return availability;
+    }
+
+    private updateAnalyzerHealth(partial: Partial<AnalyzerHealth>): void {
+        this.healthState = { ...this.healthState, ...partial };
+        this.healthEmitter.fire({ ...this.healthState });
+    }
+
+    private updateBackendMode(backend: AnalyzerBackend): void {
+        this.backendMode = backend;
+        this.updateAnalyzerHealth({ backend, message: `Active backend: ${backend.toUpperCase()}` });
     }
 
     // MCP implementations
@@ -479,9 +796,13 @@ export class ConnascenceService {
     }
 
     // CLI implementations
+    private getCliCommand(): string {
+        return this.cliBinary || 'connascence';
+    }
+
     private async analyzeCLI(filePath: string): Promise<AnalysisResult> {
         const safetyProfile = this.configService.getSafetyProfile();
-        const cmd = 'connascence';
+        const cmd = this.getCliCommand();
         const args = ['analyze', filePath, '--profile', safetyProfile, '--format', 'json'];
 
         return new Promise((resolve, reject) => {
@@ -514,7 +835,7 @@ export class ConnascenceService {
 
     private async analyzeWorkspaceCLI(workspacePath: string): Promise<WorkspaceAnalysisResult> {
         const safetyProfile = this.configService.getSafetyProfile();
-        const cmd = 'connascence';
+        const cmd = this.getCliCommand();
         const args = ['analyze', workspacePath, '--profile', safetyProfile, '--format', 'json', '--recursive'];
 
         return new Promise((resolve, reject) => {
@@ -546,7 +867,7 @@ export class ConnascenceService {
     }
 
     private async validateSafetyCLI(filePath: string, profile: string): Promise<SafetyValidationResult> {
-        const cmd = 'connascence';
+        const cmd = this.getCliCommand();
         const args = ['validate-safety', filePath, '--profile', profile, '--format', 'json'];
 
         return new Promise((resolve, reject) => {
@@ -577,7 +898,7 @@ export class ConnascenceService {
     }
 
     private async suggestRefactoringCLI(filePath: string, selection?: any): Promise<RefactoringSuggestion[]> {
-        const cmd = 'connascence';
+        const cmd = this.getCliCommand();
         const args = ['suggest-refactoring', filePath, '--format', 'json'];
         
         if (selection) {
@@ -613,7 +934,7 @@ export class ConnascenceService {
     }
 
     private async getAutofixesCLI(filePath: string): Promise<AutoFix[]> {
-        const cmd = 'connascence';
+        const cmd = this.getCliCommand();
         const args = ['autofix', filePath, '--dry-run', '--format', 'json'];
 
         return new Promise((resolve, reject) => {
@@ -645,7 +966,7 @@ export class ConnascenceService {
     }
 
     private async generateReportCLI(workspacePath: string): Promise<any> {
-        const cmd = 'connascence';
+        const cmd = this.getCliCommand();
         const args = ['report', workspacePath, '--format', 'json'];
 
         return new Promise((resolve, reject) => {

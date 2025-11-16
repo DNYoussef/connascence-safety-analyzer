@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { Finding } from '../services/connascenceService';
+import { Finding, NormalizedFinding } from '../services/connascenceService';
 
 export class VisualHighlightingManager {
     private decorationTypes: Map<string, vscode.TextEditorDecorationType> = new Map();
@@ -345,7 +345,7 @@ export class VisualHighlightingManager {
         this.refreshAllDecorations();
     }
 
-    public applyHighlighting(editor: vscode.TextEditor, findings: Finding[]) {
+    public applyHighlighting(editor: vscode.TextEditor, findings: (Finding | NormalizedFinding)[]) {
         const config = vscode.workspace.getConfiguration('connascence');
         const enabled = config.get<boolean>('enableVisualHighlighting', true);
         const showEmojis = config.get<boolean>('showEmojis', true);
@@ -361,7 +361,7 @@ export class VisualHighlightingManager {
         const findingsByType = new Map<string, Finding[]>();
         
         for (const finding of findings) {
-            const normalizedType = this.normalizeConnascenceType(finding.type);
+            const normalizedType = (finding as NormalizedFinding).normalizedType || this.normalizeConnascenceType(finding.type);
             if (!findingsByType.has(normalizedType)) {
                 findingsByType.set(normalizedType, []);
             }

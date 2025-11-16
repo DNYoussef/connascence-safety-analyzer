@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { Finding } from '../services/connascenceService';
+import { Finding, NormalizedFinding, AnalyzerBackend } from '../services/connascenceService';
 
 export interface NotificationFilter {
     enabled: boolean;
@@ -14,6 +14,8 @@ export class NotificationManager {
     private static instance: NotificationManager;
     private filters: Map<string, NotificationFilter> = new Map();
     private suppressedUntil: Map<string, number> = new Map(); // Temporarily suppress notifications
+    private lastPublishedFindings: NormalizedFinding[] = [];
+    private lastBackend: AnalyzerBackend = 'python';
 
     private constructor() {
         this.initializeDefaultFilters();
@@ -347,6 +349,30 @@ export class NotificationManager {
         this.suppressedUntil.clear();
         vscode.commands.executeCommand('connascence.refreshDiagnostics');
         vscode.window.showInformationMessage('🔊 All notification suppressions cleared');
+    }
+
+    public publishFindings(findings: NormalizedFinding[], metadata: { backend: AnalyzerBackend; fromCache: boolean }): void {
+        this.lastPublishedFindings = findings;
+        this.lastBackend = metadata.backend;
+
+        if (findings.length === 0) {
+            return;
+        }
+
+        const actionable = this.getFilteredFindings(findings).slice(0, 3);
+        if (actionable.length === 0) {
+            return;
+        }
+
+        const summary = actionable
+            .map(f => `${(f as NormalizedFinding).emoji || '🔗'} ${f.message}`)
+            .join(' • ');
+
+        const suffix = metadata.fromCache ? ' (cache)' : '';
+        vscode.window.setStatusBarMessage(
+            `Connascence[${metadata.backend.toUpperCase()}] ${summary}${suffix}`,
+            4000
+        );
     }
 
     private saveUserPreferences(): void {
