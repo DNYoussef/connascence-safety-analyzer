@@ -15,6 +15,7 @@ This provides a clean API for code analysis while maintaining separation
 of concerns and avoiding tight coupling.
 """
 
+import asyncio
 from dataclasses import asdict, dataclass
 import logging
 from pathlib import Path
@@ -57,6 +58,8 @@ try:
 except ImportError:
     # Fallback for when unified imports not available
     IMPORT_MANAGER = None
+
+from analyzer.cli_entry import CLIAnalysisRequest, CLIAnalysisResponse, run_cli_analysis
 
 logger = logging.getLogger(__name__)
 
@@ -385,7 +388,6 @@ class EnhancedConnascenceMCPServer:
         start_time = time.time()
 
         try:
-            # Create analysis request
             request = AnalysisRequest(
                 file_path=file_path,
                 analysis_type=kwargs.get("analysis_type", "full"),
@@ -393,34 +395,39 @@ class EnhancedConnascenceMCPServer:
                 format=kwargs.get("format", "json"),
             )
 
-            # Log the request
             self.audit_logger.log(
                 "analyze_file_request", {"file_path": file_path, "analysis_type": request.analysis_type}
             )
 
-            # Validate request
             validation_result = self._validate_analysis_request(request)
             if not validation_result["valid"]:
-                return self._create_error_response(request, validation_result["error"], start_time)
+                return self._create_error_response(request, validation_result["error"], start_time).to_dict()
 
-            # Perform analysis
-            analysis_result = await self._perform_analysis(request)
+            cli_request = CLIAnalysisRequest(
+                input_path=file_path,
+                mode="file",
+                policy=kwargs.get("policy", "service-defaults"),
+                include_tests=kwargs.get("include_tests", False),
+                exclude=kwargs.get("exclude", []) or [],
+                threshold=kwargs.get("threshold"),
+                parallel=kwargs.get("parallel", False),
+                max_workers=kwargs.get("max_workers"),
+            )
 
-            # Add execution time
-            analysis_result.execution_time = time.time() - start_time
+            cli_response = await self._dispatch_cli_analysis(cli_request)
+            response_dict = self._build_cli_response(cli_response, file_path, start_time)
 
-            # Log completion
             self.audit_logger.log(
                 "analyze_file_complete",
                 {
                     "file_path": file_path,
-                    "success": analysis_result.success,
-                    "violation_count": len(analysis_result.violations),
-                    "execution_time": analysis_result.execution_time,
+                    "success": response_dict.get("success", False),
+                    "violation_count": len(response_dict.get("violations", [])),
+                    "execution_time": response_dict.get("execution_time"),
                 },
             )
 
-            return analysis_result.to_dict()
+            return response_dict
 
         except Exception as e:
             error_msg = f"Analysis failed: {e!s}"
@@ -440,43 +447,36 @@ class EnhancedConnascenceMCPServer:
                     "error": f"Workspace path does not exist: {workspace_path}",
                     "execution_time": time.time() - start_time,
                 }
+            cli_request = CLIAnalysisRequest(
+                input_path=str(workspace_path),
+                mode="workspace",
+                policy=kwargs.get("policy", "service-defaults"),
+                include_tests=kwargs.get("include_tests", False),
+                exclude=kwargs.get("exclude", []) or [],
+                threshold=kwargs.get("threshold"),
+                parallel=kwargs.get("parallel", True),
+                max_workers=kwargs.get("max_workers"),
+            )
 
-            file_patterns = kwargs.get("file_patterns", ["*.py"])
-            files_to_analyze = []
+            cli_response = await self._dispatch_cli_analysis(cli_request)
+            metadata = {**cli_response.metadata, "schema_version": cli_response.schema_version}
+            if not cli_response.success:
+                return {
+                    "success": False,
+                    "workspace_path": str(workspace_path),
+                    "error": ",".join(cli_response.errors) if cli_response.errors else "Workspace analysis failed",
+                    "metadata": metadata,
+                    "execution_time": time.time() - start_time,
+                }
 
-            # Find files matching patterns
-            for pattern in file_patterns:
-                files_to_analyze.extend(workspace_path.rglob(pattern))
-
-            # Limit number of files for performance
-            max_files = PerformanceLimits.MAX_FILES_PER_BATCH
-            if len(files_to_analyze) > max_files:
-                files_to_analyze = files_to_analyze[:max_files]
-                logger.warning(f"Limited analysis to {max_files} files")
-
-            # Analyze each file
-            results = []
-            total_violations = 0
-
-            for file_path in files_to_analyze:
-                try:
-                    file_result = await self.analyze_file(str(file_path), **kwargs)
-                    results.append(file_result)
-                    if file_result.get("success", False):
-                        total_violations += len(file_result.get("violations", []))
-                except Exception as e:
-                    logger.error(f"Failed to analyze {file_path}: {e}")
-                    results.append({"file_path": str(file_path), "success": False, "error": str(e), "violations": []})
-
-            # Create workspace summary
-            summary = {
-                "total_files_analyzed": len(files_to_analyze),
-                "total_violations": total_violations,
-                "files_with_violations": sum(1 for r in results if r.get("success", False) and r.get("violations")),
+            return {
+                "success": True,
+                "workspace_path": str(workspace_path),
+                "summary": cli_response.summary,
+                "result": cli_response.result,
+                "metadata": metadata,
                 "execution_time": time.time() - start_time,
             }
-
-            return {"success": True, "workspace_path": str(workspace_path), "summary": summary, "file_results": results}
 
         except Exception as e:
             error_msg = f"Workspace analysis failed: {e!s}"
@@ -685,6 +685,32 @@ class EnhancedConnascenceMCPServer:
             error_message=error_message,
             execution_time=time.time() - start_time,
         )
+
+    async def _dispatch_cli_analysis(self, request: CLIAnalysisRequest) -> CLIAnalysisResponse:
+        loop = asyncio.get_running_loop()
+        return await loop.run_in_executor(None, run_cli_analysis, request)
+
+    def _build_cli_response(
+        self, cli_response: CLIAnalysisResponse, file_path: str, start_time: float
+    ) -> Dict[str, Any]:
+        metadata = {**cli_response.metadata, "schema_version": cli_response.schema_version}
+        result = cli_response.result
+        violations = result.get("connascence_violations", [])
+        summary = {
+            "total_violations": cli_response.summary.get("total_violations", len(violations)),
+            "quality_score": result.get("overall_quality_score"),
+        }
+
+        return {
+            "success": cli_response.success,
+            "file_path": file_path,
+            "violations": violations,
+            "summary": summary,
+            "integrations": {},
+            "metadata": metadata,
+            "errors": cli_response.errors,
+            "execution_time": time.time() - start_time,
+        }
 
     # =================================================================
     # MCP PROTOCOL METHODS

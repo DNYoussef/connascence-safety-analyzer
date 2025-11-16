@@ -19,6 +19,7 @@ after the core analyzer components were removed.
 """
 
 import argparse
+import json
 from pathlib import Path
 import sys
 from typing import List, Optional
@@ -38,6 +39,7 @@ from analyzer.constants import (
     resolve_policy_name,
     validate_policy_name,
 )
+from analyzer.cli_entry import CLIAnalysisRequest, run_cli_analysis
 
 # Import analyzer components at module level to avoid import-time issues
 try:
@@ -124,6 +126,30 @@ class ConnascenceCLI:
         scan_parser.add_argument("--incremental", action="store_true", help="Incremental scan mode")
         scan_parser.add_argument("--budget-check", action="store_true", dest="budget_check", help="Check budget compliance")
         scan_parser.add_argument("--dry-run", action="store_true", help="Dry run mode")
+
+        # Unified analyze command (shared JSON schema)
+        analyze_parser = subparsers.add_parser("analyze", help="Run the unified analyzer on a path")
+        analyze_parser.add_argument("path", nargs="?", default=".", help="Path to analyze")
+        analyze_parser.add_argument("--policy", dest="policy", default="service-defaults", help="Policy preset to use")
+        analyze_parser.add_argument("--format", choices=["json", "text"], default="json", help="Output format")
+        analyze_parser.add_argument("--include-tests", action="store_true", help="Include test files")
+        analyze_parser.add_argument("--exclude", nargs="*", default=[], help="Exclude glob patterns")
+        analyze_parser.add_argument("--threshold", type=float, help="Quality threshold override")
+        analyze_parser.add_argument("--parallel", action="store_true", help="Enable parallel processing")
+        analyze_parser.add_argument("--max-workers", type=int, help="Max worker processes")
+
+        # Workspace analyze command reuses same helper to guarantee schema stability
+        workspace_parser = subparsers.add_parser(
+            "analyze-workspace", help="Run the unified analyzer across an entire workspace"
+        )
+        workspace_parser.add_argument("path", nargs="?", default=".", help="Workspace root to analyze")
+        workspace_parser.add_argument("--policy", dest="policy", default="service-defaults", help="Policy preset to use")
+        workspace_parser.add_argument("--format", choices=["json", "text"], default="json", help="Output format")
+        workspace_parser.add_argument("--include-tests", action="store_true", help="Include test files")
+        workspace_parser.add_argument("--exclude", nargs="*", default=[], help="Exclude glob patterns")
+        workspace_parser.add_argument("--threshold", type=float, help="Quality threshold override")
+        workspace_parser.add_argument("--parallel", action="store_true", help="Enable parallel processing")
+        workspace_parser.add_argument("--max-workers", type=int, help="Max worker processes")
 
         # Scan-diff command
         diff_parser = subparsers.add_parser("scan-diff", help="Scan diff between commits")
@@ -276,6 +302,8 @@ class ConnascenceCLI:
         try:
             if parsed_args.command == "scan":
                 return self._handle_scan(parsed_args)
+            elif parsed_args.command in ["analyze", "analyze-workspace"]:
+                return self._handle_unified_analyze(parsed_args)
             elif parsed_args.command == "scan-diff":
                 return self._handle_scan_diff(parsed_args)
             elif parsed_args.command == "baseline":
@@ -528,6 +556,30 @@ class ConnascenceCLI:
         elif command == 'status':
             print("MCP server status: not running")
         return 0
+
+    def _handle_unified_analyze(self, args: argparse.Namespace) -> int:
+        """Route analyze/analyze-workspace commands through shared entry point."""
+        mode = "file" if args.command == "analyze" else "workspace"
+        request = CLIAnalysisRequest(
+            input_path=getattr(args, "path", "."),
+            mode=mode,
+            policy=getattr(args, "policy", "service-defaults"),
+            include_tests=getattr(args, "include_tests", False),
+            exclude=getattr(args, "exclude", []) or [],
+            threshold=getattr(args, "threshold", None),
+            parallel=getattr(args, "parallel", False),
+            max_workers=getattr(args, "max_workers", None),
+            format=getattr(args, "format", "json"),
+        )
+
+        response = run_cli_analysis(request)
+        if request.format == "json":
+            print(response.to_json(indent=2))
+        else:
+            print(f"Success: {response.success}")
+            print(json.dumps(response.summary, indent=2))
+
+        return ExitCode.SUCCESS if response.success else ExitCode.RUNTIME_ERROR
 
     def _load_or_scan_violations(self, args: argparse.Namespace = None):
         """Load violations from scan or existing results."""

@@ -1,7 +1,13 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import { spawn } from 'child_process';
-import { AnalysisResult, Finding, PerformanceMetrics, DuplicationCluster, NASAComplianceResult, SmartIntegrationResult } from './connascenceService';
+import { AnalysisResult, Finding } from './connascenceService';
+import {
+    convertUnifiedReportToAnalysisResult,
+    convertUnifiedWorkspaceResult,
+    calculateQualityScore,
+    calculateSeverityBreakdown
+} from './reportTransforms';
 
 /**
  * Client for integrating with the main connascence analysis system
@@ -20,15 +26,19 @@ export class ConnascenceApiClient {
         try {
             const startTime = Date.now();
             
-            // Run unified analyzer for comprehensive results
-            const result = await this.runUnifiedAnalyzer({
+            const response = await this.runCliAnalyzer({
                 inputPath: filePath,
-                mode: 'single-file',
+                mode: 'analyze',
                 safetyProfile: this.getSafetyProfile(),
-                enableAdvanced: true
+                includeTests: this.getIncludeTests(),
+                exclude: this.getExcludePatterns(),
+                parallelProcessing: this.getEnableParallelProcessing(),
+                maxWorkers: this.getMaxWorkers(),
+                threshold: this.getThreshold()
             });
-            
-            const analysisResult = this.convertUnifiedReportToAnalysisResult(result, filePath, startTime);
+
+            const report = response.result || response;
+            const analysisResult = convertUnifiedReportToAnalysisResult(report, filePath, startTime);
             
             return analysisResult;
             
@@ -51,19 +61,19 @@ export class ConnascenceApiClient {
             const startTime = Date.now();
             
             // Use parallel analyzer for workspace analysis
-            const result = await this.runUnifiedAnalyzer({
+            const response = await this.runCliAnalyzer({
                 inputPath: workspacePath,
-                mode: 'workspace',
+                mode: 'analyze-workspace',
                 parallelProcessing: this.getEnableParallelProcessing(),
                 maxWorkers: this.getMaxWorkers(),
                 safetyProfile: this.getSafetyProfile(),
                 threshold: this.getThreshold(),
                 includeTests: this.getIncludeTests(),
-                exclude: this.getExcludePatterns(),
-                enableAdvanced: true
+                exclude: this.getExcludePatterns()
             });
-            
-            return this.convertUnifiedWorkspaceResult(result, startTime);
+
+            const report = response.result || response;
+            return convertUnifiedWorkspaceResult(report, startTime);
             
         } catch (error) {
             console.error('Failed to analyze workspace with unified system:', error);
@@ -84,15 +94,16 @@ export class ConnascenceApiClient {
         }>
     }> {
         try {
-            // Try unified analyzer first
-            const result = await this.runUnifiedAnalyzer({
+            const response = await this.runCliAnalyzer({
                 inputPath: filePath,
-                mode: 'safety-validation',
+                mode: 'analyze',
                 safetyProfile: profile,
-                strictMode: this.getStrictMode()
+                includeTests: this.getIncludeTests(),
+                exclude: this.getExcludePatterns()
             });
-            
-            const nasaViolations = result.nasa_violations || [];
+
+            const report = response.result || response;
+            const nasaViolations = report.nasa_violations || [];
             
             return {
                 compliant: nasaViolations.length === 0,
@@ -124,14 +135,16 @@ export class ConnascenceApiClient {
         preview?: string
     }>> {
         try {
-            // Try unified analyzer for refactoring suggestions
-            const result = await this.runUnifiedAnalyzer({
+            const response = await this.runCliAnalyzer({
                 inputPath: filePath,
-                mode: 'single-file',
-                safetyProfile: this.getSafetyProfile()
+                mode: 'analyze',
+                safetyProfile: this.getSafetyProfile(),
+                includeTests: this.getIncludeTests(),
+                exclude: this.getExcludePatterns()
             });
-            
-            const violations = result.connascence_violations || [];
+
+            const report = response.result || response;
+            const violations = report.connascence_violations || [];
             const suggestions = [];
             
             // Generate refactoring suggestions based on violations
@@ -187,14 +200,16 @@ export class ConnascenceApiClient {
         replacement: string
     }>> {
         try {
-            // Try unified analyzer for automated fixes
-            const result = await this.runUnifiedAnalyzer({
+            const response = await this.runCliAnalyzer({
                 inputPath: filePath,
-                mode: 'single-file',
-                safetyProfile: this.getSafetyProfile()
+                mode: 'analyze',
+                safetyProfile: this.getSafetyProfile(),
+                includeTests: this.getIncludeTests(),
+                exclude: this.getExcludePatterns()
             });
-            
-            const violations = result.connascence_violations || [];
+
+            const report = response.result || response;
+            const violations = report.connascence_violations || [];
             const fixes = [];
             
             // Generate automated fixes for specific violation types
@@ -232,20 +247,19 @@ export class ConnascenceApiClient {
      */
     public async generateReport(workspacePath: string): Promise<any> {
         try {
-            // Use unified analyzer to generate comprehensive report
-            const result = await this.runUnifiedAnalyzer({
+            const response = await this.runCliAnalyzer({
                 inputPath: workspacePath,
-                mode: 'workspace',
+                mode: 'analyze-workspace',
                 safetyProfile: this.getSafetyProfile(),
                 threshold: this.getThreshold(),
                 includeTests: this.getIncludeTests(),
                 exclude: this.getExcludePatterns(),
-                enableAdvanced: true,
                 parallelProcessing: this.getEnableParallelProcessing(),
                 maxWorkers: this.getMaxWorkers()
             });
-            
-            // Format report for extension consumption
+
+            const result = response.result || response;
+
             return {
                 summary: {
                     totalViolations: result.total_violations || 0,
@@ -270,26 +284,26 @@ export class ConnascenceApiClient {
             
         } catch (error) {
             console.error('Failed to generate report:', error);
-            // Return fallback report structure
+            const fallback = this.getFallbackAnalysisResult({ inputPath: workspacePath });
             return {
                 summary: {
-                    totalViolations: 0,
-                    qualityScore: 80,
-                    filesAnalyzed: 0,
-                    analysisTime: 0
+                    totalViolations: fallback.total_violations,
+                    qualityScore: fallback.overall_quality_score,
+                    filesAnalyzed: fallback.files_analyzed,
+                    analysisTime: fallback.analysis_duration_ms
                 },
                 findings: {
-                    connascenceViolations: [],
-                    duplicationClusters: [],
-                    nasaViolations: []
+                    connascenceViolations: fallback.connascence_violations,
+                    duplicationClusters: fallback.duplication_clusters,
+                    nasaViolations: fallback.nasa_violations
                 },
                 recommendations: {
-                    priorityFixes: [],
-                    improvementActions: ['Python analyzer not available - install dependencies']
+                    priorityFixes: fallback.priority_fixes || [],
+                    improvementActions: fallback.improvement_actions || []
                 },
                 metadata: {
-                    timestamp: new Date().toISOString(),
-                    policyPreset: 'fallback'
+                    timestamp: fallback.timestamp || new Date().toISOString(),
+                    policyPreset: fallback.policy_preset || this.getSafetyProfile()
                 },
                 error: error instanceof Error ? error.message : String(error)
             };
@@ -297,98 +311,89 @@ export class ConnascenceApiClient {
     }
 
     /**
-     * Run unified analyzer with all advanced capabilities and robust error handling
+     * Run the shared CLI analyzer commands.
      */
-    private async runUnifiedAnalyzer(options: any): Promise<any> {
-        const analyzerPath = this.getUnifiedAnalyzerPath();
+    private async runCliAnalyzer(options: any): Promise<any> {
         const pythonPath = this.getPythonPath();
-        
-        // Check if analyzer file exists
-        const fs = require('fs');
-        if (!fs.existsSync(analyzerPath)) {
-            console.warn(`Analyzer not found at ${analyzerPath}, using fallback`);
-            return this.getFallbackAnalysisResult(options);
-        }
-        
+        const command = options.mode === 'analyze-workspace' ? 'analyze-workspace' : 'analyze';
         const args = [
-            analyzerPath,
-            '--path', options.inputPath,
-            '--format', 'json',
-            '--policy-preset', options.safetyProfile || 'service-defaults'
+            '-m',
+            'interfaces.cli.connascence',
+            command,
+            options.inputPath || '.',
+            '--policy', options.safetyProfile || 'service-defaults',
+            '--format', 'json'
         ];
-        
-        if (options.mode === 'single-file') {
-            args.push('--single-file');
-        }
-        
-        if (options.parallelProcessing) {
-            args.push('--parallel');
-            if (options.maxWorkers) {
-                args.push('--max-workers', options.maxWorkers.toString());
-            }
-        }
-        
-        if (options.threshold) {
-            args.push('--threshold', options.threshold.toString());
-        }
-        
+
         if (options.includeTests) {
             args.push('--include-tests');
         }
-        
-        if (options.enableAdvanced) {
-            args.push('--enable-mece', '--enable-nasa', '--enable-smart-integration');
+
+        if (options.parallelProcessing) {
+            args.push('--parallel');
         }
-        
+
+        if (options.maxWorkers) {
+            args.push('--max-workers', options.maxWorkers.toString());
+        }
+
+        if (options.threshold) {
+            args.push('--threshold', options.threshold.toString());
+        }
+
         if (options.exclude && options.exclude.length > 0) {
             args.push('--exclude', ...options.exclude);
         }
-        
-        return new Promise((resolve, reject) => {
-            const process = spawn(pythonPath, args, {
-                cwd: this.workspaceRoot,
-                timeout: 30000 // 30 second timeout
+
+        return new Promise((resolve) => {
+            const child = spawn(pythonPath, args, {
+                cwd: this.getExecutionRoot(),
+                env: this.getProcessEnv(),
+                timeout: 40000
             });
-            
+
             let stdout = '';
             let stderr = '';
-            
-            process.stdout.on('data', (data) => {
+
+            const resolveFallback = (reason: string) => {
+                console.warn(`CLI analyzer fallback: ${reason}`);
+                resolve({
+                    result: this.getFallbackAnalysisResult(options),
+                    error: reason
+                });
+            };
+
+            child.stdout.on('data', (data) => {
                 stdout += data.toString();
             });
-            
-            process.stderr.on('data', (data) => {
+
+            child.stderr.on('data', (data) => {
                 stderr += data.toString();
             });
-            
-            process.on('close', (code) => {
+
+            child.on('close', (code) => {
                 if (code === 0) {
                     try {
-                        const result = JSON.parse(stdout);
-                        resolve(result);
-                    } catch (parseError) {
-                        console.warn(`Failed to parse analyzer output, using fallback: ${parseError}`);
-                        resolve(this.getFallbackAnalysisResult(options));
+                        const parsed = JSON.parse(stdout || '{}');
+                        resolve(parsed);
+                    } catch (error) {
+                        resolveFallback(`Failed to parse CLI output: ${error}`);
                     }
                 } else {
-                    console.warn(`Analyzer failed with code ${code}: ${stderr}, using fallback`);
-                    resolve(this.getFallbackAnalysisResult(options));
+                    resolveFallback(`CLI exited with code ${code}: ${stderr}`);
                 }
             });
-            
-            process.on('error', (error) => {
-                console.warn(`Failed to run analyzer: ${error.message}, using fallback`);
-                resolve(this.getFallbackAnalysisResult(options));
+
+            child.on('error', (error) => {
+                resolveFallback(`Failed to run CLI analyzer: ${error.message}`);
             });
-            
-            // Add timeout handler
+
             setTimeout(() => {
-                if (!process.killed) {
-                    console.warn('Analyzer process timeout, using fallback');
-                    process.kill();
-                    resolve(this.getFallbackAnalysisResult(options));
+                if (!child.killed) {
+                    child.kill();
+                    resolveFallback('CLI analyzer timeout');
                 }
-            }, 35000); // 35 second total timeout
+            }, 45000);
         });
     }
     
@@ -420,222 +425,6 @@ export class ConnascenceApiClient {
         };
     }
 
-    /**
-     * Convert unified analyzer report to VS Code format with advanced metrics
-     */
-    private convertUnifiedReportToAnalysisResult(report: any, filePath: string, startTime: number): AnalysisResult {
-        const findings: Finding[] = [];
-        
-        // Process connascence violations
-        if (report.connascence_violations) {
-            for (const violation of report.connascence_violations) {
-                if (violation.file_path && path.resolve(violation.file_path) === path.resolve(filePath)) {
-                    findings.push({
-                        id: violation.id || `${violation.type}_${violation.line_number}`,
-                        type: violation.type || violation.rule_id,
-                        severity: this.mapSeverity(violation.severity),
-                        message: violation.description,
-                        file: violation.file_path,
-                        line: violation.line_number,
-                        column: violation.column_number,
-                        suggestion: violation.suggestion
-                    });
-                }
-            }
-        }
-        
-        // Generate performance metrics
-        const performanceMetrics: PerformanceMetrics = {
-            analysisTime: Date.now() - startTime,
-            parallelProcessing: report.parallel_processing || false,
-            speedupFactor: report.speedup_factor || 1.0,
-            workerCount: report.worker_count || 1,
-            memoryUsage: report.peak_memory_mb || 0,
-            efficiency: report.efficiency || 1.0
-        };
-        
-        // Process duplication clusters
-        const duplicationClusters: DuplicationCluster[] = (report.duplication_clusters || []).map((cluster: any) => ({
-            id: cluster.id,
-            blocks: cluster.blocks.map((block: any) => ({
-                file: block.file_path,
-                startLine: block.start_line,
-                endLine: block.end_line,
-                content: block.content || '',
-                hash: block.hash_signature || ''
-            })),
-            similarity: cluster.similarity_score,
-            severity: this.calculateClusterSeverity(cluster.similarity_score),
-            description: cluster.description,
-            files: cluster.files_involved || []
-        }));
-        
-        // Process NASA compliance
-        const nasaCompliance: NASAComplianceResult = {
-            compliant: report.nasa_compliance_score >= 0.8,
-            score: report.nasa_compliance_score || 1.0,
-            violations: (report.nasa_violations || []).map((v: any) => ({
-                rule: v.rule,
-                message: v.message,
-                file: v.file_path || filePath,
-                line: v.line_number || 0,
-                severity: this.mapSeverity(v.severity),
-                powerOfTenRule: v.power_of_ten_rule
-            })),
-            powerOfTenRules: report.power_of_ten_rules || []
-        };
-        
-        // Process smart integration results
-        const smartIntegrationResults: SmartIntegrationResult = {
-            crossAnalyzerCorrelation: report.correlations || [],
-            intelligentRecommendations: (report.improvement_actions || []).map((action: string, index: number) => ({
-                priority: index < 2 ? 'high' as const : 'medium' as const,
-                category: 'quality_improvement',
-                description: action,
-                impact: 'Improves code quality and maintainability',
-                effort: 'medium' as const,
-                suggestedActions: [action]
-            })),
-            qualityTrends: [{
-                metric: 'overall_quality',
-                current: report.overall_quality_score || 0.8,
-                trend: 'stable' as const,
-                projection: report.overall_quality_score || 0.8
-            }],
-            riskAssessment: {
-                overallRisk: this.calculateOverallRisk(report),
-                riskFactors: [],
-                mitigation: report.priority_fixes || []
-            }
-        };
-        
-        return {
-            findings,
-            qualityScore: Math.round((report.overall_quality_score || 0.8) * 100),
-            summary: {
-                totalIssues: findings.length + duplicationClusters.length + nasaCompliance.violations.length,
-                issuesBySeverity: this.calculateSeverityBreakdown(findings)
-            },
-            performanceMetrics,
-            duplicationClusters,
-            nasaCompliance,
-            smartIntegrationResults
-        };
-    }
-
-    /**
-     * Convert unified workspace results with advanced metrics
-     */
-    private convertUnifiedWorkspaceResult(report: any, startTime: number): {
-        fileResults: { [filePath: string]: AnalysisResult },
-        summary: { filesAnalyzed: number, totalIssues: number, qualityScore: number }
-    } {
-        const fileResults: { [filePath: string]: AnalysisResult } = {};
-        let totalIssues = 0;
-        
-        // Group connascence violations by file
-        const violationsByFile = new Map<string, any[]>();
-        if (report.connascence_violations) {
-            for (const violation of report.connascence_violations) {
-                const file = violation.file_path || 'unknown';
-                if (!violationsByFile.has(file)) {
-                    violationsByFile.set(file, []);
-                }
-                violationsByFile.get(file)!.push(violation);
-            }
-        }
-        
-        // Process each file
-        for (const [file, violations] of violationsByFile) {
-            const findings: Finding[] = violations.map(v => ({
-                id: v.id || `${v.type}_${v.line_number}`,
-                type: v.type || v.rule_id,
-                severity: this.mapSeverity(v.severity),
-                message: v.description,
-                file: v.file_path,
-                line: v.line_number,
-                column: v.column_number,
-                suggestion: v.suggestion
-            }));
-            
-            // Filter duplication clusters for this file
-            const fileDuplicationClusters = (report.duplication_clusters || []).filter((cluster: any) => 
-                cluster.files_involved && cluster.files_involved.includes(file)
-            ).map((cluster: any) => ({
-                id: cluster.id,
-                blocks: cluster.blocks.filter((block: any) => block.file_path === file),
-                similarity: cluster.similarity_score,
-                severity: this.calculateClusterSeverity(cluster.similarity_score),
-                description: cluster.description,
-                files: [file]
-            }));
-            
-            // Filter NASA violations for this file
-            const fileNasaViolations = (report.nasa_violations || []).filter((v: any) => 
-                v.file_path === file
-            ).map((v: any) => ({
-                rule: v.rule,
-                message: v.message,
-                file: v.file_path,
-                line: v.line_number,
-                severity: this.mapSeverity(v.severity),
-                powerOfTenRule: v.power_of_ten_rule
-            }));
-            
-            const performanceMetrics: PerformanceMetrics = {
-                analysisTime: Date.now() - startTime,
-                parallelProcessing: report.parallel_processing || false,
-                speedupFactor: report.speedup_factor || 1.0,
-                workerCount: report.worker_count || 1,
-                memoryUsage: report.peak_memory_mb || 0,
-                efficiency: report.efficiency || 1.0
-            };
-            
-            const nasaCompliance: NASAComplianceResult = {
-                compliant: fileNasaViolations.length === 0,
-                score: Math.max(0, 1.0 - (fileNasaViolations.length * 0.1)),
-                violations: fileNasaViolations,
-                powerOfTenRules: []
-            };
-            
-            const smartIntegrationResults: SmartIntegrationResult = {
-                crossAnalyzerCorrelation: [],
-                intelligentRecommendations: [],
-                qualityTrends: [],
-                riskAssessment: {
-                    overallRisk: findings.filter(f => f.severity === 'critical').length > 0 ? 'high' : 'low',
-                    riskFactors: [],
-                    mitigation: []
-                }
-            };
-            
-            const totalFileIssues = findings.length + fileDuplicationClusters.length + fileNasaViolations.length;
-            
-            fileResults[file] = {
-                findings,
-                qualityScore: this.calculateEnhancedQualityScore(findings, fileDuplicationClusters, nasaCompliance),
-                summary: {
-                    totalIssues: totalFileIssues,
-                    issuesBySeverity: this.calculateSeverityBreakdown(findings)
-                },
-                performanceMetrics,
-                duplicationClusters: fileDuplicationClusters,
-                nasaCompliance,
-                smartIntegrationResults
-            };
-            
-            totalIssues += totalFileIssues;
-        }
-        
-        return {
-            fileResults,
-            summary: {
-                filesAnalyzed: Object.keys(fileResults).length,
-                totalIssues,
-                qualityScore: Math.round((report.overall_quality_score || 0.8) * 100)
-            }
-        };
-    }
 
     /**
      * Fallback analysis when main system is not available
@@ -687,10 +476,10 @@ export class ConnascenceApiClient {
         
         return {
             findings,
-            qualityScore: this.calculateQualityScore(findings),
+            qualityScore: calculateQualityScore(findings),
             summary: {
                 totalIssues: findings.length,
-                issuesBySeverity: this.calculateSeverityBreakdown(findings)
+                issuesBySeverity: calculateSeverityBreakdown(findings)
             }
         };
     }
@@ -732,113 +521,13 @@ export class ConnascenceApiClient {
         ]);
     }
 
-    // Utility methods
-    private mapSeverity(severity: string): 'critical' | 'major' | 'minor' | 'info' {
-        const severityMap: { [key: string]: 'critical' | 'major' | 'minor' | 'info' } = {
-            'critical': 'critical',
-            'high': 'major',
-            'medium': 'minor',
-            'low': 'info',
-            'error': 'critical',
-            'warning': 'major',
-            'info': 'info'
-        };
-        
-        return severityMap[severity.toLowerCase()] || 'info';
+    private getExecutionRoot(): string {
+        return path.resolve(path.join(__dirname, '..', '..', '..', '..'));
     }
 
-    private calculateQualityScore(findings: Finding[]): number {
-        if (findings.length === 0) return 100;
-        
-        const weights = { critical: 10, major: 5, minor: 2, info: 1 };
-        const totalWeight = findings.reduce((sum, f) => sum + weights[f.severity], 0);
-        
-        return Math.max(0, 100 - totalWeight);
-    }
-
-    private calculateSeverityBreakdown(findings: Finding[]): {
-        critical: number;
-        major: number;
-        minor: number;
-        info: number;
-    } {
-        return findings.reduce((acc, finding) => {
-            acc[finding.severity]++;
-            return acc;
-        }, { critical: 0, major: 0, minor: 0, info: 0 });
-    }
-
-    private calculateOverallQualityScore(fileResults: { [filePath: string]: AnalysisResult }): number {
-        const scores = Object.values(fileResults).map(r => r.qualityScore);
-        return scores.length > 0 ? scores.reduce((sum, score) => sum + score, 0) / scores.length : 100;
-    }
-
-    /**
-     * Calculate enhanced quality score incorporating all advanced metrics
-     */
-    private calculateEnhancedQualityScore(
-        findings: Finding[], 
-        duplicationClusters: DuplicationCluster[], 
-        nasaCompliance: NASAComplianceResult
-    ): number {
-        let baseScore = this.calculateQualityScore(findings);
-        
-        // Adjust for duplication clusters
-        const duplicationPenalty = duplicationClusters.length * 5;
-        baseScore = Math.max(0, baseScore - duplicationPenalty);
-        
-        // Adjust for NASA compliance
-        const compliancePenalty = (1.0 - nasaCompliance.score) * 20;
-        baseScore = Math.max(0, baseScore - compliancePenalty);
-        
-        return Math.round(baseScore);
-    }
-
-    /**
-     * Calculate cluster severity based on similarity score
-     */
-    private calculateClusterSeverity(similarity: number): 'critical' | 'major' | 'minor' | 'info' {
-        if (similarity >= 0.9) return 'critical';
-        if (similarity >= 0.8) return 'major';
-        if (similarity >= 0.7) return 'minor';
-        return 'info';
-    }
-
-    /**
-     * Calculate overall risk level from analysis results
-     */
-    private calculateOverallRisk(report: any): 'low' | 'medium' | 'high' | 'critical' {
-        const criticalViolations = (report.connascence_violations || []).filter((v: any) => 
-            v.severity === 'critical'
-        ).length;
-        
-        const highSimilarityClusters = (report.duplication_clusters || []).filter((c: any) => 
-            c.similarity_score >= 0.9
-        ).length;
-        
-        const nasaViolations = (report.nasa_violations || []).length;
-        
-        if (criticalViolations > 10 || highSimilarityClusters > 5 || nasaViolations > 20) {
-            return 'critical';
-        } else if (criticalViolations > 5 || highSimilarityClusters > 2 || nasaViolations > 10) {
-            return 'high';
-        } else if (criticalViolations > 0 || highSimilarityClusters > 0 || nasaViolations > 0) {
-            return 'medium';
-        }
-        
-        return 'low';
-    }
-
-    /**
-     * Get path to unified analyzer
-     */
-    private getUnifiedAnalyzerPath(): string {
-        if (this.workspaceRoot) {
-            return path.join(this.workspaceRoot, 'analyzer', 'unified_analyzer.py');
-        }
-        
-        // Fallback to relative path from extension
-        return path.join(__dirname, '..', '..', '..', 'analyzer', 'unified_analyzer.py');
+    private getProcessEnv(): NodeJS.ProcessEnv {
+        const root = this.getExecutionRoot();
+        return { ...process.env, PYTHONPATH: root };
     }
 
     // Additional configuration helpers for advanced features
@@ -852,120 +541,6 @@ export class ConnascenceApiClient {
         return config.get('maxWorkers', 4);
     }
 
-    /**
-     * Run Python analyzer as subprocess
-     */
-    private async runPythonAnalyzer(options: any): Promise<any> {
-        const analyzerPath = this.getAnalyzerPath();
-        const pythonPath = this.getPythonPath();
-        
-        const args = [
-            analyzerPath,
-            options.inputPath,
-            '--format', 'json',
-            '--profile', options.safetyProfile || 'modern_general'
-        ];
-        
-        if (options.mode === 'single-file') {
-            args.push('--single-file');
-        }
-        
-        return new Promise((resolve, reject) => {
-            const process = spawn(pythonPath, args, {
-                cwd: this.workspaceRoot
-            });
-            
-            let stdout = '';
-            let stderr = '';
-            
-            process.stdout.on('data', (data) => {
-                stdout += data.toString();
-            });
-            
-            process.stderr.on('data', (data) => {
-                stderr += data.toString();
-            });
-            
-            process.on('close', (code) => {
-                if (code === 0) {
-                    try {
-                        const result = JSON.parse(stdout);
-                        resolve(result);
-                    } catch (parseError) {
-                        reject(new Error(`Failed to parse analyzer output: ${parseError}`));
-                    }
-                } else {
-                    reject(new Error(`Analyzer failed with code ${code}: ${stderr}`));
-                }
-            });
-            
-            process.on('error', (error) => {
-                reject(new Error(`Failed to run analyzer: ${error.message}`));
-            });
-        });
-    }
-    
-    /**
-     * Run safety validation via Python
-     */
-    private async runSafetyValidation(options: any): Promise<any> {
-        const result = await this.runPythonAnalyzer({
-            ...options,
-            mode: 'safety-validation'
-        });
-        
-        return {
-            compliant: result.safety_compliant || false,
-            violations: result.safety_violations || []
-        };
-    }
-    
-    /**
-     * Get refactoring suggestions via Python
-     */
-    private async getRefactoringSuggestions(options: any): Promise<any[]> {
-        try {
-            const result = await this.runPythonAnalyzer({
-                ...options,
-                mode: 'refactoring-suggestions'
-            });
-            
-            return result.suggestions || [];
-        } catch (error) {
-            console.warn('Refactoring suggestions not available:', error);
-            return [];
-        }
-    }
-    
-    /**
-     * Get automated fixes via Python
-     */
-    private async getAutomatedFixes(options: any): Promise<any[]> {
-        try {
-            const result = await this.runPythonAnalyzer({
-                ...options,
-                mode: 'automated-fixes'
-            });
-            
-            return result.fixes || [];
-        } catch (error) {
-            console.warn('Automated fixes not available:', error);
-            return [];
-        }
-    }
-    
-    /**
-     * Get the path to the Python analyzer (legacy support)
-     */
-    private getAnalyzerPath(): string {
-        if (this.workspaceRoot) {
-            return path.join(this.workspaceRoot, 'analyzer', 'check_connascence.py');
-        }
-        
-        // Fallback to relative path from extension
-        return path.join(__dirname, '..', '..', '..', 'analyzer', 'check_connascence.py');
-    }
-    
     /**
      * Get the Python executable path
      */
