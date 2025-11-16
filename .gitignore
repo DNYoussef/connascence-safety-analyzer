@@ -51,7 +51,7 @@ wheels/
 .installed.cfg
 *.egg
 MANIFEST
-
+.claude-flow
 # Testing
 .pytest_cache/
 .coverage
