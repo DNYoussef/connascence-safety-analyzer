@@ -40,7 +40,7 @@ suite('Connascence Extension Integration Tests', () => {
 
     test('Can handle configuration settings', () => {
         const config = vscode.workspace.getConfiguration('connascence');
-        
+
         // Test that we can read configuration values
         const safetyProfile = config.get('safetyProfile', 'modern_general');
         const realTimeAnalysis = config.get('realTimeAnalysis', true);
@@ -52,12 +52,12 @@ suite('Connascence Extension Integration Tests', () => {
     test('Can validate safety profile options', () => {
         const validProfiles = [
             'none',
-            'general_safety_strict', 
+            'general_safety_strict',
             'safety_level_1',
             'safety_level_3',
             'modern_general'
         ];
-        
+
         for (const profile of validProfiles) {
             // This should not throw
             assert.doesNotThrow(() => {
@@ -66,5 +66,34 @@ suite('Connascence Extension Integration Tests', () => {
                 assert.ok(profile.length > 0);
             });
         }
+    });
+
+    test('CLI payload conversion preserves schema', () => {
+        const now = Date.now();
+        const cliPayload = {
+            target: '/tmp/example.py',
+            profile: 'service-defaults',
+            quality_score: 88.5,
+            findings: [
+                {
+                    id: 'cli_001',
+                    type: 'CoM',
+                    severity: 'high',
+                    message: 'Magic literal detected',
+                    file: '/tmp/example.py',
+                    line: 12
+                }
+            ],
+            summary: {
+                totalIssues: 1,
+                issuesBySeverity: { critical: 0, major: 1, minor: 0, info: 0 }
+            }
+        };
+
+        const result = (apiClient as any).convertCliReportToAnalysisResult(cliPayload, cliPayload.target, now);
+        assert.strictEqual(result.summary.totalIssues, 1);
+        assert.strictEqual(result.findings[0].type, 'CoM');
+        assert.strictEqual(result.findings[0].severity, 'major');
+        assert.strictEqual(result.qualityScore, 89);
     });
 });

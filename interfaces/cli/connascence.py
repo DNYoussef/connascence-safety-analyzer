@@ -31,6 +31,7 @@ LICENSE_VALIDATION_AVAILABLE = False
 
 # Import unified policy system
 sys.path.append(str(Path(__file__).parent.parent.parent))
+from analyzer.cli_entry import get_shared_cli_analyzer
 from analyzer.constants import (
     ERROR_SEVERITY,
     EXIT_CONFIGURATION_ERROR,
@@ -93,6 +94,7 @@ class ConnascenceCLI:
         self.error_handler = ErrorHandler("cli")
         self.errors = []
         self.warnings = []
+        self.analysis_helper = get_shared_cli_analyzer()
         # Command handlers
         self.scan_handler = MockHandler()
         self.baseline_handler = MockHandler()
@@ -700,20 +702,17 @@ class ConnascenceCLI:
         return unified
 
     def _get_threshold_config(self, profile: str) -> ThresholdConfig:
-        if self.policy_manager:
-            try:
-                return self.policy_manager.get_preset(profile)
-            except ValueError as exc:
-                error = self.error_handler.create_error(
-                    "POLICY_INVALID",
-                    str(exc),
-                    ERROR_SEVERITY["HIGH"],
-                    {"policy": profile},
-                )
-                self._handle_cli_error(error)
-                return ThresholdConfig()
-
-        return ThresholdConfig()
+        try:
+            return self.analysis_helper.get_threshold_config(profile)
+        except RuntimeError as exc:
+            error = self.error_handler.create_error(
+                "POLICY_INVALID",
+                str(exc),
+                ERROR_SEVERITY["HIGH"],
+                {"policy": profile},
+            )
+            self._handle_cli_error(error)
+            return ThresholdConfig()
 
     def _require_analyzer(self) -> bool:
         if ANALYZER_AVAILABLE and ConnascenceASTAnalyzer is not None and ThresholdConfig is not None:
@@ -806,18 +805,7 @@ class ConnascenceCLI:
         fmt: str,
         output_path: Optional[str],
     ) -> int:
-        thresholds = self._get_threshold_config(profile)
-        analyzer = ConnascenceASTAnalyzer(thresholds=thresholds)
-        start = time.time()
-        violations = analyzer.analyze_file(target)
-        payload = self._format_analysis_result(
-            violations,
-            files_analyzed=1,
-            profile=profile,
-            target=str(target),
-            analysis_time=time.time() - start,
-        )
-
+        payload = self.analysis_helper.analyze_file(target, profile)
         self._emit_result(payload, fmt, output_path)
         return ExitCode.SUCCESS
 
@@ -829,47 +817,14 @@ class ConnascenceCLI:
         output_path: Optional[str],
         patterns: Optional[Iterable[str]],
     ) -> int:
-        thresholds = self._get_threshold_config(profile)
-        analyzer = ConnascenceASTAnalyzer(thresholds=thresholds)
-        files: Dict[str, Dict[str, object]] = {}
-        total_score = 0.0
-
-        for file_path in self._iter_workspace_files(workspace, patterns):
-            start = time.time()
-            violations = analyzer.analyze_file(file_path)
-            file_payload = self._format_analysis_result(
-                violations,
-                files_analyzed=1,
-                profile=profile,
-                target=str(file_path),
-                analysis_time=time.time() - start,
-            )
-            files[str(file_path)] = file_payload
-            total_score += file_payload.get("quality_score", 0.0)
-
-        analyzed_files = len(files)
-        workspace_payload = {
-            "files": files,
-            "profile": profile,
-            "files_analyzed": analyzed_files,
-            "overall_score": round(total_score / analyzed_files, 2) if analyzed_files else 100.0,
-        }
+        workspace_payload = self.analysis_helper.analyze_workspace(
+            workspace,
+            profile,
+            patterns=patterns,
+        )
 
         self._emit_result(workspace_payload, fmt, output_path)
         return ExitCode.SUCCESS
-
-    def _iter_workspace_files(self, workspace: Path, patterns: Optional[Iterable[str]]) -> Iterable[Path]:
-        glob_patterns = list(patterns) if patterns else ["*.py"]
-        seen = set()
-        for pattern in glob_patterns:
-            for path in workspace.rglob(pattern):
-                if not path.is_file():
-                    continue
-                real_path = path.resolve()
-                if real_path in seen:
-                    continue
-                seen.add(real_path)
-                yield path
 
     def _format_analysis_result(
         self,
@@ -879,33 +834,14 @@ class ConnascenceCLI:
         target: Optional[str] = None,
         analysis_time: Optional[float] = None,
     ) -> Dict[str, object]:
-        severity_map = {"critical": "critical", "high": "major", "medium": "minor", "low": "info"}
-        severity_summary = {"critical": 0, "major": 0, "minor": 0, "info": 0}
-        findings = []
-        normalized_violations = list(violations or [])
-
-        for idx, violation in enumerate(normalized_violations):
-            finding = self._convert_violation(violation, idx, target)
-            finding_severity = severity_map.get(getattr(violation, "severity", "medium").lower(), "info")
-            severity_summary[finding_severity] += 1
-            finding["severity"] = finding_severity
-            findings.append(finding)
-
-        total_weight = sum(getattr(v, "weight", 1.0) or 1.0 for v in normalized_violations)
-        quality_score = round(max(0.0, 100.0 - (total_weight * 5.0)), 2)
-        result: Dict[str, object] = {
-            "target": target,
-            "profile": profile,
-            "quality_score": quality_score,
-            "findings": findings,
-            "summary": {"totalIssues": len(findings), "issuesBySeverity": severity_summary},
-            "files_analyzed": files_analyzed,
-        }
-
-        if analysis_time is not None:
-            result["analysis_time_ms"] = int(analysis_time * 1000)
-
-        return result
+        """(Deprecated) kept for compatibility with validation commands."""
+        return self.analysis_helper.format_analysis_result(
+            violations,
+            profile=profile,
+            files_analyzed=files_analyzed,
+            target=target,
+            analysis_time=analysis_time,
+        )
 
     def _convert_violation(
         self,
