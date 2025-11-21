@@ -24,11 +24,14 @@ class PositionDetector(DetectorBase):
 
     SUPPORTED_EXTENSIONS = [".py", ".js", ".ts"]
 
+    # Configuration-driven threshold (loaded from detector_config.yaml)
+    DEFAULT_MAX_POSITIONAL_PARAMS = 3
+
     def __init__(self, file_path: str, source_lines: List[str]):
         super().__init__(file_path, source_lines)
 
-        # Use hardcoded threshold (avoiding broken configuration system)
-        self.max_positional_params = 3
+        # Load threshold from configuration system
+        self.max_positional_params = self._load_threshold_from_config()
 
     def detect_violations(self, tree: ast.AST) -> List[ConnascenceViolation]:
         """
@@ -158,3 +161,21 @@ class PositionDetector(DetectorBase):
             return (
                 "Function has excessive parameters - consider breaking into smaller functions or using builder pattern"
             )
+
+    def _load_threshold_from_config(self) -> int:
+        """Load max_positional_params from detector_config.yaml."""
+        import yaml
+        from pathlib import Path
+
+        config_path = Path(__file__).parent.parent / "config" / "detector_config.yaml"
+
+        try:
+            if config_path.exists():
+                with open(config_path, "r", encoding="utf-8") as f:
+                    config = yaml.safe_load(f)
+                    position_config = config.get("position_detector", {})
+                    return position_config.get("max_positional_params", self.DEFAULT_MAX_POSITIONAL_PARAMS)
+        except Exception:
+            pass  # Fall through to default
+
+        return self.DEFAULT_MAX_POSITIONAL_PARAMS

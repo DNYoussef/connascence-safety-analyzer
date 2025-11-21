@@ -1,47 +1,64 @@
-"""Fixtures and helper classes for agent compliance tests."""
+# SPDX-License-Identifier: MIT
+"""
+Shared fixtures for agent compliance testing.
 
-from __future__ import annotations
-
-from typing import Dict, Iterable, List
+These fixtures provide mock agent interfaces and test utilities
+required by the architectural compliance test suite.
+"""
 
 import pytest
-
-from packages.agents.core import BaseAgent
-
-
-class MockTestAgent(BaseAgent):
-    """Minimal agent implementation used to exercise the shared interface."""
-
-    def __init__(self) -> None:
-        super().__init__()
-        self._inbox: List[Dict[str, Any]] = []
-        self.initialize()
-
-    def process_task(self, task: Dict[str, Any]) -> Dict[str, Any]:
-        """Extend the base implementation with echo semantics."""
-        result = super().process_task(task)
-        result["echo"] = task.get("payload", "")
-        return result
-
-    def can_handle_task(self, task: Dict[str, Any]) -> bool:
-        task_type = task.get("type", "")
-        return task_type in {"echo", "analysis"}
-
-    def receive_message(self) -> Dict[str, Any]:
-        if self._inbox:
-            return self._inbox.pop(0)
-        return super().receive_message()
-
-    def queue_message(self, sender: str, message: str) -> None:
-        self._inbox.append({"sender": sender, "message": message})
-
-    def broadcast_message(self, recipients: Iterable[str], message: str) -> List[Dict[str, Any]]:
-        deliveries = super().broadcast_message(recipients, message)
-        self._status["last_broadcast"] = len(deliveries)
-        return deliveries
+from typing import Any, Dict, List
 
 
 @pytest.fixture
-def mock_agent() -> MockTestAgent:
-    """Provide a ready-to-use mock agent for tests."""
-    return MockTestAgent()
+def mock_agent_interface():
+    """Provide a mock agent interface for compliance testing."""
+    return MockAgentInterface()
+
+
+@pytest.fixture
+def agent_capabilities():
+    """Provide standard agent capabilities for testing."""
+    return {
+        "messaging": True,
+        "embeddings": False,
+        "reranking": False,
+        "health_check": True,
+        "task_processing": True,
+    }
+
+
+class MockAgentInterface:
+    """Mock implementation of agent interface for testing."""
+
+    def __init__(self):
+        self.messages: List[Dict[str, Any]] = []
+        self.tasks_processed: List[Any] = []
+
+    def send_message(self, recipient: str, message: str, **kwargs) -> Dict[str, Any]:
+        """Mock message sending."""
+        msg = {"recipient": recipient, "message": message, "delivered": True, **kwargs}
+        self.messages.append(msg)
+        return msg
+
+    def receive_message(self, timeout: float = None) -> List[Dict[str, Any]]:
+        """Return pending messages."""
+        return self.messages
+
+    def process_task(self, task: Any, context: Dict[str, Any] = None) -> Dict[str, Any]:
+        """Mock task processing."""
+        self.tasks_processed.append(task)
+        return {"task": task, "status": "completed", "context": context or {}}
+
+    def health_check(self) -> Dict[str, Any]:
+        """Return health status."""
+        return {"status": "healthy", "components": {"messaging": "ok"}}
+
+    def get_capabilities(self) -> Dict[str, Any]:
+        """Return interface capabilities."""
+        return {
+            "interfaces": ["mock"],
+            "formats": ["json"],
+            "messaging": True,
+            "task_processing": True,
+        }

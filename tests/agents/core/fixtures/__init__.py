@@ -1,1 +1,2 @@
-"""Support module for agent compliance tests."""
+# SPDX-License-Identifier: MIT
+"""Tests Agents Core Fixtures - Shared fixtures for agent compliance testing."""

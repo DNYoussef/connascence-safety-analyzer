@@ -1,1 +1,2 @@
-"""Test agent support package required for compliance checks."""
+# SPDX-License-Identifier: MIT
+"""Tests Agents Package - Agent fixtures for architectural compliance testing."""

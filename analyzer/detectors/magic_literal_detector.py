@@ -17,6 +17,11 @@ class MagicLiteralDetector(DetectorBase):
 
     SUPPORTED_EXTENSIONS = [".py", ".js", ".ts", ".java"]
 
+    # Severity thresholds (extracted from inline magic literals)
+    SEVERITY_HIGH_THRESHOLD = 8.0
+    SEVERITY_MEDIUM_THRESHOLD = 5.0
+    SEVERITY_MIN_THRESHOLD = 2.0
+
     def __init__(self, file_path: str, source_lines: List[str]):
         super().__init__(file_path, source_lines)
         self.magic_literals: List[Tuple[ast.AST, Any, Dict]] = []
@@ -73,7 +78,7 @@ class MagicLiteralDetector(DetectorBase):
             context = detector._build_context(node)
             severity = detector._calculate_severity(context)
 
-            if severity > 2.0:  # Only flag significant literals
+            if severity > self.SEVERITY_MIN_THRESHOLD:  # Only flag significant literals
                 self.magic_literals.append(
                     (node, node.value, {"context": context, "severity_score": severity, "formal_analysis": True})
                 )
@@ -114,13 +119,13 @@ class MagicLiteralDetector(DetectorBase):
         severity_score = context_info.get("severity_score", 3.0)
 
         # Skip low-severity items
-        if severity_score < 2.0:
+        if severity_score < self.SEVERITY_MIN_THRESHOLD:
             return
 
-        # Determine severity level
-        if severity_score > 8.0:
+        # Determine severity level using class constants
+        if severity_score > self.SEVERITY_HIGH_THRESHOLD:
             severity = "high"
-        elif severity_score > 5.0:
+        elif severity_score > self.SEVERITY_MEDIUM_THRESHOLD:
             severity = "medium"
         else:
             severity = "low"

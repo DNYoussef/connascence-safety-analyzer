@@ -218,25 +218,62 @@ class SLSAAttestationGenerator:
 
         return statement
 
-    def sign_attestation(self, attestation: Dict[str, Any], signing_method: str = "mock") -> Dict[str, Any]:
+    def sign_attestation(
+        self,
+        attestation: Dict[str, Any],
+        signing_method: str = "gpg",
+        allow_insecure: bool = False,
+    ) -> Dict[str, Any]:
+        """
+        Sign an attestation using the specified method.
+
+        Args:
+            attestation: The attestation dictionary to sign
+            signing_method: "gpg" (recommended) or "mock" (insecure, testing only)
+            allow_insecure: Must be True to use mock signing (prevents accidental use)
+
+        Returns:
+            Signed attestation with payload and signatures
+
+        Raises:
+            ValueError: If mock signing requested without allow_insecure=True
+        """
         attestation_json = json.dumps(attestation, sort_keys=True)
 
         if signing_method == "mock":
+            if not allow_insecure:
+                raise ValueError(
+                    "Mock signing provides NO cryptographic security. "
+                    "Set allow_insecure=True to acknowledge this risk. "
+                    "Use signing_method='gpg' for production environments."
+                )
+            logger.warning(
+                "SECURITY WARNING: Using mock signing - attestation is NOT cryptographically signed. "
+                "This provides ZERO non-repudiation or integrity protection."
+            )
             signature = self._mock_sign(attestation_json)
+            key_id = "INSECURE-mock-key-DO-NOT-USE-IN-PRODUCTION"
         elif signing_method == "gpg":
             signature = self._gpg_sign(attestation_json)
+            key_id = "gpg-signed"
         else:
             raise ValueError(f"Unsupported signing method: {signing_method}")
 
         signed_attestation = {
             "payload": base64.b64encode(attestation_json.encode()).decode(),
             "payloadType": "application/vnd.in-toto+json",
-            "signatures": [{"keyid": "mock-key-id", "sig": signature}],
+            "signatures": [{"keyid": key_id, "sig": signature}],
         }
 
         return signed_attestation
 
     def _mock_sign(self, data: str) -> str:
+        """
+        INSECURE: Generate a mock signature using SHA256 hash.
+
+        WARNING: This is NOT a real cryptographic signature. Anyone can forge this
+        by simply hashing the content. Use only for testing purposes.
+        """
         hasher = hashlib.sha256()
         hasher.update(data.encode())
         mock_signature = hasher.hexdigest()
@@ -333,7 +370,10 @@ def main():
 
     if args.sign:
         print(f"Signing attestation with {args.signing_method}...")
-        final_attestation = generator.sign_attestation(statement, args.signing_method)
+        allow_insecure = args.signing_method == "mock"
+        final_attestation = generator.sign_attestation(
+            statement, args.signing_method, allow_insecure=allow_insecure
+        )
     else:
         final_attestation = statement
 
