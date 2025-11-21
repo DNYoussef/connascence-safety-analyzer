@@ -110,9 +110,27 @@ except ImportError:
     from refactored_detector import RefactoredConnascenceDetector
     from smart_integration_engine import SmartIntegrationEngine
 
-# Import new architecture components
-# Temporarily disabled broken architecture imports - will re-implement correctly
-pass
+# Import new architecture components (refactored for NASA Rule 4 compliance)
+try:
+    from .architecture.cache_manager import CacheManager
+    from .architecture.metrics_collector import MetricsCollector
+    from .architecture.report_generator import ReportGenerator
+    from .architecture.stream_processor import StreamProcessor as ArchStreamProcessor
+    ARCHITECTURE_AVAILABLE = True
+except ImportError:
+    ARCHITECTURE_AVAILABLE = False
+    CacheManager = None
+    MetricsCollector = None
+    ReportGenerator = None
+    ArchStreamProcessor = None
+
+# Import refactored coordinator (recommended for new code)
+try:
+    from .unified_coordinator import UnifiedCoordinator
+    COORDINATOR_AVAILABLE = True
+except ImportError:
+    COORDINATOR_AVAILABLE = False
+    UnifiedCoordinator = None
 
 # Try to import Tree-Sitter backend with fallback
 try:
@@ -484,12 +502,21 @@ class UnifiedConnascenceAnalyzer:
             self._setup_monitoring_and_cleanup_hooks()
 
         # Initialize new architecture components (NASA Rule 4 compliant)
-        # Temporarily disabled all broken architecture components
-        # self.config_manager = ConfigurationManager()
-        # self.orchestrator_component = AnalysisOrchestrator()
-        # self.aggregator = ViolationAggregator()
-        # self.recommendation_engine = RecommendationEngine()
-        # self.enhanced_metrics = EnhancedMetricsCalculator()
+        # These delegate caching, metrics, reporting, and streaming to specialized components
+        self.arch_cache_manager = None
+        self.arch_metrics_collector = None
+        self.arch_report_generator = None
+        self.arch_stream_processor = None
+
+        if ARCHITECTURE_AVAILABLE:
+            try:
+                self.arch_cache_manager = CacheManager(config={"max_memory": 100 * 1024 * 1024})
+                self.arch_metrics_collector = MetricsCollector()
+                self.arch_report_generator = ReportGenerator(config={"version": "1.0.0"})
+                self.arch_stream_processor = ArchStreamProcessor(config=streaming_config or {})
+                logger.info("Architecture components initialized successfully")
+            except Exception as e:
+                logger.warning(f"Architecture component initialization failed: {e}")
 
         # Load configuration (simplified)
         self.config = self._load_config(config_path)
@@ -1175,6 +1202,11 @@ class UnifiedConnascenceAnalyzer:
         NASA Rule 5: Input assertions and error handling
         """
         assert project_path.exists(), "project_path must exist"
+
+        # Delegate to architecture component if available
+        if self.arch_cache_manager:
+            self.arch_cache_manager.warm_cache(project_path, file_limit=15)
+            return
 
         try:
             # Strategy 1: Pre-load frequently accessed file types
@@ -1999,6 +2031,13 @@ class UnifiedConnascenceAnalyzer:
         # NASA Rule 5: Input validation assertions
         assert violations is not None, "violations cannot be None"
         assert analysis_errors is not None, "analysis_errors cannot be None"
+
+        # Delegate to architecture component if available
+        if self.arch_metrics_collector:
+            try:
+                return self.arch_metrics_collector.collect_violation_metrics(violations)
+            except Exception as e:
+                logger.warning(f"Architecture metrics failed, using fallback: {e}")
 
         try:
             # Use MetricsCalculator as fallback since enhanced_metrics is disabled
