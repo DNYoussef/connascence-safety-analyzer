@@ -29,6 +29,15 @@ from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
+
+pytestmark = pytest.mark.anyio("asyncio")
+
+
+@pytest.fixture(scope="session")
+def anyio_backend():
+    """Force anyio to use asyncio backend to avoid optional trio dependency."""
+    return "asyncio"
+
 # Import the component under test
 from analyzer.architecture.stream_processor import (
     StreamProcessor,
