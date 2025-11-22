@@ -1209,25 +1209,30 @@ class ConnascenceCLI:
             self._write_output(content, output_path)
             return
 
-        self._print_text_summary(payload)
+        text_summary = self._render_text_summary(payload)
+        print(text_summary)
         if output_path:
-            Path(output_path).write_text(json.dumps(payload, indent=2), encoding="utf-8")
-            print(f"Detailed JSON written to {output_path}")
+            Path(output_path).write_text(text_summary, encoding="utf-8")
+            print(f"Text report written to {output_path}")
 
-    def _print_text_summary(self, payload: Dict[str, object]):
-        if "findings" in payload:
-            print(f"Analyzed {payload.get('target', 'input')} with profile {payload.get('profile')}")
-            summary = payload.get("summary", {})
-            print(f"Total findings: {summary.get('totalIssues', 0)} | Quality Score: {payload.get('quality_score', 0)}")
-            issues = summary.get("issuesBySeverity", {})
-            print(
-                "Severity breakdown: "
-                f"critical={issues.get('critical', 0)}, "
-                f"major={issues.get('major', 0)}, "
-                f"minor={issues.get('minor', 0)}, "
-                f"info={issues.get('info', 0)}"
-            )
-            return
+    def _render_text_summary(self, payload: Dict[str, object]) -> str:
+        if "findings" not in payload:
+            return "No findings available."
+
+        lines = ["CONNASCENCE ANALYSIS REPORT"]
+        lines.append(f"Analyzed {payload.get('target', 'input')} with profile {payload.get('profile')}")
+        summary = payload.get("summary", {})
+        total = summary.get("totalIssues", 0)
+        lines.append(f"Violations found: {total} | Quality Score: {payload.get('quality_score', 0)}")
+        issues = summary.get("issuesBySeverity", {})
+        lines.append(
+            "Severity breakdown: "
+            f"critical={issues.get('critical', 0)}, "
+            f"major={issues.get('major', 0)}, "
+            f"minor={issues.get('minor', 0)}, "
+            f"info={issues.get('info', 0)}"
+        )
+        return "\n".join(lines)
 
         if "files" in payload:
             print(
@@ -1278,6 +1283,7 @@ class ConnascenceCLI:
             lines.append("_No findings were reported for the selected severity threshold._")
             return "\n".join(lines)
 
+        lines.append("## Violations")
         lines.append("| Severity | Rule | Message | Location |")
         lines.append("| --- | --- | --- | --- |")
         for finding in findings:

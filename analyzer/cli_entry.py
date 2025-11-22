@@ -204,8 +204,10 @@ class SharedCLIAnalyzer:
             "profile": profile,
             "quality_score": quality_score,
             "findings": findings,
+            "violations": findings,
             "summary": {"totalIssues": len(findings), "issuesBySeverity": severity_summary},
             "files_analyzed": files_analyzed,
+            "total_files_analyzed": files_analyzed,
         }
 
         if analysis_time is not None:
