@@ -47,6 +47,11 @@ class ValuesDetector(DetectorBase):
         """
         self.violations.clear()
 
+        # Reset tracked literals for each analysis run to avoid cross-file leakage
+        # when detectors are pooled and reused across files.
+        self.string_literals.clear()
+        self.numeric_literals.clear()
+
         # Find all Constant nodes (Python 3.8+ unified constant handling)
         for node in ast.walk(tree):
             if isinstance(node, ast.Constant):
