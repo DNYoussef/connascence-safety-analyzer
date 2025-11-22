@@ -26,7 +26,8 @@ import time
 from typing import Any, Dict
 
 import pytest
-import pytest_asyncio
+
+pytest_asyncio = pytest.importorskip("pytest_asyncio")
 
 # Memory coordination for test results
 TEST_MEMORY = {}
