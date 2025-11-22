@@ -18,6 +18,8 @@ Provides common test fixtures, configuration, and utilities
 for the entire test suite.
 """
 
+import asyncio
+import inspect
 import os
 from pathlib import Path
 import shutil
@@ -32,6 +34,37 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 # Import from our mock implementations instead of removed analyzer module
 from utils.types import ConnascenceViolation
+
+
+@pytest.hookimpl(tryfirst=True)
+def pytest_pyfunc_call(pyfuncitem):
+    """
+    Add lightweight asyncio support for test functions.
+
+    The repository doesn't rely on external async pytest plugins, so we
+    execute coroutine tests with a simple event loop runner. This keeps
+    the tests self-contained while allowing ``@pytest.mark.asyncio``
+    tests to run without additional dependencies.
+    """
+
+    test_function = pyfuncitem.obj
+    if inspect.iscoroutinefunction(test_function):
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        try:
+            call_args = {
+                name: value
+                for name, value in pyfuncitem.funcargs.items()
+                if name in inspect.signature(test_function).parameters
+            }
+
+            loop.run_until_complete(test_function(**call_args))
+        finally:
+            loop.close()
+            asyncio.set_event_loop(None)
+        return True
+
+    return None
 
 
 # Mock ThresholdConfig class for tests

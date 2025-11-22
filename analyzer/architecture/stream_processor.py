@@ -89,6 +89,14 @@ class StreamProcessor:
         self.max_workers = config.get("max_workers", 4)
         self.cache_size = config.get("cache_size", 10000)
 
+        # Ensure a default event loop exists for synchronous helpers that rely
+        # on asyncio timing even outside of async test contexts.
+        try:
+            self._event_loop = asyncio.get_event_loop()
+        except RuntimeError:
+            self._event_loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(self._event_loop)
+
         logger.info(
             f"StreamProcessor initialized with queue_size={self.max_queue_size}, "
             f"workers={self.max_workers}, cache_size={self.cache_size}"
@@ -329,7 +337,7 @@ class StreamProcessor:
         return {
             "batch_size": len(batch),
             "files": [str(f) for f in batch],
-            "timestamp": asyncio.get_event_loop().time(),
+            "timestamp": self._event_loop.time(),
         }
 
     def process_stream(self, file_changes: List[Path]) -> Dict[str, Any]:
@@ -423,7 +431,14 @@ class StreamProcessor:
             return False
 
         try:
-            return self.stream_processor.is_running
+            status = self.stream_processor.is_running
+
+            # Some test doubles may expose is_running as a property object;
+            # evaluate it defensively while handling any errors gracefully.
+            if isinstance(status, property):
+                status = status.fget(self.stream_processor)
+
+            return bool(status)
         except Exception:
             return False
 
