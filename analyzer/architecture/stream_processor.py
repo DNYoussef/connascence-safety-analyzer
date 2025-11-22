@@ -20,6 +20,7 @@ NASA Compliance:
 
 import asyncio
 import logging
+import time
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Union
 
@@ -329,7 +330,7 @@ class StreamProcessor:
         return {
             "batch_size": len(batch),
             "files": [str(f) for f in batch],
-            "timestamp": asyncio.get_event_loop().time(),
+            "timestamp": time.time(),
         }
 
     def process_stream(self, file_changes: List[Path]) -> Dict[str, Any]:
@@ -423,7 +424,8 @@ class StreamProcessor:
             return False
 
         try:
-            return self.stream_processor.is_running
+            status = self.stream_processor.is_running
+            return status if isinstance(status, bool) else False
         except Exception:
             return False
 

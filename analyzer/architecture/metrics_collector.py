@@ -130,9 +130,9 @@ class MetricsCollector:
         duplication_clusters = violations.get("duplication", [])
         nasa_violations = violations.get("nasa", [])
 
-        # Count by severity
+        # Count by severity (duplication clusters are not violations)
         severity_counts = self._count_violations_by_severity(
-            connascence_violations + duplication_clusters + nasa_violations
+            connascence_violations + nasa_violations
         )
 
         # Calculate indexes and scores
@@ -560,7 +560,19 @@ class MetricsCollector:
         # NASA Rule 5: Input validation
         assert metrics is not None, "metrics cannot be None"
 
-        snapshot = MetricsSnapshot(
+        snapshot = self._build_snapshot(metrics)
+
+        return self._store_snapshot(snapshot)
+
+    def set_baseline(self, metrics: Dict[str, Any]) -> None:
+        """Set baseline metrics for comparison. NASA Rule 4 compliant."""
+        assert metrics is not None, "metrics cannot be None"
+        self.baseline_metrics = self._build_snapshot(metrics)
+        logger.info(f"Baseline metrics established: quality={self.baseline_metrics.overall_quality_score}")
+
+    def _build_snapshot(self, metrics: Dict[str, Any]) -> MetricsSnapshot:
+        """Create a snapshot object without mutating history."""
+        return MetricsSnapshot(
             timestamp=metrics.get("timestamp", self._get_iso_timestamp()),
             total_violations=metrics.get("total_violations", 0),
             critical_count=metrics.get("critical_count", 0),
@@ -576,21 +588,15 @@ class MetricsCollector:
             metadata=metrics.get("metadata", {})
         )
 
-        # Add to history
+    def _store_snapshot(self, snapshot: MetricsSnapshot) -> MetricsSnapshot:
+        """Persist a snapshot to history respecting configured limits."""
         self.metrics_history.append(snapshot)
 
-        # Limit history size
         history_limit = self.config.get("history_limit", 20)
         if len(self.metrics_history) > history_limit:
             self.metrics_history.pop(0)
 
         return snapshot
-
-    def set_baseline(self, metrics: Dict[str, Any]) -> None:
-        """Set baseline metrics for comparison. NASA Rule 4 compliant."""
-        assert metrics is not None, "metrics cannot be None"
-        self.baseline_metrics = self.create_snapshot(metrics)
-        logger.info(f"Baseline metrics established: quality={self.baseline_metrics.overall_quality_score}")
 
     def get_baseline_comparison(self) -> Optional[Dict[str, Any]]:
         """Get comparison with baseline metrics. NASA Rule 4 compliant."""

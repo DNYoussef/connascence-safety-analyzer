@@ -360,10 +360,24 @@ class ReportGenerator:
         """
         try:
             path = Path(path)
+            self._validate_output_path(path)
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(content, encoding="utf-8")
         except Exception as e:
             raise IOError(f"Failed to write to {path}: {e}") from e
+
+    def _validate_output_path(self, path: Path) -> None:
+        """Validate output paths to avoid unsupported or protected locations."""
+        normalized = path.as_posix()
+
+        # Explicitly block Windows system paths which are invalid in CI
+        if normalized.startswith("C:/Windows") or normalized.startswith("C:\\Windows"):
+            raise PermissionError(f"Unsupported output path: {path}")
+
+        # Block Windows drive prefixes on POSIX to avoid creating stray directories
+        first_part = path.parts[0] if path.parts else ""
+        if ":" in first_part and not path.is_absolute():
+            raise PermissionError(f"Invalid drive-prefixed path: {path}")
 
     def _generate_markdown_from_dict(self, result_dict: Dict[str, Any]) -> str:
         """
