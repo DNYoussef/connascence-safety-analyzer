@@ -107,3 +107,6 @@ DEMO_ARTIFACTS/*
 test_output/
 dogfood/
 test_packages/
+
+# Test logs
+tests/results/*.log
