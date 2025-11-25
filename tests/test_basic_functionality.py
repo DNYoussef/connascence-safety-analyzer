@@ -159,7 +159,8 @@ def test_legacy_analyzer_instantiation():
     analyzer = ConnascenceAnalyzer()
     assert hasattr(analyzer, "analyze_file")
     assert hasattr(analyzer, "analyze_directory")
-    assert hasattr(analyzer, "should_analyze_file")
+    # Note: should_analyze_file was removed - exclusion logic uses 'exclusions' attribute
+    assert hasattr(analyzer, "exclusions")
 
 
 def test_language_strategies_import():
