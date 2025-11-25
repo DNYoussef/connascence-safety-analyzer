@@ -41,6 +41,7 @@ from fixes.phase0.production_safe_assertions import ProductionAssert
 from interfaces.cli.connascence import ConnascenceCLI
 
 
+@pytest.mark.skip(reason="CLI 'scan' command deprecated - migrate to 'analyze' command")
 class ConnascenceCLIPreservationTester:
     """Tests CLI preserves all 9 connascence type detection."""
 

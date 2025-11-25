@@ -1,0 +1,46 @@
+# Safety Policy Configuration for Connascence Analyzer
+# This file controls how Safety handles known vulnerabilities
+# Ref: https://docs.pyup.io/docs/safety-20-policy-file
+
+version: '3.0'
+
+# Security scanning configuration
+security:
+  # Allow ignoring certain vulnerabilities with justification
+  ignore-vulnerabilities:
+    # Example: Ignore specific CVEs with rationale (empty by default)
+    # 39462:
+    #   reason: "Fixed in newer version, upgrading requires compatibility testing"
+    #   expires: "2025-12-31"
+
+  # Continue on error for development dependencies
+  continue-on-vulnerability-error: false
+
+  # Alert configuration
+  alert:
+    # Fail build on vulnerabilities above this severity
+    # Options: critical, high, medium, low
+    fail-severity-threshold: medium
+
+  # Ignore unpinned requirements (allow ranges like >=1.0)
+  ignore-unpinned-requirements: true
+
+# Configuration for different environments
+environments:
+  production:
+    continue-on-vulnerability-error: false
+    fail-severity-threshold: medium
+
+  development:
+    continue-on-vulnerability-error: true
+    fail-severity-threshold: high
+
+  testing:
+    continue-on-vulnerability-error: true
+    fail-severity-threshold: high
+
+# Dependency configuration
+dependencies:
+  # Packages to exclude from safety checks (e.g., internal packages)
+  exclude:
+    - "hypothesis"  # Test dependency, not in production

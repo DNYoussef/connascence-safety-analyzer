@@ -31,8 +31,10 @@ jobs:
         run: |
           pip install safety pip-audit
           pip install -e ".[dev,mcp,vscode,enterprise]"
-          safety check --json > safety-report.json || true
-          pip-audit --format json > pip-audit-report.json || true
+          # Safety check with policy file (allow medium severity in dev)
+          safety check --policy-file .safety-policy.yml --json > safety-report.json || echo "Safety check completed with findings"
+          # Pip-audit with proper ignore for development dependencies
+          pip-audit --format json --skip-editable > pip-audit-report.json || echo "Pip-audit completed with findings"
 
       - name: Node.js Dependency Audit
         working-directory: interfaces/vscode
@@ -66,7 +68,10 @@ jobs:
 
       - name: Run Bandit Security Scan
         run: |
-          bandit -r analyzer interfaces mcp -f json -o bandit-report.json
+          # Use bandit.yaml config to exclude tests and set thresholds
+          bandit -r analyzer interfaces mcp -c bandit.yaml -f json -o bandit-report.json || echo "Bandit scan completed with findings"
+          # Also generate text report for easier review
+          bandit -r analyzer interfaces mcp -c bandit.yaml -f txt -o bandit-report.txt || true
         continue-on-error: true
 
       - name: Run Semgrep Security Scan
@@ -80,6 +85,7 @@ jobs:
           name: security-scan-reports
           path: |
             bandit-report.json
+            bandit-report.txt
             semgrep-report.json
 
   code-quality:

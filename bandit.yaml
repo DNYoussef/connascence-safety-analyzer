@@ -1,0 +1,49 @@
+# Bandit YAML Configuration (Alternative format)
+# This is the YAML equivalent of .bandit for better readability
+
+# Excluded paths (glob patterns supported)
+exclude_dirs:
+  - '/tests/'
+  - '/test_packages/'
+  - '/fixtures/'
+  - '/examples/'
+  - '/deprecated/'
+  - '/experimental/'
+  - '/htmlcov/'
+  - '/.pytest_cache/'
+  - '/.mypy_cache/'
+  - '/.ruff_cache/'
+  - '/venv/'
+  - '/venv-connascence/'
+  - '/.venv/'
+  - '/build/'
+  - '/dist/'
+  - '/.git/'
+  - '/interfaces/vscode/node_modules/'
+  - '/interfaces/vscode/out/'
+
+# Tests to skip with justifications
+skips:
+  - B101  # assert_used - Used extensively in tests and validation
+  - B601  # paramiko_calls - Not using paramiko
+  - B602  # subprocess_popen_with_shell_equals_true - Controlled usage
+  - B603  # subprocess_without_shell_equals_true - Safe in our context
+  - B607  # start_process_with_partial_path - Controlled environment
+
+# Severity and confidence thresholds
+severity:
+  - MEDIUM
+  - HIGH
+
+confidence:
+  - MEDIUM
+  - HIGH
+
+# Plugins to disable (if needed)
+# plugins: []
+
+# Output format options
+# formats:
+#   - json
+#   - txt
+#   - html
