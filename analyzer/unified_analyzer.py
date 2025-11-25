@@ -116,6 +116,10 @@ try:
     from .architecture.metrics_collector import MetricsCollector
     from .architecture.report_generator import ReportGenerator
     from .architecture.stream_processor import StreamProcessor as ArchStreamProcessor
+    # Phase 7: New coordinators for God Object decomposition
+    from .architecture.monitoring_coordinator import MonitoringCoordinator
+    from .architecture.streaming_coordinator import StreamingCoordinator
+    from .architecture.result_builder import ResultBuilder
     ARCHITECTURE_AVAILABLE = True
 except ImportError:
     ARCHITECTURE_AVAILABLE = False
@@ -123,6 +127,9 @@ except ImportError:
     MetricsCollector = None
     ReportGenerator = None
     ArchStreamProcessor = None
+    MonitoringCoordinator = None
+    StreamingCoordinator = None
+    ResultBuilder = None
 
 # Import refactored coordinator (recommended for new code)
 try:
@@ -143,13 +150,47 @@ except ImportError:
         LanguageSupport = None
 try:
     from .constants import (
+        CACHE_CLEANUP_AGE_SECONDS,
+        CACHE_HIT_RATE_GOOD,
+        CACHE_MAX_MEMORY_MB,
+        CACHE_WARM_FILE_LIMIT,
+        CONFIDENCE_HIGH,
+        CONFIDENCE_LOW,
+        CONFIDENCE_MEDIUM,
         ERROR_CODE_MAPPING,
         ERROR_SEVERITY,
+        NASA_VIOLATION_PENALTY,
+        PRIORITY_SCORE_HIGH,
+        PRIORITY_SCORE_LOW,
+        PRIORITY_SCORE_MEDIUM,
+        PRIORITY_SCORE_MODIFIER,
+        QUALITY_SCORE_DEFAULT,
+        QUALITY_SCORE_HIGH,
+        QUALITY_SCORE_PERFECT,
+        QUALITY_SCORE_ZERO,
+        VIOLATION_WEIGHTS,
     )
 except ImportError:
     from constants import (
+        CACHE_CLEANUP_AGE_SECONDS,
+        CACHE_HIT_RATE_GOOD,
+        CACHE_MAX_MEMORY_MB,
+        CACHE_WARM_FILE_LIMIT,
+        CONFIDENCE_HIGH,
+        CONFIDENCE_LOW,
+        CONFIDENCE_MEDIUM,
         ERROR_CODE_MAPPING,
         ERROR_SEVERITY,
+        NASA_VIOLATION_PENALTY,
+        PRIORITY_SCORE_HIGH,
+        PRIORITY_SCORE_LOW,
+        PRIORITY_SCORE_MEDIUM,
+        PRIORITY_SCORE_MODIFIER,
+        QUALITY_SCORE_DEFAULT,
+        QUALITY_SCORE_HIGH,
+        QUALITY_SCORE_PERFECT,
+        QUALITY_SCORE_ZERO,
+        VIOLATION_WEIGHTS,
     )
 
 # Try to import optional components with fallbacks
@@ -514,7 +555,20 @@ class UnifiedConnascenceAnalyzer:
                 self.arch_metrics_collector = MetricsCollector()
                 self.arch_report_generator = ReportGenerator(config={"version": "1.0.0"})
                 self.arch_stream_processor = ArchStreamProcessor(config=streaming_config or {})
-                logger.info("Architecture components initialized successfully")
+                # Phase 7: Initialize new coordinators for God Object decomposition
+                self.monitoring_coordinator = MonitoringCoordinator(
+                    config={},
+                    memory_monitor=self.memory_monitor,
+                    resource_manager=self.resource_manager,
+                    file_cache=self.file_cache,
+                ) if MonitoringCoordinator else None
+                self.streaming_coordinator = StreamingCoordinator(
+                    config=streaming_config or {},
+                    stream_processor=self.stream_processor,
+                    incremental_cache=self.incremental_cache,
+                ) if StreamingCoordinator else None
+                self.result_builder = ResultBuilder(config={}) if ResultBuilder else None
+                logger.info("Architecture components initialized successfully (including Phase 7 coordinators)")
             except Exception as e:
                 logger.warning(f"Architecture component initialization failed: {e}")
 
@@ -631,7 +685,14 @@ class UnifiedConnascenceAnalyzer:
     def _analyze_project_streaming(
         self, project_path: Path, policy_preset: str, options: Dict[str, Any]
     ) -> UnifiedAnalysisResult:
-        """Execute streaming analysis with real-time processing."""
+        """Execute streaming analysis with real-time processing.
+        Delegates to StreamingCoordinator if available (Phase 7 decomposition)."""
+        # Phase 7: Delegate to StreamingCoordinator
+        if hasattr(self, 'streaming_coordinator') and self.streaming_coordinator:
+            return self.streaming_coordinator.analyze_project_streaming(
+                project_path, self._analyze_project_batch, policy_preset, options
+            )
+        # Fallback: inline implementation (legacy support)
         if not STREAMING_AVAILABLE or not self.stream_processor:
             logger.warning("Streaming mode requested but not available, falling back to batch")
             return self._analyze_project_batch(project_path, policy_preset, options)
@@ -655,7 +716,14 @@ class UnifiedConnascenceAnalyzer:
     def _analyze_project_hybrid(
         self, project_path: Path, policy_preset: str, options: Dict[str, Any]
     ) -> UnifiedAnalysisResult:
-        """Execute hybrid analysis combining batch and streaming."""
+        """Execute hybrid analysis combining batch and streaming.
+        Delegates to StreamingCoordinator if available (Phase 7 decomposition)."""
+        # Phase 7: Delegate to StreamingCoordinator
+        if hasattr(self, 'streaming_coordinator') and self.streaming_coordinator:
+            return self.streaming_coordinator.analyze_project_hybrid(
+                project_path, self._analyze_project_batch, policy_preset, options
+            )
+        # Fallback: inline implementation (legacy support)
         if not STREAMING_AVAILABLE or not self.stream_processor:
             logger.warning("Hybrid mode requested but streaming not available, using batch only")
             return self._analyze_project_batch(project_path, policy_preset, options)
@@ -1191,7 +1259,7 @@ class UnifiedConnascenceAnalyzer:
             "connascence_index": 0.0,
             "nasa_compliance_score": 1.0,
             "duplication_score": 1.0,
-            "overall_quality_score": 0.8,
+            "overall_quality_score": QUALITY_SCORE_DEFAULT,
         }
 
     def _warm_cache_intelligently(self, project_path: Path) -> None:
@@ -1357,7 +1425,7 @@ class UnifiedConnascenceAnalyzer:
         # Performance recommendations
         if hit_rate < 0.6:
             logger.warning("Low cache hit rate - consider increasing warm-up files")
-        elif hit_rate > 0.9:
+        elif hit_rate > CACHE_HIT_RATE_GOOD:
             logger.info("Excellent cache performance!")
 
     def _optimize_cache_for_future_runs(self) -> None:
@@ -1382,50 +1450,47 @@ class UnifiedConnascenceAnalyzer:
     def _setup_monitoring_and_cleanup_hooks(self) -> None:
         """
         Setup memory monitoring and resource cleanup hooks.
-
-        NASA Rule 4: Function under 60 lines
-        NASA Rule 7: Bounded resource management
+        Delegates to MonitoringCoordinator if available (Phase 7 decomposition).
         """
+        # Phase 7: Delegate to MonitoringCoordinator if available
+        if hasattr(self, 'monitoring_coordinator') and self.monitoring_coordinator:
+            self.monitoring_coordinator.setup_hooks()
+            return
+        # Fallback: inline implementation (legacy support)
         if not (self.memory_monitor and self.resource_manager):
             return
-
-        # Setup memory monitoring alerts
         self.memory_monitor.add_alert_callback(self._handle_memory_alert)
         self.memory_monitor.add_emergency_cleanup_callback(self._emergency_memory_cleanup)
-
-        # Setup resource management cleanup hooks
         self.resource_manager.add_cleanup_hook(self._cleanup_analysis_resources)
         self.resource_manager.add_emergency_hook(self._emergency_resource_cleanup)
         self.resource_manager.add_periodic_cleanup_callback(self._periodic_cache_cleanup)
-
-        # Start monitoring
         self.memory_monitor.start_monitoring()
 
     def _handle_memory_alert(self, alert_type: str, context: Dict[str, Any]) -> None:
-        """Handle memory usage alerts with appropriate actions."""
+        """Handle memory alerts. Delegates to MonitoringCoordinator if available."""
+        # Phase 7: Delegate to MonitoringCoordinator
+        if hasattr(self, 'monitoring_coordinator') and self.monitoring_coordinator:
+            self.monitoring_coordinator.handle_memory_alert(alert_type, context)
+            return
+        # Fallback: inline implementation
         logger.warning(f"Memory alert: {alert_type}")
-
-        if alert_type == "MEMORY_WARNING":
-            # Cleanup old cache entries
-            if self.file_cache:
-                self.file_cache.clear_cache()
-                logger.info("Cleared file cache due to memory warning")
-
+        if alert_type == "MEMORY_WARNING" and self.file_cache:
+            self.file_cache.clear_cache()
         elif alert_type == "MEMORY_HIGH":
-            # More aggressive cleanup
             self._aggressive_cleanup()
-
         elif alert_type == "MEMORY_CRITICAL":
-            # Emergency procedures
             self._emergency_memory_cleanup()
-
         elif alert_type == "MEMORY_LEAK":
-            growth_mb = context.get("growth_mb", 0)
-            logger.error(f"Memory leak detected: {growth_mb:.1f}MB growth")
             self._investigate_memory_leak(context)
 
     def _emergency_memory_cleanup(self) -> None:
-        """Emergency memory cleanup procedures."""
+        """Emergency memory cleanup procedures.
+        Delegates to MonitoringCoordinator if available (Phase 7 decomposition)."""
+        # Phase 7: Delegate to MonitoringCoordinator
+        if hasattr(self, 'monitoring_coordinator') and self.monitoring_coordinator:
+            self.monitoring_coordinator._emergency_memory_cleanup()
+            return
+        # Fallback: inline implementation (legacy support)
         logger.critical("Executing emergency memory cleanup")
 
         try:
@@ -1448,19 +1513,31 @@ class UnifiedConnascenceAnalyzer:
             logger.error(f"Emergency cleanup failed: {e}")
 
     def _aggressive_cleanup(self) -> None:
-        """Aggressive cleanup for high memory usage."""
+        """Aggressive cleanup for high memory usage.
+        Delegates to MonitoringCoordinator if available (Phase 7 decomposition)."""
+        # Phase 7: Delegate to MonitoringCoordinator
+        if hasattr(self, 'monitoring_coordinator') and self.monitoring_coordinator:
+            self.monitoring_coordinator._aggressive_cleanup()
+            return
+        # Fallback: inline implementation (legacy support)
         logger.info("Executing aggressive cleanup")
 
         # Clear cache entries older than 2 minutes
         if self.resource_manager:
-            self.resource_manager.cleanup_old_resources(max_age_seconds=120.0)
+            self.resource_manager.cleanup_old_resources(max_age_seconds=CACHE_CLEANUP_AGE_SECONDS)
 
         # Clear large cache entries
         if self.resource_manager:
             self.resource_manager.cleanup_large_resources(min_size_mb=5.0)
 
     def _cleanup_analysis_resources(self) -> None:
-        """Cleanup analysis-specific resources."""
+        """Cleanup analysis-specific resources.
+        Delegates to MonitoringCoordinator if available (Phase 7 decomposition)."""
+        # Phase 7: Delegate to MonitoringCoordinator
+        if hasattr(self, 'monitoring_coordinator') and self.monitoring_coordinator:
+            self.monitoring_coordinator._cleanup_analysis_resources()
+            return
+        # Fallback: inline implementation (legacy support)
         try:
             # Clear analysis patterns and priorities
             self._analysis_patterns.clear()
@@ -1473,7 +1550,13 @@ class UnifiedConnascenceAnalyzer:
             logger.error(f"Analysis resource cleanup failed: {e}")
 
     def _emergency_resource_cleanup(self) -> None:
-        """Emergency resource cleanup procedures."""
+        """Emergency resource cleanup procedures.
+        Delegates to MonitoringCoordinator if available (Phase 7 decomposition)."""
+        # Phase 7: Delegate to MonitoringCoordinator
+        if hasattr(self, 'monitoring_coordinator') and self.monitoring_coordinator:
+            self.monitoring_coordinator._emergency_resource_cleanup()
+            return
+        # Fallback: inline implementation (legacy support)
         logger.warning("Executing emergency resource cleanup")
 
         try:
@@ -1489,7 +1572,12 @@ class UnifiedConnascenceAnalyzer:
             logger.error(f"Emergency resource cleanup failed: {e}")
 
     def _periodic_cache_cleanup(self) -> int:
-        """Periodic cache cleanup callback."""
+        """Periodic cache cleanup callback.
+        Delegates to MonitoringCoordinator if available (Phase 7 decomposition)."""
+        # Phase 7: Delegate to MonitoringCoordinator
+        if hasattr(self, 'monitoring_coordinator') and self.monitoring_coordinator:
+            return self.monitoring_coordinator._periodic_cache_cleanup()
+        # Fallback: inline implementation (legacy support)
         cleaned_count = 0
 
         try:
@@ -1515,7 +1603,13 @@ class UnifiedConnascenceAnalyzer:
         return cleaned_count
 
     def _investigate_memory_leak(self, context: Dict[str, Any]) -> None:
-        """Investigate potential memory leak with detailed analysis."""
+        """Investigate potential memory leak with detailed analysis.
+        Delegates to MonitoringCoordinator if available (Phase 7 decomposition)."""
+        # Phase 7: Delegate to MonitoringCoordinator
+        if hasattr(self, 'monitoring_coordinator') and self.monitoring_coordinator:
+            self.monitoring_coordinator._investigate_memory_leak(context)
+            return
+        # Fallback: inline implementation (legacy support)
         try:
             import gc
 
@@ -1533,7 +1627,13 @@ class UnifiedConnascenceAnalyzer:
             logger.error(f"Memory leak investigation failed: {e}")
 
     def _log_comprehensive_monitoring_report(self) -> None:
-        """Log comprehensive monitoring and resource management report."""
+        """Log comprehensive monitoring and resource management report.
+        Delegates to MonitoringCoordinator if available (Phase 7 decomposition)."""
+        # Phase 7: Delegate to MonitoringCoordinator
+        if hasattr(self, 'monitoring_coordinator') and self.monitoring_coordinator:
+            self.monitoring_coordinator._log_comprehensive_monitoring_report()
+            return
+        # Fallback: inline implementation (legacy support)
         try:
             logger.info("=== COMPREHENSIVE SYSTEM MONITORING REPORT ===")
 
@@ -1628,10 +1728,16 @@ class UnifiedConnascenceAnalyzer:
     def start_streaming_analysis(self, directories: List[Union[str, Path]]) -> None:
         """
         Start streaming analysis for specified directories.
+        Delegates to StreamingCoordinator if available (Phase 7 decomposition).
 
         Args:
             directories: Directories to watch for changes
         """
+        # Phase 7: Delegate to StreamingCoordinator
+        if hasattr(self, 'streaming_coordinator') and self.streaming_coordinator:
+            self.streaming_coordinator.start_streaming_analysis(directories)
+            return
+        # Fallback: inline implementation (legacy support)
         if not self.stream_processor:
             logger.error("Streaming not available - initialize with streaming mode")
             return
@@ -1658,7 +1764,13 @@ class UnifiedConnascenceAnalyzer:
             logger.error(f"Failed to start streaming analysis: {e}")
 
     async def stop_streaming_analysis(self) -> None:
-        """Stop streaming analysis."""
+        """Stop streaming analysis.
+        Delegates to StreamingCoordinator if available (Phase 7 decomposition)."""
+        # Phase 7: Delegate to StreamingCoordinator
+        if hasattr(self, 'streaming_coordinator') and self.streaming_coordinator:
+            await self.streaming_coordinator.stop_streaming_analysis()
+            return
+        # Fallback: inline implementation (legacy support)
         if self.stream_processor:
             try:
                 self.stream_processor.stop_watching()
@@ -1668,7 +1780,12 @@ class UnifiedConnascenceAnalyzer:
                 logger.error(f"Failed to stop streaming analysis: {e}")
 
     def get_streaming_stats(self) -> Dict[str, Any]:
-        """Get streaming performance statistics."""
+        """Get streaming performance statistics.
+        Delegates to StreamingCoordinator if available (Phase 7 decomposition)."""
+        # Phase 7: Delegate to StreamingCoordinator
+        if hasattr(self, 'streaming_coordinator') and self.streaming_coordinator:
+            return self.streaming_coordinator.get_streaming_stats()
+        # Fallback: inline implementation (legacy support)
         stats = {"streaming_available": STREAMING_AVAILABLE}
 
         if self.stream_processor:
@@ -1726,7 +1843,12 @@ class UnifiedConnascenceAnalyzer:
         )
 
     def _dict_to_unified_result(self, result_dict: Dict[str, Any]) -> UnifiedAnalysisResult:
-        """Convert dictionary result to UnifiedAnalysisResult object. NASA Rule 4 compliant."""
+        """Convert dictionary result to UnifiedAnalysisResult object.
+        Delegates to ResultBuilder if available (Phase 7 decomposition). NASA Rule 4 compliant."""
+        # Phase 7: Delegate to ResultBuilder
+        if hasattr(self, 'result_builder') and self.result_builder:
+            return self.result_builder.dict_to_unified_result(result_dict)
+        # Fallback: inline implementation (legacy support)
         # NASA Rule 5: Input validation
         assert result_dict is not None, "result_dict cannot be None"
 
@@ -1765,7 +1887,15 @@ class UnifiedConnascenceAnalyzer:
         errors: Optional[List[StandardError]] = None,
         warnings: Optional[List[StandardError]] = None,
     ) -> UnifiedAnalysisResult:
-        """Build result directly without aggregator component."""
+        """Build result directly without aggregator component.
+        Delegates to ResultBuilder if available (Phase 7 decomposition)."""
+        # Phase 7: Delegate to ResultBuilder
+        if hasattr(self, 'result_builder') and self.result_builder:
+            return self.result_builder.build_unified_result_direct(
+                violations, metrics, recommendations, project_path,
+                policy_preset, analysis_time, errors, warnings
+            )
+        # Fallback: inline implementation (legacy support)
         # NASA Rule 5: Input validation assertions
         assert violations is not None, "violations cannot be None"
         assert metrics is not None, "metrics cannot be None"
@@ -1932,7 +2062,12 @@ class UnifiedConnascenceAnalyzer:
         }
 
     def _violation_to_dict(self, violation) -> Dict[str, Any]:
-        """Convert violation object to dictionary."""
+        """Convert violation object to dictionary.
+        Delegates to ResultBuilder if available (Phase 7 decomposition)."""
+        # Phase 7: Delegate to ResultBuilder
+        if hasattr(self, 'result_builder') and self.result_builder:
+            return self.result_builder.violation_to_dict(violation)
+        # Fallback: inline implementation (legacy support)
         if isinstance(violation, dict):
             return violation  # Already a dictionary
 
@@ -1949,7 +2084,12 @@ class UnifiedConnascenceAnalyzer:
         }
 
     def _cluster_to_dict(self, cluster) -> Dict[str, Any]:
-        """Convert duplication cluster to dictionary."""
+        """Convert duplication cluster to dictionary.
+        Delegates to ResultBuilder if available (Phase 7 decomposition)."""
+        # Phase 7: Delegate to ResultBuilder
+        if hasattr(self, 'result_builder') and self.result_builder:
+            return self.result_builder.cluster_to_dict(cluster)
+        # Fallback: inline implementation (legacy support)
         return {
             "id": getattr(cluster, "id", str(hash(str(cluster)))),
             "type": "duplication",
@@ -1976,7 +2116,7 @@ class UnifiedConnascenceAnalyzer:
 
     def _severity_to_weight(self, severity: str) -> float:
         """Convert severity string to numeric weight."""
-        weights = {"critical": 10.0, "high": 5.0, "medium": 2.0, "low": 1.0}
+        weights = {k: float(v) for k, v in VIOLATION_WEIGHTS.items()}
         return weights.get(severity, 2.0)
 
     def _initialize_analysis_context(self, project_path: Path, policy_preset: str) -> tuple:
@@ -2250,7 +2390,7 @@ def loadConnascenceSystem():
                     "duplication_clusters": [],
                     "nasa_violations": [],
                     "total_violations": 0,
-                    "overall_quality_score": 0.8,
+                    "overall_quality_score": QUALITY_SCORE_DEFAULT,
                     "error": error.to_dict(),
                 }
 
@@ -2382,7 +2522,7 @@ def loadConnascenceSystem():
                 "duplication_clusters": [],
                 "nasa_violations": [],
                 "total_violations": 0,
-                "overall_quality_score": 0.8,
+                "overall_quality_score": QUALITY_SCORE_DEFAULT,
                 "error": "Python analyzer not available",
             },
             "validateSafetyCompliance": lambda options: {"compliant": True, "violations": []},
@@ -2399,7 +2539,7 @@ def _get_fallback_functions():
             "duplication_clusters": [],
             "nasa_violations": [],
             "total_violations": 0,
-            "overall_quality_score": 0.8,
+            "overall_quality_score": QUALITY_SCORE_DEFAULT,
             "error": "Python analyzer not available",
         },
         "validateSafetyCompliance": lambda options: {"compliant": True, "violations": []},

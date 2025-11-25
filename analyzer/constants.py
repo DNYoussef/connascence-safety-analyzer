@@ -66,6 +66,32 @@ MAX_ANALYSIS_TIME_SECONDS = 300  # Maximum time allowed for analysis
 MAX_FILE_SIZE_KB = 1000  # Maximum file size for analysis
 MAX_FILES_PER_BATCH = 100  # Maximum files per analysis batch
 
+# Quality Score Constants (addresses CoM violations)
+QUALITY_SCORE_PERFECT = 1.0
+QUALITY_SCORE_DEFAULT = 0.8
+QUALITY_SCORE_HIGH = 0.9
+QUALITY_SCORE_MEDIUM = 0.7
+QUALITY_SCORE_LOW = 0.5
+QUALITY_SCORE_ZERO = 0.0
+CONFIDENCE_HIGH = 0.9
+CONFIDENCE_MEDIUM = 0.8
+CONFIDENCE_LOW = 0.5
+
+# NASA Penalty Per Violation
+NASA_VIOLATION_PENALTY = 0.1
+
+# Cache Configuration
+CACHE_WARM_FILE_LIMIT = 15
+CACHE_MAX_MEMORY_MB = 100
+CACHE_CLEANUP_AGE_SECONDS = 120.0
+CACHE_HIT_RATE_GOOD = 0.9
+
+# Priority Scoring Constants
+PRIORITY_SCORE_HIGH = 40
+PRIORITY_SCORE_MEDIUM = 20
+PRIORITY_SCORE_LOW = 10
+PRIORITY_SCORE_MODIFIER = 15
+
 # Violation Weight Constants
 VIOLATION_WEIGHTS = {"critical": 10, "high": 5, "medium": 2, "low": 1}
 
