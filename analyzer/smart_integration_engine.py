@@ -7,11 +7,29 @@ from typing import Any, Dict, List
 
 from fixes.phase0.production_safe_assertions import ProductionAssert
 
+# Import constants for CoM reduction (Phase 7)
+from .constants import (
+    ANALYZER_CONNASCENCE,
+    ANALYZER_DUPLICATION,
+    ANALYZER_NASA,
+    CONNASCENCE_TYPE_COA,
+    CONNASCENCE_TYPE_GOD_OBJECT,
+    CORRELATION_SCORE_HIGH,
+    CORRELATION_SCORE_MODERATE,
+    CORRELATION_TYPE_COMPLEXITY,
+    FIELD_FILE_PATH,
+    FIELD_FILES_INVOLVED,
+    FIELD_SEVERITY,
+    FIELD_TYPE,
+    PRIORITY_HIGH,
+    REMEDIATION_ARCHITECTURAL,
+)
+
 
 class CorrelationAnalyzer:
     """Analyzes correlations between different analyzer findings."""
 
-    def analyze_correlations(self, findings, duplication_clusters, nasa_violations):
+    def analyze_correlations(self, findings: List[Dict], duplication_clusters: List[Dict], nasa_violations: List[Dict]) -> List[Dict]:
         """Analyze correlations between different analyzer findings with enhanced cross-phase analysis."""
 
         ProductionAssert.not_none(findings, "findings")
@@ -52,7 +70,7 @@ class CorrelationAnalyzer:
 
         return correlations
 
-    def _find_duplication_correlations(self, findings, duplication_clusters):
+    def _find_duplication_correlations(self, findings: List[Dict], duplication_clusters: List[Dict]) -> List[Dict]:
         """Find correlations between connascence violations and duplications."""
         correlations = []
 
@@ -67,9 +85,9 @@ class CorrelationAnalyzer:
             if related_violations:
                 correlations.append(
                     {
-                        "analyzer1": "connascence",
-                        "analyzer2": "duplication",
-                        "correlation_score": 0.8,
+                        "analyzer1": ANALYZER_CONNASCENCE,
+                        "analyzer2": ANALYZER_DUPLICATION,
+                        "correlation_score": CORRELATION_SCORE_MODERATE,
                         "common_findings": related_violations,
                         "description": f"Duplication cluster correlates with {len(related_violations)} connascence violations",
                     }
@@ -77,7 +95,7 @@ class CorrelationAnalyzer:
 
         return correlations
 
-    def _find_nasa_correlations(self, findings, nasa_violations):
+    def _find_nasa_correlations(self, findings: List[Dict], nasa_violations: List[Dict]) -> List[Dict]:
         """Find correlations between NASA violations and connascence violations."""
         nasa_files = {v.get("file_path", "") for v in nasa_violations}
         connascence_files = {v.get("file_path", "") for v in findings}
@@ -86,8 +104,8 @@ class CorrelationAnalyzer:
         if common_files:
             return [
                 {
-                    "analyzer1": "nasa_compliance",
-                    "analyzer2": "connascence",
+                    "analyzer1": ANALYZER_NASA,
+                    "analyzer2": ANALYZER_CONNASCENCE,
                     "correlation_score": len(common_files) / max(len(nasa_files), 1),
                     "common_findings": list(common_files),
                     "description": f"NASA violations and connascence violations overlap in {len(common_files)} files",
@@ -96,7 +114,7 @@ class CorrelationAnalyzer:
 
         return []
 
-    def _find_complexity_correlations(self, findings, duplication_clusters, nasa_violations):
+    def _find_complexity_correlations(self, findings: List[Dict], duplication_clusters: List[Dict], nasa_violations: List[Dict]) -> List[Dict]:
         """Find correlations between complexity violations across different analyzers."""
         correlations = []
 
@@ -106,31 +124,31 @@ class CorrelationAnalyzer:
 
             # Identify complex files from connascence violations
             for finding in findings:
-                if finding.get("severity") in ["critical", "high"] and finding.get("type") in [
-                    "CoA",
-                    "god_object",
+                if finding.get(FIELD_SEVERITY) in ["critical", PRIORITY_HIGH] and finding.get(FIELD_TYPE) in [
+                    CONNASCENCE_TYPE_COA,
+                    CONNASCENCE_TYPE_GOD_OBJECT,
                     "complexity",
                 ]:
-                    high_complexity_files.add(finding.get("file_path", ""))
+                    high_complexity_files.add(finding.get(FIELD_FILE_PATH, ""))
 
             # Check duplication clusters in complex files
             complex_duplications = [
                 cluster
                 for cluster in duplication_clusters
-                if any(file_path in high_complexity_files for file_path in cluster.get("files_involved", []))
+                if any(file_path in high_complexity_files for file_path in cluster.get(FIELD_FILES_INVOLVED, []))
             ]
 
             if complex_duplications:
                 correlations.append(
                     {
-                        "analyzer1": "connascence",
-                        "analyzer2": "duplication",
-                        "correlation_type": "complexity_concentration",
-                        "correlation_score": min(0.9, len(complex_duplications) / max(len(duplication_clusters), 1)),
+                        "analyzer1": ANALYZER_CONNASCENCE,
+                        "analyzer2": ANALYZER_DUPLICATION,
+                        "correlation_type": CORRELATION_TYPE_COMPLEXITY,
+                        "correlation_score": min(CORRELATION_SCORE_HIGH, len(complex_duplications) / max(len(duplication_clusters), 1)),
                         "affected_files": list(high_complexity_files),
                         "description": f"High complexity files show {len(complex_duplications)} duplication clusters - suggests architectural issues",
-                        "priority": "high",
-                        "remediation_impact": "architectural_refactoring",
+                        "priority": PRIORITY_HIGH,
+                        "remediation_impact": REMEDIATION_ARCHITECTURAL,
                     }
                 )
 
@@ -139,7 +157,7 @@ class CorrelationAnalyzer:
 
         return correlations
 
-    def _find_file_level_correlations(self, findings, duplication_clusters, nasa_violations):
+    def _find_file_level_correlations(self, findings: List[Dict], duplication_clusters: List[Dict], nasa_violations: List[Dict]) -> List[Dict]:
         """Find file-level correlations across all analyzer types."""
         correlations = []
 
@@ -206,19 +224,11 @@ class CorrelationAnalyzer:
 class RecommendationEngine:
     """Generates intelligent recommendations based on analysis results."""
 
-    def generate_intelligent_recommendations(self, findings, duplication_clusters, nasa_violations):
+    def generate_intelligent_recommendations(self, findings: List[Dict], duplication_clusters: List[Dict], nasa_violations: List[Dict]) -> List[Dict]:
         """Generate intelligent recommendations based on analysis results."""
 
         ProductionAssert.not_none(findings, "findings")
-
         ProductionAssert.not_none(duplication_clusters, "duplication_clusters")
-
-        ProductionAssert.not_none(nasa_violations, "nasa_violations")
-
-        ProductionAssert.not_none(findings, "findings")
-
-        ProductionAssert.not_none(duplication_clusters, "duplication_clusters")
-
         ProductionAssert.not_none(nasa_violations, "nasa_violations")
 
         recommendations = []
@@ -233,7 +243,7 @@ class RecommendationEngine:
 
         return recommendations
 
-    def _generate_critical_recommendations(self, findings):
+    def _generate_critical_recommendations(self, findings: List[Dict]) -> List[Dict]:
         """Generate recommendations for critical violations."""
         critical_violations = [f for f in findings if f.get("severity") == "critical"]
         if not critical_violations:
@@ -253,7 +263,7 @@ class RecommendationEngine:
             }
         ]
 
-    def _generate_duplication_recommendations(self, duplication_clusters):
+    def _generate_duplication_recommendations(self, duplication_clusters: List[Dict]) -> List[Dict]:
         """Generate recommendations for code duplication."""
         high_similarity_clusters = [c for c in duplication_clusters if c.get("similarity_score", 0) >= 0.9]
         if not high_similarity_clusters:
@@ -274,7 +284,7 @@ class RecommendationEngine:
             }
         ]
 
-    def _generate_nasa_recommendations(self, nasa_violations):
+    def _generate_nasa_recommendations(self, nasa_violations: List[Dict]) -> List[Dict]:
         """Generate recommendations for NASA compliance."""
         if not nasa_violations:
             return []
@@ -295,7 +305,7 @@ class RecommendationEngine:
             }
         ]
 
-    def _generate_general_recommendations(self, findings):
+    def _generate_general_recommendations(self, findings: List[Dict]) -> List[Dict]:
         """Generate general quality improvement recommendations."""
         if len(findings) <= 10:
             return []
@@ -535,15 +545,8 @@ class PythonASTAnalyzer:
     def _calculate_nesting_depth(self, node: ast.FunctionDef) -> int:
         """Calculate maximum nesting depth in a function."""
 
-        def depth_visitor(current_node, current_depth=0):
+        def depth_visitor(current_node: ast.AST, current_depth: int = 0) -> int:
             ProductionAssert.not_none(current_node, "current_node")
-
-            ProductionAssert.not_none(current_depth, "current_depth")
-
-            ProductionAssert.not_none(current_node, "current_node")
-
-            ProductionAssert.not_none(current_depth, "current_depth")
-
             max_depth = current_depth
 
             for child in ast.iter_child_nodes(current_node):
@@ -562,55 +565,30 @@ class PythonASTAnalyzer:
 class SmartIntegrationEngine:
     """Smart integration engine for real connascence analysis."""
 
-    def __init__(self):
-        self.violations = []
-        self.correlations = []
-        self.recommendations = []
+    def __init__(self) -> None:
+        self.violations: List[Dict] = []
+        self.correlations: List[Dict] = []
+        self.recommendations: List[Dict] = []
         self.correlation_analyzer = CorrelationAnalyzer()
         self.recommendation_engine = RecommendationEngine()
         self.python_analyzer = PythonASTAnalyzer()
 
-    def integrate(self, *args, **kwargs):
+    def integrate(self, *args: Any, **kwargs: Any) -> List[Dict]:
         """Legacy integration method for backward compatibility."""
-
-        if args:
-            ProductionAssert.not_none(args, "args")
-
-        if kwargs:
-            ProductionAssert.not_none(kwargs, "kwargs")
-
         return []
 
-    def analyze_correlations(self, findings, duplication_clusters, nasa_violations):
+    def analyze_correlations(self, findings: List[Dict], duplication_clusters: List[Dict], nasa_violations: List[Dict]) -> List[Dict]:
         """Analyze correlations between different analyzer findings."""
-
         ProductionAssert.not_none(findings, "findings")
-
         ProductionAssert.not_none(duplication_clusters, "duplication_clusters")
-
         ProductionAssert.not_none(nasa_violations, "nasa_violations")
-
-        ProductionAssert.not_none(findings, "findings")
-
-        ProductionAssert.not_none(duplication_clusters, "duplication_clusters")
-
-        ProductionAssert.not_none(nasa_violations, "nasa_violations")
-
         return self.correlation_analyzer.analyze_correlations(findings, duplication_clusters, nasa_violations)
 
-    def generate_intelligent_recommendations(self, findings, duplication_clusters, nasa_violations):
+    def generate_intelligent_recommendations(self, findings: List[Dict], duplication_clusters: List[Dict], nasa_violations: List[Dict]) -> List[Dict]:
         """Generate intelligent recommendations based on analysis results."""
 
         ProductionAssert.not_none(findings, "findings")
-
         ProductionAssert.not_none(duplication_clusters, "duplication_clusters")
-
-        ProductionAssert.not_none(nasa_violations, "nasa_violations")
-
-        ProductionAssert.not_none(findings, "findings")
-
-        ProductionAssert.not_none(duplication_clusters, "duplication_clusters")
-
         ProductionAssert.not_none(nasa_violations, "nasa_violations")
 
         return self.recommendation_engine.generate_intelligent_recommendations(

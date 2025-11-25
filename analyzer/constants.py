@@ -940,3 +940,65 @@ def should_enable_component(component_name: str, policy_name: Optional[str] = No
             return component_name in core_components
 
     return component_config.get("enabled", True)
+
+
+# =============================================================================
+# ANALYZER AND CORRELATION CONSTANTS (Phase 7: CoM reduction)
+# =============================================================================
+
+# Analyzer type identifiers
+ANALYZER_CONNASCENCE = "connascence"
+ANALYZER_DUPLICATION = "duplication"
+ANALYZER_NASA = "nasa_compliance"
+ANALYZER_COMPLEXITY = "complexity"
+
+# Correlation types
+CORRELATION_TYPE_COMPLEXITY = "complexity_concentration"
+CORRELATION_TYPE_FILE_LEVEL = "file_level_aggregation"
+
+# Correlation score thresholds
+CORRELATION_SCORE_HIGH = 0.9
+CORRELATION_SCORE_MODERATE = 0.8
+CORRELATION_SCORE_LOW = 0.5
+
+# Priority levels
+PRIORITY_HIGH = "high"
+PRIORITY_MEDIUM = "medium"
+PRIORITY_LOW = "low"
+PRIORITY_CRITICAL = "critical"
+
+# Common field names (reduces string literal duplication)
+FIELD_FILE_PATH = "file_path"
+FIELD_SEVERITY = "severity"
+FIELD_TYPE = "type"
+FIELD_DESCRIPTION = "description"
+FIELD_RECOMMENDATION = "recommendation"
+FIELD_LINE_NUMBER = "line_number"
+FIELD_COLUMN = "column"
+FIELD_CODE_SNIPPET = "code_snippet"
+FIELD_CONTEXT = "context"
+
+# Connascence type identifiers
+CONNASCENCE_TYPE_COA = "CoA"
+CONNASCENCE_TYPE_GOD_OBJECT = "god_object"
+CONNASCENCE_TYPE_COM = "connascence_of_meaning"
+CONNASCENCE_TYPE_COP = "connascence_of_position"
+CONNASCENCE_TYPE_COT = "connascence_of_timing"
+CONNASCENCE_TYPE_COV = "connascence_of_value"
+
+# Remediation impact types
+REMEDIATION_ARCHITECTURAL = "architectural_refactoring"
+REMEDIATION_LOCAL = "local_refactoring"
+REMEDIATION_DOCUMENTATION = "documentation_update"
+
+# Cluster and violation fields
+FIELD_FILES_INVOLVED = "files_involved"
+FIELD_SIMILARITY_SCORE = "similarity_score"
+FIELD_CORRELATION_SCORE = "correlation_score"
+FIELD_COMMON_FINDINGS = "common_findings"
+FIELD_AFFECTED_FILES = "affected_files"
+
+# Minimum thresholds for reporting
+MIN_VIOLATIONS_FOR_CORRELATION = 2
+MIN_FILES_FOR_AGGREGATION = 3
+MIN_SIMILARITY_FOR_DUPLICATION = 0.85

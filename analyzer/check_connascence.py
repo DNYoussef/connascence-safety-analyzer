@@ -7,6 +7,10 @@ This tool detects various forms of connascence in Python code, focusing on:
 - Dynamic forms: Execution, Timing, Value, Identity
 
 Based on Meilir Page-Jones' connascence theory for reducing coupling.
+
+REFACTORED: Phase 1 God Object Decomposition
+- MagicLiteralHandler: Extracted all magic literal methods
+- AlgorithmDetector: Extracted algorithm duplicate detection
 """
 
 import argparse
@@ -19,8 +23,19 @@ from typing import Any, Optional
 
 from fixes.phase0.production_safe_assertions import ProductionAssert
 
-# Import canonical ConnascenceViolation
-from utils.types import ConnascenceViolation
+# Import canonical types (Phase 2: MagicLiteralParams for CoP reduction)
+from utils.types import ConnascenceViolation, MagicLiteralParams
+
+# Import extracted handlers (Phase 1 decomposition)
+try:
+    from .handlers import MagicLiteralHandler, AlgorithmDetector
+    HANDLERS_AVAILABLE = True
+except ImportError:
+    try:
+        from handlers import MagicLiteralHandler, AlgorithmDetector
+        HANDLERS_AVAILABLE = True
+    except ImportError:
+        HANDLERS_AVAILABLE = False
 
 # Import Tree-sitter backend for multi-language support
 try:
@@ -55,14 +70,32 @@ class ConnascenceDetector(ast.NodeVisitor):
     """
     AST visitor that detects connascence violations.
 
-    REFACTORED: This class now delegates to specialized detectors via DetectorFactory
-    while maintaining backward compatibility with existing code.
+    REFACTORED: This class now delegates to specialized handlers:
+    - MagicLiteralHandler: All magic literal detection and processing
+    - AlgorithmDetector: Algorithm duplicate detection
+
+    This reduces the class from ~34 methods to ~18 methods (orchestration + visitors).
     """
 
     def __init__(self, file_path: str, source_lines: list[str]):
         self.file_path = file_path
         self.source_lines = source_lines
         self.violations: list[ConnascenceViolation] = []
+
+        # Initialize extracted handlers (Phase 1 decomposition)
+        if HANDLERS_AVAILABLE:
+            self.magic_literal_handler = MagicLiteralHandler(file_path, source_lines)
+            self.algorithm_detector = AlgorithmDetector(file_path, source_lines)
+            # Direct references for delegation (Phase 7 wiring)
+            self.context_helper = self.magic_literal_handler.context_helper
+            self.severity_calc = self.magic_literal_handler.severity_calc
+            self.desc_builder = self.magic_literal_handler.desc_builder
+            self.using_handlers = True
+        else:
+            self.using_handlers = False
+            self.context_helper = None
+            self.severity_calc = None
+            self.desc_builder = None
 
         # Initialize the new detector factory
         try:
@@ -83,7 +116,7 @@ class ConnascenceDetector(ast.NodeVisitor):
             self.using_factory = False
             self._init_legacy_structures()
 
-    def _init_legacy_structures(self):
+    def _init_legacy_structures(self) -> None:
         """Initialize legacy tracking structures for fallback mode."""
         # Tracking structures
         self.function_definitions: dict[str, ast.FunctionDef] = {}
@@ -143,8 +176,6 @@ class ConnascenceDetector(ast.NodeVisitor):
 
         ProductionAssert.not_none(node, "node")
 
-        ProductionAssert.not_none(node, "node")
-
         self.function_definitions[node.name] = node
 
         # Check for Connascence of Position (>3 positional parameters)
@@ -165,17 +196,18 @@ class ConnascenceDetector(ast.NodeVisitor):
                 )
             )
 
-        # Check for algorithm duplication
-        body_hash = self._normalize_function_body(node)
-        if len(node.body) > 3:  # Only check substantial functions
-            self.function_hashes[body_hash].append((self.file_path, node))
+        # Check for algorithm duplication using handler or legacy
+        if self.using_handlers:
+            self.algorithm_detector.track_function(node)
+        else:
+            body_hash = self._normalize_function_body(node)
+            if len(node.body) > 3:  # Only check substantial functions
+                self.function_hashes[body_hash].append((self.file_path, node))
 
         self.generic_visit(node)
 
     def visit_ClassDef(self, node: ast.ClassDef):
         """Detect God Objects using context-aware analysis."""
-
-        ProductionAssert.not_none(node, "node")
 
         ProductionAssert.not_none(node, "node")
 
@@ -246,16 +278,12 @@ class ConnascenceDetector(ast.NodeVisitor):
 
         ProductionAssert.not_none(node, "node")
 
-        ProductionAssert.not_none(node, "node")
-
         for alias in node.names:
             self.imports.add(alias.name)
         self.generic_visit(node)
 
     def visit_ImportFrom(self, node: ast.ImportFrom):
         """Track imports for dependency analysis."""
-
-        ProductionAssert.not_none(node, "node")
 
         ProductionAssert.not_none(node, "node")
 
@@ -269,8 +297,6 @@ class ConnascenceDetector(ast.NodeVisitor):
 
         ProductionAssert.not_none(node, "node")
 
-        ProductionAssert.not_none(node, "node")
-
         for name in node.names:
             self.global_vars.add(name)
         self.generic_visit(node)
@@ -280,14 +306,13 @@ class ConnascenceDetector(ast.NodeVisitor):
 
         ProductionAssert.not_none(node, "node")
 
-        ProductionAssert.not_none(node, "node")
-
         # Use the formal grammar analyzer for magic literal detection
         try:
             from .formal_grammar import MagicLiteralDetector
 
             # Create a specialized detector just for this node's context
-            detector = MagicLiteralDetector(self.source_lines)
+            # Pass file_path to enable constants file detection
+            detector = MagicLiteralDetector(self.source_lines, self.file_path)
             detector.current_class = getattr(self, "_current_class", None)
             detector.current_function = getattr(self, "_current_function", None)
 
@@ -318,87 +343,64 @@ class ConnascenceDetector(ast.NodeVisitor):
         self.generic_visit(node)
 
     def _is_magic_string(self, value: str) -> bool:
-        """
-        Determine if a string value should be considered a magic literal.
-
-        Returns False (not magic) for:
-        - Empty strings and single characters
-        - Common Python idioms and built-ins
-        - Standard encoding/format strings
-        - Common separators and whitespace
-        - Documentation strings (handled separately)
-        """
+        """Determine if a string should be considered a magic literal.
+        Delegates to ContextHelper if available (Phase 7 decomposition)."""
+        # Phase 7: Delegate to ContextHelper
+        if self.context_helper:
+            try:
+                from .constants import SAFE_STRING_PATTERNS
+            except ImportError:
+                from constants import SAFE_STRING_PATTERNS
+            return self.context_helper.is_magic_string(value, SAFE_STRING_PATTERNS)
+        # Fallback: inline implementation (legacy support)
         try:
             from .constants import SAFE_STRING_PATTERNS
         except ImportError:
             from constants import SAFE_STRING_PATTERNS
-
-        # Very short strings are usually not magic
         if len(value) <= 1:
             return False
-
-        # Check against comprehensive safe patterns
         if value in SAFE_STRING_PATTERNS:
             return False
-
-        # Additional heuristics for non-magic strings
-        # File extensions (common ones)
         if len(value) <= 5 and value.startswith(".") and value[1:].isalnum():
             return False
-
-        # Simple separators or repeated characters
         if len(set(value)) == 1 and value[0] in " -_=*#":
             return False
-
-        # URLs and paths (basic check)
         if any(pattern in value for pattern in ["http://", "https://", "file://", "/", "\\"]):
-            # Might be a path or URL - could still be magic, but lower priority
-            return True  # But will get lower severity
-
+            return True
         return True
 
     def _analyze_numeric_context(self, node: ast.AST) -> dict:
-        """
-        Analyze the context of a numeric literal to determine appropriate severity.
-
-        Returns context information including:
-        - Whether it's in a conditional (higher severity)
-        - Detected context type (time, size, network, etc.)
-        - Confidence level
-        """
+        """Analyze numeric literal context. Delegates to ContextHelper (Phase 7)."""
+        # Phase 7: Delegate to ContextHelper
+        if self.context_helper:
+            return self.context_helper.analyze_numeric_context(node)
+        # Fallback: inline implementation (legacy support)
         context = {"in_conditional": self._is_in_conditional(node)}
-
-        # Get surrounding code context for analysis
         line_content = self._get_line_content(node)
         variable_context = self._get_variable_context(node)
-
-        # Analyze context keywords in surrounding code
         context_type = self._detect_context_type(line_content + " " + variable_context)
         if context_type:
             context["detected_context"] = context_type
             context["confidence"] = "medium"
-
-        # Check for common patterns that suggest non-magic usage
         if self._is_likely_array_index(node):
             context["likely_array_index"] = True
             context["severity_modifier"] = "lower"
-
         if self._is_likely_loop_counter(node):
             context["likely_loop_counter"] = True
             context["severity_modifier"] = "lower"
-
         return context
 
     def _analyze_string_context(self, node: ast.AST) -> dict:
-        """Analyze context for string literals."""
+        """Analyze string literal context. Delegates to ContextHelper (Phase 7)."""
+        # Phase 7: Delegate to ContextHelper
+        if self.context_helper:
+            return self.context_helper.analyze_string_context(node)
+        # Fallback: inline implementation (legacy support)
         context = {"in_conditional": self._is_in_conditional(node)}
-
-        # Check if it's a format string, path, or other structured string
         line_content = self._get_line_content(node)
         if any(pattern in line_content.lower() for pattern in ["format", "template", "path", "url", "pattern"]):
             context["likely_structured"] = True
             context["severity_modifier"] = "lower"
-
         return context
 
     def _is_in_appropriate_context(self, node: ast.AST, context_type: str) -> bool:
@@ -424,12 +426,14 @@ class ConnascenceDetector(ast.NodeVisitor):
         return any(keyword in full_context for keyword in keywords)
 
     def _detect_context_type(self, text: str) -> str:
-        """Detect the likely context type from surrounding text."""
+        """Detect context type. Delegates to ContextHelper (Phase 7)."""
+        if self.context_helper:
+            return self.context_helper.detect_context_type(text)
+        # Fallback: inline implementation (legacy support)
         try:
             from .constants import CONTEXT_KEYWORDS
         except ImportError:
             from constants import CONTEXT_KEYWORDS
-
         text_lower = text.lower()
         for context_type, keywords in CONTEXT_KEYWORDS.items():
             if any(keyword in text_lower for keyword in keywords):
@@ -437,48 +441,42 @@ class ConnascenceDetector(ast.NodeVisitor):
         return None
 
     def _get_line_content(self, node: ast.AST) -> str:
-        """Get the full line content containing the node."""
+        """Get line content. Delegates to ContextHelper (Phase 7)."""
+        if self.context_helper:
+            return self.context_helper.get_line_content(node)
         if not hasattr(node, "lineno") or node.lineno > len(self.source_lines):
             return ""
         return self.source_lines[node.lineno - 1]
 
     def _get_variable_context(self, node: ast.AST) -> str:
-        """
-        Get variable names and assignment context around the node.
-        This helps detect if numbers are assigned to meaningfully named variables.
-        """
+        """Get variable context. Delegates to ContextHelper (Phase 7)."""
+        if self.context_helper:
+            return self.context_helper.get_variable_context(node)
+        # Fallback: inline implementation (legacy support)
         line_content = self._get_line_content(node)
-
-        # Look for assignment patterns
         if "=" in line_content and not any(op in line_content for op in ["==", "!=", "<=", ">="]):
-            # Extract variable name before assignment
             parts = line_content.split("=")[0].strip()
             return parts
-
-        # Look for function parameter names
         parent_line_start = max(0, node.lineno - 2)
         parent_lines = " ".join(self.source_lines[parent_line_start : node.lineno])
-
         return parent_lines
 
     def _is_likely_array_index(self, node: ast.AST) -> bool:
-        """Check if the number is likely being used as an array index."""
+        """Check if likely array index. Delegates to ContextHelper (Phase 7)."""
+        if self.context_helper:
+            return self.context_helper.is_likely_array_index(node)
         line_content = self._get_line_content(node)
-
-        # Look for bracket patterns suggesting indexing
         return "[" in line_content and "]" in line_content
 
     def _is_likely_loop_counter(self, node: ast.AST) -> bool:
-        """Check if the number is likely a loop counter or range parameter."""
+        """Check if likely loop counter. Delegates to ContextHelper (Phase 7)."""
+        if self.context_helper:
+            return self.context_helper.is_likely_loop_counter(node)
         line_content = self._get_line_content(node)
-
-        # Look for loop-related keywords
         return any(pattern in line_content for pattern in ["for ", "range(", "range ", "while ", "enumerate("])
 
     def visit_Call(self, node: ast.Call):
         """Detect timing-related calls and other patterns."""
-
-        ProductionAssert.not_none(node, "node")
 
         ProductionAssert.not_none(node, "node")
 
@@ -503,19 +501,34 @@ class ConnascenceDetector(ast.NodeVisitor):
 
         self.generic_visit(node)
 
-    def finalize_analysis(self):
+    def finalize_analysis(self) -> None:
         """Perform final analysis that requires complete traversal. NASA Rule 4 compliant."""
-        # NASA Rule 5: Input validation assertions
-        assert hasattr(self, "function_hashes"), "function_hashes must be initialized"
-        assert hasattr(self, "magic_literals"), "magic_literals must be initialized"
+        # Use handlers if available, otherwise fall back to legacy methods
+        if self.using_handlers:
+            # Process algorithm duplicates via handler
+            algorithm_violations = self.algorithm_detector.process_algorithm_duplicates(self.get_code_snippet)
+            self.violations.extend(algorithm_violations)
 
-        # Check for algorithm duplicates
-        self._process_algorithm_duplicates()
+            # Process magic literals via handler
+            magic_violations = self.magic_literal_handler.process_magic_literals(
+                self.magic_literals, self.get_code_snippet, self.global_vars
+            )
+            self.violations.extend(magic_violations)
 
-        # Analyze magic literals with enhanced formal grammar context processing
-        self._process_magic_literals()
+            # Sync function_hashes for backward compatibility
+            self.function_hashes = self.algorithm_detector.get_function_hashes()
+        else:
+            # NASA Rule 5: Input validation assertions
+            assert hasattr(self, "function_hashes"), "function_hashes must be initialized"
+            assert hasattr(self, "magic_literals"), "magic_literals must be initialized"
 
-    def _process_algorithm_duplicates(self):
+            # Check for algorithm duplicates
+            self._process_algorithm_duplicates()
+
+            # Analyze magic literals with enhanced formal grammar context processing
+            self._process_magic_literals()
+
+    def _process_algorithm_duplicates(self) -> None:
         """Process algorithm duplicates and create violations. NASA Rule 4 compliant."""
         for body_hash, functions in self.function_hashes.items():
             # NASA Rule 1: Use guard clause to avoid nesting
@@ -526,7 +539,7 @@ class ConnascenceDetector(ast.NodeVisitor):
                 violation = self._create_algorithm_duplicate_violation(file_path, func_node, functions)
                 self.violations.append(violation)
 
-    def _create_algorithm_duplicate_violation(self, file_path, func_node, functions):
+    def _create_algorithm_duplicate_violation(self, file_path: str, func_node: ast.FunctionDef, functions: list) -> ConnascenceViolation:
         """Create algorithm duplicate violation. NASA Rule 4 compliant."""
         # NASA Rule 5: Input validation assertions
         assert file_path is not None, "file_path cannot be None"
@@ -548,24 +561,27 @@ class ConnascenceDetector(ast.NodeVisitor):
             },
         )
 
-    def _process_formal_magic_literal(self, node, value, context_info, formal_context, severity_score):
+    def _process_formal_magic_literal(self, params: MagicLiteralParams):
         """
         Process magic literal with formal grammar context.
 
+        Args:
+            params: MagicLiteralParams containing node, value, context, and severity
+
         NASA Rule 4: Function under 60 lines
+        NASA Rule compliance: Uses parameter object to reduce CoP
         """
-        # Determine severity based on score
-        if severity_score < 2.0:
+        # Use dataclass properties for severity logic
+        if params.should_skip:
             return  # Skip low-severity items
-        elif severity_score > 8.0:
-            severity = "high"
-        elif severity_score > 5.0:
-            severity = "medium"
-        else:
-            severity = "low"
+
+        severity = params.severity_level
+        formal_context = params.formal_context
 
         # Generate enhanced description using formal context
-        description = self._create_formal_magic_literal_description(value, formal_context, severity_score)
+        description = self._create_formal_magic_literal_description(
+            params.value, formal_context, params.severity_score
+        )
         recommendation = self._get_formal_magic_literal_recommendation(formal_context)
 
         self.violations.append(
@@ -573,13 +589,13 @@ class ConnascenceDetector(ast.NodeVisitor):
                 type="connascence_of_meaning",
                 severity=severity,
                 file_path=self.file_path,
-                line_number=node.lineno,
-                column=node.col_offset,
+                line_number=params.node.lineno,
+                column=params.node.col_offset,
                 description=description,
                 recommendation=recommendation,
-                code_snippet=self.get_code_snippet(node),
+                code_snippet=self.get_code_snippet(params.node),
                 context={
-                    "literal_value": value,
+                    "literal_value": params.value,
                     "formal_context": {
                         "in_conditional": formal_context.in_conditional,
                         "in_assignment": formal_context.in_assignment,
@@ -589,13 +605,13 @@ class ConnascenceDetector(ast.NodeVisitor):
                         "function_name": formal_context.function_name,
                         "class_name": formal_context.class_name,
                     },
-                    "severity_score": severity_score,
+                    "severity_score": params.severity_score,
                     "analysis_type": "formal_grammar",
                 },
             )
         )
 
-    def _process_legacy_magic_literal(self, node, value, context_info):
+    def _process_legacy_magic_literal(self, node: ast.AST, value: Any, context_info: dict) -> None:
         """
         Process magic literal using legacy analysis.
 
@@ -629,7 +645,7 @@ class ConnascenceDetector(ast.NodeVisitor):
             )
         )
 
-    def _check_excessive_globals(self):
+    def _check_excessive_globals(self) -> None:
         """
         Check for excessive global variable usage.
 
@@ -654,7 +670,7 @@ class ConnascenceDetector(ast.NodeVisitor):
                     )
                     break
 
-    def _process_magic_literals(self):
+    def _process_magic_literals(self) -> None:
         """
         Process magic literals with formal grammar context.
 
@@ -675,10 +691,16 @@ class ConnascenceDetector(ast.NodeVisitor):
                 node, value, context_info = item
                 # Check if we have formal grammar analysis context
                 if context_info.get("formal_analysis") and "context" in context_info:
-                    formal_context = context_info["context"]
-                    severity_score = context_info.get("severity_score", 3.0)
+                    # Create MagicLiteralParams (Phase 2 - CoP reduction)
+                    params = MagicLiteralParams(
+                        node=node,
+                        value=value,
+                        context_info=context_info,
+                        formal_context=context_info["context"],
+                        severity_score=context_info.get("severity_score", 3.0),
+                    )
                     # Process with formal grammar method
-                    self._process_formal_magic_literal(node, value, context_info, formal_context, severity_score)
+                    self._process_formal_magic_literal(params)
                 else:
                     # Fallback to legacy processing
                     self._process_legacy_magic_literal(node, value, context_info)
@@ -687,64 +709,66 @@ class ConnascenceDetector(ast.NodeVisitor):
         self._check_excessive_globals()
 
     def _is_in_conditional(self, node: ast.AST) -> bool:
-        """Check if node is within a conditional statement."""
-        # This is a simplified check - in practice you'd walk up the AST
+        """Check if node is within a conditional statement.
+        Delegates to ContextHelper if available (Phase 7 decomposition)."""
+        # Phase 7: Delegate to ContextHelper
+        if self.context_helper:
+            return self.context_helper.is_in_conditional(node)
+        # Fallback: inline implementation (legacy support)
         line_content = self.source_lines[node.lineno - 1] if node.lineno <= len(self.source_lines) else ""
         return any(keyword in line_content for keyword in ["if ", "elif ", "while ", "assert "])
 
     def _determine_magic_literal_severity(self, value, context_info: dict) -> str:
-        """
-        Determine the appropriate severity level for a magic literal violation.
+        """Determine severity for magic literal violation.
+        Delegates to SeverityCalculator if available (Phase 7 decomposition)."""
+        # Phase 7: Delegate to SeverityCalculator
+        if self.severity_calc:
+            return self.severity_calc.determine_severity(value, context_info)
+        # Fallback: inline implementation (legacy support)
+        base_severity = self._get_base_severity(context_info)
+        modified = self._apply_context_modifier(base_severity, context_info)
+        if modified:
+            return modified
+        if isinstance(value, str):
+            return self._adjust_string_severity(value, base_severity, context_info)
+        if isinstance(value, (int, float)):
+            return self._adjust_numeric_severity(value, base_severity, context_info)
+        return base_severity
 
-        Severity levels:
-        - critical: Never used (reserved for system-breaking issues)
-        - high: Magic literals in conditionals, unclear large numbers
-        - medium: Most magic literals with clear intent
-        - low: Small numbers in appropriate contexts, well-named contexts
-        - informational: Very low impact cases
-        """
-        # Start with base severity
-        if context_info.get("in_conditional", False):
-            base_severity = "high"  # Conditionals are more critical
-        else:
-            base_severity = "medium"  # Default for most magic literals
+    def _get_base_severity(self, context_info: dict) -> str:
+        """Get base severity from context (high for conditionals, medium otherwise)."""
+        return "high" if context_info.get("in_conditional", False) else "medium"
 
-        # Apply context-based modifications
+    def _apply_context_modifier(self, base_severity: str, context_info: dict) -> str:
+        """Apply context-based severity modifiers. Returns None if no modification."""
+        # Lower severity for array indices, loop counters
         if context_info.get("severity_modifier") == "lower":
-            # Lower severity for array indices, loop counters, etc.
-            if base_severity == "high":
-                return "medium"
-            elif base_severity == "medium":
-                return "low"
-            else:
-                return "informational"
+            severity_map = {"high": "medium", "medium": "low", "low": "informational"}
+            return severity_map.get(base_severity, "informational")
 
-        # Special handling for contextual numbers
+        # Contextual numbers in wrong context get medium severity
         if context_info.get("context_type"):
-            # Contextual numbers in wrong context get medium severity
             return "medium"
 
-        # String-specific severity adjustment
-        if isinstance(value, str):
-            if context_info.get("likely_structured", False):
-                return "low" if base_severity != "high" else "medium"
+        return ""  # No modification, continue processing
 
-            # Very long strings are more likely to be legitimate magic
-            if len(str(value)) > 50:
-                return "medium"
+    def _adjust_string_severity(self, value: str, base_severity: str, context_info: dict) -> str:
+        """Adjust severity for string literals."""
+        if context_info.get("likely_structured", False):
+            return "low" if base_severity != "high" else "medium"
+        if len(str(value)) > 50:
+            return "medium"
+        return base_severity
 
-        # Numeric-specific severity adjustment
-        if isinstance(value, (int, float)):
-            # Large numbers are more suspicious
-            abs_value = abs(float(value))
-            if abs_value > 10000:
-                return "high" if base_severity != "low" else "medium"
-            elif abs_value > 1000:
-                return base_severity
-            # Small numbers in good context get lower severity
-            elif context_info.get("detected_context"):
-                return "low" if base_severity != "high" else "medium"
-
+    def _adjust_numeric_severity(self, value, base_severity: str, context_info: dict) -> str:
+        """Adjust severity for numeric literals."""
+        abs_value = abs(float(value))
+        if abs_value > 10000:
+            return "high" if base_severity != "low" else "medium"
+        if abs_value > 1000:
+            return base_severity
+        if context_info.get("detected_context"):
+            return "low" if base_severity != "high" else "medium"
         return base_severity
 
     def _create_magic_literal_description(self, value, context_info: dict) -> str:
@@ -849,10 +873,8 @@ class ConnascenceDetector(ast.NodeVisitor):
         """
         Main visit method - delegates to DetectorFactory if available.
 
-        REFACTORED: Now uses specialized detectors for improved maintainability.
+        REFACTORED: Now uses specialized handlers and detectors.
         """
-
-        ProductionAssert.not_none(node, "node")
 
         ProductionAssert.not_none(node, "node")
 
