@@ -360,8 +360,6 @@ class ErrorHandler:
 
         ProductionAssert.not_none(error, "error")
 
-        ProductionAssert.not_none(error, "error")
-
         log_level_mapping = {
             ERROR_SEVERITY["CRITICAL"]: logger.critical,
             ERROR_SEVERITY["HIGH"]: logger.error,
@@ -387,7 +385,8 @@ class ComponentInitializer:
         """Initialize smart integration engine with fallback."""
         try:
             return SmartIntegrationEngine()
-        except:
+        except Exception as e:
+            logger.debug(f"SmartIntegrationEngine initialization failed: {e}")
             return None
 
     @staticmethod
@@ -396,7 +395,8 @@ class ComponentInitializer:
         if FailureDetectionSystem:
             try:
                 return FailureDetectionSystem()
-            except:
+            except Exception as e:
+                logger.debug(f"FailureDetectionSystem initialization failed: {e}")
                 return None
         return None
 
@@ -406,7 +406,8 @@ class ComponentInitializer:
         if NASAPowerOfTenIntegration:
             try:
                 return NASAPowerOfTenIntegration()
-            except:
+            except Exception as e:
+                logger.debug(f"NASAPowerOfTenIntegration initialization failed: {e}")
                 return None
         return None
 
@@ -416,7 +417,8 @@ class ComponentInitializer:
         if PolicyManager:
             try:
                 return PolicyManager()
-            except:
+            except Exception as e:
+                logger.debug(f"PolicyManager initialization failed: {e}")
                 return None
         return None
 
@@ -426,7 +428,8 @@ class ComponentInitializer:
         if BudgetTracker:
             try:
                 return BudgetTracker()
-            except:
+            except Exception as e:
+                logger.debug(f"BudgetTracker initialization failed: {e}")
                 return None
         return None
 

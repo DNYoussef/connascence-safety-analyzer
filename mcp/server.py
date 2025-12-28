@@ -114,21 +114,17 @@ except ImportError:
 
         def handle_exception(self, e, context=None, file_path=None):
             ProductionAssert.not_none(e, "e")
-            ProductionAssert.not_none(context, "context")
-            ProductionAssert.not_none(file_path, "file_path")
-
-            ProductionAssert.not_none(e, "e")
-            ProductionAssert.not_none(context, "context")
-            ProductionAssert.not_none(file_path, "file_path")
-
+            # context and file_path can be None (optional parameters)
             return StandardError(code=5001, message=str(e), context=context or {})
 
 
-# Load configuration defaults with error handling
+# Load configuration defaults with error handling (B3.3 FIX: Specific exception)
 try:
     MCP_DEFAULTS = load_config_defaults("mcp_server")
-except Exception:
-    # Fallback defaults
+except (FileNotFoundError, ValueError, KeyError) as e:
+    # Fallback defaults when config not found or invalid
+    import logging
+    logging.getLogger(__name__).debug(f"Using MCP defaults: {e}")
     MCP_DEFAULTS = {"max_requests_per_minute": 60, "enable_audit_logging": True}
 
 # Default values for backward compatibility
@@ -188,23 +184,38 @@ class ConnascenceMCPServer:
             raise Exception(f"MCP Server initialization failed: {error.message}")
 
     def _create_analyzer(self):
-        """Create mock analyzer instance for tests."""
+        """Create mock analyzer instance for tests.
+
+        WARNING: This returns a MockAnalyzer that produces FAKE/CANNED results.
+        For production use, use mcp/enhanced_server.py which provides real analysis.
+
+        This mock server is DEPRECATED and will be removed in a future version.
+        """
+        import warnings
+        import logging
+
+        logger = logging.getLogger(__name__)
+        warnings.warn(
+            "ConnascenceMCPServer uses MockAnalyzer which returns FAKE results. "
+            "Use EnhancedConnascenceMCPServer from mcp/enhanced_server.py for real analysis.",
+            DeprecationWarning,
+            stacklevel=2
+        )
+        logger.warning(
+            "MOCK MODE: This MCP server returns canned/fake violations. "
+            "For production, use mcp/enhanced_server.py instead."
+        )
 
         class MockAnalyzer:
+            """DEPRECATED: Mock analyzer that returns fake results for testing only."""
+
             def __init__(self):
                 pass
 
             def analyze_path(self, path, profile=None):
                 """Mock analyze_path method."""
-
                 ProductionAssert.not_none(path, "path")
-
-                ProductionAssert.not_none(profile, "profile")
-
-                ProductionAssert.not_none(path, "path")
-
-                ProductionAssert.not_none(profile, "profile")
-
+                # profile can be None (optional parameter)
                 return {
                     "violations": [
                         ConnascenceViolation(
@@ -223,15 +234,8 @@ class ConnascenceMCPServer:
 
             def analyze_directory(self, path, profile=None):
                 """Mock analyze_directory method for test compatibility."""
-
                 ProductionAssert.not_none(path, "path")
-
-                ProductionAssert.not_none(profile, "profile")
-
-                ProductionAssert.not_none(path, "path")
-
-                ProductionAssert.not_none(profile, "profile")
-
+                # profile can be None (optional parameter)
                 # Return violations that the tests can mock
                 return [
                     ConnascenceViolation(
@@ -410,7 +414,8 @@ class ConnascenceMCPServer:
         """Execute explain_finding tool."""
         rule_id = arguments.get("rule_id") or arguments.get("violation_id", "CON_CoM")
         include_examples = arguments.get("include_examples", False)
-        arguments.get("context", {})
+        # B2.7 FIX: Use context for enhanced explanations
+        context = arguments.get("context", {})
 
         explanations = {
             "CON_CoM": {
@@ -426,7 +431,7 @@ class ConnascenceMCPServer:
         }
 
         explanation_data = explanations.get(rule_id, explanations["CON_CoM"])
-        result = {"success": True, "rule_id": rule_id, "violation_id": rule_id, **explanation_data}
+        result = {"success": True, "rule_id": rule_id, "violation_id": rule_id, "context": context, **explanation_data}
 
         if include_examples:
             result["examples"] = [
@@ -516,19 +521,23 @@ class ConnascenceMCPServer:
             if not self.rate_limiter.check_rate_limit(client_id):
                 raise Exception("Rate limit exceeded")
 
-            # Path validation
+            # Path validation (B2.8 FIX: Removed redundant double validation)
             path = arguments.get("path")
             if path:
-                if not self.validate_path(path):
-                    raise ValueError(f"Path not allowed: {path}")
-                # Also call _validate_path directly to ensure proper exceptions
+                # _validate_path provides comprehensive validation with proper exceptions
                 self._validate_path(path)
 
             # Audit logging
             self.audit_logger.log_request(tool_name="scan_path", client_id=client_id)
 
-            # Check for result limiting
-            limit_results = arguments.get("limit_results")
+            # Check for result limiting (B3.1 FIX: Add type validation)
+            limit_results_raw = arguments.get("limit_results")
+            limit_results = None
+            if limit_results_raw is not None:
+                try:
+                    limit_results = int(limit_results_raw)
+                except (ValueError, TypeError):
+                    limit_results = None
 
             # Direct analyzer call to work with mocking
 

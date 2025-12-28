@@ -113,10 +113,10 @@ Examples:
         )
 
         parser.add_argument(
-            "--duplication-analysis",
+            "--no-duplication-analysis",
             action="store_true",
-            default=True,
-            help="Enable duplication analysis (enabled by default)",
+            default=False,
+            help="Disable duplication analysis (enabled by default)",
         )
 
         # Compatibility with old interface
@@ -265,8 +265,20 @@ Examples:
         if args.legacy_cli:
             return self.run_legacy_cli(args)
 
-        # Load configuration
-        self.discover_configuration(args.config)
+        # Load configuration and store it for use
+        discovered_config = self.discover_configuration(args.config)
+
+        # Apply discovered configuration to override defaults
+        if discovered_config:
+            # Apply config values if not explicitly set via CLI
+            if not args.policy and discovered_config.get("policy"):
+                args.policy = discovered_config.get("policy")
+            if discovered_config.get("severity"):
+                args.severity = args.severity or discovered_config.get("severity")
+            if discovered_config.get("exclude"):
+                args.exclude = args.exclude or discovered_config.get("exclude")
+            if discovered_config.get("format"):
+                args.format = discovered_config.get("format", args.format)
 
         # Detect best policy
         policy = self.detect_policy(args.paths, args.policy)
@@ -283,12 +295,14 @@ Examples:
             path = args.paths[0] if args.paths else "."
 
             # Run comprehensive analysis with all features included
+            # Duplication is enabled by default, disabled with --no-duplication-analysis
+            include_duplication = not getattr(args, 'no_duplication_analysis', False)
             combined_result = analyzer.analyze_path(
                 path=path,
                 policy=policy,
                 strict_mode=args.strict_mode,
                 nasa_validation=args.nasa_validation,
-                include_duplication=True,  # Enable duplication analysis
+                include_duplication=include_duplication,
                 duplication_threshold=0.7,  # Default threshold
             )
 

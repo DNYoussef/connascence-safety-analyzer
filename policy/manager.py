@@ -12,10 +12,8 @@
 # all copies or substantial portions of the Software.
 
 import json
-from pathlib import Path
-
-# Import shared utilities
 import sys
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
 try:
@@ -26,16 +24,32 @@ except ImportError:
     YAML_AVAILABLE = False
     yaml = None
 
-sys.path.append(str(Path(__file__).parent.parent))
-
-from analyzer.constants import (
-    UNIFIED_POLICY_NAMES,
-    list_available_policies,
-    resolve_policy_name,
-    validate_policy_name,
-)
-from utils.config_loader import ThresholdConfig, load_config_defaults
-from utils.types import ConnascenceViolation
+# B1.2 FIX: Use proper imports instead of sys.path manipulation
+# These packages are defined as top-level in pyproject.toml
+# The try/except handles development mode (running from source) vs installed package
+try:
+    from analyzer.constants import (
+        UNIFIED_POLICY_NAMES,
+        list_available_policies,
+        resolve_policy_name,
+        validate_policy_name,
+    )
+    from utils.config_loader import ThresholdConfig, load_config_defaults
+    from utils.types import ConnascenceViolation
+except ImportError:
+    # Fallback for development mode when packages aren't installed
+    # Add parent directory to path only if imports fail
+    _project_root = str(Path(__file__).parent.parent)
+    if _project_root not in sys.path:
+        sys.path.insert(0, _project_root)
+    from analyzer.constants import (
+        UNIFIED_POLICY_NAMES,
+        list_available_policies,
+        resolve_policy_name,
+        validate_policy_name,
+    )
+    from utils.config_loader import ThresholdConfig, load_config_defaults
+    from utils.types import ConnascenceViolation
 
 # Load configuration defaults
 POLICY_DEFAULTS = load_config_defaults("policy_manager")

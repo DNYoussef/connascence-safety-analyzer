@@ -176,7 +176,7 @@ class MetricsTrendAnalyzer:
                 entry_date = datetime.fromisoformat(entry["timestamp"].replace("Z", "+00:00"))
                 if entry_date.replace(tzinfo=None) >= cutoff_date:
                     filtered_entries.append(entry)
-            except:
+            except (ValueError, KeyError, TypeError):
                 # Include entries with parsing issues
                 filtered_entries.append(entry)
 

@@ -504,7 +504,11 @@ class TestCLIWorkflowsEndToEnd:
                     min_level = severity_order[severity]
 
                     for violation in violations:
-                        violation_level = severity_order.get(violation.get("severity", {}).get("value", "low"), 0)
+                        # Handle both string and object severity formats
+                        sev = violation.get("severity", "low")
+                        if isinstance(sev, dict):
+                            sev = sev.get("value", "low")
+                        violation_level = severity_order.get(sev, 0)
                         assert violation_level >= min_level, f"Violation below minimum severity {severity}"
 
                     severity_results[severity] = {"violations_count": len(violations), "filtering_correct": True}

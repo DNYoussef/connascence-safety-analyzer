@@ -322,7 +322,8 @@ class ConnascenceAnalyzer:
                 "mece_analysis": {"score": 0.75, "duplications": []},  # Fallback score
                 "god_objects": self._extract_god_objects(violation_dicts),
                 "metrics": {
-                    "files_analyzed": len(list(Path(path).glob("**/*.py"))) if Path(path).is_dir() else 1,
+                    # B3.4 FIX: Count unique files from violations, not all .py files
+                    "files_analyzed": len(set(v.get("file_path", "") for v in violation_dicts if v.get("file_path"))) or (1 if Path(path).is_file() else 0),
                     "analysis_time": 1.0,
                     "timestamp": time.time(),
                 },
@@ -391,7 +392,13 @@ class ConnascenceAnalyzer:
         return violations
 
     def _convert_policy_to_preset(self, policy: str) -> str:
-        """Convert policy string to unified analyzer preset."""
+        """Convert policy string to unified analyzer preset.
+
+        Raises:
+            ValueError: If policy name is not recognized
+        """
+        import warnings
+
         policy_mapping = {
             # Legacy CLI policy names
             "default": "service-defaults",
@@ -407,6 +414,16 @@ class ConnascenceAnalyzer:
             "experimental": "experimental",
             "balanced": "balanced",
         }
+
+        if policy not in policy_mapping:
+            available_policies = list(policy_mapping.keys())
+            warnings.warn(
+                f"Unknown policy '{policy}'. Using 'service-defaults'. "
+                f"Available: {', '.join(available_policies)}",
+                UserWarning,
+                stacklevel=2
+            )
+
         return policy_mapping.get(policy, "service-defaults")
 
     def _extract_god_objects(self, violations: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
@@ -450,8 +467,8 @@ def _add_basic_arguments(parser: argparse.ArgumentParser):
         if "list_available_policies" in globals() and list_available_policies:
             available_policies = list_available_policies(include_legacy=True)
             policy_help = f"Analysis policy to use. Available: {', '.join(available_policies)}"
-    except:
-        pass
+    except (ImportError, AttributeError, TypeError) as e:
+        pass  # Use default policy_help if policy listing fails
 
     parser.add_argument("--policy", type=str, default="default", help=policy_help)
     parser.add_argument(

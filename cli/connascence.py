@@ -16,13 +16,30 @@ try:
         StandardError,
     )
 except ImportError:
-    # Graceful fallback if specific classes not available
+    # Log the import failure instead of silently masking it
+    import warnings
+    warnings.warn(
+        "Could not import ErrorHandler/StandardError from interfaces.cli.connascence. "
+        "Some error handling features may not work correctly.",
+        ImportWarning,
+        stacklevel=2
+    )
     ErrorHandler = None
     StandardError = None
 
-# Mock classes for testing compatibility - these are placeholders that tests can patch
+# DEPRECATED: Mock classes for testing compatibility only
+# These are placeholders that tests can patch. DO NOT use in production code!
+# Use the real classes from analyzer.core or interfaces.cli.connascence instead.
+import warnings as _mock_warnings
+_mock_warnings.warn(
+    "cli/connascence.py mock classes are for testing only. "
+    "Production code should import from analyzer.core or interfaces.cli.connascence.",
+    DeprecationWarning,
+    stacklevel=1
+)
+
 class ConnascenceASTAnalyzer:
-    """Mock analyzer for testing."""
+    """Mock analyzer for testing. DO NOT use in production."""
     def __init__(self, policy_preset=None):
         self.policy_preset = policy_preset
 
