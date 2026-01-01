@@ -320,6 +320,21 @@ class TestJSONReportGeneration:
         assert parsed["key"] == "value"
         assert parsed["number"] == 42
 
+    def test_generate_json_sequence_uses_fallback(self):
+        """Ensure non-dict sequences use json.dumps fallback configuration."""
+        config = {"indent": 3, "sort_keys": True}
+        generator = ReportGenerator(config)
+
+        data_sequence = [{"b": 2}, {"a": 1}]
+
+        json_output = generator.generate_json(data_sequence)
+        parsed = json.loads(json_output)
+
+        assert isinstance(parsed, list)
+        assert parsed[0]["b"] == 2
+        # Indentation of 3 spaces should be applied from config
+        assert json_output.startswith("[\n   ")
+
     def test_generate_json_error_handling_invalid_path(self, sample_result_dict):
         """Test JSON error handling for invalid file path."""
         generator = ReportGenerator()
@@ -610,6 +625,29 @@ class TestMultiFormatGeneration:
         sarif_data = json.loads(sarif_content)
         assert sarif_data["version"] == "2.1.0"
 
+    def test_generate_all_formats_propagates_errors(
+        self,
+        sample_result_object,
+        sample_violations_dicts,
+        temp_output_dir,
+        monkeypatch,
+    ):
+        """Exceptions during multi-format generation should bubble up."""
+        generator = ReportGenerator()
+
+        # Force JSON generation failure to exercise error handling branch
+        def boom(*_, **__):
+            raise RuntimeError("boom")
+
+        monkeypatch.setattr(generator, "generate_json", boom)
+
+        with pytest.raises(RuntimeError, match="boom"):
+            generator.generate_all_formats(
+                result=sample_result_object,
+                violations=sample_violations_dicts,
+                output_dir=temp_output_dir,
+            )
+
 
 # Test Summary Formatting
 # ========================
@@ -738,6 +776,13 @@ class TestHelperMethods:
         with pytest.raises((IOError, PermissionError, OSError), match="Failed to write|Permission denied"):
             generator._write_to_file(invalid_path, content)
 
+    def test_validate_output_path_rejects_drive_prefix(self):
+        """Validate output path blocks drive-prefixed relative locations."""
+        generator = ReportGenerator()
+
+        with pytest.raises(PermissionError):
+            generator._validate_output_path(Path("Z:invalid/report.json"))
+
     def test_generate_markdown_from_dict(self, sample_result_dict):
         """Test markdown generation from dictionary."""
         generator = ReportGenerator()
@@ -795,6 +840,21 @@ class TestHelperMethods:
             "policy_preset": "strict",
             "analysis_duration_ms": 200,
             "total_files_analyzed": 2,
+        }
+
+        markdown = generator._generate_markdown_from_dict(result_dict)
+
+        assert markdown is not None
+        assert len(markdown) > 0
+
+    def test_generate_markdown_from_dict_without_violation_keys(self):
+        """Handle dictionaries without violation keys gracefully."""
+        generator = ReportGenerator()
+
+        result_dict = {
+            "policy_preset": "minimal",
+            "analysis_duration_ms": 0,
+            "total_files_analyzed": 0,
         }
 
         markdown = generator._generate_markdown_from_dict(result_dict)

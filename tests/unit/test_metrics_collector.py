@@ -954,6 +954,94 @@ class TestTrendAnalysis:
 
 
 # ============================================================================
+# TREND HELPER EDGE CASES
+# ============================================================================
+
+
+class TestTrendHelperEdges:
+    """Test private trend helper methods for edge coverage."""
+
+    def test_calculate_quality_trend_single_snapshot(self, default_collector):
+        """Ensure quality trend returns stable for single snapshot."""
+        snapshot = MetricsSnapshot(
+            timestamp="t1",
+            total_violations=5,
+            critical_count=0,
+            high_count=1,
+            medium_count=2,
+            low_count=2,
+            connascence_index=10.0,
+            nasa_compliance_score=0.9,
+            duplication_score=0.8,
+            overall_quality_score=0.75,
+            calculation_time_ms=5.0,
+            files_analyzed=3,
+        )
+
+        trend = default_collector._calculate_quality_trend([snapshot])
+
+        assert trend == {"direction": "stable", "change": 0.0}
+
+    def test_calculate_violation_trend_single_snapshot(self, default_collector):
+        """Ensure violation trend returns stable for single snapshot."""
+        snapshot = MetricsSnapshot(
+            timestamp="t1",
+            total_violations=3,
+            critical_count=1,
+            high_count=0,
+            medium_count=1,
+            low_count=1,
+            connascence_index=8.0,
+            nasa_compliance_score=0.95,
+            duplication_score=0.9,
+            overall_quality_score=0.8,
+            calculation_time_ms=4.0,
+            files_analyzed=2,
+        )
+
+        trend = default_collector._calculate_violation_trend([snapshot])
+
+        assert trend == {"direction": "stable", "change": 0}
+
+    def test_generate_trend_analysis_degrading_quality(self, default_collector):
+        """Quality degrading should surface attention message."""
+        analysis = default_collector._generate_trend_analysis(
+            {"direction": "degrading", "change": -0.1},
+            {"direction": "stable", "change": 0},
+        )
+
+        assert analysis == "Quality scores degrading, requires attention"
+
+    def test_generate_trend_analysis_mixed_trends(self, default_collector):
+        """Mixed trends return monitoring guidance."""
+        analysis = default_collector._generate_trend_analysis(
+            {"direction": "stable", "change": 0.0},
+            {"direction": "improving", "change": -5},
+        )
+
+        assert analysis == "Mixed trends observed, monitoring recommended"
+
+    def test_get_baseline_status_without_baseline(self, default_collector):
+        """Baseline status returns no_baseline when unset."""
+        snapshot = MetricsSnapshot(
+            timestamp="t1",
+            total_violations=0,
+            critical_count=0,
+            high_count=0,
+            medium_count=0,
+            low_count=0,
+            connascence_index=0.0,
+            nasa_compliance_score=1.0,
+            duplication_score=1.0,
+            overall_quality_score=1.0,
+            calculation_time_ms=0.0,
+            files_analyzed=0,
+        )
+
+        assert default_collector._get_baseline_status(snapshot) == "no_baseline"
+
+
+# ============================================================================
 # BASELINE COMPARISON TESTS
 # ============================================================================
 
