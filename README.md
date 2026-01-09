@@ -110,6 +110,13 @@ code --install-extension connascence-safety-analyzer-*.vsix
 
 The Connascence Safety Analyzer integrates seamlessly with intelligent AI development systems:
 
+**Context Cascade Cognitive Architecture** - [https://github.com/DNYoussef/context-cascade](https://github.com/DNYoussef/context-cascade)
+- **FrozenHarness Integration**: ConnascenceBridge wired into evaluation pipeline
+- **7-Analyzer Quality Gate**: sigma_level, dpmo, nasa_compliance, mece_score, theater_risk
+- **Telemetry to Memory MCP**: WHO/WHEN/PROJECT/WHY tagged metrics storage
+- **Four-Loop Architecture**: Loop 1 (execution), Loop 1.5 (reflection), Loop 2 (quality), Loop 3 (meta-optimization)
+- **Quality Gate Enforcement**: 10% penalty on lenient gate failure, hard block on strict failure
+
 **Memory MCP Triple System** - [https://github.com/DNYoussef/memory-mcp-triple-system](https://github.com/DNYoussef/memory-mcp-triple-system)
 - Persistent memory with automatic tagging protocol
 - Cross-session violation tracking and pattern detection
@@ -121,6 +128,44 @@ The Connascence Safety Analyzer integrates seamlessly with intelligent AI develo
 - Agent access control (14 code quality agents have Connascence access)
 - Complete skill and command integration
 - Evidence-based prompting techniques
+
+### ConnascenceBridge (Cognitive Architecture Integration)
+
+The `ConnascenceBridge` class provides programmatic access from Python applications:
+
+```python
+from connascence_bridge import ConnascenceBridge, ConnascenceResult
+
+bridge = ConnascenceBridge()  # Auto-detects CLI or mock fallback
+
+# Analyze a single file
+result: ConnascenceResult = bridge.analyze_file(Path("src/module.py"))
+
+# Analyze entire directory
+result: ConnascenceResult = bridge.analyze_directory(Path("src/"))
+
+# Check quality gates
+if result.passes_gate(strict=True):
+    print(f"Quality PASS - Sigma: {result.sigma_level}, DPMO: {result.dpmo}")
+else:
+    print(f"Quality FAIL - {result.violations_count} violations")
+
+# Access all metrics
+print(f"NASA Compliance: {result.nasa_compliance}")
+print(f"MECE Score: {result.mece_score}")
+print(f"Theater Risk: {result.theater_risk}")
+print(f"Clarity Score: {result.clarity_score}")
+```
+
+**Quality Thresholds**:
+| Metric | Strict | Lenient |
+|--------|--------|---------|
+| sigma_level | >= 4.0 | - |
+| dpmo | <= 6210 | - |
+| nasa_compliance | >= 0.95 | - |
+| mece_score | >= 0.80 | - |
+| theater_risk | < 0.20 | - |
+| critical_violations | == 0 | == 0 |
 
 **MCP Integration Guide**: See [docs/MCP-INTEGRATION.md](docs/MCP-INTEGRATION.md) for complete setup instructions.
 
