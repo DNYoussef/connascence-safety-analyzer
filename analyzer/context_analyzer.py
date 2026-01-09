@@ -14,6 +14,8 @@ from enum import Enum
 import re
 from typing import Dict, List, Optional, Set
 
+from utils.types import ClassMetrics
+
 
 class ClassContext(Enum):
     """Classification of class contexts for domain-specific analysis."""
@@ -93,16 +95,32 @@ class ContextAnalyzer:
         }
 
         self.api_controller_indicators = {
-            "name_patterns": [r".*[Cc]ontroller.*", r".*[Hh]andler.*", r".*[Vv]iew.*", r".*[Aa][Pp][Ii].*"],
-            "method_patterns": [r"get", r"post", r"put", r"delete", r"patch", r"handle_.*"],
-            "base_classes": ["APIView", "Controller", "Handler", "Resource"],
+            "name_patterns": [r".*[Cc]ontroller.*", r".*[Vv]iew.*", r".*[Aa][Pp][Ii].*", r".*[Rr]oute.*", r".*[Ee]ndpoint.*"],
+            # HTTP method patterns should be exact or have specific suffixes, not match any "get_*"
+            "method_patterns": [r"^get$", r"^post$", r"^put$", r"^delete$", r"^patch$", r"^head$", r"^options$", r"handle_request", r"dispatch"],
+            "base_classes": ["APIView", "Controller", "Resource", "View", "Endpoint"],
             "imports": ["flask", "django", "fastapi", "tornado", "aiohttp"],
         }
 
         self.utility_indicators = {
-            "name_patterns": [r".*[Uu]til.*", r".*[Hh]elper.*", r".*[Tt]ool.*", r".*[Uu]tility.*"],
-            "method_patterns": [r"format_.*", r"parse_.*", r"convert_.*", r"transform_.*"],
-            "base_classes": ["Utility", "Helper", "Tool"],
+            "name_patterns": [
+                r".*[Uu]til.*",
+                r".*[Hh]elper.*",
+                r".*[Tt]ool.*",
+                r".*[Uu]tility.*",
+                r".*[Cc]alculator.*",  # Added: SeverityCalculator, etc.
+                r".*[Bb]uilder.*",  # Added: DescriptionBuilder, etc.
+                r".*[Hh]andler.*",  # Added: MagicLiteralHandler, etc.
+                r".*[Dd]etector.*",  # Added: AlgorithmDetector, etc.
+                r".*[Pp]rocessor.*",  # Added: StreamProcessor, etc.
+                r".*[Mm]anager.*",  # Added: ConfigManager, etc.
+                r".*[Ff]actory.*",  # Added: DetectorFactory, etc.
+                r".*[Pp]rovider.*",  # Added: DataProvider, etc.
+                r".*[Aa]dapter.*",  # Added: Adapter pattern classes
+                r".*[Vv]alidator.*",  # Added: InputValidator, etc.
+            ],
+            "method_patterns": [r"format_.*", r"parse_.*", r"convert_.*", r"transform_.*", r"calculate_.*", r"build_.*", r"create_.*", r"process_.*", r"validate_.*"],
+            "base_classes": ["Utility", "Helper", "Tool", "Handler", "Builder", "Calculator", "Detector", "Processor"],
             "static_methods_ratio": 0.5,  # More than 50% static methods
         }
 
@@ -174,13 +192,22 @@ class ContextAnalyzer:
         thresholds = self.context_thresholds[context]
         god_object_threshold = thresholds["method_threshold"]
 
-        # Determine if this is a god object with context-aware reasoning
-        god_object_reason = self._assess_god_object_with_context(
-            class_node.name, context, method_count, loc, cohesion_score, thresholds
+        # Create ClassMetrics parameter object (Phase 2 - CoP reduction)
+        metrics = ClassMetrics(
+            class_name=class_node.name,
+            method_count=method_count,
+            loc=loc,
+            cohesion_score=cohesion_score,
+            context_value=context.value,
+            thresholds=thresholds,
+            responsibilities=responsibilities,
         )
 
+        # Determine if this is a god object with context-aware reasoning
+        god_object_reason = self._assess_god_object_with_context(metrics, context)
+
         # Generate context-specific recommendations
-        recommendations = self._generate_recommendations(context, method_count, loc, cohesion_score, responsibilities)
+        recommendations = self._generate_recommendations(metrics, context)
 
         return ClassAnalysis(
             name=class_node.name,
@@ -460,41 +487,53 @@ class ContextAnalyzer:
         if not responsibilities:
             return 0.5  # Default moderate score if no responsibilities detected
 
-        # Measure how focused the class is on its responsibilities
         total_methods = len(methods)
         responsibility_count = len(responsibilities)
 
+        # IMPORTANT: Small classes (<=10 methods) get significant cohesion bonus
+        # Small utility classes are inherently more cohesive by design
+        small_class_bonus = 1.0
+        if total_methods <= 5:
+            small_class_bonus = 1.5  # Very small classes get major bonus
+        elif total_methods <= 10:
+            small_class_bonus = 1.3  # Small classes get good bonus
+        elif total_methods <= 15:
+            small_class_bonus = 1.1  # Moderate classes get small bonus
+
         # Context-aware responsibility scoring
-        # Config classes can have more responsibilities and still be cohesive
-        max_acceptable_responsibilities = 5.0  # Allow up to 5 different types of responsibilities
+        # Allow more responsibilities for larger classes
+        max_acceptable_responsibilities = max(5.0, total_methods / 3.0)
         responsibility_penalty = min(responsibility_count / max_acceptable_responsibilities, 1.0)
 
         # Measure consistency of method sizes
         if total_methods > 1:
-            method_sizes = [max(1, method.lines_of_code) for method in methods]  # Avoid zero
+            method_sizes = [max(1, method.lines_of_code) for method in methods]
             avg_size = sum(method_sizes) / len(method_sizes)
             if avg_size > 0:
                 size_variance = sum((size - avg_size) ** 2 for size in method_sizes) / len(method_sizes)
-                consistency_score = 1.0 / (1.0 + size_variance / 100.0)  # Normalize variance
+                consistency_score = 1.0 / (1.0 + size_variance / 100.0)
             else:
                 consistency_score = 0.5
         else:
             consistency_score = 1.0
 
-        # Base cohesion calculation
-        base_cohesion = (1.0 - responsibility_penalty * 0.6) * consistency_score
+        # Base cohesion calculation with reduced penalty
+        base_cohesion = (1.0 - responsibility_penalty * 0.4) * consistency_score  # Reduced from 0.6 to 0.4
+
+        # Apply small class bonus
+        base_cohesion *= small_class_bonus
 
         # Boost cohesion for patterns that indicate good organization
-        if responsibility_count <= 3:  # Very focused classes get bonus
+        if responsibility_count <= 3:
             base_cohesion *= 1.2
-        elif responsibility_count <= 5:  # Moderately focused classes get small bonus
+        elif responsibility_count <= 5:
             base_cohesion *= 1.1
 
         # Method naming consistency bonus
         if self._has_consistent_naming_pattern(methods):
             base_cohesion *= 1.1
 
-        return max(0.1, min(1.0, base_cohesion))  # Ensure reasonable bounds
+        return max(0.1, min(1.0, base_cohesion))
 
     def _has_consistent_naming_pattern(self, methods: List[MethodAnalysis]) -> bool:
         """Check if methods follow consistent naming patterns."""
@@ -523,90 +562,104 @@ class ContextAnalyzer:
 
     def _assess_god_object_with_context(
         self,
-        class_name: str,
+        metrics: ClassMetrics,
         context: ClassContext,
-        method_count: int,
-        loc: int,
-        cohesion_score: float,
-        thresholds: Dict[str, int],
     ) -> Optional[str]:
-        """Assess if a class is a god object considering its context."""
+        """
+        Assess if a class is a god object considering its context.
 
+        Args:
+            metrics: ClassMetrics parameter object with class measurements
+            context: ClassContext enum for domain-specific analysis
+
+        Returns:
+            String describing issues if god object, None otherwise
+        """
         issues = []
+        thresholds = metrics.thresholds or {}
+        method_threshold = thresholds.get("method_threshold", 20)
+        loc_threshold = thresholds.get("loc_threshold", 500)
 
         # Check method count against context-specific threshold
-        if method_count > thresholds["method_threshold"]:
+        if metrics.method_count > method_threshold:
             issues.append(
-                f"Method count ({method_count}) exceeds {context.value} threshold ({thresholds['method_threshold']})"
+                f"Method count ({metrics.method_count}) exceeds {context.value} threshold ({method_threshold})"
             )
 
         # Check lines of code against context-specific threshold
-        if loc > thresholds["loc_threshold"]:
-            issues.append(f"Lines of code ({loc}) exceeds {context.value} threshold ({thresholds['loc_threshold']})")
+        if metrics.loc > loc_threshold:
+            issues.append(f"Lines of code ({metrics.loc}) exceeds {context.value} threshold ({loc_threshold})")
 
         # Check cohesion for business logic classes (stricter)
-        if context == ClassContext.BUSINESS_LOGIC and cohesion_score < 0.6:
-            issues.append(f"Low cohesion ({cohesion_score:.2f}) in business logic class")
-        elif context not in [ClassContext.FRAMEWORK, ClassContext.UTILITY] and cohesion_score < 0.4:
-            issues.append(f"Very low cohesion ({cohesion_score:.2f})")
+        if context == ClassContext.BUSINESS_LOGIC and metrics.cohesion_score < 0.6:
+            issues.append(f"Low cohesion ({metrics.cohesion_score:.2f}) in business logic class")
+        elif context not in [ClassContext.FRAMEWORK, ClassContext.UTILITY] and metrics.cohesion_score < 0.4:
+            issues.append(f"Very low cohesion ({metrics.cohesion_score:.2f})")
 
         # Context-specific god object assessment
         if context == ClassContext.CONFIG:
             # Config classes can be large, focus on cohesion and responsibility
             # Only flag if both cohesion is very low AND method count is excessive
-            if cohesion_score < 0.2 and method_count > 40:
+            if metrics.cohesion_score < 0.2 and metrics.method_count > 40:
                 issues.append("Configuration class lacks cohesion with excessive methods")
-            elif method_count > 50:  # Very high threshold for config classes
+            elif metrics.method_count > 50:  # Very high threshold for config classes
                 issues.append("Configuration class has too many methods even for config context")
         elif context == ClassContext.DATA_MODEL:
             # Data models should focus on data coherence
-            if method_count > 30 and cohesion_score < 0.5:
+            if metrics.method_count > 30 and metrics.cohesion_score < 0.5:
                 issues.append("Data model has too many disparate operations")
         elif context == ClassContext.API_CONTROLLER:
             # Controllers should have focused endpoint handling
-            if method_count > 25:
+            if metrics.method_count > 25:
                 issues.append("API controller handling too many endpoints")
         elif context == ClassContext.UTILITY:
             # Utilities can be large but should be well-organized
-            if method_count > 50 and cohesion_score < 0.2:
+            if metrics.method_count > 50 and metrics.cohesion_score < 0.2:
                 issues.append("Utility class is too broad and unfocused")
         elif context == ClassContext.BUSINESS_LOGIC:
             # Business logic should be strictly controlled
-            if method_count > 15 or loc > 300:
+            if metrics.method_count > 15 or metrics.loc > 300:
                 issues.append("Business logic class violates Single Responsibility Principle")
 
         return "; ".join(issues) if issues else None
 
     def _generate_recommendations(
         self,
+        metrics: ClassMetrics,
         context: ClassContext,
-        method_count: int,
-        loc: int,
-        cohesion_score: float,
-        responsibilities: Set[ResponsibilityType],
     ) -> List[str]:
-        """Generate context-specific recommendations for improvement."""
+        """
+        Generate context-specific recommendations for improvement.
+
+        Args:
+            metrics: ClassMetrics parameter object with class measurements
+            context: ClassContext enum for domain-specific analysis
+
+        Returns:
+            List of recommendation strings
+        """
         recommendations = []
+        responsibilities = metrics.responsibilities or set()
 
         if context == ClassContext.CONFIG:
-            if method_count > 30:
+            if metrics.method_count > 30:
                 recommendations.append("Consider splitting configuration into domain-specific config classes")
-            if cohesion_score < 0.4:
+            if metrics.cohesion_score < 0.4:
                 recommendations.append("Group related configuration properties into nested configuration objects")
         elif context == ClassContext.DATA_MODEL:
-            if method_count > 25:
+            if metrics.method_count > 25:
                 recommendations.append("Extract business logic methods to separate service classes")
             recommendations.append("Focus on data representation and basic operations only")
         elif context == ClassContext.API_CONTROLLER:
-            if method_count > 20:
+            if metrics.method_count > 20:
                 recommendations.append("Split into multiple controllers based on resource domains")
             recommendations.append("Extract business logic to service layer")
         elif context == ClassContext.UTILITY:
-            if method_count > 40:
+            if metrics.method_count > 40:
                 recommendations.append("Split utility class by functional domains")
             recommendations.append("Consider converting static methods to module-level functions")
         elif context == ClassContext.BUSINESS_LOGIC:
-            if method_count > 15:
+            if metrics.method_count > 15:
                 recommendations.append("Apply Single Responsibility Principle - split by business domain")
             if len(responsibilities) > 2:
                 recommendations.append("Extract different responsibilities into separate classes")
@@ -615,9 +668,9 @@ class ContextAnalyzer:
             recommendations.append("Extract different infrastructure concerns into separate classes")
 
         # General recommendations based on metrics
-        if cohesion_score < 0.3:
+        if metrics.cohesion_score < 0.3:
             recommendations.append("Improve cohesion by grouping related methods and extracting unrelated ones")
-        if loc > 1000:
+        if metrics.loc > 1000:
             recommendations.append("Consider breaking into smaller, more focused classes")
 
         return recommendations

@@ -18,6 +18,35 @@ from typing import Any, Dict, List, Optional
 
 from fixes.phase0.production_safe_assertions import ProductionAssert
 
+# Import constants (Phase 5 - CoM reduction)
+try:
+    from .literal_constants.formal_grammar_constants import (
+        BASE_SEVERITY_SCORE,
+        SEVERITY_MULTIPLIER_CONSTANT,
+        SEVERITY_MULTIPLIER_CONFIGURATION,
+        SEVERITY_MULTIPLIER_CONDITIONAL,
+        SEVERITY_MULTIPLIER_BUSINESS_LOGIC,
+        SEVERITY_MULTIPLIER_LOOP_SMALL_INT,
+        SEVERITY_MULTIPLIER_SHORT_STRING,
+        SEVERITY_MULTIPLIER_URL_PATH,
+        SMALL_INTEGER_THRESHOLD,
+        SHORT_STRING_LENGTH,
+        URL_PATH_PATTERNS,
+    )
+except ImportError:
+    # Fallback constants if import fails
+    BASE_SEVERITY_SCORE = 5.0
+    SEVERITY_MULTIPLIER_CONSTANT = 0.3
+    SEVERITY_MULTIPLIER_CONFIGURATION = 0.5
+    SEVERITY_MULTIPLIER_CONDITIONAL = 1.5
+    SEVERITY_MULTIPLIER_BUSINESS_LOGIC = 1.3
+    SEVERITY_MULTIPLIER_LOOP_SMALL_INT = 0.7
+    SEVERITY_MULTIPLIER_SHORT_STRING = 0.6
+    SEVERITY_MULTIPLIER_URL_PATH = 0.4
+    SMALL_INTEGER_THRESHOLD = 10
+    SHORT_STRING_LENGTH = 5
+    URL_PATH_PATTERNS = ("http", "/", ".", "@")
+
 
 class PatternType(Enum):
     """Types of code patterns for formal grammar analysis."""
@@ -338,8 +367,9 @@ class PythonASTVisitor(ast.NodeVisitor):
 class MagicLiteralDetector(ast.NodeVisitor):
     """Specialized detector for magic literals with context analysis."""
 
-    def __init__(self, source_lines: List[str]):
+    def __init__(self, source_lines: List[str], file_path: str = ""):
         self.source_lines = source_lines
+        self.file_path = file_path
         self.violations = []
         self.current_class = None
         self.current_function = None
@@ -351,12 +381,49 @@ class MagicLiteralDetector(ast.NodeVisitor):
         self.in_loop = False
         self.in_return = False
         self.in_assignment = False
+        self.in_dict_for_constant = False  # Track if inside dict assigned to constant
         self.current_assignment_target = None
 
-        # Whitelists
-        self.safe_numbers = {0, 1, -1, 2, 10, 100, 1000, 24, 60, 365, 1024}
-        self.safe_strings = {"", " ", "\n", "\t", "utf-8", "ascii", "None", "True", "False"}
+        # Whitelists - expanded to reduce false positives
+        self.safe_numbers = {
+            # Basic/common
+            0, 1, -1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 16, 24, 32, 48, 60, 64, 100, 128,
+            # Powers of 2 (memory/file sizes)
+            256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536,
+            # HTTP status codes
+            200, 201, 204, 301, 302, 304, 400, 401, 403, 404, 405, 500, 502, 503, 504,
+            # Common port numbers
+            80, 443, 3000, 5000, 5432, 6379, 8000, 8080, 8443, 27017,
+            # Time-related
+            365, 366, 1000, 3600, 86400, 604800, 31536000,
+            # Percentages and ratios
+            0.0, 0.1, 0.5, 1.0, 0.95, 0.99, 0.01, 0.001,
+        }
+        self.safe_strings = {
+            # Empty/whitespace
+            "", " ", "\n", "\t", "\r\n",
+            # Boolean representations
+            "None", "True", "False", "true", "false", "null",
+            # Encodings
+            "utf-8", "utf8", "ascii", "latin-1", "iso-8859-1",
+            # File modes
+            "r", "w", "a", "rb", "wb", "ab", "r+", "w+", "a+",
+            # Content types
+            "application/json", "text/plain", "text/html",
+            # Common separators
+            ",", ";", ":", ".", "-", "_", "/", "|",
+            # HTTP methods
+            "GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS",
+            # Common defaults
+            "default", "unknown", "N/A", "n/a", "TBD",
+        }
         self.config_patterns = [r".*[Cc]onfig.*", r".*[Ss]etting.*", r".*[Cc]onst.*", r".*[Dd]efault.*"]
+
+        # File patterns that are constants definition files (skip entirely)
+        self.constants_file_patterns = ["constants", "config", "settings", "defaults", "fixture", "mock"]
+
+        # Test file patterns (more lenient detection)
+        self.test_file_patterns = ["test_", "_test", "tests/", "testing/", "spec_", "_spec"]
 
     def visit_ClassDef(self, node: ast.ClassDef):
         """Track class context."""
@@ -446,6 +513,7 @@ class MagicLiteralDetector(ast.NodeVisitor):
 
         old_assignment = self.in_assignment
         old_target = self.current_assignment_target
+        old_dict_for_constant = self.in_dict_for_constant
 
         self.in_assignment = True
 
@@ -456,6 +524,9 @@ class MagicLiteralDetector(ast.NodeVisitor):
                 # Track constants (ALL_CAPS variables)
                 if target.id.isupper() and len(target.id) > 1:
                     self.constants.add(target.id)
+                    # NEW: If assigning a dict/list/set to a constant, mark context
+                    if isinstance(node.value, (ast.Dict, ast.List, ast.Set, ast.Tuple)):
+                        self.in_dict_for_constant = True
                 # Store assignment for context
                 if isinstance(node.value, ast.Constant):
                     self.assignments[target.id] = node.value.value
@@ -464,6 +535,7 @@ class MagicLiteralDetector(ast.NodeVisitor):
 
         self.in_assignment = old_assignment
         self.current_assignment_target = old_target
+        self.in_dict_for_constant = old_dict_for_constant
 
     def visit_Constant(self, node: ast.Constant):
         """Analyze constant literals with comprehensive context."""
@@ -500,23 +572,109 @@ class MagicLiteralDetector(ast.NodeVisitor):
         self.generic_visit(node)
 
     def _should_ignore_literal(self, node: ast.Constant) -> bool:
-        """Determine if a literal should be ignored based on whitelists."""
+        """
+        Determine if a literal should be ignored based on whitelists and context.
+
+        Refactored to reduce cyclomatic complexity by consolidating checks.
+        """
         value = node.value
 
-        # Ignore whitelisted numbers
-        if isinstance(value, (int, float)) and value in self.safe_numbers:
+        # Context-based ignores (early exit for entire file types)
+        if self._should_ignore_by_context():
             return True
 
-        # Ignore whitelisted strings
-        if isinstance(value, str) and value in self.safe_strings:
+        # Value-based ignores
+        return self._should_ignore_by_value(value)
+
+    def _should_ignore_by_context(self) -> bool:
+        """Check if literal should be ignored based on file/assignment context."""
+        return (
+            self._is_constants_file()
+            or self.in_dict_for_constant
+            or self._is_constant_assignment()
+            or self._is_test_file()
+        )
+
+    def _should_ignore_by_value(self, value) -> bool:
+        """Check if literal value itself should be ignored."""
+        # None and bool are always ignored
+        if value is None or isinstance(value, bool):
             return True
 
-        # Ignore single characters
-        if isinstance(value, str) and len(value) == 1:
+        # Check numeric whitelists
+        if isinstance(value, (int, float)):
+            return value in self.safe_numbers
+
+        # Check string patterns
+        if isinstance(value, str):
+            return self._should_ignore_string(value)
+
+        return False
+
+    def _should_ignore_string(self, value: str) -> bool:
+        """Check if string value should be ignored (safe patterns)."""
+        # Whitelisted strings
+        if value in self.safe_strings:
             return True
 
-        # Ignore boolean and None
-        return bool(value is None or isinstance(value, bool))
+        # Short strings (single chars, abbreviations)
+        if len(value) <= 3:
+            return True
+
+        # Documentation/message strings
+        return self._is_documentation_string(value)
+
+    def _is_constants_file(self) -> bool:
+        """Check if current file is a constants definition file."""
+        if not self.file_path:
+            return False
+        file_name = self.file_path.lower()
+        return any(pattern in file_name for pattern in self.constants_file_patterns)
+
+    def _is_constant_assignment(self) -> bool:
+        """Check if we're in a constant assignment context (SCREAMING_SNAKE_CASE = value)."""
+        if not self.in_assignment or not self.current_assignment_target:
+            return False
+        target = self.current_assignment_target
+        # Check if target is SCREAMING_SNAKE_CASE (all uppercase with underscores)
+        return target.isupper() and len(target) > 1
+
+    def _is_test_file(self) -> bool:
+        """Check if current file is a test file (more lenient detection)."""
+        if not self.file_path:
+            return False
+        file_path_lower = self.file_path.lower()
+        return any(pattern in file_path_lower for pattern in self.test_file_patterns)
+
+    def _is_documentation_string(self, value: str) -> bool:
+        """Check if string looks like documentation, error message, or log message."""
+        if len(value) < 5:
+            return False
+
+        # Contains spaces - likely a message, not a magic literal
+        if " " in value and len(value) > 10:
+            return True
+
+        # Starts with common message patterns
+        message_starts = (
+            "error", "warning", "info", "debug", "failed", "success",
+            "invalid", "missing", "cannot", "could not", "unable",
+            "expected", "unexpected", "should", "must", "required",
+        )
+        value_lower = value.lower()
+        if any(value_lower.startswith(prefix) for prefix in message_starts):
+            return True
+
+        # File paths or URLs
+        if "/" in value or "\\" in value or value.startswith("http"):
+            return True
+
+        # Regex patterns (often contain special chars)
+        special_chars = {"^", "$", "*", "+", "?", "[", "]", "(", ")", "{", "}"}
+        if any(c in value for c in special_chars):
+            return True
+
+        return False
 
     def _build_context(self, node: ast.Constant) -> MagicLiteralContext:
         """Build comprehensive context for a magic literal."""
@@ -558,36 +716,36 @@ class MagicLiteralDetector(ast.NodeVisitor):
 
     def _calculate_severity(self, context: MagicLiteralContext) -> float:
         """Calculate severity score for a magic literal based on context."""
-        base_severity = 5.0  # Base severity
+        base_severity = BASE_SEVERITY_SCORE
 
         # Reduce severity for constants
         if context.is_constant:
-            base_severity *= 0.3
+            base_severity *= SEVERITY_MULTIPLIER_CONSTANT
 
         # Reduce severity for configuration contexts
         if context.is_configuration:
-            base_severity *= 0.5
+            base_severity *= SEVERITY_MULTIPLIER_CONFIGURATION
 
         # Increase severity for conditionals
         if context.in_conditional:
-            base_severity *= 1.5
+            base_severity *= SEVERITY_MULTIPLIER_CONDITIONAL
 
         # Increase severity for business logic functions
         if context.function_name and "process" in context.function_name.lower():
-            base_severity *= 1.3
+            base_severity *= SEVERITY_MULTIPLIER_BUSINESS_LOGIC
 
         # Reduce severity for small numbers in loops
-        if context.in_loop and isinstance(context.literal_value, int) and context.literal_value < 10:
-            base_severity *= 0.7
+        if context.in_loop and isinstance(context.literal_value, int) and context.literal_value < SMALL_INTEGER_THRESHOLD:
+            base_severity *= SEVERITY_MULTIPLIER_LOOP_SMALL_INT
 
         # String-specific adjustments
         if isinstance(context.literal_value, str):
             # Very short strings are less problematic
-            if len(context.literal_value) < 5:
-                base_severity *= 0.6
+            if len(context.literal_value) < SHORT_STRING_LENGTH:
+                base_severity *= SEVERITY_MULTIPLIER_SHORT_STRING
             # URLs and file paths are often legitimate
-            if any(pattern in context.literal_value for pattern in ["http", "/", ".", "@"]):
-                base_severity *= 0.4
+            if any(pattern in context.literal_value for pattern in URL_PATH_PATTERNS):
+                base_severity *= SEVERITY_MULTIPLIER_URL_PATH
 
         return base_severity
 

@@ -68,7 +68,8 @@ class MagicLiteralDetector(DetectorBase):
         try:
             from analyzer.formal_grammar import MagicLiteralDetector as FormalDetector
 
-            detector = FormalDetector(self.source_lines)
+            # Pass file_path to enable constants file detection
+            detector = FormalDetector(self.source_lines, self.file_path)
             detector.current_class = self.current_class
             detector.current_function = self.current_function
 

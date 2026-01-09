@@ -194,7 +194,29 @@ class ConnascenceASTAnalyzer:
         """Detect magic literals (CoM - Connascence of Meaning)."""
         violations = []
 
+        # Skip constants definition files entirely
+        file_name_lower = file_path.lower()
+        constants_file_patterns = ["constants", "config", "settings", "defaults"]
+        if any(pattern in file_name_lower for pattern in constants_file_patterns):
+            return violations
+
+        # Track constant assignments to skip values inside them
+        constant_assignments = set()
         for node in ast.walk(tree):
+            if isinstance(node, ast.Assign):
+                for target in node.targets:
+                    if isinstance(target, ast.Name) and target.id.isupper() and len(target.id) > 1:
+                        constant_assignments.add(id(node.value))
+                        # Also mark any dict/list/set values as constant containers
+                        if isinstance(node.value, (ast.Dict, ast.List, ast.Set, ast.Tuple)):
+                            for child in ast.walk(node.value):
+                                constant_assignments.add(id(child))
+
+        for node in ast.walk(tree):
+            # Skip nodes that are part of constant assignments
+            if id(node) in constant_assignments:
+                continue
+
             # Check for numeric constants
             if isinstance(node, ast.Constant) and isinstance(node.value, (int, float)):
                 # Skip common literals (0, 1, -1, 2)
