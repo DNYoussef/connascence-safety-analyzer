@@ -230,56 +230,140 @@ class UnifiedQualityGate:
     def _run_connascence_analyzer(self, project_path: Path) -> None:
         """
         Run Connascence Analyzer.
-
-        TODO: Integrate with existing connascence_analyzer module
-        This should import and use the actual analyzer.
         """
         print("[Connascence Analyzer] Starting analysis...")
 
-        # Placeholder: This would invoke the actual connascence analyzer
-        # Import from analyzer module when integrated
-        sample_violations = [
-            Violation(
-                rule_id="CON_GOD_OBJECT",
-                message="Class has 26 methods (threshold: 15)",
-                file=str(project_path / "module.py"),
-                line=10,
-                severity="high",
-                category="design",
-                connascence_type="CoC (Connascence of Complexity)",
-                fix_suggestion="Split into focused classes following SRP",
-                source_analyzer="connascence_analyzer",
+        try:
+            from analyzer.connascence_analyzer import ConnascenceAnalyzer
+        except Exception as e:
+            print(
+                f"[Connascence Analyzer] Skipped - import failed: {e}"
             )
-        ]
+            return
 
-        self.results.violations.extend(sample_violations)
-        print(f"[Connascence Analyzer] Found {len(sample_violations)} violations")
+        analyzer = ConnascenceAnalyzer()
+        violations_found = 0
+
+        for file_path in project_path.rglob("*.py"):
+            try:
+                source_code = file_path.read_text(encoding="utf-8")
+            except Exception:
+                continue
+
+            try:
+                analyze_fn = getattr(analyzer, "analyze", None)
+                if analyze_fn:
+                    raw_violations = analyze_fn(source_code, str(file_path))
+                else:
+                    analyze_file_fn = getattr(analyzer, "analyze_file", None)
+                    if analyze_file_fn:
+                        raw_violations = analyze_file_fn(file_path)
+                    else:
+                        continue
+            except Exception:
+                continue
+
+            violation_dicts = []
+            for violation in raw_violations or []:
+                if isinstance(violation, dict):
+                    violation_dicts.append(violation)
+                elif hasattr(violation, "to_dict"):
+                    violation_dicts.append(violation.to_dict())
+                else:
+                    violation_dicts.append(vars(violation))
+
+            for v in violation_dicts:
+                violation = Violation(
+                    rule_id=v.get("rule_id") or v.get("type") or "CONNASCENCE",
+                    message=v.get("description")
+                    or v.get("message")
+                    or v.get("type")
+                    or "Connascence violation detected",
+                    file=v.get("file_path") or str(file_path),
+                    line=v.get("line_number", v.get("line", 0)),
+                    column=v.get("column"),
+                    severity=v.get("severity", "medium"),
+                    category=v.get("category", "design"),
+                    code_snippet=v.get("code_snippet"),
+                    fix_suggestion=v.get("recommendation")
+                    or v.get("fix_suggestion"),
+                    connascence_type=v.get("connascence_type") or v.get("type"),
+                    source_analyzer="connascence_analyzer",
+                )
+                self.results.violations.append(violation)
+                violations_found += 1
+
+        print(f"[Connascence Analyzer] Found {violations_found} violations")
 
     def _run_nasa_standards(self, project_path: Path) -> None:
         """
         Run NASA Standards compliance check.
-
-        TODO: Integrate with NASA standards checking module
         """
         print("[NASA Standards] Starting compliance check...")
 
-        # Placeholder: This would invoke actual NASA standards checker
-        sample_violations = [
-            Violation(
-                rule_id="NASA_JPL_4",
-                message="Function exceeds 60 lines",
-                file=str(project_path / "critical.py"),
-                line=100,
-                severity="high",
-                category="reliability",
-                nasa_mapping="NASA JPL Rule 4",
-                fix_suggestion="Refactor to meet NASA JPL standards",
-                source_analyzer="nasa_standards",
+        try:
+            from analyzer.nasa_engine.nasa_analyzer import NASAAnalyzer
+        except Exception as e:
+            print(
+                f"[NASA Standards] Skipped - import failed: {e}"
             )
-        ]
+            return
 
-        self.results.violations.extend(sample_violations)
-        print(f"[NASA Standards] Found {len(sample_violations)} violations")
+        analyzer = NASAAnalyzer()
+        violations_found = 0
+
+        for file_path in project_path.rglob("*.py"):
+            try:
+                source_code = file_path.read_text(encoding="utf-8")
+            except Exception:
+                continue
+
+            try:
+                analyze_fn = getattr(analyzer, "analyze", None)
+                if analyze_fn:
+                    raw_violations = analyze_fn(source_code)
+                else:
+                    analyze_file_fn = getattr(analyzer, "analyze_file", None)
+                    if analyze_file_fn:
+                        raw_violations = analyze_file_fn(
+                            str(file_path), source_code=source_code
+                        )
+                    else:
+                        continue
+            except Exception:
+                continue
+
+            violation_dicts = []
+            for violation in raw_violations or []:
+                if isinstance(violation, dict):
+                    violation_dicts.append(violation)
+                elif hasattr(violation, "to_dict"):
+                    violation_dicts.append(violation.to_dict())
+                else:
+                    violation_dicts.append(vars(violation))
+
+            for v in violation_dicts:
+                violation = Violation(
+                    rule_id=v.get("rule_id") or v.get("type") or "NASA_RULE",
+                    message=v.get("description")
+                    or v.get("message")
+                    or v.get("type")
+                    or "NASA standards violation detected",
+                    file=v.get("file_path") or str(file_path),
+                    line=v.get("line_number", v.get("line", 0)),
+                    column=v.get("column"),
+                    severity=v.get("severity", "medium"),
+                    category=v.get("category", "reliability"),
+                    code_snippet=v.get("code_snippet"),
+                    fix_suggestion=v.get("recommendation")
+                    or v.get("fix_suggestion"),
+                    nasa_mapping=v.get("nasa_mapping") or v.get("type"),
+                    source_analyzer="nasa_standards",
+                )
+                self.results.violations.append(violation)
+                violations_found += 1
+
+        print(f"[NASA Standards] Found {violations_found} violations")
 
     def _calculate_metrics(self) -> None:
         """Calculate quality metrics from violations"""

@@ -191,7 +191,7 @@ class MECEAnalyzer:
         normalized = self._normalize_code(content)
 
         # Create hash signature
-        hash_sig = hashlib.md5(normalized.encode()).hexdigest()[:16]
+        hash_sig = hashlib.sha256(normalized.encode()).hexdigest()[:16]
 
         return CodeBlock(
             file_path=str(file_path),
