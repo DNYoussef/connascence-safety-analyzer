@@ -280,15 +280,15 @@ def main():
     if args.enrich_licenses:
         generator.enrich_with_licenses()
 
-    print(f"Found {len(generator.components)} components")
+    logger.info("Found %s components", len(generator.components))
 
     if args.format in ["cyclonedx", "both"]:
         generator.generate_cyclonedx(args.output_cyclonedx)
-        print(f"CycloneDX SBOM: {args.output_cyclonedx}")
+        logger.info("CycloneDX SBOM: %s", args.output_cyclonedx)
 
     if args.format in ["spdx", "both"]:
         generator.generate_spdx(args.output_spdx)
-        print(f"SPDX SBOM: {args.output_spdx}")
+        logger.info("SPDX SBOM: %s", args.output_spdx)
 
 
 if __name__ == "__main__":

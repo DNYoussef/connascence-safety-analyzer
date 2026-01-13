@@ -8,6 +8,7 @@ import ast
 from dataclasses import dataclass
 import hashlib
 import json
+import logging
 from pathlib import Path
 import sys
 from typing import Any, Dict, List
@@ -18,26 +19,9 @@ from constants import MECE_CLUSTER_MIN_SIZE, MECE_SIMILARITY_THRESHOLD
 
 # Fixed: Import ConnascenceViolation from utils instead of missing mcp.server
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
-try:
-    from utils.types import ConnascenceViolation
-except ImportError:
-    # Ultimate fallback - should not happen with consolidated approach
-    try:
-        from utils.config_loader import ConnascenceViolation
-    except ImportError:
-        # Emergency fallback
-        from dataclasses import dataclass
+from utils.types import ConnascenceViolation
 
-        @dataclass
-        class ConnascenceViolation:
-            """Emergency fallback ConnascenceViolation for MECE analysis."""
-
-            type: str = ""
-            severity: str = "medium"
-            description: str = ""
-            file_path: str = ""
-            line_number: int = 0
-            column: int = 0
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -65,8 +49,9 @@ class DuplicationCluster:
 class MECEAnalyzer:
     """MECE duplication analyzer for detecting real code duplication and overlap."""
 
-    def __init__(self, threshold: float = MECE_SIMILARITY_THRESHOLD):
+    def __init__(self, threshold: float = MECE_SIMILARITY_THRESHOLD, include_same_file: bool = False):
         self.threshold = threshold
+        self.include_same_file = include_same_file
         self.min_lines = 3  # Minimum lines for a code block to be considered
         self.min_cluster_size = MECE_CLUSTER_MIN_SIZE
 
@@ -174,7 +159,7 @@ class MECEAnalyzer:
                         blocks.append(block)
 
         except (SyntaxError, UnicodeDecodeError) as e:
-            print(f"Warning: Could not parse {file_path}: {e}")
+            logger.warning("Could not parse %s: %s", file_path, e)
 
         return blocks
 
@@ -191,7 +176,7 @@ class MECEAnalyzer:
         normalized = self._normalize_code(content)
 
         # Create hash signature
-        hash_sig = hashlib.md5(normalized.encode()).hexdigest()[:16]
+        hash_sig = hashlib.sha256(normalized.encode()).hexdigest()[:16]
 
         return CodeBlock(
             file_path=str(file_path),
@@ -269,10 +254,15 @@ class MECEAnalyzer:
 
     def _calculate_similarity(self, block1: CodeBlock, block2: CodeBlock) -> float:
         """Calculate similarity between two code blocks."""
-        # Don't compare blocks from the same file
-        if block1.file_path == block2.file_path:
+        if (
+            not self.include_same_file
+            and block1.file_path == block2.file_path
+        ):
             return 0.0
-
+        if block1.file_path == block2.file_path and (
+            block1.start_line == block2.start_line and block1.end_line == block2.end_line
+        ):
+            return 0.0
         # Use normalized content for comparison
         content1 = block1.normalized_content
         content2 = block2.normalized_content
@@ -300,15 +290,6 @@ class MECEAnalyzer:
         for i, block1 in enumerate(blocks):
             for block2 in blocks[i + 1 :]:
                 similarity = self._calculate_similarity(block1, block2)
-                # For blocks in the same cluster, use their actual similarity
-                if similarity == 0.0:  # Same file check failed, recalculate
-                    tokens1 = set(block1.normalized_content.split())
-                    tokens2 = set(block2.normalized_content.split())
-                    if tokens1 and tokens2:
-                        intersection = len(tokens1 & tokens2)
-                        union = len(tokens1 | tokens2)
-                        similarity = intersection / union if union > 0 else 0.0
-
                 total_similarity += similarity
                 comparisons += 1
 
@@ -354,11 +335,13 @@ class MECEAnalyzer:
 
     def _should_analyze_file(self, file_path: Path) -> bool:
         """Check if a file should be analyzed."""
-        # Skip test files, __pycache__, etc.
-        skip_patterns = ["__pycache__", ".git", ".pytest_cache", "test_", "_test.py"]
-
-        path_str = str(file_path)
-        return not any(pattern in path_str for pattern in skip_patterns)
+        # Skip if in test directory
+        if "tests" in file_path.parts or "test" in file_path.parts:
+            return False
+        # Skip if filename starts with test_
+        if file_path.name.startswith("test_"):
+            return False
+        return True
 
 
 def main():
@@ -380,11 +363,11 @@ def main():
             with open(args.output, "w") as f:
                 json.dump(result, f, indent=2)
         else:
-            print(json.dumps(result, indent=2))
+            logger.info("%s", json.dumps(result, indent=2))
 
         return 0
     except Exception as e:
-        print(f"Error: {e}", file=sys.stderr)
+        logger.error("Error: %s", e)
         return 1
 
 

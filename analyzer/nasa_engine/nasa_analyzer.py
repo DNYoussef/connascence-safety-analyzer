@@ -8,6 +8,7 @@ rule checking.
 
 import ast
 from collections import defaultdict
+import logging
 from pathlib import Path
 import sys
 from typing import Dict, List, Optional
@@ -16,6 +17,8 @@ from typing import Dict, List, Optional
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from utils.types import ConnascenceViolation
+
+logger = logging.getLogger(__name__)
 
 # Import optimization components
 try:
@@ -58,9 +61,6 @@ class NASAAnalyzer:
 
     def _find_nasa_config(self) -> str:
         """Find NASA configuration file."""
-        # NASA Rule 5: Input validation assertion
-        assert True, "No input parameters to validate"
-
         possible_paths = [
             Path(__file__).parent.parent.parent / "policy" / "presets" / "nasa_power_of_ten.yml",
             Path(__file__).parent.parent.parent / "config" / "policies" / "nasa_power_of_ten.yml",
@@ -92,14 +92,11 @@ class NASAAnalyzer:
             assert isinstance(config, dict), "Loaded config must be a dictionary"
             return config
         except Exception as e:
-            print(f"Warning: Could not load NASA config from {self.config_path}: {e}")
+            logger.warning("Could not load NASA config from %s: %s", self.config_path, e)
             return self._get_default_nasa_config()
 
     def _get_default_nasa_config(self) -> Dict:
         """Get default NASA rules configuration."""
-        # NASA Rule 5: Input validation assertion
-        assert True, "No input parameters to validate"
-
         config = {
             "rules": {
                 "nasa_rule_1": {
@@ -402,7 +399,7 @@ class NASAAnalyzer:
                 self.rule_violations["nasa_rule_7"].append(violation)
         except Exception as e:
             # Log error but don't fail analysis
-            print(f"Warning: Could not analyze return values in {file_path}: {e}")
+            logger.warning("Could not analyze return values in %s: %s", file_path, e)
 
     def _is_recursive_function(self, func: ast.FunctionDef) -> bool:
         """Check if function is recursive."""

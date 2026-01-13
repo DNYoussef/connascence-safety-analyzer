@@ -5,11 +5,14 @@ AST-based analyzer orchestrator for god object detection and other complex analy
 
 import argparse
 import json
+import logging
 from pathlib import Path
 import sys
 from typing import List, Union
 
 from utils.types import ConnascenceViolation
+
+logger = logging.getLogger(__name__)
 
 
 class GodObjectAnalyzer:
@@ -35,7 +38,7 @@ class GodObjectAnalyzer:
                 try:
                     violations.extend(self._analyze_file(py_file))
                 except Exception as e:
-                    print(f"Warning: Failed to analyze {py_file}: {e}")
+                    logger.warning("Failed to analyze %s: %s", py_file, e)
 
         return violations
 
@@ -69,7 +72,7 @@ class GodObjectAnalyzer:
                             )
                         )
         except Exception as e:
-            print(f"Error analyzing {file_path}: {e}")
+            logger.error("Error analyzing %s: %s", file_path, e)
 
         return violations
 
@@ -103,7 +106,7 @@ class AnalyzerOrchestrator:
             god_violations = god_object_analyzer.analyze_path(path)
             violations.extend(god_violations)
         except Exception as e:
-            print(f"Warning: God object analysis failed: {e}")
+            logger.warning("God object analysis failed: %s", e)
 
         return violations
 
@@ -155,11 +158,11 @@ def main():
             with open(args.output, "w") as f:
                 json.dump(result, f, indent=2)
         else:
-            print(json.dumps(result, indent=2))
+            logger.info("%s", json.dumps(result, indent=2))
 
         return 0
     except Exception as e:
-        print(f"Error: {e}", file=sys.stderr)
+        logger.error("Error: %s", e)
         return 1
 
 

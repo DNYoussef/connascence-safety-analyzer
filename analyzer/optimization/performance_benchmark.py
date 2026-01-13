@@ -7,10 +7,13 @@ Measures I/O reduction, cache hit rates, and analysis speed improvements.
 """
 
 from contextlib import contextmanager
+import logging
 from pathlib import Path
 import statistics
 import time
 from typing import Dict, Optional
+
+logger = logging.getLogger(__name__)
 
 # Import optimization components
 try:
@@ -20,7 +23,7 @@ try:
     COMPONENTS_AVAILABLE = True
 except ImportError:
     COMPONENTS_AVAILABLE = False
-    print("Warning: Optimization components not available for benchmarking")
+    logger.warning("Optimization components not available for benchmarking")
 
 # Import streaming components
 try:
@@ -35,7 +38,7 @@ try:
     STREAMING_AVAILABLE = True
 except ImportError:
     STREAMING_AVAILABLE = False
-    print("Warning: Streaming components not available for benchmarking")
+    logger.warning("Streaming components not available for benchmarking")
 
 
 @contextmanager
@@ -55,8 +58,8 @@ class PerformanceBenchmark:
 
     def run_full_benchmark(self) -> Dict[str, Dict]:
         """Run complete benchmark suite."""
-        print("Starting Performance Benchmark Suite")
-        print("=" * 50)
+        logger.info("Starting Performance Benchmark Suite")
+        logger.info("%s", "=" * 50)
 
         # Clear cache before starting
         if COMPONENTS_AVAILABLE:
@@ -89,7 +92,7 @@ class PerformanceBenchmark:
 
     def benchmark_file_discovery(self):
         """Benchmark file discovery operations."""
-        print("\n1. Benchmarking File Discovery...")
+        logger.info("1. Benchmarking File Discovery...")
 
         test_path = Path(self.test_directory)
 
@@ -127,20 +130,20 @@ class PerformanceBenchmark:
             "io_reduction": "67%" if COMPONENTS_AVAILABLE else "0%",
         }
 
-        print(f"  Traditional: {avg_traditional*1000:.2f}ms")
-        print(f"  Optimized:   {avg_optimized*1000:.2f}ms")
-        print(f"  Improvement: {improvement:.1f}%")
+        logger.info("  Traditional: %.2fms", avg_traditional * 1000)
+        logger.info("  Optimized:   %.2fms", avg_optimized * 1000)
+        logger.info("  Improvement: %.1f%%", improvement)
 
     def benchmark_file_reading(self):
         """Benchmark file reading operations."""
-        print("\n2. Benchmarking File Reading...")
+        logger.info("2. Benchmarking File Reading...")
 
         # Get sample files
         test_path = Path(self.test_directory)
         python_files = list(test_path.rglob("*.py"))[:10]  # Sample 10 files
 
         if not python_files:
-            print("  No Python files found for benchmarking")
+            logger.warning("  No Python files found for benchmarking")
             return
 
         # Traditional approach (direct file I/O)
@@ -179,20 +182,20 @@ class PerformanceBenchmark:
             "files_tested": len(python_files),
         }
 
-        print(f"  Traditional: {avg_traditional*1000:.2f}ms ({len(python_files)} files)")
-        print(f"  Optimized:   {avg_optimized*1000:.2f}ms")
-        print(f"  Improvement: {improvement:.1f}%")
+        logger.info("  Traditional: %.2fms (%s files)", avg_traditional * 1000, len(python_files))
+        logger.info("  Optimized:   %.2fms", avg_optimized * 1000)
+        logger.info("  Improvement: %.1f%%", improvement)
 
     def benchmark_ast_parsing(self):
         """Benchmark AST parsing operations."""
-        print("\n3. Benchmarking AST Parsing...")
+        logger.info("3. Benchmarking AST Parsing...")
 
         # Get sample files
         test_path = Path(self.test_directory)
         python_files = list(test_path.rglob("*.py"))[:5]  # Sample 5 files
 
         if not python_files:
-            print("  No Python files found for AST benchmarking")
+            logger.warning("  No Python files found for AST benchmarking")
             return
 
         # Traditional approach
@@ -232,16 +235,16 @@ class PerformanceBenchmark:
             "files_parsed": len(python_files),
         }
 
-        print(f"  Traditional: {avg_traditional*1000:.2f}ms ({len(python_files)} files)")
-        print(f"  Optimized:   {avg_optimized*1000:.2f}ms")
-        print(f"  Improvement: {improvement:.1f}%")
+        logger.info("  Traditional: %.2fms (%s files)", avg_traditional * 1000, len(python_files))
+        logger.info("  Optimized:   %.2fms", avg_optimized * 1000)
+        logger.info("  Improvement: %.1f%%", improvement)
 
     def benchmark_full_analysis(self):
         """Benchmark full analysis pipeline."""
-        print("\n4. Benchmarking Full Analysis Pipeline...")
+        logger.info("4. Benchmarking Full Analysis Pipeline...")
 
         if not COMPONENTS_AVAILABLE:
-            print("  Unified analyzer not available")
+            logger.warning("  Unified analyzer not available")
             return
 
         test_path = Path(self.test_directory)
@@ -274,7 +277,7 @@ class PerformanceBenchmark:
             times_with_cache.append(timer())
 
         except Exception as e:
-            print(f"  Analysis benchmark failed: {e}")
+            logger.warning("  Analysis benchmark failed: %s", e)
             return
 
         if times_without_cache and times_with_cache:
@@ -289,18 +292,18 @@ class PerformanceBenchmark:
                 "violations_found": getattr(result_with_cache, "total_violations", 0),
             }
 
-            print(f"  Without Cache: {avg_without*1000:.2f}ms")
-            print(f"  With Cache:    {avg_with*1000:.2f}ms")
-            print(f"  Improvement:   {improvement:.1f}%")
+            logger.info("  Without Cache: %.2fms", avg_without * 1000)
+            logger.info("  With Cache:    %.2fms", avg_with * 1000)
+            logger.info("  Improvement:   %.1f%%", improvement)
         else:
-            print("  Insufficient data for comparison")
+            logger.warning("  Insufficient data for comparison")
 
     def analyze_cache_performance(self):
         """Analyze cache performance metrics."""
-        print("\n5. Cache Performance Analysis...")
+        logger.info("5. Cache Performance Analysis...")
 
         if not COMPONENTS_AVAILABLE:
-            print("  Cache not available")
+            logger.warning("  Cache not available")
             return
 
         cache = get_global_cache()
@@ -318,19 +321,19 @@ class PerformanceBenchmark:
             "ast_trees_cached": memory_usage["ast_cache_count"],
         }
 
-        print(f"  Hit Rate:           {stats.hit_rate()*100:.1f}%")
-        print(f"  Cache Hits:         {stats.hits}")
-        print(f"  Cache Misses:       {stats.misses}")
-        print(f"  Memory Usage:       {memory_usage['file_cache_bytes']/(1024*1024):.2f} MB")
-        print(f"  Files Cached:       {memory_usage['file_cache_count']}")
-        print(f"  AST Trees Cached:   {memory_usage['ast_cache_count']}")
+        logger.info("  Hit Rate:           %.1f%%", stats.hit_rate() * 100)
+        logger.info("  Cache Hits:         %s", stats.hits)
+        logger.info("  Cache Misses:       %s", stats.misses)
+        logger.info("  Memory Usage:       %.2f MB", memory_usage["file_cache_bytes"] / (1024 * 1024))
+        logger.info("  Files Cached:       %s", memory_usage["file_cache_count"])
+        logger.info("  AST Trees Cached:   %s", memory_usage["ast_cache_count"])
 
     def benchmark_streaming_analysis(self):
         """Benchmark streaming analysis performance."""
-        print("\n6. Benchmarking Streaming Analysis...")
+        logger.info("6. Benchmarking Streaming Analysis...")
 
         if not STREAMING_AVAILABLE:
-            print("  Streaming components not available")
+            logger.warning("  Streaming components not available")
             return
 
         Path(self.test_directory)
@@ -399,22 +402,25 @@ class PerformanceBenchmark:
                 "components_available": True,
             }
 
-            print(f"  Streaming Init:     {avg_streaming_init*1000:.2f}ms")
-            print(f"  Hybrid Init:        {avg_hybrid_init*1000:.2f}ms")
-            print(f"  Batch Init:         {avg_batch_init*1000:.2f}ms")
-            print(f"  Dashboard Gen:      {avg_dashboard_time*1000:.2f}ms")
-            print(f"  Monitor Report:     {avg_monitor_time*1000:.2f}ms")
-            print(f"  Streaming Overhead: {((avg_streaming_init - avg_batch_init) / avg_batch_init) * 100:.1f}%")
+            logger.info("  Streaming Init:     %.2fms", avg_streaming_init * 1000)
+            logger.info("  Hybrid Init:        %.2fms", avg_hybrid_init * 1000)
+            logger.info("  Batch Init:         %.2fms", avg_batch_init * 1000)
+            logger.info("  Dashboard Gen:      %.2fms", avg_dashboard_time * 1000)
+            logger.info("  Monitor Report:     %.2fms", avg_monitor_time * 1000)
+            logger.info(
+                "  Streaming Overhead: %.1f%%",
+                ((avg_streaming_init - avg_batch_init) / avg_batch_init) * 100,
+            )
 
         except Exception as e:
-            print(f"  Streaming benchmark failed: {e}")
+            logger.warning("  Streaming benchmark failed: %s", e)
             self.results["streaming_analysis"] = {"error": str(e), "components_available": False}
 
     def print_benchmark_report(self):
         """Print comprehensive benchmark report."""
-        print("\n" + "=" * 60)
-        print("PERFORMANCE BENCHMARK REPORT")
-        print("=" * 60)
+        logger.info("%s", "=" * 60)
+        logger.info("PERFORMANCE BENCHMARK REPORT")
+        logger.info("%s", "=" * 60)
 
         improvements = []
 
@@ -424,36 +430,48 @@ class PerformanceBenchmark:
 
         if improvements:
             avg_improvement = statistics.mean(improvements)
-            print(f"\nAverage Performance Improvement: {avg_improvement:.1f}%")
+            logger.info("Average Performance Improvement: %.1f%%", avg_improvement)
 
-        print("\nI/O Operations Reduced: ~70%")
-        print("Memory Usage: Bounded to 50MB")
-        print("Thread Safety: Enabled")
+        logger.info("I/O Operations Reduced: ~70%")
+        logger.info("Memory Usage: Bounded to 50MB")
+        logger.info("Thread Safety: Enabled")
 
         # NASA Rule 7 Compliance
         if "cache_performance" in self.results:
             cache_data = self.results["cache_performance"]
-            print("\nNASA Rule 7 Compliance:")
-            print(f"  Memory Bounded: ✓ ({cache_data.get('memory_usage_mb', 0)}MB < 50MB)")
-            print(f"  LRU Eviction: ✓ ({cache_data.get('cache_evictions', 0)} evictions)")
-            print("  Thread Safe: ✓")
+            logger.info("NASA Rule 7 Compliance:")
+            logger.info("  Memory Bounded: ✓ (%sMB < 50MB)", cache_data.get("memory_usage_mb", 0))
+            logger.info("  LRU Eviction: ✓ (%s evictions)", cache_data.get("cache_evictions", 0))
+            logger.info("  Thread Safe: ✓")
 
-        print("\nOptimization Benefits:")
-        print("  • Single file traversal instead of 3 separate traversals")
-        print("  • Content hash-based AST caching")
-        print("  • Memory-bounded operations with LRU eviction")
-        print("  • Thread-safe concurrent access")
-        print("  • Reduced disk I/O by ~70%")
+        logger.info("Optimization Benefits:")
+        logger.info("  • Single file traversal instead of 3 separate traversals")
+        logger.info("  • Content hash-based AST caching")
+        logger.info("  • Memory-bounded operations with LRU eviction")
+        logger.info("  • Thread-safe concurrent access")
+        logger.info("  • Reduced disk I/O by ~70%")
 
         # Streaming analysis performance summary
         if "streaming_analysis" in self.results and self.results["streaming_analysis"].get("components_available"):
             streaming_data = self.results["streaming_analysis"]
-            print("\nStreaming Analysis Performance:")
-            print(f"  • Streaming mode overhead: {streaming_data.get('streaming_overhead_percent', 0)}%")
-            print(f"  • Dashboard generation: {streaming_data.get('dashboard_generation_time_ms', 0)}ms")
-            print(f"  • Real-time monitoring: {streaming_data.get('monitor_report_time_ms', 0)}ms")
-            print(f"  • Hybrid mode initialization: {streaming_data.get('hybrid_init_time_ms', 0)}ms")
-            print("  • Full streaming stack available and tested")
+            logger.info("Streaming Analysis Performance:")
+            logger.info(
+                "  • Streaming mode overhead: %s%%",
+                streaming_data.get("streaming_overhead_percent", 0),
+            )
+            logger.info(
+                "  • Dashboard generation: %sms",
+                streaming_data.get("dashboard_generation_time_ms", 0),
+            )
+            logger.info(
+                "  • Real-time monitoring: %sms",
+                streaming_data.get("monitor_report_time_ms", 0),
+            )
+            logger.info(
+                "  • Hybrid mode initialization: %sms",
+                streaming_data.get("hybrid_init_time_ms", 0),
+            )
+            logger.info("  • Full streaming stack available and tested")
 
 
 def main():
@@ -474,7 +492,7 @@ def main():
 
         with open(args.output, "w") as f:
             json.dump(results, f, indent=2)
-        print(f"\nResults saved to: {args.output}")
+        logger.info("Results saved to: %s", args.output)
 
 
 if __name__ == "__main__":

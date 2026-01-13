@@ -2619,19 +2619,19 @@ def main():
 
         if args.format == "json":
             if hasattr(result, "to_dict"):
-                print(json.dumps(result.to_dict(), indent=2))
+                logger.info("%s", json.dumps(result.to_dict(), indent=2))
             else:
-                print(json.dumps(result, indent=2))
+                logger.info("%s", json.dumps(result, indent=2))
         elif hasattr(result, "to_dict"):
             result_dict = result.to_dict()
-            print(f"Analysis Results for {args.path}")
-            print(f"Total violations: {result_dict.get('total_violations', 0)}")
-            print(f"Quality score: {result_dict.get('overall_quality_score', 0)}")
+            logger.info("Analysis Results for %s", args.path)
+            logger.info("Total violations: %s", result_dict.get("total_violations", 0))
+            logger.info("Quality score: %s", result_dict.get("overall_quality_score", 0))
         else:
-            print(f"Analysis Results: {result}")
+            logger.info("Analysis Results: %s", result)
 
     except Exception as e:
-        print(f"Error: {e}", file=sys.stderr)
+        logger.error("Error: %s", e)
         sys.exit(1)
 
 

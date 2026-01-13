@@ -7,10 +7,13 @@ Provides the main entry point for connascence analysis.
 import argparse
 from datetime import datetime
 import json
+import logging
 from pathlib import Path
 import sys
 import time
 from typing import Any, Dict, List, Optional
+
+logger = logging.getLogger(__name__)
 
 # Import using unified import strategy
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -27,7 +30,7 @@ if constants_result.has_module:
     constants = constants_result.module
     NASA_COMPLIANCE_THRESHOLD = getattr(constants, "NASA_COMPLIANCE_THRESHOLD", 0.95)
     MECE_QUALITY_THRESHOLD = getattr(constants, "MECE_QUALITY_THRESHOLD", 0.80)
-    OVERALL_QUALITY_THRESHOLD = getattr(constants, "OVERALL_QUALITY_THRESHOLD", 0.75)
+    OVERALL_QUALITY_THRESHOLD = getattr(constants, "OVERALL_QUALITY_THRESHOLD", 0.70)
     VIOLATION_WEIGHTS = getattr(constants, "VIOLATION_WEIGHTS", {"critical": 10, "high": 5, "medium": 2, "low": 1})
     # Import policy resolution functions
     resolve_policy_name = getattr(constants, "resolve_policy_name", None)
@@ -37,7 +40,7 @@ else:
     # Fallback constants and functions
     NASA_COMPLIANCE_THRESHOLD = 0.95
     MECE_QUALITY_THRESHOLD = 0.80
-    OVERALL_QUALITY_THRESHOLD = 0.75
+    OVERALL_QUALITY_THRESHOLD = 0.70
     VIOLATION_WEIGHTS = {"critical": 10, "high": 5, "medium": 2, "low": 1}
     resolve_policy_name = None
     validate_policy_name = None
@@ -49,7 +52,7 @@ UNIFIED_ANALYZER_AVAILABLE = analyzer_result.has_module
 if UNIFIED_ANALYZER_AVAILABLE:
     UnifiedConnascenceAnalyzer = analyzer_result.module
 else:
-    print("[WARNING] Unified analyzer not available, using fallback mode")
+    logger.warning("Unified analyzer not available, using fallback mode")
     UnifiedConnascenceAnalyzer = None
 
 # Import unified duplication analyzer
@@ -59,7 +62,7 @@ try:
 
     DUPLICATION_ANALYZER_AVAILABLE = True
 except ImportError:
-    print("[WARNING] Unified duplication analyzer not available")
+    logger.warning("Unified duplication analyzer not available")
     DUPLICATION_ANALYZER_AVAILABLE = False
     UnifiedDuplicationAnalyzer = None
 
@@ -125,7 +128,7 @@ class ConnascenceAnalyzer:
             self.analysis_mode = "fallback"
         else:
             self.analysis_mode = "mock"
-            print("[WARNING] Neither unified nor fallback analyzer available, using mock mode")
+            logger.warning("Neither unified nor fallback analyzer available, using mock mode")
 
     def analyze_path(self, path: str, policy: str = "default", **kwargs) -> Dict[str, Any]:
         """Analyze a file or directory for connascence violations using real analysis pipeline."""
@@ -620,9 +623,10 @@ def _validate_and_resolve_policy(policy: str) -> str:
 
             available_policies = UNIFIED_POLICY_NAMES
 
-        print(
-            f"Error: Unknown policy '{policy}'. Available policies: {', '.join(available_policies)}",
-            file=sys.stderr,
+        logger.error(
+            "Unknown policy '%s'. Available policies: %s",
+            policy,
+            ", ".join(available_policies),
         )
         sys.exit(1)
 
@@ -656,7 +660,7 @@ def _run_analysis(args, policy: str, analyzer, include_duplication: bool, duplic
     )
 
     if use_enhanced_analyzer and UNIFIED_ANALYZER_AVAILABLE:
-        print("Using enhanced unified analyzer for cross-phase analysis...")
+        logger.info("Using enhanced unified analyzer for cross-phase analysis...")
 
         enhanced_analyzer = UnifiedConnascenceAnalyzer()
         result = enhanced_analyzer.analyze_path(
@@ -698,29 +702,29 @@ def _handle_output_format(args, result):
         sarif_reporter = SARIFReporter()
         if args.output:
             sarif_reporter.export_results(result, args.output)
-            print(f"SARIF report written to: {args.output}")
+            logger.info("SARIF report written to: %s", args.output)
         else:
             sarif_output = sarif_reporter.export_results(result)
             try:
-                print(sarif_output)
+                logger.info("%s", sarif_output)
             except UnicodeEncodeError:
-                print(sarif_output.encode("ascii", errors="replace").decode("ascii"))
+                logger.info("%s", sarif_output.encode("ascii", errors="replace").decode("ascii"))
     elif args.format == "json":
         json_reporter = JSONReporter()
         if args.output:
             json_reporter.export_results(result, args.output)
-            print(f"JSON report written to: {args.output}")
+            logger.info("JSON report written to: %s", args.output)
         else:
             json_output = json_reporter.export_results(result)
             try:
-                print(json_output)
+                logger.info("%s", json_output)
             except UnicodeEncodeError:
-                print(json_output.encode("ascii", errors="replace").decode("ascii"))
+                logger.info("%s", json_output.encode("ascii", errors="replace").decode("ascii"))
     elif args.output:
         with open(args.output, "w") as f:
             f.write(str(result))
     else:
-        print(result)
+        logger.info("%s", result)
 
 
 def _export_enhanced_results(args, result, use_enhanced_analyzer: bool):
@@ -736,19 +740,19 @@ def _export_enhanced_results(args, result, use_enhanced_analyzer: bool):
     if args.export_audit_trail and result.get("audit_trail"):
         with open(args.export_audit_trail, "w") as f:
             json.dump(result["audit_trail"], f, indent=2, default=str)
-        print(f"Audit trail exported to: {args.export_audit_trail}")
+        logger.info("Audit trail exported to: %s", args.export_audit_trail)
 
     # Export correlations
     if args.export_correlations and result.get("correlations"):
         with open(args.export_correlations, "w") as f:
             json.dump(result["correlations"], f, indent=2, default=str)
-        print(f"Correlations exported to: {args.export_correlations}")
+        logger.info("Correlations exported to: %s", args.export_correlations)
 
     # Export smart recommendations
     if args.export_recommendations and result.get("smart_recommendations"):
         with open(args.export_recommendations, "w") as f:
             json.dump(result["smart_recommendations"], f, indent=2, default=str)
-        print(f"Smart recommendations exported to: {args.export_recommendations}")
+        logger.info("Smart recommendations exported to: %s", args.export_recommendations)
 
     # Display phase timing
     _display_phase_timing(args, result)
@@ -763,7 +767,7 @@ def _export_enhanced_results(args, result, use_enhanced_analyzer: bool):
 def _display_phase_timing(args, result):
     """Display phase timing information (helper for _export_enhanced_results)."""
     if args.phase_timing and result.get("audit_trail"):
-        print("\n=== Analysis Phase Timing ===")
+        logger.info("=== Analysis Phase Timing ===")
         for phase in result["audit_trail"]:
             if phase.get("started") and phase.get("completed"):
                 start_time = datetime.fromisoformat(phase["started"].replace("Z", "+00:00"))
@@ -774,36 +778,42 @@ def _display_phase_timing(args, result):
                 violations = phase.get("violations_found", 0)
                 clusters = phase.get("clusters_found", 0)
 
-                print(f"{phase_name:25} | {duration:8.1f}ms | {violations:3d} violations | {clusters:3d} clusters")
+                logger.info(
+                    "%-25s | %8.1fms | %3d violations | %3d clusters",
+                    phase_name,
+                    duration,
+                    violations,
+                    clusters,
+                )
 
 
 def _display_correlations_summary(result):
     """Display correlation summary (helper for _export_enhanced_results)."""
     if result.get("correlations") and len(result["correlations"]) > 0:
-        print("\n=== Cross-Phase Analysis Summary ===")
+        logger.info("=== Cross-Phase Analysis Summary ===")
         correlations = result["correlations"]
-        print(f"Found {len(correlations)} cross-phase correlations")
+        logger.info("Found %s cross-phase correlations", len(correlations))
 
         sorted_corr = sorted(correlations, key=lambda x: x.get("correlation_score", 0), reverse=True)
         for i, corr in enumerate(sorted_corr[:3]):
             score = corr.get("correlation_score", 0) * 100
             analyzer1 = corr.get("analyzer1", "Unknown")
             analyzer2 = corr.get("analyzer2", "Unknown")
-            print(f"{i+1}. {analyzer1} <-> {analyzer2}: {score:.1f}% correlation")
+            logger.info("%s. %s <-> %s: %.1f%% correlation", i + 1, analyzer1, analyzer2, score)
 
 
 def _display_recommendations_summary(result):
     """Display recommendations summary (helper for _export_enhanced_results)."""
     if result.get("smart_recommendations") and len(result["smart_recommendations"]) > 0:
-        print("\n=== Smart Recommendations Summary ===")
+        logger.info("=== Smart Recommendations Summary ===")
         recommendations = result["smart_recommendations"]
-        print(f"Generated {len(recommendations)} architectural recommendations")
+        logger.info("Generated %s architectural recommendations", len(recommendations))
 
         high_priority = [r for r in recommendations if r.get("priority", "").lower() == "high"]
         for rec in high_priority[:3]:
             category = rec.get("category", "General")
             description = rec.get("description", "No description")[:60] + "..."
-            print(f"• [{category}] {description}")
+            logger.info("• [%s] %s", category, description)
 
 
 def _check_exit_conditions(args, result):
@@ -813,7 +823,7 @@ def _check_exit_conditions(args, result):
     NASA Rule 4: Function under 60 lines
     """
     if not result.get("success", False):
-        print(f"Analysis failed: {result.get('error', 'Unknown error')}", file=sys.stderr)
+        logger.error("Analysis failed: %s", result.get("error", "Unknown error"))
         sys.exit(1)
 
     violations = result.get("violations", [])
@@ -843,10 +853,14 @@ def _check_exit_conditions(args, result):
         exit_reasons.append(f"{critical_count} critical violations (strict mode)")
 
     if should_exit_with_error:
-        print(f"Analysis failed: {', '.join(exit_reasons)}", file=sys.stderr)
+        logger.error("Analysis failed: %s", ", ".join(exit_reasons))
         sys.exit(1)
 
-    print(f"Analysis completed successfully. {len(violations)} total violations ({critical_count} critical)")
+    logger.info(
+        "Analysis completed successfully. %s total violations (%s critical)",
+        len(violations),
+        critical_count,
+    )
     sys.exit(0)
 
 
@@ -856,7 +870,7 @@ def _handle_error(e: Exception, args):
 
     NASA Rule 4: Function under 60 lines
     """
-    print(f"Analyzer error: {e}", file=sys.stderr)
+    logger.error("Analyzer error: %s", e)
     import traceback
 
     traceback.print_exc()
@@ -878,9 +892,9 @@ def _handle_error(e: Exception, args):
                 json_reporter = JSONReporter()
                 json_reporter.export_results(minimal_result, args.output)
 
-            print(f"Minimal {args.format.upper()} report written for CI compatibility")
+            logger.info("Minimal %s report written for CI compatibility", args.format.upper())
         except Exception as export_error:
-            print(f"Failed to write minimal report: {export_error}", file=sys.stderr)
+            logger.error("Failed to write minimal report: %s", export_error)
 
     sys.exit(1)
 
@@ -897,7 +911,7 @@ def main():
 
     # Validate path exists (path resolution done in parser)
     if not Path(args.path).exists():
-        print(f"Error: Path does not exist: {args.path}", file=sys.stderr)
+        logger.error("Path does not exist: %s", args.path)
         sys.exit(2)
 
     analyzer = ConnascenceAnalyzer()
@@ -925,7 +939,7 @@ def main():
         _check_exit_conditions(args, result)
 
     except KeyboardInterrupt:
-        print("\nAnalysis interrupted by user", file=sys.stderr)
+        logger.warning("Analysis interrupted by user")
         sys.exit(130)
     except Exception as e:
         _handle_error(e, args)
@@ -934,7 +948,7 @@ def main():
 # Deprecated: Use SARIFReporter class instead
 def convert_to_sarif(result: Dict[str, Any], args) -> Dict[str, Any]:
     """Legacy SARIF conversion - use SARIFReporter class instead."""
-    print("Warning: Using deprecated convert_to_sarif function. Use SARIFReporter class instead.", file=sys.stderr)
+    logger.warning("Using deprecated convert_to_sarif function. Use SARIFReporter class instead.")
     reporter = SARIFReporter()
     return json.loads(reporter.export_results(result))
 

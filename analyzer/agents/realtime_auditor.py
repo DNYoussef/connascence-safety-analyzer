@@ -344,19 +344,19 @@ def main():
     else:
         auditor.ingest_diagnostic_event(diagnostics)
 
-    print(f"Processed {len(auditor.event_history)} diagnostic events")
-    print(f"Identified {len(auditor.violations)} violations")
+    logger.info("Processed %s diagnostic events", len(auditor.event_history))
+    logger.info("Identified %s violations", len(auditor.violations))
 
     report = auditor.generate_audit_report(args.period_minutes)
 
-    print(f"\nQuality Score: {report.quality_score:.2%}")
-    print(f"Trend: {report.trend}")
-    print("\nRecommendations:")
+    logger.info("Quality Score: %.2f%%", report.quality_score * 100)
+    logger.info("Trend: %s", report.trend)
+    logger.info("Recommendations:")
     for rec in report.recommendations:
-        print(f"  - {rec}")
+        logger.info("  - %s", rec)
 
     auditor.export_report(report, args.output)
-    print(f"\nReport saved to: {args.output}")
+    logger.info("Report saved to: %s", args.output)
 
 
 if __name__ == "__main__":

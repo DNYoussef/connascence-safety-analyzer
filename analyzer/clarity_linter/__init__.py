@@ -9,6 +9,7 @@ NASA Rule 5 Compliant: Input assertions
 """
 
 import ast
+import logging
 from pathlib import Path
 import sys
 from typing import Any, Dict, List, Optional
@@ -21,6 +22,8 @@ from analyzer.clarity_linter.config_loader import ClarityConfigLoader
 from analyzer.clarity_linter.models import ClarityViolation
 from analyzer.clarity_linter.sarif_exporter import SARIFExporter
 
+logger = logging.getLogger(__name__)
+
 # Import the 5 clarity detectors
 try:
     from analyzer.detectors.clarity_call_chain import CallChainDepthDetector
@@ -31,7 +34,7 @@ try:
     DETECTORS_AVAILABLE = True
 except ImportError:
     DETECTORS_AVAILABLE = False
-    print("[WARNING] Clarity detectors not available for import")
+    logger.warning("Clarity detectors not available for import")
 
 
 class ClarityLinter:
@@ -117,7 +120,7 @@ class ClarityLinter:
         assert self.config is not None, "config must be loaded before registering detectors"
 
         if not DETECTORS_AVAILABLE:
-            print("[WARNING] Clarity detectors not available, returning empty list")
+            logger.warning("Clarity detectors not available, returning empty list")
             return []
 
         detectors = []
@@ -243,10 +246,10 @@ class ClarityLinter:
 
         except SyntaxError as e:
             # Skip files with syntax errors
-            print(f"[WARNING] Syntax error in {file_path}: {e}")
+            logger.warning("Syntax error in %s: %s", file_path, e)
         except Exception as e:
             # Log other errors but continue
-            print(f"[ERROR] Failed to analyze {file_path}: {e}")
+            logger.error("Failed to analyze %s: %s", file_path, e)
 
         return violations
 

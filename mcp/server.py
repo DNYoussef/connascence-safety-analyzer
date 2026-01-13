@@ -156,10 +156,11 @@ class AuditLogger:
 
 
 class ConnascenceMCPServer:
-    """Mock MCP server for connascence analysis with standardized error handling."""
+    """MCP server for connascence analysis with standardized error handling."""
 
-    def __init__(self, config=None):
+    def __init__(self, config=None, use_mock: bool = False):
         self.config = config or {}
+        self.config["use_mock"] = use_mock or self.config.get("use_mock", False)
         self.name = "connascence"
         self.version = "2.0.0"  # Updated version to match test expectations
 
@@ -184,22 +185,93 @@ class ConnascenceMCPServer:
             raise Exception(f"MCP Server initialization failed: {error.message}")
 
     def _create_analyzer(self):
-        """Create mock analyzer instance for tests.
-
-        WARNING: This returns a MockAnalyzer that produces FAKE/CANNED results.
-        For production use, use mcp/enhanced_server.py which provides real analysis.
-
-        This mock server is DEPRECATED and will be removed in a future version.
-        """
+        """Create analyzer instance."""
         import warnings
         import logging
 
         logger = logging.getLogger(__name__)
+
+        class RealAnalyzerBridge:
+            """Bridge to actual analyzer implementations."""
+
+            def __init__(self):
+                from analyzer.connascence_analyzer import ConnascenceAnalyzer
+                from analyzer.nasa_engine.nasa_analyzer import NASAAnalyzer
+                from analyzer.dup_detection.mece_analyzer import MECEAnalyzer
+                from analyzer.enterprise.sixsigma.analyzer import SixSigmaAnalyzer
+                from analyzer.theater_detection.core import TheaterDetector
+
+                self.connascence = ConnascenceAnalyzer()
+                self.nasa = NASAAnalyzer()
+                self.mece = MECEAnalyzer()
+                self.sixsigma = SixSigmaAnalyzer()
+                self.theater = TheaterDetector()
+
+            def analyze(self, source_code: str, file_path: str = "<unknown>") -> dict:
+                """Run all analyzers and return combined results."""
+                connascence_violations = self.connascence.analyze_file(Path(file_path))
+                nasa_violations = self.nasa.analyze_file(file_path, source_code=source_code)
+                theater_violations = self.theater.detect_all(source_code)
+                sixsigma_result = self.sixsigma.analyze_violations(
+                    [v.to_dict() if hasattr(v, "to_dict") else v for v in connascence_violations],
+                    file_path=Path(file_path),
+                )
+                return {
+                    "connascence": connascence_violations,
+                    "nasa": nasa_violations,
+                    "mece": [],
+                    "sixsigma": sixsigma_result,
+                    "theater": theater_violations,
+                }
+
+            def analyze_path(self, path, profile=None):
+                """Analyze a single file and return combined violations."""
+                ProductionAssert.not_none(path, "path")
+                path_obj = Path(path)
+                if not path_obj.exists():
+                    return {"violations": [], "metrics": {}}
+
+                if path_obj.is_file():
+                    try:
+                        source_code = path_obj.read_text(encoding="utf-8")
+                    except (OSError, UnicodeDecodeError):
+                        source_code = ""
+                else:
+                    source_code = ""
+                results = self.analyze(source_code, str(path_obj))
+                violations = results["connascence"] + results["nasa"]
+                metrics = {
+                    "files_analyzed": 1,
+                    "violations_found": len(violations),
+                    "analysis_time": 0.1,
+                }
+                return {"violations": violations, "metrics": metrics}
+
+            def analyze_directory(self, path, profile=None):
+                """Analyze a directory and return combined violations."""
+                ProductionAssert.not_none(path, "path")
+                path_obj = Path(path)
+                violations = []
+                if not path_obj.exists():
+                    return violations
+
+                connascence_violations = self.connascence.analyze_directory(path_obj)
+                violations.extend(connascence_violations)
+                for file_path in path_obj.rglob("*.py"):
+                    try:
+                        violations.extend(self.nasa.analyze_file(str(file_path)))
+                    except Exception:
+                        continue
+                return violations
+
+        if not self.config.get("use_mock", False):
+            return RealAnalyzerBridge()
+
         warnings.warn(
             "ConnascenceMCPServer uses MockAnalyzer which returns FAKE results. "
             "Use EnhancedConnascenceMCPServer from mcp/enhanced_server.py for real analysis.",
             DeprecationWarning,
-            stacklevel=2
+            stacklevel=2,
         )
         logger.warning(
             "MOCK MODE: This MCP server returns canned/fake violations. "
@@ -210,7 +282,7 @@ class ConnascenceMCPServer:
             """DEPRECATED: Mock analyzer that returns fake results for testing only."""
 
             def __init__(self):
-                pass
+                self.logger = logger
 
             def analyze_path(self, path, profile=None):
                 """Mock analyze_path method."""
@@ -856,9 +928,19 @@ class MCPConnascenceTool:
 
 def main():
     """Main entry point for MCP server."""
-    server = ConnascenceMCPServer()
-    print(f"Starting Connascence MCP Server v{server.version}")
-    print(f"Available tools: {', '.join(server._tools.keys())}")
+    import argparse
+    import logging
+
+    parser = argparse.ArgumentParser(description="Connascence MCP Server")
+    parser.add_argument("--mock", action="store_true", help="Use mock analyzer for testing only")
+    args = parser.parse_args()
+
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger(__name__)
+
+    server = ConnascenceMCPServer(use_mock=args.mock)
+    logger.info("Starting Connascence MCP Server v%s", server.version)
+    logger.info("Available tools: %s", ", ".join(server._tools.keys()))
     # For now, just print server info - full MCP integration would need more setup
     return 0
 

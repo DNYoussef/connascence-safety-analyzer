@@ -2,8 +2,11 @@
 # Smart integration engine for real connascence analysis
 
 import ast
+import logging
 from pathlib import Path
 from typing import Any, Dict, List
+
+logger = logging.getLogger(__name__)
 
 from fixes.phase0.production_safe_assertions import ProductionAssert
 
@@ -66,7 +69,7 @@ class CorrelationAnalyzer:
             correlations.extend(file_correlations)
 
         except Exception as e:
-            print(f"Warning: Enhanced correlation analysis failed: {e}")
+            logger.warning("Enhanced correlation analysis failed: %s", e)
 
         return correlations
 
@@ -153,7 +156,7 @@ class CorrelationAnalyzer:
                 )
 
         except Exception as e:
-            print(f"Warning: Complexity correlation analysis failed: {e}")
+            logger.warning("Complexity correlation analysis failed: %s", e)
 
         return correlations
 
@@ -216,7 +219,7 @@ class CorrelationAnalyzer:
                 )
 
         except Exception as e:
-            print(f"Warning: File-level correlation analysis failed: {e}")
+            logger.warning("File-level correlation analysis failed: %s", e)
 
         return correlations
 
@@ -239,7 +242,7 @@ class RecommendationEngine:
             recommendations.extend(self._generate_nasa_recommendations(nasa_violations))
             recommendations.extend(self._generate_general_recommendations(findings))
         except Exception as e:
-            print(f"Warning: Recommendation generation failed: {e}")
+            logger.warning("Recommendation generation failed: %s", e)
 
         return recommendations
 
@@ -344,7 +347,7 @@ class PythonASTAnalyzer:
                 violations.extend(self._analyze_node(node, file_path))
 
         except Exception as e:
-            print(f"Error analyzing {file_path}: {e}")
+            logger.error("Error analyzing %s: %s", file_path, e)
 
         return violations
 
@@ -632,7 +635,7 @@ class SmartIntegrationEngine:
             try:
                 violations.extend(self.python_analyzer.analyze_file(py_file))
             except Exception as e:
-                print(f"Warning: Failed to analyze {py_file}: {e}")
+                logger.warning("Failed to analyze %s: %s", py_file, e)
 
         return violations
 

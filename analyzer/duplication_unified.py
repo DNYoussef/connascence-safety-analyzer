@@ -18,9 +18,12 @@ from collections import defaultdict
 from dataclasses import asdict, dataclass
 import hashlib
 import json
+import logging
 from pathlib import Path
 import sys
 from typing import Any, Dict, List, Optional, Tuple
+
+logger = logging.getLogger(__name__)
 
 # Import both existing analyzers
 try:
@@ -201,7 +204,7 @@ class UnifiedDuplicationAnalyzer:
                 self._extract_algorithm_patterns(tree, str(file_path), source_lines)
 
             except (SyntaxError, UnicodeDecodeError, OSError) as e:
-                print(f"Warning: Could not analyze {file_path}: {e}")
+                logger.warning("Could not analyze %s: %s", file_path, e)
                 continue
 
         # Find algorithm duplications
@@ -471,12 +474,12 @@ def main():
         output = analyzer.export_results(result, args.output)
 
         if not args.output:
-            print(output)
+            logger.info("%s", output)
 
         return 0 if result.success else 1
 
     except Exception as e:
-        print(f"Error: {e}", file=sys.stderr)
+        logger.error("Error: %s", e)
         return 1
 
 

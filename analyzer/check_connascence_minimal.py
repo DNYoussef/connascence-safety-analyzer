@@ -6,6 +6,7 @@ while delegating the actual work to the new modular architecture.
 """
 
 import argparse
+import logging
 import ast
 from pathlib import Path
 import sys
@@ -13,6 +14,8 @@ import time
 from typing import Dict, List, Optional
 
 from utils.types import ConnascenceViolation
+
+logger = logging.getLogger(__name__)
 
 from .check_connascence import ConnascenceDetector
 
@@ -118,7 +121,7 @@ def main():
 
     target_path = Path(args.path).resolve()
     if not target_path.exists():
-        print(f"Error: Path {target_path} does not exist")
+        logger.error("Path %s does not exist", target_path)
         return 1
 
     start_time = time.time()
@@ -164,11 +167,11 @@ def main():
         with open(args.output, "w", encoding="utf-8") as f:
             f.write(report)
     else:
-        print(report)
+        logger.info("%s", report)
 
     if args.verbose:
-        print(f"Analysis completed in {elapsed:.2f} seconds")
-        print(f"Found {len(violations)} violations")
+        logger.info("Analysis completed in %.2f seconds", elapsed)
+        logger.info("Found %s violations", len(violations))
 
     # Exit with error code if critical violations found
     critical_count = sum(1 for v in violations if v.severity == "critical")

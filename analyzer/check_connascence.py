@@ -14,6 +14,7 @@ REFACTORED: Phase 1 God Object Decomposition
 """
 
 import argparse
+import logging
 import ast
 import collections
 from pathlib import Path
@@ -25,6 +26,8 @@ from fixes.phase0.production_safe_assertions import ProductionAssert
 
 # Import canonical types (Phase 2: MagicLiteralParams for CoP reduction)
 from utils.types import ConnascenceViolation, MagicLiteralParams
+
+logger = logging.getLogger(__name__)
 
 # Import extracted handlers (Phase 1 decomposition)
 try:
@@ -1024,7 +1027,7 @@ def main():
 
     target_path = Path(args.path).resolve()
     if not target_path.exists():
-        print(f"Error: Path {target_path} does not exist")
+        logger.error("Path %s does not exist", target_path)
         return 1
 
     start_time = time.time()
@@ -1070,11 +1073,11 @@ def main():
         with open(args.output, "w", encoding="utf-8") as f:
             f.write(report)
     else:
-        print(report)
+        logger.info("%s", report)
 
     if args.verbose:
-        print(f"Analysis completed in {elapsed:.2f} seconds")
-        print(f"Found {len(violations)} violations")
+        logger.info("Analysis completed in %.2f seconds", elapsed)
+        logger.info("Found %s violations", len(violations))
 
     # Exit with error code if critical violations found
     critical_count = sum(1 for v in violations if v.severity == "critical")
