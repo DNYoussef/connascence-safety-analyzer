@@ -13,7 +13,10 @@ Calculates Six Sigma quality metrics:
 """
 
 from dataclasses import dataclass
+import logging
 from typing import Optional
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -123,13 +126,13 @@ def main():
 
     metrics = DPMOCalculator.calculate_metrics(args.defects, args.opportunities, args.units)
 
-    print("\\nSix Sigma Quality Metrics:")
-    print(f"  Defects: {metrics.defects}")
-    print(f"  Opportunities: {metrics.opportunities}")
-    print(f"  DPMO: {metrics.dpmo:,.0f}")
-    print(f"  Sigma Level: {metrics.sigma_level}")
-    print(f"  Yield: {metrics.yield_percent}%")
-    print(f"  RTY: {metrics.rty}%")
+    logger.info("Six Sigma Quality Metrics:")
+    logger.info("  Defects: %s", metrics.defects)
+    logger.info("  Opportunities: %s", metrics.opportunities)
+    logger.info("  DPMO: %,.0f", metrics.dpmo)
+    logger.info("  Sigma Level: %s", metrics.sigma_level)
+    logger.info("  Yield: %s%%", metrics.yield_percent)
+    logger.info("  RTY: %s%%", metrics.rty)
 
 
 if __name__ == "__main__":

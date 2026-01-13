@@ -19,8 +19,14 @@ across the analyzer, eliminating duplicate class definitions and ensuring
 consistency across all modules.
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass, field
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import ast
+    from analyzer.formal_grammar import MagicLiteralContext
 
 
 @dataclass
@@ -130,9 +136,37 @@ def create_violation(**kwargs) -> ConnascenceViolation:
     return ConnascenceViolation(**kwargs)
 
 
+# Parameter object for formal magic literal analysis (CoP reduction)
+@dataclass(frozen=True)
+class MagicLiteralParams:
+    """Parameters for formal magic literal processing."""
+
+    node: "ast.AST"
+    value: Any
+    context_info: Dict[str, Any]
+    formal_context: "MagicLiteralContext"
+    severity_score: float = 0.0
+
+    @property
+    def severity_level(self) -> str:
+        """Map severity score to severity level."""
+        if self.severity_score >= 8.0:
+            return "high"
+        if self.severity_score >= 5.0:
+            return "medium"
+        if self.severity_score >= 2.0:
+            return "low"
+        return "informational"
+
+    @property
+    def should_skip(self) -> bool:
+        """Determine if this item should be skipped based on severity."""
+        return self.severity_level == "informational"
+
+
 # Type aliases for common use patterns
 Violation = ConnascenceViolation  # Short alias
 ViolationDict = Dict[str, Any]  # Dictionary representation
 
 
-__all__ = ["ConnascenceViolation", "Violation", "ViolationDict", "create_violation"]
+__all__ = ["ConnascenceViolation", "MagicLiteralParams", "Violation", "ViolationDict", "create_violation"]

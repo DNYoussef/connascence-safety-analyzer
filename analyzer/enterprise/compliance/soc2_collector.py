@@ -321,22 +321,22 @@ def main():
 
     collector = SOC2Collector(args.project)
 
-    print(f"Collecting SOC 2 evidence from {args.project}...")
+    logger.info("Collecting SOC 2 evidence from %s...", args.project)
 
     evidence = collector.collect_all_evidence()
-    print(f"Collected {len(evidence)} evidence items")
+    logger.info("Collected %s evidence items", len(evidence))
 
     report = collector.generate_report(args.period_start, args.period_end)
 
-    print(f"\nSOC 2 Compliance Score: {report.compliance_score:.1%}")
-    print("\nCriteria Coverage:")
+    logger.info("SOC 2 Compliance Score: %.1f%%", report.compliance_score * 100)
+    logger.info("Criteria Coverage:")
     for criterion, count in report.criteria_coverage.items():
         status = "✓" if count > 0 else "✗"
         description = SOC2Collector.TSC_CRITERIA[criterion]
-        print(f"  {status} {criterion}: {description} ({count} evidence items)")
+        logger.info("  %s %s: %s (%s evidence items)", status, criterion, description, count)
 
     collector.export_report(report, args.output)
-    print(f"\nReport saved to: {args.output}")
+    logger.info("Report saved to: %s", args.output)
 
 
 if __name__ == "__main__":

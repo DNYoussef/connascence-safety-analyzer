@@ -84,6 +84,7 @@ class StreamProcessor:
         self.incremental_cache: Optional[IncrementalCache] = None
         self._is_initialized = False
         self._watched_directories: List[Path] = []
+        self._analyzer_factory: Optional[Callable[[], Any]] = None
 
         # Configuration with defaults
         self.max_queue_size = config.get("max_queue_size", 1000)
@@ -117,6 +118,7 @@ class StreamProcessor:
             return True
 
         try:
+            self._analyzer_factory = analyzer_factory
             # Initialize global incremental cache
             self.incremental_cache = get_global_incremental_cache()
             logger.info("Incremental cache initialized")
@@ -315,7 +317,7 @@ class StreamProcessor:
         """
         Analyze a single batch of files.
 
-        This is a placeholder that would integrate with the main analyzer.
+        Uses the configured analyzer factory when available.
 
         Args:
             batch: List of files in this batch
@@ -325,12 +327,33 @@ class StreamProcessor:
 
         NASA Rule 4: Function under 60 lines
         """
-        # This would integrate with the actual analyzer
-        # For now, return a placeholder result
+        analyzer = None
+        if self._analyzer_factory:
+            try:
+                analyzer = self._analyzer_factory()
+            except Exception as e:
+                logger.error(f"Failed to create analyzer for batch: {e}")
+
+        analysis_results = []
+        if analyzer:
+            for file_path in batch:
+                try:
+                    if hasattr(analyzer, "analyze_file"):
+                        analysis = analyzer.analyze_file(file_path)
+                        analysis_results.append({"file": str(file_path), "analysis": analysis})
+                    else:
+                        analysis_results.append(
+                            {"file": str(file_path), "analysis": None, "error": "Analyzer missing analyze_file"}
+                        )
+                except Exception as e:
+                    analysis_results.append({"file": str(file_path), "analysis": None, "error": str(e)})
+
         return {
             "batch_size": len(batch),
             "files": [str(f) for f in batch],
             "timestamp": time.time(),
+            "analysis_results": analysis_results,
+            "analyzer_available": analyzer is not None,
         }
 
     def process_stream(self, file_changes: List[Path]) -> Dict[str, Any]:

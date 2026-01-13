@@ -286,9 +286,9 @@ def main():
     if args.output:
         with open(args.output, "w") as f:
             json.dump(result, f, indent=2)
-        print(f"Prediction saved to {args.output}")
+        logger.info("Prediction saved to %s", args.output)
     else:
-        print(json.dumps(result, indent=2))
+        logger.info("%s", json.dumps(result, indent=2))
 
 
 if __name__ == "__main__":

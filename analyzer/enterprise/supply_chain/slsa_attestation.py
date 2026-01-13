@@ -351,13 +351,13 @@ def main():
 
     generator = SLSAAttestationGenerator(args.project)
 
-    print(f"Collecting build materials from {args.project}...")
+    logger.info("Collecting build materials from %s...", args.project)
     materials = generator.collect_build_materials()
-    print(f"Found {len(materials)} materials")
+    logger.info("Found %s materials", len(materials))
 
-    print("Collecting build artifacts...")
+    logger.info("Collecting build artifacts...")
     artifacts = generator.collect_build_artifacts()
-    print(f"Found {len(artifacts)} artifacts")
+    logger.info("Found %s artifacts", len(artifacts))
 
     if args.format == "v0.2":
         provenance = generator.generate_provenance_v02(args.builder_id, args.build_type)
@@ -369,7 +369,7 @@ def main():
     statement = generator.generate_in_toto_statement(provenance, predicate_type)
 
     if args.sign:
-        print(f"Signing attestation with {args.signing_method}...")
+        logger.info("Signing attestation with %s...", args.signing_method)
         allow_insecure = args.signing_method == "mock"
         final_attestation = generator.sign_attestation(
             statement, args.signing_method, allow_insecure=allow_insecure
@@ -378,14 +378,14 @@ def main():
         final_attestation = statement
 
     level, requirements = generator.calculate_slsa_level()
-    print(f"\nSLSA Level: {level}")
-    print("\nRequirements:")
+    logger.info("SLSA Level: %s", level)
+    logger.info("Requirements:")
     for req, met in requirements.items():
         status = "✓" if met else "✗"
-        print(f"  {status} {req}")
+        logger.info("  %s %s", status, req)
 
     generator.export_attestation(final_attestation, args.output)
-    print(f"\nAttestation saved to: {args.output}")
+    logger.info("Attestation saved to: %s", args.output)
 
 
 if __name__ == "__main__":

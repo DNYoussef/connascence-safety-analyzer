@@ -9,6 +9,7 @@ and producing consolidated reports with actionable insights.
 from dataclasses import dataclass, field
 from datetime import datetime
 import json
+import logging
 from pathlib import Path
 import sys
 from typing import Dict, List, Optional
@@ -17,6 +18,10 @@ import yaml
 
 # Import ClarityLinter for integration
 from analyzer.clarity_linter import ClarityLinter
+from analyzer.connascence_analyzer import ConnascenceAnalyzer
+from analyzer.nasa_engine.nasa_analyzer import NASAAnalyzer
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -105,9 +110,9 @@ class UnifiedQualityGate:
         # Initialize ClarityLinter (finds its own config automatically)
         try:
             self.clarity_linter = ClarityLinter()
-            print("[UnifiedQualityGate] ClarityLinter initialized successfully")
+            logger.info("[UnifiedQualityGate] ClarityLinter initialized successfully")
         except Exception as e:
-            print(f"[UnifiedQualityGate] Warning: Failed to initialize ClarityLinter: {e}")
+            logger.warning("[UnifiedQualityGate] Failed to initialize ClarityLinter: %s", e)
             self.clarity_linter = None
 
     def _load_config(self) -> Dict:
@@ -191,10 +196,10 @@ class UnifiedQualityGate:
         - PoorNamingDetector
         - CommentIssuesDetector
         """
-        print("[Clarity Linter] Starting analysis...")
+        logger.info("[Clarity Linter] Starting analysis...")
 
         if not self.clarity_linter:
-            print("[Clarity Linter] Skipped - not initialized")
+            logger.warning("[Clarity Linter] Skipped - not initialized")
             return
 
         try:
@@ -219,67 +224,73 @@ class UnifiedQualityGate:
 
             # Get summary metrics
             summary = self.clarity_linter.get_summary()
-            print(f"[Clarity Linter] Analyzed {summary['total_files_analyzed']} files")
-            print(f"[Clarity Linter] Found {summary['total_violations_found']} violations")
+            logger.info("[Clarity Linter] Analyzed %s files", summary["total_files_analyzed"])
+            logger.info("[Clarity Linter] Found %s violations", summary["total_violations_found"])
 
         except Exception as e:
-            print(f"[Clarity Linter] Error during analysis: {e}")
+            logger.error("[Clarity Linter] Error during analysis: %s", e)
             import traceback
             traceback.print_exc()
 
     def _run_connascence_analyzer(self, project_path: Path) -> None:
         """
         Run Connascence Analyzer.
-
-        TODO: Integrate with existing connascence_analyzer module
-        This should import and use the actual analyzer.
         """
-        print("[Connascence Analyzer] Starting analysis...")
+        logger.info("[Connascence Analyzer] Starting analysis...")
 
-        # Placeholder: This would invoke the actual connascence analyzer
-        # Import from analyzer module when integrated
-        sample_violations = [
-            Violation(
-                rule_id="CON_GOD_OBJECT",
-                message="Class has 26 methods (threshold: 15)",
-                file=str(project_path / "module.py"),
-                line=10,
-                severity="high",
-                category="design",
-                connascence_type="CoC (Connascence of Complexity)",
-                fix_suggestion="Split into focused classes following SRP",
-                source_analyzer="connascence_analyzer",
-            )
-        ]
-
-        self.results.violations.extend(sample_violations)
-        print(f"[Connascence Analyzer] Found {len(sample_violations)} violations")
+        try:
+            analyzer = ConnascenceAnalyzer()
+            violations = analyzer.analyze_directory(project_path)
+            for violation in violations:
+                self.results.violations.append(
+                    Violation(
+                        rule_id=getattr(violation, "rule_id", None) or getattr(violation, "type", "connascence"),
+                        message=getattr(violation, "description", ""),
+                        file=getattr(violation, "file_path", ""),
+                        line=getattr(violation, "line_number", 0),
+                        column=getattr(violation, "column", None),
+                        severity=getattr(violation, "severity", "medium"),
+                        category="design",
+                        connascence_type=getattr(violation, "connascence_type", None)
+                        or getattr(violation, "type", None),
+                        fix_suggestion=getattr(violation, "recommendation", None),
+                        source_analyzer="connascence_analyzer",
+                    )
+                )
+            logger.info("[Connascence Analyzer] Found %s violations", len(violations))
+        except Exception as e:
+            logger.error("[Connascence Analyzer] Analysis failed: %s", e)
 
     def _run_nasa_standards(self, project_path: Path) -> None:
         """
         Run NASA Standards compliance check.
-
-        TODO: Integrate with NASA standards checking module
         """
-        print("[NASA Standards] Starting compliance check...")
+        logger.info("[NASA Standards] Starting compliance check...")
 
-        # Placeholder: This would invoke actual NASA standards checker
-        sample_violations = [
-            Violation(
-                rule_id="NASA_JPL_4",
-                message="Function exceeds 60 lines",
-                file=str(project_path / "critical.py"),
-                line=100,
-                severity="high",
-                category="reliability",
-                nasa_mapping="NASA JPL Rule 4",
-                fix_suggestion="Refactor to meet NASA JPL standards",
-                source_analyzer="nasa_standards",
-            )
-        ]
+        try:
+            analyzer = NASAAnalyzer()
+            nasa_violations = []
+            for file_path in project_path.rglob("*.py"):
+                nasa_violations.extend(analyzer.analyze_file(str(file_path)))
 
-        self.results.violations.extend(sample_violations)
-        print(f"[NASA Standards] Found {len(sample_violations)} violations")
+            for violation in nasa_violations:
+                self.results.violations.append(
+                    Violation(
+                        rule_id=getattr(violation, "rule_id", None) or getattr(violation, "type", "nasa_rule"),
+                        message=getattr(violation, "description", ""),
+                        file=getattr(violation, "file_path", ""),
+                        line=getattr(violation, "line_number", 0),
+                        column=getattr(violation, "column", None),
+                        severity=getattr(violation, "severity", "medium"),
+                        category="reliability",
+                        nasa_mapping=getattr(violation, "rule_id", None),
+                        fix_suggestion=getattr(violation, "recommendation", None),
+                        source_analyzer="nasa_standards",
+                    )
+                )
+            logger.info("[NASA Standards] Found %s violations", len(nasa_violations))
+        except Exception as e:
+            logger.error("[NASA Standards] Analysis failed: %s", e)
 
     def _calculate_metrics(self) -> None:
         """Calculate quality metrics from violations"""
@@ -630,18 +641,16 @@ def main():
         else:
             gate.export_json(args.output_file)
 
-        print(f"Results written to: {args.output_file}")
+        logger.info("Results written to: %s", args.output_file)
 
     # Print summary
-    print("\n" + "=" * 50)
-    print("Quality Gate Results")
-    print("=" * 50)
-    print(f"Overall Score: {results.overall_score:.2f}/100")
-    print(f"Total Violations: {results.metrics['total_violations']}")
-    print(
-        f"Quality Gate: {'PASSED' if results.metadata['quality_gate_passed'] else 'FAILED'}"
-    )
-    print("=" * 50)
+    logger.info("\n%s", "=" * 50)
+    logger.info("Quality Gate Results")
+    logger.info("%s", "=" * 50)
+    logger.info("Overall Score: %.2f/100", results.overall_score)
+    logger.info("Total Violations: %s", results.metrics["total_violations"])
+    logger.info("Quality Gate: %s", "PASSED" if results.metadata["quality_gate_passed"] else "FAILED")
+    logger.info("%s", "=" * 50)
 
     # Exit with appropriate code
     sys.exit(0 if results.metadata["quality_gate_passed"] else 1)
