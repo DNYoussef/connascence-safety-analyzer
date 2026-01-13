@@ -9,11 +9,14 @@ and provides metrics on improvement achieved.
 import ast
 from collections import defaultdict
 from dataclasses import dataclass
+import logging
 from pathlib import Path
 import time
 from typing import Any, Dict, List
 
 from .config_manager import get_config_manager
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -74,7 +77,7 @@ class ConnascenceValidator:
         Returns:
             Dictionary containing validation results and metrics
         """
-        print("🔍 Validating connascence reduction effectiveness...")
+        logger.info("Validating connascence reduction effectiveness...")
         start_time = time.time()
 
         # Collect metrics from the analyzer codebase
@@ -174,7 +177,7 @@ class ConnascenceValidator:
             metrics.interface_inconsistencies = self._count_interface_inconsistencies(tree)
 
         except Exception as e:
-            print(f"Warning: Failed to analyze {file_path}: {e}")
+            logger.warning("Failed to analyze %s: %s", file_path, e)
 
         return metrics
 
@@ -402,18 +405,18 @@ def validate_connascence_reduction() -> Dict[str, Any]:
     results = validator.validate_reduction_effectiveness()
 
     # Print summary
-    print("\n📊 CONNASCENCE REDUCTION VALIDATION RESULTS")
-    print("=" * 50)
-    print(f"Overall Improvement: {results['improvement_percentages']['overall']}%")
-    print(f"Files Analyzed: {results['validation_summary']['files_analyzed']}")
-    print(f"Total Violations After: {results['after_metrics']['total_violations']}")
-    print("\n🎯 Key Improvements:")
+    logger.info("CONNASCENCE REDUCTION VALIDATION RESULTS")
+    logger.info("%s", "=" * 50)
+    logger.info("Overall Improvement: %s%%", results["improvement_percentages"]["overall"])
+    logger.info("Files Analyzed: %s", results["validation_summary"]["files_analyzed"])
+    logger.info("Total Violations After: %s", results["after_metrics"]["total_violations"])
+    logger.info("Key Improvements:")
     for improvement in results["specific_improvements"]:
-        print(f"  • {improvement['area']}: {improvement['description']}")
+        logger.info("  • %s: %s", improvement["area"], improvement["description"])
 
-    print("\n💡 Recommendations:")
+    logger.info("Recommendations:")
     for rec in results["recommendations"]:
-        print(f"  • {rec}")
+        logger.info("  • %s", rec)
 
     return results
 

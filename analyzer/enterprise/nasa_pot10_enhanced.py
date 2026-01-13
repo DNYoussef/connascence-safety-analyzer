@@ -122,13 +122,7 @@ class EnhancedNASAPowerOfTenAnalyzer:
         self.enable_defense_mode = enable_defense_mode
         self.scoring_engine = WeightedScoringEngine()
 
-        self.dynamic_memory_patterns = [
-            r"\bmalloc\s*\(",
-            r"\bcalloc\s*\(",
-            r"\brealloc\s*\(",
-            r"\bfree\s*\(",
-            r"\bnew\s+\w+",
-            r"\bdelete\s+",
+        self.python_dynamic_memory_patterns = [
             r"\.append\s*\(",
             r"\.extend\s*\(",
             r"\.insert\s*\(",
@@ -138,17 +132,32 @@ class EnhancedNASAPowerOfTenAnalyzer:
             r"set\s*\(",
             r"\.update\s*\(",
         ]
+        self.c_dynamic_memory_patterns = [
+            r"\bmalloc\s*\(",
+            r"\bcalloc\s*\(",
+            r"\brealloc\s*\(",
+            r"\bfree\s*\(",
+            r"\bnew\s+\w+",
+            r"\bdelete\s+",
+        ]
 
-        self.pointer_patterns = [
+        self.python_pointer_patterns = [
+            r"ctypes\.",
+            r"pointer\(",
+        ]
+        self.c_pointer_patterns = [
             r"\*\w+",
             r"\w+\s*\*",
             r"->",
             r"&\w+",
-            r"ctypes\.",
-            r"pointer\(",
         ]
 
-        self.preprocessor_patterns = [
+        self.python_preprocessor_patterns = [
+            r"exec\s*\(",
+            r"eval\s*\(",
+            r"compile\s*\(",
+        ]
+        self.c_preprocessor_patterns = [
             r"#define\s+",
             r"#ifdef\s+",
             r"#ifndef\s+",
@@ -156,9 +165,6 @@ class EnhancedNASAPowerOfTenAnalyzer:
             r"#else",
             r"#endif",
             r"#pragma\s+",
-            r"exec\s*\(",
-            r"eval\s*\(",
-            r"compile\s*\(",
         ]
 
         self.assertion_patterns = [
@@ -243,7 +249,7 @@ class EnhancedNASAPowerOfTenAnalyzer:
             violations.extend(file_violations)
 
         except Exception as e:
-            logger.error(f"Failed to analyze {file_path}: {e}")
+            logger.error("Failed to analyze %s: %s", file_path, e)
 
         return violations
 
@@ -322,7 +328,15 @@ class EnhancedNASAPowerOfTenAnalyzer:
                 )
             )
 
-        memory_violations = self._find_memory_violations(func_content, func_start, func_node.name, category)
+        patterns = self._get_language_patterns(file_path)
+        memory_violations = self._find_memory_violations(
+            func_content,
+            func_start,
+            func_node.name,
+            category,
+            patterns["dynamic_memory"],
+            patterns["pointer"],
+        )
         violations.extend([self._set_file_path(v, str(file_path)) for v in memory_violations])
 
         return violations
@@ -352,17 +366,24 @@ class EnhancedNASAPowerOfTenAnalyzer:
                 )
             )
 
-        preprocessor_violations = self._find_preprocessor_usage(content, lines)
+        patterns = self._get_language_patterns(file_path)
+        preprocessor_violations = self._find_preprocessor_usage(content, lines, patterns["preprocessor"])
         violations.extend([self._set_file_path(v, str(file_path)) for v in preprocessor_violations])
 
         return violations
 
     def _find_memory_violations(
-        self, func_content: str, func_start: int, func_name: str, category: str
+        self,
+        func_content: str,
+        func_start: int,
+        func_name: str,
+        category: str,
+        dynamic_patterns: List[str],
+        pointer_patterns: List[str],
     ) -> List[EnhancedNASAViolation]:
         violations = []
 
-        for pattern in self.dynamic_memory_patterns:
+        for pattern in dynamic_patterns:
             matches = re.finditer(pattern, func_content, re.MULTILINE)
             for match in matches:
                 line_offset = func_content[: match.start()].count("\n")
@@ -386,7 +407,7 @@ class EnhancedNASAPowerOfTenAnalyzer:
                     )
                 )
 
-        for pattern in self.pointer_patterns:
+        for pattern in pointer_patterns:
             matches = re.finditer(pattern, func_content, re.MULTILINE)
             for match in matches:
                 line_offset = func_content[: match.start()].count("\n")
@@ -412,10 +433,12 @@ class EnhancedNASAPowerOfTenAnalyzer:
 
         return violations
 
-    def _find_preprocessor_usage(self, content: str, lines: List[str]) -> List[EnhancedNASAViolation]:
+    def _find_preprocessor_usage(
+        self, content: str, lines: List[str], preprocessor_patterns: List[str]
+    ) -> List[EnhancedNASAViolation]:
         violations = []
 
-        for pattern in self.preprocessor_patterns:
+        for pattern in preprocessor_patterns:
             matches = re.finditer(pattern, content, re.MULTILINE)
             for match in matches:
                 line_num = content[: match.start()].count("\n") + 1
@@ -534,6 +557,21 @@ class EnhancedNASAPowerOfTenAnalyzer:
 
         return recommendations
 
+    def _get_language_patterns(self, file_path: Path) -> Dict[str, List[str]]:
+        """Select language-appropriate regex patterns."""
+        suffix = file_path.suffix.lower()
+        if suffix in {".py", ".pyi", ".pyx"}:
+            return {
+                "dynamic_memory": self.python_dynamic_memory_patterns,
+                "pointer": self.python_pointer_patterns,
+                "preprocessor": self.python_preprocessor_patterns,
+            }
+        return {
+            "dynamic_memory": self.c_dynamic_memory_patterns,
+            "pointer": self.c_pointer_patterns,
+            "preprocessor": self.c_preprocessor_patterns,
+        }
+
     def _determine_category(self, file_path: Path, func_name: str) -> str:
         path_str = str(file_path).lower()
         if "test" in path_str or func_name.startswith("test_"):
@@ -596,7 +634,64 @@ class EnhancedNASAPowerOfTenAnalyzer:
         return complexity
 
     def _analyze_variable_scope(self, tree: ast.AST) -> List[Dict[str, Any]]:
-        return []
+        violations = []
+
+        class ScopeAnalyzer(ast.NodeVisitor):
+            def __init__(self):
+                self.scope_stack = []
+                self.declarations = {}
+                self.usages = defaultdict(list)
+
+            def _current_scope(self) -> int:
+                return len(self.scope_stack)
+
+            def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
+                self.scope_stack.append(("function", node.name, node.lineno))
+                self.generic_visit(node)
+                self.scope_stack.pop()
+
+            def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> None:
+                self.scope_stack.append(("async_function", node.name, node.lineno))
+                self.generic_visit(node)
+                self.scope_stack.pop()
+
+            def visit_ClassDef(self, node: ast.ClassDef) -> None:
+                self.scope_stack.append(("class", node.name, node.lineno))
+                self.generic_visit(node)
+                self.scope_stack.pop()
+
+            def visit_Assign(self, node: ast.Assign) -> None:
+                current_scope = self._current_scope()
+                for target in node.targets:
+                    if isinstance(target, ast.Name):
+                        self.declarations.setdefault(target.id, (current_scope, node.lineno))
+                self.generic_visit(node)
+
+            def visit_Name(self, node: ast.Name) -> None:
+                if isinstance(node.ctx, ast.Load):
+                    self.usages[node.id].append((self._current_scope(), node.lineno))
+                self.generic_visit(node)
+
+        analyzer = ScopeAnalyzer()
+        analyzer.visit(tree)
+
+        for var_name, (decl_scope, decl_line) in analyzer.declarations.items():
+            if var_name not in analyzer.usages:
+                continue
+            usage_entries = analyzer.usages[var_name]
+            if decl_scope == 0 and usage_entries and all(scope_level > 0 for scope_level, _ in usage_entries):
+                if len(usage_entries) < 3:
+                    violations.append(
+                        {
+                            "rule": "NASA-6",
+                            "message": f"Variable '{var_name}' may be declared at too broad a scope",
+                            "line": decl_line,
+                            "severity": "warning",
+                            "description": f"Variable '{var_name}' declared at module scope but used only in inner scope",
+                        }
+                    )
+
+        return violations
 
     def _generate_function_split_fix(self, func_node: ast.FunctionDef, func_content: str) -> str:
         return f"Extract methods: Split {func_node.name}() into smaller focused functions"

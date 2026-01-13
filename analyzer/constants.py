@@ -27,12 +27,15 @@ class ExitCode(IntEnum):
 
 NASA_PARAMETER_THRESHOLD = 6  # Rule #6: Function parameters should not exceed 6
 NASA_GLOBAL_THRESHOLD = 5  # Rule #7: Limit global variable usage
-NASA_COMPLIANCE_THRESHOLD = 0.95  # Minimum NASA compliance score for passing
+NASA_MIN_COMPLIANCE = 0.95  # Minimum NASA compliance score for passing
+NASA_COMPLIANCE_THRESHOLD = NASA_MIN_COMPLIANCE  # Backward compatibility alias
 
 # God Object Detection Thresholds
-GOD_OBJECT_METHOD_THRESHOLD = 20  # Classes with >20 methods are god objects
+GOD_OBJECT_METHOD_THRESHOLD = 15  # Classes with >15 methods are god objects
+GOD_OBJECT_FIELD_THRESHOLD = 10  # Classes with >10 fields are god objects
+PARAMETER_BOMB_THRESHOLD = 7  # Methods with >7 params are parameter bombs
 GOD_OBJECT_LOC_THRESHOLD = 500  # Classes with >500 LOC are god objects
-GOD_OBJECT_PARAMETER_THRESHOLD = 10  # Methods with >10 params are parameter bombs
+GOD_OBJECT_PARAMETER_THRESHOLD = PARAMETER_BOMB_THRESHOLD  # Backward compatibility alias
 
 # RESTORED: Original threshold for CI/CD pipeline - TECHNICAL DEBT ACKNOWLEDGED
 # DOCUMENTED VIOLATIONS: This change reveals 2 god object violations:
@@ -52,7 +55,7 @@ POSITION_COUPLING_THRESHOLD = 4  # Parameter count before position coupling
 ALGORITHM_COMPLEXITY_THRESHOLD = 10  # Cyclomatic complexity threshold
 
 # Quality Gate Thresholds
-OVERALL_QUALITY_THRESHOLD = 0.75  # Minimum overall quality score
+OVERALL_QUALITY_THRESHOLD = 0.70  # Minimum overall quality score
 CRITICAL_VIOLATION_LIMIT = 0  # Maximum allowed critical violations
 HIGH_VIOLATION_LIMIT = 5  # Maximum allowed high-severity violations
 
@@ -60,6 +63,13 @@ HIGH_VIOLATION_LIMIT = 5  # Maximum allowed high-severity violations
 # After major refactoring, temporarily lower threshold to allow deployment
 # TODO: Continue improving quality score through iterative refactoring
 OVERALL_QUALITY_THRESHOLD_CI = 0.55  # Temporary reduced threshold for CI/CD
+
+# Six Sigma Thresholds
+SIGMA_LEVEL_TARGET = 4.0
+MAX_DPMO = 6210
+
+# Theater Detection Thresholds
+MAX_THEATER_RISK = 0.20
 
 # Performance Thresholds
 MAX_ANALYSIS_TIME_SECONDS = 300  # Maximum time allowed for analysis

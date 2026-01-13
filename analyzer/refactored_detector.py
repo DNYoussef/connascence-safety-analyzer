@@ -7,7 +7,10 @@ NASA Rule 4/5/6 compliant implementation.
 """
 
 import ast
+import logging
 from typing import List
+
+logger = logging.getLogger(__name__)
 
 try:
     from .utils.types import ConnascenceViolation
@@ -189,7 +192,7 @@ class RefactoredConnascenceDetector(ast.NodeVisitor):
 
             except Exception as e:
                 # NASA Rule 5: Error handling
-                print(f"Warning: {detector_name} detector failed: {e}")
+                logger.warning("%s detector failed: %s", detector_name, e)
                 continue
 
         return violations
@@ -210,7 +213,7 @@ class RefactoredConnascenceDetector(ast.NodeVisitor):
                 detector = detector_class(self.file_path, self.source_lines)
                 violations.extend(detector.analyze_from_data(collected_data))
             except Exception as e:
-                print(f"Warning: Fallback {name} detector failed: {e}")
+                logger.warning("Fallback %s detector failed: %s", name, e)
 
         return violations
 
@@ -298,7 +301,7 @@ class RefactoredConnascenceDetector(ast.NodeVisitor):
                 self._detector_pool.release_all_detectors(self._acquired_detectors)
                 self._acquired_detectors = {}
             except Exception as e:
-                print(f"Warning: Failed to release detector pool resources: {e}")
+                logger.warning("Failed to release detector pool resources: %s", e)
 
     def finalize_analysis(self):
         """Legacy method for compatibility - now handled by detect_all_violations."""

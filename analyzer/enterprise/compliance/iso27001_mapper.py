@@ -354,24 +354,30 @@ def main():
 
     mapper = ISO27001Mapper(args.project)
 
-    print(f"Mapping ISO 27001:2022 controls for {args.project}...")
+    logger.info("Mapping ISO 27001:2022 controls for %s...", args.project)
 
     mappings = mapper.map_all_controls()
-    print(f"Mapped {len(mappings)} controls")
+    logger.info("Mapped %s controls", len(mappings))
 
     report = mapper.generate_report()
 
-    print(f"\nISO 27001:2022 Compliance: {report.compliance_percentage:.1%}")
-    print(f"  Implemented: {report.implemented_controls}")
-    print(f"  Partial: {report.partial_controls}")
-    print(f"  Missing: {report.missing_controls}")
+    logger.info("ISO 27001:2022 Compliance: %.1f%%", report.compliance_percentage * 100)
+    logger.info("  Implemented: %s", report.implemented_controls)
+    logger.info("  Partial: %s", report.partial_controls)
+    logger.info("  Missing: %s", report.missing_controls)
 
-    print("\nDomain Summary:")
+    logger.info("Domain Summary:")
     for domain, stats in report.domain_summary.items():
-        print(f"  {domain}: {stats['implemented']} implemented, {stats['partial']} partial, {stats['missing']} missing")
+        logger.info(
+            "  %s: %s implemented, %s partial, %s missing",
+            domain,
+            stats["implemented"],
+            stats["partial"],
+            stats["missing"],
+        )
 
     mapper.export_report(report, args.output)
-    print(f"\nReport saved to: {args.output}")
+    logger.info("Report saved to: %s", args.output)
 
 
 if __name__ == "__main__":

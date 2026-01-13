@@ -37,28 +37,30 @@ except ImportError:
     # Create stub classes for when watchdog is not available
     class FileSystemEvent:  # type: ignore
         """Stub class for when watchdog is not available."""
-
-        pass
+        # Intentional no-op: watchdog not available in this environment.
 
     class FileSystemEventHandler:  # type: ignore
         """Stub class for when watchdog is not available."""
-
-        pass
+        # Intentional no-op: watchdog not available in this environment.
 
     class Observer:  # type: ignore
         """Stub class for when watchdog is not available."""
 
         def __init__(self, *args: Any, **kwargs: Any) -> None:
-            pass
+            # Intentional no-op: watchdog not available in this environment.
+            return None
 
         def schedule(self, *args: Any, **kwargs: Any) -> None:
-            pass
+            # Intentional no-op: watchdog not available in this environment.
+            return None
 
         def start(self) -> None:
-            pass
+            # Intentional no-op: watchdog not available in this environment.
+            return None
 
         def stop(self) -> None:
-            pass
+            # Intentional no-op: watchdog not available in this environment.
+            return None
 
 
 logger = logging.getLogger(__name__)

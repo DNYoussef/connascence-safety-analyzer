@@ -6,9 +6,12 @@ Singleton pattern with thread-safe detector reuse
 Eliminates object creation overhead (8 objects per file -> 1 pool)
 """
 
+import logging
 import threading
 import time
 from typing import Any, Dict, List, Optional
+
+logger = logging.getLogger(__name__)
 
 try:
     from ..detectors import (
@@ -202,7 +205,7 @@ class DetectorPool:
 
         except Exception as e:
             # NASA Rule 5: Error handling
-            print(f"Warning: Failed to create {detector_name} detector: {e}")
+            logger.warning("Failed to create %s detector: %s", detector_name, e)
             return None
 
     def acquire_detector(self, detector_name: str, file_path: str, source_lines: List[str]) -> Optional[DetectorBase]:
@@ -294,7 +297,7 @@ class DetectorPool:
             self.release_detector(detector)
 
         # Log warning about resource pressure
-        print(f"Warning: Could not acquire detectors: {failed}. Pool at capacity.")
+        logger.warning("Could not acquire detectors: %s. Pool at capacity.", failed)
 
     def release_all_detectors(self, detectors: Dict[str, DetectorBase]):
         """Release multiple detectors back to pool."""

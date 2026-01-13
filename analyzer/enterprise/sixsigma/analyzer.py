@@ -5,6 +5,7 @@ Integrates Six Sigma quality metrics with connascence analysis
 to provide enterprise-grade quality measurement and improvement.
 """
 
+import ast
 from dataclasses import dataclass
 from datetime import datetime
 import json
@@ -12,6 +13,7 @@ import logging
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
+from analyzer.constants import MAX_DPMO, SIGMA_LEVEL_TARGET
 from .calculator import CTQCalculator, ProcessCapability
 from .telemetry import SixSigmaTelemetry
 
@@ -46,7 +48,7 @@ class SixSigmaAnalyzer:
     QUALITY_TARGETS = {
         "world_class": {"sigma": 6.0, "dpmo": 3.4},
         "enterprise": {"sigma": 5.0, "dpmo": 233},
-        "standard": {"sigma": 4.0, "dpmo": 6210},
+        "standard": {"sigma": SIGMA_LEVEL_TARGET, "dpmo": MAX_DPMO},
         "baseline": {"sigma": 3.0, "dpmo": 66807},
     }
 
@@ -111,7 +113,7 @@ class SixSigmaAnalyzer:
 
         # Record file analysis
         total_violations = len(violations)
-        total_checks = 100  # Assume 100 potential violation points per file
+        total_checks = self._count_violation_opportunities(file_path)
         self.telemetry.record_file_analyzed(total_violations, total_checks)
 
         # Generate metrics
@@ -167,6 +169,32 @@ class SixSigmaAnalyzer:
 
         return ctq_metrics
 
+    def _count_violation_opportunities(self, file_path: Optional[Path]) -> int:
+        """Count actual checkable opportunities in the AST."""
+        if not file_path:
+            return 10
+
+        try:
+            path = Path(file_path)
+            tree = ast.parse(path.read_text(encoding="utf-8"))
+        except (FileNotFoundError, PermissionError, SyntaxError, UnicodeDecodeError):
+            return 10
+
+        opportunities = 0
+        for node in ast.walk(tree):
+            if isinstance(node, ast.FunctionDef):
+                opportunities += 10
+            elif isinstance(node, ast.ClassDef):
+                opportunities += 8
+            elif isinstance(node, ast.If):
+                opportunities += 2
+            elif isinstance(node, ast.Try):
+                opportunities += 3
+            elif isinstance(node, ast.Assign):
+                opportunities += 1
+
+        return max(opportunities, 10)
+
     def _generate_improvement_suggestions(
         self,
         dpmo: float,
@@ -209,7 +237,7 @@ class SixSigmaAnalyzer:
                 )
 
         # Process improvement suggestions
-        if sigma_level < 4.0:
+        if sigma_level < SIGMA_LEVEL_TARGET:
             suggestions.append("Implement automated detection and fixing for common violations")
         if sigma_level < 5.0:
             suggestions.append("Establish code review gates with Six Sigma metrics")

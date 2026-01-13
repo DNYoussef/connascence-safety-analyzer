@@ -56,8 +56,8 @@ except ImportError:
         def record_performance(self, **kwargs):
             if kwargs:
                 ProductionAssert.not_none(kwargs, "kwargs")
-
-            pass
+            # Intentional no-op: metrics backend not available.
+            return None
 
 
 logger = logging.getLogger(__name__)

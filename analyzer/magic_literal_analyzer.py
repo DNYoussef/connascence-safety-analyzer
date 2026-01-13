@@ -83,7 +83,8 @@ class MagicLiteralAnalyzer:
             self._analyze_node(tree, file_path, source)
             self._detect_repeated_literals(file_path)
         except SyntaxError:
-            pass
+            # Intentional no-op: skip files with syntax errors.
+            return self.violations
 
         return self.violations
 
@@ -153,12 +154,12 @@ class MagicLiteralAnalyzer:
         for comparator in node.comparators:
             if isinstance(comparator, ast.Constant):
                 # Already handled in _check_constant with context
-                pass
+                continue
 
     def _check_binary_op(self, node: ast.BinOp, file_path: str):
         """Check binary operations for magic literals."""
         # Already handled via _check_constant
-        pass
+        return None
 
     def _determine_context(self, node: ast.Constant, tree: ast.AST) -> str:
         """Determine the context where the literal is used."""

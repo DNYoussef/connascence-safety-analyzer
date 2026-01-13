@@ -370,24 +370,24 @@ def main():
 
     aligner = NISTSSDFAligner(args.project)
 
-    print(f"Assessing NIST SSDF compliance for {args.project}...")
+    logger.info("Assessing NIST SSDF compliance for %s...", args.project)
 
     practices = aligner.assess_all_practices()
-    print(f"Assessed {len(practices)} practices")
+    logger.info("Assessed %s practices", len(practices))
 
     report = aligner.generate_report()
 
-    print(f"\nNIST SSDF Maturity Level: {report.maturity_level}")
-    print(f"  Implemented Practices: {report.implemented_practices}/{report.total_practices}")
+    logger.info("NIST SSDF Maturity Level: %s", report.maturity_level)
+    logger.info("  Implemented Practices: %s/%s", report.implemented_practices, report.total_practices)
 
-    print("\nPractice Group Summary:")
+    logger.info("Practice Group Summary:")
     for group, stats in report.group_summary.items():
         total = sum(stats.values())
         advanced = stats.get("quantitatively_managed", 0) + stats.get("defined", 0)
-        print(f"  {group}: {advanced}/{total} practices at defined or higher maturity")
+        logger.info("  %s: %s/%s practices at defined or higher maturity", group, advanced, total)
 
     aligner.export_report(report, args.output)
-    print(f"\nReport saved to: {args.output}")
+    logger.info("Report saved to: %s", args.output)
 
 
 if __name__ == "__main__":

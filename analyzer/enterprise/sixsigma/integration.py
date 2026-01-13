@@ -341,7 +341,7 @@ class ConnascenceSixSigmaIntegration:
         gate = self.generate_quality_gate_decision(analysis_results)
 
         # Print report to console
-        print(self.generate_executive_report(analysis_results))
+        logger.info("%s", self.generate_executive_report(analysis_results))
 
         # Export metrics for CI/CD artifacts
         self.export_dashboard_data(analysis_results, Path("./.connascence-six-sigma-metrics.json"))

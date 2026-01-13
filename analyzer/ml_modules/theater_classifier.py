@@ -310,7 +310,7 @@ def main():
 
     if args.mode == "train":
         if not args.training_data:
-            print("Error: --training-data required for training mode")
+            logger.error("--training-data required for training mode")
             return
 
         with open(args.training_data) as f:
@@ -322,19 +322,19 @@ def main():
             is_theater = item["is_theater"]
             training_data.append((features, is_theater))
 
-        print(f"Training on {len(training_data)} samples...")
+        logger.info("Training on %s samples...", len(training_data))
         metrics = classifier.train(training_data)
 
-        print("\nTraining Results:")
+        logger.info("Training Results:")
         for key, value in metrics.items():
-            print(f"  {key}: {value:.3f}" if isinstance(value, float) else f"  {key}: {value}")
+            logger.info("  %s: %s", key, f"{value:.3f}" if isinstance(value, float) else value)
 
         classifier.save_model(args.model_path)
-        print(f"\nModel saved to {args.model_path}")
+        logger.info("Model saved to %s", args.model_path)
 
     elif args.mode == "predict":
         if not args.theater_report:
-            print("Error: --theater-report required for prediction mode")
+            logger.error("--theater-report required for prediction mode")
             return
 
         if Path(args.model_path).exists():
@@ -346,13 +346,13 @@ def main():
         features = classifier.extract_features_from_theater_report(theater_report)
         result = classifier.predict(features)
 
-        print("\nClassification Result:")
-        print(f"  Theater Detected: {result.is_theater}")
-        print(f"  Confidence: {result.confidence:.2%}")
-        print("  Probabilities:")
-        print(f"    Authentic: {result.probabilities['authentic']:.2%}")
-        print(f"    Theater: {result.probabilities['theater']:.2%}")
-        print(f"  Model: {result.model_type}")
+        logger.info("Classification Result:")
+        logger.info("  Theater Detected: %s", result.is_theater)
+        logger.info("  Confidence: %.2f%%", result.confidence * 100)
+        logger.info("  Probabilities:")
+        logger.info("    Authentic: %.2f%%", result.probabilities["authentic"] * 100)
+        logger.info("    Theater: %.2f%%", result.probabilities["theater"] * 100)
+        logger.info("  Model: %s", result.model_type)
 
 
 if __name__ == "__main__":

@@ -7,6 +7,7 @@ NASA Rule 4 Compliant: All functions under 60 lines
 NASA Rule 5 Compliant: Input assertions
 """
 
+import logging
 from pathlib import Path
 from typing import Any, Dict, Optional
 
@@ -15,7 +16,9 @@ try:
     YAML_AVAILABLE = True
 except ImportError:
     YAML_AVAILABLE = False
-    print("[WARNING] PyYAML not available, using default configuration")
+    logging.getLogger(__name__).warning("PyYAML not available, using default configuration")
+
+logger = logging.getLogger(__name__)
 
 
 class ClarityConfigLoader:
@@ -72,7 +75,7 @@ class ClarityConfigLoader:
         config_path = Path(config_path)
 
         if not config_path.exists():
-            print(f"[WARNING] Config file not found: {config_path}")
+            logger.warning("Config file not found: %s", config_path)
             return ClarityConfigLoader._get_default_config()
 
         try:
@@ -88,7 +91,7 @@ class ClarityConfigLoader:
             return config
 
         except Exception as e:
-            print(f"[ERROR] Failed to load config from {config_path}: {e}")
+            logger.error("Failed to load config from %s: %s", config_path, e)
             return ClarityConfigLoader._get_default_config()
 
     @staticmethod

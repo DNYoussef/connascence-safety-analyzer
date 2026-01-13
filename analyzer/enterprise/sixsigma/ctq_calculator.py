@@ -365,15 +365,15 @@ async def main():
     results = await calculator.calculate(metrics_data)
     calculator.export_results(results, args.output)
 
-    print(f"Overall Score: {results.overall_score:.2%}")
-    print(f"Sigma Level: {results.sigma_level}")
-    print(f"DPMO: {results.dpmo:.0f}")
-    print(f"Defects: {results.defect_count}/{results.opportunities}")
+    logger.info("Overall Score: %.2f%%", results.overall_score * 100)
+    logger.info("Sigma Level: %s", results.sigma_level)
+    logger.info("DPMO: %.0f", results.dpmo)
+    logger.info("Defects: %s/%s", results.defect_count, results.opportunities)
 
     if results.recommendations:
-        print("\nRecommendations:")
+        logger.info("Recommendations:")
         for rec in results.recommendations:
-            print(f"  [{rec['priority']}] {rec['ctq']}: {rec['message']}")
+            logger.info("  [%s] %s: %s", rec["priority"], rec["ctq"], rec["message"])
 
 
 if __name__ == "__main__":

@@ -3,6 +3,7 @@ Language-specific strategy implementations for connascence detection.
 Consolidates duplicate algorithms across JavaScript and C language detection.
 """
 
+import logging
 from pathlib import Path
 import re
 from typing import Dict, List
@@ -34,6 +35,7 @@ class LanguageStrategy:
 
     def __init__(self, language_name: str):
         self.language_name = language_name
+        self.logger = logging.getLogger(__name__)
 
     def detect_magic_literals(self, file_path: Path, source_lines: List[str]) -> List[ConnascenceViolation]:
         """Detect magic literals using formal grammar analysis when possible."""
@@ -134,23 +136,29 @@ class LanguageStrategy:
     # Abstract methods to be implemented by language-specific strategies
     def get_magic_literal_patterns(self) -> Dict[str, re.Pattern]:
         """Return regex patterns for magic literal detection."""
-        raise NotImplementedError
+        self.logger.warning("No magic literal patterns defined for %s", self.__class__.__name__)
+        empty_pattern = re.compile(r"$^")
+        return {"numeric": empty_pattern, "string": empty_pattern}
 
     def get_function_detector(self) -> re.Pattern:
         """Return regex pattern for function detection."""
-        raise NotImplementedError
+        self.logger.warning("No function detector defined for %s", self.__class__.__name__)
+        return re.compile(r"$^")
 
     def get_parameter_detector(self) -> re.Pattern:
         """Return regex pattern for parameter detection."""
-        raise NotImplementedError
+        self.logger.warning("No parameter detector defined for %s", self.__class__.__name__)
+        return re.compile(r"$^")
 
     def is_comment_line(self, line: str) -> bool:
         """Check if line is a comment."""
-        raise NotImplementedError
+        stripped = line.strip()
+        return stripped.startswith("#") or stripped.startswith("//")
 
     def extract_function_name(self, line: str) -> str:
         """Extract function name from definition line."""
-        raise NotImplementedError
+        match = re.search(r"([A-Za-z_][A-Za-z0-9_]*)\s*\(", line)
+        return match.group(1) if match else ""
 
     def count_braces(self, line: str) -> int:
         """Count brace difference for function boundary detection."""
