@@ -3,13 +3,17 @@ Specialized Connascence Detectors
 
 This package contains focused detector classes that implement the Single Responsibility Principle.
 Each detector handles one specific type of connascence violation.
+
+CON-007: Added DetectorFactory and IdentityDetector (consolidated from src/detectors/)
 """
 
 from .algorithm_detector import AlgorithmDetector
 from .base import DetectorBase
 from .convention_detector import ConventionDetector
+from .detector_factory import DetectorFactory
 from .execution_detector import ExecutionDetector
 from .god_object_detector import GodObjectDetector
+from .identity_detector import IdentityDetector
 from .magic_literal_detector import MagicLiteralDetector
 from .position_detector import PositionDetector
 from .timing_detector import TimingDetector
@@ -19,8 +23,10 @@ __all__ = [
     "AlgorithmDetector",
     "ConventionDetector",
     "DetectorBase",
+    "DetectorFactory",
     "ExecutionDetector",
     "GodObjectDetector",
+    "IdentityDetector",
     "MagicLiteralDetector",
     "PositionDetector",
     "TimingDetector",

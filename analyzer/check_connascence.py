@@ -100,17 +100,9 @@ class ConnascenceDetector(ast.NodeVisitor):
             self.severity_calc = None
             self.desc_builder = None
 
-        # Initialize the new detector factory
+        # CON-007: Initialize detector factory from consolidated analyzer.detectors package
         try:
-            import os
-            import sys
-
-            # Add src directory to path for imports
-            src_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "src")
-            if src_path not in sys.path:
-                sys.path.insert(0, src_path)
-
-            from detectors.detector_factory import DetectorFactory
+            from .detectors.detector_factory import DetectorFactory
 
             self.detector_factory = DetectorFactory(file_path, source_lines)
             self.using_factory = True
@@ -905,12 +897,13 @@ class ConnascenceDetector(ast.NodeVisitor):
             super().visit(node)
 
 
-class ConnascenceAnalyzer:
+class FallbackConnascenceAnalyzer:
     """
-    Lightweight analyzer wrapper that delegates to the new modular architecture.
+    Legacy fallback analyzer used by core.py when UnifiedConnascenceAnalyzer unavailable.
 
-    REFACTORED: Now uses DetectorFactory and ConnascenceAnalyzer service
-    while maintaining 100% backward compatibility.
+    REFACTORED: Renamed from ConnascenceAnalyzer to FallbackConnascenceAnalyzer
+    to support CON-CLEAN-007 consolidation. The canonical ConnascenceAnalyzer
+    is now in core.py.
     """
 
     def __init__(self, exclusions: Optional[list[str]] = None):
@@ -1031,7 +1024,7 @@ def main():
         return 1
 
     start_time = time.time()
-    analyzer = ConnascenceAnalyzer()
+    analyzer = FallbackConnascenceAnalyzer()
     violations = analyzer.analyze_directory(target_path)
     elapsed = time.time() - start_time
 
@@ -1082,6 +1075,13 @@ def main():
     # Exit with error code if critical violations found
     critical_count = sum(1 for v in violations if v.severity == "critical")
     return min(critical_count, 1)
+
+
+# Backward-compatible alias for legacy code that imports ConnascenceAnalyzer from here
+# CON-CLEAN-007: The CANONICAL ConnascenceAnalyzer is in analyzer/core.py
+# This alias provides backward compatibility but users should migrate to:
+#   from analyzer.core import ConnascenceAnalyzer
+ConnascenceAnalyzer = FallbackConnascenceAnalyzer
 
 
 if __name__ == "__main__":
