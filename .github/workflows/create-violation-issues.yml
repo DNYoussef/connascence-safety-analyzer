@@ -58,15 +58,17 @@ jobs:
             --verbose
 
           # Run Connascence Analysis
-          python -m connascence_analyzer analyze \
+          python -m analyzer \
             --path . \
-            --output-format json \
-            --output-file connascence_violations.json \
-            --include-nasa-checks
+            --format json \
+            --output connascence_violations.json \
+            --include-nasa-rules
 
           # Run NASA Compliance Check
-          python -m connascence_analyzer nasa-check \
+          python -m analyzer \
             --path . \
+            --nasa-validation \
+            --format json \
             --output nasa_violations.json
 
       - name: Group Violations by File and Rule
