@@ -50,8 +50,8 @@ jobs:
         id: scan
         run: |
           # Run Clarity Linter
-          python -m clarity_linter \
-            --config clarity_linter.yaml \
+          python -m analyzer.clarity_linter \
+            --config config/clarity_linter.yaml \
             --output-format json \
             --output-file clarity_violations.json \
             --severity-threshold ${{ github.event.inputs.severity_threshold || 'high' }} \
