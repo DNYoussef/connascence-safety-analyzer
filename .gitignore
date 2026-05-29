@@ -11,6 +11,11 @@ memory/claude-flow-data.json
 memory/sessions/*
 !memory/sessions/README.md
 
+# Environment and local secrets
+.env
+.env.*
+!.env.example
+
 # Temporary artifacts and reproduction files
 temp-artifacts/
 memory/agents/*
