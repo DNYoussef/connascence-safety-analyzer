@@ -35,7 +35,7 @@ class SARIFReporter:
 
     def __init__(self):
         self.tool_name = "connascence"
-        self.tool_version = "1.0.0"
+        self.tool_version = "2.0.0"
         self.tool_uri = "https://github.com/connascence/connascence-analyzer"
         self.organization = "Connascence Analytics"
 

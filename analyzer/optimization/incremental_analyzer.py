@@ -8,6 +8,7 @@ analyzes changed files and their dependencies.
 """
 
 from dataclasses import dataclass, field
+import ast
 import hashlib
 import json
 import logging
@@ -573,44 +574,114 @@ class IncrementalAnalyzer:
                 logger.warning(f"Failed to load dependency cache: {e}")
                 self.dependency_graph = {}
 
+    def _relative_path_key(self, file_path: Path) -> str:
+        """Return stable project-relative dependency keys."""
+        return str(file_path.relative_to(self.project_root)).replace("\\", "/")
+
+    def _module_to_project_file(self, module_name: str) -> Optional[str]:
+        """Resolve an importable module name to a project-local Python file."""
+        if not module_name:
+            return None
+
+        module_path = Path(*module_name.split("."))
+        candidates = [
+            self.project_root / module_path.with_suffix(".py"),
+            self.project_root / module_path / "__init__.py",
+        ]
+
+        for candidate in candidates:
+            if candidate.exists() and candidate.is_file():
+                return self._relative_path_key(candidate)
+
+        return None
+
+    def _resolve_import_base(self, relative_path: str, module: Optional[str], level: int) -> str:
+        """Resolve an ast.ImportFrom base module, including relative imports."""
+        if level == 0:
+            return module or ""
+
+        package_parts = list(Path(relative_path).parent.parts)
+        up_count = level - 1
+        if up_count > len(package_parts):
+            base_parts: List[str] = []
+        else:
+            base_parts = package_parts[: len(package_parts) - up_count]
+
+        if module:
+            base_parts.extend(module.split("."))
+
+        return ".".join(part for part in base_parts if part)
+
+    def _extract_import_dependencies(self, relative_path: str, tree: ast.AST) -> List[str]:
+        """Extract project-local import edges from an AST."""
+        dependencies: set[str] = set()
+
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                for alias in node.names:
+                    dependency = self._module_to_project_file(alias.name)
+                    if dependency:
+                        dependencies.add(dependency)
+                continue
+
+            if isinstance(node, ast.ImportFrom):
+                base_module = self._resolve_import_base(relative_path, node.module, node.level)
+                candidates = [base_module] if base_module else []
+                for alias in node.names:
+                    if alias.name == "*":
+                        continue
+                    candidates.append(f"{base_module}.{alias.name}" if base_module else alias.name)
+
+                for candidate in candidates:
+                    dependency = self._module_to_project_file(candidate)
+                    if dependency:
+                        dependencies.add(dependency)
+
+        dependencies.discard(relative_path)
+        return sorted(dependencies)
+
     def _update_dependency_cache(self):
-        """Update dependency cache (simplified implementation)."""
+        """Update dependency cache from project-local Python import edges."""
 
-        # This is a simplified implementation
-        # In a full implementation, this would analyze import/dependency relationships
-
-        python_files = list(self.project_root.glob("**/*.py"))
+        python_files = sorted(self.project_root.glob("**/*.py"))
+        dependency_graph: Dict[str, Dict[str, Any]] = {}
+        updated_at = time.time()
 
         for file_path in python_files:
-            relative_path = str(file_path.relative_to(self.project_root))
+            relative_path = self._relative_path_key(file_path)
 
-            # Simple dependency detection based on imports
             try:
                 with open(file_path, encoding="utf-8") as f:
-                    content = f.read()
+                    tree = ast.parse(f.read(), filename=str(file_path))
 
-                dependencies = []
-                dependents = []
-
-                # Extract import statements (simplified)
-                for line in content.split("\n"):
-                    line = line.strip()
-                    if line.startswith("import ") or line.startswith("from "):
-                        # This is a very simplified dependency extraction
-                        # A full implementation would use AST parsing
-                        pass
-
-                self.dependency_graph[relative_path] = {
+                dependencies = self._extract_import_dependencies(relative_path, tree)
+                dependency_graph[relative_path] = {
                     "dependencies": dependencies,
-                    "dependents": dependents,
-                    "last_updated": time.time(),
+                    "dependents": [],
+                    "last_updated": updated_at,
                 }
 
             except Exception as e:
                 logger.warning(f"Failed to analyze dependencies for {file_path}: {e}")
+                dependency_graph[relative_path] = {
+                    "dependencies": [],
+                    "dependents": [],
+                    "last_updated": updated_at,
+                }
+
+        for source_path, dependency_info in dependency_graph.items():
+            for dependency_path in dependency_info["dependencies"]:
+                if dependency_path in dependency_graph:
+                    dependency_graph[dependency_path]["dependents"].append(source_path)
+
+        for dependency_info in dependency_graph.values():
+            dependency_info["dependents"].sort()
+
+        self.dependency_graph = dependency_graph
 
         # Save dependency cache
         try:
+            self.dependency_cache_file.parent.mkdir(parents=True, exist_ok=True)
             with open(self.dependency_cache_file, "w") as f:
                 json.dump(self.dependency_graph, f, indent=2, default=str)
             logger.debug("Updated dependency cache")

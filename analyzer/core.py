@@ -262,6 +262,18 @@ class ConnascenceAnalyzer:
             "god_objects": [],
         }
 
+    @staticmethod
+    def _unavailable_evidence_result(reason: str, violations: Optional[List[Dict[str, Any]]] = None):
+        """Return explicit non-evidence fields instead of fabricated quality scores."""
+        violations = violations or []
+        return {
+            "score": None,
+            "violations": violations,
+            "passing": None,
+            "evidence_status": reason,
+            "independent_evidence": False,
+        }
+
     def _run_unified_analysis(
         self, path: str, policy: str, duplication_result: Optional[Any] = None, **kwargs
     ) -> Dict[str, Any]:
@@ -272,8 +284,6 @@ class ConnascenceAnalyzer:
         Helper functions handle file/directory analysis, result formatting, and errors.
         """
         try:
-            time.time()
-
             # Convert policy to unified analyzer format
             policy_preset = self._convert_policy_to_preset(policy)
             path_obj = Path(path)
@@ -318,11 +328,17 @@ class ConnascenceAnalyzer:
                     "critical_violations": critical_count,
                     "overall_quality_score": quality_score,
                 },
-                "nasa_compliance": {
-                    "score": 0.8,  # Fallback score
-                    "violations": [v for v in violation_dicts if "NASA" in v.get("rule_id", "")],
+                "nasa_compliance": self._unavailable_evidence_result(
+                    "unavailable_fallback_analyzer",
+                    [v for v in violation_dicts if "NASA" in v.get("rule_id", "")],
+                ),
+                "mece_analysis": {
+                    "score": None,
+                    "duplications": [],
+                    "passing": None,
+                    "evidence_status": "unavailable_fallback_analyzer",
+                    "independent_evidence": False,
                 },
-                "mece_analysis": {"score": 0.75, "duplications": []},  # Fallback score
                 "god_objects": self._extract_god_objects(violation_dicts),
                 "metrics": {
                     # B3.4 FIX: Count unique files from violations, not all .py files
@@ -332,33 +348,37 @@ class ConnascenceAnalyzer:
                 },
             }
 
-        except Exception:
-            return self._run_mock_analysis(path, policy, **kwargs)
+        except Exception as error:
+            return self._run_mock_analysis(path, policy, error=error, **kwargs)
 
     def _run_mock_analysis(self, path: str, policy: str, **kwargs) -> Dict[str, Any]:
-        """Fallback mock analysis when real analyzers are unavailable."""
-        # Generate basic mock violations for testing
-        violations = self._generate_mock_violations(path, policy)
-
+        """Fail closed when real analyzers are unavailable."""
+        error = kwargs.get("error")
+        reason = "real_analyzer_unavailable"
         return {
-            "success": True,
+            "success": False,
+            "error": f"Analysis unavailable: {error!s}" if error else "Analysis unavailable",
+            "evidence_status": reason,
             "path": str(path),
             "policy": policy,
-            "violations": [self._violation_to_dict(v) for v in violations],
+            "violations": [],
             "summary": {
-                "total_violations": len(violations),
-                "critical_violations": len([v for v in violations if v.severity == "critical"]),
-                "overall_quality_score": 0.75,
+                "total_violations": 0,
+                "critical_violations": 0,
+                "overall_quality_score": None,
             },
-            "nasa_compliance": {
-                "score": 0.85,
-                "violations": [self._violation_to_dict(v) for v in violations if v.rule_id.startswith("NASA")],
+            "nasa_compliance": self._unavailable_evidence_result(reason),
+            "mece_analysis": {
+                "score": None,
+                "duplications": [],
+                "passing": None,
+                "evidence_status": reason,
+                "independent_evidence": False,
             },
-            "mece_analysis": {"score": 0.75, "duplications": []},
             "god_objects": [],
             "metrics": {
-                "files_analyzed": 1 if Path(path).is_file() else 5,
-                "analysis_time": 0.5,
+                "files_analyzed": 0,
+                "analysis_time": 0.0,
                 "timestamp": time.time(),
             },
         }

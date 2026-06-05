@@ -432,6 +432,36 @@ class MockHandler:
     def handle(self, *args, **kwargs):
         return ExitCode.SUCCESS
 
+
+RULE_EXPLANATIONS = {
+    "CON_CoT": {
+        "name": "Connascence of Type",
+        "summary": "Multiple components must agree on implicit or missing type contracts.",
+        "recommendation": "Add explicit type annotations or a typed boundary object.",
+    },
+    "connascence_of_type": {
+        "name": "Connascence of Type",
+        "summary": "Multiple components must agree on implicit or missing type contracts.",
+        "recommendation": "Add explicit type annotations or a typed boundary object.",
+    },
+    "CoT": {
+        "name": "Connascence of Type",
+        "summary": "Multiple components must agree on implicit or missing type contracts.",
+        "recommendation": "Add explicit type annotations or a typed boundary object.",
+    },
+    "CON_CoP": {
+        "name": "Connascence of Position",
+        "summary": "Callers and callees depend on positional argument ordering.",
+        "recommendation": "Use keyword arguments, parameter objects, or typed request objects.",
+    },
+    "CON_CoM": {
+        "name": "Connascence of Meaning",
+        "summary": "Shared literals or values carry meaning outside a named domain concept.",
+        "recommendation": "Replace magic values with named constants or enums.",
+    },
+}
+
+
 class ConnascenceCLI:
     """Basic CLI interface for connascence analysis."""
 
@@ -652,6 +682,33 @@ class ConnascenceCLI:
         """Parse command line arguments."""
         return self.parser.parse_args(args)
 
+    def _handle_explain(self, args: argparse.Namespace) -> int:
+        """Explain a known violation or rule identifier."""
+        violation_id = getattr(args, "violation_id", "")
+        explanation = RULE_EXPLANATIONS.get(violation_id)
+        if explanation is None:
+            print(f"No built-in explanation for {violation_id}.")
+            print("Known rule ids: " + ", ".join(sorted(RULE_EXPLANATIONS)))
+            return ExitCode.INVALID_ARGUMENTS
+
+        print(f"{violation_id}: {explanation['name']}")
+        print(explanation["summary"])
+        print(f"Recommendation: {explanation['recommendation']}")
+        return ExitCode.SUCCESS
+
+    def _handle_license(self, args: argparse.Namespace) -> int:
+        """Report license status for the current package."""
+        action = getattr(args, "action", "check")
+        license_path = Path("LICENSE")
+        if not license_path.exists():
+            print("License file not found.")
+            return ExitCode.CONFIGURATION_ERROR
+
+        first_line = license_path.read_text(encoding="utf-8", errors="replace").splitlines()[0]
+        print(f"License {action}: {first_line}")
+        print(f"Source: {license_path.resolve()}")
+        return ExitCode.SUCCESS
+
     def run(self, args: Optional[List[str]] = None) -> int:
         """Run the CLI with given arguments."""
         try:
@@ -762,9 +819,10 @@ class ConnascenceCLI:
                 return self.autofix_handler.handle(parsed_args)
             elif parsed_args.command == "mcp":
                 return self.mcp_handler.handle(parsed_args)
-            elif parsed_args.command in ["explain", "license"]:
-                # These commands just return success for now
-                return ExitCode.SUCCESS
+            elif parsed_args.command == "explain":
+                return self._handle_explain(parsed_args)
+            elif parsed_args.command == "license":
+                return self._handle_license(parsed_args)
         except KeyboardInterrupt:
             print("\nAnalysis interrupted by user", file=sys.stderr)
             return ExitCode.USER_INTERRUPTED

@@ -39,6 +39,10 @@ class SeverityLevel(Enum):
     LOW = "low"
 
 
+# Backwards-compatible name used by older JSON schema validation tests.
+Severity = SeverityLevel
+
+
 # Default severity mappings for connascence types
 DEFAULT_SEVERITY_MAP = {
     ConnascenceType.NAME: SeverityLevel.MEDIUM,

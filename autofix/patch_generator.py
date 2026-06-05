@@ -25,6 +25,7 @@ are generated and provides comprehensive context for AI-driven code generation.
 """
 
 from dataclasses import dataclass
+from datetime import datetime
 from enum import Enum
 import hashlib
 from pathlib import Path
@@ -187,7 +188,10 @@ class PatchGenerator:
         """Propose fix for god object violations"""
 
         return {
-            "description": "Break down god object into smaller, focused classes using Single Responsibility Principle",
+            "description": (
+                "Manual refactor required: split the god object into smaller, focused classes using "
+                "Single Responsibility Principle. No automatic source patch is generated."
+            ),
             "strategy": "extract_classes",
             "requires_human_review": True,
             "complexity": "high",
@@ -197,8 +201,12 @@ class PatchGenerator:
         """Propose fix for parameter position violations"""
 
         return {
-            "description": "Replace parameter list with parameter object or named parameters",
+            "description": (
+                "Manual refactor required: replace the parameter list with a parameter object or named "
+                "parameters after reviewing call sites. No automatic source patch is generated."
+            ),
             "strategy": "parameter_object",
+            "requires_human_review": True,
             "complexity": "medium",
         }
 
@@ -311,69 +319,14 @@ class PatchGenerator:
     def _generate_class_extraction_ops(
         self, violation: Dict[str, Any], context_data: Dict[str, Any], proposed_fix: Dict[str, Any]
     ) -> List[PatchOperation]:
-        """Generate operations for god object refactoring (requires human review)"""
-
-        # For god objects, we generate a high-level plan rather than specific operations
-        # since this requires architectural decisions
-
-        operations = []
-        file_path = violation["file_path"]
-
-        # Create a comment with refactoring suggestions
-        refactor_comment = """
-# TODO: Refactor this class to follow Single Responsibility Principle
-# Suggested approach:
-# 1. Extract data access methods to a Repository class
-# 2. Extract business logic to Service classes
-# 3. Extract validation logic to Validator classes
-# 4. Keep only coordination logic in this class
-"""
-
-        operations.append(
-            PatchOperation(
-                operation_type="insert",
-                file_path=file_path,
-                new_content=refactor_comment,
-                line_start=violation.get("line_number", 1),
-            )
-        )
-
-        return operations
+        """God object refactoring requires an architectural plan, not a TODO patch."""
+        return []
 
     def _generate_parameter_object_ops(
         self, violation: Dict[str, Any], context_data: Dict[str, Any], proposed_fix: Dict[str, Any]
     ) -> List[PatchOperation]:
-        """Generate operations for parameter object refactoring"""
-
-        operations = []
-        file_path = violation["file_path"]
-
-        # This is a simplified implementation - in practice would need
-        # more sophisticated AST analysis to properly refactor parameters
-
-        refactor_comment = """
-# TODO: Replace parameter list with parameter object
-# Example:
-# @dataclass
-# class ConfigParams:
-#     param1: Type1
-#     param2: Type2
-#     param3: Type3
-#
-# def function_name(config: ConfigParams):
-#     # Use config.param1, config.param2, etc.
-"""
-
-        operations.append(
-            PatchOperation(
-                operation_type="insert",
-                file_path=file_path,
-                new_content=refactor_comment,
-                line_start=violation.get("line_number", 1),
-            )
-        )
-
-        return operations
+        """Parameter-object refactoring is unsafe without call-site analysis."""
+        return []
 
     def _generate_generic_ops(
         self, violation: Dict[str, Any], context_data: Dict[str, Any], proposed_fix: Dict[str, Any]
@@ -509,6 +462,13 @@ class PatchGenerator:
         if patch.safety_tier == SafetyTier.UNSAFE:
             return {"success": False, "error": "Patch marked as unsafe - cannot apply", "patch_id": patch.patch_id}
 
+        if not patch.operations:
+            return {
+                "success": False,
+                "error": "No automatic patch operations generated; manual refactor required",
+                "patch_id": patch.patch_id,
+            }
+
         if dry_run:
             return {
                 "success": True,
@@ -610,8 +570,6 @@ def generate_patch_for_violation(
 
 if __name__ == "__main__":
     # Example usage
-    from datetime import datetime
-
     # Test magic literal patch generation
     violation = {
         "type": "magic_literal",

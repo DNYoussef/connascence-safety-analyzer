@@ -17,7 +17,6 @@ import re
 from typing import Any, Dict, List, Optional
 
 from config.central_constants import IntegrationConstants
-from fixes.phase0.production_safe_assertions import ProductionAssert
 
 from .unified_base import INTEGRATION_REGISTRY, IntegrationType, UnifiedBaseIntegration
 
@@ -345,34 +344,25 @@ def get_available_integrations(config: Optional[Dict] = None) -> Dict[str, Unifi
 # =============================================================================
 
 
+def _legacy_config(config: Optional[Dict] = None) -> Dict:
+    """Normalize legacy wrapper defaults to match the integration constructors."""
+    return {} if config is None else config
+
+
 # Provide backwards compatibility for existing code
 def BlackIntegrationLegacy(config=None):
     """Legacy compatibility wrapper."""
-    ProductionAssert.not_none(config, "config")
-
-    ProductionAssert.not_none(config, "config")
-
-    return BlackIntegration(config)
+    return BlackIntegration(_legacy_config(config))
 
 
 def MyPyIntegrationLegacy(config=None):
     """Legacy compatibility wrapper."""
-
-    ProductionAssert.not_none(config, "config")
-
-    ProductionAssert.not_none(config, "config")
-
-    return MyPyIntegration(config)
+    return MyPyIntegration(_legacy_config(config))
 
 
 def RuffIntegrationLegacy(config=None):
     """Legacy compatibility wrapper."""
-
-    ProductionAssert.not_none(config, "config")
-
-    ProductionAssert.not_none(config, "config")
-
-    return RuffIntegration(config)
+    return RuffIntegration(_legacy_config(config))
 
 
 # Export the registry for external use
@@ -380,9 +370,12 @@ __all__ = [
     "INTEGRATION_REGISTRY",
     "BanditIntegration",
     "BlackIntegration",
+    "BlackIntegrationLegacy",
     "MyPyIntegration",
+    "MyPyIntegrationLegacy",
     "RadonIntegration",
     "RuffIntegration",
+    "RuffIntegrationLegacy",
     "create_all_integrations",
     "get_available_integrations",
 ]

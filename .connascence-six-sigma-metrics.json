@@ -1,0 +1,168 @@
+{
+  "timestamp": "2026-01-18T09:27:01.373605",
+  "summary": {
+    "sigma_level": 2.9808812724941047,
+    "dpmo": 71428.57,
+    "rty": 100.0,
+    "quality_level": "TWO_SIGMA"
+  },
+  "gauges": {
+    "sigma": {
+      "value": 2.9808812724941047,
+      "min": 1,
+      "max": 6,
+      "target": 5,
+      "zones": [
+        {
+          "from": 1,
+          "to": 3,
+          "color": "red"
+        },
+        {
+          "from": 3,
+          "to": 4,
+          "color": "yellow"
+        },
+        {
+          "from": 4,
+          "to": 5,
+          "color": "green"
+        },
+        {
+          "from": 5,
+          "to": 6,
+          "color": "blue"
+        }
+      ]
+    },
+    "dpmo": {
+      "value": 71428.57,
+      "min": 0,
+      "max": 100000,
+      "target": 6210,
+      "zones": [
+        {
+          "from": 0,
+          "to": 233,
+          "color": "blue"
+        },
+        {
+          "from": 233,
+          "to": 6210,
+          "color": "green"
+        },
+        {
+          "from": 6210,
+          "to": 66807,
+          "color": "yellow"
+        },
+        {
+          "from": 66807,
+          "to": 100000,
+          "color": "red"
+        }
+      ]
+    }
+  },
+  "charts": {
+    "violations_by_type": {
+      "title": "Violations by Type",
+      "type": "bar",
+      "data": {
+        "labels": [],
+        "values": []
+      }
+    },
+    "ctq_metrics": {
+      "title": "CTQ Metrics",
+      "type": "bar",
+      "data": {
+        "labels": [
+          "identity",
+          "meaning",
+          "algorithm",
+          "position",
+          "execution",
+          "timing",
+          "values",
+          "type",
+          "convention"
+        ],
+        "values": [
+          0.0,
+          12.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    }
+  },
+  "quality_gate": {
+    "decision": "FAIL",
+    "criteria": {
+      "sigma_level": {
+        "passed": false,
+        "threshold": 4.0,
+        "actual": 2.9808812724941047
+      },
+      "dpmo": {
+        "passed": false,
+        "threshold": 6210,
+        "actual": 71428.57
+      },
+      "rty": {
+        "passed": true,
+        "threshold": 80.0,
+        "actual": 100.0
+      },
+      "critical_violations": {
+        "passed": true,
+        "threshold": 0,
+        "actual": 0
+      }
+    },
+    "recommendations": [
+      "Improve sigma level by 0.0 to reach 3.0 target",
+      "Reduce DPMO by 4622 to reach target of 66807.0",
+      "Focus on meaning violations (1 found) - CTQ weight: 12%"
+    ],
+    "quality_level": "TWO_SIGMA"
+  },
+  "trends": [
+    {
+      "index": 0,
+      "dpmo": 71428.57,
+      "sigma_level": 2.9808812724941047,
+      "rty": 100.0
+    },
+    {
+      "index": 1,
+      "dpmo": 71428.57,
+      "sigma_level": 2.9808812724941047,
+      "rty": 100.0
+    },
+    {
+      "index": 2,
+      "dpmo": 71428.57,
+      "sigma_level": 2.9808812724941047,
+      "rty": 100.0
+    },
+    {
+      "index": 3,
+      "dpmo": 71428.57,
+      "sigma_level": 2.9808812724941047,
+      "rty": 100.0
+    },
+    {
+      "index": 4,
+      "dpmo": 71428.57,
+      "sigma_level": 2.9808812724941047,
+      "rty": 100.0
+    }
+  ]
+}

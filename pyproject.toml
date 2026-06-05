@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "connascence-analyzer"
-version = "1.0.0"
+version = "2.0.0"
 description = "Professional connascence analysis for Python codebases"
 authors = [{name = "Connascence Analytics", email = "hello@connascence.io"}]
 license = {file = "LICENSE"}
@@ -84,7 +84,26 @@ connascence = "mcp.server:main"
 # Tool Configuration
 
 [tool.setuptools]
-packages = ["analyzer", "interfaces", "autofix", "policy", "mcp", "utils", "security", "fixes"]
+packages = [
+    "analyzer",
+    "interfaces",
+    "autofix",
+    "policy",
+    "mcp",
+    "utils",
+    "security",
+    "fixes",
+    "core",
+    "grammar",
+    "grammar.backends",
+    "grammar.constrained_generator",
+    "src",
+    "src.detectors",
+    "src.library",
+    "src.library.validation",
+    "src.services",
+    "src.utils",
+]
 
 [tool.setuptools.package-data]
 # Include runtime files for all packages

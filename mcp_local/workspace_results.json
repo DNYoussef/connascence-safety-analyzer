@@ -1,0 +1,170 @@
+{
+  "success": true,
+  "workspace_path": "..\\docs\\examples",
+  "summary": {
+    "total_files_analyzed": 3,
+    "total_violations": 1,
+    "files_with_violations": 1,
+    "execution_time": 5.853341579437256
+  },
+  "file_results": [
+    {
+      "success": true,
+      "file_path": "..\\docs\\examples\\bad_example.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {
+        "black": {
+          "success": true,
+          "issues": []
+        },
+        "mypy": {
+          "success": true,
+          "issues": []
+        },
+        "ruff": {
+          "success": false,
+          "issues": []
+        },
+        "radon": {
+          "success": false,
+          "issues": []
+        },
+        "bandit": {
+          "success": true,
+          "issues": []
+        }
+      },
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "..\\docs\\examples\\bad_example.py",
+        "timestamp": 1757175890.491457,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 2.764662981033325
+    },
+    {
+      "success": true,
+      "file_path": "..\\docs\\examples\\good_example.py",
+      "violations": [],
+      "summary": {
+        "total_violations": 0,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        },
+        "by_type": {}
+      },
+      "integrations": {
+        "black": {
+          "success": true,
+          "issues": []
+        },
+        "mypy": {
+          "success": true,
+          "issues": [
+            {
+              "type": "type-error",
+              "severity": "note",
+              "message": "By default the bodies of untyped functions are not checked, consider using --check-untyped-defs",
+              "line": 83,
+              "column": null,
+              "rule": "annotation-unchecked",
+              "file": "..\\docs\\examples\\good_example.py"
+            }
+          ]
+        },
+        "ruff": {
+          "success": false,
+          "issues": []
+        },
+        "radon": {
+          "success": false,
+          "issues": []
+        },
+        "bandit": {
+          "success": true,
+          "issues": []
+        }
+      },
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "..\\docs\\examples\\good_example.py",
+        "timestamp": 1757175892.0691187,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 1.5776617527008057
+    },
+    {
+      "success": true,
+      "file_path": "..\\docs\\examples\\quick_start_demo.py",
+      "violations": [
+        {
+          "id": "config_magic_literal_16",
+          "rule_id": "connascence_of_meaning",
+          "type": "CoM",
+          "severity": "medium",
+          "description": "Configuration value \"10000\" should be a named constant (likely port/timeout/limit)",
+          "file_path": "..\\docs\\examples\\quick_start_demo.py",
+          "line_number": 16,
+          "weight": 2.0
+        }
+      ],
+      "summary": {
+        "total_violations": 1,
+        "by_severity": {
+          "critical": 0,
+          "high": 0,
+          "medium": 1,
+          "low": 0
+        },
+        "by_type": {
+          "CoM": 1
+        }
+      },
+      "integrations": {
+        "black": {
+          "success": true,
+          "issues": []
+        },
+        "mypy": {
+          "success": true,
+          "issues": []
+        },
+        "ruff": {
+          "success": false,
+          "issues": []
+        },
+        "radon": {
+          "success": false,
+          "issues": []
+        },
+        "bandit": {
+          "success": true,
+          "issues": []
+        }
+      },
+      "metadata": {
+        "analysis_type": "full",
+        "file_path": "..\\docs\\examples\\quick_start_demo.py",
+        "timestamp": 1757175893.5801356,
+        "server_version": "2.0.0"
+      },
+      "error_message": null,
+      "execution_time": 1.511016845703125
+    }
+  ]
+}

@@ -20,6 +20,7 @@ from .identity_detector import IdentityDetector
 from .magic_literal_detector import MagicLiteralDetector
 from .position_detector import PositionDetector
 from .timing_detector import TimingDetector
+from .type_detector import TypeDetector
 from .values_detector import ValuesDetector
 
 
@@ -54,6 +55,7 @@ class DetectorFactory:
             ValuesDetector(file_path, source_lines),
             MagicLiteralDetector(file_path, source_lines),
             IdentityDetector(file_path, source_lines),
+            TypeDetector(file_path, source_lines),
         ]
 
     def detect_all(self, tree: ast.AST) -> List[ConnascenceViolation]:
@@ -94,7 +96,8 @@ class DetectorFactory:
             "connascence_of_position": PositionDetector,
             "connascence_of_algorithm": AlgorithmDetector,
             "connascence_of_name": ConventionDetector,
-            "connascence_of_type": ConventionDetector,
+            "connascence_of_type": TypeDetector,
+            "CoT": TypeDetector,
             "connascence_of_meaning": MagicLiteralDetector,
             "connascence_of_execution": ExecutionDetector,
             "connascence_of_timing": TimingDetector,

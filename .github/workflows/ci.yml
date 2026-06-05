@@ -81,6 +81,10 @@ jobs:
         pip install -e .
         pip install bandit safety
 
+    - name: Run Tracked Secret Scan
+      run: |
+        python scripts/scan_secrets.py
+
     - name: Run Bandit Security Scan
       run: |
         bandit -r analyzer interfaces mcp -f json -o bandit-report.json

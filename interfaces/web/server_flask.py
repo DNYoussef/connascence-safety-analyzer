@@ -19,6 +19,7 @@ connascence violations, trends, and autofix suggestions locally.
 """
 
 from datetime import datetime
+import os
 from pathlib import Path
 import sys
 import threading
@@ -44,11 +45,30 @@ from .metrics import DashboardMetrics
 class LocalDashboard:
     """Local web dashboard for connascence analysis."""
 
+    LOOPBACK_HOSTS = {"localhost", "127.0.0.1", "::1"}
+
     def __init__(self, port: int = 8080, auto_open: bool = True):
         self.port = port
         self.auto_open = auto_open
-        self.app = Flask(__name__, template_folder="templates", static_folder="static")
-        self.socketio = SocketIO(self.app, cors_allowed_origins="*")
+        self.template_dir = Path(__file__).with_name("templates")
+        self.static_dir = Path(__file__).with_name("static")
+        self.app = Flask(
+            __name__,
+            template_folder=str(self.template_dir),
+            static_folder=str(self.static_dir),
+        )
+        self.bind_host = os.getenv("CONNASCENCE_DASHBOARD_HOST", "127.0.0.1")
+        self.auth_token = os.getenv("CONNASCENCE_DASHBOARD_TOKEN")
+        self.scan_root = Path(
+            os.getenv("CONNASCENCE_SCAN_ROOT", str(Path.cwd()))
+        ).resolve()
+        self.socketio = SocketIO(
+            self.app,
+            cors_allowed_origins=[
+                f"http://localhost:{self.port}",
+                f"http://127.0.0.1:{self.port}",
+            ],
+        )
 
         # Core components - using unified analyzer
         self.analyzer = UnifiedConnascenceAnalyzer()
@@ -66,8 +86,41 @@ class LocalDashboard:
         self._setup_routes()
         self._setup_websocket_handlers()
 
+    def _is_loopback_bind_host(self) -> bool:
+        host = self.bind_host.strip().lower()
+        return host in self.LOOPBACK_HOSTS or host.startswith("127.")
+
+    def _is_loopback_remote(self) -> bool:
+        remote_addr = (request.remote_addr or "").strip().lower()
+        return remote_addr in {"127.0.0.1", "::1"} or remote_addr.startswith("127.")
+
     def _setup_routes(self):
         """Set up Flask routes."""
+
+        def require_dashboard_auth():
+            if not self.auth_token:
+                if not self._is_loopback_bind_host():
+                    return jsonify({
+                        "error": "CONNASCENCE_DASHBOARD_TOKEN is required when binding outside loopback"
+                    }), 503
+                if self._is_loopback_remote():
+                    return None
+
+            expected = f"Bearer {self.auth_token}" if self.auth_token else None
+            if expected and request.headers.get("Authorization") == expected:
+                return None
+
+            return jsonify({"error": "Authentication required"}), 401
+
+        def resolve_scan_path(raw_path: str) -> Path:
+            candidate = (self.scan_root / raw_path).resolve()
+            try:
+                candidate.relative_to(self.scan_root)
+            except ValueError as exc:
+                raise ValueError(
+                    f"Scan path must stay under configured root: {self.scan_root}"
+                ) from exc
+            return candidate
 
         @self.app.route("/")
         def dashboard():
@@ -81,8 +134,12 @@ class LocalDashboard:
         @self.app.route("/api/scan", methods=["POST"])
         def scan_project():
             """Scan project for connascence violations."""
+            auth_error = require_dashboard_auth()
+            if auth_error:
+                return auth_error
+
             data = request.get_json()
-            project_path = Path(data.get("path", "."))
+            project_path = resolve_scan_path(data.get("path", "."))
             policy_preset = data.get("policy_preset", "service-defaults")
 
             try:
@@ -95,8 +152,12 @@ class LocalDashboard:
         @self.app.route("/api/autofix/preview", methods=["POST"])
         def preview_autofix():
             """Preview autofix suggestions."""
+            auth_error = require_dashboard_auth()
+            if auth_error:
+                return auth_error
+
             data = request.get_json()
-            file_path = data.get("file_path")
+            file_path = str(resolve_scan_path(data.get("file_path", ".")))
             violations = data.get("violations", [])
 
             try:
@@ -110,6 +171,10 @@ class LocalDashboard:
         @self.app.route("/api/metrics/trends")
         def get_trends():
             """Get historical trend data."""
+            auth_error = require_dashboard_auth()
+            if auth_error:
+                return auth_error
+
             days = request.args.get("days", 30, type=int)
             return jsonify(self.metrics.get_trends(days))
 
@@ -117,6 +182,9 @@ class LocalDashboard:
         def get_chart(chart_type):
             """Generate chart data."""
             ProductionAssert.not_none(chart_type, "chart_type")
+            auth_error = require_dashboard_auth()
+            if auth_error:
+                return auth_error
 
             ProductionAssert.not_none(chart_type, "chart_type")
 
@@ -132,6 +200,10 @@ class LocalDashboard:
         @self.app.route("/api/policy/presets")
         def get_policy_presets():
             """Get available policy presets."""
+            auth_error = require_dashboard_auth()
+            if auth_error:
+                return auth_error
+
             presets = self.policy_manager.list_presets()
             return jsonify(presets)
 
@@ -139,6 +211,9 @@ class LocalDashboard:
         def export_results(format):
             """Export scan results in various formats."""
             ProductionAssert.not_none(format, "format")
+            auth_error = require_dashboard_auth()
+            if auth_error:
+                return auth_error
 
             ProductionAssert.not_none(format, "format")
 
@@ -158,9 +233,7 @@ class LocalDashboard:
             """Serve static files."""
             ProductionAssert.not_none(filename, "filename")
 
-            ProductionAssert.not_none(filename, "filename")
-
-            return send_from_directory("static", filename)
+            return send_from_directory(self.static_dir, filename)
 
     def _setup_websocket_handlers(self):
         """Set up WebSocket event handlers."""
@@ -168,6 +241,15 @@ class LocalDashboard:
         @self.socketio.on("connect")
         def handle_connect():
             """Handle client connection."""
+            if not self.auth_token:
+                if not self._is_loopback_bind_host() or not self._is_loopback_remote():
+                    return False
+                emit("connected", {"message": "Connected to Connascence Dashboard"})
+                return None
+
+            token = request.headers.get("Authorization")
+            if token != f"Bearer {self.auth_token}":
+                return False
             emit("connected", {"message": "Connected to Connascence Dashboard"})
 
         @self.socketio.on("request_live_update")
@@ -183,7 +265,7 @@ class LocalDashboard:
 
             ProductionAssert.not_none(data, "data")
 
-            file_path = Path(data["file_path"])
+            file_path = resolve_scan_path(data["file_path"])
             try:
                 file_results = self.analyzer.analyze_file(file_path)
                 file_results["timestamp"] = datetime.now().isoformat()
@@ -363,7 +445,7 @@ class LocalDashboard:
             browser_thread.start()
 
         print(f"[RELEASE] Connascence Dashboard starting on http://localhost:{self.port}")
-        self.socketio.run(self.app, host="0.0.0.0", port=self.port, debug=False)
+        self.socketio.run(self.app, host=self.bind_host, port=self.port, debug=False)
 
     def stop_server(self):
         """Stop the dashboard server."""

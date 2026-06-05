@@ -52,7 +52,7 @@ class LargeClass:
     def method_with_hardcoded_values(self):
         """Method with hardcoded business values."""
         api_endpoint = "https://api.production.com/v1/data"  # Values violation
-        api_key = "sk-prod-abc123def456ghi789"  # Values violation
+        api_key = "example-api-key"  # Values violation
         max_retries = 7  # Magic number
         return {"endpoint": api_endpoint, "key": api_key, "retries": max_retries}
 

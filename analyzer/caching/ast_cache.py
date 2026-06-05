@@ -11,9 +11,9 @@ import ast
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 import hashlib
+import json
 import logging
 from pathlib import Path
-import pickle
 import sys
 import threading
 import time
@@ -128,19 +128,7 @@ class ASTCache:
         """Cache AST for file."""
 
         ProductionAssert.not_none(file_path, "file_path")
-
-        ProductionAssert.not_none(file_path, "file_path")
-
         ProductionAssert.not_none(ast_tree, "ast_tree")
-
-        ProductionAssert.not_none(analysis_duration_ms, "analysis_duration_ms")
-
-        ProductionAssert.not_none(file_path, "file_path")
-
-        ProductionAssert.not_none(file_path, "file_path")
-
-        ProductionAssert.not_none(ast_tree, "ast_tree")
-
         ProductionAssert.not_none(analysis_duration_ms, "analysis_duration_ms")
 
         file_path = Path(file_path)
@@ -232,12 +220,6 @@ class ASTCache:
 
         ProductionAssert.not_none(file_path, "file_path")
 
-        ProductionAssert.not_none(file_path, "file_path")
-
-        ProductionAssert.not_none(file_path, "file_path")
-
-        ProductionAssert.not_none(file_path, "file_path")
-
         file_path = Path(file_path)
 
         with self.cache_lock:
@@ -255,7 +237,7 @@ class ASTCache:
         with self.cache_lock:
             if self.enable_persistence:
                 # Remove all cache files
-                for cache_file in self.cache_dir.glob("*.cache"):
+                for cache_file in list(self.cache_dir.glob("*.cache")) + list(self.cache_dir.glob("*.json")):
                     try:
                         cache_file.unlink()
                     except Exception as e:
@@ -340,15 +322,6 @@ class ASTCache:
         """Pre-warm cache by analyzing multiple files in parallel."""
 
         ProductionAssert.not_none(file_paths, "file_paths")
-
-        ProductionAssert.not_none(file_paths, "file_paths")
-
-        ProductionAssert.not_none(max_workers, "max_workers")
-
-        ProductionAssert.not_none(file_paths, "file_paths")
-
-        ProductionAssert.not_none(file_paths, "file_paths")
-
         ProductionAssert.not_none(max_workers, "max_workers")
 
         logger.info(f"Warming cache for {len(file_paths)} files with {max_workers} workers")
@@ -356,8 +329,6 @@ class ASTCache:
 
         def analyze_and_cache(file_path):
             """Analyze file and cache results."""
-
-            ProductionAssert.not_none(file_path, "file_path")
 
             ProductionAssert.not_none(file_path, "file_path")
 
@@ -407,18 +378,15 @@ class ASTCache:
     def _generate_cache_key(self, file_path: Path, cache_type: str) -> str:
         """Generate cache key for file and analysis type."""
 
-        # Include file path and type in hash for uniqueness
+        # Include file path and type in a collision-resistant digest because
+        # this value selects the persisted cache metadata file.
         key_data = f"{file_path.absolute()}:{cache_type}"
-        return hashlib.md5(key_data.encode()).hexdigest()
+        return hashlib.sha256(key_data.encode()).hexdigest()
 
     def _add_entry(self, key: str, entry: CacheEntry):
         """Add entry to cache."""
 
-        # Calculate entry size (rough estimate)
-        try:
-            entry_size = len(pickle.dumps(entry.data))
-        except Exception:
-            entry_size = 1024  # Default estimate
+        entry_size = self._estimate_entry_size(entry)
 
         self.memory_cache[key] = entry
         self.cache_stats["size_bytes"] += entry_size
@@ -434,22 +402,19 @@ class ASTCache:
             entry = self.memory_cache[key]
 
             # Estimate size reduction
-            try:
-                entry_size = len(pickle.dumps(entry.data))
-            except Exception:
-                entry_size = 1024
+            entry_size = self._estimate_entry_size(entry)
 
             del self.memory_cache[key]
             self.cache_stats["size_bytes"] -= entry_size
 
             # Remove from disk if enabled
             if self.enable_persistence:
-                cache_file = self.cache_dir / f"{key}.cache"
-                try:
-                    if cache_file.exists():
-                        cache_file.unlink()
-                except Exception as e:
-                    logger.warning(f"Failed to delete cache file {cache_file}: {e}")
+                for cache_file in (self.cache_dir / f"{key}.cache", self.cache_dir / f"{key}.json"):
+                    try:
+                        if cache_file.exists():
+                            cache_file.unlink()
+                    except Exception as e:
+                        logger.warning(f"Failed to delete cache file {cache_file}: {e}")
 
     def _enforce_cache_limits(self):
         """Enforce cache size and entry count limits."""
@@ -464,6 +429,18 @@ class ASTCache:
                 self._remove_entry(key)
                 self.cache_stats["evictions"] += 1
 
+    def _estimate_entry_size(self, entry: CacheEntry) -> int:
+        """Estimate memory pressure without serializing arbitrary objects."""
+        try:
+            return max(
+                sys.getsizeof(entry.data)
+                + sys.getsizeof(entry.file_path)
+                + sys.getsizeof(entry.key),
+                1024,
+            )
+        except Exception:
+            return 1024
+
         # Check memory size limit
         if self.cache_stats["size_bytes"] > self.max_size_bytes:
             # Remove entries until under limit
@@ -476,60 +453,47 @@ class ASTCache:
                 self.cache_stats["evictions"] += 1
 
     def _persist_entry(self, key: str, entry: CacheEntry):
-        """Persist cache entry to disk."""
+        """Persist non-executable cache metadata to disk.
+
+        Cache payloads are intentionally not serialized. Loading pickle from a
+        writable cache directory is a code-execution risk, and this cache is an
+        optimization only.
+        """
 
         try:
-            cache_file = self.cache_dir / f"{key}.cache"
-
-            with open(cache_file, "wb") as f:
-                if self.enable_compression:
-                    import gzip
-
-                    with gzip.open(f, "wb") as gf:
-                        pickle.dump(entry, gf)
-                else:
-                    pickle.dump(entry, f)
+            cache_file = self.cache_dir / f"{key}.json"
+            metadata = {
+                "key": entry.key,
+                "file_path": entry.file_path,
+                "file_mtime": entry.file_mtime,
+                "file_size": entry.file_size,
+                "created_at": entry.created_at,
+                "accessed_at": entry.accessed_at,
+                "access_count": entry.access_count,
+                "analysis_duration_ms": entry.analysis_duration_ms,
+                "payload_persisted": False,
+            }
+            cache_file.write_text(json.dumps(metadata, sort_keys=True), encoding="utf-8")
 
         except Exception as e:
             logger.warning(f"Failed to persist cache entry {key}: {e}")
 
     def _load_cache_index(self):
-        """Load cache entries from disk."""
+        """Do not load executable cache payloads from disk.
+
+        Older versions wrote pickle ``*.cache`` files. Those files are ignored
+        and removed where possible because deserializing them can execute
+        attacker-controlled code.
+        """
 
         if not self.cache_dir.exists():
             return
 
-        loaded_count = 0
-        failed_count = 0
-
         for cache_file in self.cache_dir.glob("*.cache"):
             try:
-                key = cache_file.stem
-
-                with open(cache_file, "rb") as f:
-                    if self.enable_compression:
-                        import gzip
-
-                        with gzip.open(f, "rb") as gf:
-                            entry = pickle.load(gf)
-                    else:
-                        entry = pickle.load(f)
-
-                # Validate entry
-                if entry.is_valid():
-                    self.memory_cache[key] = entry
-                    loaded_count += 1
-                else:
-                    # Remove invalid cache file
-                    cache_file.unlink()
-                    failed_count += 1
-
+                cache_file.unlink()
             except Exception as e:
-                logger.warning(f"Failed to load cache file {cache_file}: {e}")
-                failed_count += 1
-
-        if loaded_count > 0:
-            logger.info(f"Loaded {loaded_count} cache entries from disk ({failed_count} invalid)")
+                logger.warning(f"Failed to remove unsafe legacy cache file {cache_file}: {e}")
 
     def _save_cache_index(self):
         """Save current cache entries to disk."""
@@ -572,47 +536,52 @@ class ASTCache:
             return []
 
 
-# Global cache instance
-ast_cache = ASTCache()
+_default_ast_cache: Optional[ASTCache] = None
+
+
+def get_default_ast_cache() -> ASTCache:
+    """Return the process default AST cache, creating it on first use."""
+    global _default_ast_cache
+    if _default_ast_cache is None:
+        _default_ast_cache = ASTCache()
+    return _default_ast_cache
+
+
+class _LazyASTCacheProxy:
+    """Backwards-compatible lazy proxy for the historic module-level ast_cache."""
+
+    def __getattr__(self, name: str):
+        return getattr(get_default_ast_cache(), name)
+
+
+ast_cache = _LazyASTCacheProxy()
 
 
 def get_cached_ast(file_path: Union[str, Path]) -> Optional[ast.AST]:
     """Get cached AST for file (convenience function)."""
-    return ast_cache.get_ast(file_path)
+    return get_default_ast_cache().get_ast(file_path)
 
 
 def cache_ast(file_path: Union[str, Path], ast_tree: ast.AST, analysis_duration_ms: float = 0.0):
     """Cache AST for file (convenience function)."""
 
     ProductionAssert.not_none(file_path, "file_path")
-
-    ProductionAssert.not_none(file_path, "file_path")
-
     ProductionAssert.not_none(ast_tree, "ast_tree")
-
     ProductionAssert.not_none(analysis_duration_ms, "analysis_duration_ms")
 
-    ProductionAssert.not_none(file_path, "file_path")
-
-    ProductionAssert.not_none(file_path, "file_path")
-
-    ProductionAssert.not_none(ast_tree, "ast_tree")
-
-    ProductionAssert.not_none(analysis_duration_ms, "analysis_duration_ms")
-
-    ast_cache.put_ast(file_path, ast_tree, analysis_duration_ms)
+    get_default_ast_cache().put_ast(file_path, ast_tree, analysis_duration_ms)
 
 
 def get_cache_stats() -> Dict[str, Any]:
     """Get cache statistics (convenience function)."""
-    return ast_cache.get_cache_statistics()
+    return get_default_ast_cache().get_cache_statistics()
 
 
 def optimize_cache():
     """Optimize cache (convenience function)."""
-    ast_cache.optimize_cache()
+    get_default_ast_cache().optimize_cache()
 
 
 def clear_cache():
     """Clear cache (convenience function)."""
-    ast_cache.clear_cache()
+    get_default_ast_cache().clear_cache()

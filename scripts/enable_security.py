@@ -4,12 +4,15 @@ Script to enable GitHub Advanced Security and Code Scanning
 """
 
 import subprocess
+from shlex import join as shell_join
 
 
 def run_command(command, capture_output=True):
-    """Run a shell command and return the result."""
+    """Run a command without invoking a shell."""
+    if isinstance(command, str):
+        raise TypeError("command must be an argv sequence, not a shell string")
     try:
-        result = subprocess.run(command, shell=True, capture_output=capture_output, text=True, check=False)
+        result = subprocess.run(command, shell=False, capture_output=capture_output, text=True, check=False)
         return result
     except subprocess.SubprocessError as e:
         print(f"Command failed: {e}")
@@ -22,13 +25,37 @@ def enable_advanced_security():
 
     # Try to enable advanced security using different approaches
     commands = [
-        'gh api --method PATCH repos/DNYoussef/connascence-safety-analyzer --field "security_and_analysis[advanced_security][status]"="enabled"',
-        'gh api --method PATCH repos/DNYoussef/connascence-safety-analyzer --field "security_and_analysis[secret_scanning][status]"="enabled"',
-        'gh api --method PATCH repos/DNYoussef/connascence-safety-analyzer --field "security_and_analysis[secret_scanning_push_protection][status]"="enabled"',
+        [
+            "gh",
+            "api",
+            "--method",
+            "PATCH",
+            "repos/DNYoussef/connascence-safety-analyzer",
+            "--field",
+            "security_and_analysis[advanced_security][status]=enabled",
+        ],
+        [
+            "gh",
+            "api",
+            "--method",
+            "PATCH",
+            "repos/DNYoussef/connascence-safety-analyzer",
+            "--field",
+            "security_and_analysis[secret_scanning][status]=enabled",
+        ],
+        [
+            "gh",
+            "api",
+            "--method",
+            "PATCH",
+            "repos/DNYoussef/connascence-safety-analyzer",
+            "--field",
+            "security_and_analysis[secret_scanning_push_protection][status]=enabled",
+        ],
     ]
 
     for cmd in commands:
-        print(f"Running: {cmd}")
+        print(f"Running: {shell_join(cmd)}")
         result = run_command(cmd)
         if result and result.returncode == 0:
             print("SUCCESS: Command completed")

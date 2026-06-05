@@ -34,15 +34,15 @@ class IdentityDetector(ast.NodeVisitor):
         if len(self._global_vars) > 5:
             self.violations.append(
                 ConnascenceViolation(
-                    violation_id=f"CoI-{self.file_path}:1",
+                    id=f"CoI-{self.file_path}:1",
                     type="connascence_of_identity",
                     severity="high",
                     file_path=self.file_path,
                     line_number=1,
                     column=0,
-                    message=f"Excessive global variable usage: {len(self._global_vars)} globals",
+                    description=f"Excessive global variable usage: {len(self._global_vars)} globals",
                     recommendation="Use dependency injection, configuration objects, or class attributes",
-                    context={"global_count": len(self._global_vars), "global_vars": list(self._global_vars)},
+                    context={"global_count": len(self._global_vars), "global_vars": sorted(self._global_vars)},
                 )
             )
 

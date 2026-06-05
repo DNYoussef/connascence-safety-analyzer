@@ -233,6 +233,17 @@ class SBOMGenerator:
 
         return json.dumps(spdx, indent=2)
 
+    def generate_all_formats(self, project_root: Optional[str] = None) -> Dict[str, str]:
+        """Generate CycloneDX and SPDX files for compatibility tests."""
+        if project_root is not None:
+            self.project_root = Path(project_root)
+        output_dir = Path(self.project_root) / ".artifacts" / "supply_chain"
+        output_dir.mkdir(parents=True, exist_ok=True)
+        return {
+            "cyclone_dx": self.generate_cyclonedx(str(output_dir / "sbom-cyclone-dx.json")),
+            "spdx": self.generate_spdx(str(output_dir / "sbom-spdx.json")),
+        }
+
     def _generate_uuid(self) -> str:
         import uuid
 

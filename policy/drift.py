@@ -275,8 +275,9 @@ class EnhancedDriftTracker:
 
         # Forecast based on trend
         intercept = y_mean - slope * x_mean
-        forecast_7d = max(0, int(intercept + slope * (days + 7)))
-        forecast_30d = max(0, int(intercept + slope * (days + 30)))
+        last_observed_day = max(x_values)
+        forecast_7d = max(0, int(intercept + slope * (last_observed_day + 7)))
+        forecast_30d = max(0, int(intercept + slope * (last_observed_day + 30)))
 
         return TrendAnalysis(
             trend_direction=trend_direction,

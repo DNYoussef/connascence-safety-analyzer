@@ -12,7 +12,7 @@
 # all copies or substantial portions of the Software.
 
 """
-Mock MCP Server implementation for test compatibility.
+MCP server implementation and compatibility entry point.
 """
 
 import asyncio
@@ -926,23 +926,38 @@ class MCPConnascenceTool:
         return self.validate_input(arguments)
 
 
-def main():
-    """Main entry point for MCP server."""
+async def _run_stdio_entrypoint(args):
+    """Delegate the package entry point to the real stdio MCP transport."""
+    from mcp.cli import load_config, mcp_server_command
+
+    args.config = load_config(args.config)
+    return await mcp_server_command(args)
+
+
+def main(argv=None):
+    """Main entry point for the registered MCP server.
+
+    The previous implementation returned success after printing server metadata,
+    which made the package entry point look operational without serving anything.
+    This path now starts the real stdio transport, with --once retained for
+    deterministic health-check tests.
+    """
     import argparse
-    import logging
 
-    parser = argparse.ArgumentParser(description="Connascence MCP Server")
-    parser.add_argument("--mock", action="store_true", help="Use mock analyzer for testing only")
-    args = parser.parse_args()
+    parser = argparse.ArgumentParser(description="Connascence MCP stdio server")
+    parser.add_argument("--config", help="Optional MCP configuration file")
+    parser.add_argument("--once", action="store_true", help="Emit readiness once and exit")
+    parser.add_argument(
+        "--mock",
+        action="store_true",
+        help="Removed: mock serving is not a valid package entry point",
+    )
+    args = parser.parse_args(argv)
 
-    logging.basicConfig(level=logging.INFO)
-    logger = logging.getLogger(__name__)
+    if args.mock:
+        parser.error("--mock is test-only and cannot be used by the package MCP entry point")
 
-    server = ConnascenceMCPServer(use_mock=args.mock)
-    logger.info("Starting Connascence MCP Server v%s", server.version)
-    logger.info("Available tools: %s", ", ".join(server._tools.keys()))
-    # For now, just print server info - full MCP integration would need more setup
-    return 0
+    return asyncio.run(_run_stdio_entrypoint(args))
 
 
 __all__ = ["ConnascenceMCPServer", "MCPConnascenceTool"]

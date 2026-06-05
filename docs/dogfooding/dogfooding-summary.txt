@@ -1,0 +1,48 @@
+================================================================================
+COMPREHENSIVE DOGFOODING ANALYSIS - ALL 7 ANALYZERS
+================================================================================
+
+Metadata:
+--------------------------------------------------------------------------------
+  analysis_date: 2025-11-25T13:04:04.817313
+  target_path: analyzer/
+  analysis_time_seconds: 33.74
+  analyzer_version: 2.0.0
+  components_used: ['AST', 'GodObject', 'MECE', 'NASA', 'SmartEngine']
+  analyzers_run: 7
+
+Summary:
+--------------------------------------------------------------------------------
+  total_violations: 20641
+  critical_violations: 51
+  high_violations: 375
+  medium_violations: 1945
+  low_violations: 18270
+  connascence_index: 37795.0
+  nasa_compliance_score: 1.0
+  duplication_score: 1.0
+  overall_quality_score: 1.0
+
+By Analyzer:
+--------------------------------------------------------------------------------
+  1. Connascence:  20361 violations
+  2. NASA Safety:      0 violations
+  3. MECE:         See completeness score above
+  4. Duplication:      9 clusters
+  5. Clarity:        280 violations
+  6. Safety:         174 violations
+  7. Six Sigma:    1.94 sigma
+
+Top 10 Connascence Types:
+--------------------------------------------------------------------------------
+  connascence_of_meaning        : 15936
+  CoV                           :  2133
+  connascence_of_convention     :   809
+  connascence_of_execution      :   697
+  connascence_of_algorithm      :   343
+  connascence_of_position       :   177
+  connascence_of_name           :    77
+  god_object                    :    73
+  CoP                           :    71
+  CoA                           :    30
+

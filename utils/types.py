@@ -136,6 +136,19 @@ def create_violation(**kwargs) -> ConnascenceViolation:
     return ConnascenceViolation(**kwargs)
 
 
+@dataclass
+class ClassMetrics:
+    """Parameter object for context-aware class analysis metrics."""
+
+    class_name: str
+    method_count: int
+    loc: int
+    cohesion_score: float
+    context_value: str = ""
+    thresholds: Dict[str, Any] = field(default_factory=dict)
+    responsibilities: set[Any] = field(default_factory=set)
+
+
 # Parameter object for formal magic literal analysis (CoP reduction)
 @dataclass(frozen=True)
 class MagicLiteralParams:

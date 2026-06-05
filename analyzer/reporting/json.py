@@ -29,6 +29,7 @@ class JSONReporter:
 
     def __init__(self):
         self.schema_version = "1.0.0"
+        self.tool_version = "2.0.0"
 
     def generate(self, result: AnalysisResult) -> str:
         """Generate JSON report from analysis result."""
@@ -49,7 +50,7 @@ class JSONReporter:
         return {
             "tool": {
                 "name": "connascence",
-                "version": "1.0.0",
+                "version": self.tool_version,
                 "url": "https://github.com/connascence/connascence-analyzer",
             },
             "analysis": {

@@ -22,6 +22,20 @@ from typing import Any, Dict, List, Optional
 from .config_discovery import ConfigDiscovery
 from .policy_detection import PolicyDetection
 
+RICH_CLI_COMMANDS = {
+    "analyze",
+    "analyze-workspace",
+    "autofix",
+    "baseline",
+    "explain",
+    "license",
+    "mcp",
+    "scan",
+    "scan-diff",
+    "suggest-refactoring",
+    "validate-safety",
+}
+
 # Import the full analyzer for actual analysis
 try:
     from analyzer.core import ConnascenceAnalyzer
@@ -251,6 +265,12 @@ Examples:
 
     def run(self, argv: Optional[List[str]] = None) -> int:
         """Main entry point - run the simple CLI."""
+        argv = list(sys.argv[1:] if argv is None else argv)
+        if argv and argv[0] in RICH_CLI_COMMANDS:
+            from .connascence import ConnascenceCLI
+
+            return int(ConnascenceCLI().run(argv))
+
         parser = self.create_parser()
         args = parser.parse_args(argv)
 
@@ -291,20 +311,23 @@ Examples:
         try:
             analyzer = ConnascenceAnalyzer()
 
-            # Use first path for analysis (simple CLI focuses on single path)
-            path = args.paths[0] if args.paths else "."
-
             # Run comprehensive analysis with all features included
             # Duplication is enabled by default, disabled with --no-duplication-analysis
             include_duplication = not getattr(args, 'no_duplication_analysis', False)
-            combined_result = analyzer.analyze_path(
-                path=path,
-                policy=policy,
-                strict_mode=args.strict_mode,
-                nasa_validation=args.nasa_validation,
-                include_duplication=include_duplication,
-                duplication_threshold=0.7,  # Default threshold
-            )
+            results = []
+            for path in args.paths or ["."]:
+                results.append(
+                    analyzer.analyze_path(
+                        path=path,
+                        policy=policy,
+                        strict_mode=args.strict_mode,
+                        nasa_validation=args.nasa_validation,
+                        include_duplication=include_duplication,
+                        duplication_threshold=0.7,  # Default threshold
+                    )
+                )
+            combined_result = self._combine_results(results)
+            combined_result["analyzed_paths"] = list(args.paths or ["."])
 
             # Apply filtering
             if args.severity:
@@ -383,13 +406,21 @@ Examples:
         combined = {
             "success": all(r.get("success", False) for r in results),
             "violations": [],
-            "summary": {"total_violations": 0},
+            "god_objects": [],
+            "summary": {"total_violations": 0, "overall_quality_score": 1.0},
         }
 
+        quality_scores = []
         for result in results:
             combined["violations"].extend(result.get("violations", []))
+            combined["god_objects"].extend(result.get("god_objects", []))
+            score = result.get("summary", {}).get("overall_quality_score")
+            if isinstance(score, (int, float)):
+                quality_scores.append(float(score))
 
         combined["summary"]["total_violations"] = len(combined["violations"])
+        if quality_scores:
+            combined["summary"]["overall_quality_score"] = min(quality_scores)
 
         return combined
 
