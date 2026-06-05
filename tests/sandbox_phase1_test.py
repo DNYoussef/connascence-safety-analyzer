@@ -57,7 +57,6 @@ def example_function(a, b, c, d, e):
     print(f"[PASS] get_node_type_name() works: {type_name}")
 
     print("[PASS] All ASTUtils tests passed")
-    return True
 
 
 def test_violation_factory():
@@ -105,7 +104,6 @@ def test_violation_factory():
     print(f"[PASS] create_cot_violation() works: {cot_violation['description']}")
 
     print("[PASS] All ViolationFactory tests passed")
-    return True
 
 
 def test_detector_result():
@@ -146,7 +144,6 @@ def test_detector_result():
     print(f"[PASS] to_dict() works: {result_dict.keys()}")
 
     print("[PASS] All DetectorResult tests passed")
-    return True
 
 
 def test_analysis_context():
@@ -181,7 +178,6 @@ def test_analysis_context():
     print(f"[PASS] to_dict() works: {context_dict.keys()}")
 
     print("[PASS] All AnalysisContext tests passed")
-    return True
 
 
 def main():
@@ -202,8 +198,8 @@ def main():
 
     for test_name, test_func in tests:
         try:
-            if test_func():
-                passed += 1
+            test_func()
+            passed += 1
         except Exception as e:
             print(f"[FAIL] {test_name} test failed: {e}")
             import traceback
