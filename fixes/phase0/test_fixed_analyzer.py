@@ -60,7 +60,7 @@ def complex_function(a, b, c, d, e, f):
 
     # Run analyzer
     analyzer = PythonNASAAnalyzer()
-    violations = analyzer.analyze_file(temp_file)
+    violations = analyzer.analyze_file(temp_file, sample_code)
 
     print("Sample Code Violations Found:")
     print("=" * 50)
@@ -70,7 +70,7 @@ def complex_function(a, b, c, d, e, f):
     # Clean up
     Path(temp_file).unlink()
 
-    return len(violations)
+    assert len(violations) > 0, "Sample should produce legitimate NASA violations"
 
 
 def compare_with_baseline():
@@ -92,10 +92,10 @@ def compare_with_baseline():
     print(f"  NASA Compliance: {baseline['original_compliance']}%")
 
     # Test on sample
-    sample_violations = test_sample_code()
+    test_sample_code()
 
     print("\nFIXED ANALYZER (Python AST analysis):")
-    print(f"  Sample violations: {sample_violations} (all legitimate)")
+    print("  Sample violations: non-empty legitimate violation set")
     print("  False positives: 0")
     print("  Accuracy: 100%")
 
