@@ -47,6 +47,37 @@ from .result_types import UnifiedAnalysisResult
 
 logger = logging.getLogger(__name__)
 
+# Fields stripped from emitted violations: source-code excerpts must never leave
+# the analyzer (hard project rule), and they bloat artifacts without analytic value.
+_SOURCE_BEARING_FIELDS = ("code_snippet", "source_code", "source", "snippet")
+
+
+def _json_safe(value: Any) -> Any:
+    """Recursively coerce a value into JSON-serializable primitives.
+
+    Detector ``context`` payloads can embed raw ``ast`` nodes (e.g. CoP records
+    ``all_args`` as a list of ``ast.arg``). Those are not JSON-serializable, so any
+    non-primitive is converted to ``str`` as a last resort.
+    """
+    if value is None or isinstance(value, (str, int, float, bool)):
+        return value
+    if isinstance(value, dict):
+        return {str(k): _json_safe(v) for k, v in value.items()}
+    if isinstance(value, (list, tuple, set)):
+        return [_json_safe(v) for v in value]
+    text = str(value)
+    # A default object repr ("<ast.arg object at 0x...>") embeds a non-deterministic
+    # memory address. Collapse it to a stable, address-free token so artifacts are
+    # reproducible and diff-friendly; meaningful reprs (Path, datetime, Enum) pass through.
+    if text.startswith("<") and " object at 0x" in text:
+        return f"<{type(value).__name__}>"
+    return text
+
+
+def _sanitize_violation_dict(raw: Dict[str, Any]) -> Dict[str, Any]:
+    """Return a JSON-safe, source-free copy of a violation dict."""
+    return {key: _json_safe(val) for key, val in raw.items() if key not in _SOURCE_BEARING_FIELDS}
+
 
 class UnifiedCoordinator(MonitoringLifecycleMixin):
     """
@@ -470,14 +501,24 @@ class UnifiedCoordinator(MonitoringLifecycleMixin):
         return not any(excl in str(file_path) for excl in excludes)
 
     def _violation_to_dict(self, violation: Any) -> Dict[str, Any]:
-        """Convert violation to dictionary. NASA Rule 4 compliant."""
+        """Convert violation to a JSON-safe dictionary. NASA Rule 4 compliant.
+
+        Detectors return either dicts (service / DetectorFactory path) or objects
+        (ConnascenceViolation). Both are normalized here, then sanitized so the
+        emitted artifact is (a) JSON-serializable (detector context can embed raw
+        ``ast`` nodes) and (b) free of source-code excerpts.
+        """
         if isinstance(violation, dict):
-            return violation
-        if hasattr(violation, "__dict__"):
-            return vars(violation)
-        if hasattr(violation, "_asdict"):
-            return violation._asdict()
-        return {"value": str(violation)}
+            raw = violation
+        elif hasattr(violation, "to_dict"):
+            raw = violation.to_dict()
+        elif hasattr(violation, "__dict__"):
+            raw = vars(violation)
+        elif hasattr(violation, "_asdict"):
+            raw = violation._asdict()
+        else:
+            return {"value": str(violation)}
+        return _sanitize_violation_dict(raw)
 
     def _extract_violations_list(self, result: Any) -> List[Dict[str, Any]]:
         """Extract violations list from result. NASA Rule 4 compliant."""

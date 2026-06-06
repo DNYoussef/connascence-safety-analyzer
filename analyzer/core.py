@@ -330,7 +330,7 @@ class ConnascenceAnalyzer:
                 },
                 "nasa_compliance": self._unavailable_evidence_result(
                     "unavailable_fallback_analyzer",
-                    [v for v in violation_dicts if "NASA" in v.get("rule_id", "")],
+                    [v for v in violation_dicts if "NASA" in (v.get("rule_id") or "")],
                 ),
                 "mece_analysis": {
                     "score": None,
@@ -451,7 +451,7 @@ class ConnascenceAnalyzer:
 
     def _extract_god_objects(self, violations: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Extract god object violations from violation list."""
-        return [v for v in violations if v.get("type") == "god_object" or "god_object" in v.get("rule_id", "").lower()]
+        return [v for v in violations if v.get("type") == "god_object" or "god_object" in (v.get("rule_id") or "").lower()]
 
     def _violation_to_dict(self, violation: ConnascenceViolation) -> Dict[str, Any]:
         """Convert violation object to dictionary with enhanced metadata."""
@@ -829,7 +829,7 @@ def _display_recommendations_summary(result):
         recommendations = result["smart_recommendations"]
         logger.info("Generated %s architectural recommendations", len(recommendations))
 
-        high_priority = [r for r in recommendations if r.get("priority", "").lower() == "high"]
+        high_priority = [r for r in recommendations if (r.get("priority") or "").lower() == "high"]
         for rec in high_priority[:3]:
             category = rec.get("category", "General")
             description = rec.get("description", "No description")[:60] + "..."

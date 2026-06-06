@@ -897,6 +897,18 @@ class ConnascenceDetector(ast.NodeVisitor):
             super().visit(node)
 
 
+def _violation_field(violation: Any, name: str, default: Any = None) -> Any:
+    """Read a field from a violation that may be a dict or a ConnascenceViolation object.
+
+    Detectors in this codebase return EITHER dictionaries (service / DetectorFactory
+    path) OR ConnascenceViolation objects (optimized fallback path). This accessor
+    normalizes the boundary so callers can read fields safely from either shape.
+    """
+    if isinstance(violation, dict):
+        return violation.get(name, default)
+    return getattr(violation, name, default)
+
+
 class FallbackConnascenceAnalyzer:
     """
     Legacy fallback analyzer used by core.py when UnifiedConnascenceAnalyzer unavailable.
@@ -999,7 +1011,7 @@ class FallbackConnascenceAnalyzer:
             # Update stats
             self.file_stats[str(py_file)] = {
                 "violations": len(file_violations),
-                "types": list({v.type for v in file_violations}),
+                "types": list({_violation_field(v, "type") for v in file_violations}),
             }
 
         self.violations = all_violations
@@ -1032,7 +1044,7 @@ def main():
     if args.severity:
         severity_order = {"low": 0, "medium": 1, "high": 2, "critical": 3}
         min_level = severity_order[args.severity]
-        violations = [v for v in violations if severity_order.get(v.severity, 0) >= min_level]
+        violations = [v for v in violations if severity_order.get(_violation_field(v, "severity"), 0) >= min_level]
 
     # Generate report
     if args.format == "json":
@@ -1040,14 +1052,13 @@ def main():
 
         report_data = [
             {
-                "type": v.type,
-                "severity": v.severity,
-                "file_path": v.file_path,
-                "line_number": v.line_number,
-                "column": v.column,
-                "description": v.description,
-                "recommendation": v.recommendation,
-                "context": v.context,
+                "type": _violation_field(v, "type"),
+                "severity": _violation_field(v, "severity"),
+                "file_path": _violation_field(v, "file_path"),
+                "line_number": _violation_field(v, "line_number"),
+                "column": _violation_field(v, "column"),
+                "description": _violation_field(v, "description"),
+                "recommendation": _violation_field(v, "recommendation"),
             }
             for v in violations
         ]
@@ -1056,9 +1067,10 @@ def main():
         # Text format
         report_lines = [f"Found {len(violations)} connascence violations:\n"]
         for v in violations:
-            report_lines.append(f"{v.severity.upper()}: {v.description}")
-            report_lines.append(f"  File: {v.file_path}:{v.line_number}")
-            report_lines.append(f"  Fix: {v.recommendation}\n")
+            severity = str(_violation_field(v, "severity", "")).upper()
+            report_lines.append(f"{severity}: {_violation_field(v, 'description')}")
+            report_lines.append(f"  File: {_violation_field(v, 'file_path')}:{_violation_field(v, 'line_number')}")
+            report_lines.append(f"  Fix: {_violation_field(v, 'recommendation')}\n")
         report = "\n".join(report_lines)
 
     # Output
@@ -1073,7 +1085,7 @@ def main():
         logger.info("Found %s violations", len(violations))
 
     # Exit with error code if critical violations found
-    critical_count = sum(1 for v in violations if v.severity == "critical")
+    critical_count = sum(1 for v in violations if _violation_field(v, "severity") == "critical")
     return min(critical_count, 1)
 
 

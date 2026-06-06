@@ -134,6 +134,9 @@ class MetricsCollector:
         severity_counts = self._count_violations_by_severity(
             connascence_violations + nasa_violations
         )
+        files_analyzed = self._count_files_analyzed(
+            connascence_violations + duplication_clusters + nasa_violations
+        )
 
         # Calculate indexes and scores
         connascence_index = self._calculate_connascence_index(connascence_violations)
@@ -159,11 +162,23 @@ class MetricsCollector:
             "nasa_compliance_score": nasa_score,
             "duplication_score": duplication_score,
             "overall_quality_score": overall_quality,
+            "files_analyzed": files_analyzed,
             "collection_time_ms": round((time.time() - start_time) * 1000, 2),
             "timestamp": self._get_iso_timestamp()
         }
 
         return metrics
+
+    def _count_files_analyzed(self, violations: List[Dict]) -> int:
+        """Count unique source files represented by normalized findings."""
+        file_paths = set()
+        for violation in violations:
+            if not isinstance(violation, dict):
+                continue
+            file_path = violation.get("file_path") or violation.get("file") or violation.get("path")
+            if file_path:
+                file_paths.add(str(file_path))
+        return len(file_paths)
 
     def _count_violations_by_severity(self, violations: List[Dict]) -> Dict[str, int]:
         """Count violations by severity level. NASA Rule 4 compliant."""
