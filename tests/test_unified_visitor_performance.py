@@ -15,6 +15,7 @@ import unittest
 
 from analyzer.optimization.unified_visitor import UnifiedASTVisitor
 from analyzer.refactored_detector import RefactoredConnascenceDetector
+from analyzer.utils.types import ConnascenceViolation
 
 
 class TestUnifiedVisitorPerformance(unittest.TestCase):
@@ -217,6 +218,31 @@ def threading_function():
             self.assertIsInstance(violation.recommendation, str)
 
         print("✓ API compatibility maintained - zero breaking changes")
+
+    def test_analyzer_utils_violation_supports_canonical_contract(self):
+        """The package-local violation type must accept the canonical API."""
+        violation = ConnascenceViolation(
+            type="connascence_of_identity",
+            severity="high",
+            file_path="example.py",
+            line_number=3,
+            column=2,
+            description="Excessive global variable usage",
+            recommendation="Use dependency injection",
+            code_snippet="global x",
+            context={"global_count": 6},
+        )
+
+        self.assertEqual(violation.description, "Excessive global variable usage")
+        self.assertEqual(violation.message, "Excessive global variable usage")
+        self.assertEqual(violation.code_snippet, "global x")
+        self.assertEqual(violation.column_number, 2)
+        self.assertEqual(violation.connascence_type, "connascence_of_identity")
+
+        as_dict = violation.to_dict()
+        self.assertEqual(as_dict["description"], violation.description)
+        self.assertEqual(as_dict["message"], violation.message)
+        self.assertEqual(as_dict["code_snippet"], violation.code_snippet)
 
     def test_performance_improvement_estimation(self):
         """Estimate performance improvement from reduced AST traversals."""

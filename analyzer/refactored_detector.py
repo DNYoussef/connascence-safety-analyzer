@@ -8,12 +8,12 @@ NASA Rule 4/5/6 compliant implementation.
 
 import ast
 import logging
-from typing import List
+from typing import Any, List
 
 logger = logging.getLogger(__name__)
 
 try:
-    from .utils.types import ConnascenceViolation
+    from utils.types import ConnascenceViolation
     from .optimization.unified_visitor import ASTNodeData, UnifiedASTVisitor
     from .utils.code_utils import get_code_snippet_for_node
 except ImportError:
@@ -136,8 +136,29 @@ class RefactoredConnascenceDetector(ast.NodeVisitor):
         # NASA Rule 5: Output validation
         assert isinstance(all_violations, list), "violations must be list"
 
+        all_violations = [self._normalize_violation(violation) for violation in all_violations]
         self.violations = all_violations
         return all_violations
+
+    def _normalize_violation(self, violation: Any) -> ConnascenceViolation:
+        """Normalize pooled detector dicts into ConnascenceViolation objects."""
+        if not isinstance(violation, dict):
+            return violation
+
+        return ConnascenceViolation(
+            id=violation.get("id"),
+            rule_id=violation.get("rule_id"),
+            type=violation.get("type", ""),
+            connascence_type=violation.get("connascence_type"),
+            severity=violation.get("severity", "medium"),
+            file_path=violation.get("file_path", self.file_path),
+            line_number=violation.get("line_number", 0),
+            column=violation.get("column", violation.get("column_number", 0)),
+            description=violation.get("description", violation.get("message", "")),
+            recommendation=violation.get("recommendation", ""),
+            code_snippet=violation.get("code_snippet", ""),
+            context=violation.get("context", {}),
+        )
 
     def _analyze_with_detector_pool(self, collected_data: ASTNodeData) -> List[ConnascenceViolation]:
         """
