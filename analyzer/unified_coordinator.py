@@ -41,13 +41,14 @@ from .dup_detection.mece_analyzer import MECEAnalyzer
 from .refactored_detector import RefactoredConnascenceDetector
 from .optimization.ast_optimizer import ConnascencePatternOptimizer
 
-# Import result dataclass from unified_analyzer
-from .unified_analyzer import UnifiedAnalysisResult, ErrorHandler, ComponentInitializer
+from .component_init import ComponentInitializer, ErrorHandler
+from .monitoring_lifecycle import MonitoringLifecycleMixin
+from .result_types import UnifiedAnalysisResult
 
 logger = logging.getLogger(__name__)
 
 
-class UnifiedCoordinator:
+class UnifiedCoordinator(MonitoringLifecycleMixin):
     """
     Lightweight orchestrator coordinating specialized architecture components.
 
@@ -93,10 +94,15 @@ class UnifiedCoordinator:
         # Initialize optional components via initializer
         initializer = ComponentInitializer()
         self.smart_engine = initializer.init_smart_engine()
+        self.failure_detector = initializer.init_failure_detector()
         self.nasa_integration = initializer.init_nasa_integration()
+        self.policy_manager = initializer.init_policy_manager()
+        self.budget_tracker = initializer.init_budget_tracker()
 
         # Error handling
         self.error_handler = ErrorHandler("coordinator")
+        self.metrics_calculator = self.metrics_collector
+        self.recommendation_generator = None
 
         logger.info(f"UnifiedCoordinator initialized (mode={analysis_mode})")
 
@@ -127,15 +133,34 @@ class UnifiedCoordinator:
         """Single file analysis. NASA Rule 4 compliant."""
         file_path = Path(file_path)
         if not file_path.exists():
-            return {"file_path": str(file_path), "violations": [], "error": "File not found"}
+            error = self.error_handler.handle_exception(FileNotFoundError(f"File does not exist: {file_path}"))
+            return {
+                "file_path": str(file_path),
+                "connascence_violations": [],
+                "nasa_violations": [],
+                "violation_count": 0,
+                "nasa_compliance_score": 0.0,
+                "errors": [error.to_dict()],
+                "warnings": [],
+                "has_errors": True,
+            }
 
         violations = self.ast_analyzer.analyze_file(file_path)
+        violation_dicts = [self._violation_to_dict(v) for v in violations]
         metrics = self.metrics_collector.collect_violation_metrics({
-            "connascence": [self._violation_to_dict(v) for v in violations],
+            "connascence": violation_dicts,
             "duplication": [],
             "nasa": []
         })
-        return {"file_path": str(file_path), "violations": violations, "metrics": metrics}
+        return {
+            "file_path": str(file_path),
+            "violations": violations,
+            "connascence_violations": violation_dicts,
+            "nasa_violations": [],
+            "violation_count": len(violation_dicts),
+            "nasa_compliance_score": metrics.get("nasa_compliance_score", 1.0),
+            "metrics": metrics,
+        }
 
     def get_dashboard_summary(self, analysis_result: Union[Dict, UnifiedAnalysisResult]) -> str:
         """Generate dashboard summary via ReportGenerator. NASA Rule 4 compliant."""
@@ -355,6 +380,71 @@ class UnifiedCoordinator:
     def get_streaming_stats(self) -> Dict[str, Any]:
         """Backward compatibility: delegate to StreamProcessor."""
         return self.stream_processor.get_stats()
+
+    def get_architecture_components(self) -> Dict[str, Any]:
+        """Return specialized component owners for compatibility."""
+        return {
+            "cache_manager": self.cache_manager,
+            "metrics_collector": self.metrics_collector,
+            "report_generator": self.report_generator,
+            "stream_processor": self.stream_processor,
+        }
+
+    def get_component_status(self) -> Dict[str, bool]:
+        """Report availability of core and optional components."""
+        return {
+            "core_components": True,
+            "architecture_components": True,
+            "smart_engine": self.smart_engine is not None,
+            "failure_detector": self.failure_detector is not None,
+            "nasa_integration": self.nasa_integration is not None,
+            "policy_manager": self.policy_manager is not None,
+            "budget_tracker": self.budget_tracker is not None,
+            "caching": self.cache_manager is not None,
+        }
+
+    def validate_architecture_extraction(self) -> Dict[str, bool]:
+        """Validate that the facade delegates to focused component owners."""
+        validation = {
+            "coordinator_owner": True,
+            "cache_manager_extracted": self.cache_manager is not None,
+            "metrics_collector_extracted": self.metrics_collector is not None,
+            "report_generator_extracted": self.report_generator is not None,
+            "stream_processor_extracted": self.stream_processor is not None,
+            "api_compatibility": self._check_api_compatibility(),
+        }
+        validation["overall_success"] = all(validation.values())
+        return validation
+
+    def _check_api_compatibility(self) -> bool:
+        """Check that public legacy API methods remain available."""
+        required_methods = [
+            "analyze_project",
+            "analyze_file",
+            "get_dashboard_summary",
+            "create_integration_error",
+            "convert_exception_to_standard_error",
+        ]
+        return all(hasattr(self, method) for method in required_methods)
+
+    def create_integration_error(
+        self,
+        integration: str,
+        error_type: str,
+        message: str,
+        context: Optional[Dict[str, Any]] = None,
+    ):
+        """Create integration-specific error through the shared error handler."""
+        return ErrorHandler(integration).create_error(error_type, message, context=context)
+
+    def convert_exception_to_standard_error(
+        self,
+        exception: Exception,
+        integration: str = "analyzer",
+        context: Optional[Dict[str, Any]] = None,
+    ):
+        """Convert an exception to the shared StandardError contract."""
+        return ErrorHandler(integration).handle_exception(exception, context)
 
     # === HELPER METHODS ===
 
