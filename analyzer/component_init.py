@@ -31,7 +31,10 @@ from typing import Any, Dict, List, Optional
 import uuid
 
 from fixes.phase0.production_safe_assertions import ProductionAssert
-from .result_types import StandardError
+try:
+    from .result_types import StandardError
+except ImportError:
+    from result_types import StandardError
 
 # Import constants
 try:
