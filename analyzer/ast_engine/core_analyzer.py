@@ -114,7 +114,7 @@ class ConnascenceASTAnalyzer:
             List of ConnascenceViolation objects
         """
         # Check cache
-        cache_key = hashlib.md5(f"{file_path}:{code}".encode()).hexdigest()
+        cache_key = hashlib.md5(f"{file_path}:{code}".encode()).hexdigest()  # nosec B324 - cache key, not security
         if cache_key in self._cache:
             return self._cache[cache_key]
 

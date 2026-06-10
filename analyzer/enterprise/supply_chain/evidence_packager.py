@@ -21,7 +21,7 @@ class EvidencePackager:
             "sha512": hashlib.sha512(data).hexdigest(),
         }
         if self.config.get("allow_legacy_hashes", False):
-            hashes["sha1"] = hashlib.sha1(data).hexdigest()
+            hashes["sha1"] = hashlib.sha1(data).hexdigest()  # nosec B324 - explicit legacy-hash opt-in
         return hashes
 
     def create_evidence_package(

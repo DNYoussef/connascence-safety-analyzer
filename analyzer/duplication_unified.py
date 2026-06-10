@@ -264,7 +264,7 @@ class UnifiedDuplicationAnalyzer:
             if isinstance(node, ast.FunctionDef) and len(node.body) >= self.min_function_lines:
                 # Create normalized algorithm pattern
                 pattern = self._normalize_algorithm_pattern(node)
-                pattern_hash = hashlib.md5(pattern.encode()).hexdigest()
+                pattern_hash = hashlib.md5(pattern.encode()).hexdigest()  # nosec B324 - dedup key, not security
 
                 self.function_hashes[pattern_hash].append((file_path, node, source_lines))
 

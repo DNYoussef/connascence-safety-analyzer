@@ -382,7 +382,7 @@ class IncrementalAnalyzer:
                     # Calculate content hash
                     try:
                         with open(full_path, "rb") as f:
-                            content_hash = hashlib.md5(f.read()).hexdigest()
+                            content_hash = hashlib.md5(f.read()).hexdigest()  # nosec B324 - change detection, not security
                         change_info.content_hash = content_hash
                     except Exception:
                         pass
