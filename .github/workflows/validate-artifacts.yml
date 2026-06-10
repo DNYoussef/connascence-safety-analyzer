@@ -1,4 +1,4 @@
-name: 🎯 Connascence Artifact Validation Pipeline
+name: Connascence Artifact Validation Pipeline
 
 on:
   push:
@@ -55,7 +55,7 @@ env:
 jobs:
   # Job 1: Setup and Validation Environment
   setup-validation:
-    name: 🚀 Setup Validation Environment
+    name: Setup Validation Environment
     runs-on: ubuntu-latest
     outputs:
       validation-session-id: ${{ steps.session.outputs.session-id }}
@@ -86,7 +86,7 @@ jobs:
         run: |
           SESSION_ID="${{ env.VALIDATION_SESSION_PREFIX }}-$(date +%Y%m%d-%H%M%S)-${{ github.run_id }}"
           echo "session-id=${SESSION_ID}" >> $GITHUB_OUTPUT
-          echo "📝 Generated session ID: ${SESSION_ID}"
+          echo "Generated session ID: ${SESSION_ID}"
 
       - name: Configure Validation Matrix
         id: matrix
@@ -101,7 +101,7 @@ jobs:
             CONFIG='{"include":[{"name":"full","timeout":1800,"memory_limit":"4GB","benchmark":true}]}'
           fi
           echo "config=${CONFIG}" >> $GITHUB_OUTPUT
-          echo "🎯 Matrix configuration: ${CONFIG}"
+          echo "Matrix configuration: ${CONFIG}"
 
       - name: Setup Configuration Flags
         id: config
@@ -126,7 +126,7 @@ jobs:
 
   # Job 2: Core Artifact Validation
   validate-artifacts:
-    name: 🔍 Artifact Validation [${{ matrix.name }}]
+    name: Artifact Validation [${{ matrix.name }}]
     runs-on: ubuntu-latest
     needs: setup-validation
     strategy:
@@ -154,13 +154,13 @@ jobs:
       - name: Initialize Memory Coordination
         run: |
           SESSION_ID="${{ needs.setup-validation.outputs.validation-session-id }}"
-          echo "📝 Initializing memory coordination for session: ${SESSION_ID}"
+          echo "Initializing memory coordination for session: ${SESSION_ID}"
           mkdir -p ci-metrics/${{ matrix.name }}
           echo "{\"session_id\":\"${SESSION_ID}\",\"matrix_name\":\"${{ matrix.name }}\",\"start_time\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}" > ci-metrics/${{ matrix.name }}/session.json
 
       - name: Pre-validation System Check
         run: |
-          echo "🔧 System Information:"
+          echo "System Information:"
           echo "Memory: $(free -h | grep '^Mem:' | awk '{print $2}')"
           echo "CPU: $(nproc) cores"
           echo "Disk: $(df -h . | tail -1 | awk '{print $4}')"
@@ -170,7 +170,7 @@ jobs:
       - name: Run Consolidated Analyzer Validation
         id: validation
         run: |
-          echo "🎯 Running Consolidated Analyzer Validation"
+          echo "Running Consolidated Analyzer Validation"
           VERBOSE_FLAG=""
           if [ "${{ github.event.inputs.verbose }}" = "true" ]; then
             VERBOSE_FLAG="--verbose"
@@ -193,9 +193,9 @@ jobs:
           echo "validation-exit-code=${VALIDATION_EXIT_CODE}" >> $GITHUB_OUTPUT
           
           if [ ${VALIDATION_EXIT_CODE} -eq 0 ]; then
-            echo "✅ Validation PASSED"
+            echo "Validation PASSED"
           else
-            echo "⚠️ Validation completed with warnings"
+            echo "Validation completed with warnings"
           fi
 
       - name: Store Validation Results
@@ -270,7 +270,7 @@ jobs:
           with open('ci-metrics/${{ matrix.name }}/memory-coordination.json', 'w') as f:
               json.dump(memory_data, f, indent=2)
               
-          print(f'📊 Memory coordination data written for {memory_data[\"matrix_name\"]}')
+          print(f'Memory coordination data written for {memory_data[\"matrix_name\"]}')
           print(f'Analyzer tests: {memory_data[\"analyzer_tests\"]}')
           "
 
@@ -289,15 +289,15 @@ jobs:
         if: always()
         run: |
           if [ "${{ steps.validation.outputs.validation-exit-code }}" != "0" ]; then
-            echo "❌ Validation failed with exit code: ${{ steps.validation.outputs.validation-exit-code }}"
+            echo "Validation failed with exit code: ${{ steps.validation.outputs.validation-exit-code }}"
             exit 1
           else
-            echo "✅ Validation completed successfully"
+            echo "Validation completed successfully"
           fi
 
   # Job 3: Performance Benchmarking
   performance-benchmark:
-    name: 📊 Performance Benchmarking
+    name: Performance Benchmarking
     runs-on: ubuntu-latest
     needs: [setup-validation, validate-artifacts]
     if: needs.setup-validation.outputs.benchmark-enabled == 'true'
@@ -320,7 +320,7 @@ jobs:
       - name: Run Performance Benchmarks
         timeout-minutes: 30
         run: |
-          echo "🚀 Running performance benchmarks..."
+          echo "Running performance benchmarks..."
           
           # Create benchmark script
           mkdir -p scripts/ci
@@ -351,7 +351,7 @@ jobs:
               
               def benchmark_validation_speed(self):
                   """Benchmark validation script performance"""
-                  print("🔍 Benchmarking validation speed...")
+                  print("Benchmarking validation speed...")
                   
                   start_time = time.time()
                   start_memory = psutil.Process().memory_info().rss
@@ -381,7 +381,7 @@ jobs:
               
               def benchmark_file_parsing(self):
                   """Benchmark file parsing performance"""
-                  print("📄 Benchmarking file parsing...")
+                  print("Benchmarking file parsing...")
                   
                   files_to_test = [
                       Path("README.md"),
@@ -427,7 +427,7 @@ jobs:
                       json.dump(self.results, f, indent=2)
                   
                   # Print summary
-                  print("\n🎯 Performance Benchmark Summary:")
+                  print("\nPerformance Benchmark Summary:")
                   for benchmark_name, results in self.results["benchmarks"].items():
                       print(f"  {benchmark_name}:")
                       if isinstance(results, dict):
@@ -474,7 +474,7 @@ jobs:
 
   # Job 4: Reproducibility Validation
   reproducibility-test:
-    name: 🔄 Reproducibility Validation
+    name: Reproducibility Validation
     runs-on: ubuntu-latest
     needs: [setup-validation, validate-artifacts]
     if: github.event.inputs.validation_mode == 'reproducibility' || github.event.inputs.validation_mode == 'full'
@@ -498,7 +498,7 @@ jobs:
 
       - name: Run Reproducibility Test (Attempt ${{ matrix.run }})
         run: |
-          echo "🔄 Reproducibility Test - Attempt ${{ matrix.run }}"
+          echo "Reproducibility Test - Attempt ${{ matrix.run }}"
           python scripts/verify_counts.py --base-path . --verbose > reproducibility-run-${{ matrix.run }}.log 2>&1
           
           # Generate fingerprint of results
@@ -588,7 +588,7 @@ jobs:
           }
           EOF
           
-          echo "🏆 Generated validation badge: ${VALIDATION_STATUS}"
+          echo "Generated validation badge: ${VALIDATION_STATUS}"
 
       - name: Generate Performance Badge
         run: |
@@ -623,7 +623,7 @@ jobs:
           }
           EOF
           
-          echo "⚡ Generated performance badge: ${PERFORMANCE_STATUS}"
+          echo "Generated performance badge: ${PERFORMANCE_STATUS}"
 
       - name: Generate Count Validation Badge
         run: |
@@ -669,7 +669,7 @@ jobs:
           }
           EOF
           
-          echo "🎯 Generated count validation badge: ${COUNT_STATUS}"
+          echo "Generated count validation badge: ${COUNT_STATUS}"
 
       - name: Store Badge Generation Memory
         run: |
@@ -703,7 +703,7 @@ jobs:
 
   # Job 6: Memory Coordination Summary
   memory-coordination-summary:
-    name: 💾 Memory Coordination Summary
+    name: Memory Coordination Summary
     runs-on: ubuntu-latest
     needs: [setup-validation, validate-artifacts, performance-benchmark, generate-badges]
     if: always()
@@ -718,7 +718,7 @@ jobs:
 
       - name: Generate Comprehensive Memory Report
         run: |
-          echo "💾 Generating comprehensive memory coordination report..."
+          echo "Generating comprehensive memory coordination report..."
           
           # Create comprehensive memory report
           python -c "
@@ -794,7 +794,7 @@ jobs:
           with open('ci-metrics/final/comprehensive-memory-report.json', 'w') as f:
               json.dump(memory_data, f, indent=2)
           
-          print(f'📊 Memory Coordination Summary:')
+          print(f'Memory Coordination Summary:')
           print(f'  Total Validations: {total_validations}')
           print(f'  Successful: {successful_validations}')
           print(f'  Success Rate: {memory_data[\"coordination_summary\"][\"success_rate\"]}%')
@@ -853,7 +853,7 @@ jobs:
           with open(trend_file, 'w') as f:
               json.dump(trend_data, f, indent=2)
           
-          print(f'📈 Updated trend data: {len(trend_data[\"runs\"])} runs tracked')
+          print(f'Updated trend data: {len(trend_data[\"runs\"])} runs tracked')
           "
 
       - name: Upload Final Memory Coordination Report
@@ -865,7 +865,7 @@ jobs:
 
       - name: Display Final Status
         run: |
-          echo "🎯 CI PIPELINE COMPLETION SUMMARY"
+          echo "CI PIPELINE COMPLETION SUMMARY"
           echo "=================================="
           echo "Session ID: ${{ needs.setup-validation.outputs.validation-session-id }}"
           echo "Workflow: ${{ github.workflow }}"
@@ -893,4 +893,4 @@ jobs:
           fi
           
           echo ""
-          echo "🚀 Pipeline completed with memory coordination active"
+          echo "Pipeline completed with memory coordination active"
