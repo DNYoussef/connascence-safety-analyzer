@@ -323,6 +323,7 @@ jobs:
           echo "🚀 Running performance benchmarks..."
           
           # Create benchmark script
+          mkdir -p scripts/ci
           cat > scripts/ci/performance_benchmark.py << 'EOF'
           #!/usr/bin/env python3
           """Performance benchmarking for CI pipeline"""
@@ -503,27 +504,27 @@ jobs:
           # Generate fingerprint of results
           if [ -f "DEMO_ARTIFACTS/validation_report.json" ]; then
             python -c "
-            import json
-            import hashlib
-            
-            with open('DEMO_ARTIFACTS/validation_report.json', 'r') as f:
-                data = json.load(f)
-            
-            # Create deterministic fingerprint
-            fingerprint_data = {
-                'summary': data.get('summary', {}),
-                'expected_counts': data.get('expected_counts', {}),
-                'actual_counts': data.get('actual_counts', {})
-            }
-            
-            fingerprint_str = json.dumps(fingerprint_data, sort_keys=True)
-            fingerprint_hash = hashlib.sha256(fingerprint_str.encode()).hexdigest()
-            
-            with open('reproducibility-fingerprint-${{ matrix.run }}.txt', 'w') as f:
-                f.write(fingerprint_hash)
-            
-            print(f'Reproducibility fingerprint ${{ matrix.run }}: {fingerprint_hash}')
-            "
+          import json
+          import hashlib
+
+          with open('DEMO_ARTIFACTS/validation_report.json', 'r') as f:
+              data = json.load(f)
+
+          # Create deterministic fingerprint
+          fingerprint_data = {
+              'summary': data.get('summary', {}),
+              'expected_counts': data.get('expected_counts', {}),
+              'actual_counts': data.get('actual_counts', {})
+          }
+
+          fingerprint_str = json.dumps(fingerprint_data, sort_keys=True)
+          fingerprint_hash = hashlib.sha256(fingerprint_str.encode()).hexdigest()
+
+          with open('reproducibility-fingerprint-${{ matrix.run }}.txt', 'w') as f:
+              f.write(fingerprint_hash)
+
+          print(f'Reproducibility fingerprint ${{ matrix.run }}: {fingerprint_hash}')
+          "
           fi
 
       - name: Store Reproducibility Data
@@ -600,12 +601,12 @@ jobs:
             PERF_FILE=$(find artifacts/ -name "performance-benchmark.json" | head -1)
             if [ -f "$PERF_FILE" ]; then
               VALIDATION_TIME=$(python -c "
-              import json
-              with open('$PERF_FILE', 'r') as f:
-                  data = json.load(f)
-              duration = data.get('benchmarks', {}).get('validation_speed', {}).get('duration_seconds', 0)
-              print(f'{duration:.1f}s')
-              ")
+          import json
+          with open('$PERF_FILE', 'r') as f:
+              data = json.load(f)
+          duration = data.get('benchmarks', {}).get('validation_speed', {}).get('duration_seconds', 0)
+          print(f'{duration:.1f}s')
+          ")
               PERFORMANCE_STATUS="$VALIDATION_TIME"
               PERFORMANCE_COLOR="blue"
             fi
@@ -633,20 +634,20 @@ jobs:
           VALIDATION_REPORT=$(find artifacts/ -name "validation_report.json" | head -1)
           if [ -f "$VALIDATION_REPORT" ]; then
             COUNT_STATUS=$(python -c "
-            import json
-            with open('$VALIDATION_REPORT', 'r') as f:
-                data = json.load(f)
-            
-            summary = data.get('summary', {})
-            total_tests = summary.get('total_tests', 0)
-            passed = summary.get('passed', 0)
-            
-            if total_tests > 0:
-                success_rate = round((passed / total_tests) * 100)
-                print(f'{passed}/{total_tests} ({success_rate}%)')
-            else:
-                print('no tests')
-            ")
+          import json
+          with open('$VALIDATION_REPORT', 'r') as f:
+              data = json.load(f)
+
+          summary = data.get('summary', {})
+          total_tests = summary.get('total_tests', 0)
+          passed = summary.get('passed', 0)
+
+          if total_tests > 0:
+              success_rate = round((passed / total_tests) * 100)
+              print(f'{passed}/{total_tests} ({success_rate}%)')
+          else:
+              print('no tests')
+          ")
             
             if [[ "$COUNT_STATUS" == *"100%"* ]]; then
               COUNT_COLOR="brightgreen"
@@ -874,30 +875,21 @@ jobs:
           
           if [ -f "ci-metrics/final/comprehensive-memory-report.json" ]; then
             python -c "
-            import json
-            with open('ci-metrics/final/comprehensive-memory-report.json', 'r') as f:
-                data = json.load(f)
-            
-            summary = data.get('coordination_summary', {})
-            print('Validation Results:')
-            print(f'  Total Runs: {summary.get(\"total_validation_runs\", 0)}')
-            print(f'  Successful: {summary.get(\"successful_validations\", 0)}')
-            print(f'  Success Rate: {summary.get(\"success_rate\", 0)}%')
-            print(f'  Overall Status: {summary.get(\"overall_status\", \"unknown\")}')
-            print('')
-            print('Detection Systems Integration:')
-            print(f'  Consolidated Analyzers: ✅ Connected')
-            print(f'  Unicode Safety: ✅ Enabled') 
-            print(f'  MECE Duplication: ✅ Active')
-            print(f'  NASA Safety Rules: ✅ Enforced')
-            print(f'  God Object Detection: ✅ Running')
-            print('')
-            print('Memory Coordination:')
-            print(f'  MCP Flow-Nexus: ✅ Compatible')
-            print(f'  Performance Data: {\"✅\" if summary.get(\"has_performance_data\") else \"❌\"}')
-            print(f'  Badges Generated: {summary.get(\"badges_generated\", 0)}')
-            print(f'  Cross-Session Memory: ✅ Active')
-            "
+          import json
+          with open('ci-metrics/final/comprehensive-memory-report.json', 'r') as f:
+              data = json.load(f)
+
+          summary = data.get('coordination_summary', {})
+          print('Validation Results:')
+          print(f'  Total Runs: {summary.get(\"total_validation_runs\", 0)}')
+          print(f'  Successful: {summary.get(\"successful_validations\", 0)}')
+          print(f'  Success Rate: {summary.get(\"success_rate\", 0)}%')
+          print(f'  Overall Status: {summary.get(\"overall_status\", \"unknown\")}')
+          print('')
+          print('Memory Coordination:')
+          print(f'  Performance Data: {\"yes\" if summary.get(\"has_performance_data\") else \"no\"}')
+          print(f'  Badges Generated: {summary.get(\"badges_generated\", 0)}')
+          "
           fi
           
           echo ""
