@@ -543,10 +543,12 @@ jobs:
 
   # Job 5: Badge Generation and Status Reporting
   generate-badges:
-    name: 🏆 Generate Status Badges
+    name: Generate Status Badges
     runs-on: ubuntu-latest
     needs: [setup-validation, validate-artifacts, performance-benchmark]
-    if: always() && env.BADGE_GENERATION == 'true'
+    # env context is not available in job-level if; BADGE_GENERATION is
+    # hardcoded true in the workflow env block, so the check was dead.
+    if: always()
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
