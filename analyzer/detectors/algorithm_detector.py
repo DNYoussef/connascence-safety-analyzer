@@ -65,18 +65,19 @@ class AlgorithmDetector(DetectorBase):
             self.function_hashes[body_hash].append((self.file_path, node))
 
     def _normalize_function_body(self, node: ast.FunctionDef) -> str:
-        """Create normalized hash of function body for duplicate detection."""
+        """Create normalized hash of function body for duplicate detection.
+
+        Issue #37: delegates to the body-aware normalizer (local-rename
+        stable, logic-sensitive). The previous statement-type skeleton
+        flagged same-shape distinct-logic functions as duplicates.
+        """
         # NASA Rule 5: Input validation assertions
         assert node is not None, "Function node cannot be None"
         assert hasattr(node, "body"), "Function node must have body attribute"
 
-        # Extract just the structure, not variable names
-        body_parts = []
-        for stmt in node.body:
-            stmt_type = self._get_statement_type(stmt)
-            body_parts.append(stmt_type)
+        from .algorithm_normalizer import normalized_algorithm_hash
 
-        result = "|".join(body_parts)
+        result = normalized_algorithm_hash(node)
         # NASA Rule 7: Validate return value
         assert isinstance(result, str), "Normalized body must be string"
         return result

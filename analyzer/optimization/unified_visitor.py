@@ -272,21 +272,18 @@ class UnifiedASTVisitor(ast.NodeVisitor):
     # Utility methods (NASA Rule 4: each <60 lines)
 
     def _normalize_function_body(self, node: ast.FunctionDef) -> str:
-        """Create normalized hash of function body."""
+        """Create normalized hash of function body.
+
+        Issue #37: delegates to the body-aware normalizer. The previous
+        statement-type skeleton hashed any same-shape functions as equal
+        regardless of logic, flagging dispatch/registry handlers as
+        duplicate algorithms.
+        """
         assert isinstance(node, ast.FunctionDef), "Invalid function node"
 
-        body_parts = []
-        for stmt in node.body:
-            stmt_type = type(stmt).__name__.lower()
-            if isinstance(stmt, ast.Return):
-                if stmt.value:
-                    body_parts.append(f"return {type(stmt.value).__name__}")
-                else:
-                    body_parts.append("return")
-            else:
-                body_parts.append(stmt_type)
+        from analyzer.detectors.algorithm_normalizer import normalized_algorithm_hash
 
-        return "|".join(body_parts)
+        return normalized_algorithm_hash(node)
 
     def _calculate_complexity(self, node: ast.FunctionDef) -> int:
         """Calculate cyclomatic complexity."""
