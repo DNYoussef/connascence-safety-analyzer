@@ -41,14 +41,16 @@ jobs:
     - name: Full Connascence Scan
       run: |
         echo "::group::Full Connascence Analysis"
-        connascence scan . --format json --output connascence_full.json
+        # scan exits 1 when violations are found (reporting only here, the
+        # quality gate is self-analysis.yml); only >=2 means the tool broke
+        connascence scan . --format json --output connascence_full.json || [ $? -eq 1 ]
         python -c "import json; d=json.load(open('connascence_full.json')); v=d.get('violations', []); print('Total violations:', len(v)); print('Critical:', len([x for x in v if x.get('severity') == 'critical'])); print('Quality score:', d.get('quality_score'))"
         echo "::endgroup::"
 
     - name: NASA Policy Scan
       run: |
         echo "::group::NASA Compliance Policy Analysis"
-        connascence scan . --policy nasa-compliance --format json --output nasa_analysis.json
+        connascence scan . --policy nasa-compliance --format json --output nasa_analysis.json || [ $? -eq 1 ]
         python -c "import json; d=json.load(open('nasa_analysis.json')); print('NASA-policy violations:', len(d.get('violations', [])))"
         echo "::endgroup::"
 
@@ -62,7 +64,7 @@ jobs:
     - name: Generate SARIF Report
       run: |
         echo "::group::SARIF Generation"
-        connascence scan . --format sarif --output connascence_analysis.sarif
+        connascence scan . --format sarif --output connascence_analysis.sarif || [ $? -eq 1 ]
         python -m json.tool connascence_analysis.sarif > /dev/null
         echo "SARIF file size: $(wc -c < connascence_analysis.sarif) bytes"
         echo "::endgroup::"
