@@ -52,14 +52,16 @@ jobs:
         continue-on-error: true
         run: |
           python -m analyzer.clarity_linter \
-            --config clarity_linter.yaml \
+            --config config/clarity_linter.yaml \
             --output-format sarif \
             --output-file clarity_results.sarif \
+            --severity-threshold high \
+            --verbose
+          python -m analyzer.clarity_linter \
+            --config config/clarity_linter.yaml \
             --output-format json \
             --output-file clarity_results.json \
-            --output-format markdown \
-            --output-file clarity_results.md \
-            --fail-on high \
+            --severity-threshold high \
             --verbose
 
       - name: Run Connascence Analysis
@@ -235,10 +237,10 @@ jobs:
 
           # Fail if critical or high violations
           if critical > 0 or high > 0:
-              print('❌ QUALITY GATE FAILED: Critical or high severity violations detected')
+              print('QUALITY GATE FAILED: Critical or high severity violations detected')
               sys.exit(1)
           else:
-              print('✅ QUALITY GATE PASSED')
+              print('QUALITY GATE PASSED')
               sys.exit(0)
           "
 
