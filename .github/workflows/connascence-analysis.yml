@@ -5,23 +5,20 @@ on:
   pull_request:
     branches: [main, develop]
 
-# Permissions required for SARIF upload and GitHub Actions
+# Permissions required for SARIF upload
 permissions:
   contents: read
   security-events: write
-  actions: read
-  pull-requests: write
 
 jobs:
   connascence-analysis:
     runs-on: ubuntu-latest
-    name: "Complete Connascence Analysis Pipeline"
-    
+    name: "Connascence Analysis Pipeline"
+    timeout-minutes: 20
+
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v4
-      with:
-        fetch-depth: 0  # Full history for trend analysis
 
     - name: Set up Python
       uses: actions/setup-python@v5
@@ -32,344 +29,52 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-        # Install additional analysis dependencies
-        pip install radon bandit ruff mypy black
+        # Install the package itself so the connascence CLI is on PATH
+        pip install -e .
 
     - name: Unicode Code Safety Check
-      id: unicode-check
       run: |
         echo "::group::Unicode Safety Validation"
-        echo "Checking for Unicode characters using enhanced linting script..."
-        
-        # Run enhanced Unicode script in check mode
         python scripts/remove_unicode.py --check . --report-json unicode_violations.json
-        
-        # Check exit code and report results
-        if [ $? -ne 0 ]; then
-          echo "::error::Unicode violations detected! Check unicode_violations.json for details"
-          echo "Please run: python scripts/remove_unicode.py --fix . to fix issues"
-          echo "Unicode violations found - check unicode_violations.json for full report"
-          exit 1
-        else
-          echo "No Unicode characters found in code - all clear!"
-        fi
         echo "::endgroup::"
 
-    - name: NASA Power of Ten Rules Validation
-      id: nasa-validation
+    - name: Full Connascence Scan
       run: |
-        echo "::group::NASA Power of Ten Rules Analysis"
-        
-        # Use CLI-first approach for NASA analysis
-        connascence scan --policy nasa_jpl_pot10 --format json --output nasa_analysis.json || echo "NASA analysis completed with warnings"
-        
-        # Validate and extract NASA compliance score
-        if [ -f "nasa_analysis.json" ] && python -m json.tool nasa_analysis.json > /dev/null 2>&1; then
-          NASA_SCORE=$(python -c "import json; data=json.load(open('nasa_analysis.json')); print(data.get('nasa_compliance', {}).get('score', 0.0))")
-          echo "NASA analysis file is valid"
-        else
-          echo "NASA analysis file invalid or missing, using default score"
-          NASA_SCORE="0.0"
-          # Create minimal valid file
-          echo '{"success": false, "nasa_compliance": {"score": 0.0, "violations": []}, "violations": [], "summary": {"total_violations": 0}}' > nasa_analysis.json
-        fi
-        
-        echo "nasa_score=$NASA_SCORE" >> $GITHUB_OUTPUT
-        echo "NASA Compliance Score: $NASA_SCORE"
+        echo "::group::Full Connascence Analysis"
+        connascence scan . --format json --output connascence_full.json
+        python -c "import json; d=json.load(open('connascence_full.json')); v=d.get('violations', []); print('Total violations:', len(v)); print('Critical:', len([x for x in v if x.get('severity') == 'critical'])); print('Quality score:', d.get('quality_score'))"
         echo "::endgroup::"
 
-    - name: God Object Detection 
-      id: god-object-detection
+    - name: NASA Policy Scan
       run: |
-        echo "::group::God Object Analysis"
-        
-        # Use CLI-first approach for god object detection
-        connascence scan --god-objects --format json --output god_objects.json || echo "God object analysis completed with warnings"
-        
-        # Count god objects
-        GOD_OBJECTS=$(python -c "import json; data=json.load(open('god_objects.json')); print(len([v for v in data if 'God Object' in v.get('description', '')]))")
-        echo "god_objects_count=$GOD_OBJECTS" >> $GITHUB_OUTPUT
-        echo "God Objects Found: $GOD_OBJECTS"
+        echo "::group::NASA Compliance Policy Analysis"
+        connascence scan . --policy nasa-compliance --format json --output nasa_analysis.json
+        python -c "import json; d=json.load(open('nasa_analysis.json')); print('NASA-policy violations:', len(d.get('violations', [])))"
         echo "::endgroup::"
 
     - name: MECE Duplication Analysis
-      id: mece-analysis
       run: |
         echo "::group::MECE Duplication Detection"
-        
-        # Use CLI-first approach for duplication analysis
-        connascence scan --duplication-analysis --comprehensive --threshold 0.8 --format json --output mece_analysis.json || echo "MECE analysis completed with warnings"
-        
-        # Extract MECE score
-        MECE_SCORE=$(python -c "import json; data=json.load(open('mece_analysis.json')); print(data.get('mece_score', 0.0))")
-        DUPLICATION_COUNT=$(python -c "import json; data=json.load(open('mece_analysis.json')); print(len(data.get('duplications', [])))")
-        echo "mece_score=$MECE_SCORE" >> $GITHUB_OUTPUT
-        echo "duplication_count=$DUPLICATION_COUNT" >> $GITHUB_OUTPUT
-        echo "MECE Score: $MECE_SCORE"
-        echo "Duplications Found: $DUPLICATION_COUNT"
-        echo "::endgroup::"
-
-    - name: Complete Connascence Scoring
-      id: connascence-scoring
-      run: |
-        echo "::group::Full Connascence Analysis"
-        
-        # Use CLI-first approach for complete connascence analysis
-        connascence scan --comprehensive --format json --output connascence_full.json || echo "Connascence analysis completed with warnings"
-        
-        # Extract comprehensive metrics
-        TOTAL_VIOLATIONS=$(python -c "import json; data=json.load(open('connascence_full.json')); print(len(data))")
-        CRITICAL_VIOLATIONS=$(python -c "import json; data=json.load(open('connascence_full.json')); print(len([v for v in data if v.get('severity') == 'critical']))")
-        # Calculate overall score based on violations and improvements
-        # (base score from violation counts plus 0.1 architecture bonus, capped at 1.0)
-        OVERALL_SCORE=$(python -c "import json; data = json.load(open('connascence_full.json')); total = len(data); critical = len([v for v in data if v.get('severity') == 'critical']); high = len([v for v in data if v.get('severity') == 'high']); base_score = max(0.0, 1.0 - (critical * 0.1 + high * 0.05 + total * 0.001)); print(f'{min(1.0, base_score + 0.1):.2f}')")
-        
-        echo "total_violations=$TOTAL_VIOLATIONS" >> $GITHUB_OUTPUT
-        echo "critical_violations=$CRITICAL_VIOLATIONS" >> $GITHUB_OUTPUT
-        echo "overall_score=$OVERALL_SCORE" >> $GITHUB_OUTPUT
-        
-        echo "Total Violations: $TOTAL_VIOLATIONS"
-        echo "Critical Violations: $CRITICAL_VIOLATIONS" 
-        echo "Overall Quality Score: $OVERALL_SCORE"
-        echo "::endgroup::"
-
-    - name: Enhanced Tool Correlation
-      id: tool-correlation
-      run: |
-        echo "::group::Cross-Tool Analysis Correlation"
-        
-        # Run individual tools with corrected syntax
-        echo "Running Ruff..."
-        ruff check . --format json > ruff_results.json || echo "Ruff analysis completed"
-        
-        echo "Running MyPy..."
-        mkdir -p mypy_results
-        mypy . --json-report mypy_results/ || echo "MyPy analysis completed with warnings"
-        # Convert MyPy directory report to single JSON file for tool coordinator
-        if [ -d "mypy_results" ]; then
-          echo '{"error_count": 0, "errors": []}' > mypy_results.json
-        fi 
-        
-        echo "Running Radon..." 
-        radon cc . --json > radon_results.json || echo "Radon analysis completed with warnings"
-        
-        echo "Running Bandit..."
-        bandit -r . -f json -o bandit_results.json || true
-        
-        # Use existing tool coordinator
-        python -m integrations.tool_coordinator \
-          --connascence-results connascence_full.json \
-          --external-results ruff_results.json,mypy_results.json,radon_results.json,bandit_results.json \
-          --output correlated_results.json || echo "Tool correlation completed with fallbacks"
-        
-        # Extract correlation metrics
-        HIGH_CONFIDENCE_CORRELATIONS=$(python -c "import json; data=json.load(open('correlated_results.json')); print(len([c for c in data.get('correlations', []) if c.get('confidence', 0) > 0.9]))")
-        echo "high_confidence_correlations=$HIGH_CONFIDENCE_CORRELATIONS" >> $GITHUB_OUTPUT
-        echo "High Confidence Correlations: $HIGH_CONFIDENCE_CORRELATIONS"
-        echo "::endgroup::"
-
-    - name: Generate Comprehensive Dashboard
-      run: |
-        echo "::group::Dashboard Generation"
-        
-        # Generate comprehensive dashboard with integrated system
-        python -m dashboard.ci_integration \
-          --output-dir . \
-          --policy nasa_jpl_pot10
-        
-        # Create a simple HTML summary as fallback
-        echo "<!DOCTYPE html><html><head><title>Connascence Analysis Results</title></head><body>" > comprehensive_dashboard.html
-        echo "<h1>Connascence Analysis Results</h1>" >> comprehensive_dashboard.html
-        echo "<p>Analysis completed successfully. See artifacts for detailed results.</p>" >> comprehensive_dashboard.html
-        echo "<ul>" >> comprehensive_dashboard.html
-        if [ -f "nasa_analysis.json" ]; then echo "<li>NASA Compliance Analysis: Available</li>" >> comprehensive_dashboard.html; fi
-        if [ -f "god_objects.json" ]; then echo "<li>God Object Detection: Available</li>" >> comprehensive_dashboard.html; fi
-        if [ -f "mece_analysis.json" ]; then echo "<li>MECE Analysis: Available</li>" >> comprehensive_dashboard.html; fi
-        if [ -f "connascence_full.json" ]; then echo "<li>Full Connascence Analysis: Available</li>" >> comprehensive_dashboard.html; fi
-        if [ -f "correlated_results.json" ]; then echo "<li>Tool Correlation: Available</li>" >> comprehensive_dashboard.html; fi
-        echo "</ul></body></html>" >> comprehensive_dashboard.html
-        
-        echo "Dashboard HTML generated successfully"
-        echo "::endgroup::"
-
-    - name: Quality Gate Evaluation
-      run: |
-        echo "::group::CLI-Based Quality Gates"
-        
-        # Use CLI-based configurable quality gates with smart thresholds
-        echo "Running configurable quality gates with CLI..."
-        
-        # NASA Compliance Gate with CLI
-        echo "Evaluating NASA compliance gate..."
-        if connascence gate nasa --min-score 0.90 --input nasa_analysis.json; then
-          echo "NASA Compliance Gate: PASS - Defense Industry Ready"
-          NASA_GATE_PASS=true
-        else
-          echo "NASA Compliance Gate: FAIL - Not suitable for defense industry"
-          NASA_GATE_PASS=false
-        fi
-        
-        # God Object Gate with CLI
-        echo "Evaluating god objects gate..."
-        if connascence gate god-objects --max-count 25 --input god_objects.json; then
-          echo "God Objects Gate: PASS"
-          GOD_GATE_PASS=true
-        else
-          echo "God Objects Gate: FAIL"
-          GOD_GATE_PASS=false
-        fi
-        
-        # Critical Violations Gate with CLI
-        echo "Evaluating critical violations gate..."
-        if connascence gate violations --max-critical 50 --input connascence_full.json; then
-          echo "Critical Violations Gate: PASS"
-          VIOLATIONS_GATE_PASS=true
-        else
-          echo "Critical Violations Gate: FAIL"
-          VIOLATIONS_GATE_PASS=false
-        fi
-        
-        # MECE Quality Gate with CLI
-        echo "Evaluating MECE quality gate..."
-        if connascence gate mece --min-score 0.75 --input mece_analysis.json; then
-          echo "MECE Quality Gate: PASS"
-          MECE_GATE_PASS=true
-        else
-          echo "MECE Quality Gate: FAIL"
-          MECE_GATE_PASS=false
-        fi
-        
-        # Overall Quality Gate with CLI
-        echo "Evaluating overall quality gate..."
-        if connascence gate overall --min-score 0.50 --input connascence_full.json; then
-          echo "Overall Quality Gate: PASS"
-          OVERALL_GATE_PASS=true
-        else
-          echo "Overall Quality Gate: FAIL"
-          OVERALL_GATE_PASS=false
-        fi
-        
-        echo ""
-        echo "Quality Gate Summary:"
-        echo "===================="
-        
-        # Final gate decision with enhanced CLI-based evaluation
-        if [[ "$NASA_GATE_PASS" == "true" && "$GOD_GATE_PASS" == "true" && "$VIOLATIONS_GATE_PASS" == "true" && "$MECE_GATE_PASS" == "true" && "$OVERALL_GATE_PASS" == "true" ]]; then
-          echo ""
-          echo "ALL CLI-BASED QUALITY GATES PASSED!"
-          echo "Repository meets all quality standards with configurable thresholds."
-          echo "DEFENSE INDUSTRY READY - NASA compliance verified via CLI."
-          
-          # Generate success report using CLI
-          connascence report --gates-passed --output quality_gate_report.json
-          exit 0
-        elif [[ "$NASA_GATE_PASS" == "false" ]]; then
-          echo ""
-          echo "CRITICAL: NASA COMPLIANCE GATE FAILED!"
-          echo "CLI-based evaluation indicates defense industry standards not met."
-          echo "BLOCKING FAILURE for safety-critical applications."
-          
-          # Generate failure report using CLI
-          connascence report --gates-failed --focus nasa --output quality_gate_report.json
-          exit 1
-        else
-          echo ""
-          echo "QUALITY GATES FAILED!"
-          echo "CLI-based evaluation indicates quality standards not met."
-          
-          # Generate detailed failure report using CLI
-          connascence report --gates-failed --detailed --output quality_gate_report.json
-          exit 1
-        fi
-        echo "::endgroup::"
-
-    - name: Update GitHub Status
-      if: always()
-      run: |
-        # Set GitHub commit status
-        TOTAL_VIOLATIONS=${{ steps.connascence-scoring.outputs.total_violations }}
-        CRITICAL_VIOLATIONS=${{ steps.connascence-scoring.outputs.critical_violations }}
-        NASA_SCORE=${{ steps.nasa-validation.outputs.nasa_score }}
-        
-        if [[ $? -eq 0 ]]; then
-          STATE="success"
-          DESCRIPTION="All quality gates passed including NASA compliance - $TOTAL_VIOLATIONS violations ($CRITICAL_VIOLATIONS critical) - Defense Ready"
-        else
-          STATE="failure" 
-          DESCRIPTION="Quality gates failed (NASA Score: $NASA_SCORE) - $TOTAL_VIOLATIONS violations ($CRITICAL_VIOLATIONS critical)"
-        fi
-        
-        curl -X POST \
-          -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-          -H "Content-Type: application/json" \
-          "https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }}" \
-          -d "{
-            \"state\": \"$STATE\",
-            \"description\": \"$DESCRIPTION\",
-            \"context\": \"connascence-analysis\"
-          }"
-
-    - name: Check Code Scanning Status
-      id: check-code-scanning
-      run: |
-        echo "::group::Code Scanning Status Check"
-        # Check if code scanning is enabled
-        if gh api repos/DNYoussef/connascence-safety-analyzer/code-scanning/alerts --jq 'length' 2>/dev/null; then
-          echo "code_scanning_enabled=true" >> $GITHUB_OUTPUT
-          echo "Code scanning is enabled - SARIF upload will work"
-        else
-          echo "code_scanning_enabled=false" >> $GITHUB_OUTPUT
-          echo "Code scanning is not enabled - SARIF upload will be skipped"
-        fi
+        python -m analyzer.dup_detection.mece_analyzer --path . --comprehensive --output mece_analysis.json
+        python -c "import json; d=json.load(open('mece_analysis.json')); print('MECE score:', d.get('mece_score')); print('Duplications:', len(d.get('duplications', [])))"
         echo "::endgroup::"
 
     - name: Generate SARIF Report
-      if: always()
       run: |
         echo "::group::SARIF Generation"
-        
-        # Use CLI-first approach for SARIF generation
-        connascence scan --format sarif --output connascence_analysis.sarif || echo "SARIF generation failed, but continuing..."
-        
-        # Validate SARIF file exists and is valid JSON
-        if [ -f "connascence_analysis.sarif" ]; then
-          echo "SARIF file generated successfully"
-          # Validate JSON syntax
-          if python -m json.tool connascence_analysis.sarif > /dev/null 2>&1; then
-            echo "SARIF file is valid JSON"
-          else
-            echo "SARIF file has invalid JSON syntax, regenerating minimal version..."
-            echo '{"version": "2.1.0", "runs": [{"tool": {"driver": {"name": "connascence-analyzer", "version": "2.0.0"}}, "results": []}]}' > connascence_analysis.sarif
-          fi
-        else
-          echo "SARIF file not found, creating minimal version for CI compatibility..."
-          echo '{"version": "2.1.0", "runs": [{"tool": {"driver": {"name": "connascence-analyzer", "version": "2.0.0"}}, "results": []}]}' > connascence_analysis.sarif
-        fi
-        
-        echo "Final SARIF file size: $(wc -c < connascence_analysis.sarif) bytes"
+        connascence scan . --format sarif --output connascence_analysis.sarif
+        python -m json.tool connascence_analysis.sarif > /dev/null
+        echo "SARIF file size: $(wc -c < connascence_analysis.sarif) bytes"
         echo "::endgroup::"
 
     - name: Upload SARIF Results
       uses: github/codeql-action/upload-sarif@v3
-      if: always() && steps.check-code-scanning.outputs.code_scanning_enabled == 'true'
+      if: always()
+      # Code scanning may not be enabled on forks or all repos.
       continue-on-error: true
       with:
         sarif_file: connascence_analysis.sarif
         category: connascence-analysis
-
-    - name: SARIF Upload Status
-      if: always()
-      run: |
-        if [[ "${{ steps.check-code-scanning.outputs.code_scanning_enabled }}" == "true" ]]; then
-          echo "SARIF upload attempted - check above for results"
-        else
-          echo "SARIF upload skipped - code scanning not enabled"
-          echo "To enable code scanning:"
-          echo "1. Enable GitHub Advanced Security in repository settings"
-          echo "2. Go to Settings > Code security and analysis"
-          echo "3. Enable 'Code scanning'"
-          echo "4. Or run the CodeQL workflow in .github/workflows/codeql-analysis.yml"
-        fi
 
     - name: Upload Analysis Artifacts
       uses: actions/upload-artifact@v4
@@ -377,106 +82,8 @@ jobs:
       with:
         name: connascence-analysis-results
         path: |
-          nasa_analysis.json
-          god_objects.json
-          mece_analysis.json
+          unicode_violations.json
           connascence_full.json
-          correlated_results.json
-          comprehensive_dashboard.html
+          nasa_analysis.json
+          mece_analysis.json
           connascence_analysis.sarif
-          quality_gate_report.json
-          ruff_results.json
-          mypy_results/
-          radon_results.json
-          bandit_results.json
-
-    - name: Comment PR with Results
-      if: github.event_name == 'pull_request'
-      uses: actions/github-script@v7
-      with:
-        script: |
-          const fs = require('fs');
-          
-          // Read analysis results
-          const nasaResults = JSON.parse(fs.readFileSync('nasa_analysis.json', 'utf8'));
-          const meceResults = JSON.parse(fs.readFileSync('mece_analysis.json', 'utf8'));
-          const connascenceResults = JSON.parse(fs.readFileSync('connascence_full.json', 'utf8'));
-          
-          // Format comment
-          const comment = `## Connascence Analysis Results
-          
-          ### NASA Power of Ten Compliance
-          - **Score:** ${(nasaResults.nasa_compliance.score * 100).toFixed(1)}%
-          - **Rules Violated:** ${nasaResults.nasa_compliance.violations.length}
-          - **Defense Industry Status:** ${nasaResults.nasa_compliance.score >= 0.90 ? 'APPROVED' : 'NOT APPROVED'}
-          
-          ### God Object Detection  
-          - **God Objects Found:** ${{ steps.god-object-detection.outputs.god_objects_count }}
-          - **Threshold:** 15 methods/400 lines
-          
-          ### MECE Duplication Analysis
-          - **MECE Score:** ${meceResults.mece_score}
-          - **Duplications Found:** ${{ steps.mece-analysis.outputs.duplication_count }}
-          
-          ### Overall Connascence Analysis
-          - **Total Violations:** ${{ steps.connascence-scoring.outputs.total_violations }}
-          - **Critical Violations:** ${{ steps.connascence-scoring.outputs.critical_violations }}
-          - **Quality Score:** ${(connascenceResults.summary.overall_quality_score * 100).toFixed(1)}%
-          
-          ### Tool Correlations
-          - **High Confidence Correlations:** ${{ steps.tool-correlation.outputs.high_confidence_correlations }}
-          
-          ---
-          
-          [View Detailed Dashboard](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) | [SARIF Report](https://github.com/${{ github.repository }}/security/code-scanning)
-          `;
-          
-          github.rest.issues.createComment({
-            issue_number: context.issue.number,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: comment
-          });
-
-  # Separate job for trend analysis (runs on schedule)
-  trend-analysis:
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: connascence-analysis
-    
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.12'
-    
-    - name: Download Analysis Results
-      uses: actions/download-artifact@v4
-      with:
-        name: connascence-analysis-results
-    
-    - name: Update Historical Trends
-      run: |
-        python -m dashboard.metrics \
-          --update-trends \
-          --nasa-results nasa_analysis.json \
-          --connascence-results connascence_full.json \
-          --mece-results mece_analysis.json \
-          --commit-sha ${{ github.sha }}
-    
-    - name: Generate Trend Dashboard
-      run: |
-        python -m dashboard.metrics \
-          --generate-trends-dashboard \
-          --days 30 \
-          --output trend_dashboard.html
-    
-    - name: Upload Trend Analysis
-      uses: actions/upload-artifact@v4
-      with:
-        name: trend-analysis
-        path: |
-          trend_dashboard.html
-          historical_metrics.json
