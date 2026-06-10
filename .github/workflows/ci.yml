@@ -125,7 +125,6 @@ jobs:
 
   vscode-extension:
     runs-on: ubuntu-latest
-    if: ${{ hashFiles('interfaces/vscode/package.json') != '' }}
 
     steps:
     - uses: actions/checkout@v3

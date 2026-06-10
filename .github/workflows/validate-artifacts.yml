@@ -238,7 +238,7 @@ jobs:
               'timestamp': datetime.now().isoformat(),
               'system_info': {
                   'runner_os': '${{ runner.os }}',
-                  'memory_limit': '${{ matrix.memory_limit || \"2GB\" }}',
+                  'memory_limit': '${{ matrix.memory_limit || '2GB' }}',
                   'timeout': ${{ matrix.timeout || 30 }}
               },
               'validation_summary': {},
