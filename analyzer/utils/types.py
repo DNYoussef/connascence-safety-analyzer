@@ -1,8 +1,18 @@
-"""Type definitions for analyzer utilities."""
+"""Type definitions for analyzer utilities.
+
+NOTE: This module shadows the canonical top-level ``utils.types`` when
+``analyzer/check_connascence.py`` is executed as a script (the script
+directory becomes sys.path[0]). It must therefore mirror the public API
+of the canonical module for every name the analyzer imports.
+"""
 
 from dataclasses import dataclass, field, InitVar
+from typing import Any, Dict, Optional, TYPE_CHECKING
 from pathlib import Path
-from typing import Any, Dict, Optional
+
+if TYPE_CHECKING:
+    import ast
+    from analyzer.formal_grammar import MagicLiteralContext
 
 
 @dataclass
@@ -73,3 +83,32 @@ class ConnascenceViolation:
             "code_snippet": self.code_snippet,
             "context": self.context,
         }
+
+
+# Parameter object for formal magic literal analysis (CoP reduction).
+# Mirrors the canonical definition in the top-level utils/types.py.
+@dataclass(frozen=True)
+class MagicLiteralParams:
+    """Parameters for formal magic literal processing."""
+
+    node: "ast.AST"
+    value: Any
+    context_info: Dict[str, Any]
+    formal_context: "MagicLiteralContext"
+    severity_score: float = 0.0
+
+    @property
+    def severity_level(self) -> str:
+        """Map severity score to severity level."""
+        if self.severity_score >= 8.0:
+            return "high"
+        if self.severity_score >= 5.0:
+            return "medium"
+        if self.severity_score >= 2.0:
+            return "low"
+        return "informational"
+
+    @property
+    def should_skip(self) -> bool:
+        """Determine if this item should be skipped based on severity."""
+        return self.severity_level == "informational"
