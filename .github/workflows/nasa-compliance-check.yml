@@ -331,7 +331,10 @@ jobs:
             },
             'connascence_analysis': 'completed',
             'mece_analysis': 'completed',
-            'overall_status': 'passed_with_warnings'
+            # Not a hardcoded pass: the build-failing decision is the critical-violation
+            # gate above (sys.exit(1)). Rules 6-9 are 'todo' (unenforced), so this report
+            # is explicitly partial, not a green light.
+            'overall_status': 'partial_rules_6_9_unenforced'
         }
         
         with open('nasa-compliance-report.json', 'w') as f:
@@ -391,8 +394,8 @@ jobs:
             
             if len(critical_violations) > 5:  # Allow some critical violations for now
                 print(f"[FAIL] Too many critical violations: {len(critical_violations)}")
-                print("Build would fail in production environment")
-                # sys.exit(1)  # Uncomment to fail the build
+                print("Build fails: critical NASA-compliance violations present")
+                sys.exit(1)
             else:
                 print(f"[OK] Critical violations within acceptable range: {len(critical_violations)}")
         except:

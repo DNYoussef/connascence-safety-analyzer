@@ -114,6 +114,15 @@ class MagicLiteralDetector(DetectorBase):
             else:
                 self._create_simple_violation(node, value, context_info)
 
+    def _mask(self, value):
+        """Mask long string literals so PHI/secrets (e.g. SSNs) do not leak into
+        descriptions or JSON metadata. Non-string / short values pass through so
+        numeric magic-literal reporting is unchanged. Raw value stays available
+        only behind the --show-source opt-in."""
+        if isinstance(value, str) and len(value) > 4:
+            return f"<str len={len(value)}>"
+        return value
+
     def _create_formal_violation(self, node: ast.AST, value: Any, context_info: Dict) -> None:
         """Create violation using formal grammar analysis."""
         formal_context = context_info["context"]
@@ -131,7 +140,7 @@ class MagicLiteralDetector(DetectorBase):
         else:
             severity = "low"
 
-        description = self._create_formal_description(value, formal_context, severity_score)
+        description = self._create_formal_description(self._mask(value), formal_context, severity_score)
         recommendation = self._get_formal_recommendation(formal_context)
 
         self.violations.append(
@@ -145,7 +154,7 @@ class MagicLiteralDetector(DetectorBase):
                 recommendation=recommendation,
                 code_snippet=self.get_code_snippet(node),
                 context={
-                    "literal_value": value,
+                    "literal_value": self._mask(value),
                     "formal_context": {
                         "in_conditional": formal_context.in_conditional,
                         "in_assignment": formal_context.in_assignment,
@@ -168,7 +177,7 @@ class MagicLiteralDetector(DetectorBase):
         if context_info.get("in_conditional", False):
             severity = "high"
 
-        description = f"Magic literal '{value}' should be replaced with a named constant"
+        description = f"Magic literal '{self._mask(value)}' should be replaced with a named constant"
         recommendation = "Replace with a well-named constant or configuration value"
 
         self.violations.append(
@@ -182,7 +191,7 @@ class MagicLiteralDetector(DetectorBase):
                 recommendation=recommendation,
                 code_snippet=self.get_code_snippet(node),
                 context={
-                    "literal_value": value,
+                    "literal_value": self._mask(value),
                     "analysis_context": context_info,
                     "in_conditional": context_info.get("in_conditional", False),
                     "analysis_type": "simple",
