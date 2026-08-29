@@ -13,3 +13,4 @@ dist/** export-ignore
 *.egg-info/** export-ignore
 .coverage export-ignore
 coverage.xml export-ignore
+mcp_stdio_bridge.py text eol=lf

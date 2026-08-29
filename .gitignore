@@ -15,6 +15,7 @@ memory/sessions/*
 .env
 .env.*
 !.env.example
+venv-connascence/
 
 # Temporary artifacts and reproduction files
 temp-artifacts/
