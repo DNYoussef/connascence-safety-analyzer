@@ -448,6 +448,13 @@ class StreamProcessor:
 
         try:
             status = self.stream_processor.is_running
+            # Some test doubles may expose is_running as a property object;
+            # evaluate it defensively while handling any errors gracefully.
+            if isinstance(status, property):
+                if status.fget is None:
+                    return False
+                status = status.fget(self.stream_processor)
+
             return status if isinstance(status, bool) else False
         except Exception:
             return False
