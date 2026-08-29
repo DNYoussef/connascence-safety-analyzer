@@ -15,15 +15,16 @@ only if/when the repo package is renamed off `mcp`.
 """
 
 import asyncio
+from contextlib import redirect_stdout, suppress
+from dataclasses import asdict, is_dataclass
 import json
 import sys
 
 # enhanced_server emits warnings on import; keep them off stdout (stdout is
 # reserved for JSON-RPC only).
 _real_stdout = sys.stdout
-sys.stdout = sys.stderr
-from mcp.enhanced_server import create_enhanced_mcp_server, get_server_info  # noqa: E402
-sys.stdout = _real_stdout
+with redirect_stdout(sys.stderr):
+    from mcp.enhanced_server import create_enhanced_mcp_server, get_server_info
 
 PROTOCOL_VERSION = "2024-11-05"
 
@@ -48,10 +49,25 @@ def _error(req_id, code, message):
     _send({"jsonrpc": "2.0", "id": req_id, "error": {"code": code, "message": message}})
 
 
+def _jsonable(value):
+    """Normalize server result objects before serializing an MCP response."""
+    to_dict = getattr(value, "to_dict", None)
+    if callable(to_dict):
+        return to_dict()
+    if is_dataclass(value) and not isinstance(value, type):
+        return asdict(value)
+    return value
+
+
 async def handle(server, msg):
     method = msg.get("method")
     req_id = msg.get("id")
     is_notification = "id" not in msg
+
+    # JSON-RPC notifications never receive a response. tools/call still runs
+    # for its side effect, then discards the result below.
+    if is_notification and method != "tools/call":
+        return
 
     if method == "initialize":
         info = get_server_info()
@@ -77,16 +93,18 @@ async def handle(server, msg):
         name = params.get("name")
         arguments = params.get("arguments") or {}
         try:
-            out = await server.call_tool(name, dict(arguments))
+            with redirect_stdout(sys.stderr):
+                out = await server.call_tool(name, dict(arguments))
+            out = _jsonable(out)
             is_error = isinstance(out, dict) and out.get("success") is False
-            _result(req_id, {
-                "content": [{"type": "text", "text": json.dumps(out, indent=2, default=str)}],
-                "isError": bool(is_error),
-            })
+            if not is_notification:
+                _result(req_id, {
+                    "content": [{"type": "text", "text": json.dumps(out, indent=2, default=str)}],
+                    "isError": bool(is_error),
+                })
         except Exception as e:  # every error path is a code path
-            _error(req_id, -32603, f"tool execution failed: {e}")
-    elif is_notification:
-        pass  # ignore unknown notifications
+            if not is_notification:
+                _error(req_id, -32603, f"tool execution failed: {e}")
     else:
         _error(req_id, -32601, f"method not found: {method}")
 
@@ -110,7 +128,5 @@ async def main():
 
 
 if __name__ == "__main__":
-    try:
+    with suppress(KeyboardInterrupt):
         asyncio.run(main())
-    except KeyboardInterrupt:
-        pass
